@@ -155,80 +155,14 @@ export function parseYarnClassicDependencies(
   for (const json of parseJsonLines(stdout, logger)) {
     if (json.type === 'tree' && json.data?.trees) {
       for (const info of json.data.trees) {
-        const name = info.name.split('@')[0];
-        const version = info.name.split('@').pop();
+        const lastAtIndex = info.name.lastIndexOf('@');
+        const name = info.name.slice(0, lastAtIndex);
+        const version = info.name.slice(lastAtIndex + 1);
+
         dependencies.set(name, {
           name,
           version,
         });
-      }
-    }
-  }
-
-  logger?.debug(`  Found ${dependencies.size} dependencies.`);
-
-  return dependencies;
-}
-
-/**
- * Parses the output of `yarn list` (modern).
- *
- * The expected JSON structure is a single object.
- * Yarn modern does not provide a path, so the `path` property will be `undefined`.
- *
- * ```json
- * {
- *   "trees": [
- *     { "name": "@angular/cli@18.0.0", "children": [] }
- *   ]
- * }
- * ```
- *
- * @param stdout The standard output of the command.
- * @param logger An optional logger instance.
- * @returns A map of package names to their installed package details.
- */
-export function parseYarnModernDependencies(
-  stdout: string,
-  logger?: Logger,
-): Map<string, InstalledPackage> {
-  logger?.debug(`Parsing yarn modern dependency list...`);
-  logStdout(stdout, logger);
-
-  const dependencies = new Map<string, InstalledPackage>();
-  if (!stdout) {
-    logger?.debug('  stdout is empty. No dependencies found.');
-
-    return dependencies;
-  }
-
-  // Modern yarn `list` command outputs a single JSON object with a `trees` property.
-  // Each line is not a separate JSON object.
-  try {
-    const data = JSON.parse(stdout);
-    for (const info of data.trees) {
-      const name = info.name.split('@')[0];
-      const version = info.name.split('@').pop();
-      dependencies.set(name, {
-        name,
-        version,
-      });
-    }
-  } catch (e) {
-    logger?.debug(
-      `  Failed to parse as single JSON object: ${e}. Falling back to line-by-line parsing.`,
-    );
-    // Fallback for older versions of yarn berry that might still output json lines
-    for (const json of parseJsonLines(stdout, logger)) {
-      if (json.type === 'tree' && json.data?.trees) {
-        for (const info of json.data.trees) {
-          const name = info.name.split('@')[0];
-          const version = info.name.split('@').pop();
-          dependencies.set(name, {
-            name,
-            version,
-          });
-        }
       }
     }
   }
@@ -518,4 +452,114 @@ export function parseYarnClassicError(output: string, logger?: Logger): ErrorInf
   logger?.debug('  Failed to parse yarn classic error. No structured error found.');
 
   return null;
+}
+
+/**
+ * Parses the output of `bun pm ls`.
+ *
+ * Bun does not support JSON output for `pm ls`. The output is a tree structure:
+ * ```
+ * /path/to/project node_modules (1084)
+ * ├── @angular/core@20.3.15
+ * ├── rxjs @7.8.2
+ * └── zone.js @0.15.1
+ * ```
+ *
+ * @param stdout The standard output of the command.
+ * @param logger An optional logger instance.
+ * @returns A map of package names to their installed package details.
+ */
+export function parseBunDependencies(
+  stdout: string,
+  logger?: Logger,
+): Map<string, InstalledPackage> {
+  logger?.debug('Parsing Bun dependency list...');
+  logStdout(stdout, logger);
+
+  const dependencies = new Map<string, InstalledPackage>();
+  if (!stdout) {
+    return dependencies;
+  }
+
+  const lines = stdout.split('\n');
+  // Skip the first line (project info)
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      continue;
+    }
+
+    // Remove tree structure characters
+    const cleanLine = line.replace(/^[└├]──\s*/, '');
+
+    // Parse name and version
+    // Scoped: @angular/core@20.3.15
+    // Unscoped: rxjs @7.8.2
+    const match = cleanLine.match(/^(.+?)\s?@([^@\s]+)$/);
+    if (match) {
+      const name = match[1];
+      const version = match[2];
+      dependencies.set(name, { name, version });
+    }
+  }
+
+  logger?.debug(`  Found ${dependencies.size} dependencies.`);
+
+  return dependencies;
+}
+
+/**
+ * Parses the output of `yarn info --name-only --json`.
+ *
+ * The expected output is a JSON stream (JSONL) of strings.
+ * Each string represents a package locator.
+ *
+ * ```
+ * "karma@npm:6.4.4"
+ * "@angular/core@npm:20.3.15"
+ * ```
+ *
+ * @param stdout The standard output of the command.
+ * @param logger An optional logger instance.
+ * @returns A map of package names to their installed package details.
+ */
+export function parseYarnModernDependencies(
+  stdout: string,
+  logger?: Logger,
+): Map<string, InstalledPackage> {
+  logger?.debug('Parsing Yarn Berry dependency list...');
+  logStdout(stdout, logger);
+
+  const dependencies = new Map<string, InstalledPackage>();
+  if (!stdout) {
+    return dependencies;
+  }
+
+  for (const json of parseJsonLines(stdout, logger)) {
+    if (typeof json === 'string') {
+      const match = json.match(/^(@?[^@]+)@(.+)$/);
+      if (match) {
+        const name = match[1];
+        let version = match[2];
+
+        // Handle "npm:" prefix
+        if (version.startsWith('npm:')) {
+          version = version.slice(4);
+        }
+
+        // Handle complex locators with embedded version metadata (e.g., "patch:...", "virtual:...")
+        // Yarn Berry often appends metadata like "::version=x.y.z"
+        const versionParamMatch = version.match(/::version=([^&]+)/);
+        if (versionParamMatch) {
+          version = versionParamMatch[1];
+        }
+
+        dependencies.set(name, { name, version });
+      }
+    }
+  }
+
+  logger?.debug(`  Found ${dependencies.size} dependencies.`);
+
+  return dependencies;
 }
