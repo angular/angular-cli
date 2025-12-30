@@ -521,3 +521,57 @@ export function parseYarnClassicError(output: string, logger?: Logger): ErrorInf
 
   return null;
 }
+
+/**
+ * Parses the output of `bun pm ls`.
+ *
+ * Bun does not support JSON output for `pm ls`. The output is a tree structure:
+ * ```
+ * /path/to/project node_modules (1084)
+ * ├── @angular/core@20.3.15
+ * ├── rxjs @7.8.2
+ * └── zone.js @0.15.1
+ * ```
+ *
+ * @param stdout The standard output of the command.
+ * @param logger An optional logger instance.
+ * @returns A map of package names to their installed package details.
+ */
+export function parseBunDependencies(
+  stdout: string,
+  logger?: Logger,
+): Map<string, InstalledPackage> {
+  logger?.debug('Parsing Bun dependency list...');
+  logStdout(stdout, logger);
+
+  const dependencies = new Map<string, InstalledPackage>();
+  if (!stdout) {
+    return dependencies;
+  }
+
+  const lines = stdout.split('\n');
+  // Skip the first line (project info)
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) {
+      continue;
+    }
+
+    // Remove tree structure characters
+    const cleanLine = line.replace(/^[└├]──\s*/, '');
+
+    // Parse name and version
+    // Scoped: @angular/core@20.3.15
+    // Unscoped: rxjs @7.8.2
+    const match = cleanLine.match(/^(.+?)\s?@([^@\s]+)$/);
+    if (match) {
+      const name = match[1];
+      const version = match[2];
+      dependencies.set(name, { name, version });
+    }
+  }
+
+  logger?.debug(`  Found ${dependencies.size} dependencies.`);
+
+  return dependencies;
+}

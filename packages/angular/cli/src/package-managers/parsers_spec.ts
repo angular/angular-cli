@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { parseNpmLikeError, parseNpmLikeManifest, parseYarnClassicError } from './parsers';
+import {
+  parseBunDependencies,
+  parseNpmLikeError,
+  parseNpmLikeManifest,
+  parseYarnClassicError,
+} from './parsers';
 
 describe('parsers', () => {
   describe('parseNpmLikeError', () => {
@@ -126,6 +131,43 @@ describe('parsers', () => {
     it('should return null for unparsable stdout', () => {
       const error = parseYarnClassicError('A random error message.');
       expect(error).toBeNull();
+    });
+  });
+
+  describe('parseBunDependencies', () => {
+    it('should parse bun pm ls output', () => {
+      const stdout = `
+/tmp/angular-cli-e2e-PiL5n3/e2e-test/assets/19.0-project-1767113081927 node_modules (1084)
+├── @angular-devkit/build-angular@20.3.13
+├── @angular/cli@20.3.13
+├── jasmine-core @5.6.0
+├── rxjs @7.8.2
+└── zone.js @0.15.1
+`.trim();
+
+      const deps = parseBunDependencies(stdout);
+      expect(deps.size).toBe(5);
+      expect(deps.get('@angular-devkit/build-angular')).toEqual({
+        name: '@angular-devkit/build-angular',
+        version: '20.3.13',
+      });
+      expect(deps.get('@angular/cli')).toEqual({ name: '@angular/cli', version: '20.3.13' });
+      expect(deps.get('jasmine-core')).toEqual({ name: 'jasmine-core', version: '5.6.0' });
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2' });
+      expect(deps.get('zone.js')).toEqual({ name: 'zone.js', version: '0.15.1' });
+    });
+
+    it('should return empty map for empty stdout', () => {
+      expect(parseBunDependencies('').size).toBe(0);
+    });
+
+    it('should skip lines that do not match the pattern', () => {
+      const stdout = `
+project node_modules
+├── invalid-line
+└── another-invalid
+`.trim();
+      expect(parseBunDependencies(stdout).size).toBe(0);
     });
   });
 });
