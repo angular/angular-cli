@@ -17,6 +17,7 @@ import { Logger } from './logger';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
 import {
+  parseBunDependencies,
   parseNpmLikeDependencies,
   parseNpmLikeError,
   parseNpmLikeManifest,
@@ -241,10 +242,10 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     ignoreScriptsFlag: '--ignore-scripts',
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
-    listDependenciesCommand: ['pm', 'ls', '--json'],
+    listDependenciesCommand: ['pm', 'ls'],
     getManifestCommand: ['pm', 'view', '--json'],
     outputParsers: {
-      listDependencies: parseNpmLikeDependencies,
+      listDependencies: parseBunDependencies,
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
       getError: parseNpmLikeError,
