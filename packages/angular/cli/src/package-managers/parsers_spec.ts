@@ -11,6 +11,7 @@ import {
   parseNpmLikeError,
   parseNpmLikeManifest,
   parseYarnClassicError,
+  parseYarnModernDependencies,
 } from './parsers';
 
 describe('parsers', () => {
@@ -168,6 +169,40 @@ project node_modules
 └── another-invalid
 `.trim();
       expect(parseBunDependencies(stdout).size).toBe(0);
+    });
+  });
+
+  describe('parseYarnModernDependencies', () => {
+    it('should parse yarn info --name-only --json output', () => {
+      const stdout = `
+"karma@npm:6.4.4"
+"rxjs@npm:7.8.2"
+"tslib@npm:2.8.1"
+"typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
+`.trim();
+
+      const deps = parseYarnModernDependencies(stdout);
+      expect(deps.size).toBe(4);
+      expect(deps.get('karma')).toEqual({ name: 'karma', version: '6.4.4' });
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2' });
+      expect(deps.get('tslib')).toEqual({ name: 'tslib', version: '2.8.1' });
+      expect(deps.get('typescript')).toEqual({
+        name: 'typescript',
+        version: '5.9.3',
+      });
+    });
+
+    it('should handle scoped packages', () => {
+      const stdout = '"@angular/core@npm:20.3.15"';
+      const deps = parseYarnModernDependencies(stdout);
+      expect(deps.get('@angular/core')).toEqual({
+        name: '@angular/core',
+        version: '20.3.15',
+      });
+    });
+
+    it('should return empty map for empty stdout', () => {
+      expect(parseYarnModernDependencies('').size).toBe(0);
     });
   });
 });
