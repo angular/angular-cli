@@ -698,10 +698,8 @@ describe('Application Schematic', () => {
         workspaceTree,
       );
 
-      const content = tree.readContent('/projects/foo/src/main.ts');
-      expect(content).toContain(
-        'applicationProviders: [provideZoneChangeDetection({ eventCoalescing: true })]',
-      );
+      const content = tree.readContent('/projects/foo/src/app/app-module.ts');
+      expect(content).toContain('provideZoneChangeDetection({ eventCoalescing: true })');
     });
 
     it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, async () => {
@@ -892,6 +890,17 @@ describe('Application Schematic', () => {
     });
 
     describe('standalone: false', () => {
+      it('should add the provideZoneChangeDetection with event coalescing option by default with zone.js apps', async () => {
+        const options = {
+          ...defaultOptions,
+          standalone: false,
+          zoneless: false,
+          fileNameStyleGuide: '2016' as const,
+        };
+        const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+        const content = tree.readContent('/projects/foo/src/app/app.module.ts');
+        expect(content).toContain('provideZoneChangeDetection({ eventCoalescing: true })');
+      });
       it('should create a component with the correct template and style urls', async () => {
         const options = {
           ...defaultOptions,

@@ -422,7 +422,7 @@ describe('standalone utilities', () => {
       assertContains(content, `import { SOME_TOKEN } from '@my/module';`);
       assertContains(
         content,
-        `providers: [provideBrowserGlobalErrorListeners(),{ provide: SOME_TOKEN, useValue: 123 }]`,
+        `providers: [provideBrowserGlobalErrorListeners(),{ provide: SOME_TOKEN, useValue: 123 },]`,
       );
     });
 
