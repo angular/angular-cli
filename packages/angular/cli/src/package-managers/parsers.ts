@@ -155,8 +155,10 @@ export function parseYarnClassicDependencies(
   for (const json of parseJsonLines(stdout, logger)) {
     if (json.type === 'tree' && json.data?.trees) {
       for (const info of json.data.trees) {
-        const name = info.name.split('@')[0];
-        const version = info.name.split('@').pop();
+        const lastAtIndex = info.name.lastIndexOf('@');
+        const name = info.name.slice(0, lastAtIndex);
+        const version = info.name.slice(lastAtIndex + 1);
+
         dependencies.set(name, {
           name,
           version,
