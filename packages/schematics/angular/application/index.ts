@@ -136,6 +136,7 @@ export default function (options: ApplicationOptions): Rule {
             folderName,
             suffix,
             testRunner: options.testRunner,
+            tailwind: isTailwind
           }),
           move(appDir),
         ]),

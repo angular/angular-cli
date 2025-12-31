@@ -19,7 +19,7 @@
     --gray-900: oklch(19.37% 0.006 300.98);
     --gray-700: oklch(36.98% 0.014 302.71);
     --gray-400: oklch(70.9% 0.015 304.04);
-
+<% if (!tailwind) { %>
     --red-to-pink-to-purple-vertical-gradient: linear-gradient(
       180deg,
       var(--orange-red) 0%,
@@ -35,15 +35,15 @@
     );
 
     --pill-accent: var(--bright-blue);
-
+<% } %>
     font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
       Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
-      "Segoe UI Symbol";
+      "Segoe UI Symbol";<% if (!tailwind) { %>
     box-sizing: border-box;
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    -moz-osx-font-smoothing: grayscale;<% } %>
   }
-
+<% if (!tailwind) { %>
   h1 {
     font-size: 3.125rem;
     color: var(--gray-900);
@@ -180,16 +180,16 @@
       margin-block: 1.5rem;
     }
   }
-</style>
+<% } %></style>
 
-<main class="main">
-  <div class="content">
-    <div class="left-side">
+<main class="<% if (tailwind) { %>flex min-h-full w-full items-center justify-center p-4 antialiased<% } %><% else { %>main<% } %>">
+  <div class="<% if (tailwind) { %>flex  flex-col justify-around max-w-[700px] mb-12 size-max sm:w-full sm:gap-6 sm:flex-row<% } %><% else { %>content<% } %>">
+    <div class="<% if (tailwind) { %>flex flex-col<% } %><% else { %>left-side<% } %>">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 982 239"
         fill="none"
-        class="angular-logo"
+        class="<% if (tailwind) { %>max-w-[9.2rem]<% } %><% else { %>angular-logo<% } %>"
       >
         <g clip-path="url(#a)">
           <path
@@ -230,12 +230,12 @@
           <clipPath id="a"><path fill="#fff" d="M0 0h982v239H0z" /></clipPath>
         </defs>
       </svg>
-      <h1>Hello, {{ title() }}</h1>
-      <p>Congratulations! Your app is running. 🎉</p>
+      <h1 <% if (tailwind) { %>class="text-[3.125rem] font-medium leading-none tracking-[-0.125rem] text-[var(--gray-900)] mt-7"<% } %>>Hello, {{ title() }}</h1>
+      <p <% if (tailwind) { %>class="mt-6 text-[var(--gray-700)]"<% } %>>Congratulations! Your app is running. 🎉</p>
     </div>
-    <div class="divider" role="separator" aria-label="Divider"></div>
-    <div class="right-side">
-      <div class="pill-group">
+    <div class="<% if (tailwind) { %>m:bg-[linear-gradient(180deg,var(--orange-red)_0%,var(--vivid-pink)_50%,var(--electric-violet)_100%)] bg-[linear-gradient(90deg,var(--orange-red)_0%,var(--vivid-pink)_50%,var(--electric-violet)_100%)] sm:w-px mx-2 sm:h-auto h-px sm:w-px w-full sm:my-0 my-6<% } %><% else { %>divider<% } %>" role="separator" aria-label="Divider"></div>
+    <div class="<% if (tailwind) { %>flex flex-col<% } %><% else { %>right-side<% } %>">
+      <div class="<% if (tailwind) { %>flex flex-col items-start gap-5<% } %><% else { %>pill-group<% } %>">
         @for (item of [
           { title: 'Explore the Docs', link: 'https://angular.dev' },
           { title: 'Learn with Tutorials', link: 'https://angular.dev/tutorials' },
@@ -245,13 +245,14 @@
           { title: 'Angular DevTools', link: 'https://angular.dev/tools/devtools' },
         ]; track item.title) {
           <a
-            class="pill"
+            class="<% if (tailwind) { %>group inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition [--pill-accent:var(--bright-blue)] nth-[6n+1]:[--pill-accent:var(--bright-blue)] nth-[6n+2]:[--pill-accent:var(--electric-violet)] nth-[6n+3]:[--pill-accent:var(--french-violet)] nth-[6n+4]:[--pill-accent:var(--hot-red)] nth-[6n+5]:[--pill-accent:var(--hot-red)] nth-[6n+6]:[--pill-accent:var(--hot-red)] text-[var(--pill-accent)] bg-[color-mix(in_srgb,var(--pill-accent)_5%,transparent)] hover:bg-[color-mix(in_srgb,var(--pill-accent)_15%,transparent)]<% } %><% else { %>pill<% } %>"
             [href]="item.link"
             target="_blank"
             rel="noopener"
           >
             <span>{{ item.title }}</span>
             <svg
+              <% if (tailwind) { %>class="ml-1"<% } %>
               xmlns="http://www.w3.org/2000/svg"
               height="14"
               viewBox="0 -960 960 960"
@@ -265,14 +266,16 @@
           </a>
         }
       </div>
-      <div class="social-links">
+      <div class="<% if (tailwind) { %>mt-6 flex items-center gap-3<% } %><% else { %>social-links<% } %>">
         <a
+          <% if (tailwind) { %>class="group"<% } %>
           href="https://github.com/angular/angular"
           aria-label="Github"
           target="_blank"
           rel="noopener"
         >
           <svg
+            <% if (tailwind) { %>class="fill-[var(--gray-400)] group-hover:fill-[var(--gray-900)] transition"<% } %>
             width="25"
             height="24"
             viewBox="0 0 25 24"
@@ -286,12 +289,14 @@
           </svg>
         </a>
         <a
+          <% if (tailwind) { %>class="group"<% } %>
           href="https://x.com/angular"
           aria-label="X"
           target="_blank"
           rel="noopener"
         >
           <svg
+            <% if (tailwind) { %>class="fill-[var(--gray-400)] group-hover:fill-[var(--gray-900)] transition"<% } %>
             width="24"
             height="24"
             viewBox="0 0 24 24"
@@ -305,12 +310,14 @@
           </svg>
         </a>
         <a
+          <% if (tailwind) { %>class="group"<% } %>
           href="https://www.youtube.com/channel/UCbn1OgGei-DV7aSRo_HaAiw"
           aria-label="Youtube"
           target="_blank"
           rel="noopener"
         >
           <svg
+            <% if (tailwind) { %>class="fill-[var(--gray-400)] group-hover:fill-[var(--gray-900)] transition"<% } %>
             width="29"
             height="20"
             viewBox="0 0 29 20"
