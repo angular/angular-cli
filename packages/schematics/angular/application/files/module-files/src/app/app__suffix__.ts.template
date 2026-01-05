@@ -4,7 +4,8 @@ import { Component, signal } from '@angular/core';
   selector: '<%= selector %>',<% if(inlineTemplate) { %>
   template: `
     <h1>Hello, {{ title() }}</h1>
-
+    <p>Congratulations! Your app is running. 🎉</p>
+    
     <% if (routing) {
      %><router-outlet /><%
     } %>
