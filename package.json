@@ -102,7 +102,7 @@
     "eslint-plugin-import": "2.32.0",
     "express": "5.2.1",
     "fast-glob": "3.3.3",
-    "globals": "16.5.0",
+    "globals": "17.0.0",
     "http-proxy": "^1.18.1",
     "http-proxy-middleware": "3.0.5",
     "husky": "9.1.7",
