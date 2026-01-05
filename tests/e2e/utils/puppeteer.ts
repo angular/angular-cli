@@ -18,7 +18,7 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
     if (!url) {
       // Start serving and find address (1 - Webpack; 2 - Vite)
       const match = /(?:open your browser on|Local:)\s+(http:\/\/localhost:\d+\/)/;
-      const serveArgs = ['serve', '--port=0'];
+      const serveArgs = ['serve', '--port=0', '--no-watch', '--no-live-reload'];
       if (options.project) {
         serveArgs.push(options.project);
       }
