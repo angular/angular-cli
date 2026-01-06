@@ -176,13 +176,13 @@ function createDocSearchHandler({ logger }: McpToolContext) {
     const textContent: {
       type: 'text';
       text: string;
-      annotations?: { audience: string[]; priority: number };
+      annotations?: { audience: ('assistant' | 'user')[]; priority: number };
     }[] = [
       {
         type: 'text' as const,
         text: `Showing results for Angular v${finalSearchedVersion} documentation.`,
         annotations: {
-          audience: ['assistant'],
+          audience: ['assistant' as const],
           priority: 0.9,
         },
       },

@@ -211,7 +211,7 @@ function createBestPracticesHandler({ logger }: McpToolContext) {
           type: 'text' as const,
           text: content,
           annotations: {
-            audience: ['assistant'],
+            audience: ['assistant' as const],
             priority: 0.9,
             source,
           },
