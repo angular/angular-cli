@@ -85,7 +85,6 @@ const init: any = (config: any, emitter: any) => {
   });
 
   let lastCompilationHash: string | undefined;
-  let isFirstRun = true;
 
   return new Promise<void>((resolve) => {
     compiler.hooks.done.tap('karma', (stats) => {
@@ -115,14 +114,11 @@ const init: any = (config: any, emitter: any) => {
         emitter.refreshFiles();
       }
 
-      if (isFirstRun) {
-        // This is needed to block Karma from launching browsers before Webpack writes the assets in memory.
-        // See the below:
-        // https://github.com/karma-runner/karma-chrome-launcher/issues/154#issuecomment-986661937
-        // https://github.com/angular/angular-cli/issues/22495
-        isFirstRun = false;
-        resolve();
-      }
+      // This is needed to block Karma from launching browsers before Webpack writes the assets in memory.
+      // See the below:
+      // https://github.com/karma-runner/karma-chrome-launcher/issues/154#issuecomment-986661937
+      // https://github.com/angular/angular-cli/issues/22495
+      resolve();
     });
   });
 };
