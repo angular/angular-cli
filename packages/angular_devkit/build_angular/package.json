@@ -28,7 +28,7 @@
     "browserslist": "^4.26.0",
     "copy-webpack-plugin": "13.0.1",
     "css-loader": "7.1.2",
-    "esbuild-wasm": "0.27.1",
+    "esbuild-wasm": "0.27.2",
     "http-proxy-middleware": "3.0.5",
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
@@ -46,7 +46,7 @@
     "postcss-loader": "8.2.0",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.2",
-    "sass": "1.97.0",
+    "sass": "1.97.1",
     "sass-loader": "16.0.6",
     "semver": "7.7.3",
     "source-map-loader": "5.0.0",
@@ -55,21 +55,21 @@
     "tinyglobby": "0.2.15",
     "tree-kill": "1.2.2",
     "tslib": "2.8.1",
-    "webpack": "5.104.0",
+    "webpack": "5.104.1",
     "webpack-dev-middleware": "7.4.5",
     "webpack-dev-server": "5.2.2",
     "webpack-merge": "6.0.1",
     "webpack-subresource-integrity": "5.1.0"
   },
   "optionalDependencies": {
-    "esbuild": "0.27.1"
+    "esbuild": "0.27.2"
   },
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
     "ng-packagr": "21.1.0-next.0",
-    "undici": "7.16.0"
+    "undici": "7.18.0"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
