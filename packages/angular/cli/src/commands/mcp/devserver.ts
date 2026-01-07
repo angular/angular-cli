@@ -62,6 +62,16 @@ export interface Devserver {
    * `ng serve` port to use.
    */
   port: number;
+
+  /**
+   * The workspace path for this server.
+   */
+  workspacePath: string;
+
+  /**
+   * The project name for this server.
+   */
+  project: string;
 }
 
 /**
@@ -70,7 +80,8 @@ export interface Devserver {
 export class LocalDevserver implements Devserver {
   readonly host: Host;
   readonly port: number;
-  readonly project?: string;
+  readonly workspacePath: string;
+  readonly project: string;
 
   private devserverProcess: ChildProcess | null = null;
   private serverLogs: string[] = [];
@@ -78,10 +89,21 @@ export class LocalDevserver implements Devserver {
   private latestBuildLogStartIndex?: number = undefined;
   private latestBuildStatus: BuildStatus = 'unknown';
 
-  constructor({ host, port, project }: { host: Host; port: number; project?: string }) {
+  constructor({
+    host,
+    port,
+    workspacePath,
+    project,
+  }: {
+    host: Host;
+    port: number;
+    workspacePath: string;
+    project: string;
+  }) {
     this.host = host;
-    this.project = project;
     this.port = port;
+    this.workspacePath = workspacePath;
+    this.project = project;
   }
 
   start() {
@@ -96,7 +118,10 @@ export class LocalDevserver implements Devserver {
 
     args.push(`--port=${this.port}`);
 
-    this.devserverProcess = this.host.spawn('ng', args, { stdio: 'pipe' });
+    this.devserverProcess = this.host.spawn('ng', args, {
+      stdio: 'pipe',
+      cwd: this.workspacePath,
+    });
     this.devserverProcess.stdout?.on('data', (data) => {
       this.addLog(data.toString());
     });
@@ -141,4 +166,25 @@ export class LocalDevserver implements Devserver {
   isBuilding() {
     return this.buildInProgress;
   }
+}
+
+export function getDevserverKey(workspacePath: string, projectName: string): string {
+  return `${workspacePath}:${projectName}`;
+}
+
+export function createDevServerNotFoundError(
+  devservers: Map<string, { project: string; workspacePath: string }>,
+): Error {
+  if (devservers.size === 0) {
+    return new Error('No development servers are currently running.');
+  }
+
+  const runningServers = Array.from(devservers.values())
+    .map((server) => `- Project '${server.project}' in workspace path '${server.workspacePath}'`)
+    .join('\n');
+
+  return new Error(
+    `Dev server not found. Currently running servers:\n${runningServers}\n` +
+      'Please provide the correct workspace and project arguments.',
+  );
 }

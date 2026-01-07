@@ -7,16 +7,14 @@
  */
 
 import { z } from 'zod';
-import { createStructuredContentOutput, getDefaultProjectName } from '../../utils';
+import { createDevServerNotFoundError, getDevserverKey } from '../../devserver';
+import { workspaceAndProjectOptions } from '../../shared-options';
+import { createStructuredContentOutput } from '../../utils';
+import { resolveWorkspaceAndProject } from '../../workspace-utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const devserverStopToolInputSchema = z.object({
-  project: z
-    .string()
-    .optional()
-    .describe(
-      'Which project to stop serving in a monorepo context. If not provided, stops the default project server.',
-    ),
+  ...workspaceAndProjectOptions,
 });
 
 export type DevserverStopToolInput = z.infer<typeof devserverStopToolInputSchema>;
@@ -28,43 +26,26 @@ const devserverStopToolOutputSchema = z.object({
 
 export type DevserverStopToolOutput = z.infer<typeof devserverStopToolOutputSchema>;
 
-export function stopDevserver(input: DevserverStopToolInput, context: McpToolContext) {
-  if (context.devservers.size === 0) {
-    return createStructuredContentOutput({
-      message: ['No development servers are currently running.'],
-      logs: undefined,
-    });
+export async function stopDevserver(input: DevserverStopToolInput, context: McpToolContext) {
+  const { workspacePath, projectName } = await resolveWorkspaceAndProject({
+    host: context.host,
+    workspacePathInput: input.workspace,
+    projectNameInput: input.project,
+    mcpWorkspace: context.workspace,
+  });
+  const key = getDevserverKey(workspacePath, projectName);
+  const devserver = context.devservers.get(key);
+
+  if (!devserver) {
+    throw createDevServerNotFoundError(context.devservers);
   }
 
-  let projectName = input.project ?? getDefaultProjectName(context);
-
-  if (!projectName) {
-    // This should not happen. But if there's just a single running devserver, stop it.
-    if (context.devservers.size === 1) {
-      projectName = Array.from(context.devservers.keys())[0];
-    } else {
-      return createStructuredContentOutput({
-        message: ['Project name not provided, and no default project found.'],
-        logs: undefined,
-      });
-    }
-  }
-
-  const devServer = context.devservers.get(projectName);
-
-  if (!devServer) {
-    return createStructuredContentOutput({
-      message: `Development server for project '${projectName}' was not running.`,
-      logs: undefined,
-    });
-  }
-
-  devServer.stop();
-  context.devservers.delete(projectName);
+  devserver.stop();
+  context.devservers.delete(key);
 
   return createStructuredContentOutput({
     message: `Development server for project '${projectName}' stopped.`,
-    logs: devServer.getServerLogs(),
+    logs: devserver.getServerLogs(),
   });
 }
 

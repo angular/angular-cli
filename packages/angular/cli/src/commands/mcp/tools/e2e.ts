@@ -7,25 +7,17 @@
  */
 
 import { z } from 'zod';
-import { CommandError, type Host, LocalWorkspaceHost } from '../host';
-import {
-  createStructuredContentOutput,
-  getCommandErrorLogs,
-  getDefaultProjectName,
-  getProject,
-} from '../utils';
+import { type Host } from '../host';
+import { workspaceAndProjectOptions } from '../shared-options';
+import { createStructuredContentOutput, getCommandErrorLogs } from '../utils';
+import { resolveWorkspaceAndProject } from '../workspace-utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from './tool-registry';
 
 const e2eStatusSchema = z.enum(['success', 'failure']);
 type E2eStatus = z.infer<typeof e2eStatusSchema>;
 
 const e2eToolInputSchema = z.object({
-  project: z
-    .string()
-    .optional()
-    .describe(
-      'Which project to test in a monorepo context. If not provided, tests the default project.',
-    ),
+  ...workspaceAndProjectOptions,
 });
 
 export type E2eToolInput = z.infer<typeof e2eToolInputSchema>;
@@ -38,11 +30,16 @@ const e2eToolOutputSchema = z.object({
 export type E2eToolOutput = z.infer<typeof e2eToolOutputSchema>;
 
 export async function runE2e(input: E2eToolInput, host: Host, context: McpToolContext) {
-  const projectName = input.project ?? getDefaultProjectName(context);
+  const { workspacePath, workspace, projectName } = await resolveWorkspaceAndProject({
+    host,
+    workspacePathInput: input.workspace,
+    projectNameInput: input.project,
+    mcpWorkspace: context.workspace,
+  });
 
-  if (context.workspace && projectName) {
+  if (workspace && projectName) {
     // Verify that if a project can be found, it has an e2e testing already set up.
-    const targetProject = getProject(context, projectName);
+    const targetProject = workspace.projects.get(projectName);
     if (targetProject) {
       if (!targetProject.targets.has('e2e')) {
         return createStructuredContentOutput({
@@ -58,16 +55,13 @@ export async function runE2e(input: E2eToolInput, host: Host, context: McpToolCo
   }
 
   // Build "ng"'s command line.
-  const args = ['e2e'];
-  if (input.project) {
-    args.push(input.project);
-  }
+  const args = ['e2e', projectName];
 
   let status: E2eStatus = 'success';
   let logs: string[] = [];
 
   try {
-    logs = (await host.runCommand('ng', args)).logs;
+    logs = (await host.runCommand('ng', args, { cwd: workspacePath })).logs;
   } catch (e) {
     status = 'failure';
     logs = getCommandErrorLogs(e);
@@ -104,5 +98,5 @@ Perform an end-to-end test with ng e2e.
   isLocalOnly: true,
   inputSchema: e2eToolInputSchema.shape,
   outputSchema: e2eToolOutputSchema.shape,
-  factory: (context) => (input) => runE2e(input, LocalWorkspaceHost, context),
+  factory: (context) => (input) => runE2e(input, context.host, context),
 });
