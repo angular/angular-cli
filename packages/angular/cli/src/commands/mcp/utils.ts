@@ -13,7 +13,8 @@
 
 import { workspaces } from '@angular-devkit/core';
 import { dirname, join } from 'node:path';
-import { CommandError, LocalWorkspaceHost } from './host';
+import { AngularWorkspace } from '../../utilities/config';
+import { CommandError, type Host, LocalWorkspaceHost } from './host';
 import { McpToolContext } from './tools/tool-registry';
 
 /**
@@ -76,14 +77,14 @@ export function getProject(
  * If no default project is defined but there's only a single project in the workspace, its name will
  * be returned.
  */
-export function getDefaultProjectName(context: McpToolContext): string | undefined {
-  const projects = context.workspace?.projects;
+export function getDefaultProjectName(workspace: AngularWorkspace | undefined): string | undefined {
+  const projects = workspace?.projects;
 
   if (!projects) {
     return undefined;
   }
 
-  const defaultProjectName = context.workspace?.extensions['defaultProject'] as string | undefined;
+  const defaultProjectName = workspace?.extensions['defaultProject'] as string | undefined;
   if (defaultProjectName) {
     return defaultProjectName;
   }
@@ -109,4 +110,140 @@ export function getCommandErrorLogs(e: unknown): string[] {
   } else {
     return [String(e)];
   }
+}
+
+export function createWorkspaceNotFoundError(): Error {
+  return new Error(
+    'Could not find an Angular workspace (angular.json) in the current directory. ' +
+      "You can use 'list_projects' to find available workspaces.",
+  );
+}
+
+export function createWorkspacePathDoesNotExistError(path: string): Error {
+  return new Error(
+    `Workspace path does not exist: ${path}. ` +
+      "You can use 'list_projects' to find available workspaces.",
+  );
+}
+
+export function createNoAngularJsonFoundError(path: string): Error {
+  return new Error(
+    `No angular.json found at ${path}. ` +
+      "You can use 'list_projects' to find available workspaces.",
+  );
+}
+
+export function createProjectNotFoundError(projectName: string, workspacePath: string): Error {
+  return new Error(
+    `Project '${projectName}' not found in workspace path ${workspacePath}. ` +
+      "You can use 'list_projects' to find available projects.",
+  );
+}
+
+export function createNoProjectResolvedError(workspacePath: string): Error {
+  return new Error(
+    `No project name provided and no default project found in workspace path ${workspacePath}. ` +
+      'Please provide a project name or set a default project in angular.json. ' +
+      "You can use 'list_projects' to find available projects.",
+  );
+}
+
+export function createDevServerNotFoundError(
+  devservers: Map<string, { project: string; workspacePath: string }>,
+): Error {
+  if (devservers.size === 0) {
+    return new Error('No development servers are currently running.');
+  }
+
+  const runningServers = Array.from(devservers.values())
+    .map((server) => `- Project '${server.project}' in workspace path '${server.workspacePath}'`)
+    .join('\n');
+
+  return new Error(
+    `Dev server not found. Currently running servers:\n${runningServers}\n` +
+      'Please provide the correct workspace and project arguments.',
+  );
+}
+
+/**
+ * Resolves workspace and project for tools to operate on.
+ *
+ * If `workspacePathInput` is absent, uses the MCP's configured workspace. If none is configured, use the
+ * current directory as the workspace.
+ * If `projectNameInput` is absent, uses the default project in the workspace.
+ */
+export async function resolveWorkspaceAndProject({
+  host,
+  workspacePathInput,
+  projectNameInput,
+  mcpWorkspace,
+  workspaceLoader = AngularWorkspace.load,
+}: {
+  host: Host;
+  workspacePathInput?: string;
+  projectNameInput?: string;
+  mcpWorkspace?: AngularWorkspace;
+  workspaceLoader?: (path: string) => Promise<AngularWorkspace>;
+}): Promise<{
+  workspace: AngularWorkspace;
+  workspacePath: string;
+  projectName: string;
+}> {
+  let workspacePath: string;
+  let workspace: AngularWorkspace;
+
+  if (workspacePathInput) {
+    if (!host.existsSync(workspacePathInput)) {
+      throw createWorkspacePathDoesNotExistError(workspacePathInput);
+    }
+    if (!host.existsSync(join(workspacePathInput, 'angular.json'))) {
+      throw createNoAngularJsonFoundError(workspacePathInput);
+    }
+    workspacePath = workspacePathInput;
+    const configPath = join(workspacePath, 'angular.json');
+    try {
+      workspace = await workspaceLoader(configPath);
+    } catch (e) {
+      throw new Error(
+        `Failed to load workspace configuration at ${configPath}: ${
+          e instanceof Error ? e.message : e
+        }`,
+      );
+    }
+  } else if (mcpWorkspace) {
+    workspace = mcpWorkspace;
+    workspacePath = workspace.basePath;
+  } else {
+    const found = findAngularJsonDir(process.cwd(), host);
+
+    if (!found) {
+      throw createWorkspaceNotFoundError();
+    }
+    workspacePath = found;
+    const configPath = join(workspacePath, 'angular.json');
+    try {
+      workspace = await workspaceLoader(configPath);
+    } catch (e) {
+      throw new Error(
+        `Failed to load workspace configuration at ${configPath}: ${
+          e instanceof Error ? e.message : e
+        }`,
+      );
+    }
+  }
+
+  let projectName = projectNameInput;
+  if (projectName) {
+    if (!workspace.projects.has(projectName)) {
+      throw createProjectNotFoundError(projectName, workspacePath);
+    }
+  } else {
+    projectName = getDefaultProjectName(workspace);
+  }
+
+  if (!projectName) {
+    throw createNoProjectResolvedError(workspacePath);
+  }
+
+  return { workspace, workspacePath, projectName };
 }

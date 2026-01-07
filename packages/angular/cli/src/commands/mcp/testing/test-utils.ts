@@ -42,6 +42,13 @@ export interface MockContextOptions {
 }
 
 /**
+ * Same as McpToolContext, just with guaranteed nonnull workspace.
+ */
+export interface MockMcpToolContext extends McpToolContext {
+  workspace: AngularWorkspace;
+}
+
+/**
  * Creates a comprehensive mock for the McpToolContext, including a mock Host,
  * an AngularWorkspace, and a ProjectDefinitionCollection. This simplifies testing
  * MCP tools by providing a consistent and configurable testing environment.
@@ -50,15 +57,14 @@ export interface MockContextOptions {
  */
 export function createMockContext(options: MockContextOptions = {}): {
   host: MockHost;
-  context: McpToolContext;
+  context: MockMcpToolContext;
   projects: workspaces.ProjectDefinitionCollection;
-  workspace: AngularWorkspace;
 } {
   const host = options.host ?? createMockHost();
   const projects = new workspaces.ProjectDefinitionCollection(options.projects);
   const workspace = new AngularWorkspace({ projects, extensions: {} }, '/test/angular.json');
 
-  const context: McpToolContext = {
+  const context: MockMcpToolContext = {
     server: {} as unknown as McpServer,
     workspace,
     logger: { warn: () => {} },
@@ -66,7 +72,7 @@ export function createMockContext(options: MockContextOptions = {}): {
     host,
   };
 
-  return { host, context, projects, workspace };
+  return { host, context, projects };
 }
 
 /**
