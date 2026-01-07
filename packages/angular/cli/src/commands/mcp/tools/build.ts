@@ -7,9 +7,10 @@
  */
 
 import { z } from 'zod';
-import { CommandError, type Host } from '../host';
+import { workspaceAndProjectOptions } from '../shared-options';
 import { createStructuredContentOutput, getCommandErrorLogs } from '../utils';
-import { type McpToolDeclaration, declareTool } from './tool-registry';
+import { resolveWorkspaceAndProject } from '../workspace-utils';
+import { type McpToolContext, type McpToolDeclaration, declareTool } from './tool-registry';
 
 const DEFAULT_CONFIGURATION = 'development';
 
@@ -17,12 +18,7 @@ const buildStatusSchema = z.enum(['success', 'failure']);
 type BuildStatus = z.infer<typeof buildStatusSchema>;
 
 const buildToolInputSchema = z.object({
-  project: z
-    .string()
-    .optional()
-    .describe(
-      'Which project to build in a monorepo context. If not provided, builds the default project.',
-    ),
+  ...workspaceAndProjectOptions,
   configuration: z
     .string()
     .optional()
@@ -39,20 +35,23 @@ const buildToolOutputSchema = z.object({
 
 export type BuildToolOutput = z.infer<typeof buildToolOutputSchema>;
 
-export async function runBuild(input: BuildToolInput, host: Host) {
+export async function runBuild(input: BuildToolInput, context: McpToolContext) {
+  const { workspacePath, projectName } = await resolveWorkspaceAndProject({
+    host: context.host,
+    workspacePathInput: input.workspace,
+    projectNameInput: input.project,
+    mcpWorkspace: context.workspace,
+  });
+
   // Build "ng"'s command line.
-  const args = ['build'];
-  if (input.project) {
-    args.push(input.project);
-  }
-  args.push('-c', input.configuration ?? DEFAULT_CONFIGURATION);
+  const args = ['build', projectName, '-c', input.configuration ?? DEFAULT_CONFIGURATION];
 
   let status: BuildStatus = 'success';
   let logs: string[] = [];
   let outputPath: string | undefined;
 
   try {
-    logs = (await host.runCommand('ng', args)).logs;
+    logs = (await context.host.runCommand('ng', args, { cwd: workspacePath })).logs;
   } catch (e) {
     status = 'failure';
     logs = getCommandErrorLogs(e);
@@ -101,5 +100,5 @@ Perform a one-off, non-watched build using "ng build". Use this tool whenever th
   isLocalOnly: true,
   inputSchema: buildToolInputSchema.shape,
   outputSchema: buildToolOutputSchema.shape,
-  factory: (context) => (input) => runBuild(input, context.host),
+  factory: (context) => (input) => runBuild(input, context),
 });

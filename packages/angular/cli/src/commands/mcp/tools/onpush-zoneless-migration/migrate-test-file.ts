@@ -10,7 +10,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { glob } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import type { SourceFile } from 'typescript';
-import { findAngularJsonDir } from '../../utils';
+import { findAngularJsonDir } from '../../workspace-utils';
 import { createFixResponseForZoneTests, createProvideZonelessForTestsSetupPrompt } from './prompts';
 import { loadTypescript } from './ts-utils';
 import { MigrationResponse } from './types';

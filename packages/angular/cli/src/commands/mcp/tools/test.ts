@@ -7,18 +7,16 @@
  */
 
 import { z } from 'zod';
-import { CommandError, type Host, LocalWorkspaceHost } from '../host';
+import { workspaceAndProjectOptions } from '../shared-options';
 import { createStructuredContentOutput, getCommandErrorLogs } from '../utils';
-import { type McpToolDeclaration, declareTool } from './tool-registry';
+import { resolveWorkspaceAndProject } from '../workspace-utils';
+import { type McpToolContext, type McpToolDeclaration, declareTool } from './tool-registry';
 
 const testStatusSchema = z.enum(['success', 'failure']);
 type TestStatus = z.infer<typeof testStatusSchema>;
 
 const testToolInputSchema = z.object({
-  project: z
-    .string()
-    .optional()
-    .describe('Which project to test in a monorepo context. If not provided, tests all projects.'),
+  ...workspaceAndProjectOptions,
   filter: z.string().optional().describe('Filter the executed tests by spec name.'),
 });
 
@@ -31,12 +29,16 @@ const testToolOutputSchema = z.object({
 
 export type TestToolOutput = z.infer<typeof testToolOutputSchema>;
 
-export async function runTest(input: TestToolInput, host: Host) {
+export async function runTest(input: TestToolInput, context: McpToolContext) {
+  const { workspacePath, projectName } = await resolveWorkspaceAndProject({
+    host: context.host,
+    workspacePathInput: input.workspace,
+    projectNameInput: input.project,
+    mcpWorkspace: context.workspace,
+  });
+
   // Build "ng"'s command line.
-  const args = ['test'];
-  if (input.project) {
-    args.push(input.project);
-  }
+  const args = ['test', projectName];
 
   // This is ran by the agent so we want a non-watched, headless test.
   args.push('--browsers', 'ChromeHeadless');
@@ -50,7 +52,7 @@ export async function runTest(input: TestToolInput, host: Host) {
   let logs: string[] = [];
 
   try {
-    logs = (await host.runCommand('ng', args)).logs;
+    logs = (await context.host.runCommand('ng', args, { cwd: workspacePath })).logs;
   } catch (e) {
     status = 'failure';
     logs = getCommandErrorLogs(e);
@@ -88,5 +90,5 @@ Perform a one-off, non-watched unit test execution with ng test.
   isLocalOnly: true,
   inputSchema: testToolInputSchema.shape,
   outputSchema: testToolOutputSchema.shape,
-  factory: () => (input) => runTest(input, LocalWorkspaceHost),
+  factory: (context) => (input) => runTest(input, context),
 });

@@ -7,17 +7,14 @@
  */
 
 import { z } from 'zod';
-import { LocalDevserver } from '../../devserver';
-import { createStructuredContentOutput, getDefaultProjectName } from '../../utils';
+import { LocalDevserver, getDevserverKey } from '../../devserver';
+import { workspaceAndProjectOptions } from '../../shared-options';
+import { createStructuredContentOutput } from '../../utils';
+import { resolveWorkspaceAndProject } from '../../workspace-utils';
 import { type McpToolContext, type McpToolDeclaration, declareTool } from '../tool-registry';
 
 const devserverStartToolInputSchema = z.object({
-  project: z
-    .string()
-    .optional()
-    .describe(
-      'Which project to serve in a monorepo context. If not provided, serves the default project.',
-    ),
+  ...workspaceAndProjectOptions,
 });
 
 export type DevserverStartToolInput = z.infer<typeof devserverStartToolInputSchema>;
@@ -39,15 +36,16 @@ function localhostAddress(port: number) {
 }
 
 export async function startDevserver(input: DevserverStartToolInput, context: McpToolContext) {
-  const projectName = input.project ?? getDefaultProjectName(context);
+  const { workspacePath, projectName } = await resolveWorkspaceAndProject({
+    host: context.host,
+    workspacePathInput: input.workspace,
+    projectNameInput: input.project,
+    mcpWorkspace: context.workspace,
+  });
 
-  if (!projectName) {
-    return createStructuredContentOutput({
-      message: ['Project name not provided, and no default project found.'],
-    });
-  }
+  const key = getDevserverKey(workspacePath, projectName);
 
-  let devserver = context.devservers.get(projectName);
+  let devserver = context.devservers.get(key);
   if (devserver) {
     return createStructuredContentOutput({
       message: `Development server for project '${projectName}' is already running.`,
@@ -57,10 +55,15 @@ export async function startDevserver(input: DevserverStartToolInput, context: Mc
 
   const port = await context.host.getAvailablePort();
 
-  devserver = new LocalDevserver({ host: context.host, project: input.project, port });
+  devserver = new LocalDevserver({
+    host: context.host,
+    project: projectName,
+    port,
+    workspacePath,
+  });
   devserver.start();
 
-  context.devservers.set(projectName, devserver);
+  context.devservers.set(key, devserver);
 
   return createStructuredContentOutput({
     message: `Development server for project '${projectName}' started and watching for workspace changes.`,
