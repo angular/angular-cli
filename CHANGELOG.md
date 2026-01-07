@@ -1,3 +1,30 @@
+<a name="21.0.5"></a>
+
+# 21.0.5 (2026-01-07)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [249563749](https://github.com/angular/angular-cli/commit/24956374941f3753a24470bfdafaf6d3645a3ddb) | fix  | use narrower types for new MCP TS SDK compatibility |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------- |
+| [cbd0718b9](https://github.com/angular/angular-cli/commit/cbd0718b93c0d51331af772f578b6e0dc3dfbe9e) | fix  | move 'provideZoneChangeDetection' to the root module                                    |
+| [33f7cf761](https://github.com/angular/angular-cli/commit/33f7cf761aa222e1754e039533831c729895e5e6) | fix  | update application schematics for module-based apps to use 'provideZoneChangeDetection' |
+| [37b14d1f7](https://github.com/angular/angular-cli/commit/37b14d1f7b18a607ada3e9a113c16f5e8a7669ef) | fix  | update default app component message                                                    |
+| [c37dccb09](https://github.com/angular/angular-cli/commit/c37dccb093f7b48027fac27bd78abe7f3e3e15ad) | fix  | update default app component welcome message                                            |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [2b9be3a7c](https://github.com/angular/angular-cli/commit/2b9be3a7cadc444e67d629c2a74c54f0c65f4a54) | fix  | ensure correct project targeting during Vitest debugging |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.4"></a>
 
 # 21.0.4 (2025-12-18)
