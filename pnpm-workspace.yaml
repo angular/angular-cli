@@ -22,6 +22,7 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@angular-devkit/*'
   - '@angular/*'
+  - '@modelcontextprotocol/sdk@1.25.2' # Fix: https://www.cve.org/CVERecord?id=CVE-2026-0621
   - '@ngtools/webpack'
   - '@schematics/*'
   - 'ng-packagr'
