@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { BuilderOutput } from '@angular-devkit/architect';
+import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
-import path, { join } from 'node:path';
+import path from 'node:path';
 import type { Vitest } from 'vitest/node';
 import {
   DevServerExternalResultMetadata,
@@ -32,6 +32,7 @@ export class VitestExecutor implements TestExecutor {
   private normalizePath: ((id: string) => string) | undefined;
   private readonly projectName: string;
   private readonly options: NormalizedUnitTestBuilderOptions;
+  private readonly logger: BuilderContext['logger'];
   private readonly buildResultFiles = new Map<string, ResultFile>();
   private readonly externalMetadata: DevServerExternalResultMetadata = {
     implicitBrowser: [],
@@ -51,9 +52,11 @@ export class VitestExecutor implements TestExecutor {
     projectName: string,
     options: NormalizedUnitTestBuilderOptions,
     testEntryPointMappings: Map<string, string> | undefined,
+    logger: BuilderContext['logger'],
   ) {
     this.projectName = projectName;
     this.options = options;
+    this.logger = logger;
 
     if (testEntryPointMappings) {
       for (const [entryPoint, testFile] of testEntryPointMappings) {
@@ -209,13 +212,26 @@ export class VitestExecutor implements TestExecutor {
         ? await findVitestBaseConfig([projectRoot, workspaceRoot])
         : runnerConfig;
 
+    let project = projectName;
+    if (debug && browserOptions.browser?.instances) {
+      if (browserOptions.browser.instances.length > 1) {
+        this.logger.warn(
+          'Multiple browsers are configured, but only the first browser will be used for debugging.',
+        );
+      }
+
+      // When running browser tests, Vitest appends the browser name to the project identifier.
+      // The project name must match this augmented name to ensure the correct project is targeted.
+      project = `${projectName} (${browserOptions.browser.instances[0].browser})`;
+    }
+
     return startVitest(
       'test',
       undefined,
       {
         config: externalConfigPath,
         root: workspaceRoot,
-        project: projectName,
+        project,
         outputFile,
         cache: cacheOptions.enabled ? undefined : false,
         testNamePattern: this.options.filter,
