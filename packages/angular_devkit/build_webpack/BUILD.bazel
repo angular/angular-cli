@@ -90,6 +90,10 @@ jasmine_test(
         "//:node_modules/typescript",
         "//:node_modules/zone.js",
     ],
+    env = {
+        # Force IPv4 to resolve RBE resolution issues
+        "NODE_OPTIONS": "--dns-result-order=ipv4first",
+    },
 )
 
 genrule(
