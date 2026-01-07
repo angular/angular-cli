@@ -67,7 +67,7 @@ const VitestTestRunner: TestRunner = {
       context.logger.info('Automatically searching for and using Vitest configuration file.');
     }
 
-    return new VitestExecutor(projectName, options, testEntryPointMappings);
+    return new VitestExecutor(projectName, options, testEntryPointMappings, context.logger);
   },
 };
 
