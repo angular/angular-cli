@@ -17,6 +17,7 @@ import { RunnerOptions } from '../api';
 function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
+  teardown: boolean,
   polyfills: string[] = [],
 ): string {
   const usesZoneJS = polyfills.includes('zone.js');
@@ -58,6 +59,7 @@ function createTestBedInitVirtualFile(
       getTestBed().initTestEnvironment([BrowserTestingModule, TestModule], platformBrowserTesting(), {
         errorOnUnknownElements: true,
         errorOnUnknownProperties: true,
+        ${teardown === false ? 'teardown: { destroyAfterEach: false },' : ''}
       });
     }
   `;
@@ -133,6 +135,7 @@ export async function getVitestBuildOptions(
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,
     projectSourceRoot,
+    !options.debug,
     buildOptions.polyfills,
   );
 
