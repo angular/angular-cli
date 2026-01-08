@@ -1,3 +1,39 @@
+<a name="21.1.0-rc.0"></a>
+
+# 21.1.0-rc.0 (2026-01-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [772e6efe7](https://github.com/angular/angular-cli/commit/772e6efe7acb2d2318a57ba77092a85fc286c51b) | feat | add 'test' and 'e2e' MCP tools                         |
+| [8efb86318](https://github.com/angular/angular-cli/commit/8efb8631842401e219e20dd7955512d4a90a28a3) | feat | Add "all" as an experimental tool group                |
+| [316fca862](https://github.com/angular/angular-cli/commit/316fca8626d51b28ea8cd840f3815b7c6dfcfffa) | fix  | handle array output from npm view in manifest parser   |
+| [1ad773671](https://github.com/angular/angular-cli/commit/1ad773671afa2849a966f9974cb30e7c8e8ed7d4) | fix  | update dependency @modelcontextprotocol/sdk to v1.25.2 |
+| [45d4f5668](https://github.com/angular/angular-cli/commit/45d4f5668018362f90fcc4cdc487470286f03c02) | fix  | update yarn berry package manager configuration        |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------- |
+| [9006ec057](https://github.com/angular/angular-cli/commit/9006ec057ced126f1c7822ffd36adee7748819ed) | fix  | move 'provideZoneChangeDetection' to the root module                                    |
+| [42d4febf4](https://github.com/angular/angular-cli/commit/42d4febf4698ac33f9aa5a2d2d6183adca34f7b5) | fix  | update application schematics for module-based apps to use 'provideZoneChangeDetection' |
+| [5dfc0eea0](https://github.com/angular/angular-cli/commit/5dfc0eea03c1faecd636fac775b0f5bc5f0ed430) | fix  | update default app component message                                                    |
+| [424a465df](https://github.com/angular/angular-cli/commit/424a465df7fa131803de4184f787ad9573a65090) | fix  | update default app component welcome message                                            |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [1eda0a99f](https://github.com/angular/angular-cli/commit/1eda0a99f89f625f8db1ecfe4873a7672e625401) | feat | directly support ng-packagr in unit-test builder                     |
+| [87175f9dc](https://github.com/angular/angular-cli/commit/87175f9dcdb7349dc8701fa1d5cf61c1b8542d42) | feat | disable TestBed teardown during debugging in Vitest                  |
+| [32adc3a75](https://github.com/angular/angular-cli/commit/32adc3a757a1e75cf8d44a227c57f7947053ca8c) | fix  | ensure correct project targeting during Vitest debugging             |
+| [1e39c77a4](https://github.com/angular/angular-cli/commit/1e39c77a4fe272ccab1a1d8bd58eef1ce608a6c7) | fix  | inject source-map-support for Vitest browser tests                   |
+| [3fd7dcd76](https://github.com/angular/angular-cli/commit/3fd7dcd764be0d0afb9cd792d53268d6f314df83) | fix  | normalize roots to POSIX in test discovery for Windows compatibility |
+| [164e7dbbc](https://github.com/angular/angular-cli/commit/164e7dbbc2b06bbd5aab84937c903e0590591c60) | fix  | resolve test files correctly on Windows when using non-C drives      |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.5"></a>
 
 # 21.0.5 (2026-01-07)
