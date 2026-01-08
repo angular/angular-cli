@@ -26,6 +26,11 @@
     "ts-node": "~10.9.0",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8",
+    "@vitest/browser-playwright": "^4.0.8",
+    "@vitest/browser-webdriverio": "^4.0.8",
+    "@vitest/browser-preview": "^4.0.8",
+    "playwright": "^1.48.0",
+    "webdriverio": "^9.0.0",
     "zone.js": "~0.16.0"
   }
 }
