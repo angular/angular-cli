@@ -10,7 +10,7 @@ import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
 import semver, { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
@@ -33,6 +33,7 @@ import {
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
+import { getCacheConfig } from '../cache/utilities';
 
 class CommandError extends Error {}
 
@@ -298,10 +299,32 @@ export default class AddCommandModule
     context: AddCommandTaskContext,
     task: AddCommandTaskWrapper,
   ): Promise<void> {
+    let tempDirectory: string | undefined;
+    const tempOptions = ['node_modules'];
+
+    const cacheConfig = getCacheConfig(this.context.workspace);
+    if (cacheConfig.enabled) {
+      const cachePath = resolve(this.context.root, cacheConfig.path);
+      if (!relative(this.context.root, cachePath).startsWith('..')) {
+        tempOptions.push(cachePath);
+      }
+    }
+
+    for (const tempOption of tempOptions) {
+      try {
+        const directory = resolve(this.context.root, tempOption);
+        if ((await fs.stat(directory)).isDirectory()) {
+          tempDirectory = directory;
+          break;
+        }
+      } catch {}
+    }
+
     context.packageManager = await createPackageManager({
       cwd: this.context.root,
       logger: this.context.logger,
       dryRun: context.dryRun,
+      tempDirectory,
     });
     task.output = `Using package manager: ${color.dim(context.packageManager.name)}`;
   }
