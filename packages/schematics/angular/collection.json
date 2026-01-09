@@ -149,6 +149,13 @@
       "schema": "./refactor/jasmine-vitest/schema.json",
       "description": "[EXPERIMENTAL] Refactors Jasmine tests to use Vitest APIs.",
       "hidden": true
+    },
+    "vitest-browser": {
+      "factory": "./vitest-browser",
+      "schema": "./vitest-browser/schema.json",
+      "hidden": true,
+      "private": true,
+      "description": "[INTERNAL] Adds a Vitest browser provider to a project. Intended for use for ng add."
     }
   }
 }

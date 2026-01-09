@@ -47,6 +47,7 @@ WEBPACK_IGNORE_TESTS = [
     "tests/build/app-shell/**",
     "tests/i18n/ivy-localize-app-shell.js",
     "tests/i18n/ivy-localize-app-shell-service-worker.js",
+    "tests/commands/add/add-vitest-browser.js",
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/build/styles/sass-pkg-importer.js",
     "tests/build/prerender/http-requests-assets.js",

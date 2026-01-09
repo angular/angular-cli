@@ -84,6 +84,18 @@ const BUILT_IN_SCHEMATICS = {
     collection: '@schematics/angular',
     name: 'tailwind',
   },
+  '@vitest/browser-playwright': {
+    collection: '@schematics/angular',
+    name: 'vitest-browser',
+  },
+  '@vitest/browser-webdriverio': {
+    collection: '@schematics/angular',
+    name: 'vitest-browser',
+  },
+  '@vitest/browser-preview': {
+    collection: '@schematics/angular',
+    name: 'vitest-browser',
+  },
 } as const;
 
 export default class AddCommandModule
@@ -260,6 +272,7 @@ export default class AddCommandModule
               ...options,
               collection: builtInSchematic.collection,
               schematicName: builtInSchematic.name,
+              package: packageName,
             });
           }
         }
