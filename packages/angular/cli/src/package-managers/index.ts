@@ -9,5 +9,6 @@
 export { createPackageManager } from './factory';
 export type { PackageManagerName } from './package-manager-descriptor';
 export { PackageManager } from './package-manager';
+export { PackageManagerError } from './error';
 export type * from './package-metadata';
 export type { InstalledPackage } from './package-tree';
