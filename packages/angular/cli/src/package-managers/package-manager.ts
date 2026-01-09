@@ -544,6 +544,18 @@ export class PackageManager {
     specifier: string,
     options: { registry?: string; ignoreScripts?: boolean } = {},
   ): Promise<{ workingDirectory: string; cleanup: () => Promise<void> }> {
+    if (this.descriptor.tempPackageStrategy === 'project-root') {
+      const flags = [
+        options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
+        this.descriptor.noSaveFlag,
+      ].filter((flag): flag is string => !!flag);
+      const args = [this.descriptor.addCommand, specifier, ...flags];
+
+      await this.#run(args, { ...options, cwd: this.cwd });
+
+      return { workingDirectory: this.cwd, cleanup: async () => {} };
+    }
+
     const workingDirectory = await this.host.createTempDirectory(this.options.tempDirectory);
     const cleanup = () => this.host.deleteDirectory(workingDirectory);
 

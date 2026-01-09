@@ -65,6 +65,16 @@ export interface PackageManagerDescriptor {
   /** The flag to ignore peer dependency warnings/errors. */
   readonly ignorePeerDependenciesFlag?: string;
 
+  /**
+   * The strategy to use when acquiring a temporary package.
+   * - `temporary-directory`: The package is installed in a separate temporary directory. (Default)
+   * - `project-root`: The package is installed in the project root (e.g. `node_modules`), but not saved to `package.json`.
+   */
+  readonly tempPackageStrategy?: 'temporary-directory' | 'project-root';
+
+  /** The flag to install a package without saving it to `package.json`. Used with `project-root` strategy. */
+  readonly noSaveFlag?: string;
+
   /** A function that returns the arguments and environment variables to use a custom registry. */
   readonly getRegistryOptions?: (registry: string) => {
     args?: string[];
@@ -141,6 +151,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveExactFlag: '--save-exact',
     saveTildeFlag: '--save-tilde',
     saveDevFlag: '--save-dev',
+    noSaveFlag: '--no-save',
     noLockfileFlag: '--no-package-lock',
     ignoreScriptsFlag: '--ignore-scripts',
     ignorePeerDependenciesFlag: '--force',
@@ -242,6 +253,8 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveExactFlag: '--exact',
     saveTildeFlag: '', // Bun does not have a flag for tilde, it defaults to caret.
     saveDevFlag: '--development',
+    noSaveFlag: '--no-save',
+    tempPackageStrategy: 'project-root',
     noLockfileFlag: '', // Bun does not have a flag for this.
     ignoreScriptsFlag: '--ignore-scripts',
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
