@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
 import { extname } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
+import { INDEX_HTML_CSR } from '../../../builders/application/options';
 import { ResultFile } from '../../../builders/application/results';
 import { AngularMemoryOutputFiles, AngularOutputAssets, pathnameWithoutBasePath } from '../utils';
 
@@ -96,7 +97,9 @@ export function createAngularAssetsMiddleware(
     // Resource files are handled directly.
     // Global stylesheets (CSS files) are currently considered resources to workaround
     // dev server sourcemap issues with stylesheets.
-    if (extension !== '.js' && extension !== '.html') {
+    // Vite will added the client code even when no-live-reload and no-hmr are passed thus we need to
+    // exclude .js and .html files when hmr is disabled.
+    if ((extension !== '.js' && extension !== '.html') || !server.config.server?.hmr) {
       const outputFile = outputFiles.get(pathname);
       if (outputFile?.servable) {
         let data: Uint8Array | string = outputFile.contents;

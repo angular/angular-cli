@@ -138,13 +138,14 @@ export async function executePostBundleSteps(
 
   // Pre-render (SSG) and App-shell
   // If localization is enabled, prerendering is handled in the inlining process.
+  let indexHtmlOutputPath = indexHtmlOptions?.output;
   if (
     !partialSSRBuild &&
     (prerenderOptions || appShellOptions || (outputMode && serverEntryPoint)) &&
     !allErrors.length
   ) {
     assert(
-      indexHtmlOptions,
+      indexHtmlOptions && indexHtmlOutputPath,
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
@@ -163,17 +164,19 @@ export async function executePostBundleSteps(
     allErrors.push(...errors);
     allWarnings.push(...warnings);
 
-    const indexHasBeenPrerendered = output[indexHtmlOptions.output];
+    const indexHasBeenPrerendered = output[indexHtmlOutputPath];
     for (const [path, { content, appShellRoute }] of Object.entries(output)) {
       // Update the index contents with the app shell under these conditions:
       // - Replace 'index.html' with the app shell only if it hasn't been prerendered yet.
       // - Always replace 'index.csr.html' with the app shell.
       let filePath = path;
       if (appShellRoute && !indexHasBeenPrerendered) {
-        if (outputMode !== OutputMode.Server && indexHtmlOptions.output === INDEX_HTML_CSR) {
+        if (outputMode !== OutputMode.Server && indexHtmlOutputPath === INDEX_HTML_CSR) {
           filePath = 'index.html';
+          // Needed to update the ngsw.json "index" value.
+          indexHtmlOutputPath = filePath;
         } else {
-          filePath = indexHtmlOptions.output;
+          filePath = indexHtmlOutputPath;
         }
       }
 
@@ -232,7 +235,7 @@ export async function executePostBundleSteps(
         workspaceRoot,
         serviceWorker,
         baseHref,
-        options.indexHtmlOptions?.output,
+        indexHtmlOutputPath,
         // Ensure additional files recently added are used
         [...outputFiles, ...additionalOutputFiles],
         assetFiles,
