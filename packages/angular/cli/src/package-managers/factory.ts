@@ -110,8 +110,9 @@ export async function createPackageManager(options: {
   configuredPackageManager?: PackageManagerName;
   logger?: Logger;
   dryRun?: boolean;
+  tempDirectory?: string;
 }): Promise<PackageManager> {
-  const { cwd, configuredPackageManager, logger, dryRun } = options;
+  const { cwd, configuredPackageManager, logger, dryRun, tempDirectory } = options;
   const host = NodeJS_HOST;
 
   const { name, source } = await determinePackageManager(
@@ -127,7 +128,11 @@ export async function createPackageManager(options: {
     throw new Error(`Unsupported package manager: "${name}"`);
   }
 
-  const packageManager = new PackageManager(host, cwd, descriptor, { dryRun, logger });
+  const packageManager = new PackageManager(host, cwd, descriptor, {
+    dryRun,
+    logger,
+    tempDirectory,
+  });
 
   // Do not verify if the package manager is installed during a dry run.
   if (!dryRun) {

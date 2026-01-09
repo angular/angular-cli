@@ -47,9 +47,10 @@ export interface Host {
 
   /**
    * Creates a new, unique temporary directory.
+   * @param baseDir The base directory in which to create the temporary directory.
    * @returns A promise that resolves to the absolute path of the created directory.
    */
-  createTempDirectory(): Promise<string>;
+  createTempDirectory(baseDir?: string): Promise<string>;
 
   /**
    * Deletes a directory recursively.
@@ -94,7 +95,7 @@ export const NodeJS_HOST: Host = {
   readdir,
   readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
   writeFile,
-  createTempDirectory: () => mkdtemp(join(tmpdir(), 'angular-cli-')),
+  createTempDirectory: (baseDir?: string) => mkdtemp(join(baseDir ?? tmpdir(), 'angular-cli-')),
   deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),
   runCommand: async (
     command: string,
