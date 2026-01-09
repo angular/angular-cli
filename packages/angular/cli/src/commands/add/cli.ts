@@ -26,6 +26,7 @@ import {
 import {
   NgAddSaveDependency,
   PackageManager,
+  PackageManagerError,
   PackageManifest,
   PackageMetadata,
   createPackageManager,
@@ -576,36 +577,47 @@ export default class AddCommandModule
     // Only show if installation will actually occur
     task.title = 'Installing package';
 
-    if (context.savePackage === false) {
-      task.title += ' in temporary location';
+    try {
+      if (context.savePackage === false) {
+        task.title += ' in temporary location';
 
-      // Temporary packages are located in a different directory
-      // Hence we need to resolve them using the temp path
-      const { workingDirectory } = await packageManager.acquireTempPackage(
-        packageIdentifier.toString(),
-        {
-          registry,
-        },
-      );
+        // Temporary packages are located in a different directory
+        // Hence we need to resolve them using the temp path
+        const { workingDirectory } = await packageManager.acquireTempPackage(
+          packageIdentifier.toString(),
+          {
+            registry,
+          },
+        );
 
-      const tempRequire = createRequire(workingDirectory + '/');
-      assert(context.collectionName, 'Collection name should always be available');
-      const resolvedCollectionPath = tempRequire.resolve(
-        join(context.collectionName, 'package.json'),
-      );
+        const tempRequire = createRequire(workingDirectory + '/');
+        assert(context.collectionName, 'Collection name should always be available');
+        const resolvedCollectionPath = tempRequire.resolve(
+          join(context.collectionName, 'package.json'),
+        );
 
-      context.collectionName = dirname(resolvedCollectionPath);
-    } else {
-      await packageManager.add(
-        packageIdentifier.toString(),
-        'none',
-        savePackage !== 'dependencies',
-        false,
-        true,
-        {
-          registry,
-        },
-      );
+        context.collectionName = dirname(resolvedCollectionPath);
+      } else {
+        await packageManager.add(
+          packageIdentifier.toString(),
+          'none',
+          savePackage !== 'dependencies',
+          false,
+          true,
+          {
+            registry,
+          },
+        );
+      }
+    } catch (e) {
+      if (e instanceof PackageManagerError) {
+        const output = e.stderr || e.stdout;
+        if (output) {
+          throw new CommandError(`Package installation failed: ${e.message}\nOutput: ${output}`);
+        }
+      }
+
+      throw e;
     }
   }
 
