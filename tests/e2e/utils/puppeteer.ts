@@ -29,11 +29,14 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
       const { stdout } = await execAndWaitForOutputToMatch('ng', serveArgs, match, {
         ...process.env,
         'NO_COLOR': '1',
+        'NG_BUILD_PARTIAL_SSR': '0',
       });
+
       url = stripVTControlCharacters(stdout).match(match)?.[1];
       if (!url) {
         throw new Error('Could not find serving URL');
       }
+
       hasStartedServer = true;
     }
 
