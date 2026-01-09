@@ -59,6 +59,12 @@ export interface PackageManagerOptions {
 
   /** A logger instance for debugging and dry run output. */
   logger?: Logger;
+
+  /**
+   * The path to use as the base for temporary directories.
+   * If not specified, the system's temporary directory will be used.
+   */
+  tempDirectory?: string;
 }
 
 /**
@@ -538,7 +544,7 @@ export class PackageManager {
     specifier: string,
     options: { registry?: string; ignoreScripts?: boolean } = {},
   ): Promise<{ workingDirectory: string; cleanup: () => Promise<void> }> {
-    const workingDirectory = await this.host.createTempDirectory();
+    const workingDirectory = await this.host.createTempDirectory(this.options.tempDirectory);
     const cleanup = () => this.host.deleteDirectory(workingDirectory);
 
     // Some package managers, like yarn classic, do not write a package.json when adding a package.
