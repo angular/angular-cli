@@ -298,10 +298,22 @@ export default class AddCommandModule
     context: AddCommandTaskContext,
     task: AddCommandTaskWrapper,
   ): Promise<void> {
+    let tempDirectory: string | undefined;
+    for (const path of ['.angular/cache', 'node_modules']) {
+      try {
+        const directory = join(this.context.root, path);
+        if ((await fs.stat(directory)).isDirectory()) {
+          tempDirectory = directory;
+          break;
+        }
+      } catch {}
+    }
+
     context.packageManager = await createPackageManager({
       cwd: this.context.root,
       logger: this.context.logger,
       dryRun: context.dryRun,
+      tempDirectory,
     });
     task.output = `Using package manager: ${color.dim(context.packageManager.name)}`;
   }
