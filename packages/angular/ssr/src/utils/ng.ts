@@ -100,6 +100,19 @@ export async function renderAngular(
     // Block until application is stable.
     await applicationRef.whenStable();
 
+    // This code protect againsts app destruction during bootstrapping which is a
+    // valid case. We should not assume the `applicationRef` is not in destroyed state.
+    // Calling `envInjector.get` would throw `NG0205: Injector has already been destroyed`.
+    if (applicationRef.destroyed) {
+      return {
+        hasNavigationError,
+        redirectTo: undefined,
+        // TODO(alanagius): let's think on the content?
+        // or should we use `Promise.resolve('...')`?
+        content: () => Promise.reject(new Error('Application was destroyed during bootstrapping')),
+      };
+    }
+
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
     const envInjector = applicationRef.injector;
     const routerIsProvided = !!envInjector.get(ActivatedRoute, null);

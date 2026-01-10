@@ -12,8 +12,8 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { APP_BASE_HREF } from '@angular/common';
-import { Component, REQUEST, RESPONSE_INIT, inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { Component, PlatformRef, REQUEST, RESPONSE_INIT, inject } from '@angular/core';
+import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
@@ -26,7 +26,13 @@ describe('AngularServerApp', () => {
       selector: 'app-home',
       template: `Home works`,
     })
-    class HomeComponent {}
+    class HomeComponent {
+      constructor() {
+        if (inject(ActivatedRoute).snapshot.data['destroyApp']) {
+          inject(PlatformRef).destroy();
+        }
+      }
+    }
 
     @Component({
       selector: 'app-redirect',
@@ -65,7 +71,7 @@ describe('AngularServerApp', () => {
         { path: 'home-ssg', component: HomeComponent },
         { path: 'page-with-headers', component: HomeComponent },
         { path: 'page-with-status', component: HomeComponent },
-
+        { path: 'page-destroy-app', component: HomeComponent, data: { destroyApp: true } },
         { path: 'redirect', redirectTo: 'home' },
         { path: 'redirect-via-navigate', component: RedirectComponent },
         {
@@ -225,6 +231,13 @@ describe('AngularServerApp', () => {
       it('should return the configured status for pages with specific status settings', async () => {
         const response = await app.handle(new Request('http://localhost/page-with-status'));
         expect(response?.status).toBe(201);
+      });
+
+      it('should not throw an error when app destroys itself', async () => {
+        const response = await app.handle(new Request('http://localhost/page-destroy-app'));
+        // The test expects response to be null, which is reasonable - if the app destroys
+        // itself, there's nothing to render.
+        expect(response).toBeNull();
       });
 
       it('should return static `index.csr.html` for routes with CSR rendering mode', async () => {
