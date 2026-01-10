@@ -59,7 +59,10 @@ export async function renderAngular(
   url: URL,
   platformProviders: StaticProvider[],
   serverContext: string,
-): Promise<{ hasNavigationError: boolean; redirectTo?: string; content: () => Promise<string> }> {
+): Promise<
+  | { hasNavigationError: true }
+  | { hasNavigationError: boolean; redirectTo?: string; content: () => Promise<string> }
+> {
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
   const urlToRender = stripIndexHtmlFromURL(url);
   const platformRef = platformServer([
@@ -99,6 +102,13 @@ export async function renderAngular(
 
     // Block until application is stable.
     await applicationRef.whenStable();
+
+    // This code protect against app destruction during bootstrapping which is a
+    // valid case. We should not assume the `applicationRef` is not in destroyed state.
+    // Calling `envInjector.get` would throw `NG0205: Injector has already been destroyed`.
+    if (applicationRef.destroyed) {
+      return { hasNavigationError: true };
+    }
 
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
     const envInjector = applicationRef.injector;
