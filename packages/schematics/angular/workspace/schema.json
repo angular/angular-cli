@@ -44,6 +44,11 @@
       "$default": {
         "$source": "packageManager"
       }
+    },
+    "skipPrettier": {
+      "description": "Skip adding Prettier configuration and dependency to the workspace.",
+      "type": "boolean",
+      "default": false
     }
   },
   "required": ["name", "version"]
