@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
     "test": "ng test"<% } %>
-  },
+  },<% if (!skipPrettier) { %>
   "prettier": {
     "printWidth": 100,
     "singleQuote": true,
@@ -19,7 +19,7 @@
         }
       }
     ]
-  },
+  },<% } %>
   "private": true,
   <% if (packageManagerWithVersion) { %>"packageManager": "<%= packageManagerWithVersion %>",<% } %>
   "dependencies": {
@@ -34,7 +34,8 @@
   },
   "devDependencies": {
     "@angular/cli": "<%= '^' + version %>",
-    "@angular/compiler-cli": "<%= latestVersions.Angular %>",
+    "@angular/compiler-cli": "<%= latestVersions.Angular %>",<% if (!skipPrettier) { %>
+    "prettier": "<%= latestVersions['prettier'] %>",<% } %>
     "typescript": "<%= latestVersions['typescript'] %>"
   }
 }

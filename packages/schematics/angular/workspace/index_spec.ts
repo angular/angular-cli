@@ -135,9 +135,24 @@ describe('Workspace Schematic', () => {
     expect(tasks).not.toContain(jasmine.objectContaining({ type: 'npm', script: 'test' }));
   });
 
-  it('should include prettier config overrides for Angular templates', async () => {
+  it('should include prettier config and dependency by default', async () => {
     const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.prettier).withContext('package.json#prettier is present').toBeTruthy();
+    expect(pkg.devDependencies['prettier'])
+      .withContext('prettier is in devDependencies')
+      .toEqual(latestVersions['prettier']);
+  });
+
+  it('should not include prettier config and dependency when skipPrettier is true', async () => {
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      skipPrettier: true,
+    });
+    const pkg = JSON.parse(tree.readContent('/package.json'));
+    expect(pkg.prettier).withContext('package.json#prettier should not be present').toBeUndefined();
+    expect(pkg.devDependencies['prettier'])
+      .withContext('prettier should not be in devDependencies')
+      .toBeUndefined();
   });
 });
