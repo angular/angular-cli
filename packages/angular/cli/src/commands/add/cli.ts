@@ -33,6 +33,7 @@ import {
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
+import { getCacheConfig } from '../cache/utilities';
 
 class CommandError extends Error {}
 
@@ -299,7 +300,8 @@ export default class AddCommandModule
     task: AddCommandTaskWrapper,
   ): Promise<void> {
     context.packageManager = await createPackageManager({
-      cwd: this.context.root,
+      cacheDirectory: getCacheConfig(this.context.workspace).path,
+      root: this.context.root,
       logger: this.context.logger,
       dryRun: context.dryRun,
     });

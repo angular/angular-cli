@@ -15,8 +15,8 @@
 
 import { type SpawnOptions, spawn } from 'node:child_process';
 import { Stats } from 'node:fs';
-import { mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
-import { platform, tmpdir } from 'node:os';
+import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { platform } from 'node:os';
 import { join } from 'node:path';
 import { PackageManagerError } from './error';
 
@@ -88,67 +88,80 @@ export interface Host {
 
 /**
  * A concrete implementation of the `Host` interface that uses the Node.js APIs.
+ * @param root The root directory of the project.
+ * @param cacheDirectory The directory to use for caching.
+ * @returns A host that uses the Node.js APIs.
  */
-export const NodeJS_HOST: Host = {
-  stat,
-  readdir,
-  readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
-  writeFile,
-  createTempDirectory: () => mkdtemp(join(tmpdir(), 'angular-cli-')),
-  deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),
-  runCommand: async (
-    command: string,
-    args: readonly string[],
-    options: {
-      timeout?: number;
-      stdio?: 'pipe' | 'ignore';
-      cwd?: string;
-      env?: Record<string, string>;
-    } = {},
-  ): Promise<{ stdout: string; stderr: string }> => {
-    const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
-    const isWin32 = platform() === 'win32';
+export function createNodeJsHost(root: string, cacheDirectory: string): Host {
+  return {
+    stat,
+    readdir,
+    readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
+    writeFile,
+    createTempDirectory: async () => {
+      await mkdir(cacheDirectory, { recursive: true });
+      const tmpDir = await mkdtemp(join(cacheDirectory, 'package-manager-temp-'));
 
-    return new Promise((resolve, reject) => {
-      const spawnOptions = {
-        shell: isWin32,
-        stdio: options.stdio ?? 'pipe',
-        signal,
-        cwd: options.cwd,
-        env: {
-          ...process.env,
-          ...options.env,
-        },
-      } satisfies SpawnOptions;
-      const childProcess = isWin32
-        ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
-        : spawn(command, args, spawnOptions);
+      // Copy the .npmrc file to the temp directory if it exists.
+      await copyFile(`${root}/.npmrc`, `${tmpDir}/.npmrc`).catch(() => {});
 
-      let stdout = '';
-      childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
+      return tmpDir;
+    },
+    deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),
+    runCommand: async (
+      command: string,
+      args: readonly string[],
+      options: {
+        timeout?: number;
+        stdio?: 'pipe' | 'ignore';
+        cwd?: string;
+        env?: Record<string, string>;
+      } = {},
+    ): Promise<{ stdout: string; stderr: string }> => {
+      const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
+      const isWin32 = platform() === 'win32';
 
-      let stderr = '';
-      childProcess.stderr?.on('data', (data) => (stderr += data.toString()));
+      return new Promise((resolve, reject) => {
+        const spawnOptions = {
+          shell: isWin32,
+          stdio: options.stdio ?? 'pipe',
+          signal,
+          cwd: options.cwd,
+          env: {
+            ...process.env,
+            ...options.env,
+          },
+        } satisfies SpawnOptions;
+        const childProcess = isWin32
+          ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
+          : spawn(command, args, spawnOptions);
 
-      childProcess.on('close', (code) => {
-        if (code === 0) {
-          resolve({ stdout, stderr });
-        } else {
-          const message = `Process exited with code ${code}.`;
-          reject(new PackageManagerError(message, stdout, stderr, code));
-        }
-      });
+        let stdout = '';
+        childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
 
-      childProcess.on('error', (err) => {
-        if (err.name === 'AbortError') {
-          const message = `Process timed out.`;
+        let stderr = '';
+        childProcess.stderr?.on('data', (data) => (stderr += data.toString()));
+
+        childProcess.on('close', (code) => {
+          if (code === 0) {
+            resolve({ stdout, stderr });
+          } else {
+            const message = `Process exited with code ${code}.`;
+            reject(new PackageManagerError(message, stdout, stderr, code));
+          }
+        });
+
+        childProcess.on('error', (err) => {
+          if (err.name === 'AbortError') {
+            const message = `Process timed out.`;
+            reject(new PackageManagerError(message, stdout, stderr, null));
+
+            return;
+          }
+          const message = `Process failed with error: ${err.message}`;
           reject(new PackageManagerError(message, stdout, stderr, null));
-
-          return;
-        }
-        const message = `Process failed with error: ${err.message}`;
-        reject(new PackageManagerError(message, stdout, stderr, null));
+        });
       });
-    });
-  },
-};
+    },
+  };
+}
