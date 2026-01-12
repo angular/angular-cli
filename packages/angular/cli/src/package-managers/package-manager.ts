@@ -546,9 +546,11 @@ export class PackageManager {
     // Writing an empty package.json file beforehand prevents this.
     await this.host.writeFile(join(workingDirectory, 'package.json'), '{}');
 
-    const flags = [options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : ''].filter(
-      (flag) => flag,
-    );
+    const flags = [];
+    if (options.ignoreScripts) {
+      flags.push(this.descriptor.ignoreScriptsFlag);
+    }
+
     const args: readonly string[] = [this.descriptor.addCommand, specifier, ...flags];
 
     try {

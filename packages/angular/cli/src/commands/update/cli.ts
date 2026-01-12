@@ -30,6 +30,7 @@ import {
   getProjectDependencies,
   readPackageJson,
 } from '../../utilities/package-tree';
+import { getCacheConfig } from '../cache/utilities';
 import {
   checkCLIVersion,
   coerceVersionNumber,
@@ -172,7 +173,8 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     const { logger } = this.context;
     // Instantiate the package manager
     const packageManager = await createPackageManager({
-      cwd: this.context.root,
+      root: this.context.root,
+      cacheDirectory: getCacheConfig(this.context.workspace).path,
       logger,
       configuredPackageManager: this.context.packageManager.name,
     });

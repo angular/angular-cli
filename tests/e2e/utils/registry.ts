@@ -70,30 +70,21 @@ export async function createNpmConfigForAuthentication(
   const token = invalidToken ? `invalid=` : VALID_TOKEN;
   const registry = (getGlobalVariable('package-secure-registry') as string).replace(/^\w+:/, '');
 
+  // `always-auth is required for yarn classic.
+  // See: https://www.verdaccio.org/docs/setup-yarn#yarn-classic-1x
   await writeFile(
     '.npmrc',
     scopedAuthentication
       ? `
-${registry}/:_auth="${token}"
-registry=http:${registry}
-`
+  ${registry}/:_auth="${token}"
+  registry=http:${registry}
+  always-auth = true
+  `
       : `
-_auth="${token}"
-registry=http:${registry}
-`,
-  );
-
-  await writeFile(
-    '.yarnrc',
-    scopedAuthentication
-      ? `
-${registry}/:_auth "${token}"
-registry http:${registry}
-`
-      : `
-_auth "${token}"
-registry http:${registry}
-`,
+  _auth="${token}"
+  registry=http:${registry}
+  always-auth = true
+  `,
   );
 }
 

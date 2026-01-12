@@ -8,7 +8,7 @@
 
 import { major } from 'semver';
 import { discover } from './discovery';
-import { Host, NodeJS_HOST } from './host';
+import { Host, createNodeJsHost } from './host';
 import { Logger } from './logger';
 import { PackageManager } from './package-manager';
 import { PackageManagerName, SUPPORTED_PACKAGE_MANAGERS } from './package-manager-descriptor';
@@ -106,13 +106,14 @@ async function determinePackageManager(
  * @returns A promise that resolves to a new `PackageManager` instance.
  */
 export async function createPackageManager(options: {
-  cwd: string;
+  root: string;
+  cacheDirectory: string;
   configuredPackageManager?: PackageManagerName;
   logger?: Logger;
   dryRun?: boolean;
 }): Promise<PackageManager> {
-  const { cwd, configuredPackageManager, logger, dryRun } = options;
-  const host = NodeJS_HOST;
+  const { root: cwd, cacheDirectory, configuredPackageManager, logger, dryRun } = options;
+  const host = createNodeJsHost(cwd, cacheDirectory);
 
   const { name, source } = await determinePackageManager(
     host,
