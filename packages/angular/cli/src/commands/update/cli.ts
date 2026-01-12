@@ -29,7 +29,6 @@ import {
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
-import { findPackageJson } from '../../utilities/package-tree';
 import {
   checkCLIVersion,
   coerceVersionNumber,
@@ -693,6 +692,17 @@ async function readPackageManifest(manifestPath: string): Promise<PackageManifes
     const content = await fs.readFile(manifestPath, 'utf8');
 
     return JSON.parse(content) as PackageManifest;
+  } catch {
+    return undefined;
+  }
+}
+
+function findPackageJson(workspaceDir: string, packageName: string): string | undefined {
+  try {
+    const projectRequire = createRequire(path.join(workspaceDir, 'package.json'));
+    const packageJsonPath = projectRequire.resolve(`${packageName}/package.json`);
+
+    return packageJsonPath;
   } catch {
     return undefined;
   }
