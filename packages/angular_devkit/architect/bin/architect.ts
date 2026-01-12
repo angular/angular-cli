@@ -16,21 +16,23 @@ import { Architect } from '../index';
 import { WorkspaceNodeModulesArchitectHost } from '../node/index';
 
 function findUp(names: string | string[], from: string) {
-  if (!Array.isArray(names)) {
-    names = [names];
-  }
-  const root = path.parse(from).root;
+  const filenames = Array.isArray(names) ? names : [names];
 
-  let currentDir = from;
-  while (currentDir && currentDir !== root) {
-    for (const name of names) {
+  let currentDir = path.resolve(from);
+  while (true) {
+    for (const name of filenames) {
       const p = path.join(currentDir, name);
       if (existsSync(p)) {
         return p;
       }
     }
 
-    currentDir = path.dirname(currentDir);
+    const parentDir = path.dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
   }
 
   return null;

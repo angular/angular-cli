@@ -10,7 +10,7 @@ import { normalize } from '@angular-devkit/core';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { findUp } from './find-up';
+import { findUpSync } from './find-up';
 
 interface PackageDependencies {
   dependencies?: Record<string, string>;
@@ -19,7 +19,7 @@ interface PackageDependencies {
 
 export function findWorkspaceFile(currentDirectory = process.cwd()): string | null {
   const possibleConfigFiles = ['angular.json', '.angular.json'];
-  const configFilePath = findUp(possibleConfigFiles, currentDirectory);
+  const configFilePath = findUpSync(possibleConfigFiles, currentDirectory);
   if (configFilePath === null) {
     return null;
   }

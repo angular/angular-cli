@@ -7,24 +7,66 @@
  */
 
 import { existsSync } from 'node:fs';
-import * as path from 'node:path';
+import { stat } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
 
-export function findUp(names: string | string[], from: string) {
-  if (!Array.isArray(names)) {
-    names = [names];
+/**
+ * Find a file or directory by walking up the directory tree.
+ * @param names The name or names of the files or directories to find.
+ * @param from The directory to start the search from.
+ * @returns The path to the first match found, or `null` if no match was found.
+ */
+export async function findUp(names: string | string[], from: string): Promise<string | null> {
+  const filenames = Array.isArray(names) ? names : [names];
+
+  let currentDir = resolve(from);
+  while (true) {
+    for (const name of filenames) {
+      const p = join(currentDir, name);
+      try {
+        await stat(p);
+
+        return p;
+      } catch {
+        // Ignore errors (e.g. file not found).
+      }
+    }
+
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
   }
-  const root = path.parse(from).root;
 
-  let currentDir = from;
-  while (currentDir && currentDir !== root) {
-    for (const name of names) {
-      const p = path.join(currentDir, name);
+  return null;
+}
+
+/**
+ * Synchronously find a file or directory by walking up the directory tree.
+ * @param names The name or names of the files or directories to find.
+ * @param from The directory to start the search from.
+ * @returns The path to the first match found, or `null` if no match was found.
+ */
+export function findUpSync(names: string | string[], from: string): string | null {
+  const filenames = Array.isArray(names) ? names : [names];
+
+  let currentDir = resolve(from);
+  while (true) {
+    for (const name of filenames) {
+      const p = join(currentDir, name);
       if (existsSync(p)) {
         return p;
       }
     }
 
-    currentDir = path.dirname(currentDir);
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      break;
+    }
+
+    currentDir = parentDir;
   }
 
   return null;
