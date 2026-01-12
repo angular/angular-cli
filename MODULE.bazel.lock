@@ -412,7 +412,7 @@
     "@@aspect_rules_js+//npm:extensions.bzl%pnpm": {
       "general": {
         "bzlTransitiveDigest": "zVV86HvMwDBJ8IsFt27k/Sjq0vCMPr8b8X9OAuprQ6w=",
-        "usagesDigest": "joQrwYZve0LRGQcA0w659tYcDgO7i285JhM3m8ojguc=",
+        "usagesDigest": "/NqvQUP/nSwl7fsTFSQHEZJU5rTvs4M1h1n8n0KpF7Q=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
