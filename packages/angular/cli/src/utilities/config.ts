@@ -11,7 +11,7 @@ import { existsSync, promises as fs } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { PackageManager } from '../../lib/config/workspace-schema';
-import { findUp } from './find-up';
+import { findUp, findUpSync } from './find-up';
 import { JSONFile, readAndParseJson } from './json-file';
 
 function isJsonObject(value: json.JsonValue | undefined): value is json.JsonObject {
@@ -70,13 +70,13 @@ function xdgConfigHomeOld(home: string): string {
   return path.join(p, '.angular-config.json');
 }
 
-function projectFilePath(projectPath?: string): string | null {
+async function projectFilePath(projectPath?: string): Promise<string | null> {
   // Find the configuration, either where specified, in the Angular CLI project
   // (if it's in node_modules) or from the current process.
   return (
-    (projectPath && findUp(configNames, projectPath)) ||
-    findUp(configNames, process.cwd()) ||
-    findUp(configNames, __dirname)
+    (projectPath && (await findUp(configNames, projectPath))) ||
+    (await findUp(configNames, process.cwd())) ||
+    (await findUp(configNames, __dirname))
   );
 }
 
@@ -181,7 +181,7 @@ export async function getWorkspace(
     return cachedWorkspaces.get(level);
   }
 
-  const configPath = level === 'local' ? projectFilePath() : globalFilePath();
+  const configPath = level === 'local' ? await projectFilePath() : globalFilePath();
   if (!configPath) {
     if (level === 'global') {
       // Unlike a local config, a global config is not mandatory.
@@ -223,7 +223,7 @@ export async function getWorkspace(
 export async function getWorkspaceRaw(
   level: 'local' | 'global' = 'local',
 ): Promise<[JSONFile | null, string | null]> {
-  let configPath = level === 'local' ? projectFilePath() : globalFilePath();
+  let configPath = level === 'local' ? await projectFilePath() : globalFilePath();
 
   if (!configPath) {
     if (level === 'global') {
