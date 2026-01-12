@@ -552,6 +552,18 @@ export class PackageManager {
     // Writing an empty package.json file beforehand prevents this.
     await this.host.writeFile(join(workingDirectory, 'package.json'), '{}');
 
+    // Copy configuration files if the package manager requires it (e.g., bun).
+    if (this.descriptor.copyConfigFromProject) {
+      for (const configFile of this.descriptor.configFiles) {
+        try {
+          const configPath = join(this.cwd, configFile);
+          await this.host.copyFile(configPath, join(workingDirectory, configFile));
+        } catch {
+          // Ignore missing config files.
+        }
+      }
+    }
+
     const flags = [options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : ''].filter(
       (flag) => flag,
     );
