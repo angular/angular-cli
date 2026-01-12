@@ -65,6 +65,15 @@ export interface PackageManagerDescriptor {
   /** The flag to ignore peer dependency warnings/errors. */
   readonly ignorePeerDependenciesFlag?: string;
 
+  /** The configuration files used by the package manager. */
+  readonly configFiles: readonly string[];
+
+  /**
+   * Whether to copy configuration files from the project root to the temporary directory.
+   * This is necessary for package managers that do not inherit configuration from parent directories (e.g., bun).
+   */
+  readonly copyConfigFromProject?: boolean;
+
   /** A function that returns the arguments and environment variables to use a custom registry. */
   readonly getRegistryOptions?: (registry: string) => {
     args?: string[];
@@ -144,6 +153,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     noLockfileFlag: '--no-package-lock',
     ignoreScriptsFlag: '--ignore-scripts',
     ignorePeerDependenciesFlag: '--force',
+    configFiles: ['.npmrc'],
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json=true', '--all=true'],
@@ -168,6 +178,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveDevFlag: '--dev',
     noLockfileFlag: '',
     ignoreScriptsFlag: '--mode=skip-build',
+    configFiles: ['.yarnrc.yml', '.yarnrc.yaml'],
     getRegistryOptions: (registry: string) => ({ env: { YARN_NPM_REGISTRY_SERVER: registry } }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json', '--recursive=false'],
@@ -195,6 +206,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveDevFlag: '--dev',
     noLockfileFlag: '--no-lockfile',
     ignoreScriptsFlag: '--ignore-scripts',
+    configFiles: ['.yarnrc', '.npmrc'],
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],
@@ -220,6 +232,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     noLockfileFlag: '--no-lockfile',
     ignoreScriptsFlag: '--ignore-scripts',
     ignorePeerDependenciesFlag: '--strict-peer-dependencies=false',
+    configFiles: ['.npmrc', 'pnpm-workspace.yaml'],
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],
@@ -244,6 +257,8 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     saveDevFlag: '--development',
     noLockfileFlag: '', // Bun does not have a flag for this.
     ignoreScriptsFlag: '--ignore-scripts',
+    configFiles: ['bunfig.toml', '.npmrc'],
+    copyConfigFromProject: true,
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['pm', 'ls', '--json'],
