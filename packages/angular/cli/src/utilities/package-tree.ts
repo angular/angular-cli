@@ -7,8 +7,8 @@
  */
 
 import * as fs from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, join } from 'node:path';
-import * as resolve from 'resolve';
 import { NgAddSaveDependency } from './package-metadata';
 
 interface PackageJson {
@@ -52,8 +52,8 @@ export async function readPackageJson(packageJsonPath: string): Promise<PackageJ
 
 export function findPackageJson(workspaceDir: string, packageName: string): string | undefined {
   try {
-    // avoid require.resolve here, see: https://github.com/angular/angular-cli/pull/18610#issuecomment-681980185
-    const packageJsonPath = resolve.sync(`${packageName}/package.json`, { basedir: workspaceDir });
+    const projectRequire = createRequire(join(workspaceDir, 'package.json'));
+    const packageJsonPath = projectRequire.resolve(`${packageName}/package.json`);
 
     return packageJsonPath;
   } catch {

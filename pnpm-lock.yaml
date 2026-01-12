@@ -145,9 +145,6 @@ importers:
       '@types/progress':
         specifier: ^2.0.3
         version: 2.0.7
-      '@types/resolve':
-        specifier: ^1.17.1
-        version: 1.20.6
       '@types/semver':
         specifier: ^7.3.12
         version: 7.7.1
@@ -492,9 +489,6 @@ importers:
       parse5-html-rewriting-stream:
         specifier: 8.0.0
         version: 8.0.0
-      resolve:
-        specifier: 1.22.11
-        version: 1.22.11
       semver:
         specifier: 7.7.3
         version: 7.7.3
@@ -3623,9 +3617,6 @@ packages:
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
-
-  '@types/resolve@1.20.6':
-    resolution: {integrity: sha512-A4STmOXPhMUtHH+S6ymgE2GiBSMqf4oTvcQZMcHzokuTLVYzXTB8ttjcgxOVaAp2lGwEdzZ0J+cRbbeevQj1UQ==}
 
   '@types/responselike@1.0.0':
     resolution: {integrity: sha512-85Y2BjiufFzaMIlvJDvTTB8Fxl2xfLo4HgmHzVBz08w4wDePCTjYw66PdrolO0kzli3yam/YCgRufyo1DdQVTA==}
@@ -12186,8 +12177,6 @@ snapshots:
   '@types/range-parser@1.2.7': {}
 
   '@types/resolve@1.20.2': {}
-
-  '@types/resolve@1.20.6': {}
 
   '@types/responselike@1.0.0':
     dependencies:
