@@ -134,12 +134,14 @@ export const NodeJS_HOST: Host = {
         if (code === 0) {
           resolve({ stdout, stderr });
         } else {
+          console.log({ stdout, stderr, code });
           const message = `Process exited with code ${code}.`;
           reject(new PackageManagerError(message, stdout, stderr, code));
         }
       });
 
       childProcess.on('error', (err) => {
+        console.log({ err });
         if (err.name === 'AbortError') {
           const message = `Process timed out.`;
           reject(new PackageManagerError(message, stdout, stderr, null));
