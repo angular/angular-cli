@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import { major } from 'semver';
 import { discover } from './discovery';
 import { Host, NodeJS_HOST } from './host';
@@ -110,9 +111,8 @@ export async function createPackageManager(options: {
   configuredPackageManager?: PackageManagerName;
   logger?: Logger;
   dryRun?: boolean;
-  tempDirectory?: string;
 }): Promise<PackageManager> {
-  const { cwd, configuredPackageManager, logger, dryRun, tempDirectory } = options;
+  const { cwd, configuredPackageManager, logger, dryRun } = options;
   const host = NodeJS_HOST;
 
   const { name, source } = await determinePackageManager(
@@ -131,13 +131,12 @@ export async function createPackageManager(options: {
   const packageManager = new PackageManager(host, cwd, descriptor, {
     dryRun,
     logger,
-    tempDirectory,
   });
 
   // Do not verify if the package manager is installed during a dry run.
   if (!dryRun) {
     try {
-      await packageManager.getVersion();
+      assert(packageManager.version);
     } catch {
       if (source === 'default') {
         throw new Error(

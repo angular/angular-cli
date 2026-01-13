@@ -19,10 +19,10 @@ import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
 import { AnalyticsCollector } from '../analytics/analytics-collector';
 import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
+import { PackageManager } from '../package-managers';
 import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
-import { PackageManagerUtils } from '../utilities/package-manager';
 import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
 
 export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
@@ -39,16 +39,16 @@ export enum CommandScope {
 }
 
 export interface CommandContext {
-  currentDirectory: string;
-  root: string;
-  workspace?: AngularWorkspace;
-  globalConfiguration: AngularWorkspace;
-  logger: logging.Logger;
-  packageManager: PackageManagerUtils;
-  yargsInstance: Argv<{}>;
+  readonly currentDirectory: string;
+  readonly root: string;
+  readonly workspace?: AngularWorkspace;
+  readonly globalConfiguration: AngularWorkspace;
+  readonly logger: logging.Logger;
+  readonly packageManager: PackageManager;
+  readonly yargsInstance: Argv<{}>;
 
   /** Arguments parsed in free-from without parser configuration. */
-  args: {
+  readonly args: {
     positional: string[];
     options: {
       help: boolean;
@@ -60,8 +60,10 @@ export interface CommandContext {
 
 export type OtherOptions = Record<string, unknown>;
 
-export interface CommandModuleImplementation<T extends {} = {}>
-  extends Omit<YargsCommandModule<{}, T>, 'builder' | 'handler'> {
+export interface CommandModuleImplementation<T extends {} = {}> extends Omit<
+  YargsCommandModule<{}, T>,
+  'builder' | 'handler'
+> {
   /** Scope in which the command can be executed in. */
   scope: CommandScope;
 
