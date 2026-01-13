@@ -242,6 +242,7 @@ export type UnitTestBuilderOptions = {
     setupFiles?: string[];
     tsConfig?: string;
     ui?: boolean;
+    update?: boolean;
     watch?: boolean;
 };
 
