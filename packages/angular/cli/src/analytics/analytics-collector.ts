@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { logging } from '@angular-devkit/core';
 import { randomUUID } from 'node:crypto';
 import * as https from 'node:https';
 import * as os from 'node:os';
 import * as querystring from 'node:querystring';
 import * as semver from 'semver';
-import type { CommandContext } from '../command-builder/command-module';
 import { ngDebug } from '../utilities/environment-options';
 import { assertIsError } from '../utilities/error';
 import { VERSION } from '../utilities/version';
@@ -32,8 +32,9 @@ export class AnalyticsCollector {
   private readonly userParameters: Record<UserCustomDimension, PrimitiveTypes | undefined>;
 
   constructor(
-    private context: CommandContext,
+    private logger: logging.Logger,
     userId: string,
+    packageManagerInfo: { name: string; version: string | undefined },
   ) {
     const requestParameters: Partial<Record<RequestParameter, PrimitiveTypes>> = {
       [RequestParameter.ProtocolVersion]: 2,
@@ -63,7 +64,7 @@ export class AnalyticsCollector {
     this.requestParameterStringified = querystring.stringify(requestParameters);
 
     const parsedVersion = semver.parse(process.version);
-    const packageManagerVersion = context.packageManager.version;
+    const packageManagerVersion = packageManagerInfo.version;
 
     this.userParameters = {
       // While architecture is being collect by GA as UserAgentArchitecture.
@@ -75,7 +76,7 @@ export class AnalyticsCollector {
         ? `${parsedVersion.major}.${parsedVersion.minor}.${parsedVersion.patch}`
         : 'other',
       [UserCustomDimension.NodeMajorVersion]: parsedVersion?.major,
-      [UserCustomDimension.PackageManager]: context.packageManager.name,
+      [UserCustomDimension.PackageManager]: packageManagerInfo.name,
       [UserCustomDimension.PackageManagerVersion]: packageManagerVersion,
       [UserCustomDimension.PackageManagerMajorVersion]: packageManagerVersion
         ? +packageManagerVersion.split('.', 1)[0]
@@ -152,7 +153,7 @@ export class AnalyticsCollector {
 
   async flush(): Promise<void> {
     const pendingTrackingEvents = this.trackingEventsQueue;
-    this.context.logger.debug(`Analytics flush size. ${pendingTrackingEvents?.length}.`);
+    this.logger.debug(`Analytics flush size. ${pendingTrackingEvents?.length}.`);
 
     if (!pendingTrackingEvents?.length) {
       return;
@@ -167,7 +168,7 @@ export class AnalyticsCollector {
     } catch (error) {
       // Failure to report analytics shouldn't crash the CLI.
       assertIsError(error);
-      this.context.logger.debug(`Send analytics error. ${error.message}.`);
+      this.logger.debug(`Send analytics error. ${error.message}.`);
     }
   }
 

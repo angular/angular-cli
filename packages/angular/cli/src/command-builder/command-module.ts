@@ -60,8 +60,10 @@ export interface CommandContext {
 
 export type OtherOptions = Record<string, unknown>;
 
-export interface CommandModuleImplementation<T extends {} = {}>
-  extends Omit<YargsCommandModule<{}, T>, 'builder' | 'handler'> {
+export interface CommandModuleImplementation<T extends {} = {}> extends Omit<
+  YargsCommandModule<{}, T>,
+  'builder' | 'handler'
+> {
   /** Scope in which the command can be executed in. */
   scope: CommandScope;
 
@@ -187,7 +189,12 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       ['version', 'update', 'analytics'].includes(this.commandName),
     );
 
-    return userId ? new AnalyticsCollector(this.context, userId) : undefined;
+    return userId
+      ? new AnalyticsCollector(this.context.logger, userId, {
+          name: this.context.packageManager.name,
+          version: this.context.packageManager.version,
+        })
+      : undefined;
   }
 
   /**

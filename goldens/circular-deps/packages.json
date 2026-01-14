@@ -32,10 +32,6 @@
     "packages/angular/build/src/utils/server-rendering/manifest.ts"
   ],
   [
-    "packages/angular/cli/src/analytics/analytics-collector.ts",
-    "packages/angular/cli/src/command-builder/command-module.ts"
-  ],
-  [
     "packages/angular/cli/src/analytics/analytics.ts",
     "packages/angular/cli/src/command-builder/command-module.ts"
   ]
