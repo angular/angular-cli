@@ -1,3 +1,15 @@
+<a name="21.0.6"></a>
+
+# 21.0.6 (2026-01-14)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [730ae6609](https://github.com/angular/angular-cli/commit/730ae6609b847802124a5c6e12c77522af54b967) | fix  | handle platform destruction during rendering |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.0.5"></a>
 
 # 21.0.5 (2026-01-07)
