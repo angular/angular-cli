@@ -204,6 +204,9 @@ export function getFeatureSupport(
     // Native async/await is not supported with Zone.js. Disabling support here will cause
     // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
     'async-await': nativeAsyncAwait,
+    // Workaround for an esbuild minification bug when async-await is disabled and the target is es2019+.
+    // The catch binding for downleveled for-await will be incorrectly removed in this specific situation.
+    ...(!nativeAsyncAwait ? { 'optional-catch-binding': false } : {}),
     // V8 currently has a performance defect involving object spread operations that can cause signficant
     // degradation in runtime performance. By not supporting the language feature here, a downlevel form
     // will be used instead which provides a workaround for the performance issue.
