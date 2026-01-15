@@ -65,6 +65,13 @@ export interface PackageManagerOptions {
    * If not specified, the system's temporary directory will be used.
    */
   tempDirectory?: string;
+
+  /**
+   * The version of the package manager.
+   * If provided, the `getVersion` method will return this version
+   * instead of running the version command.
+   */
+  version?: string;
 }
 
 /**
@@ -79,6 +86,7 @@ export class PackageManager {
   readonly #manifestCache = new Map<string, PackageManifest | null>();
   readonly #metadataCache = new Map<string, PackageMetadata | null>();
   #dependencyCache: Map<string, InstalledPackage> | null = null;
+  #version: string | undefined;
 
   /**
    * Creates a new `PackageManager` instance.
@@ -96,6 +104,7 @@ export class PackageManager {
     if (this.options.dryRun && !this.options.logger) {
       throw new Error('A logger must be provided when dryRun is enabled.');
     }
+    this.#version = options.version;
   }
 
   /**
@@ -334,9 +343,14 @@ export class PackageManager {
    * @returns A promise that resolves to the trimmed version string.
    */
   async getVersion(): Promise<string> {
-    const { stdout } = await this.#run(this.descriptor.versionCommand);
+    if (this.#version) {
+      return this.#version;
+    }
 
-    return stdout.trim();
+    const { stdout } = await this.#run(this.descriptor.versionCommand);
+    this.#version = stdout.trim();
+
+    return this.#version;
   }
 
   /**
