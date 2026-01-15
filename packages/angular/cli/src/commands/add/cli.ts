@@ -25,11 +25,9 @@ import {
 } from '../../command-builder/schematics-command-module';
 import {
   NgAddSaveDependency,
-  PackageManager,
   PackageManagerError,
   PackageManifest,
   PackageMetadata,
-  createPackageManager,
 } from '../../package-managers';
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
@@ -46,7 +44,6 @@ interface AddCommandArgs extends SchematicsCommandArgs {
 }
 
 interface AddCommandTaskContext {
-  packageManager: PackageManager;
   packageIdentifier: npa.Result;
   savePackage?: NgAddSaveDependency;
   collectionName?: string;
@@ -334,13 +331,9 @@ export default class AddCommandModule
       } catch {}
     }
 
-    context.packageManager = await createPackageManager({
-      cwd: this.context.root,
-      logger: this.context.logger,
-      dryRun: context.dryRun,
-      tempDirectory,
-    });
-    task.output = `Using package manager: ${color.dim(context.packageManager.name)}`;
+    this.context.packageManager.temporaryDirectory = tempDirectory;
+
+    task.output = `Using package manager: ${color.dim(this.context.packageManager.name)}`;
   }
 
   private async findCompatiblePackageVersionTask(
@@ -349,7 +342,8 @@ export default class AddCommandModule
     options: Options<AddCommandArgs>,
   ): Promise<void> {
     const { registry, verbose } = options;
-    const { packageManager, packageIdentifier } = context;
+    const { packageIdentifier } = context;
+    const { packageManager } = this.context;
     const packageName = packageIdentifier.name;
 
     assert(packageName, 'Registry package identifiers should always have a name.');
@@ -446,7 +440,8 @@ export default class AddCommandModule
       rejectionReasons: string[];
     },
   ): Promise<PackageManifest | null> {
-    const { packageManager, packageIdentifier } = context;
+    const { packageIdentifier } = context;
+    const { packageManager } = this.context;
     const { registry, verbose, rejectionReasons } = options;
     const packageName = packageIdentifier.name;
     assert(packageName, 'Package name must be defined.');
@@ -524,9 +519,12 @@ export default class AddCommandModule
 
     let manifest;
     try {
-      manifest = await context.packageManager.getManifest(context.packageIdentifier.toString(), {
-        registry,
-      });
+      manifest = await this.context.packageManager.getManifest(
+        context.packageIdentifier.toString(),
+        {
+          registry,
+        },
+      );
     } catch (e) {
       assertIsError(e);
       throw new CommandError(
@@ -585,7 +583,8 @@ export default class AddCommandModule
     options: Options<AddCommandArgs>,
   ): Promise<void> {
     const { registry } = options;
-    const { packageManager, packageIdentifier, savePackage } = context;
+    const { packageIdentifier, savePackage } = context;
+    const { packageManager } = this.context;
 
     // Only show if installation will actually occur
     task.title = 'Installing package';

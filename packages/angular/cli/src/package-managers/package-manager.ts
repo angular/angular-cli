@@ -12,6 +12,7 @@
  * a flexible and secure abstraction over the various package managers.
  */
 
+import { execSync } from 'node:child_process';
 import { join } from 'node:path';
 import npa from 'npm-package-arg';
 import { maxSatisfying } from 'semver';
@@ -79,6 +80,9 @@ export class PackageManager {
   readonly #manifestCache = new Map<string, PackageManifest | null>();
   readonly #metadataCache = new Map<string, PackageMetadata | null>();
   #dependencyCache: Map<string, InstalledPackage> | null = null;
+
+  /** The path to use as the base for temporary directories. */
+  temporaryDirectory?: string;
 
   /**
    * Creates a new `PackageManager` instance.
@@ -329,14 +333,34 @@ export class PackageManager {
     this.#dependencyCache = null;
   }
 
+  #version: string | undefined;
+
   /**
    * Gets the version of the package manager binary.
-   * @returns A promise that resolves to the trimmed version string.
    */
-  async getVersion(): Promise<string> {
-    const { stdout } = await this.#run(this.descriptor.versionCommand);
+  get version(): string {
+    if (!this.#version) {
+      this.#version = this.getVersion();
+    }
 
-    return stdout.trim();
+    return this.#version;
+  }
+
+  /**
+   * Gets the version of the package manager binary.
+   * @returns The version of the package manager binary.
+   */
+  private getVersion(): string {
+    return execSync(`${this.descriptor.binary} ${this.descriptor.versionCommand}`, {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+      env: {
+        ...process.env,
+        //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
+        NO_UPDATE_NOTIFIER: '1',
+        NPM_CONFIG_UPDATE_NOTIFIER: 'false',
+      },
+    }).trim();
   }
 
   /**
@@ -544,7 +568,7 @@ export class PackageManager {
     specifier: string,
     options: { registry?: string; ignoreScripts?: boolean } = {},
   ): Promise<{ workingDirectory: string; cleanup: () => Promise<void> }> {
-    const workingDirectory = await this.host.createTempDirectory(this.options.tempDirectory);
+    const workingDirectory = await this.host.createTempDirectory(this.temporaryDirectory);
     const cleanup = () => this.host.deleteDirectory(workingDirectory);
 
     // Some package managers, like yarn classic, do not write a package.json when adding a package.

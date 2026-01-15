@@ -175,16 +175,16 @@ export async function runTempBinary(
  * @param verbose Whether to log verbose output.
  * @returns True if the package manager should be forced, false otherwise.
  */
-export async function shouldForcePackageManager(
+export function shouldForcePackageManager(
   packageManager: PackageManager,
   logger: logging.LoggerApi,
   verbose: boolean,
-): Promise<boolean> {
+): boolean {
   // npm 7+ can fail due to it incorrectly resolving peer dependencies that have valid SemVer
   // ranges during an update. Update will set correct versions of dependencies within the
   // package.json file. The force option is set to workaround these errors.
   if (packageManager.name === 'npm') {
-    const version = await packageManager.getVersion();
+    const version = packageManager.version;
     if (semver.gte(version, '7.0.0')) {
       if (verbose) {
         logger.info('NPM 7+ detected -- enabling force option for package installation');
