@@ -106,21 +106,6 @@ describeBuilder(buildEsbuildBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
         harness.expectFile('dist/test.svg').toNotExist();
       });
-
-      it('fail if asset path is not within project source root', async () => {
-        await harness.writeFile('test.svg', '<svg></svg>');
-
-        harness.useTarget('build', {
-          ...BASE_OPTIONS,
-          assets: ['test.svg'],
-        });
-
-        const { error } = await harness.executeOnce({ outputLogsOnException: false });
-
-        expect(error?.message).toMatch('path must start with the project source root');
-
-        harness.expectFile('dist/test.svg').toNotExist();
-      });
     });
 
     describe('longhand syntax', () => {

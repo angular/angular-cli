@@ -107,19 +107,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         harness.expectFile('dist/browser/test.svg').toNotExist();
       });
 
-      it('fail if asset path is not within project source root', async () => {
-        await harness.writeFile('test.svg', '<svg></svg>');
+      it('copies an asset from project root (outside source root)', async () => {
+        await harness.writeFile('extra.txt', 'extra');
 
         harness.useTarget('build', {
           ...BASE_OPTIONS,
-          assets: ['test.svg'],
+          assets: ['extra.txt'],
         });
 
-        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+        const { result } = await harness.executeOnce();
 
-        expect(error?.message).toMatch('path must start with the project source root');
+        expect(result?.success).toBe(true);
 
-        harness.expectFile('dist/browser/test.svg').toNotExist();
+        harness.expectFile('dist/browser/extra.txt').content.toBe('extra');
       });
     });
 
@@ -357,6 +357,17 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBe(true);
 
         harness.expectFile('dist/browser/subdirectory/test.svg').content.toBe('<svg></svg>');
+      });
+
+      it('fails if asset path is outside workspace root', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: ['../outside.txt'],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toMatch('asset path must be within the workspace root');
       });
 
       it('fails if output option is not within project output path', async () => {
