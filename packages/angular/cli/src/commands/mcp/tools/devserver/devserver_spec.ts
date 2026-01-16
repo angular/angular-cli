@@ -8,10 +8,12 @@
 
 import { EventEmitter } from 'events';
 import type { ChildProcess } from 'node:child_process';
-import { AngularWorkspace } from '../../../../utilities/config';
 import type { MockHost } from '../../testing/mock-host';
-import { addProjectToWorkspace, createMockContext } from '../../testing/test-utils';
-import type { McpToolContext } from '../tool-registry';
+import {
+  MockMcpToolContext,
+  addProjectToWorkspace,
+  createMockContext,
+} from '../../testing/test-utils';
 import { startDevserver } from './devserver-start';
 import { stopDevserver } from './devserver-stop';
 import { WATCH_DELAY, waitForDevserverBuild } from './devserver-wait-for-build';
@@ -24,10 +26,9 @@ class MockChildProcess extends EventEmitter {
 
 describe('Serve Tools', () => {
   let mockHost: MockHost;
-  let mockContext: McpToolContext;
+  let mockContext: MockMcpToolContext;
   let mockProcess: MockChildProcess;
   let portCounter: number;
-  let mockWorkspace: AngularWorkspace;
 
   beforeEach(() => {
     portCounter = 12345;
@@ -36,7 +37,6 @@ describe('Serve Tools', () => {
     const mock = createMockContext();
     mockHost = mock.host;
     mockContext = mock.context;
-    mockWorkspace = mock.workspace;
 
     // Customize host spies
     mockHost.spawn.and.returnValue(mockProcess as unknown as ChildProcess);
@@ -44,7 +44,7 @@ describe('Serve Tools', () => {
 
     // Setup default project
     addProjectToWorkspace(mock.projects, 'my-app');
-    mockWorkspace.extensions['defaultProject'] = 'my-app';
+    mockContext.workspace.extensions['defaultProject'] = 'my-app';
   });
 
   it('should start and stop a dev server', async () => {
@@ -52,9 +52,12 @@ describe('Serve Tools', () => {
     expect(startResult.structuredContent.message).toBe(
       `Development server for project 'my-app' started and watching for workspace changes.`,
     );
-    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', '--port=12345'], { stdio: 'pipe' });
+    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'my-app', '--port=12345'], {
+      stdio: 'pipe',
+      cwd: '/test',
+    });
 
-    const stopResult = stopDevserver({}, mockContext);
+    const stopResult = await stopDevserver({}, mockContext);
     expect(stopResult.structuredContent.message).toBe(
       `Development server for project 'my-app' stopped.`,
     );
@@ -84,7 +87,7 @@ describe('Serve Tools', () => {
 
   it('should handle multiple dev servers', async () => {
     // Add extra projects
-    const projects = mockWorkspace.projects;
+    const projects = mockContext.workspace.projects;
     addProjectToWorkspace(projects, 'app-one');
     addProjectToWorkspace(projects, 'app-two');
 
@@ -105,13 +108,15 @@ describe('Serve Tools', () => {
 
     expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'app-one', '--port=12345'], {
       stdio: 'pipe',
+      cwd: '/test',
     });
     expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'app-two', '--port=12346'], {
       stdio: 'pipe',
+      cwd: '/test',
     });
 
     // Stop server for project 1
-    const stopResult1 = stopDevserver({ project: 'app-one' }, mockContext);
+    const stopResult1 = await stopDevserver({ project: 'app-one' }, mockContext);
     expect(stopResult1.structuredContent.message).toBe(
       `Development server for project 'app-one' stopped.`,
     );
@@ -119,7 +124,7 @@ describe('Serve Tools', () => {
     expect(process2.kill).not.toHaveBeenCalled();
 
     // Stop server for project 2
-    const stopResult2 = stopDevserver({ project: 'app-two' }, mockContext);
+    const stopResult2 = await stopDevserver({ project: 'app-two' }, mockContext);
     expect(stopResult2.structuredContent.message).toBe(
       `Development server for project 'app-two' stopped.`,
     );
@@ -127,20 +132,20 @@ describe('Serve Tools', () => {
   });
 
   it('should handle server crash', async () => {
-    addProjectToWorkspace(mockWorkspace.projects, 'crash-app');
+    addProjectToWorkspace(mockContext.workspace.projects, 'crash-app');
     await startDevserver({ project: 'crash-app' }, mockContext);
 
     // Simulate a crash with exit code 1
     mockProcess.stdout.emit('data', 'Fatal error.');
     mockProcess.emit('close', 1);
 
-    const stopResult = stopDevserver({ project: 'crash-app' }, mockContext);
+    const stopResult = await stopDevserver({ project: 'crash-app' }, mockContext);
     expect(stopResult.structuredContent.message).toContain('stopped');
     expect(stopResult.structuredContent.logs).toEqual(['Fatal error.']);
   });
 
   it('wait should timeout if build takes too long', async () => {
-    addProjectToWorkspace(mockWorkspace.projects, 'timeout-app');
+    addProjectToWorkspace(mockContext.workspace.projects, 'timeout-app');
     await startDevserver({ project: 'timeout-app' }, mockContext);
     const waitResult = await waitForDevserverBuild(
       { project: 'timeout-app', timeout: 10 },
@@ -158,6 +163,9 @@ describe('Serve Tools', () => {
       mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...');
 
       const waitPromise = waitForDevserverBuild({ timeout: 5 * WATCH_DELAY }, mockContext);
+
+      // Allow the async resolveWorkspaceAndProject to complete.
+      await Promise.resolve();
 
       // Tick past the first debounce. The while loop will be entered.
       jasmine.clock().tick(WATCH_DELAY + 1);
@@ -180,6 +188,22 @@ describe('Serve Tools', () => {
       ]);
     } finally {
       jasmine.clock().uninstall();
+    }
+  });
+
+  it('should fail with list of running servers when server not found', async () => {
+    addProjectToWorkspace(mockContext.workspace.projects, 'app-one');
+    addProjectToWorkspace(mockContext.workspace.projects, 'app-two');
+    // Start app-one
+    await startDevserver({ project: 'app-one' }, mockContext);
+
+    // Try to stop app-two (which is not running)
+    try {
+      await stopDevserver({ project: 'app-two' }, mockContext);
+      fail('Should have thrown');
+    } catch (e) {
+      expect((e as Error).message).toContain('Dev server not found. Currently running servers:');
+      expect((e as Error).message).toContain("- Project 'app-one' in workspace path '/test'");
     }
   });
 });
