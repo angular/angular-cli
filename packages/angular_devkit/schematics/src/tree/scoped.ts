@@ -89,6 +89,15 @@ class ScopedDirEntry implements DirEntry {
   }
 }
 
+// Workaround for "error TS9038: Computed property names on class or object literals cannot be inferred with --isolatedDeclarations."
+// When this is fixed within TypeScript, the method can be added back directly to the class.
+// See: https://github.com/microsoft/TypeScript/issues/61892
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface ScopedTree {
+  [TreeSymbol](): ScopedTree;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class ScopedTree implements Tree {
   readonly _root: ScopedDirEntry;
 
@@ -96,6 +105,7 @@ export class ScopedTree implements Tree {
     private _base: Tree,
     scope: string,
   ) {
+    this[TreeSymbol] = () => this;
     const normalizedScope = normalize('/' + scope);
     this._root = new ScopedDirEntry(this._base.getDir(normalizedScope), normalizedScope);
   }
@@ -195,10 +205,6 @@ export class ScopedTree implements Tree {
     }
 
     return scopedActions;
-  }
-
-  [TreeSymbol](): this {
-    return this;
   }
 
   private _fullPath(path: string): Path {

@@ -18,8 +18,19 @@ import {
   UpdateRecorder,
 } from './interface';
 
+// Workaround for "error TS9038: Computed property names on class or object literals cannot be inferred with --isolatedDeclarations."
+// When this is fixed within TypeScript, the method can be added back directly to the class.
+// See: https://github.com/microsoft/TypeScript/issues/61892
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface DelegateTree {
+  [TreeSymbol](): DelegateTree;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class DelegateTree implements Tree {
-  constructor(protected _other: Tree) {}
+  constructor(protected _other: Tree) {
+    this[TreeSymbol] = () => this;
+  }
 
   branch(): Tree {
     return this._other.branch();
@@ -82,9 +93,5 @@ export class DelegateTree implements Tree {
   }
   get actions(): Action[] {
     return this._other.actions;
-  }
-
-  [TreeSymbol]() {
-    return this;
   }
 }
