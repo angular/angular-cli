@@ -100,8 +100,8 @@ export async function runModernization(input: ModernizeInput, host: Host) {
   if (transformationNames.length === 0) {
     return createStructuredContentOutput({
       instructions: [
-        'See https://angular.dev/best-practices for Angular best practices. ' +
-          'You can call this tool if you have specific transformation you want to run.',
+        'Call this tool with the specific transformations you want to run. See the tool description for more info. Also call the' +
+          ' `get_best_practices` tool for general Angular best practices.',
       ],
     });
   }
