@@ -9,7 +9,7 @@
 /**
  * An set of HTTP status codes that are considered valid for redirect responses.
  */
-export const VALID_REDIRECT_RESPONSE_CODES = new Set([301, 302, 303, 307, 308]);
+export const VALID_REDIRECT_RESPONSE_CODES: Set<number> = new Set([301, 302, 303, 307, 308]);
 
 /**
  * Checks if the given HTTP status code is a valid redirect response code.
