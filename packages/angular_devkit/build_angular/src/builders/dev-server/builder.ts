@@ -13,7 +13,7 @@ import type { Plugin } from 'esbuild';
 import type http from 'node:http';
 import { EMPTY, Observable, defer, switchMap } from 'rxjs';
 import type { ExecutionTransformer } from '../../transforms';
-import { normalizeOptions } from './options';
+import { isEsbuildBased, normalizeOptions } from './options';
 import type { Schema as DevServerBuilderOptions } from './schema';
 
 /**
@@ -192,23 +192,6 @@ case.
     builderName,
     normalizedOptions,
   };
-}
-
-export function isEsbuildBased(
-  builderName: string,
-): builderName is
-  | '@angular/build:application'
-  | '@angular-devkit/build-angular:application'
-  | '@angular-devkit/build-angular:browser-esbuild' {
-  if (
-    builderName === '@angular/build:application' ||
-    builderName === '@angular-devkit/build-angular:application' ||
-    builderName === '@angular-devkit/build-angular:browser-esbuild'
-  ) {
-    return true;
-  }
-
-  return false;
 }
 
 interface BuilderSelectorInfo {

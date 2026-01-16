@@ -10,10 +10,26 @@ import { BuilderContext, targetFromTargetString } from '@angular-devkit/architec
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { normalizeOptimization } from '../../utils/normalize-optimization';
-import { isEsbuildBased } from './builder';
 import { Schema as DevServerOptions } from './schema';
 
 export type NormalizedDevServerOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+
+export function isEsbuildBased(
+  builderName: string,
+): builderName is
+  | '@angular/build:application'
+  | '@angular-devkit/build-angular:application'
+  | '@angular-devkit/build-angular:browser-esbuild' {
+  if (
+    builderName === '@angular/build:application' ||
+    builderName === '@angular-devkit/build-angular:application' ||
+    builderName === '@angular-devkit/build-angular:browser-esbuild'
+  ) {
+    return true;
+  }
+
+  return false;
+}
 
 /**
  * Normalize the user provided options by creating full paths for all path based options
