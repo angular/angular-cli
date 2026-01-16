@@ -9,12 +9,7 @@
 import { logging, schema } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
 import * as path from 'node:path';
-import type {
-  ArgumentsCamelCase,
-  Argv,
-  CamelCaseKey,
-  CommandModule as YargsCommandModule,
-} from 'yargs';
+import type { ArgumentsCamelCase, Argv, CommandModule as YargsCommandModule } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
 import { AnalyticsCollector } from '../analytics/analytics-collector';
@@ -23,42 +18,11 @@ import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
 import { PackageManagerUtils } from '../utilities/package-manager';
+import { CommandContext, CommandScope, Options, OtherOptions } from './definitions';
 import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
 
-export type Options<T> = { [key in keyof T as CamelCaseKey<key>]: T[key] };
-
-export enum CommandScope {
-  /** Command can only run inside an Angular workspace. */
-  In,
-
-  /** Command can only run outside an Angular workspace. */
-  Out,
-
-  /** Command can run inside and outside an Angular workspace. */
-  Both,
-}
-
-export interface CommandContext {
-  currentDirectory: string;
-  root: string;
-  workspace?: AngularWorkspace;
-  globalConfiguration: AngularWorkspace;
-  logger: logging.Logger;
-  packageManager: PackageManagerUtils;
-  yargsInstance: Argv<{}>;
-
-  /** Arguments parsed in free-from without parser configuration. */
-  args: {
-    positional: string[];
-    options: {
-      help: boolean;
-      jsonHelp: boolean;
-      getYargsCompletions: boolean;
-    } & Record<string, unknown>;
-  };
-}
-
-export type OtherOptions = Record<string, unknown>;
+export { CommandScope };
+export type { CommandContext, Options, OtherOptions };
 
 export interface CommandModuleImplementation<T extends {} = {}> extends Omit<
   YargsCommandModule<{}, T>,
