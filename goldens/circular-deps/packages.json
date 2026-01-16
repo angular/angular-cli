@@ -30,9 +30,5 @@
   [
     "packages/angular/build/src/tools/esbuild/utils.ts",
     "packages/angular/build/src/utils/server-rendering/manifest.ts"
-  ],
-  [
-    "packages/angular/cli/src/analytics/analytics.ts",
-    "packages/angular/cli/src/command-builder/command-module.ts"
   ]
 ]
