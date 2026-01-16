@@ -6,5 +6,5 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 export default function () {
-  return () => {};
+  return (): void => {};
 }
