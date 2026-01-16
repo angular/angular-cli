@@ -10,7 +10,7 @@
 import { SchematicContext, Tree } from '@angular-devkit/schematics';
 
 export default function () {
-  return (_: Tree, context: SchematicContext) => {
+  return (_: Tree, context: SchematicContext): void => {
     context.addTask({
       toConfiguration() {
         return { name: 'file-tasks/file-task.js' };

@@ -10,7 +10,7 @@
 import { SchematicContext, Tree } from '@angular-devkit/schematics';
 
 export default function (options: {}) {
-  return (tree: Tree, context: SchematicContext) => {
+  return (tree: Tree, context: SchematicContext): void => {
     // We pass information back to the test.
     tree.create(
       (context.schematic.description as any).extra, // tslint:disable-line:no-any
