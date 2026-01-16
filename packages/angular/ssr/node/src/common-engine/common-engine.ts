@@ -65,7 +65,7 @@ export class CommonEngine {
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
 
-  constructor(private options?: CommonEngineOptions) {
+  constructor(private options?: CommonEngineOptions | undefined) {
     attachNodeGlobalErrorHandlers();
   }
 
