@@ -98,6 +98,15 @@ export class HostDirEntry implements DirEntry {
   }
 }
 
+// Workaround for "error TS9038: Computed property names on class or object literals cannot be inferred with --isolatedDeclarations."
+// When this is fixed within TypeScript, the method can be added back directly to the class.
+// See: https://github.com/microsoft/TypeScript/issues/61892
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface HostTree {
+  [TreeSymbol](): HostTree;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class HostTree implements Tree {
   private readonly _id = --_uniqueId;
   private _record: virtualFs.CordHost;
@@ -105,10 +114,6 @@ export class HostTree implements Tree {
   private _ancestry = new Set<number>();
 
   private _dirCache = new Map<Path, HostDirEntry>();
-
-  [TreeSymbol](): this {
-    return this;
-  }
 
   static isHostTree(tree: Tree): tree is HostTree {
     if (tree instanceof HostTree) {
@@ -123,6 +128,7 @@ export class HostTree implements Tree {
   }
 
   constructor(protected _backend: virtualFs.ReadonlyHost<{}> = new virtualFs.Empty()) {
+    this[TreeSymbol] = () => this;
     this._record = new virtualFs.CordHost(new virtualFs.SafeReadonlyHost(_backend));
     this._recordSync = new virtualFs.SyncDelegateHost(this._record);
   }

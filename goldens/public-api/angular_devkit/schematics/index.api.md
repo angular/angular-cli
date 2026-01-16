@@ -203,9 +203,13 @@ export interface CreateFileAction extends ActionBase {
 }
 
 // @public (undocumented)
+export interface DelegateTree {
+}
+
+// @public (undocumented)
 export class DelegateTree implements Tree_2 {
     // (undocumented)
-    [TreeSymbol]: () => this;
+    [TreeSymbol]: () => DelegateTree;
     constructor(_other: Tree_2);
     // (undocumented)
     get actions(): Action[];
@@ -517,9 +521,13 @@ export class HostSink extends SimpleSinkBase {
 }
 
 // @public (undocumented)
+export interface HostTree {
+}
+
+// @public (undocumented)
 export class HostTree implements Tree_2 {
     // (undocumented)
-    [TreeSymbol]: () => this;
+    [TreeSymbol]: () => HostTree;
     constructor(_backend?: virtualFs.ReadonlyHost<{}>);
     // (undocumented)
     get actions(): Action[];

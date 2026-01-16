@@ -46,9 +46,18 @@ export class NullTreeDirEntry implements DirEntry {
   visit(): void {}
 }
 
+// Workaround for "error TS9038: Computed property names on class or object literals cannot be inferred with --isolatedDeclarations."
+// When this is fixed within TypeScript, the method can be added back directly to the class.
+// See: https://github.com/microsoft/TypeScript/issues/61892
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+export interface NullTree {
+  [TreeSymbol](): NullTree;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class NullTree implements Tree {
-  [TreeSymbol](): this {
-    return this;
+  constructor() {
+    this[TreeSymbol] = () => this;
   }
 
   branch(): Tree {
