@@ -69,7 +69,7 @@
     "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
     "ng-packagr": "21.1.0",
-    "undici": "7.18.0"
+    "undici": "7.18.2"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
