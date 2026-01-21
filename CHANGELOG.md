@@ -1,3 +1,21 @@
+<a name="20.3.15"></a>
+
+# 20.3.15 (2026-01-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [795d65413](https://github.com/angular/angular-cli/commit/795d654138701a03d4d793d3299ff4f33e427a03) | fix  | update pacote to v21.0.4 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [ffc72cbc5](https://github.com/angular/angular-cli/commit/ffc72cbc52e23cb545476b3fdefc7e5f170eb55d) | fix  | update webpack to version 5.104.1 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.14"></a>
 
 # 20.3.14 (2026-01-07)
