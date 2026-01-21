@@ -130,14 +130,13 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
     it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
       await harness.modifyFile('tsconfig.json', (content) => {
         return content.replace(
-          /"baseUrl": ".\/",/,
-          `
-            "baseUrl": "./",
-            "paths": {
-              "@app/*": [
-                "src/app/*"
-              ]
-            },
+          /"compilerOptions": {/,
+          `"compilerOptions": {
+              "paths": {
+                "@app/*": [
+                  "./src/app/*"
+                ]
+              },
           `,
         );
       });

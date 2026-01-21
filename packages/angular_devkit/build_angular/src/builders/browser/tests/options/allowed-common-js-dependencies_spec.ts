@@ -120,12 +120,14 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
     it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
       await harness.modifyFile('tsconfig.json', (content) => {
         return content.replace(
-          /"baseUrl": ".\/",/,
-          `
+          /"compilerOptions": {/,
+          // TODO(crisbeto): the `baseUrl` here will trigger a deprecation error in TS6. We may
+          // have to opt out of it for this test since Webpack seems to depend on the `baseUrl`.
+          `"compilerOptions": {
             "baseUrl": "./",
             "paths": {
               "@app/*": [
-                "src/app/*"
+                "./src/app/*"
               ]
             },
           `,

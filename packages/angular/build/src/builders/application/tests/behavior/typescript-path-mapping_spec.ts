@@ -81,7 +81,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       await harness.modifyFile('tsconfig.json', (content) => {
         const tsconfig = JSON.parse(content);
         tsconfig.compilerOptions.paths = {
-          'app-module': ['a.js'],
+          'app-module': ['./a.js'],
         };
 
         return JSON.stringify(tsconfig);

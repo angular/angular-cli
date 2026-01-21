@@ -1,7 +1,6 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
     "outDir": "./dist/out-tsc",
     "sourceMap": true,
     "declaration": false,
@@ -17,7 +16,6 @@
     ]
   },
   "angularCompilerOptions": {
-    "enableIvy": true,
     "disableTypeScriptVersionCheck": true,
     "strictTemplates": true
   }
