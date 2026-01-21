@@ -12,7 +12,7 @@
  * a flexible and secure abstraction over the various package managers.
  */
 
-import { join } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
 import { maxSatisfying } from 'semver';
 import { PackageManagerError } from './error';
@@ -61,8 +61,7 @@ export interface PackageManagerOptions {
   logger?: Logger;
 
   /**
-   * The path to use as the base for temporary directories.
-   * If not specified, the system's temporary directory will be used.
+   * The base path to use for temporary directories.
    */
   tempDirectory?: string;
 
@@ -340,7 +339,6 @@ export class PackageManager {
 
   /**
    * Gets the version of the package manager binary.
-   * @returns A promise that resolves to the trimmed version string.
    */
   async getVersion(): Promise<string> {
     if (this.#version) {
@@ -544,6 +542,29 @@ export class PackageManager {
     }
   }
 
+  private async getTemporaryDirectory(): Promise<string | undefined> {
+    const { tempDirectory } = this.options;
+
+    if (tempDirectory && !relative(this.cwd, tempDirectory).startsWith('..')) {
+      try {
+        await this.host.stat(tempDirectory);
+      } catch {
+        // If the cache directory doesn't exist, create it.
+        await this.host.mkdir(tempDirectory);
+      }
+    }
+
+    const tempOptions = ['node_modules'];
+    for (const tempOption of tempOptions) {
+      try {
+        const directory = resolve(this.cwd, tempOption);
+        if ((await this.host.stat(directory)).isDirectory()) {
+          return directory;
+        }
+      } catch {}
+    }
+  }
+
   /**
    * Acquires a package by installing it into a temporary directory. The caller is
    * responsible for managing the lifecycle of the temporary directory by calling
@@ -558,7 +579,9 @@ export class PackageManager {
     specifier: string,
     options: { registry?: string; ignoreScripts?: boolean } = {},
   ): Promise<{ workingDirectory: string; cleanup: () => Promise<void> }> {
-    const workingDirectory = await this.host.createTempDirectory(this.options.tempDirectory);
+    const workingDirectory = await this.host.createTempDirectory(
+      await this.getTemporaryDirectory(),
+    );
     const cleanup = () => this.host.deleteDirectory(workingDirectory);
 
     // Some package managers, like yarn classic, do not write a package.json when adding a package.

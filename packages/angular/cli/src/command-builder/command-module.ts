@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging, schema } from '@angular-devkit/core';
+import { schema } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
-import * as path from 'node:path';
+import { join, posix } from 'node:path';
 import type { ArgumentsCamelCase, Argv, CommandModule as YargsCommandModule } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
@@ -17,7 +17,6 @@ import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-
 import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
-import { PackageManagerUtils } from '../utilities/package-manager';
 import { CommandContext, CommandScope, Options, OtherOptions } from './definitions';
 import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
 
@@ -75,8 +74,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
           ...(this.longDescriptionPath
             ? {
                 longDescriptionRelativePath: path
-                  .relative(path.join(__dirname, '../../../../'), this.longDescriptionPath)
-                  .replace(/\\/g, path.posix.sep),
+                  .relative(join(__dirname, '../../../../'), this.longDescriptionPath)
+                  .replace(/\\/g, posix.sep),
                 longDescription: readFileSync(this.longDescriptionPath, 'utf8').replace(
                   /\r\n/g,
                   '\n',
@@ -156,7 +155,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     return userId
       ? new AnalyticsCollector(this.context.logger, userId, {
           name: this.context.packageManager.name,
-          version: this.context.packageManager.version,
+          version: await this.context.packageManager.getVersion(),
         })
       : undefined;
   }
