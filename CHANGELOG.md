@@ -1,3 +1,30 @@
+<a name="21.1.1"></a>
+
+# 21.1.1 (2026-01-21)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [151b69587](https://github.com/angular/angular-cli/commit/151b69587d982130bb80461e4fe143c8f047e68d) | fix  | Remove nonexistent link from MCP response |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [9da6d8fa7](https://github.com/angular/angular-cli/commit/9da6d8fa7640f321547b0308accbfcafefee5b0b) | fix  | correct vscode MCP configuration for new projects             |
+| [361758c75](https://github.com/angular/angular-cli/commit/361758c75c08d80100ab2307578ef74e8ec288e2) | fix  | remove special characters from jasmine-vitest report filename |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [1b7e3307a](https://github.com/angular/angular-cli/commit/1b7e3307afb21224ade885e5be64f16c1de860c9) | fix  | allow application assets in workspace root                       |
+| [d1e596dc5](https://github.com/angular/angular-cli/commit/d1e596dc53b9a43063308fa775cd9ad8f60cad8b) | fix  | prevent incorrect catch binding removal in downleveled for-await |
+| [98ef0981a](https://github.com/angular/angular-cli/commit/98ef0981a2e3aee3c6fd2b6cf0561f6919487723) | fix  | update undici to v7.18.2                                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.15"></a>
 
 # 20.3.15 (2026-01-21)
