@@ -11,7 +11,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, promises as fs } from 'node:fs';
 import { join, resolve } from 'node:path';
 import * as semver from 'semver';
-import { PackageManager } from '../../../package-managers';
+import type { PackageManager } from '../../../package-managers';
 import { VERSION } from '../../../utilities/version';
 import { ANGULAR_PACKAGES_REGEXP } from './constants';
 

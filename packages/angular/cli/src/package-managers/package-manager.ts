@@ -550,7 +550,7 @@ export class PackageManager {
         await this.host.stat(tempDirectory);
       } catch {
         // If the cache directory doesn't exist, create it.
-        await this.host.mkdir(tempDirectory);
+        await this.host.mkdir(tempDirectory, { recursive: true });
       }
     }
 

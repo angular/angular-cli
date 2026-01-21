@@ -20,7 +20,7 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
-import { InstalledPackage, PackageManager, PackageManifest } from '../../package-managers';
+import type { InstalledPackage, PackageManager, PackageManifest } from '../../package-managers';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';

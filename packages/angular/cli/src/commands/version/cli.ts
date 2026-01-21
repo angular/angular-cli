@@ -56,7 +56,7 @@ export default class VersionCommandModule
    */
   async run(options: { json?: boolean }): Promise<void> {
     const { logger } = this.context;
-    const versionInfo = gatherVersionInfo(this.context);
+    const versionInfo = await gatherVersionInfo(this.context);
 
     if (options.json) {
       // eslint-disable-next-line no-console

@@ -8,7 +8,7 @@
 
 import { schema } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';
-import { join, posix } from 'node:path';
+import { join, posix, relative } from 'node:path';
 import type { ArgumentsCamelCase, Argv, CommandModule as YargsCommandModule } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
@@ -73,9 +73,10 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
           describe: this.describe,
           ...(this.longDescriptionPath
             ? {
-                longDescriptionRelativePath: path
-                  .relative(join(__dirname, '../../../../'), this.longDescriptionPath)
-                  .replace(/\\/g, posix.sep),
+                longDescriptionRelativePath: relative(
+                  join(__dirname, '../../../../'),
+                  this.longDescriptionPath,
+                ).replace(/\\/g, posix.sep),
                 longDescription: readFileSync(this.longDescriptionPath, 'utf8').replace(
                   /\r\n/g,
                   '\n',

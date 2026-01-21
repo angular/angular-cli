@@ -14,7 +14,7 @@
  */
 
 import { type SpawnOptions, spawn } from 'node:child_process';
-import { Stats, constants, existsSync } from 'node:fs';
+import { Stats, constants } from 'node:fs';
 import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { platform, tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -27,9 +27,10 @@ export interface Host {
   /**
    * Creates a directory.
    * @param path The path to the directory.
+   * @param options Options for the directory creation.
    * @returns A promise that resolves when the directory is created.
    */
-  mkdir(path: string): Promise<void>;
+  mkdir(path: string, options?: { recursive?: boolean }): Promise<string | undefined>;
 
   /**
    * Gets the stats of a file or directory.

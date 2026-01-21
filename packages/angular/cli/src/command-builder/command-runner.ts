@@ -18,7 +18,8 @@ import {
   RootCommands,
   RootCommandsAliases,
 } from '../commands/command-config';
-import { PackageManagerName, createPackageManager } from '../package-managers';
+import { createPackageManager } from '../package-managers';
+import { ConfiguredPackageManagerInfo } from '../package-managers/factory';
 import { colors } from '../utilities/color';
 import { AngularWorkspace, getProjectByCwd, getWorkspace } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
@@ -64,13 +65,12 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   }
 
   const root = workspace?.basePath ?? process.cwd();
-
-  const cacheConfig = getCacheConfig(workspace);
+  const cacheConfig = workspace && getCacheConfig(workspace);
   const packageManager = await createPackageManager({
     cwd: root,
     logger,
-    dryRun,
-    tempDirectory: cacheConfig.enabled ? cacheConfig.path : undefined,
+    dryRun: dryRun || help || jsonHelp || getYargsCompletions,
+    tempDirectory: cacheConfig?.enabled ? cacheConfig.path : undefined,
     configuredPackageManager: await getConfiguredPackageManager(
       root,
       workspace,
@@ -187,14 +187,14 @@ async function getCommandsToRegister(
  * @param root The root directory of the workspace.
  * @param localWorkspace The local workspace.
  * @param globalWorkspace The global workspace.
- * @returns The package manager name.
+ * @returns The package manager name and version.
  */
 async function getConfiguredPackageManager(
   root: string,
   localWorkspace: AngularWorkspace | undefined,
   globalWorkspace: AngularWorkspace,
-): Promise<PackageManagerName | undefined> {
-  let result: PackageManagerName | undefined;
+): Promise<ConfiguredPackageManagerInfo | undefined> {
+  let result: ConfiguredPackageManagerInfo | undefined;
 
   try {
     const packageJsonPath = join(root, 'package.json');
@@ -223,13 +223,15 @@ async function getConfiguredPackageManager(
 /**
  * Get the package manager name from a JSON value.
  * @param source The JSON value to get the package manager name from.
- * @returns The package manager name.
+ * @returns The package manager name and version.
  */
-function getPackageManager(source: JsonValue | undefined): PackageManagerName | undefined {
+function getPackageManager(
+  source: JsonValue | undefined,
+): ConfiguredPackageManagerInfo | undefined {
   if (source && isJsonObject(source)) {
     const value = source['packageManager'];
     if (typeof value === 'string') {
-      return value.split('@', 1)[0] as unknown as PackageManagerName;
+      return value.split('@', 2) as unknown as ConfiguredPackageManagerInfo;
     }
   }
 

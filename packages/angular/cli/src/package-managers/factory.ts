@@ -15,6 +15,11 @@ import { PackageManager } from './package-manager';
 import { PackageManagerName, SUPPORTED_PACKAGE_MANAGERS } from './package-manager-descriptor';
 
 /**
+ * Information about the package manager to use for a given project.
+ */
+export type ConfiguredPackageManagerInfo = [name?: PackageManagerName, version?: string];
+
+/**
  * The default package manager to use when none is discovered or configured.
  */
 const DEFAULT_PACKAGE_MANAGER: PackageManagerName = 'npm';
@@ -59,7 +64,7 @@ async function getPackageManagerVersion(
 async function determinePackageManager(
   host: Host,
   cwd: string,
-  configured?: PackageManagerName,
+  configured: ConfiguredPackageManagerInfo = [],
   logger?: Logger,
   dryRun?: boolean,
 ): Promise<{
@@ -67,11 +72,10 @@ async function determinePackageManager(
   source: 'configured' | 'discovered' | 'default';
   version?: string;
 }> {
-  let name: PackageManagerName;
+  let [name, version] = configured;
   let source: 'configured' | 'discovered' | 'default';
 
-  if (configured) {
-    name = configured;
+  if (name) {
     source = 'configured';
     logger?.debug(`Using configured package manager: '${name}'.`);
   } else {
@@ -89,7 +93,6 @@ async function determinePackageManager(
     }
   }
 
-  let version: string | undefined;
   if (name === 'yarn' && !dryRun) {
     assert.deepStrictEqual(
       SUPPORTED_PACKAGE_MANAGERS.yarn.versionCommand,
@@ -98,7 +101,7 @@ async function determinePackageManager(
     );
 
     try {
-      version = await getPackageManagerVersion(host, cwd, name, logger);
+      version ??= await getPackageManagerVersion(host, cwd, name, logger);
       if (version && major(version) < 2) {
         name = 'yarn-classic';
         logger?.debug(`Detected yarn classic. Using 'yarn-classic'.`);
@@ -124,7 +127,7 @@ async function determinePackageManager(
  */
 export async function createPackageManager(options: {
   cwd: string;
-  configuredPackageManager?: PackageManagerName;
+  configuredPackageManager?: ConfiguredPackageManagerInfo;
   logger?: Logger;
   dryRun?: boolean;
   tempDirectory?: string;

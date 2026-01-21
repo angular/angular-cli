@@ -7,6 +7,8 @@
  */
 
 import { createRequire } from 'node:module';
+import { CommandContext } from '../../command-builder/definitions';
+import { PackageManager } from '../../package-managers';
 import { VERSION } from '../../utilities/version';
 
 /**
@@ -81,10 +83,7 @@ const PACKAGE_PATTERNS = [
  * Gathers all the version information from the environment and workspace.
  * @returns An object containing all the version information.
  */
-export function gatherVersionInfo(context: {
-  packageManager: { name: string; version: string | undefined };
-  root: string;
-}): VersionInfo {
+export async function gatherVersionInfo(context: CommandContext): Promise<VersionInfo> {
   // Trailing slash is used to allow the path to be treated as a directory
   const workspaceRequire = createRequire(context.root + '/');
 
@@ -132,7 +131,7 @@ export function gatherVersionInfo(context: {
       },
       packageManager: {
         name: context.packageManager.name,
-        version: context.packageManager.version,
+        version: await context.packageManager.getVersion(),
       },
     },
     packages,

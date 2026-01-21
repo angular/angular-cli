@@ -8,7 +8,7 @@
 
 import { logging } from '@angular-devkit/core';
 import type { Argv, CamelCaseKey } from 'yargs';
-import { PackageManager } from '../package-managers/package-manager';
+import type { PackageManager } from '../package-managers/package-manager';
 import { AngularWorkspace } from '../utilities/config';
 
 export enum CommandScope {
