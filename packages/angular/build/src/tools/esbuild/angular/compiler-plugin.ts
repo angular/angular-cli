@@ -733,7 +733,9 @@ function createCompilerOptionsTransformer(
     return {
       ...compilerOptions,
       noEmitOnError: false,
-      composite: false,
+      // TypeScript requires either declaration or composite to be true when isolatedDeclarations is set
+      declaration: compilerOptions.isolatedDeclarations ? compilerOptions.declaration : false,
+      composite: compilerOptions.isolatedDeclarations ? compilerOptions.composite : false,
       inlineSources: !!pluginOptions.sourcemap,
       inlineSourceMap: !!pluginOptions.sourcemap,
       sourceMap: undefined,

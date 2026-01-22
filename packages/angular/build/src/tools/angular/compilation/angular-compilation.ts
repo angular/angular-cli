@@ -52,7 +52,6 @@ export abstract class AngularCompilation {
         suppressOutputPathCheck: true,
         outDir: undefined,
         sourceMap: false,
-        declaration: false,
         declarationMap: false,
         allowEmptyCodegenFiles: false,
         annotationsAs: 'decorators',
