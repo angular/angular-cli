@@ -9,18 +9,13 @@
 import { logging } from '@angular-devkit/core';
 import { Rule, SchematicContext, SchematicsException, Tree } from '@angular-devkit/schematics';
 import * as npa from 'npm-package-arg';
-import type { Manifest } from 'pacote';
 import * as semver from 'semver';
 import {
-  NgPackageManifestProperties,
   NpmRepositoryPackageJson,
+  PackageManifest,
   getNpmPackageJson,
 } from '../../../utilities/package-metadata';
 import { Schema as UpdateSchema } from './schema';
-
-interface JsonSchemaForNpmPackageJsonFiles extends Manifest, NgPackageManifestProperties {
-  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
-}
 
 type VersionRange = string & { __VERSION_RANGE: void };
 type PeerVersionTransform = string | ((range: string) => string);
@@ -64,7 +59,7 @@ const knownPeerCompatibleList: { [name: string]: PeerVersionTransform } = {
 
 interface PackageVersionInfo {
   version: VersionRange;
-  packageJson: JsonSchemaForNpmPackageJsonFiles;
+  packageJson: PackageManifest;
   updateMetadata: UpdateMetadata;
 }
 
@@ -268,7 +263,7 @@ function _performUpdate(
     throw new SchematicsException('Could not find a package.json. Are you in a Node project?');
   }
 
-  const packageJson = tree.readJson('/package.json') as JsonSchemaForNpmPackageJsonFiles;
+  const packageJson = tree.readJson('/package.json') as PackageManifest;
 
   const updateDependency = (deps: Record<string, string>, name: string, newVersion: string) => {
     const oldVersion = deps[name];
@@ -347,7 +342,7 @@ function _performUpdate(
 }
 
 function _getUpdateMetadata(
-  packageJson: JsonSchemaForNpmPackageJsonFiles,
+  packageJson: PackageManifest,
   logger: logging.LoggerApi,
 ): UpdateMetadata {
   const metadata = packageJson['ng-update'];
@@ -548,7 +543,7 @@ function _buildPackageInfo(
 
   let installedVersion: string | undefined | null;
   if (pkgJsonExists) {
-    const { version } = tree.readJson(pkgJsonPath) as JsonSchemaForNpmPackageJsonFiles;
+    const { version } = tree.readJson(pkgJsonPath) as PackageManifest;
     installedVersion = version;
   }
 
@@ -774,7 +769,7 @@ function _addPeerDependencies(
 function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]> {
   const { dependencies, devDependencies, peerDependencies } = tree.readJson(
     '/package.json',
-  ) as JsonSchemaForNpmPackageJsonFiles;
+  ) as PackageManifest;
 
   return [
     ...(Object.entries(peerDependencies || {}) as Array<[string, VersionRange]>),

@@ -49,6 +49,7 @@ export interface NgPackageManifestProperties {
 
 export interface PackageManifest extends Manifest, NgPackageManifestProperties {
   deprecated?: boolean;
+  peerDependenciesMeta?: Record<string, { optional?: boolean }>;
 }
 
 interface PackageManagerOptions extends Record<string, unknown> {
