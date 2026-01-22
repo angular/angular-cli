@@ -10,7 +10,7 @@ import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join, relative, resolve } from 'node:path';
+import { dirname, join } from 'node:path';
 import npa from 'npm-package-arg';
 import semver, { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
@@ -25,16 +25,13 @@ import {
 } from '../../command-builder/schematics-command-module';
 import {
   NgAddSaveDependency,
-  PackageManager,
   PackageManagerError,
   PackageManifest,
   PackageMetadata,
-  createPackageManager,
 } from '../../package-managers';
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
-import { getCacheConfig } from '../cache/utilities';
 
 class CommandError extends Error {}
 
@@ -46,7 +43,6 @@ interface AddCommandArgs extends SchematicsCommandArgs {
 }
 
 interface AddCommandTaskContext {
-  packageManager: PackageManager;
   packageIdentifier: npa.Result;
   savePackage?: NgAddSaveDependency;
   collectionName?: string;
@@ -198,7 +194,8 @@ export default class AddCommandModule
       [
         {
           title: 'Determining Package Manager',
-          task: (context, task) => this.determinePackageManagerTask(context, task),
+          task: (_context, task) =>
+            (task.output = `Using package manager: ${color.dim(this.context.packageManager.name)}`),
           rendererOptions: { persistentOutput: true },
         },
         {
@@ -309,47 +306,14 @@ export default class AddCommandModule
     }
   }
 
-  private async determinePackageManagerTask(
-    context: AddCommandTaskContext,
-    task: AddCommandTaskWrapper,
-  ): Promise<void> {
-    let tempDirectory: string | undefined;
-    const tempOptions = ['node_modules'];
-
-    const cacheConfig = getCacheConfig(this.context.workspace);
-    if (cacheConfig.enabled) {
-      const cachePath = resolve(this.context.root, cacheConfig.path);
-      if (!relative(this.context.root, cachePath).startsWith('..')) {
-        tempOptions.push(cachePath);
-      }
-    }
-
-    for (const tempOption of tempOptions) {
-      try {
-        const directory = resolve(this.context.root, tempOption);
-        if ((await fs.stat(directory)).isDirectory()) {
-          tempDirectory = directory;
-          break;
-        }
-      } catch {}
-    }
-
-    context.packageManager = await createPackageManager({
-      cwd: this.context.root,
-      logger: this.context.logger,
-      dryRun: context.dryRun,
-      tempDirectory,
-    });
-    task.output = `Using package manager: ${color.dim(context.packageManager.name)}`;
-  }
-
   private async findCompatiblePackageVersionTask(
     context: AddCommandTaskContext,
     task: AddCommandTaskWrapper,
     options: Options<AddCommandArgs>,
   ): Promise<void> {
     const { registry, verbose } = options;
-    const { packageManager, packageIdentifier } = context;
+    const { packageIdentifier } = context;
+    const { packageManager } = this.context;
     const packageName = packageIdentifier.name;
 
     assert(packageName, 'Registry package identifiers should always have a name.');
@@ -446,7 +410,8 @@ export default class AddCommandModule
       rejectionReasons: string[];
     },
   ): Promise<PackageManifest | null> {
-    const { packageManager, packageIdentifier } = context;
+    const { packageIdentifier } = context;
+    const { packageManager } = this.context;
     const { registry, verbose, rejectionReasons } = options;
     const packageName = packageIdentifier.name;
     assert(packageName, 'Package name must be defined.');
@@ -524,9 +489,12 @@ export default class AddCommandModule
 
     let manifest;
     try {
-      manifest = await context.packageManager.getManifest(context.packageIdentifier.toString(), {
-        registry,
-      });
+      manifest = await this.context.packageManager.getManifest(
+        context.packageIdentifier.toString(),
+        {
+          registry,
+        },
+      );
     } catch (e) {
       assertIsError(e);
       throw new CommandError(
@@ -585,7 +553,8 @@ export default class AddCommandModule
     options: Options<AddCommandArgs>,
   ): Promise<void> {
     const { registry } = options;
-    const { packageManager, packageIdentifier, savePackage } = context;
+    const { packageIdentifier, savePackage } = context;
+    const { packageManager } = this.context;
 
     // Only show if installation will actually occur
     task.title = 'Installing package';

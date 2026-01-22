@@ -23,6 +23,10 @@ export class MockHost implements Host {
     }
   }
 
+  mkdir(path: string, options?: { recursive?: boolean }): Promise<string | undefined> {
+    throw new Error('Method not implemented.');
+  }
+
   stat(path: string): Promise<Stats> {
     const content = this.fs.get(path.replace(/\\/g, '/'));
     if (content === undefined) {

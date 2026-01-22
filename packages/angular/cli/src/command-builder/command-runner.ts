@@ -6,19 +6,23 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging } from '@angular-devkit/core';
+import { JsonValue, isJsonObject, logging } from '@angular-devkit/core';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import yargs from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
+import { getCacheConfig } from '../commands/cache/utilities';
 import {
   CommandConfig,
   CommandNames,
   RootCommands,
   RootCommandsAliases,
 } from '../commands/command-config';
+import { createPackageManager } from '../package-managers';
+import { ConfiguredPackageManagerInfo } from '../package-managers/factory';
 import { colors } from '../utilities/color';
-import { AngularWorkspace, getWorkspace } from '../utilities/config';
+import { AngularWorkspace, getProjectByCwd, getWorkspace } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
-import { PackageManagerUtils } from '../utilities/package-manager';
 import { VERSION } from '../utilities/version';
 import { CommandContext, CommandModuleError } from './command-module';
 import {
@@ -34,11 +38,12 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     $0,
     _,
     help = false,
+    dryRun = false,
     jsonHelp = false,
     getYargsCompletions = false,
     ...rest
   } = yargsParser(args, {
-    boolean: ['help', 'json-help', 'get-yargs-completions'],
+    boolean: ['help', 'json-help', 'get-yargs-completions', 'dry-run'],
     alias: { 'collection': 'c' },
   });
 
@@ -60,8 +65,20 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   }
 
   const root = workspace?.basePath ?? process.cwd();
-  const localYargs = yargs(args);
+  const cacheConfig = workspace && getCacheConfig(workspace);
+  const packageManager = await createPackageManager({
+    cwd: root,
+    logger,
+    dryRun: dryRun || help || jsonHelp || getYargsCompletions,
+    tempDirectory: cacheConfig?.enabled ? cacheConfig.path : undefined,
+    configuredPackageManager: await getConfiguredPackageManager(
+      root,
+      workspace,
+      globalConfiguration,
+    ),
+  });
 
+  const localYargs = yargs(args);
   const context: CommandContext = {
     globalConfiguration,
     workspace,
@@ -69,7 +86,7 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     currentDirectory: process.cwd(),
     yargsInstance: localYargs,
     root,
-    packageManager: new PackageManagerUtils({ globalConfiguration, workspace, root }),
+    packageManager,
     args: {
       positional: positional.map((v) => v.toString()),
       options: {
@@ -162,4 +179,61 @@ async function getCommandsToRegister(
   }
 
   return Promise.all(commands.map((command) => command.factory().then((m) => m.default)));
+}
+
+/**
+ * Gets the configured package manager by checking package.json, or the local and global angular.json files.
+ *
+ * @param root The root directory of the workspace.
+ * @param localWorkspace The local workspace.
+ * @param globalWorkspace The global workspace.
+ * @returns The package manager name and version.
+ */
+async function getConfiguredPackageManager(
+  root: string,
+  localWorkspace: AngularWorkspace | undefined,
+  globalWorkspace: AngularWorkspace,
+): Promise<ConfiguredPackageManagerInfo | undefined> {
+  let result: ConfiguredPackageManagerInfo | undefined;
+
+  try {
+    const packageJsonPath = join(root, 'package.json');
+    const pkgJson = JSON.parse(await readFile(packageJsonPath, 'utf-8')) as JsonValue;
+    result = getPackageManager(pkgJson);
+  } catch {}
+
+  if (result) {
+    return result;
+  }
+
+  if (localWorkspace) {
+    const project = getProjectByCwd(localWorkspace);
+    if (project) {
+      result = getPackageManager(localWorkspace.projects.get(project)?.extensions['cli']);
+    }
+
+    result ??= getPackageManager(localWorkspace.extensions['cli']);
+  }
+
+  result ??= getPackageManager(globalWorkspace.extensions['cli']);
+
+  return result;
+}
+
+/**
+ * Get the package manager name from a JSON value.
+ * @param source The JSON value to get the package manager name from.
+ * @returns The package manager name and version.
+ */
+function getPackageManager(
+  source: JsonValue | undefined,
+): ConfiguredPackageManagerInfo | undefined {
+  if (source && isJsonObject(source)) {
+    const value = source['packageManager'];
+    if (typeof value === 'string') {
+      return value.split('@', 2) as unknown as ConfiguredPackageManagerInfo;
+    }
+  }
+
+  return undefined;
 }

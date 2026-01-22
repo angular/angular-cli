@@ -15,7 +15,7 @@
 
 import { type SpawnOptions, spawn } from 'node:child_process';
 import { Stats, constants } from 'node:fs';
-import { copyFile, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
+import { copyFile, mkdir, mkdtemp, readFile, readdir, rm, stat, writeFile } from 'node:fs/promises';
 import { platform, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PackageManagerError } from './error';
@@ -24,6 +24,14 @@ import { PackageManagerError } from './error';
  * An abstraction layer for side-effectful operations.
  */
 export interface Host {
+  /**
+   * Creates a directory.
+   * @param path The path to the directory.
+   * @param options Options for the directory creation.
+   * @returns A promise that resolves when the directory is created.
+   */
+  mkdir(path: string, options?: { recursive?: boolean }): Promise<string | undefined>;
+
   /**
    * Gets the stats of a file or directory.
    * @param path The path to the file or directory.
@@ -101,10 +109,12 @@ export interface Host {
 export const NodeJS_HOST: Host = {
   stat,
   readdir,
+  mkdir,
   readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
   copyFile: (src, dest) => copyFile(src, dest, constants.COPYFILE_FICLONE),
   writeFile,
-  createTempDirectory: (baseDir?: string) => mkdtemp(join(baseDir ?? tmpdir(), 'angular-cli-')),
+  createTempDirectory: (baseDir?: string) =>
+    mkdtemp(join(baseDir ?? tmpdir(), 'angular-cli-tmp-packages-')),
   deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),
   runCommand: async (
     command: string,

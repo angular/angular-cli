@@ -20,12 +20,7 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
-import {
-  InstalledPackage,
-  PackageManager,
-  PackageManifest,
-  createPackageManager,
-} from '../../package-managers';
+import type { InstalledPackage, PackageManager, PackageManifest } from '../../package-managers';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
@@ -168,13 +163,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
   }
 
   async run(options: Options<UpdateCommandArgs>): Promise<number | void> {
-    const { logger } = this.context;
-    // Instantiate the package manager
-    const packageManager = await createPackageManager({
-      cwd: this.context.root,
-      logger,
-      configuredPackageManager: this.context.packageManager.name,
-    });
+    const { logger, packageManager } = this.context;
 
     // Check if the current installed CLI version is older than the latest compatible version.
     // Skip when running `ng update` without a package name as this will not trigger an actual update.
