@@ -552,6 +552,8 @@ export class PackageManager {
         // If the cache directory doesn't exist, create it.
         await this.host.mkdir(tempDirectory, { recursive: true });
       }
+
+      return tempDirectory;
     }
 
     const tempOptions = ['node_modules'];
