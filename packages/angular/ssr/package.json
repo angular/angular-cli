@@ -36,7 +36,7 @@
     "@angular/platform-server": "21.1.0-rc.0",
     "@angular/router": "21.1.0-rc.0",
     "@schematics/angular": "workspace:*",
-    "beasties": "0.3.5"
+    "beasties": "0.4.0"
   },
   "sideEffects": false,
   "schematics": "./schematics/collection.json",
