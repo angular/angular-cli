@@ -85,6 +85,11 @@ export class VitestExecutor implements TestExecutor {
 
     updateExternalMetadata(buildResult, this.externalMetadata, undefined, true);
 
+    // Reset the exit code to allow for a clean state.
+    // This is necessary because Vitest may set the exit code on failure, which can
+    // affect subsequent runs in watch mode or when running multiple builders.
+    process.exitCode = 0;
+
     // Initialize Vitest if not already present.
     this.vitest ??= await this.initializeVitest();
     const vitest = this.vitest;
@@ -122,7 +127,17 @@ export class VitestExecutor implements TestExecutor {
     // Check if all the tests pass to calculate the result
     const testModules = testResults?.testModules ?? this.vitest.state.getTestModules();
 
-    yield { success: testModules.every((testModule) => testModule.ok()) };
+    let success = testModules.every((testModule) => testModule.ok());
+    // Vitest does not return a failure result when coverage thresholds are not met.
+    // Instead, it sets the process exit code to 1.
+    // We check this exit code to determine if the test run should be considered a failure.
+    if (success && process.exitCode === 1) {
+      success = false;
+      // Reset the exit code to prevent it from carrying over to subsequent runs/builds
+      process.exitCode = 0;
+    }
+
+    yield { success };
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
