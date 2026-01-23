@@ -22,6 +22,15 @@ const VitestTestRunner: TestRunner = {
     const checker = new DependencyChecker(options.projectSourceRoot);
     checker.check('vitest');
 
+    // If a runnerConfig is present, only check for 'vitest' itself.
+    // Custom configuration may include unknown browsers or other setup
+    // that doesn't follow the default dependency requirements.
+    if (options.runnerConfig) {
+      checker.report();
+
+      return;
+    }
+
     if (options.browsers?.length) {
       if (process.versions.webcontainer) {
         checker.check('@vitest/browser-preview');
