@@ -113,8 +113,8 @@ jobs:
         run: |
           pnpm bazel build \
             --config=e2e \
-            //tests:e2e.webpack_node22 \
-            //tests:e2e.esbuild_node22 \
+            //tests:e2e.webpack_node24 \
+            //tests:e2e.esbuild_node24 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -131,7 +131,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [22]
+        node: [24]
         subset: [esbuild, webpack]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: windows-2025

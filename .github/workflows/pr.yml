@@ -139,7 +139,7 @@ jobs:
         run: |
           pnpm bazel build \
             --config=e2e \
-            //tests:e2e.esbuild_node22 \
+            //tests:e2e.esbuild_node24 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
@@ -167,7 +167,7 @@ jobs:
       - name: Run CLI E2E tests
         uses: ./.github/shared-actions/windows-bazel-test
         with:
-          test_target_name: e2e.esbuild_node22
+          test_target_name: e2e.esbuild_node24
         env:
           E2E_SHARD_TOTAL: 1
           TESTBRIDGE_TEST_ONLY: tests/basic/{build,rebuild,serve}.ts
