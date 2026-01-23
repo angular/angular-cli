@@ -47,8 +47,8 @@ importers:
         specifier: 21.1.1
         version: 21.1.1(3a4bcd8bb2d7d0838dbb55561be6b67b)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#df3deb932339daede9a7ddd215775b8f043f5150
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/df3deb932339daede9a7ddd215775b8f043f5150(@modelcontextprotocol/sdk@1.25.2(zod@4.3.5))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#c018d7f32d8d6efb63ee3b15485bfe5c4e085581
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581(@modelcontextprotocol/sdk@1.25.2(zod@4.3.5))
       '@angular/platform-browser':
         specifier: 21.1.1
         version: 21.1.1(@angular/animations@21.1.1(@angular/core@21.1.1(@angular/compiler@21.1.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.1.1(@angular/core@21.1.1(@angular/compiler@21.1.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.1.1(@angular/compiler@21.1.1)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -1026,9 +1026,9 @@ packages:
       '@angular/platform-browser': ^21.0.0 || ^22.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/df3deb932339daede9a7ddd215775b8f043f5150':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/df3deb932339daede9a7ddd215775b8f043f5150}
-    version: 0.0.0-f61cab48315bd8e1a8224c284ca6176bf8456b27
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581}
+    version: 0.0.0-eaf8b84148f9fd8e974c6498f4cd19602bb7814d
     hasBin: true
 
   '@angular/platform-browser@21.1.1':
@@ -3546,6 +3546,9 @@ packages:
 
   '@types/jasmine@5.1.15':
     resolution: {integrity: sha512-ZAC8KjmV2MJxbNTrwXFN+HKeajpXQZp6KpPiR6Aa4XvaEnjP6qh23lL/Rqb7AYzlp3h/rcwDrQ7Gg7q28cQTQg==}
+
+  '@types/jasmine@6.0.0':
+    resolution: {integrity: sha512-18lgGsLmEh3VJk9eZ5wAjTISxdqzl6YOwu8UdMpolajN57QOCNbl+AbHUd+Yu9ItrsFdB+c8LSZSGNg8nHaguw==}
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
@@ -9393,7 +9396,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/df3deb932339daede9a7ddd215775b8f043f5150(@modelcontextprotocol/sdk@1.25.2(zod@4.3.5))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581(@modelcontextprotocol/sdk@1.25.2(zod@4.3.5))':
     dependencies:
       '@actions/core': 2.0.2
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -9416,7 +9419,7 @@ snapshots:
       '@types/events': 3.0.3
       '@types/folder-hash': 4.0.4
       '@types/git-raw-commits': 5.0.1
-      '@types/jasmine': 5.1.15
+      '@types/jasmine': 6.0.0
       '@types/node': 24.10.9
       '@types/semver': 7.7.1
       '@types/which': 3.0.4
@@ -12083,6 +12086,8 @@ snapshots:
       '@types/jasmine': 5.1.15
 
   '@types/jasmine@5.1.15': {}
+
+  '@types/jasmine@6.0.0': {}
 
   '@types/json-schema@7.0.15': {}
 
