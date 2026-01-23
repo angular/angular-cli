@@ -180,5 +180,5 @@ register_toolchains(
     "@devinfra//bazel/git-toolchain:git_macos_arm64_toolchain",
     "@devinfra//bazel/git-toolchain:git_windows_toolchain",
     "//tools/toolchains:dummy_cc_windows_no_exec_toolchain",
-    "//tools/toolchains:node22_windows_no_exec_toolchain",
+    "//tools/toolchains:node24_windows_no_exec_toolchain",
 )
