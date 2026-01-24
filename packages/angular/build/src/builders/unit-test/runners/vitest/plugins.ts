@@ -14,6 +14,7 @@ import path from 'node:path';
 import type {
   BrowserConfigOptions,
   InlineConfig,
+  ResolvedConfig,
   UserWorkspaceConfig,
   VitestPlugin,
 } from 'vitest/node';
@@ -185,11 +186,15 @@ async function loadResultFile(file: ResultFile): Promise<string> {
 export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins {
   const { workspaceRoot, buildResultFiles, testFileToEntryPoint } = pluginOptions;
   const isWindows = platform() === 'win32';
+  let vitestConfig: ResolvedConfig;
 
   return [
     {
       name: 'angular:test-in-memory-provider',
       enforce: 'pre',
+      configureVitest(context) {
+        vitestConfig = context.vitest.config;
+      },
       resolveId: (id, importer) => {
         // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
@@ -248,7 +253,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         // If the module cannot be resolved from the build artifacts, let other plugins handle it.
         return undefined;
       },
-      load: async (id) => {
+      async load(id) {
         assert(buildResultFiles.size > 0, 'buildResult must be available for in-memory loading.');
 
         // Attempt to load as a source test file.
@@ -257,11 +262,14 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         if (entryPoint) {
           outputPath = entryPoint + '.js';
 
-          // To support coverage exclusion of the actual test file, the virtual
-          // test entry point only references the built and bundled intermediate file.
-          return {
-            code: `import "./${outputPath}";`,
-          };
+          if (vitestConfig.coverage.enabled) {
+            // To support coverage exclusion of the actual test file, the virtual
+            // test entry point only references the built and bundled intermediate file.
+            // If vitest supported an "excludeOnlyAfterRemap" option, this could be removed completely.
+            return {
+              code: `import "./${outputPath}";`,
+            };
+          }
         } else {
           // Attempt to load as a built artifact.
           const relativePath = path.relative(workspaceRoot, id);
