@@ -39,7 +39,7 @@
     "parse5-html-rewriting-stream": "8.0.0",
     "semver": "7.7.3",
     "yargs": "18.0.0",
-    "zod": "4.3.5"
+    "zod": "4.3.6"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
