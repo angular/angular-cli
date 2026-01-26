@@ -180,9 +180,16 @@ function parseOptions(args: string[]): Options {
       }
     }
 
-    // Type inference for numbers
-    if (typeof value === 'string' && !isNaN(Number(value))) {
-      value = Number(value);
+    if (typeof value === 'string') {
+      if (!isNaN(Number(value))) {
+        // Type inference for numbers
+        value = Number(value);
+      } else if (value === 'true') {
+        // Type inference for booleans
+        value = true;
+      } else if (value === 'false') {
+        value = false;
+      }
     }
 
     const camelName = strings.camelize(name);
