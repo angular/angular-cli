@@ -113,8 +113,11 @@ export async function createVitestConfigPlugin(
         delete config.plugins;
       }
 
-      // Add browser source map support
-      if (browser || testConfig?.browser?.enabled) {
+      // Add browser source map support if coverage is enabled
+      if (
+        (browser || testConfig?.browser?.enabled) &&
+        (options.coverage.enabled || testConfig?.coverage?.enabled)
+      ) {
         projectPlugins.unshift(createSourcemapSupportPlugin());
         setupFiles.unshift('virtual:source-map-support');
       }
@@ -291,6 +294,17 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
           if (map) {
             if (!map.sources?.length && !map.sourcesContent?.length && !map.mappings) {
               map.sources = ['virtual:builder'];
+            } else if (!vitestConfig.coverage.enabled && Array.isArray(map.sources)) {
+              map.sources = (map.sources as string[]).map((source) => {
+                if (source.startsWith('angular:')) {
+                  return source;
+                }
+
+                // source is relative to the workspace root because the output file is at the root of the output.
+                const absoluteSource = path.join(workspaceRoot, source);
+
+                return toPosixPath(path.relative(path.dirname(id), absoluteSource));
+              });
             }
           }
 
