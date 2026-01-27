@@ -8,18 +8,6 @@
     "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
     "test": "ng test"<% } %>
   },
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "overrides": [
-      {
-        "files": "*.html",
-        "options": {
-          "parser": "angular"
-        }
-      }
-    ]
-  },
   "private": true,
   <% if (packageManagerWithVersion) { %>"packageManager": "<%= packageManagerWithVersion %>",<% } %>
   "dependencies": {
@@ -35,6 +23,7 @@
   "devDependencies": {
     "@angular/cli": "<%= '^' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",
+    "prettier": "<%= latestVersions['prettier'] %>",
     "typescript": "<%= latestVersions['typescript'] %>"
   }
 }
