@@ -217,20 +217,6 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
           }
         }
 
-        if (importer && (id[0] === '.' || id[0] === '/')) {
-          let fullPath;
-          if (testFileToEntryPoint.has(importer)) {
-            fullPath = toPosixPath(path.join(workspaceRoot, id));
-          } else {
-            fullPath = toPosixPath(path.join(path.dirname(importer), id));
-          }
-
-          const relativePath = path.relative(workspaceRoot, fullPath);
-          if (buildResultFiles.has(toPosixPath(relativePath))) {
-            return fullPath;
-          }
-        }
-
         // Determine the base directory for resolution.
         let baseDir: string;
         if (importer) {
