@@ -13,7 +13,7 @@ export default async function () {
   try {
     await ng('add', 'tailwindcss', '--skip-confirmation');
     await expectFileToExist('.postcssrc.json');
-    await expectFileToMatch('src/styles.css', /@import "tailwindcss";/);
+    await expectFileToMatch('src/styles.css', /@import 'tailwindcss';/);
     await expectFileToMatch('package.json', /"tailwindcss":/);
     await expectFileToMatch('package.json', /"@tailwindcss\/postcss":/);
     await expectFileToMatch('package.json', /"postcss":/);
