@@ -45,9 +45,9 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     try {
       const prettierPath = createRequire(cwd + '/').resolve('prettier/package.json');
       const prettierPackageJson = JSON.parse(await readFile(prettierPath, 'utf-8')) as {
-        bin: { prettier: string };
+        bin: string;
       };
-      prettierCliPath = join(dirname(prettierPath), prettierPackageJson.bin.prettier);
+      prettierCliPath = join(dirname(prettierPath), prettierPackageJson.bin);
     } catch {
       // Prettier is not installed.
       prettierCliPath = null;
