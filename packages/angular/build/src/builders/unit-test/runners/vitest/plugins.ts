@@ -11,6 +11,7 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { platform } from 'node:os';
 import path from 'node:path';
+import type { ExistingRawSourceMap } from 'rolldown';
 import type {
   BrowserConfigOptions,
   InlineConfig,
@@ -286,26 +287,9 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
           const sourceMapFile = buildResultFiles.get(sourceMapPath);
           const sourceMapText = sourceMapFile ? await loadResultFile(sourceMapFile) : undefined;
 
-          // Vitest will include files in the coverage report if the sourcemap contains no sources.
-          // For builder-internal generated code chunks, which are typically helper functions,
-          // a virtual source is added to the sourcemap to prevent them from being incorrectly
-          // included in the final coverage report.
           const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
           if (map) {
-            if (!map.sources?.length && !map.sourcesContent?.length && !map.mappings) {
-              map.sources = ['virtual:builder'];
-            } else if (!vitestConfig.coverage.enabled && Array.isArray(map.sources)) {
-              map.sources = (map.sources as string[]).map((source) => {
-                if (source.startsWith('angular:')) {
-                  return source;
-                }
-
-                // source is relative to the workspace root because the output file is at the root of the output.
-                const absoluteSource = path.join(workspaceRoot, source);
-
-                return toPosixPath(path.relative(path.dirname(id), absoluteSource));
-              });
-            }
+            adjustSourcemapSources(map, !vitestConfig.coverage.enabled, workspaceRoot, id);
           }
 
           return {
@@ -336,6 +320,40 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
       },
     },
   ];
+}
+
+/**
+ * Adjusts the sources field in a sourcemap to ensure correct source mapping and coverage reporting.
+ *
+ * @param map The raw sourcemap to adjust.
+ * @param rebaseSources Whether to rebase the source paths relative to the test file.
+ * @param workspaceRoot The root directory of the workspace.
+ * @param id The ID (path) of the file being loaded.
+ */
+function adjustSourcemapSources(
+  map: ExistingRawSourceMap,
+  rebaseSources: boolean,
+  workspaceRoot: string,
+  id: string,
+): void {
+  if (!map.sources?.length && !map.sourcesContent?.length && !map.mappings) {
+    // Vitest will include files in the coverage report if the sourcemap contains no sources.
+    // For builder-internal generated code chunks, which are typically helper functions,
+    // a virtual source is added to the sourcemap to prevent them from being incorrectly
+    // included in the final coverage report.
+    map.sources = ['virtual:builder'];
+  } else if (rebaseSources && map.sources) {
+    map.sources = map.sources.map((source) => {
+      if (!source || source.startsWith('angular:')) {
+        return source;
+      }
+
+      // source is relative to the workspace root because the output file is at the root of the output.
+      const absoluteSource = path.join(workspaceRoot, source);
+
+      return toPosixPath(path.relative(path.dirname(id), absoluteSource));
+    });
+  }
 }
 
 function createSourcemapSupportPlugin(): VitestPlugins[0] {
