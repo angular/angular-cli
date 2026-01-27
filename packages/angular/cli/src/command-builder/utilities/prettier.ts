@@ -7,6 +7,7 @@
  */
 
 import { execFile } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, extname, join, relative } from 'node:path';
 import { promisify } from 'node:util';
@@ -43,7 +44,10 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
   if (prettierCliPath === undefined) {
     try {
       const prettierPath = createRequire(cwd + '/').resolve('prettier/package.json');
-      prettierCliPath = join(dirname(prettierPath), 'bin/prettier.cjs');
+      const prettierPackageJson = JSON.parse(await readFile(prettierPath, 'utf-8')) as {
+        bin: { prettier: string };
+      };
+      prettierCliPath = join(dirname(prettierPath), prettierPackageJson.bin.prettier);
     } catch {
       // Prettier is not installed.
       prettierCliPath = null;

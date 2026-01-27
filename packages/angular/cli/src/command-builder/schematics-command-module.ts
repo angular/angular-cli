@@ -368,7 +368,15 @@ export abstract class SchematicsCommandModule
 
       if (files.size) {
         // Note: we could use a task executor to format the files but this is simpler.
-        await formatFiles(this.context.root, files);
+        try {
+          await formatFiles(this.context.root, files);
+        } catch (error) {
+          assertIsError(error);
+
+          logger.warn(
+            `WARNING: Formatting of files failed with the following error: ${error.message}`,
+          );
+        }
       }
 
       return 0;
