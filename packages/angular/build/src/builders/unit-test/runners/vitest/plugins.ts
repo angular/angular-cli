@@ -179,9 +179,10 @@ export async function createVitestConfigPlugin(
   };
 }
 
+const textDecoder = new TextDecoder('utf-8');
 async function loadResultFile(file: ResultFile): Promise<string> {
   if (file.origin === 'memory') {
-    return new TextDecoder('utf-8').decode(file.contents);
+    return textDecoder.decode(file.contents);
   }
 
   return readFile(file.inputPath, 'utf-8');
@@ -266,7 +267,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         if (entryPoint) {
           outputPath = entryPoint + '.js';
 
-          if (vitestConfig.coverage.enabled) {
+          if (vitestConfig?.coverage?.enabled) {
             // To support coverage exclusion of the actual test file, the virtual
             // test entry point only references the built and bundled intermediate file.
             // If vitest supported an "excludeOnlyAfterRemap" option, this could be removed completely.
@@ -289,7 +290,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
 
           const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
           if (map) {
-            adjustSourcemapSources(map, !vitestConfig.coverage.enabled, workspaceRoot, id);
+            adjustSourcemapSources(map, !vitestConfig?.coverage?.enabled, workspaceRoot, id);
           }
 
           return {
