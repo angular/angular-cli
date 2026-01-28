@@ -47,8 +47,8 @@ importers:
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(543b4cd5add643034223e4134967d1ab)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#c018d7f32d8d6efb63ee3b15485bfe5c4e085581
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#15a2e18c3d5403d2b2355c5e42c67effc55f9c9f
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.0-next.0
         version: 21.2.0-next.0(@angular/animations@21.2.0-next.0(@angular/core@21.2.0-next.0(@angular/compiler@21.2.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.0(@angular/core@21.2.0-next.0(@angular/compiler@21.2.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.0(@angular/compiler@21.2.0-next.0)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -1020,9 +1020,9 @@ packages:
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581}
-    version: 0.0.0-eaf8b84148f9fd8e974c6498f4cd19602bb7814d
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f}
+    version: 0.0.0-1d545550f0a93b2ffee3672587314d6f6b3dc7fd
     hasBin: true
 
   '@angular/platform-browser@21.2.0-next.0':
@@ -8492,6 +8492,7 @@ packages:
   tar@7.5.6:
     resolution: {integrity: sha512-xqUeu2JAIJpXyvskvU3uvQW8PAmHrtXp2KDuMJwQqW8Sqq0CaZBAQ+dKS3RBXVhU4wC5NjAdKrmh84241gO9cA==}
     engines: {node: '>=18'}
+    deprecated: Old versions of tar are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exhorbitant rates) by contacting i@izs.me
 
   teeny-request@10.1.0:
     resolution: {integrity: sha512-3ZnLvgWF29jikg1sAQ1g0o+lr5JX6sVgYvfUJazn7ZjJroDBUTWp44/+cFVX0bULjv4vci+rBD+oGVAkWqhUbw==}
@@ -9527,7 +9528,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c018d7f32d8d6efb63ee3b15485bfe5c4e085581(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
     dependencies:
       '@actions/core': 2.0.2
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -14873,7 +14874,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@10.2.2)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
