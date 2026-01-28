@@ -10,7 +10,7 @@ import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { platform } from 'node:os';
-import { dirname, extname, join, relative } from 'node:path';
+import { dirname, extname, join } from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
@@ -62,7 +62,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
   const filesToFormat: string[] = [];
   for (const file of files) {
     if (fileTypes.has(extname(file))) {
-      filesToFormat.push(relative(cwd, file));
+      filesToFormat.push(file);
     }
   }
 
@@ -70,8 +70,12 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
-    cwd,
-    shell: platform() === 'win32',
-  });
+  await execFileAsync(
+    prettierCliPath,
+    ['--write', '--no-error-on-unmatched-pattern', ...filesToFormat],
+    {
+      cwd,
+      shell: platform() === 'win32',
+    },
+  );
 }
