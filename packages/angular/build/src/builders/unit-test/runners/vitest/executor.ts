@@ -26,6 +26,7 @@ import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
 import { findVitestBaseConfig } from './configuration';
 import { createVitestConfigPlugin, createVitestPlugins } from './plugins';
+import { getSetupEntrypoints } from '../../test-discovery';
 
 export class VitestExecutor implements TestExecutor {
   private vitest: Vitest | undefined;
@@ -145,9 +146,19 @@ export class VitestExecutor implements TestExecutor {
   }
 
   private prepareSetupFiles(): string[] {
-    const { setupFiles } = this.options;
+    const { setupFiles, workspaceRoot } = this.options;
+
+    const setupFilesEntrypoints = getSetupEntrypoints(setupFiles, {
+      projectSourceRoot: this.options.projectSourceRoot,
+      workspaceRoot,
+      removeTestExtension: true,
+    });
+    const setupFileNames = Array.from(setupFilesEntrypoints.keys()).map(
+      (entrypoint) => `${entrypoint}.js`,
+    );
+
     // Add setup file entries for TestBed initialization and project polyfills
-    const testSetupFiles = ['init-testbed.js', ...setupFiles];
+    const testSetupFiles = ['init-testbed.js', ...setupFileNames];
 
     // TODO: Provide additional result metadata to avoid needing to extract based on filename
     if (this.buildResultFiles.has('polyfills.js')) {
