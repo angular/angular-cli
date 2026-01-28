@@ -63,7 +63,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
   const filesToFormat: string[] = [];
   for (const file of files) {
     if (fileTypes.has(extname(file))) {
-      filesToFormat.push(file);
+      filesToFormat.push(`"${file}"`);
     }
   }
 
@@ -73,8 +73,10 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
 
   console.log({ filesToFormat, cwd });
 
-  await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
+  const x = await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
     cwd,
     shell: platform() === 'win32',
   });
+
+  console.log({ x });
 }
