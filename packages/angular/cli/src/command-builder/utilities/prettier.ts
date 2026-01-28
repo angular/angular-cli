@@ -20,6 +20,7 @@ let prettierCliPath: string | null | undefined;
  * File types that can be formatted using Prettier.
  */
 const fileTypes: ReadonlySet<string> = new Set([
+  '.md',
   '.ts',
   '.html',
   '.js',
