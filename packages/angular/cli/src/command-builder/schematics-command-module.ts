@@ -29,6 +29,7 @@ import {
   OtherOptions,
 } from './command-module';
 import { Option, parseJsonSchemaToOptions } from './utilities/json-schema';
+import { formatFiles } from './utilities/prettier';
 import { SchematicEngineHost } from './utilities/schematic-engine-host';
 import { subscribeToWorkflow } from './utilities/schematic-workflow';
 
@@ -361,7 +362,24 @@ export abstract class SchematicsCommandModule
 
       if (executionOptions.dryRun) {
         logger.warn(`\nNOTE: The "--dry-run" option means no changes were made.`);
+
+        return 0;
       }
+
+      if (files.size) {
+        // Note: we could use a task executor to format the files but this is simpler.
+        try {
+          await formatFiles(this.context.root, files);
+        } catch (error) {
+          assertIsError(error);
+
+          logger.warn(
+            `WARNING: Formatting of files failed with the following error: ${error.message}`,
+          );
+        }
+      }
+
+      return 0;
     } catch (err) {
       // In case the workflow was not successful, show an appropriate error message.
       if (err instanceof UnsuccessfulWorkflowExecution) {
@@ -376,8 +394,6 @@ export abstract class SchematicsCommandModule
     } finally {
       unsubscribe();
     }
-
-    return 0;
   }
 
   private getProjectName(): string | undefined {

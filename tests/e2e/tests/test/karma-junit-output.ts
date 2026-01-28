@@ -9,7 +9,7 @@ const E2E_CUSTOM_LAUNCHER = `
       flags: ['--no-sandbox', '--headless', '--disable-gpu', '--disable-dev-shm-usage'],
     },
   },
-  restartOnFileChange: true,
+  restartOnFileChange: true
 `;
 
 export default async function () {
