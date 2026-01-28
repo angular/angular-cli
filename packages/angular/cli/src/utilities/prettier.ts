@@ -9,28 +9,11 @@
 import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, extname, join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 let prettierCliPath: string | null | undefined;
-
-/**
- * File types that can be formatted using Prettier.
- */
-const fileTypes: ReadonlySet<string> = new Set([
-  '.md',
-  '.ts',
-  '.html',
-  '.js',
-  '.mjs',
-  '.cjs',
-  '.json',
-  '.css',
-  '.less',
-  '.scss',
-  '.sass',
-]);
 
 /**
  * Formats files using Prettier.
@@ -59,20 +42,9 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  const filesToFormat: string[] = [];
-  for (const file of files) {
-    if (fileTypes.has(extname(file))) {
-      filesToFormat.push(file);
-    }
-  }
-
-  if (!filesToFormat.length) {
-    return;
-  }
-
   await execFileAsync(
     process.execPath,
-    [prettierCliPath, '--write', '--no-error-on-unmatched-pattern', ...filesToFormat],
+    [prettierCliPath, '--write', '--no-error-on-unmatched-pattern', ...files],
     {
       cwd,
       shell: false,
