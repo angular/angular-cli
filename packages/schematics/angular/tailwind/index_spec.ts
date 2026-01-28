@@ -64,17 +64,17 @@ describe('Tailwind Schematic', () => {
   it('should add tailwind imports to styles.css', async () => {
     const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
     const stylesContent = tree.readContent('/projects/bar/src/styles.css');
-    expect(stylesContent).toContain('@import "tailwindcss";');
+    expect(stylesContent).toContain(`@import 'tailwindcss';`);
   });
 
   it('should not add duplicate tailwind imports to styles.css', async () => {
     let tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
     const stylesContent = tree.readContent('/projects/bar/src/styles.css');
-    expect(stylesContent.match(/@import "tailwindcss";/g)?.length).toBe(1);
+    expect(stylesContent.match(/@import 'tailwindcss';/g)?.length).toBe(1);
 
     tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, tree);
     const stylesContentAfter = tree.readContent('/projects/bar/src/styles.css');
-    expect(stylesContentAfter.match(/@import "tailwindcss";/g)?.length).toBe(1);
+    expect(stylesContentAfter.match(/@import 'tailwindcss';/g)?.length).toBe(1);
   });
 
   describe('with scss styles', () => {
@@ -86,7 +86,7 @@ describe('Tailwind Schematic', () => {
       const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
       expect(tree.exists('/projects/bar/src/tailwind.css')).toBe(true);
       const stylesContent = tree.readContent('/projects/bar/src/tailwind.css');
-      expect(stylesContent).toContain('@import "tailwindcss";');
+      expect(stylesContent).toContain(`@import 'tailwindcss';`);
     });
 
     it('should add tailwind.css to angular.json', async () => {
@@ -99,7 +99,7 @@ describe('Tailwind Schematic', () => {
     it('should not add tailwind imports to styles.scss', async () => {
       const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
       const stylesContent = tree.readContent('/projects/bar/src/styles.scss');
-      expect(stylesContent).not.toContain('@import "tailwindcss";');
+      expect(stylesContent).not.toContain(`@import 'tailwindcss';`);
     });
   });
 

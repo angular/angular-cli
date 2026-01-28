@@ -868,7 +868,7 @@ describe('Application Schematic', () => {
     expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
 
     const stylesContent = tree.readContent('/projects/foo/src/styles.css');
-    expect(stylesContent).toContain('@import "tailwindcss";');
+    expect(stylesContent).toContain(`@import 'tailwindcss';`);
   });
 
   describe(`fileNameStyleGuide: '2016'`, () => {
