@@ -30,7 +30,7 @@ export function spawnAsObservable(
   options: SpawnOptions = {},
 ): Observable<{ stdout?: string; stderr?: string }> {
   return new Observable((obs) => {
-    const proc = spawn(command, args, options);
+    const proc = spawn(`${command} ${args.join(' ')}`, options);
     if (proc.stdout) {
       proc.stdout.on('data', (data) => obs.next({ stdout: data.toString() }));
     }
