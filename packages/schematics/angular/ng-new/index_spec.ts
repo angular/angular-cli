@@ -126,7 +126,7 @@ describe('Ng New Schematic', () => {
     expect(packageJson.devDependencies['@tailwindcss/postcss']).toBeDefined();
 
     const stylesContent = tree.readContent('/bar/src/styles.css');
-    expect(stylesContent).toContain('@import "tailwindcss";');
+    expect(stylesContent).toContain(`@import 'tailwindcss';`);
   });
 
   it(`should create files with file name style guide '2016'`, async () => {
