@@ -9,7 +9,6 @@
 import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { platform } from 'node:os';
 import { dirname, extname, join } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -48,6 +47,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
       const prettierPackageJson = JSON.parse(await readFile(prettierPath, 'utf-8')) as {
         bin: string;
       };
+
       prettierCliPath = join(dirname(prettierPath), prettierPackageJson.bin);
     } catch {
       // Prettier is not installed.
@@ -55,7 +55,6 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     }
   }
 
-  console.log({ prettierCliPath });
   if (!prettierCliPath) {
     return;
   }
@@ -63,7 +62,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
   const filesToFormat: string[] = [];
   for (const file of files) {
     if (fileTypes.has(extname(file))) {
-      filesToFormat.push(`"${file}"`);
+      filesToFormat.push(file);
     }
   }
 
@@ -71,19 +70,8 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  console.log({ filesToFormat, cwd });
-
-  console.log(
-    await execFileAsync(prettierCliPath, ['--check', ...filesToFormat], {
-      cwd,
-      shell: platform() === 'win32',
-    }),
-  );
-  
-  const x = await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
+  await execFileAsync(process.execPath, [prettierCliPath, '--write', ...filesToFormat], {
     cwd,
-    shell: platform() === 'win32',
+    shell: false,
   });
-
-  console.log({ x });
 }
