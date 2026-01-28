@@ -19,6 +19,7 @@ import { subscribeToWorkflow } from '../../../command-builder/utilities/schemati
 import { colors, figures } from '../../../utilities/color';
 import { assertIsError } from '../../../utilities/error';
 import { writeErrorToLogFile } from '../../../utilities/log-file';
+import { formatFiles } from '../../../utilities/prettier';
 import { askChoices } from '../../../utilities/prompt';
 import { isTTY } from '../../../utilities/tty';
 import { coerceVersionNumber } from './cli-version';
@@ -228,6 +229,18 @@ async function executePackageMigrations(
       default:
         modifiedFilesText = `${files.size} files modified`;
         break;
+    }
+
+    if (files.size) {
+      try {
+        await formatFiles(process.cwd(), files);
+      } catch (error) {
+        assertIsError(error);
+
+        logger.warn(
+          `WARNING: Formatting of files failed with the following error: ${error.message}`,
+        );
+      }
     }
 
     logger.info(`  Migration completed (${modifiedFilesText}).`);

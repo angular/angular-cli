@@ -20,6 +20,7 @@ import { EventCustomDimension } from '../analytics/analytics-parameters';
 import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { memoize } from '../utilities/memoize';
+import { formatFiles } from '../utilities/prettier';
 import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
@@ -29,7 +30,6 @@ import {
   OtherOptions,
 } from './command-module';
 import { Option, parseJsonSchemaToOptions } from './utilities/json-schema';
-import { formatFiles } from './utilities/prettier';
 import { SchematicEngineHost } from './utilities/schematic-engine-host';
 import { subscribeToWorkflow } from './utilities/schematic-workflow';
 
