@@ -9,6 +9,7 @@
 import { execFile } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
+import { platform } from 'node:os';
 import { dirname, extname, join, relative } from 'node:path';
 import { promisify } from 'node:util';
 
@@ -69,5 +70,8 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], { cwd });
+  await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
+    cwd,
+    shell: platform() === 'win32',
+  });
 }
