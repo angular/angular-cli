@@ -1,3 +1,28 @@
+<a name="21.1.2"></a>
+
+# 21.1.2 (2026-01-28)
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [e7458c81d](https://github.com/angular/angular-cli/commit/e7458c81d669296c767fca272f80054d3b434a72) | fix  | Add boolean type inference for 'true' and 'false' string values in argument parsing |
+
+### @angular-devkit/architect
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [d66f1fe64](https://github.com/angular/angular-cli/commit/d66f1fe647560498d78e9db362a5fdf1ab492326) | fix  | Add boolean type inference for 'true' and 'false' string values in argument parsing |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [80911af67](https://github.com/angular/angular-cli/commit/80911af673365af3bcb86760bebb4200967ca433) | fix  | loosen Vitest dependency checks when runnerConfig is used    |
+| [2d30639d3](https://github.com/angular/angular-cli/commit/2d30639d3c5a0eb3a1f40ec4cd8fe157f28f19f5) | fix  | support merging coverage thresholds with Vitest runnerConfig |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.1"></a>
 
 # 21.1.1 (2026-01-21)
