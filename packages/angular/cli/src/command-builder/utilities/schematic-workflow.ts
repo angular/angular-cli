@@ -55,10 +55,14 @@ export function subscribeToWorkflow(
         logs.push(`${colors.yellow('DELETE')} ${eventPath}`);
         files.add(eventPath);
         break;
-      case 'rename':
-        logs.push(`${colors.blue('RENAME')} ${eventPath} => ${removeLeadingSlash(event.to)}`);
-        files.add(eventPath);
+      case 'rename': {
+        const newFilename = removeLeadingSlash(event.to);
+
+        logs.push(`${colors.blue('RENAME')} ${eventPath} => ${newFilename}`);
+        files.add(newFilename);
+
         break;
+      }
     }
   });
 
