@@ -1,3 +1,38 @@
+<a name="21.2.0-next.0"></a>
+
+# 21.2.0-next.0 (2026-01-28)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [0dd04f289](https://github.com/angular/angular-cli/commit/0dd04f289e555a4a8af7bdadabe300da74701e3b) | feat | add markdown files to Prettier's formatting list                |
+| [fbae1b6ab](https://github.com/angular/angular-cli/commit/fbae1b6ab384186ae69e804c54815cea80e6a600) | feat | automatic formatting files modified by schematics               |
+| [98a24d040](https://github.com/angular/angular-cli/commit/98a24d0401f36f484dc9c4d8b0f5284ffa524f19) | feat | standardize MCP tools around workspace/project options          |
+| [d9cd609c5](https://github.com/angular/angular-cli/commit/d9cd609c5d13fe492b1f31973d9be518f8529387) | fix  | correctly parse scoped packages in yarn classic list output     |
+| [5b05f2500](https://github.com/angular/angular-cli/commit/5b05f25005621828565585692b1d7a67c5f0fec8) | fix  | enable shell option for Prettier execution on Windows platforms |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [aa7381efd](https://github.com/angular/angular-cli/commit/aa7381efd213eff70a8004731a7e2b06a60cb8c2) | feat | add a '.prettierrc' file to generated workspaces and add Prettier as dev dependency |
+| [f80db6fb7](https://github.com/angular/angular-cli/commit/f80db6fb714aa326f6ed03a8a51090ca59ad0955) | feat | add ng-add support for Vitest browser providers                                     |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [b4a8d198c](https://github.com/angular/angular-cli/commit/b4a8d198c78aaf0cac7671f26162ce5818a5704c) | fix  | address Node.js deprecation DEP0190 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0b4982720](https://github.com/angular/angular-cli/commit/0b4982720e111bf5029bcf97f7e0ce2658c42d43) | fix  | adjust sourcemap sources when Vitest wrapper is bypassed |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.2"></a>
 
 # 21.1.2 (2026-01-28)
