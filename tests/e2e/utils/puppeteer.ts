@@ -18,7 +18,7 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
     if (!url) {
       // Start serving and find address (1 - Webpack; 2 - Vite)
       const match = /(?:open your browser on|Local:)\s+(http:\/\/localhost:\d+\/)/;
-      const serveArgs = ['serve', '--port=0'];
+      const serveArgs = ['serve', '--port=0', '--no-watch', '--no-live-reload'];
       if (options.project) {
         serveArgs.push(options.project);
       }
@@ -29,11 +29,14 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
       const { stdout } = await execAndWaitForOutputToMatch('ng', serveArgs, match, {
         ...process.env,
         'NO_COLOR': '1',
+        'NG_BUILD_PARTIAL_SSR': '0',
       });
+
       url = stripVTControlCharacters(stdout).match(match)?.[1];
       if (!url) {
         throw new Error('Could not find serving URL');
       }
+
       hasStartedServer = true;
     }
 

@@ -48,26 +48,21 @@ export function updateResultRecord(
     return;
   }
 
-  let filePath;
-  if (outputPath === htmlIndexPath) {
-    // Convert custom index output path to standard index path for dev-server usage.
-    // This mimics the Webpack dev-server behavior.
-    filePath = '/index.html';
-  } else {
-    filePath = '/' + normalizePath(outputPath);
-  }
-
-  const servable =
-    file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media;
+  const filePath = '/' + normalizePath(outputPath);
+  const generatedFile: OutputFileRecord = {
+    contents: file.contents,
+    size: file.contents.byteLength,
+    hash: file.hash,
+    // Consider the files updated except on the initial build result
+    updated: !initial,
+    type: file.type,
+    servable: file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media,
+  };
 
   // Skip analysis of sourcemaps
   if (filePath.endsWith('.map')) {
     generatedFiles.set(filePath, {
-      contents: file.contents,
-      servable,
-      size: file.contents.byteLength,
-      hash: file.hash,
-      type: file.type,
+      ...generatedFile,
       updated: false,
     });
 
@@ -75,15 +70,13 @@ export function updateResultRecord(
   }
 
   // New or updated file
-  generatedFiles.set(filePath, {
-    contents: file.contents,
-    size: file.contents.byteLength,
-    hash: file.hash,
-    // Consider the files updated except on the initial build result
-    updated: !initial,
-    type: file.type,
-    servable,
-  });
+  generatedFiles.set(filePath, generatedFile);
+
+  if (outputPath === htmlIndexPath) {
+    // Convert custom index output path to standard index path for dev-server usage.
+    // This mimics the Webpack dev-server behavior.
+    generatedFiles.set('/index.html', generatedFile);
+  }
 
   // Record any external component styles
   if (filePath.endsWith('.css') && /^\/[a-f0-9]{64}\.css$/.test(filePath)) {
