@@ -55,6 +55,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     }
   }
 
+  console.log({ prettierCliPath });
   if (!prettierCliPath) {
     return;
   }
@@ -70,12 +71,10 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  await execFileAsync(
-    prettierCliPath,
-    ['--write', '--no-error-on-unmatched-pattern', ...filesToFormat],
-    {
-      cwd,
-      shell: platform() === 'win32',
-    },
-  );
+  console.log({ filesToFormat, cwd });
+
+  await execFileAsync(prettierCliPath, ['--write', ...filesToFormat], {
+    cwd,
+    shell: platform() === 'win32',
+  });
 }
