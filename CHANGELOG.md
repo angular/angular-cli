@@ -1,3 +1,15 @@
+<a name="21.2.0-next.1"></a>
+
+# 21.2.0-next.1 (2026-01-29)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [91b9d281f](https://github.com/angular/angular-cli/commit/91b9d281fc88a242aa6e5dd5495e275990d926ef) | feat | integrate file formatting into update migrations |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.0-next.0"></a>
 
 # 21.2.0-next.0 (2026-01-28)
