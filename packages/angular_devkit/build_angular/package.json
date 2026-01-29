@@ -27,7 +27,7 @@
     "babel-loader": "10.0.0",
     "browserslist": "^4.26.0",
     "copy-webpack-plugin": "13.0.1",
-    "css-loader": "7.1.2",
+    "css-loader": "7.1.3",
     "esbuild-wasm": "0.27.2",
     "http-proxy-middleware": "3.0.5",
     "istanbul-lib-instrument": "6.0.3",
@@ -69,7 +69,7 @@
     "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
     "ng-packagr": "21.2.0-next.0",
-    "undici": "7.19.1"
+    "undici": "7.19.2"
   },
   "peerDependencies": {
     "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
