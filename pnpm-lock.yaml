@@ -212,8 +212,8 @@ importers:
         specifier: ~5.13.0
         version: 5.13.0
       jasmine-core:
-        specifier: ~5.13.0
-        version: 5.13.0
+        specifier: ~6.0.0
+        version: 6.0.1
       jasmine-reporters:
         specifier: ^2.5.2
         version: 2.5.2
@@ -234,7 +234,7 @@ importers:
         version: 5.1.0(karma@6.4.4(bufferutil@4.1.0))
       karma-jasmine-html-reporter:
         specifier: ~2.2.0
-        version: 2.2.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0))
+        version: 2.2.0(jasmine-core@6.0.1)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0))
       karma-source-map-support:
         specifier: 1.4.0
         version: 1.4.0
@@ -16374,9 +16374,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  karma-jasmine-html-reporter@2.2.0(jasmine-core@5.13.0)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0)):
+  karma-jasmine-html-reporter@2.2.0(jasmine-core@6.0.1)(karma-jasmine@5.1.0(karma@6.4.4(bufferutil@4.1.0)))(karma@6.4.4(bufferutil@4.1.0)):
     dependencies:
-      jasmine-core: 5.13.0
+      jasmine-core: 6.0.1
       karma: 6.4.4(bufferutil@4.1.0)
       karma-jasmine: 5.1.0(karma@6.4.4(bufferutil@4.1.0))
 
