@@ -67,10 +67,10 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
     it(`should collect coverage from paths in 'sourceRoot'`, async () => {
       await harness.writeFiles({
-        './dist/my-lib/index.d.ts': `
+        './node_modules/my-lib/index.d.ts': `
           export declare const title = 'app';
         `,
-        './dist/my-lib/index.js': `
+        './node_modules/my-lib/index.js': `
           export const title = 'app';
         `,
         './src/app/app.component.ts': `
@@ -88,20 +88,6 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
           }
         `,
       });
-      await harness.modifyFile('tsconfig.json', (content) =>
-        content.replace(
-          /"baseUrl": ".\/",/,
-          `
-            "baseUrl": "./",
-            "paths": {
-              "my-lib": [
-                "./dist/my-lib"
-              ]
-            },
-          `,
-        ),
-      );
-
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         codeCoverage: true,
