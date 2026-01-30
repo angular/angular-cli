@@ -106,7 +106,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 }
 
 const serviceWorkerSchematic: RuleFactory<ServiceWorkerOptions> = createProjectSchematic(
-  async (options, { project, workspace, tree }) => {
+  async (options, { project, workspace, tree, context: { logger } }) => {
     if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
@@ -126,6 +126,11 @@ const serviceWorkerSchematic: RuleFactory<ServiceWorkerOptions> = createProjectS
       const productionConf = buildTarget.configurations?.production;
       if (productionConf) {
         productionConf.serviceWorker = ngswConfigPath;
+      } else {
+        logger.warn(
+          'No "production" configuration found for build target. ' +
+            `The "serviceWorker" option with a value of "${ngswConfigPath}" will need to be set manually.`,
+        );
       }
     } else {
       buildOptions.serviceWorker = true;
