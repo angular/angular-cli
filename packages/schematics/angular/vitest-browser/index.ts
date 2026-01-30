@@ -98,6 +98,13 @@ export default function (options: VitestBrowserOptions): Rule {
           install: options.skipInstall ? InstallBehavior.None : InstallBehavior.Auto,
         }),
       ),
+      (_, context) => {
+        context.logger.info(
+          'Vitest browser testing support has been added. ' +
+            "To run tests in a browser, add a 'browsers' field to the 'test' target in 'angular.json', " +
+            "or use the '--browsers' command line option.",
+        );
+      },
     ]);
   };
 }
