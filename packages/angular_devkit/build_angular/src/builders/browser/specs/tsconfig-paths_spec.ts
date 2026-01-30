@@ -21,16 +21,20 @@ describe('Browser Builder tsconfig paths', () => {
 
   it('works', async () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
+
+    // TODO(crisbeto): the `baseUrl` here will trigger a deprecation error in TS6. We may
+    // have to opt out of it for this test since Webpack seems to depend on the `baseUrl`.
     host.replaceInFile(
       'tsconfig.json',
-      /"baseUrl": ".\/",/,
+      /"compilerOptions": {/,
       `
-      "baseUrl": "./",
-      "paths": {
-        "@root/*": [
-          "./src/*"
-        ]
-      },
+      "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+          "@root/*": [
+            "./src/*"
+          ]
+        },
     `,
     );
 
@@ -43,23 +47,27 @@ describe('Browser Builder tsconfig paths', () => {
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
       'src/app/shared/index.ts': `export * from './meaning'`,
     });
+
+    // TODO(crisbeto): the `baseUrl` here will trigger a deprecation error in TS6. We may
+    // have to opt out of it for this test since Webpack seems to depend on the `baseUrl`.
     host.replaceInFile(
       'tsconfig.json',
-      /"baseUrl": ".\/",/,
+      /"compilerOptions": {/,
       `
-      "baseUrl": "./",
-      "paths": {
-        "@shared": [
-          "src/app/shared"
-        ],
-        "@shared/*": [
-          "src/app/shared/*"
-        ],
-        "*": [
-          "*",
-          "src/app/shared/*"
-        ]
-      },
+      "compilerOptions": {
+        "baseUrl": "./",
+        "paths": {
+          "@shared": [
+            "./src/app/shared"
+          ],
+          "@shared/*": [
+            "./src/app/shared/*"
+          ],
+          "*": [
+            "*",
+            "./src/app/shared/*"
+          ]
+        },
     `,
     );
     host.appendToFile(
