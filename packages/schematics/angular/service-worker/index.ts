@@ -106,7 +106,7 @@ function getTsSourceFile(host: Tree, path: string): ts.SourceFile {
 }
 
 const serviceWorkerSchematic: RuleFactory<ServiceWorkerOptions> = createProjectSchematic(
-  async (options, { project, workspace, tree, logger }) => {
+  async (options, { project, workspace, tree, context: { logger } }) => {
     if (project.extensions.projectType !== 'application') {
       throw new SchematicsException(`Service worker requires a project type of "application".`);
     }
