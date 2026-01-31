@@ -269,6 +269,11 @@
       "description": "Dumps build output files to the `.angular/cache` directory for debugging purposes.",
       "default": false,
       "visible": false
+    },
+    "update": {
+      "type": "boolean",
+      "description": "Updates test snapshots to match the current test output. This option is only available for the Vitest runner.",
+      "default": false
     }
   },
   "additionalProperties": false,
