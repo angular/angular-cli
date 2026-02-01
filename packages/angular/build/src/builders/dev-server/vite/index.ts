@@ -9,19 +9,21 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
-import { builtinModules, isBuiltin } from 'node:module';
 import { join } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import { ServerSsrMode } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption, updateExternalMetadata } from '../../../tools/vite/utils';
 import { normalizeSourceMaps } from '../../../utils';
-import { useComponentStyleHmr, useComponentTemplateHmr } from '../../../utils/environment-options';
+import {
+  useComponentStyleHmr,
+  useComponentTemplateHmr,
+  usePartialSsrBuild,
+} from '../../../utils/environment-options';
 import { Result, ResultKind } from '../../application/results';
 import { OutputHashing } from '../../application/schema';
 import {
   type ApplicationBuilderInternalOptions,
-  type ExternalResultMetadata,
   JavaScriptTransformer,
   getSupportedBrowsers,
   isZonelessApp,
@@ -119,7 +121,7 @@ export async function* serveWithVite(
 
   // Disable generating a full manifest with routes.
   // This is done during runtime when using the dev-server.
-  browserOptions.partialSSRBuild = true;
+  browserOptions.partialSSRBuild = usePartialSsrBuild;
 
   // The development server currently only supports a single locale when localizing.
   // This matches the behavior of the Webpack-based development server but could be expanded in the future.
