@@ -23,8 +23,8 @@ importers:
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))
       '@angular/cdk':
-        specifier: 21.2.0-next.1
-        version: 21.2.0-next.1(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
+        specifier: 21.2.0-next.2
+        version: 21.2.0-next.2(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
       '@angular/common':
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
@@ -44,11 +44,11 @@ importers:
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(@angular/compiler-cli@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(typescript@5.9.3))(@angular/compiler@21.2.0-next.1)
       '@angular/material':
-        specifier: 21.2.0-next.1
-        version: 21.2.0-next.1(d363ea0c032248a351f6672d2b982900)
+        specifier: 21.2.0-next.2
+        version: 21.2.0-next.2(6b9533c79e21fd4edd0310d63320e9ff)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#15a2e18c3d5403d2b2355c5e42c67effc55f9c9f
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#b48eb307ab83560c557cea5dcaa467d229e438eb
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -872,17 +872,17 @@ packages:
   '@acemir/cssom@0.9.31':
     resolution: {integrity: sha512-ZnR3GSaH+/vJ0YlHau21FjfLYjMpYVIzTD8M8vIEQvIGxeOXyXdzCI140rrCY862p/C/BbzWsjc1dgnM9mkoTA==}
 
-  '@actions/core@2.0.2':
-    resolution: {integrity: sha512-Ast1V7yHbGAhplAsuVlnb/5J8Mtr/Zl6byPPL+Qjq3lmfIgWF1ak1iYfF/079cRERiuTALTXkSuEUdZeDCfGtA==}
+  '@actions/core@3.0.0':
+    resolution: {integrity: sha512-zYt6cz+ivnTmiT/ksRVriMBOiuoUpDCJJlZ5KPl2/FRdvwU3f7MPh9qftvbkXJThragzUZieit2nyHUyw53Seg==}
 
-  '@actions/exec@2.0.0':
-    resolution: {integrity: sha512-k8ngrX2voJ/RIN6r9xB82NVqKpnMRtxDoiO+g3olkIUpQNqjArXrCQceduQZCQj3P3xm32pChRLqRrtXTlqhIw==}
+  '@actions/exec@3.0.0':
+    resolution: {integrity: sha512-6xH/puSoNBXb72VPlZVm7vQ+svQpFyA96qdDBvhB8eNZOE8LtPf9L4oAsfzK/crCL8YZ+19fKYVnM63Sl+Xzlw==}
 
-  '@actions/http-client@3.0.1':
-    resolution: {integrity: sha512-SbGS8c/vySbNO3kjFgSW77n83C4MQx/Yoe+b1hAdpuvfHxnkHzDq2pWljUpAA56Si1Gae/7zjeZsV0CYjmLo/w==}
+  '@actions/http-client@4.0.0':
+    resolution: {integrity: sha512-QuwPsgVMsD6qaPD57GLZi9sqzAZCtiJT8kVBCDpLtxhL5MydQ4gS+DrejtZZPdIYyB1e95uCK9Luyds7ybHI3g==}
 
-  '@actions/io@2.0.0':
-    resolution: {integrity: sha512-Jv33IN09XLO+0HS79aaODsvIRyduiF7NY/F6LYeK5oeUmrsz7aFdRphQjFoESF4jS7lMauDOttKALcpapVDIAg==}
+  '@actions/io@3.0.2':
+    resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
   '@algolia/abtesting@1.13.0':
     resolution: {integrity: sha512-Zrqam12iorp3FjiKMXSTpedGYznZ3hTEOAr2oCxI8tbF8bS1kQHClyDYNq/eV0ewMNLyFkgZVWjaS+8spsOYiQ==}
@@ -950,8 +950,8 @@ packages:
     peerDependencies:
       '@angular/core': 21.2.0-next.1
 
-  '@angular/cdk@21.2.0-next.1':
-    resolution: {integrity: sha512-vP5sta8kEDA1rbFCHxi1q4S+gfQdh9rsw+zPnmmP1Cttm3axW8WqEVi+46zul2ATGDERdvMSxteY2v+S2rkILw==}
+  '@angular/cdk@21.2.0-next.2':
+    resolution: {integrity: sha512-dX12K6HATzw7e5le9VHd9ltyBgQBLIM9K5fftybKO7VleMoRvivgiu0yPf3tlNXWEGsjHSOitezApGoir0Vmvg==}
     peerDependencies:
       '@angular/common': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       '@angular/core': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
@@ -1010,19 +1010,19 @@ packages:
       '@angular/compiler': 21.2.0-next.1
       '@angular/compiler-cli': 21.2.0-next.1
 
-  '@angular/material@21.2.0-next.1':
-    resolution: {integrity: sha512-kglL0rQrRCbYXAe8yLRv2sBZq/RLbu4c3a3sUvBbJe94JcE1u8N7WOUMAlxD3GeiEghCUFwq4Pel4p1p+ufJKg==}
+  '@angular/material@21.2.0-next.2':
+    resolution: {integrity: sha512-ampOfdcq2FVmMPl4B3qo90CthAOptoEis0/9+CALWZc04kYRPK5TLZsQHLhwNIPxjiWgl+Y/tw5BuL8RUc0L3g==}
     peerDependencies:
-      '@angular/cdk': 21.2.0-next.1
+      '@angular/cdk': 21.2.0-next.2
       '@angular/common': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       '@angular/core': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       '@angular/forms': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f}
-    version: 0.0.0-1d545550f0a93b2ffee3672587314d6f6b3dc7fd
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb}
+    version: 0.0.0-31db86455c01b4b7c17e46c21e545daa6371d7a1
     hasBin: true
 
   '@angular/platform-browser@21.2.0-next.1':
@@ -1872,10 +1872,6 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
-
-  '@fastify/busboy@2.1.1':
-    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
-    engines: {node: '>=14'}
 
   '@firebase/ai@2.7.0':
     resolution: {integrity: sha512-PwpCz+TtAMWICM7uQNO0mkSPpUKwrMV4NSwHkbVKDvPKoaQmSlO96vIz+Suw2Ao1EaUUsxYb5LGImHWt/fSnRQ==}
@@ -6636,6 +6632,9 @@ packages:
   jasmine-core@5.13.0:
     resolution: {integrity: sha512-vsYjfh7lyqvZX5QgqKc4YH8phs7g96Z8bsdIFNEU3VqXhlHaq+vov/Fgn/sr6MiUczdZkyXRC3TX369Ll4Nzbw==}
 
+  jasmine-core@6.0.0:
+    resolution: {integrity: sha512-fmBb8aruz2mEIDBUGWOGNmxhXwFJs44SSzwbMcBDqQnNChavPTq3Ra9A6WAn6WdxvxWEdakKTcEb3NzeR3yD1A==}
+
   jasmine-core@6.0.1:
     resolution: {integrity: sha512-gUtzV5ASR0MLBwDNqri4kBsgKNCcRQd9qOlNw/w/deavD0cl3JmWXXfH8JhKM4LTg6LPTt2IOQ4px3YYfgh2Xg==}
 
@@ -8916,9 +8915,9 @@ packages:
   undici-types@7.19.1:
     resolution: {integrity: sha512-z2f4eae6/P3L9bogRUfLEZfRRxyrH4ssRq8s2/NOOgXEwwM5w0hsaj+mtDJPN7sBXQQNlagCzYUfjHywUiTETw==}
 
-  undici@5.29.0:
-    resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
-    engines: {node: '>=14.0'}
+  undici@6.23.0:
+    resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
+    engines: {node: '>=18.17'}
 
   undici@7.19.2:
     resolution: {integrity: sha512-4VQSpGEGsWzk0VYxyB/wVX/Q7qf9t5znLRgs0dzszr9w9Fej/8RVNQ+S20vdXSAyra/bJ7ZQfGv6ZMj7UEbzSg==}
@@ -9497,21 +9496,21 @@ snapshots:
 
   '@acemir/cssom@0.9.31': {}
 
-  '@actions/core@2.0.2':
+  '@actions/core@3.0.0':
     dependencies:
-      '@actions/exec': 2.0.0
-      '@actions/http-client': 3.0.1
+      '@actions/exec': 3.0.0
+      '@actions/http-client': 4.0.0
 
-  '@actions/exec@2.0.0':
+  '@actions/exec@3.0.0':
     dependencies:
-      '@actions/io': 2.0.0
+      '@actions/io': 3.0.2
 
-  '@actions/http-client@3.0.1':
+  '@actions/http-client@4.0.0':
     dependencies:
       tunnel: 0.0.6
-      undici: 5.29.0
+      undici: 6.23.0
 
-  '@actions/io@2.0.0': {}
+  '@actions/io@3.0.2': {}
 
   '@algolia/abtesting@1.13.0':
     dependencies:
@@ -9607,7 +9606,7 @@ snapshots:
       '@angular/core': 21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)
       tslib: 2.8.1
 
-  '@angular/cdk@21.2.0-next.1(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)':
+  '@angular/cdk@21.2.0-next.2(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)':
     dependencies:
       '@angular/common': 21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/core': 21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)
@@ -9670,9 +9669,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/material@21.2.0-next.1(d363ea0c032248a351f6672d2b982900)':
+  '@angular/material@21.2.0-next.2(6b9533c79e21fd4edd0310d63320e9ff)':
     dependencies:
-      '@angular/cdk': 21.2.0-next.1(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
+      '@angular/cdk': 21.2.0-next.2(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
       '@angular/common': 21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2)
       '@angular/core': 21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)
       '@angular/forms': 21.2.0-next.1(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(@angular/platform-browser@21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(rxjs@7.8.2)
@@ -9680,9 +9679,9 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/15a2e18c3d5403d2b2355c5e42c67effc55f9c9f(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
     dependencies:
-      '@actions/core': 2.0.2
+      '@actions/core': 3.0.0
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
       '@google/genai': 1.38.0(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)
       '@inquirer/prompts': 8.2.0(@types/node@24.10.9)
@@ -9721,7 +9720,7 @@ snapshots:
       folder-hash: 4.1.1(supports-color@10.2.2)
       git-raw-commits: 5.0.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.2.1)
       jasmine: 6.0.0
-      jasmine-core: 5.13.0
+      jasmine-core: 6.0.0
       jasmine-reporters: 2.5.2
       jsonc-parser: 3.3.1
       minimatch: 10.1.1
@@ -10676,8 +10675,6 @@ snapshots:
       levn: 0.4.1
 
   '@exodus/bytes@1.9.0': {}
-
-  '@fastify/busboy@2.1.1': {}
 
   '@firebase/ai@2.7.0(@firebase/app-types@0.9.3)(@firebase/app@0.14.7)':
     dependencies:
@@ -16181,6 +16178,8 @@ snapshots:
 
   jasmine-core@5.13.0: {}
 
+  jasmine-core@6.0.0: {}
+
   jasmine-core@6.0.1: {}
 
   jasmine-reporters@2.5.2:
@@ -18942,9 +18941,7 @@ snapshots:
 
   undici-types@7.19.1: {}
 
-  undici@5.29.0:
-    dependencies:
-      '@fastify/busboy': 2.1.1
+  undici@6.23.0: {}
 
   undici@7.19.2: {}
 
