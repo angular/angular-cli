@@ -71,6 +71,12 @@ export interface PackageManagerOptions {
    * instead of running the version command.
    */
   version?: string;
+
+  /**
+   * An error that occurred during the initialization of the package manager.
+   * If provided, this error will be thrown when attempting to execute any command.
+   */
+  initializationError?: Error;
 }
 
 /**
@@ -84,6 +90,7 @@ export interface PackageManagerOptions {
 export class PackageManager {
   readonly #manifestCache = new Map<string, PackageManifest | null>();
   readonly #metadataCache = new Map<string, PackageMetadata | null>();
+  readonly #initializationError?: Error;
   #dependencyCache: Map<string, InstalledPackage> | null = null;
   #version: string | undefined;
 
@@ -104,6 +111,7 @@ export class PackageManager {
       throw new Error('A logger must be provided when dryRun is enabled.');
     }
     this.#version = options.version;
+    this.#initializationError = options.initializationError;
   }
 
   /**
@@ -111,6 +119,18 @@ export class PackageManager {
    */
   get name(): string {
     return this.descriptor.binary;
+  }
+
+  /**
+   * Ensures that the package manager is installed and available in the PATH.
+   * If it is not, this method will throw an error with instructions on how to install it.
+   *
+   * @throws {Error} If the package manager is not installed.
+   */
+  ensureInstalled(): void {
+    if (this.#initializationError) {
+      throw this.#initializationError;
+    }
   }
 
   /**
@@ -142,6 +162,8 @@ export class PackageManager {
     args: readonly string[],
     options: { timeout?: number; registry?: string; cwd?: string } = {},
   ): Promise<{ stdout: string; stderr: string }> {
+    this.ensureInstalled();
+
     const { registry, cwd, ...runOptions } = options;
     const finalArgs = [...args];
     let finalEnv: Record<string, string> | undefined;

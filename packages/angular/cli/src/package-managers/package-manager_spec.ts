@@ -51,4 +51,32 @@ describe('PackageManager', () => {
       expect(runCommandSpy).not.toHaveBeenCalled();
     });
   });
+
+  describe('initializationError', () => {
+    it('should throw initializationError when running commands', async () => {
+      const error = new Error('Not installed');
+      const pm = new PackageManager(host, '/tmp', descriptor, { initializationError: error });
+
+      expect(() => pm.ensureInstalled()).toThrow(error);
+      await expectAsync(pm.getVersion()).toBeRejectedWith(error);
+      await expectAsync(pm.install()).toBeRejectedWith(error);
+      await expectAsync(pm.add('foo', 'none', false, false, false)).toBeRejectedWith(error);
+    });
+
+    it('should not throw initializationError for operations that do not require the binary', async () => {
+      const error = new Error('Not installed');
+      const pm = new PackageManager(host, '/tmp', descriptor, { initializationError: error });
+
+      // Mock readFile for getManifest directory case
+      spyOn(host, 'readFile').and.resolveTo('{"name": "foo", "version": "1.0.0"}');
+
+      // Should not throw
+      const manifest = await pm.getManifest({
+        type: 'directory',
+        fetchSpec: '/tmp/foo',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } as any);
+      expect(manifest).toEqual({ name: 'foo', version: '1.0.0' });
+    });
+  });
 });
