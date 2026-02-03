@@ -40,13 +40,6 @@ export interface Host {
   stat(path: string): Promise<Stats>;
 
   /**
-   * Reads the contents of a directory.
-   * @param path The path to the directory.
-   * @returns A promise that resolves to an array of file and directory names.
-   */
-  readdir(path: string): Promise<string[]>;
-
-  /**
    * Reads the content of a file.
    * @param path The path to the file.
    * @returns A promise that resolves to the file content as a string.
@@ -108,7 +101,6 @@ export interface Host {
  */
 export const NodeJS_HOST: Host = {
   stat,
-  readdir,
   mkdir,
   readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
   copyFile: (src, dest) => copyFile(src, dest, constants.COPYFILE_FICLONE),

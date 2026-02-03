@@ -19,7 +19,16 @@ export class MockHost implements Host {
   constructor(files: Record<string, string[] | true> = {}) {
     // Normalize paths to use forward slashes for consistency in tests.
     for (const [path, content] of Object.entries(files)) {
-      this.fs.set(path.replace(/\\/g, '/'), content);
+      const normalizedPath = path.replace(/\\/g, '/');
+      this.fs.set(normalizedPath, content);
+
+      // If the content is an array (directory listing), create entries for the files in it.
+      if (Array.isArray(content)) {
+        for (const file of content) {
+          const filePath = normalizedPath === '/' ? `/${file}` : `${normalizedPath}/${file}`;
+          this.fs.set(filePath, []); // Use empty array to represent a file (not `true` which is a dir)
+        }
+      }
     }
   }
 
@@ -34,17 +43,11 @@ export class MockHost implements Host {
     }
 
     // A `true` value signifies a directory in our mock file system.
-    return Promise.resolve({ isDirectory: () => content === true } as Stats);
-  }
-
-  readdir(path: string): Promise<string[]> {
-    const content = this.fs.get(path.replace(/\\/g, '/'));
-    if (content === true || content === undefined) {
-      // This should be a directory with a file list.
-      return Promise.reject(new Error(`Directory not found or not a directory: ${path}`));
-    }
-
-    return Promise.resolve(content);
+    // Anything else is considered a file for the purpose of this mock.
+    return Promise.resolve({
+      isDirectory: () => content === true,
+      isFile: () => content !== true,
+    } as Stats);
   }
 
   runCommand(): Promise<{ stdout: string; stderr: string }> {
