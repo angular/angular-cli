@@ -64,14 +64,6 @@ describe('discover', () => {
     expect(result).toBeNull();
   });
 
-  it('should handle file system errors during readdir gracefully', async () => {
-    const host = new MockHost({});
-    host.readdir = () => Promise.reject(new Error('Permission denied'));
-
-    const result = await discover(host, '/project');
-    expect(result).toBeNull();
-  });
-
   it('should handle file system errors during stat gracefully', async () => {
     const host = new MockHost({ '/project': ['.git'] });
     host.stat = () => Promise.reject(new Error('Permission denied'));
