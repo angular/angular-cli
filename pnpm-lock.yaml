@@ -287,8 +287,8 @@ importers:
         specifier: 5.9.3
         version: 5.9.3
       undici:
-        specifier: 7.18.2
-        version: 7.18.2
+        specifier: 7.20.0
+        version: 7.20.0
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
@@ -407,8 +407,8 @@ importers:
         specifier: 0.2.15
         version: 0.2.15
       undici:
-        specifier: 7.18.2
-        version: 7.18.2
+        specifier: 7.20.0
+        version: 7.20.0
       vite:
         specifier: 7.3.0
         version: 7.3.0(@types/node@24.10.9)(jiti@2.6.1)(less@4.4.2)(sass@1.97.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
@@ -744,8 +744,8 @@ importers:
         specifier: 21.1.0
         version: 21.1.0(@angular/compiler-cli@21.1.2(@angular/compiler@21.1.2)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
       undici:
-        specifier: 7.18.2
-        version: 7.18.2
+        specifier: 7.20.0
+        version: 7.20.0
     optionalDependencies:
       esbuild:
         specifier: 0.27.2
@@ -8639,8 +8639,8 @@ packages:
     resolution: {integrity: sha512-VfQPToRA5FZs/qJxLIinmU59u0r7LXqoJkCzinq3ckNJp3vKEh7jTWN589YQ5+aoAC/TGRLyJLCPKcLQbM8r9g==}
     engines: {node: '>=18.17'}
 
-  undici@7.18.2:
-    resolution: {integrity: sha512-y+8YjDFzWdQlSE9N5nzKMT3g4a5UBX1HKowfdXh0uvAnTaqqwqB92Jt4UXBAeKekDs5IaDKyJFR4X1gYVCgXcw==}
+  undici@7.20.0:
+    resolution: {integrity: sha512-MJZrkjyd7DeC+uPZh+5/YaMDxFiiEEaDgbUSVMXayofAkDWF1088CDo+2RPg7B1BuS1qf1vgNE7xqwPxE0DuSQ==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -18329,7 +18329,7 @@ snapshots:
 
   undici@6.23.0: {}
 
-  undici@7.18.2: {}
+  undici@7.20.0: {}
 
   unenv@1.10.0:
     dependencies:
