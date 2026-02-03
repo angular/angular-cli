@@ -114,15 +114,6 @@ export async function createVitestConfigPlugin(
         delete config.plugins;
       }
 
-      // Add browser source map support if coverage is enabled
-      if (
-        (browser || testConfig?.browser?.enabled) &&
-        (options.coverage.enabled || testConfig?.coverage?.enabled)
-      ) {
-        projectPlugins.unshift(createSourcemapSupportPlugin());
-        setupFiles.unshift('virtual:source-map-support');
-      }
-
       const projectResolver = createRequire(projectSourceRoot + '/').resolve;
 
       const projectDefaults: UserWorkspaceConfig = {
@@ -276,7 +267,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
 
           const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
           if (map) {
-            adjustSourcemapSources(map, !vitestConfig?.coverage?.enabled, workspaceRoot, id);
+            adjustSourcemapSources(map, true, workspaceRoot, id);
           }
 
           return {
@@ -341,36 +332,6 @@ function adjustSourcemapSources(
       return toPosixPath(path.relative(path.dirname(id), absoluteSource));
     });
   }
-}
-
-function createSourcemapSupportPlugin(): VitestPlugins[0] {
-  return {
-    name: 'angular:source-map-support',
-    enforce: 'pre',
-    resolveId(source) {
-      if (source.includes('virtual:source-map-support')) {
-        return '\0source-map-support';
-      }
-    },
-    async load(id) {
-      if (id !== '\0source-map-support') {
-        return;
-      }
-
-      const packageResolve = createRequire(__filename).resolve;
-      const supportPath = packageResolve('source-map-support/browser-source-map-support.js');
-
-      const content = await readFile(supportPath, 'utf-8');
-
-      // The `source-map-support` library currently relies on `this` being defined in the global scope.
-      // However, when running in an ESM environment, `this` is undefined.
-      // To workaround this, we patch the library to use `globalThis` instead of `this`.
-      return (
-        content.replaceAll(/this\.(define|sourceMapSupport|base64js)/g, 'globalThis.$1') +
-        '\n;globalThis.sourceMapSupport.install();'
-      );
-    },
-  };
 }
 
 async function generateCoverageOption(

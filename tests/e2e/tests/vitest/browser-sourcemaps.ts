@@ -7,6 +7,7 @@ import { stripVTControlCharacters } from 'node:util';
 
 export default async function (): Promise<void> {
   await applyVitestBuilder();
+  await installPackage('@vitest/coverage-v8');
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
   await ng('generate', 'component', 'my-comp');
@@ -25,6 +26,22 @@ export default async function (): Promise<void> {
 
   try {
     await noSilentNg('test', '--no-watch', '--browsers', 'chromiumHeadless');
+    throw new Error('Expected "ng test" to fail.');
+  } catch (error: any) {
+    const stdout = stripVTControlCharacters(error.stdout || error.message);
+    // We expect the failure from failing.spec.ts
+    assert.match(stdout, /1 failed/, 'Expected 1 test to fail.');
+    // Check that the stack trace points to the correct file
+    assert.match(
+      stdout,
+      /\bsrc[\/\\]app[\/\\]failing\.spec\.ts:4:\d+/,
+      'Expected stack trace to point to the source file.',
+    );
+  }
+
+  // Again but with coverage
+  try {
+    await noSilentNg('test', '--no-watch', '--coverage', '--browsers', 'chromiumHeadless');
     throw new Error('Expected "ng test" to fail.');
   } catch (error: any) {
     const stdout = stripVTControlCharacters(error.stdout || error.message);
