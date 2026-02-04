@@ -192,12 +192,19 @@ export class VitestExecutor implements TestExecutor {
     // Setup vitest browser options if configured
     const browserOptions = await setupBrowserConfiguration(
       browsers,
+      this.options.headless,
       debug,
       projectSourceRoot,
       browserViewport,
     );
     if (browserOptions.errors?.length) {
       throw new Error(browserOptions.errors.join('\n'));
+    }
+
+    if (browserOptions.messages?.length) {
+      for (const message of browserOptions.messages) {
+        this.logger.info(message);
+      }
     }
 
     assert(

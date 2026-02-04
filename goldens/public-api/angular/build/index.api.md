@@ -231,6 +231,7 @@ export type UnitTestBuilderOptions = {
     dumpVirtualFiles?: boolean;
     exclude?: string[];
     filter?: string;
+    headless?: boolean;
     include?: string[];
     listTests?: boolean;
     outputFile?: string;

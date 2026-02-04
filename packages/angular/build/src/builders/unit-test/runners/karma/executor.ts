@@ -47,6 +47,12 @@ export class KarmaExecutor implements TestExecutor {
       );
     }
 
+    if (unitTestOptions.headless !== undefined) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "headless" option. The option will be ignored.',
+      );
+    }
+
     const buildTargetOptions = (await context.validateOptions(
       await context.getTargetOptions(unitTestOptions.buildTarget),
       await context.getBuilderNameForTarget(unitTestOptions.buildTarget),

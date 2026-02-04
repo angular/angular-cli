@@ -60,6 +60,10 @@
       "type": "boolean",
       "description": "Enables watch mode, which re-runs tests when source files change. Defaults to `true` in TTY environments and `false` otherwise."
     },
+    "headless": {
+      "type": "boolean",
+      "description": "Forces all configured browsers to run in headless mode. When using the Vitest runner, this option is ignored if no browsers are configured. The Karma runner does not support this option."
+    },
     "debug": {
       "type": "boolean",
       "description": "Enables debugging mode for tests, allowing the use of the Node Inspector.",

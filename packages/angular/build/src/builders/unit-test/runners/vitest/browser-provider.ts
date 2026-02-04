@@ -13,6 +13,7 @@ import { assertIsError } from '../../../../utils/error';
 export interface BrowserConfiguration {
   browser?: BrowserConfigOptions;
   errors?: string[];
+  messages?: string[];
 }
 
 function findBrowserProvider(
@@ -51,11 +52,18 @@ function normalizeBrowserName(browserName: string): { browser: string; headless:
 
 export async function setupBrowserConfiguration(
   browsers: string[] | undefined,
+  headless: boolean | undefined,
   debug: boolean,
   projectSourceRoot: string,
   viewport: { width: number; height: number } | undefined,
 ): Promise<BrowserConfiguration> {
   if (browsers === undefined) {
+    if (headless !== undefined) {
+      return {
+        messages: ['The "headless" option is ignored when no browsers are configured.'],
+      };
+    }
+
     return {};
   }
 
@@ -125,9 +133,29 @@ export async function setupBrowserConfiguration(
 
   const isCI = !!process.env['CI'];
   const instances = browsers.map(normalizeBrowserName);
+  const messages: string[] = [];
+
   if (providerName === 'preview') {
     instances.forEach((instance) => {
+      // Preview mode only supports headed execution
       instance.headless = false;
+    });
+
+    if (headless) {
+      messages.push('The "headless" option is ignored when using the "preview" provider.');
+    }
+  } else if (headless !== undefined) {
+    if (headless) {
+      const allHeadlessByDefault = isCI || instances.every((i) => i.headless);
+      if (allHeadlessByDefault) {
+        messages.push(
+          'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
+        );
+      }
+    }
+
+    instances.forEach((instance) => {
+      instance.headless = headless;
     });
   } else if (isCI) {
     instances.forEach((instance) => {
@@ -143,5 +171,5 @@ export async function setupBrowserConfiguration(
     instances,
   } satisfies BrowserConfigOptions;
 
-  return { browser };
+  return { browser, messages };
 }
