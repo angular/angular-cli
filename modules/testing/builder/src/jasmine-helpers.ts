@@ -40,6 +40,9 @@ export function describeBuilder<T>(
     optionSchema,
   });
 
+  // This is needed as there are multiple describe calls for the same builder.
+  jasmine.getEnv().configure({ forbidDuplicateNames: false });
+
   describe(options.name || builderHandler.name, () => {
     beforeEach(async () => {
       harness.resetProjectMetadata();
