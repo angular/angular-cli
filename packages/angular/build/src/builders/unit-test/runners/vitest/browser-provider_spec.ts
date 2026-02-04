@@ -39,6 +39,7 @@ describe('setupBrowserConfiguration', () => {
   it('should configure headless mode for specific browsers based on name', async () => {
     const { browser } = await setupBrowserConfiguration(
       ['ChromeHeadless', 'Firefox'],
+      undefined,
       false,
       workspaceRoot,
       undefined,
@@ -58,6 +59,7 @@ describe('setupBrowserConfiguration', () => {
     try {
       const { browser } = await setupBrowserConfiguration(
         ['Chrome', 'FirefoxHeadless'],
+        undefined,
         false,
         workspaceRoot,
         undefined,
@@ -85,6 +87,7 @@ describe('setupBrowserConfiguration', () => {
       // Case 1: All headless -> UI false
       let result = await setupBrowserConfiguration(
         ['ChromeHeadless'],
+        undefined,
         false,
         workspaceRoot,
         undefined,
@@ -94,6 +97,7 @@ describe('setupBrowserConfiguration', () => {
       // Case 2: Mixed -> UI true
       result = await setupBrowserConfiguration(
         ['ChromeHeadless', 'Firefox'],
+        undefined,
         false,
         workspaceRoot,
         undefined,
@@ -113,6 +117,7 @@ describe('setupBrowserConfiguration', () => {
     try {
       const { browser } = await setupBrowserConfiguration(
         ['Chrome'],
+        undefined,
         false,
         workspaceRoot,
         undefined,
@@ -151,6 +156,7 @@ describe('setupBrowserConfiguration', () => {
 
     const { browser } = await setupBrowserConfiguration(
       ['ChromeHeadless'],
+      undefined,
       false,
       workspaceRoot,
       undefined,
@@ -159,5 +165,35 @@ describe('setupBrowserConfiguration', () => {
     expect(browser?.provider).toBeDefined();
     // Preview forces headless false
     expect(browser?.instances?.[0].headless).toBeFalse();
+  });
+
+  it('should force headless mode when headless option is true', async () => {
+    const { browser, messages } = await setupBrowserConfiguration(
+      ['Chrome', 'Firefox'],
+      true,
+      false,
+      workspaceRoot,
+      undefined,
+    );
+
+    expect(browser?.instances).toEqual([
+      { browser: 'chrome', headless: true },
+      { browser: 'firefox', headless: true },
+    ]);
+    expect(messages).toEqual([]);
+  });
+
+  it('should return information message when headless option is redundant', async () => {
+    const { messages } = await setupBrowserConfiguration(
+      ['ChromeHeadless'],
+      true,
+      false,
+      workspaceRoot,
+      undefined,
+    );
+
+    expect(messages).toEqual([
+      'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
+    ]);
   });
 });

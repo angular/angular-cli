@@ -96,6 +96,7 @@ export async function normalizeOptions(
     exclude: options.exclude,
     filter,
     runnerName: runner ?? Runner.Vitest,
+    headless: options.headless,
     coverage: {
       enabled: options.coverage,
       exclude: options.coverageExclude,
