@@ -3,6 +3,7 @@ import { applyVitestBuilder } from '../../utils/vitest';
 import { ng } from '../../utils/process';
 import { installPackage } from '../../utils/packages';
 import { writeFile } from '../../utils/fs';
+import { updateJsonFile } from '../../utils/project';
 
 export default async function (): Promise<void> {
   await applyVitestBuilder();
@@ -19,6 +20,10 @@ export default async function (): Promise<void> {
     getTestBed().configureTestingModule({});
   `,
   );
+
+  await updateJsonFile('tsconfig.spec.json', (json) => {
+    json.include = [...(json.include || []), 'src/setup1.ts'];
+  });
 
   const { stdout } = await ng(
     'test',

@@ -81,6 +81,7 @@ interface TestEntrypointsOptions {
   projectSourceRoot: string;
   workspaceRoot: string;
   removeTestExtension?: boolean;
+  prefix?: string;
 }
 
 /**
@@ -93,22 +94,39 @@ interface TestEntrypointsOptions {
  */
 export function getTestEntrypoints(
   testFiles: string[],
-  { projectSourceRoot, workspaceRoot, removeTestExtension }: TestEntrypointsOptions,
+  {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension,
+    prefix = 'spec',
+  }: TestEntrypointsOptions,
 ): Map<string, string> {
   const seen = new Set<string>();
+  const counters = new Map<string, number>();
   const roots = [projectSourceRoot, workspaceRoot];
+  const infixes = TEST_FILE_INFIXES.map((i) => i.slice(1));
+  if (!infixes.includes(prefix)) {
+    infixes.push(prefix);
+  }
+  const infixesPattern = infixes.join('|');
 
   return new Map(
     Array.from(testFiles, (testFile) => {
       const fileName = generateNameFromPath(testFile, roots, !!removeTestExtension);
-      const baseName = `spec-${fileName}`;
+      const baseName = fileName === prefix ? prefix : `${prefix}-${fileName}`;
       let uniqueName = baseName;
-      let suffix = 2;
+      // Start at 2 for collisions as the first instance remains suffix-less.
+      let suffix = counters.get(baseName) ?? 2;
+
       while (seen.has(uniqueName)) {
-        uniqueName = `${baseName}-${suffix}`.replace(/([^\w](?:spec|test))-([\d]+)$/, '-$2$1');
+        uniqueName = `${baseName}-${suffix}`.replace(
+          new RegExp(`([^\\w](?:${infixesPattern}))-([\\d]+)$`),
+          '-$2$1',
+        );
         ++suffix;
       }
       seen.add(uniqueName);
+      counters.set(baseName, suffix);
 
       return [uniqueName, testFile];
     }),

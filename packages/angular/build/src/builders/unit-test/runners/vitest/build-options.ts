@@ -98,6 +98,20 @@ export async function getVitestBuildOptions(
     workspaceRoot,
     removeTestExtension: true,
   });
+
+  if (options.setupFiles?.length) {
+    const setupEntryPoints = getTestEntrypoints(options.setupFiles, {
+      projectSourceRoot,
+      workspaceRoot,
+      removeTestExtension: false,
+      prefix: 'setup',
+    });
+
+    for (const [entryPoint, setupFile] of setupEntryPoints) {
+      entryPoints.set(entryPoint, setupFile);
+    }
+  }
+
   entryPoints.set('init-testbed', 'angular:test-bed-init');
 
   // The 'vitest' package is always external for testing purposes

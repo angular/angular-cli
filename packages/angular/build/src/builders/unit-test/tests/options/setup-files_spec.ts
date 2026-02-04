@@ -16,7 +16,7 @@ import {
 } from '../setup';
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
-  xdescribe('Option: "setupFiles"', () => {
+  describe('Option: "setupFiles"', () => {
     beforeEach(async () => {
       setupApplicationTarget(harness);
     });
@@ -27,19 +27,21 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         setupFiles: ['src/setup.ts'],
       });
 
-      const { result, error } = await harness.executeOnce({ outputLogsOnFailure: false });
-      expect(result).toBeUndefined();
-      expect(error?.message).toMatch(`The specified setup file "src/setup.ts" does not exist.`);
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      // Verify that the build failed due to resolution error (esbuild error)
+      expectLog(logs, /Could not resolve/);
+      expectLog(logs, /src\/setup\.ts/);
     });
 
     it('should include the setup files', async () => {
       await harness.writeFiles({
-        'src/setup.ts': `console.log('Hello from setup.ts');`,
+        'src/setup.ts': `globalThis['TEST_SETUP_RAN'] = true;`,
         'src/app/app.component.spec.ts': `
         import { describe, expect, test } from 'vitest'
         describe('AppComponent', () => {
-          test('should create the app', () => {
-            expect(true).toBe(true);
+          test('should have run setup file', () => {
+            expect(globalThis['TEST_SETUP_RAN']).toBe(true);
           });
         });`,
       });
@@ -49,9 +51,8 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         setupFiles: ['src/setup.ts'],
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expectLog(logs, 'Hello from setup.ts');
     });
   });
 });
