@@ -240,6 +240,15 @@ export class VitestExecutor implements TestExecutor {
       project = `${projectName} (${browserOptions.browser.instances[0].browser})`;
     }
 
+    // Filter internal entries and setup files from the include list
+    const internalEntries = ['angular:'];
+    const setupFileSet = new Set(testSetupFiles);
+    const include = [...this.testFileToEntryPoint.keys()].filter((entry) => {
+      return (
+        !internalEntries.some((internal) => entry.startsWith(internal)) && !setupFileSet.has(entry)
+      );
+    });
+
     return startVitest(
       'test',
       undefined,
@@ -272,10 +281,7 @@ export class VitestExecutor implements TestExecutor {
             reporters,
             setupFiles: testSetupFiles,
             projectPlugins,
-            include: [...this.testFileToEntryPoint.keys()].filter(
-              // Filter internal entries
-              (entry) => !entry.startsWith('angular:'),
-            ),
+            include,
           }),
         ],
       },

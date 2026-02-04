@@ -6,7 +6,79 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { generateNameFromPath } from './test-discovery';
+import { generateNameFromPath, getTestEntrypoints } from './test-discovery';
+
+describe('getTestEntrypoints', () => {
+  const workspaceRoot = '/project';
+  const projectSourceRoot = '/project/src';
+  const options = { workspaceRoot, projectSourceRoot };
+
+  it('should generate entry points for unique files', () => {
+    const files = ['/project/src/a.spec.ts', '/project/src/b.spec.ts'];
+    const result = getTestEntrypoints(files, { ...options, removeTestExtension: true });
+
+    expect(result.size).toBe(2);
+    expect(result.get('spec-a')).toBe(files[0]);
+    expect(result.get('spec-b')).toBe(files[1]);
+  });
+
+  it('should handle collisions with numeric suffixes correctly positioned', () => {
+    // To trigger the regex replacement, the name must end in 'spec', 'test', or the prefix.
+    const files = ['/project/src/sub-test.spec.ts', '/project/src/sub/test.spec.ts'];
+
+    const result = getTestEntrypoints(files, { ...options, removeTestExtension: true });
+    // Both map to 'sub-test' (relative to src root).
+    // baseName = 'spec-sub-test'.
+    // 1st: 'spec-sub-test'.
+    // 2nd: 'spec-sub-test-2'. Regex matches '-test-2'. -> 'spec-sub-2-test'.
+    expect(result.get('spec-sub-test')).toBe(files[0]);
+    expect(result.get('spec-sub-2-test')).toBe(files[1]);
+  });
+
+  it('should handle setup file naming with prefix setup', () => {
+    const files = ['/project/src/setup.ts'];
+    const result = getTestEntrypoints(files, {
+      ...options,
+      removeTestExtension: false,
+      prefix: 'setup',
+    });
+
+    // 'setup.ts' -> 'setup' (via generateNameFromPath).
+    // prefix='setup'.
+    // baseName = 'setup' === 'setup' ? 'setup' : 'setup-setup' -> 'setup'.
+    expect(result.get('setup')).toBe(files[0]);
+  });
+
+  it('should handle setup file collisions', () => {
+    const files = ['/project/src/sub-setup.ts', '/project/src/sub/setup.ts'];
+    const result = getTestEntrypoints(files, {
+      ...options,
+      removeTestExtension: false,
+      prefix: 'setup',
+    });
+
+    // Both map to 'sub-setup' (baseName: 'setup-sub-setup').
+    // 1st: 'setup-sub-setup'.
+    // 2nd: 'setup-sub-setup-2'. Regex matches '-setup-2'. -> 'setup-sub-2-setup'.
+    expect(result.get('setup-sub-setup')).toBe(files[0]);
+    expect(result.get('setup-sub-2-setup')).toBe(files[1]);
+  });
+
+  it('should handle custom prefixes', () => {
+    const files = ['/project/src/sub-my-file.ts', '/project/src/sub/my-file.ts'];
+    const result = getTestEntrypoints(files, {
+      ...options,
+      removeTestExtension: false,
+      prefix: 'custom',
+    });
+
+    // 'sub-my-file.ts' -> 'sub-my-file'.
+    // baseName: 'custom-sub-my-file'.
+    expect(result.get('custom-sub-my-file')).toBe(files[0]);
+    // 'custom-sub-my-file-2'. Does not match regex (no 'spec'/'test'/'custom' at end).
+    expect(result.get('custom-sub-my-file-2')).toBe(files[1]);
+  });
+});
 
 describe('generateNameFromPath', () => {
   const roots = ['/project/src/', '/project/'];
