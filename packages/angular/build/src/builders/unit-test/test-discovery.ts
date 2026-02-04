@@ -77,7 +77,7 @@ export async function findTests(
   return [...resolvedTestFiles];
 }
 
-interface TestEntrypointsOptions {
+interface EntrypointsOptions {
   projectSourceRoot: string;
   workspaceRoot: string;
   removeTestExtension?: boolean;
@@ -93,15 +93,49 @@ interface TestEntrypointsOptions {
  */
 export function getTestEntrypoints(
   testFiles: string[],
-  { projectSourceRoot, workspaceRoot, removeTestExtension }: TestEntrypointsOptions,
+  { projectSourceRoot, workspaceRoot, removeTestExtension }: EntrypointsOptions,
+): Map<string, string> {
+  return getEntrypoints(testFiles, {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension,
+    prefix: 'spec',
+  });
+}
+
+/**
+ * @param setupFiles An array of absolute paths to setup files.
+ * @param options Configuration options for generating entry points.
+ * @returns A map where keys are the generated unique bundle names and values are the original file paths.
+ */
+export function getSetupEntrypoints(
+  setupFiles: string[],
+  { projectSourceRoot, workspaceRoot, removeTestExtension }: EntrypointsOptions,
+): Map<string, string> {
+  return getEntrypoints(setupFiles, {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension,
+    prefix: 'setup',
+  });
+}
+
+function getEntrypoints(
+  files: string[],
+  {
+    projectSourceRoot,
+    workspaceRoot,
+    removeTestExtension,
+    prefix,
+  }: EntrypointsOptions & { prefix: string },
 ): Map<string, string> {
   const seen = new Set<string>();
   const roots = [projectSourceRoot, workspaceRoot];
 
   return new Map(
-    Array.from(testFiles, (testFile) => {
-      const fileName = generateNameFromPath(testFile, roots, !!removeTestExtension);
-      const baseName = `spec-${fileName}`;
+    Array.from(files, (setupFile) => {
+      const fileName = generateNameFromPath(setupFile, roots, !!removeTestExtension);
+      const baseName = `${prefix}-${fileName}`;
       let uniqueName = baseName;
       let suffix = 2;
       while (seen.has(uniqueName)) {
@@ -110,7 +144,7 @@ export function getTestEntrypoints(
       }
       seen.add(uniqueName);
 
-      return [uniqueName, testFile];
+      return [uniqueName, setupFile];
     }),
   );
 }
@@ -140,7 +174,7 @@ export function generateNameFromPath(
   let endIndex = relativePath.length;
   if (removeTestExtension) {
     const infixes = TEST_FILE_INFIXES.map((p) => p.substring(1)).join('|');
-    const match = relativePath.match(new RegExp(`\\.(${infixes})\\.[^.]+$`));
+    const match = relativePath.match(new RegExp(`\\.((${infixes})\\.)?[^.]+$`));
 
     if (match?.index) {
       endIndex = match.index;
