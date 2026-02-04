@@ -47,8 +47,8 @@ importers:
         specifier: 21.2.0-next.2
         version: 21.2.0-next.2(6b9533c79e21fd4edd0310d63320e9ff)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#b48eb307ab83560c557cea5dcaa467d229e438eb
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#27c324522fd6909792dadad56f486aef067ca1b1
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/27c324522fd6909792dadad56f486aef067ca1b1(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.0-next.1
         version: 21.2.0-next.1(@angular/animations@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-next.1(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-next.1(@angular/compiler@21.2.0-next.1)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -1020,9 +1020,9 @@ packages:
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb}
-    version: 0.0.0-31db86455c01b4b7c17e46c21e545daa6371d7a1
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/27c324522fd6909792dadad56f486aef067ca1b1':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/27c324522fd6909792dadad56f486aef067ca1b1}
+    version: 0.0.0-5f0d1a63cf2cb1ac3589fc354f1f6783dfc42008
     hasBin: true
 
   '@angular/platform-browser@21.2.0-next.1':
@@ -5845,6 +5845,7 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
   glob@13.0.0:
@@ -5853,7 +5854,7 @@ packages:
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}
@@ -9531,7 +9532,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b48eb307ab83560c557cea5dcaa467d229e438eb(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/27c324522fd6909792dadad56f486aef067ca1b1(@modelcontextprotocol/sdk@1.25.3(zod@4.3.6))':
     dependencies:
       '@actions/core': 3.0.0
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -9587,6 +9588,7 @@ snapshots:
       which: 6.0.0
       yaml: 2.8.2
       yargs: 18.0.0
+      zod: 4.3.6
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - '@react-native-async-storage/async-storage'
@@ -14886,7 +14888,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@10.2.2)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
