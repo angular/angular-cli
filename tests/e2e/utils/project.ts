@@ -52,9 +52,7 @@ export async function prepareProjectForE2e(name: string) {
 
   console.log(`Project ${name} created... Installing packages.`);
   await installWorkspacePackages();
-  await ng('generate', 'private-e2e', '--related-app-name', name);
 
-  await useCIChrome(name, 'e2e');
   await useCIChrome(name, '');
   await useCIDefaults(name);
 
@@ -137,12 +135,6 @@ export function useCIDefaults(projectName = 'test-project'): Promise<void> {
     const appTargets = project.targets || project.architect;
     appTargets.build.options.progress = false;
     appTargets.test.options.progress = false;
-    if (appTargets.e2e) {
-      // Disable auto-updating webdriver in e2e.
-      appTargets.e2e.options.webdriverUpdate = false;
-      // Use a random port in e2e.
-      appTargets.e2e.options.port = 0;
-    }
 
     if (appTargets.serve) {
       // Use a random port in serve.
@@ -153,25 +145,6 @@ export function useCIDefaults(projectName = 'test-project'): Promise<void> {
 }
 
 export async function useCIChrome(projectName: string, projectDir = ''): Promise<void> {
-  const protractorConf = path.join(projectDir, 'protractor.conf.js');
-  if (fs.existsSync(protractorConf)) {
-    // Ensure the headless sandboxed chrome is configured in the protractor config
-    await replaceInFile(
-      protractorConf,
-      `browserName: 'chrome'`,
-      `browserName: 'chrome',
-      chromeOptions: {
-        args: ['--headless', '--no-sandbox', '--disable-gpu', '--disable-dev-shm-usage'],
-        binary: String.raw\`${process.env.CHROME_BIN}\`,
-      }`,
-    );
-    await replaceInFile(
-      protractorConf,
-      'directConnect: true,',
-      `directConnect: true, chromeDriver: String.raw\`${process.env.CHROMEDRIVER_BIN}\`,`,
-    );
-  }
-
   const karmaConf = path.join(projectDir, 'karma.conf.js');
   if (fs.existsSync(karmaConf)) {
     // Ensure the headless sandboxed chrome is configured in the karma config

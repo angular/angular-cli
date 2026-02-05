@@ -10,6 +10,8 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
+  await ng('generate', 'private-e2e', '--related-app-name', 'test-project');
+
   // Workaround for https://github.com/angular/angular/issues/32192
   await replaceInFile('src/app/app.html', /class="material-icons"/g, '');
 
@@ -43,6 +45,7 @@ export default async function () {
     await ng(
       'e2e',
       'test-project',
+      '--no-webdriver-update',
       '--protractor-config=e2e/protractor-saucelabs.conf.js',
       '--dev-server-target=',
     );

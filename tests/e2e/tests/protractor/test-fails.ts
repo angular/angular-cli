@@ -1,11 +1,15 @@
-import { execAndCaptureError } from '../../utils/process';
+import { execAndCaptureError, ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function () {
-  // Revert the `private-protractor` builder name back to the previous `protractor`.
+  // Setup `protractor` builder.
   await updateJsonFile('angular.json', (config) => {
-    config.projects['test-project'].architect['e2e'].builder =
-      '@angular-devkit/build-angular:protractor';
+    config.projects['test-project'].architect['e2e'] = {
+      builder: '@angular-devkit/build-angular:protractor',
+      options: {
+        protractorConfig: '',
+      },
+    };
   });
 
   const error = await execAndCaptureError('ng', ['e2e']);
