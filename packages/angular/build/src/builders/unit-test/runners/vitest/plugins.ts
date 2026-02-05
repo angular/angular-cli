@@ -229,7 +229,17 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         }
 
         // Construct the full, absolute path and normalize it to POSIX format.
-        const fullPath = toPosixPath(path.join(baseDir, id));
+        let fullPath: string;
+        if (path.isAbsolute(id)) {
+          const relativeId = path.relative(baseDir, id);
+          fullPath =
+            !relativeId.startsWith('..') && !path.isAbsolute(relativeId)
+              ? id
+              : path.join(baseDir, id);
+        } else {
+          fullPath = path.join(baseDir, id);
+        }
+        fullPath = toPosixPath(fullPath);
 
         if (testFileToEntryPoint.has(fullPath)) {
           return fullPath;
