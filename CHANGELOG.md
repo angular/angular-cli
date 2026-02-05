@@ -1,3 +1,21 @@
+<a name="21.1.3"></a>
+
+# 21.1.3 (2026-02-05)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [a18196a10](https://github.com/angular/angular-cli/commit/a18196a1096e5eb69cf64102943781d34c4389bf) | fix  | warn when production configuration is missing for service worker |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
+| [6d05d27ca](https://github.com/angular/angular-cli/commit/6d05d27ca097b16efb139bcee1c45b1b51dfe746) | fix  | address Node.js deprecation DEP0190 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.0-next.0"></a>
 
 # 21.2.0-next.0 (2026-01-28)
