@@ -147,7 +147,7 @@ export class VitestExecutor implements TestExecutor {
   private prepareSetupFiles(): string[] {
     const { setupFiles } = this.options;
     // Add setup file entries for TestBed initialization and project polyfills
-    const testSetupFiles = ['init-testbed.js', ...setupFiles];
+    const testSetupFiles = ['init-testbed.js', 'vitest-mock-patch.js', ...setupFiles];
 
     // TODO: Provide additional result metadata to avoid needing to extract based on filename
     if (this.buildResultFiles.has('polyfills.js')) {
