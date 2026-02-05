@@ -1,3 +1,31 @@
+<a name="21.2.0-next.1"></a>
+
+# 21.2.0-next.1 (2026-02-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [91b9d281f](https://github.com/angular/angular-cli/commit/91b9d281fc88a242aa6e5dd5495e275990d926ef) | feat | integrate file formatting into update migrations           |
+| [6f29a8c35](https://github.com/angular/angular-cli/commit/6f29a8c35abb8928d4e7ea01958192dd2a83491d) | fix  | renamed files by their new path in the schematic workflow  |
+| [bc363af8b](https://github.com/angular/angular-cli/commit/bc363af8bc40f117a4e35ec9eb7eedf69f5b5b37) | perf | optimize package manager discovery with stat-based probing |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [5d1df50d8](https://github.com/angular/angular-cli/commit/5d1df50d8b84b453570ae5fd9ab6f949bbc11649) | fix  | add actionable feedback to vitest-browser schematic              |
+| [51fc77828](https://github.com/angular/angular-cli/commit/51fc77828a33fdf35051b7e18d79ad43f90cba1d) | fix  | warn when production configuration is missing for service worker |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [ece30f235](https://github.com/angular/angular-cli/commit/ece30f2359c2dc794b0c9272447f623a121e88b0) | feat | add headless option to unit-test builder           |
+| [1f114a9e8](https://github.com/angular/angular-cli/commit/1f114a9e8b9bddd53e01016a2d7cb211a04eee48) | fix  | bundle setup files in unit-test builder for Vitest |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.3"></a>
 
 # 21.1.3 (2026-02-05)
