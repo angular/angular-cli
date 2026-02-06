@@ -124,6 +124,7 @@ describe('SSR Schematic', () => {
       const { scripts } = tree.readJson('/package.json') as { scripts: Record<string, string> };
 
       expect(scripts['serve:ssr:test-app']).toBe(`node dist/test-app/server/server.mjs`);
+      expect(scripts['watch:ssr:test-app']).toBe(`node --watch dist/test-app/server/server.mjs`);
     });
 
     it('works when using a custom "outputPath.browser" and "outputPath.server" values', async () => {

@@ -125,6 +125,7 @@ function addScriptsRule({ project }: SSROptions, isUsingApplicationBuilder: bool
       const { base, server } = await getApplicationBuilderOutputPaths(host, project);
       pkg.scripts ??= {};
       pkg.scripts[`serve:ssr:${project}`] = `node ${join(base, server)}/server.mjs`;
+      pkg.scripts[`watch:ssr:${project}`] = `node --watch ${join(base, server)}/server.mjs`;
     } else {
       const serverDist = await getLegacyOutputPaths(host, project, 'server');
       pkg.scripts = {
@@ -376,13 +377,13 @@ const ssrSchematic: RuleFactory<SSROptions> = createProjectSchematic(
       }),
       ...(usingApplicationBuilder
         ? [
-            updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
-            updateApplicationBuilderTsConfigRule(options),
-          ]
+          updateApplicationBuilderWorkspaceConfigRule(sourceRoot, options, context),
+          updateApplicationBuilderTsConfigRule(options),
+        ]
         : [
-            updateWebpackBuilderServerTsConfigRule(options),
-            updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
-          ]),
+          updateWebpackBuilderServerTsConfigRule(options),
+          updateWebpackBuilderWorkspaceConfigRule(sourceRoot, options),
+        ]),
       addServerFile(sourceRoot, options, isStandalone),
       addScriptsRule(options, usingApplicationBuilder),
       addDependencies(options, usingApplicationBuilder),
