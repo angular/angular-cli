@@ -2,9 +2,8 @@ import express from 'express';
 import * as path from 'node:path';
 import { copyProjectAsset } from '../../utils/assets';
 import { appendToFile, createDir, replaceInFile, writeFile } from '../../utils/fs';
-import { ng } from '../../utils/process';
+import { exec, ng } from '../../utils/process';
 import { installPackage } from '../../utils/packages';
-import { updateJsonFile } from '../../utils/project';
 
 /**
  * The list of development dependencies used by the E2E protractor-based builder.
@@ -25,17 +24,6 @@ export default async function () {
   for (const e2eDep of E2E_DEV_DEPENDENCIES) {
     await installPackage(e2eDep);
   }
-
-  // Setup `protractor` builder.
-  await updateJsonFile('angular.json', (config) => {
-    config.projects['test-project'].architect['e2e'] = {
-      builder: '@angular-devkit/build-angular:protractor',
-      options: {
-        devServerTarget: '',
-        protractorConfig: 'e2e/protractor-saucelabs.conf.js',
-      },
-    };
-  });
 
   await appendToFile(
     'src/app/app.config.ts',
@@ -97,13 +85,8 @@ describe('workspace-project App', () => {
 
   try {
     // Execute application's E2E tests with SauceLabs
-    await ng(
-      'e2e',
-      'test-project',
-      '--no-webdriver-update',
-      '--protractor-config=e2e/protractor-saucelabs.conf.js',
-      '--dev-server-target=',
-    );
+    const binPath = path.join('node_modules', '.bin', 'protractor');
+    await exec(binPath, 'e2e/protractor-saucelabs.conf.js');
   } finally {
     server.close();
   }
