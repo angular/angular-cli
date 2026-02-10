@@ -34,7 +34,7 @@ export function getEmittedFiles(compilation: Compilation): EmittedFiles[] {
       chunkFileNames.add(file);
       files.push({
         id: chunk.id?.toString(),
-        name: chunk.name,
+        name: chunk.name ?? undefined,
         file,
         extension: path.extname(file),
         initial: chunk.isOnlyInitial(),

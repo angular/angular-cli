@@ -131,7 +131,7 @@ export class CssOptimizerPlugin {
   private optimize(
     input: string,
     name: string,
-    inputMap: object,
+    inputMap: object | null,
     target: string[] | undefined,
   ): Promise<TransformResult> {
     let sourceMapLine;

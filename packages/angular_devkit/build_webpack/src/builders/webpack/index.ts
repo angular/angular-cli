@@ -7,9 +7,10 @@
  */
 
 import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import assert from 'node:assert';
 import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
-import webpack from 'webpack';
+import type webpack from 'webpack';
 import { EmittedFiles, getEmittedFiles, getWebpackConfig } from '../../utils';
 import { Schema as RealWebpackBuilderSchema } from './schema';
 
@@ -19,7 +20,7 @@ export interface WebpackLoggingCallback {
   (stats: webpack.Stats, config: webpack.Configuration): void;
 }
 export interface WebpackFactory {
-  (config: webpack.Configuration): Observable<webpack.Compiler> | webpack.Compiler;
+  (config: webpack.Configuration): Observable<webpack.Compiler | null> | webpack.Compiler | null;
 }
 
 export type BuildResult = BuilderOutput & {
@@ -56,7 +57,7 @@ export function runWebpack(
         return of(result);
       }
     } else {
-      return of(webpack(c));
+      return from(import('webpack').then((mod) => mod.default(c)));
     }
   };
 
@@ -64,6 +65,8 @@ export function runWebpack(
     switchMap(
       (webpackCompiler) =>
         new Observable<BuildResult>((obs) => {
+          assert(webpackCompiler, 'Webpack compiler factory did not return a compiler instance.');
+
           const callback = (err?: Error | null, stats?: webpack.Stats) => {
             if (err) {
               return obs.error(err);
@@ -101,7 +104,7 @@ export function runWebpack(
 
               // Teardown logic. Close the watcher when unsubscribed from.
               return () => {
-                watching.close(() => {});
+                watching?.close(() => {});
                 webpackCompiler.close(() => {});
               };
             } else {

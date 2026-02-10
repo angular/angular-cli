@@ -7,8 +7,8 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import { Observable } from 'rxjs';
-import webpack from 'webpack';
-import WebpackDevServer from 'webpack-dev-server';
+import type webpack from 'webpack';
+import type WebpackDevServer from 'webpack-dev-server';
 
 // @public (undocumented)
 export type BuildResult = BuilderOutput & {
@@ -65,7 +65,7 @@ export type WebpackDevServerFactory = typeof WebpackDevServer;
 // @public (undocumented)
 export interface WebpackFactory {
     // (undocumented)
-    (config: webpack.Configuration): Observable<webpack.Compiler> | webpack.Compiler;
+    (config: webpack.Configuration): Observable<webpack.Compiler | null> | webpack.Compiler | null;
 }
 
 // @public (undocumented)
