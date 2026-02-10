@@ -28,7 +28,7 @@ describe('setupBrowserConfiguration', () => {
     );
     await writeFile(
       join(playwrightPkgPath, 'index.js'),
-      'module.exports = { playwright: () => ({ name: "playwright" }) };',
+      'module.exports = { playwright: (options) => ({ name: "playwright", options }) };',
     );
   });
 
@@ -133,6 +133,25 @@ describe('setupBrowserConfiguration', () => {
         process.env['CI'] = originalCI;
       }
     }
+  });
+
+  // See: https://github.com/angular/angular-cli/issues/32469
+  it('should pass colorScheme=null to Playwright provider', async () => {
+    const { browser } = await setupBrowserConfiguration(
+      ['ChromeHeadless'],
+      undefined,
+      false,
+      workspaceRoot,
+      undefined,
+    );
+
+    expect(browser?.provider?.options).toEqual(
+      jasmine.objectContaining({
+        contextOptions: jasmine.objectContaining({
+          colorScheme: null,
+        }),
+      }),
+    );
   });
 
   it('should support Preview provider forcing headless false', async () => {
