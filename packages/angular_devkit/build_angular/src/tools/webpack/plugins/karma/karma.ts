@@ -10,6 +10,7 @@
 // TODO: cleanup this file, it's copied as is from Angular CLI.
 import * as http from 'http';
 import * as path from 'path';
+import assert from 'node:assert';
 import webpack from 'webpack';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 
@@ -141,6 +142,8 @@ const init: any = (config: any, emitter: any) => {
     isBlocked = true;
     callback?.();
   }
+
+  assert(compiler, 'Compiler cannot be undefined.');
 
   compiler.hooks.invalid.tap('karma', () => handler());
   compiler.hooks.watchRun.tapAsync('karma', (_: any, callback: () => void) => handler(callback));
