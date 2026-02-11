@@ -1,3 +1,15 @@
+<a name="21.1.4"></a>
+
+# 21.1.4 (2026-02-11)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [7a9dd6b47](https://github.com/angular/angular-cli/commit/7a9dd6b47e2191862c64355b10abaeead189759f) | fix  | correctly resolve absolute setup file paths in Vitest |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.3"></a>
 
 # 21.1.3 (2026-02-05)
