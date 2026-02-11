@@ -1,3 +1,17 @@
+<a name="21.2.0-next.2"></a>
+
+# 21.2.0-next.2 (2026-02-11)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [cad7a7c0f](https://github.com/angular/angular-cli/commit/cad7a7c0ff3778f04820a99ad0aa9d74f1067fd5) | feat | run vitest browser with playwright with OS theme      |
+| [8ae7f59e6](https://github.com/angular/angular-cli/commit/8ae7f59e6f988489fda8c1346e3d2c3768d7a5f0) | fix  | correctly resolve absolute setup file paths in Vitest |
+| [fd5cb28c8](https://github.com/angular/angular-cli/commit/fd5cb28c8082417288a896b89bde659bb0dc92e2) | fix  | explicitly fail when using Vitest runtime mocking     |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.4"></a>
 
 # 21.1.4 (2026-02-11)
