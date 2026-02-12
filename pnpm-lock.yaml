@@ -8,11 +8,16 @@ overrides:
   typescript: 5.8.1-rc
   '@angular/build': workspace:*
 
-packageExtensionsChecksum: ea5f588691095a73da0f9364791a5f26
+packageExtensionsChecksum: sha256-ypzT2QGfTigFnHHp4GjDCVCL+PuG6afZkUNw2T/fqi4=
 
 importers:
 
   .:
+    dependenciesMeta:
+      esbuild:
+        built: true
+      puppeteer:
+        built: true
     devDependencies:
       '@ampproject/remapping':
         specifier: 2.3.0
@@ -46,7 +51,7 @@ importers:
         version: 19.2.15(@angular/compiler-cli@19.2.15(@angular/compiler@19.2.15)(typescript@5.8.1-rc))(@angular/compiler@19.2.15)
       '@angular/material':
         specifier: 19.2.0-rc.0
-        version: 19.2.0-rc.0(tfkip326m4ctzuf6kjub6dyir4)
+        version: 19.2.0-rc.0(6026edc4067c2c1155492ec249a986d0)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#252589f7bc8fe6ca13b31e02d506ec52e826cdd2
         version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/252589f7bc8fe6ca13b31e02d506ec52e826cdd2(encoding@0.1.13)
@@ -509,11 +514,6 @@ importers:
       zone.js:
         specifier: ^0.15.0
         version: 0.15.0
-    dependenciesMeta:
-      esbuild:
-        built: true
-      puppeteer:
-        built: true
 
   modules/testing/builder:
     devDependencies:
@@ -610,10 +610,6 @@ importers:
       watchpack:
         specifier: 2.4.2
         version: 2.4.2
-    optionalDependencies:
-      lmdb:
-        specifier: 3.2.6
-        version: 3.2.6
     devDependencies:
       '@angular-devkit/core':
         specifier: workspace:*
@@ -621,6 +617,10 @@ importers:
       '@angular/ssr':
         specifier: workspace:*
         version: link:../ssr
+    optionalDependencies:
+      lmdb:
+        specifier: 3.2.6
+        version: 3.2.6
 
   packages/angular/cli:
     dependencies:
@@ -920,10 +920,6 @@ importers:
       webpack-subresource-integrity:
         specifier: 5.1.0
         version: 5.1.0(webpack@5.105.0(esbuild@0.25.4))
-    optionalDependencies:
-      esbuild:
-        specifier: 0.25.4
-        version: 0.25.4
     devDependencies:
       '@angular/ssr':
         specifier: workspace:*
@@ -931,6 +927,10 @@ importers:
       undici:
         specifier: 6.21.1
         version: 6.21.1
+    optionalDependencies:
+      esbuild:
+        specifier: 0.25.4
+        version: 0.25.4
 
   packages/angular_devkit/build_webpack:
     dependencies:
@@ -8782,7 +8782,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/material@19.2.0-rc.0(tfkip326m4ctzuf6kjub6dyir4)':
+  '@angular/material@19.2.0-rc.0(6026edc4067c2c1155492ec249a986d0)':
     dependencies:
       '@angular/cdk': 19.2.0-rc.0(@angular/common@19.2.15(@angular/core@19.2.15(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1))(@angular/core@19.2.15(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1)
       '@angular/common': 19.2.15(@angular/core@19.2.15(rxjs@7.8.1)(zone.js@0.15.0))(rxjs@7.8.1)
