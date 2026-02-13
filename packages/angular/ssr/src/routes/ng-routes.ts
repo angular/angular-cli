@@ -11,6 +11,7 @@ import {
   ApplicationRef,
   Compiler,
   EnvironmentInjector,
+  InjectionToken,
   Injector,
   createEnvironmentInjector,
   runInInjectionContext,
@@ -23,6 +24,7 @@ import {
   Router,
   ɵloadChildren as loadChildrenHelper,
 } from '@angular/router';
+
 import { ServerAssets } from '../assets';
 import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
@@ -38,6 +40,16 @@ import {
   ServerRoutesConfig,
 } from './route-config';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
+
+/**
+ * A DI token that indicates whether the application is in the process of discovering routes.
+ *
+ * This token is provided with the value `true` when route discovery is active, allowing other
+ * parts of the application to conditionally execute logic. For example, it can be used to
+ * disable features or behaviors that are not necessary or might interfere with the route
+ * discovery process.
+ */
+export const DURING_ROUTE_DISCOVERY = new InjectionToken<boolean>('DURING_ROUTE_DISCOVERY');
 
 interface Route extends AngularRoute {
   ɵentryName?: string;
@@ -622,6 +634,10 @@ export async function getRoutesFromAngularRouterConfig(
     {
       provide: ɵENABLE_ROOT_COMPONENT_BOOTSTRAP,
       useValue: false,
+    },
+    {
+      provide: DURING_ROUTE_DISCOVERY,
+      useValue: true,
     },
   ]);
 

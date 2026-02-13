@@ -24,3 +24,5 @@ export {
   type ServerRouteServer,
   type ServerRouteCommon,
 } from './src/routes/route-config';
+
+export { DURING_ROUTE_DISCOVERY } from './src/routes/ng-routes';

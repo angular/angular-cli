@@ -6,6 +6,7 @@
 
 import { DefaultExport } from '@angular/router';
 import { EnvironmentProviders } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 import { Provider } from '@angular/core';
 import { Type } from '@angular/core';
 
@@ -18,6 +19,9 @@ export class AngularAppEngine {
 
 // @public
 export function createRequestHandler(handler: RequestHandlerFunction): RequestHandlerFunction;
+
+// @public
+export const DURING_ROUTE_DISCOVERY: InjectionToken<boolean>;
 
 // @public
 export enum PrerenderFallback {
