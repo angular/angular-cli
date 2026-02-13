@@ -1,3 +1,15 @@
+<a name="19.2.20"></a>
+
+# 19.2.20 (2026-02-13)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [0e5421ba7](https://github.com/angular/angular-cli/commit/0e5421ba78814cf11e4d4510e930eaacc6458662) | fix  | update webpack to 5.105.0 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.19"></a>
 
 # 19.2.19 (2025-10-29)
