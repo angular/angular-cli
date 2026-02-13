@@ -269,6 +269,7 @@ export class VitestExecutor implements TestExecutor {
         watch,
         ...(typeof ui === 'boolean' ? { ui } : {}),
         ...debugOptions,
+        update: this.options.update,
       },
       {
         // Note `.vitest` is auto appended to the path.
