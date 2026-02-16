@@ -92,7 +92,7 @@
     "@types/yarnpkg__lockfile": "^1.1.5",
     "@typescript-eslint/eslint-plugin": "8.52.0",
     "@typescript-eslint/parser": "8.52.0",
-    "ajv": "8.17.1",
+    "ajv": "8.18.0",
     "buffer": "6.0.3",
     "esbuild": "0.27.2",
     "esbuild-wasm": "0.27.2",
