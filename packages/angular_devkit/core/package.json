@@ -25,7 +25,7 @@
     "./*.js": "./*.js"
   },
   "dependencies": {
-    "ajv": "8.17.1",
+    "ajv": "8.18.0",
     "ajv-formats": "3.0.1",
     "jsonc-parser": "3.3.1",
     "picomatch": "4.0.3",
