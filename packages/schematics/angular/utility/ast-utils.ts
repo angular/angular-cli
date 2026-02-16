@@ -323,12 +323,13 @@ export function getDecoratorMetadata(
     .filter((node) => {
       return (
         node.kind == ts.SyntaxKind.Decorator &&
+        (node as ts.Decorator).expression &&
         (node as ts.Decorator).expression.kind == ts.SyntaxKind.CallExpression
       );
     })
     .map((node) => (node as ts.Decorator).expression as ts.CallExpression)
     .filter((expr) => {
-      if (expr.expression.kind == ts.SyntaxKind.Identifier) {
+      if (expr.expression && expr.expression.kind == ts.SyntaxKind.Identifier) {
         const id = expr.expression as ts.Identifier;
 
         return id.text == identifier && angularImports[id.text] === module;
@@ -336,7 +337,7 @@ export function getDecoratorMetadata(
         // This covers foo.NgModule when importing * as foo.
         const paExpr = expr.expression as ts.PropertyAccessExpression;
         // If the left expression is not an identifier, just give up at that point.
-        if (paExpr.expression.kind !== ts.SyntaxKind.Identifier) {
+        if (!paExpr.expression || paExpr.expression.kind !== ts.SyntaxKind.Identifier) {
           return false;
         }
 

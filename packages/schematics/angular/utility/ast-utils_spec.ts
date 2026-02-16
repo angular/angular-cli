@@ -16,6 +16,7 @@ import {
   addRouteDeclarationToModule,
   addSymbolToNgModuleMetadata,
   findNodes,
+  getDecoratorMetadata,
   hasTopLevelIdentifier,
   insertAfterLastOccurrence,
   insertImport,
@@ -837,6 +838,55 @@ describe('ast utils', () => {
       const source = getTsSource(filePath, fileContent);
 
       expect(hasTopLevelIdentifier(source, 'FooInterface', '@foo/interfaces')).toBe(false);
+    });
+  });
+
+  describe('getDecoratorMetadata', () => {
+    const filePath = './src/app.module.ts';
+
+    it('should return decorator metadata for a valid NgModule', () => {
+      const fileContent = `
+        import { NgModule } from '@angular/core';
+
+        @NgModule({
+          declarations: [],
+          imports: []
+        })
+        export class AppModule { }
+      `;
+      const source = getTsSource(filePath, fileContent);
+      const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].kind).toBe(ts.SyntaxKind.ObjectLiteralExpression);
+    });
+
+    it('should not crash when processing files without decorators', () => {
+      const fileContent = `
+        export const environment = {
+          production: false
+        };
+      `;
+      const source = getTsSource(filePath, fileContent);
+      const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+
+      expect(nodes.length).toBe(0);
+    });
+
+    it('should handle namespace imports correctly', () => {
+      const fileContent = `
+        import * as ng from '@angular/core';
+
+        @ng.NgModule({
+          declarations: []
+        })
+        export class AppModule { }
+      `;
+      const source = getTsSource(filePath, fileContent);
+      const nodes = getDecoratorMetadata(source, 'NgModule', '@angular/core');
+
+      expect(nodes.length).toBe(1);
+      expect(nodes[0].kind).toBe(ts.SyntaxKind.ObjectLiteralExpression);
     });
   });
 });
