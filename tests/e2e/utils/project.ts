@@ -200,7 +200,7 @@ export function updateServerFileForEsbuild(filepath: string): Promise<void> {
       const browserDistFolder = resolve(serverDistFolder, '../browser');
       const indexHtml = join(serverDistFolder, 'index.server.html');
 
-      const commonEngine = new CommonEngine();
+      const commonEngine = new CommonEngine({ allowedHosts: [] });
 
       server.set('view engine', 'html');
       server.set('views', browserDistFolder);

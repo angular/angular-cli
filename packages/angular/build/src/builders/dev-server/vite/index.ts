@@ -9,7 +9,6 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
-import { builtinModules, isBuiltin } from 'node:module';
 import { join } from 'node:path';
 import type { Connect, ViteDevServer } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
@@ -21,7 +20,6 @@ import { Result, ResultKind } from '../../application/results';
 import { OutputHashing } from '../../application/schema';
 import {
   type ApplicationBuilderInternalOptions,
-  type ExternalResultMetadata,
   JavaScriptTransformer,
   getSupportedBrowsers,
   isZonelessApp,
@@ -102,6 +100,7 @@ export async function* serveWithVite(
   // Disable auto CSP.
   browserOptions.security = {
     autoCsp: false,
+    allowedHosts: Array.isArray(serverOptions.allowedHosts) ? serverOptions.allowedHosts : [],
   };
 
   // Disable JSON build stats.
