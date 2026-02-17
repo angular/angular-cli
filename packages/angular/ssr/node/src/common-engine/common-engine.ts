@@ -20,6 +20,11 @@ import {
   runMethodAndMeasurePerf,
 } from './peformance-profiler';
 
+/**
+ * Regular expression to match and remove the `www.` prefix from hostnames.
+ */
+const WWW_HOST_REGEX = /^www\./i;
+
 const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
 export interface CommonEngineOptions {
@@ -31,6 +36,9 @@ export interface CommonEngineOptions {
 
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
+
+  /** A set of hostnames that are allowed to access the server. */
+  allowedHosts: readonly string[];
 }
 
 export interface CommonEngineRenderOptions {
@@ -64,8 +72,17 @@ export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
+  private readonly allowedHosts: ReadonlySet<string>;
 
-  constructor(private options?: CommonEngineOptions) {
+  constructor(private options: CommonEngineOptions) {
+    this.allowedHosts = new Set([
+      ...options.allowedHosts.map((host) => host.replace(WWW_HOST_REGEX, '')),
+      'localhost',
+      '127.0.0.1',
+      '::1',
+      '[::1]',
+    ]);
+
     attachNodeGlobalErrorHandlers();
   }
 
@@ -74,6 +91,10 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
+    if (opts.url) {
+      this.validateHost(opts.url);
+    }
+
     const enablePerformanceProfiler = this.options?.enablePerformanceProfiler;
 
     const runMethod = enablePerformanceProfiler
@@ -100,6 +121,34 @@ export class CommonEngine {
     }
 
     return html;
+  }
+
+  private validateHost(url: string): void {
+    if (!URL.canParse(url)) {
+      throw new Error(`URL "${url}" is invalid.`);
+    }
+
+    const hostname = new URL(url).hostname.replace(WWW_HOST_REGEX, '');
+
+    if (this.allowedHosts.has(hostname)) {
+      return;
+    }
+
+    // Support wildcard hostnames.
+    for (const allowedHost of this.allowedHosts) {
+      if (!allowedHost.startsWith('*.')) {
+        continue;
+      }
+
+      const domain = allowedHost.slice(1);
+      if (hostname.endsWith(domain)) {
+        return;
+      }
+    }
+
+    throw new Error(
+      `Host ${hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
+    );
   }
 
   private inlineCriticalCss(html: string, opts: CommonEngineRenderOptions): Promise<string> {

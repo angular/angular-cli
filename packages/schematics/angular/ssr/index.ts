@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isJsonObject } from '@angular-devkit/core';
+import { JsonObject, isJsonObject } from '@angular-devkit/core';
 import {
   Rule,
   RuleFactory,
@@ -206,6 +206,10 @@ function updateApplicationBuilderWorkspaceConfigRule(
 
     buildTarget.options = {
       ...buildTarget.options,
+      security: {
+        ...((buildTarget.options?.security as JsonObject | undefined) ?? {}),
+        allowedHosts: [],
+      },
       outputPath,
       outputMode: 'server',
       ssr: {
