@@ -115,6 +115,7 @@ export async function* serveWithVite(
   // Disable auto CSP.
   browserOptions.security = {
     autoCsp: false,
+    allowedHosts: Array.isArray(serverOptions.allowedHosts) ? serverOptions.allowedHosts : [],
   };
 
   // Disable JSON build stats.

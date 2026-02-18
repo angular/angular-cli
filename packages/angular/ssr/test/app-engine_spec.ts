@@ -84,6 +84,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
         entryPoints: {
@@ -163,6 +164,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app with single locale', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           it: createEntryPoint('it'),
         },
@@ -230,6 +232,7 @@ describe('AngularAppEngine', () => {
       class HomeComponent {}
 
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           '': async () => {
             setAngularAppTestingManifest(
@@ -272,6 +275,59 @@ describe('AngularAppEngine', () => {
       const request = new Request('https://example.com/home/index.html');
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
+    });
+  });
+
+  describe('Invalid host headers', () => {
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {},
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine();
+    });
+
+    it('should return 400 for disallowed host', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'host': 'evil.com',
+        },
+      });
+
+      const response = await appEngine.handle(request);
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" with value "evil.com" is not allowed.',
+      );
+    });
+
+    it('should return 400 for disallowed x-forwarded-host', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'x-forwarded-host': 'evil.com',
+        },
+      });
+      const response = await appEngine.handle(request);
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "x-forwarded-host" with value "evil.com" is not allowed.',
+      );
+    });
+
+    it('should return 400 for host with path separator', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'host': 'example.com/evil',
+        },
+      });
+      const response = await appEngine.handle(request);
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" contains path separators which is not allowed.',
+      );
     });
   });
 });
