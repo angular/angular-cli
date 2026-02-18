@@ -10,8 +10,8 @@ import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
-import { validateHeaders } from './utils/headers';
 import { joinUrlParts } from './utils/url';
+import { validateRequest } from './utils/validation';
 
 /**
  * Angular server application engine.
@@ -80,7 +80,7 @@ export class AngularAppEngine {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     try {
-      validateHeaders(request, this.allowedHosts);
+      validateRequest(request, this.allowedHosts);
     } catch (error) {
       const body = error instanceof Error ? error.message : undefined;
 

@@ -86,11 +86,7 @@ export function generateAngularServerAppEngineManifest(
   const manifestContent = `
 export default {
   basePath: '${basePath}',
-  allowedHosts: ${JSON.stringify(
-    allowedHosts.map((host) => host.replace(/^www\./i, '')),
-    undefined,
-    2,
-  )},
+  allowedHosts: ${JSON.stringify(allowedHosts, undefined, 2)},
   supportedLocales: ${JSON.stringify(supportedLocales, undefined, 2)},
   entryPoints: {
     ${Object.entries(entryPoints)

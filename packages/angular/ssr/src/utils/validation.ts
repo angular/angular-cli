@@ -17,11 +17,6 @@ const VALID_PORT_REGEX = /^\d+$/;
 const VALID_PROTO_REGEX = /^https?$/i;
 
 /**
- * Regular expression to match and remove the `www.` prefix from hostnames.
- */
-const WWW_HOST_REGEX = /^www\./i;
-
-/**
  * Regular expression to match path separators.
  */
 const PATH_SEPARATOR_REGEX = /[/\\]/;
@@ -58,29 +53,36 @@ export function getFirstHeaderValue(
 }
 
 /**
- * Validates the headers of an incoming request.
+ * Validates a request.
  *
- * This function checks for the validity of critical headers such as `x-forwarded-host`,
- *  `host`, `x-forwarded-port`, and `x-forwarded-proto`.
- * It ensures that the hostnames match the allowed hosts and that ports and protocols adhere to expected formats.
- *
- * @param request - The incoming `Request` object containing the headers to validate.
+ * @param request - The incoming `Request` object to validate.
  * @param allowedHosts - A set of allowed hostnames.
  * @throws Error if any of the validated headers contain invalid values.
  */
-export function validateHeaders(request: Request, allowedHosts: ReadonlySet<string>): void {
-  const headers = request.headers;
-  validateHost('x-forwarded-host', headers, allowedHosts);
-  validateHost('host', headers, allowedHosts);
+export function validateRequest(request: Request, allowedHosts: ReadonlySet<string>): void {
+  validateHeaders(request, allowedHosts);
+  validateUrl(new URL(request.url), allowedHosts);
+}
 
-  const xForwardedPort = getFirstHeaderValue(headers.get('x-forwarded-port'));
-  if (xForwardedPort && !VALID_PORT_REGEX.test(xForwardedPort)) {
-    throw new Error('Header "x-forwarded-port" must be a numeric value.');
-  }
+/**
+ * Validates that the hostname of a given URL is allowed.
+ *
+ * @param url - The URL object to validate.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @throws Error if the hostname is not in the allowlist.
+ */
+export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
+  const { hostname } = url;
+  if (!isHostAllowed(hostname, allowedHosts)) {
+    let errorMessage = `URL with hostname "${hostname}" is not allowed.`;
+    if (typeof ngDevMode === 'undefined' || ngDevMode) {
+      errorMessage +=
+        '\n\nAction Required: Update your "angular.json" to include this hostname. ' +
+        'Path: "projects.[project-name].architect.build.options.security.allowedHosts".' +
+        '\n\nFor more information, see https://angular.dev/guide/ssr#configuring-allowed-hosts';
+    }
 
-  const xForwardedProto = getFirstHeaderValue(headers.get('x-forwarded-proto'));
-  if (xForwardedProto && !VALID_PROTO_REGEX.test(xForwardedProto)) {
-    throw new Error('Header "x-forwarded-proto" must be either "http" or "https".');
+    throw new Error(errorMessage);
   }
 }
 
@@ -92,12 +94,12 @@ export function validateHeaders(request: Request, allowedHosts: ReadonlySet<stri
  * @param allowedHosts - A set of allowed hostnames.
  * @throws Error if the header value is invalid or the hostname is not in the allowlist.
  */
-function validateHost(
+function validateHostHeaders(
   headerName: string,
   headers: Headers,
   allowedHosts: ReadonlySet<string>,
 ): void {
-  const value = getFirstHeaderValue(headers.get(headerName))?.replace(WWW_HOST_REGEX, '');
+  const value = getFirstHeaderValue(headers.get(headerName));
   if (!value) {
     return;
   }
@@ -113,25 +115,34 @@ function validateHost(
   }
 
   const { hostname } = new URL(url);
-  if (
+  if (!isHostAllowed(hostname, allowedHosts)) {
+    let errorMessage = `Header "${headerName}" with value "${value}" is not allowed.`;
+    if (typeof ngDevMode === 'undefined' || ngDevMode) {
+      errorMessage +=
+        '\n\nAction Required: Update your "angular.json" to include this hostname. ' +
+        'Path: "projects.[project-name].architect.build.options.security.allowedHosts".' +
+        '\n\nFor more information, see https://angular.dev/guide/ssr#configuring-allowed-hosts';
+    }
+
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * Checks if the hostname is allowed.
+ * @param hostname - The hostname to check.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @returns `true` if the hostname is allowed, `false` otherwise.
+ */
+export function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
+  return (
     // Check the provided allowed hosts first.
     allowedHosts.has(hostname) ||
     checkWildcardHostnames(hostname, allowedHosts) ||
     // Check the default allowed hosts last this is the fallback and should be rarely if ever used in production.
     DEFAULT_ALLOWED_HOSTS.has(hostname) ||
     checkWildcardHostnames(hostname, DEFAULT_ALLOWED_HOSTS)
-  ) {
-    return;
-  }
-
-  let errorMessage = `Header "${headerName}" with value "${value}" is not allowed.`;
-  if (typeof ngDevMode === 'undefined' || ngDevMode) {
-    errorMessage +=
-      '\n\nAction Required: Update your "angular.json" to include this hostname. ' +
-      'Path: "projects.[project-name].architect.build.options.security.allowedHosts".';
-  }
-
-  throw new Error(errorMessage);
+  );
 }
 
 /**
@@ -153,4 +164,31 @@ function checkWildcardHostnames(hostname: string, allowedHosts: ReadonlySet<stri
   }
 
   return false;
+}
+
+/**
+ * Validates the headers of an incoming request.
+ *
+ * This function checks for the validity of critical headers such as `x-forwarded-host`,
+ *  `host`, `x-forwarded-port`, and `x-forwarded-proto`.
+ * It ensures that the hostnames match the allowed hosts and that ports and protocols adhere to expected formats.
+ *
+ * @param request - The incoming `Request` object containing the headers to validate.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @throws Error if any of the validated headers contain invalid values.
+ */
+function validateHeaders(request: Request, allowedHosts: ReadonlySet<string>): void {
+  const headers = request.headers;
+  validateHostHeaders('x-forwarded-host', headers, allowedHosts);
+  validateHostHeaders('host', headers, allowedHosts);
+
+  const xForwardedPort = getFirstHeaderValue(headers.get('x-forwarded-port'));
+  if (xForwardedPort && !VALID_PORT_REGEX.test(xForwardedPort)) {
+    throw new Error('Header "x-forwarded-port" must be a numeric value.');
+  }
+
+  const xForwardedProto = getFirstHeaderValue(headers.get('x-forwarded-proto'));
+  if (xForwardedProto && !VALID_PROTO_REGEX.test(xForwardedProto)) {
+    throw new Error('Header "x-forwarded-proto" must be either "http" or "https".');
+  }
 }

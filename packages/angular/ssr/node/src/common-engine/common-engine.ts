@@ -12,6 +12,7 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
+import { isHostAllowed } from '../../../src/utils/validation';
 import { attachNodeGlobalErrorHandlers } from '../errors';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
@@ -19,11 +20,6 @@ import {
   printPerformanceLogs,
   runMethodAndMeasurePerf,
 } from './peformance-profiler';
-
-/**
- * Regular expression to match and remove the `www.` prefix from hostnames.
- */
-const WWW_HOST_REGEX = /^www\./i;
 
 const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
@@ -75,13 +71,7 @@ export class CommonEngine {
   private readonly allowedHosts: ReadonlySet<string>;
 
   constructor(private options: CommonEngineOptions) {
-    this.allowedHosts = new Set([
-      ...options.allowedHosts.map((host) => host.replace(WWW_HOST_REGEX, '')),
-      'localhost',
-      '127.0.0.1',
-      '::1',
-      '[::1]',
-    ]);
+    this.allowedHosts = new Set(options.allowedHosts);
 
     attachNodeGlobalErrorHandlers();
   }
@@ -128,27 +118,12 @@ export class CommonEngine {
       throw new Error(`URL "${url}" is invalid.`);
     }
 
-    const hostname = new URL(url).hostname.replace(WWW_HOST_REGEX, '');
-
-    if (this.allowedHosts.has(hostname)) {
-      return;
+    const hostname = new URL(url).hostname;
+    if (!isHostAllowed(hostname, this.allowedHosts)) {
+      throw new Error(
+        `Host ${hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
+      );
     }
-
-    // Support wildcard hostnames.
-    for (const allowedHost of this.allowedHosts) {
-      if (!allowedHost.startsWith('*.')) {
-        continue;
-      }
-
-      const domain = allowedHost.slice(1);
-      if (hostname.endsWith(domain)) {
-        return;
-      }
-    }
-
-    throw new Error(
-      `Host ${hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
-    );
   }
 
   private inlineCriticalCss(html: string, opts: CommonEngineRenderOptions): Promise<string> {
