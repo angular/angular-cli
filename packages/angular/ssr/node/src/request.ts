@@ -8,7 +8,7 @@
 
 import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
-import { getFirstHeaderValue } from '../../src/utils/headers';
+import { getFirstHeaderValue } from '../../src/utils/validation';
 
 /**
  * A set containing all the pseudo-headers defined in the HTTP/2 specification.

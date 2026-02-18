@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { validateHeaders } from '../../src/utils/headers';
+import { validateRequest, validateUrl } from '../../src/utils/validation';
 
-describe('validateHeaders', () => {
+describe('validateRequest', () => {
   const allowedHosts = new Set(['example.com', 'sub.example.com']);
 
   it('should pass valid headers with allowed host', () => {
@@ -21,7 +21,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).not.toThrow();
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
   });
 
   it('should pass valid headers with localhost (default allowed)', () => {
@@ -31,7 +31,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).not.toThrow();
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
   });
 
   it('should throw error for disallowed host', () => {
@@ -41,10 +41,12 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       /Header "host" with value "evil\.com" is not allowed/,
     );
   });
+
+  // ...
 
   it('should throw error for disallowed x-forwarded-host', () => {
     const request = new Request('https://example.com', {
@@ -54,7 +56,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       /Header "x-forwarded-host" with value "evil\.com" is not allowed/,
     );
   });
@@ -67,7 +69,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       'Header "x-forwarded-host" contains path separators which is not allowed.',
     );
   });
@@ -80,7 +82,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       'Header "x-forwarded-port" must be a numeric value.',
     );
   });
@@ -93,7 +95,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       'Header "x-forwarded-proto" must be either "http" or "https".',
     );
   });
@@ -106,7 +108,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).not.toThrow();
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
   });
 
   it('should ignore port in host validation', () => {
@@ -116,7 +118,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).not.toThrow();
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
   });
 
   it('should throw if host header is completely malformed url', () => {
@@ -126,7 +128,7 @@ describe('validateHeaders', () => {
       },
     });
 
-    expect(() => validateHeaders(request, allowedHosts)).toThrowError(
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
       'Header "host" contains an invalid value.',
     );
   });
@@ -141,7 +143,7 @@ describe('validateHeaders', () => {
         },
       });
 
-      expect(() => validateHeaders(request, wildcardHosts)).not.toThrow();
+      expect(() => validateRequest(request, wildcardHosts)).not.toThrow();
     });
 
     it('should match nested subdomain', () => {
@@ -151,7 +153,7 @@ describe('validateHeaders', () => {
         },
       });
 
-      expect(() => validateHeaders(request, wildcardHosts)).not.toThrow();
+      expect(() => validateRequest(request, wildcardHosts)).not.toThrow();
     });
 
     it('should not match base domain', () => {
@@ -161,7 +163,7 @@ describe('validateHeaders', () => {
         },
       });
 
-      expect(() => validateHeaders(request, wildcardHosts)).toThrowError(
+      expect(() => validateRequest(request, wildcardHosts)).toThrowError(
         /Header "host" with value "example\.com" is not allowed/,
       );
     });
@@ -173,9 +175,26 @@ describe('validateHeaders', () => {
         },
       });
 
-      expect(() => validateHeaders(request, wildcardHosts)).toThrowError(
+      expect(() => validateRequest(request, wildcardHosts)).toThrowError(
         /Header "host" with value "evil\.com" is not allowed/,
       );
     });
+  });
+
+  it('should pass valid URL with allowed host', () => {
+    const request = new Request('https://example.com/path');
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
+  });
+
+  it('should pass valid URL with allowed sub-domain', () => {
+    const request = new Request('https://sub.example.com/path');
+    expect(() => validateRequest(request, allowedHosts)).not.toThrow();
+  });
+
+  it('should throw error for disallowed host', () => {
+    const request = new Request('https://evil.com/path');
+    expect(() => validateRequest(request, allowedHosts)).toThrowError(
+      /URL with hostname "evil\.com" is not allowed/,
+    );
   });
 });
