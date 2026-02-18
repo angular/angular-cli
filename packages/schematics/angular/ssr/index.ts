@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isJsonObject, join, normalize, strings } from '@angular-devkit/core';
+import { JsonObject, isJsonObject, join, normalize, strings } from '@angular-devkit/core';
 import {
   Rule,
   SchematicContext,
@@ -201,6 +201,10 @@ function updateApplicationBuilderWorkspaceConfigRule(
 
     buildTarget.options = {
       ...buildTarget.options,
+      security: {
+        ...((buildTarget.options?.security as JsonObject | undefined) ?? {}),
+        allowedHosts: [],
+      },
       outputPath,
       outputMode: options.serverRouting ? 'server' : undefined,
       prerender: options.serverRouting ? undefined : true,

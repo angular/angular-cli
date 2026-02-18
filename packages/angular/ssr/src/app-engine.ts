@@ -11,6 +11,7 @@ import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { joinUrlParts } from './utils/url';
+import { validateRequest } from './utils/validation';
 
 /**
  * Angular server application engine.
@@ -48,6 +49,11 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
+   * A set of allowed hostnames for the server application.
+   */
+  private readonly allowedHosts: ReadonlySet<string> = new Set(this.manifest.allowedHosts);
+
+  /**
    * A map of supported locales from the server application's manifest.
    */
   private readonly supportedLocales: ReadonlyArray<string> = Object.keys(
@@ -69,10 +75,25 @@ export class AngularAppEngine {
    *
    * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
+   *
+   * @remarks If the `Host` or `X-Forwarded-Host` header value is not in the allowed hosts list, this function will return a 400 response.
+   * To resolve this, configure the `allowedHosts` option in `angular.json` and include the hostname.
+   * Path: `projects.[project-name].architect.build.options.security.allowedHosts`.
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
-    const serverApp = await this.getAngularServerAppForRequest(request);
+    try {
+      validateRequest(request, this.allowedHosts);
+    } catch (error) {
+      const body = error instanceof Error ? error.message : undefined;
 
+      return new Response(body, {
+        status: 400,
+        statusText: 'Bad Request',
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
+
+    const serverApp = await this.getAngularServerAppForRequest(request);
     if (serverApp) {
       return serverApp.handle(request, requestContext);
     }

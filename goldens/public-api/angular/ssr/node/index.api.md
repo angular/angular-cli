@@ -20,12 +20,13 @@ export class AngularNodeAppEngine {
 
 // @public
 export class CommonEngine {
-    constructor(options?: CommonEngineOptions | undefined);
+    constructor(options: CommonEngineOptions);
     render(opts: CommonEngineRenderOptions): Promise<string>;
 }
 
 // @public (undocumented)
 export interface CommonEngineOptions {
+    allowedHosts: readonly string[];
     bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
     enablePerformanceProfiler?: boolean;
     providers?: StaticProvider[];

@@ -34,7 +34,7 @@ describe('Serve SSR Builder', () => {
           const server = express();
           const distFolder = resolve(__dirname, '../dist');
           const indexHtml = join(distFolder, 'index.html');
-          const commonEngine = new CommonEngine();
+          const commonEngine = new CommonEngine({ allowedHosts: [] });
 
           server.set('view engine', 'html');
           server.set('views', distFolder);
@@ -44,11 +44,12 @@ describe('Serve SSR Builder', () => {
           }));
 
           server.get('*', (req, res, next) => {
+            const { protocol, originalUrl, baseUrl, headers } = req;
             commonEngine
               .render({
                 bootstrap: AppServerModule,
                 documentFilePath: indexHtml,
-                url: req.originalUrl,
+                url: \`\${protocol}://\${headers.host}\${originalUrl}\`,
                 publicPath: distFolder,
               })
               .then((html) => res.send(html))

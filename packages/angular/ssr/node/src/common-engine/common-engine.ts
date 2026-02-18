@@ -12,6 +12,7 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
+import { isHostAllowed } from '../../../src/utils/validation';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
   noopRunMethodAndMeasurePerf,
@@ -30,6 +31,9 @@ export interface CommonEngineOptions {
 
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
+
+  /** A set of hostnames that are allowed to access the server. */
+  allowedHosts: readonly string[];
 }
 
 export interface CommonEngineRenderOptions {
@@ -63,14 +67,21 @@ export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
+  private readonly allowedHosts: ReadonlySet<string>;
 
-  constructor(private options?: CommonEngineOptions) {}
+  constructor(private options: CommonEngineOptions) {
+    this.allowedHosts = new Set(options.allowedHosts);
+  }
 
   /**
    * Render an HTML document for a specific URL with specified
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
+    if (opts.url) {
+      this.validateHost(opts.url);
+    }
+
     const enablePerformanceProfiler = this.options?.enablePerformanceProfiler;
 
     const runMethod = enablePerformanceProfiler
@@ -97,6 +108,19 @@ export class CommonEngine {
     }
 
     return html;
+  }
+
+  private validateHost(url: string): void {
+    if (!URL.canParse(url)) {
+      throw new Error(`URL "${url}" is invalid.`);
+    }
+
+    const hostname = new URL(url).hostname;
+    if (!isHostAllowed(hostname, this.allowedHosts)) {
+      throw new Error(
+        `Host ${hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
+      );
+    }
   }
 
   private inlineCriticalCss(html: string, opts: CommonEngineRenderOptions): Promise<string> {

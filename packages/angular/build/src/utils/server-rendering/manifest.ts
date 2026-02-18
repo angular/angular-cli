@@ -53,11 +53,13 @@ function escapeUnsafeChars(str: string): string {
  *
  * @param i18nOptions - The internationalization options for the application build. This
  * includes settings for inlining locales and determining the output structure.
+ * @param allowedHosts - A list of hosts that are allowed to access the server-side application.
  * @param baseHref - The base HREF for the application. This is used to set the base URL
  * for all relative URLs in the application.
  */
 export function generateAngularServerAppEngineManifest(
   i18nOptions: NormalizedApplicationBuildOptions['i18nOptions'],
+  allowedHosts: string[],
   baseHref: string | undefined,
 ): string {
   const entryPoints: Record<string, string> = {};
@@ -84,6 +86,7 @@ export function generateAngularServerAppEngineManifest(
   const manifestContent = `
 export default {
   basePath: '${basePath}',
+  allowedHosts: ${JSON.stringify(allowedHosts, undefined, 2)},
   supportedLocales: ${JSON.stringify(supportedLocales, undefined, 2)},
   entryPoints: {
     ${Object.entries(entryPoints)

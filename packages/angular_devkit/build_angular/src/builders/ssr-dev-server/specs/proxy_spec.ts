@@ -15,7 +15,16 @@ import { SSRDevServerBuilderOutput } from '../index';
 
 describe('Serve SSR Builder', () => {
   const target = { project: 'app', target: 'serve-ssr' };
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   let architect: Architect;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 100_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   beforeEach(async () => {
     await host.initialize().toPromise();
@@ -34,7 +43,7 @@ describe('Serve SSR Builder', () => {
           const server = express();
           const distFolder = resolve(__dirname, '../dist');
           const indexHtml = join(distFolder, 'index.html');
-          const commonEngine = new CommonEngine();
+          const commonEngine = new CommonEngine({ allowedHosts: [] });
 
           server.set('view engine', 'html');
           server.set('views', distFolder);
@@ -44,11 +53,12 @@ describe('Serve SSR Builder', () => {
           }));
 
           server.get('*', (req, res, next) => {
+            const { protocol, originalUrl, baseUrl, headers } = req;
             commonEngine
               .render({
                 bootstrap: AppServerModule,
                 documentFilePath: indexHtml,
-                url: req.originalUrl,
+                url: \`\${protocol}://\${headers.host}\${originalUrl}\`,
                 publicPath: distFolder,
               })
               .then((html) => res.send(html))

@@ -388,8 +388,9 @@ export async function normalizeOptions(
     }
   }
 
-  const autoCsp = options.security?.autoCsp;
+  const { autoCsp, allowedHosts = [] } = options.security ?? {};
   const security = {
+    allowedHosts,
     autoCsp: autoCsp
       ? {
           unsafeEval: autoCsp === true ? false : !!autoCsp.unsafeEval,

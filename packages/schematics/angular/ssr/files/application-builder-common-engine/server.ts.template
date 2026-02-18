@@ -10,7 +10,9 @@ const browserDistFolder = resolve(serverDistFolder, '../<%= browserDistDirectory
 const indexHtml = join(serverDistFolder, 'index.server.html');
 
 const app = express();
-const commonEngine = new CommonEngine();
+const commonEngine = new CommonEngine({
+  allowedHosts: [/* Provide a list of allowed hosts. */],
+});
 
 /**
  * Example Express Rest API endpoints can be defined here.

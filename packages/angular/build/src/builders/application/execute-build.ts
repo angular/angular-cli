@@ -56,6 +56,7 @@ export async function executeBuild(
     verbose,
     colors,
     jsonLogs,
+    security,
   } = options;
 
   // TODO: Consider integrating into watch mode. Would require full rebuild on target changes.
@@ -263,7 +264,7 @@ export async function executeBuild(
   if (serverEntryPoint) {
     executionResult.addOutputFile(
       SERVER_APP_ENGINE_MANIFEST_FILENAME,
-      generateAngularServerAppEngineManifest(i18nOptions, baseHref),
+      generateAngularServerAppEngineManifest(i18nOptions, security.allowedHosts, baseHref),
       BuildOutputFileType.ServerRoot,
     );
   }
