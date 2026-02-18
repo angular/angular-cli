@@ -53,7 +53,7 @@
       "additionalProperties": false,
       "properties": {
         "allowedHosts": {
-          "description": "A list of hosts that are allowed to access the server-side application.",
+          "description": "A list of hostnames that are allowed to access the server-side application. For more information, see https://angular.dev/guide/ssr#configuring-allowed-hosts.",
           "type": "array",
           "uniqueItems": true,
           "items": {

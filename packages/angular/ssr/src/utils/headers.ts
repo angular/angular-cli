@@ -17,11 +17,6 @@ const VALID_PORT_REGEX = /^\d+$/;
 const VALID_PROTO_REGEX = /^https?$/i;
 
 /**
- * Regular expression to match and remove the `www.` prefix from hostnames.
- */
-const WWW_HOST_REGEX = /^www\./i;
-
-/**
  * Regular expression to match path separators.
  */
 const PATH_SEPARATOR_REGEX = /[/\\]/;
@@ -97,7 +92,7 @@ function validateHost(
   headers: Headers,
   allowedHosts: ReadonlySet<string>,
 ): void {
-  const value = getFirstHeaderValue(headers.get(headerName))?.replace(WWW_HOST_REGEX, '');
+  const value = getFirstHeaderValue(headers.get(headerName));
   if (!value) {
     return;
   }
@@ -113,25 +108,33 @@ function validateHost(
   }
 
   const { hostname } = new URL(url);
-  if (
+  if (!isHostAllowed(hostname, allowedHosts)) {
+    let errorMessage = `Header "${headerName}" with value "${value}" is not allowed.`;
+    if (typeof ngDevMode === 'undefined' || ngDevMode) {
+      errorMessage +=
+        '\n\nAction Required: Update your "angular.json" to include this hostname. ' +
+        'Path: "projects.[project-name].architect.build.options.security.allowedHosts".';
+    }
+
+    throw new Error(errorMessage);
+  }
+}
+
+/**
+ * Checks if the hostname is allowed.
+ * @param hostname - The hostname to check.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @returns `true` if the hostname is allowed, `false` otherwise.
+ */
+export function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
+  return (
     // Check the provided allowed hosts first.
     allowedHosts.has(hostname) ||
     checkWildcardHostnames(hostname, allowedHosts) ||
     // Check the default allowed hosts last this is the fallback and should be rarely if ever used in production.
     DEFAULT_ALLOWED_HOSTS.has(hostname) ||
     checkWildcardHostnames(hostname, DEFAULT_ALLOWED_HOSTS)
-  ) {
-    return;
-  }
-
-  let errorMessage = `Header "${headerName}" with value "${value}" is not allowed.`;
-  if (typeof ngDevMode === 'undefined' || ngDevMode) {
-    errorMessage +=
-      '\n\nAction Required: Update your "angular.json" to include this hostname. ' +
-      'Path: "projects.[project-name].architect.build.options.security.allowedHosts".';
-  }
-
-  throw new Error(errorMessage);
+  );
 }
 
 /**
