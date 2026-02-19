@@ -81,6 +81,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
         entryPoints: {
@@ -160,6 +161,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app with single locale', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           it: createEntryPoint('it'),
         },
@@ -226,6 +228,7 @@ describe('AngularAppEngine', () => {
       class HomeComponent {}
 
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           '': async () => {
             setAngularAppTestingManifest(
@@ -268,6 +271,80 @@ describe('AngularAppEngine', () => {
       const request = new Request('https://example.com/home/index.html');
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
+    });
+  });
+
+  describe('Invalid host headers', () => {
+    let consoleErrorSpy: jasmine.Spy;
+
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: class {} }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
+
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine();
+    });
+
+    beforeEach(() => {
+      consoleErrorSpy = spyOn(console, 'error');
+    });
+
+    it('should log error and fallback to CSR when disallowed host', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'host': 'evil.com',
+        },
+      });
+
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(await response?.text()).toContain('<title>CSR page</title>');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+      );
+    });
+
+    it('should log error and fallback to CSR when disallowed x-forwarded-host', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'x-forwarded-host': 'evil.com',
+        },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(await response?.text()).toContain('<title>CSR page</title>');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "x-forwarded-host" with value "evil.com" is not allowed.'),
+      );
+    });
+
+    it('should log error and fallback to CSR when host with path separator', async () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'host': 'example.com/evil',
+        },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(await response?.text()).toContain('<title>CSR page</title>');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "host" contains path separators which is not allowed.'),
+      );
     });
   });
 });

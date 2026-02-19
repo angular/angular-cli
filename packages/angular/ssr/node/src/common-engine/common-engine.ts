@@ -12,6 +12,7 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
+import { validateUrl } from '../../../src/utils/validation';
 import { attachNodeGlobalErrorHandlers } from '../errors';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
@@ -31,6 +32,9 @@ export interface CommonEngineOptions {
 
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
+
+  /** A set of hostnames that are allowed to access the server. */
+  allowedHosts?: readonly string[];
 }
 
 export interface CommonEngineRenderOptions {
@@ -64,8 +68,11 @@ export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
+  private readonly allowedHosts: ReadonlySet<string>;
 
-  constructor(private options?: CommonEngineOptions | undefined) {
+  constructor(private options?: CommonEngineOptions) {
+    this.allowedHosts = this.resolveAllowedHosts(options);
+
     attachNodeGlobalErrorHandlers();
   }
 
@@ -74,6 +81,25 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
+    const { url } = opts;
+
+    if (url && URL.canParse(url)) {
+      const urlObj = new URL(url);
+      try {
+        validateUrl(urlObj, this.allowedHosts);
+      } catch (error) {
+        let document = opts.document;
+        if (!document && opts.documentFilePath) {
+          document = await this.getDocument(opts.documentFilePath);
+        }
+        // eslint-disable-next-line no-console
+        console.error(
+          `ERROR: Host ${urlObj.hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
+          'Fallbacking to client side rendering. This will become a 400 Bad Request in a future major version.\n',
+        );
+      }
+    }
+
     const enablePerformanceProfiler = this.options?.enablePerformanceProfiler;
 
     const runMethod = enablePerformanceProfiler
@@ -185,6 +211,34 @@ export class CommonEngine {
     }
 
     return doc;
+  }
+
+  /**
+   * Resolves the allowed hosts from the provided options and environment variables.
+   * @param options Options for the common engine.
+   * @returns A set of allowed hosts.
+   */
+  private resolveAllowedHosts(options: CommonEngineOptions | undefined): ReadonlySet<string> {
+    const allowedHosts = new Set(options?.allowedHosts ?? []);
+    const processEnv = process.env;
+
+    const envNgAllowedHosts = processEnv['NG_ALLOWED_HOSTS'];
+    if (envNgAllowedHosts) {
+      const hosts = envNgAllowedHosts.split(',');
+      for (const host of hosts) {
+        const hostTrimmed = host.trim();
+        if (hostTrimmed) {
+          allowedHosts.add(hostTrimmed);
+        }
+      }
+    }
+
+    const envHostName = processEnv['HOSTNAME']?.trim();
+    if (envHostName) {
+      allowedHosts.add(envHostName);
+    }
+
+    return allowedHosts;
   }
 }
 
