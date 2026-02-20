@@ -131,7 +131,6 @@ describe('Validation Utils', () => {
       for (const prefix of inputs) {
         const request = new Request('https://example.com', {
           headers: {
-            'host': 'example.com',
             'x-forwarded-prefix': prefix,
           },
         });
