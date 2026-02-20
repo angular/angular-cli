@@ -14,7 +14,7 @@
 
 import { join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
-import { maxSatisfying } from 'semver';
+import { maxSatisfying, valid } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
@@ -369,6 +369,10 @@ export class PackageManager {
 
     const { stdout } = await this.#run(this.descriptor.versionCommand);
     this.#version = stdout.trim();
+
+    if (!valid(this.#version)) {
+      throw new Error(`Invalid semver version for ${this.name}: "${this.#version}"`);
+    }
 
     return this.#version;
   }
