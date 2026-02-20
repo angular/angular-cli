@@ -61,6 +61,7 @@ export default async function () {
       {
         ...process.env,
         'PORT': String(port),
+        'NG_ALLOWED_HOSTS': 'localhost',
       },
     );
 

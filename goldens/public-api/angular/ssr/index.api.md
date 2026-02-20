@@ -11,9 +11,15 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularAppEngine {
+    constructor(options?: AngularAppEngineOptions);
     handle(request: Request, requestContext?: unknown): Promise<Response | null>;
     static ɵallowStaticRouteRender: boolean;
     static ɵhooks: Hooks;
+}
+
+// @public
+export interface AngularAppEngineOptions {
+    allowedHosts?: readonly string[];
 }
 
 // @public

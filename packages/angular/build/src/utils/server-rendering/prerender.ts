@@ -225,6 +225,9 @@ async function renderPages(
       hasSsrEntry: !!outputFilesForWorker['server.mjs'],
     } as RenderWorkerData,
     execArgv: workerExecArgv,
+    env: {
+      'NG_ALLOWED_HOSTS': 'localhost',
+    },
   });
 
   try {
@@ -337,6 +340,9 @@ async function getAllRoutes(
       hasSsrEntry: !!outputFilesForWorker['server.mjs'],
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
+    env: {
+      'NG_ALLOWED_HOSTS': 'localhost',
+    },
   });
 
   try {
