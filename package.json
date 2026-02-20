@@ -1,6 +1,6 @@
 {
   "name": "@angular/devkit-repo",
-  "version": "21.3.0-next.0",
+  "version": "22.0.0-next.0",
   "private": true,
   "description": "Software Development Kit for Angular",
   "keywords": [
