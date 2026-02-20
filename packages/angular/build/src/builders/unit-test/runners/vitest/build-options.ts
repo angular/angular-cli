@@ -6,11 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { toPosixPath } from '../../../../utils/path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import { OutputHashing } from '../../../application/schema';
-import { NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
+import { NormalizedUnitTestBuilderOptions } from '../../options';
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
@@ -18,9 +19,8 @@ function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
   teardown: boolean,
-  polyfills: string[] = [],
+  zoneTestingStrategy: 'none' | 'static' | 'dynamic',
 ): string {
-  const usesZoneJS = polyfills.includes('zone.js');
   let providersImport = 'const providers = [];';
   if (providersFile) {
     const relativePath = path.relative(projectSourceRoot, providersFile);
@@ -31,11 +31,24 @@ function createTestBedInitVirtualFile(
 
   return `
     // Initialize the Angular testing environment
-    import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';
+    import { NgModule, provideZoneChangeDetection } from '@angular/core';
     import { getTestBed, ɵgetCleanupHook as getCleanupHook } from '@angular/core/testing';
     import { BrowserTestingModule, platformBrowserTesting } from '@angular/platform-browser/testing';
     import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
+
+    ${
+      zoneTestingStrategy === 'static'
+        ? `import 'zone.js/testing';`
+        : zoneTestingStrategy === 'dynamic'
+          ? `
+    if (typeof Zone !== 'undefined') {
+      // 'zone.js/testing' is used to initialize the ZoneJS testing environment.
+      // It must be imported dynamically to avoid a static dependency on 'zone.js'.
+      await import('zone.js/testing');
+    }`
+          : ''
+    }
 
     // The beforeEach and afterEach hooks are registered outside the globalThis guard.
     // This ensures that the hooks are always applied, even in non-isolated browser environments.
@@ -52,7 +65,10 @@ function createTestBedInitVirtualFile(
       // The guard condition above ensures that the setup is only performed once.
 
       @NgModule({
-        providers: [${usesZoneJS ? 'provideZoneChangeDetection(), ' : ''}...providers],
+        providers: [
+          ...(typeof Zone !== 'undefined' ? [provideZoneChangeDetection()] : []),
+          ...providers,
+        ],
       })
       class TestModule {}
 
@@ -145,13 +161,30 @@ export async function getVitestBuildOptions(
     externalDependencies,
   };
 
-  buildOptions.polyfills = injectTestingPolyfills(buildOptions.polyfills);
+  // Inject the zone.js testing polyfill if Zone.js is installed.
+  let zoneTestingStrategy: 'none' | 'static' | 'dynamic' = 'none';
+  let isZoneJsInstalled = false;
+  try {
+    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
+    projectRequire.resolve('zone.js');
+    isZoneJsInstalled = true;
+  } catch {}
+
+  if (isZoneJsInstalled) {
+    if (buildOptions.polyfills?.includes('zone.js/testing')) {
+      zoneTestingStrategy = 'none';
+    } else if (buildOptions.polyfills?.includes('zone.js')) {
+      zoneTestingStrategy = 'static';
+    } else {
+      zoneTestingStrategy = 'dynamic';
+    }
+  }
 
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,
     projectSourceRoot,
     !options.debug,
-    buildOptions.polyfills,
+    zoneTestingStrategy,
   );
 
   const mockPatchContents = `
