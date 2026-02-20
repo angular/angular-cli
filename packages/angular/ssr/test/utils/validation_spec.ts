@@ -7,8 +7,8 @@
  */
 
 import {
+  cloneRequestAndPatchHeaders,
   getFirstHeaderValue,
-  secureRequest,
   validateRequest,
   validateUrl,
 } from '../../src/utils/validation';
@@ -112,7 +112,7 @@ describe('Validation Utils', () => {
         headers: { 'host': 'example.com/bad' },
       });
       expect(() => validateRequest(req, allowedHosts)).toThrowError(
-        'Header "host" contains path separators which is not allowed.',
+        'Header "host" contains characters that are not allowed.',
       );
     });
 
@@ -121,22 +121,25 @@ describe('Validation Utils', () => {
         headers: { 'x-forwarded-host': 'example.com/bad' },
       });
       expect(() => validateRequest(req, allowedHosts)).toThrowError(
-        'Header "x-forwarded-host" contains path separators which is not allowed.',
+        'Header "x-forwarded-host" contains characters that are not allowed.',
       );
     });
   });
 
-  describe('secureRequest', () => {
+  describe('cloneRequestAndPatchHeaders', () => {
     const allowedHosts = new Set(['example.com', '*.valid.com']);
 
-    it('should validate host header when accessed via get()', () => {
+    it('should validate host header when accessed via get()', async () => {
       const req = new Request('http://example.com', {
         headers: { 'host': 'evil.com' },
       });
-      const secured = secureRequest(req, allowedHosts);
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
-      expect(() => secured.headers.get('host')).toThrowError(
-        /Header "host" with value "evil.com" is not allowed/,
+      expect(secured.headers.get('host')).toBeNull();
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed'),
+        }),
       );
     });
 
@@ -144,18 +147,23 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'host': 'example.com' },
       });
-      const secured = secureRequest(req, allowedHosts);
+      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
       expect(secured.headers.get('host')).toBe('example.com');
     });
 
-    it('should validate x-forwarded-host header', () => {
+    it('should validate x-forwarded-host header', async () => {
       const req = new Request('http://example.com', {
         headers: { 'x-forwarded-host': 'evil.com' },
       });
-      const secured = secureRequest(req, allowedHosts);
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
-      expect(() => secured.headers.get('x-forwarded-host')).toThrowError(
-        /Header "x-forwarded-host" with value "evil.com" is not allowed/,
+      expect(secured.headers.get('x-forwarded-host')).toBeNull();
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching(
+            'Header "x-forwarded-host" with value "evil.com" is not allowed',
+          ),
+        }),
       );
     });
 
@@ -163,19 +171,9 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'accept': 'application/json' },
       });
-      const secured = secureRequest(req, allowedHosts);
+      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
       expect(secured.headers.get('accept')).toBe('application/json');
-    });
-
-    it('should bind methods correctly', () => {
-      const req = new Request('http://example.com', {
-        headers: { 'x-foo': 'bar' },
-      });
-      const secured = secureRequest(req, allowedHosts);
-
-      expect(typeof secured.headers.has).toBe('function');
-      expect(secured.headers.has('x-foo')).toBeTrue();
     });
   });
 });

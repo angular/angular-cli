@@ -13,6 +13,7 @@ import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
 import { validateUrl } from '../../../src/utils/validation';
+import { getAllowedHostsFromEnv } from '../environment-options';
 import { attachNodeGlobalErrorHandlers } from '../errors';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
@@ -71,7 +72,10 @@ export class CommonEngine {
   private readonly allowedHosts: ReadonlySet<string>;
 
   constructor(private options?: CommonEngineOptions) {
-    this.allowedHosts = this.resolveAllowedHosts(options);
+    this.allowedHosts = new Set([
+      ...getAllowedHostsFromEnv(),
+      ...(this.options?.allowedHosts ?? []),
+    ]);
 
     attachNodeGlobalErrorHandlers();
   }
@@ -88,15 +92,30 @@ export class CommonEngine {
       try {
         validateUrl(urlObj, this.allowedHosts);
       } catch (error) {
-        let document = opts.document;
-        if (!document && opts.documentFilePath) {
-          document = await this.getDocument(opts.documentFilePath);
-        }
+        const isAllowedHostConfigured = this.allowedHosts.size > 0;
         // eslint-disable-next-line no-console
         console.error(
-          `ERROR: Host ${urlObj.hostname} is not allowed. Please provide a list of allowed hosts in the "allowedHosts" option.`,
-          'Fallbacking to client side rendering. This will become a 400 Bad Request in a future major version.\n',
+          `ERROR: ${(error as Error).message}` +
+            'Please provide a list of allowed hosts in the "allowedHosts" option in the "CommonEngine" constructor.',
+          isAllowedHostConfigured
+            ? ''
+            : '\nFallbacking to client side rendering. This will become a 400 Bad Request in a future major version.',
         );
+
+        if (!isAllowedHostConfigured) {
+          // Fallback to CSR to avoid a breaking change.
+          // TODO(alanagius): Return a 400 and remove this fallback in the next major version (v22).
+          let document = opts.document;
+          if (!document && opts.documentFilePath) {
+            document = opts.document ?? (await this.getDocument(opts.documentFilePath));
+          }
+
+          if (document) {
+            return document;
+          }
+        }
+
+        throw error;
       }
     }
 
@@ -211,34 +230,6 @@ export class CommonEngine {
     }
 
     return doc;
-  }
-
-  /**
-   * Resolves the allowed hosts from the provided options and environment variables.
-   * @param options Options for the common engine.
-   * @returns A set of allowed hosts.
-   */
-  private resolveAllowedHosts(options: CommonEngineOptions | undefined): ReadonlySet<string> {
-    const allowedHosts = new Set(options?.allowedHosts ?? []);
-    const processEnv = process.env;
-
-    const envNgAllowedHosts = processEnv['NG_ALLOWED_HOSTS'];
-    if (envNgAllowedHosts) {
-      const hosts = envNgAllowedHosts.split(',');
-      for (const host of hosts) {
-        const hostTrimmed = host.trim();
-        if (hostTrimmed) {
-          allowedHosts.add(hostTrimmed);
-        }
-      }
-    }
-
-    const envHostName = processEnv['HOSTNAME']?.trim();
-    if (envHostName) {
-      allowedHosts.add(envHostName);
-    }
-
-    return allowedHosts;
   }
 }
 

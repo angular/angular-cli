@@ -10,6 +10,7 @@ import { AngularAppEngine } from '@angular/ssr';
 import type { IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
 import { AngularAppEngineOptions } from '../../src/app-engine';
+import { getAllowedHostsFromEnv } from './environment-options';
 import { attachNodeGlobalErrorHandlers } from './errors';
 import { createWebRequestFromNodeRequest } from './request';
 
@@ -34,7 +35,10 @@ export class AngularNodeAppEngine {
    * @param options Options for the Angular Node.js server application engine.
    */
   constructor(options?: AngularNodeAppEngineOptions) {
-    this.angularAppEngine = new AngularAppEngine(this.resolveAppEngineOptions(options));
+    this.angularAppEngine = new AngularAppEngine({
+      ...options,
+      allowedHosts: [...getAllowedHostsFromEnv(), ...(options?.allowedHosts ?? [])],
+    });
 
     attachNodeGlobalErrorHandlers();
   }
@@ -52,20 +56,20 @@ export class AngularNodeAppEngine {
    *
    * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
-   * 
+   *
    * @remarks
-* To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname 
-* of the `request.url` against a list of authorized hosts. 
-* If the hostname is not recognized, a Client-Side Rendered (CSR) version of the page is returned.
-
-* Resolution:
-* Authorize your hostname by configuring `allowedHosts` in `angular.json` in:
-* `projects.[project-name].architect.build.options.security.allowedHosts`. 
-* Alternatively, you can define the allowed hostname via environment variables 
-* (`process.env['HOSTNAME']` or `process.env['NG_ALLOWED_HOSTS']`) or pass it directly 
-* through the configuration options of `AngularNodeAppEngine`.
-* 
-* For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf
+   * To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname
+   * of the `request.url` against a list of authorized hosts.
+   * If the hostname is not recognized and `allowedHosts` is not empty, a Client-Side Rendered (CSR) version of the
+   * page is returned otherwise a 400 Bad Request is returned.
+   *
+   * Resolution:
+   * Authorize your hostname by configuring `allowedHosts` in `angular.json` in:
+   * `projects.[project-name].architect.build.options.security.allowedHosts`.
+   * Alternatively, you can define the allowed hostname via the environment variable `process.env['NG_ALLOWED_HOSTS']`
+   * or pass it directly through the configuration options of `AngularNodeAppEngine`.
+   *
+   * For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf
    */
   async handle(
     request: IncomingMessage | Http2ServerRequest | Request,
@@ -75,38 +79,5 @@ export class AngularNodeAppEngine {
       request instanceof Request ? request : createWebRequestFromNodeRequest(request);
 
     return this.angularAppEngine.handle(webRequest, requestContext);
-  }
-
-  /**
-   * Resolves the Angular server application engine options.
-   * @param options Options for the Angular server application engine.
-   * @returns Resolved options for the Angular server application engine.
-   */
-  private resolveAppEngineOptions(
-    options: AngularNodeAppEngineOptions | undefined,
-  ): AngularAppEngineOptions {
-    const allowedHosts = options?.allowedHosts ? [...options.allowedHosts] : [];
-    const processEnv = process.env;
-
-    const envNgAllowedHosts = processEnv['NG_ALLOWED_HOSTS'];
-    if (envNgAllowedHosts) {
-      const hosts = envNgAllowedHosts.split(',');
-      for (const host of hosts) {
-        const hostTrimmed = host.trim();
-        if (hostTrimmed) {
-          allowedHosts.push(hostTrimmed);
-        }
-      }
-    }
-
-    const envHostName = processEnv['HOSTNAME']?.trim();
-    if (envHostName) {
-      allowedHosts.push(envHostName);
-    }
-
-    return {
-      ...options,
-      allowedHosts,
-    };
   }
 }

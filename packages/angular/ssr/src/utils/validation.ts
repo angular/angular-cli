@@ -7,11 +7,6 @@
  */
 
 /**
- * The default set of allowed hosts.
- */
-const DEFAULT_ALLOWED_HOSTS: ReadonlySet<string> = new Set(['localhost', '*.localhost']);
-
-/**
  * The set of headers that should be validated for host header injection attacks.
  */
 const HOST_HEADERS_TO_VALIDATE: ReadonlySet<string> = new Set(['host', 'x-forwarded-host']);
@@ -27,9 +22,9 @@ const VALID_PORT_REGEX = /^\d+$/;
 const VALID_PROTO_REGEX = /^https?$/i;
 
 /**
- * Regular expression to match path separators.
+ * Regular expression to validate that the host is a valid hostname.
  */
-const PATH_SEPARATOR_REGEX = /[/\\]/;
+const VALID_HOST_REGEX = /^[a-z0-9.:-]+$/i;
 
 /**
  * Extracts the first value from a multi-value header string.
@@ -59,8 +54,8 @@ export function getFirstHeaderValue(
  * @throws Error if any of the validated headers contain invalid values.
  */
 export function validateRequest(request: Request, allowedHosts: ReadonlySet<string>): void {
-  validateUrl(new URL(request.url), allowedHosts);
   validateHeaders(request);
+  validateUrl(new URL(request.url), allowedHosts);
 }
 
 /**
@@ -73,55 +68,55 @@ export function validateRequest(request: Request, allowedHosts: ReadonlySet<stri
 export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
   const { hostname } = url;
   if (!isHostAllowed(hostname, allowedHosts)) {
-    const errorMessage =
-      `URL with hostname "${hostname}" is not allowed.` +
-      '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf';
-
-    throw new Error(errorMessage);
+    throw new Error(`URL with hostname "${hostname}" is not allowed.`);
   }
 }
 
 /**
- * Secures a request by proxying it and validating the host headers.
- * @param request - The request to secure.
- * @param allowedHosts - The set of allowed hosts.
- * @returns A proxy of the request with host headers validated.
+ * Clones a request and patches the `get` method of the request headers to validate the host headers.
+ * @param request - The request to validate.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @returns An object containing the cloned request and a promise that resolves to an error
+ * if any of the validated headers contain invalid values.
  */
-export function secureRequest(request: Request, allowedHosts: ReadonlySet<string>): Request {
-  return new Proxy(request, {
-    get(target, prop) {
-      if (prop !== 'headers') {
-        const value = Reflect.get(target, prop);
-
-        return typeof value === 'function' ? value.bind(target) : value;
-      }
-
-      const headersTarget = target.headers;
-
-      return new Proxy(headersTarget, {
-        get(headersTarget, headersProperty) {
-          const method = Reflect.get(headersTarget, headersProperty);
-          if (headersProperty === 'get') {
-            return (name: string) => {
-              const value = headersTarget.get(name);
-              if (!value) {
-                return value;
-              }
-
-              const key = name.toLowerCase();
-              if (HOST_HEADERS_TO_VALIDATE.has(key)) {
-                verifyHostAllowed(key, value, allowedHosts);
-              }
-
-              return value;
-            };
-          }
-
-          return typeof method === 'function' ? method.bind(headersTarget) : method;
-        },
-      });
-    },
+export function cloneRequestAndPatchHeaders(
+  request: Request,
+  allowedHosts: ReadonlySet<string>,
+): { request: Request; onError: Promise<Error> } {
+  let onError: (value: Error) => void;
+  const onErrorPromise = new Promise<Error>((resolve) => {
+    onError = resolve;
   });
+
+  const clonedReq = new Request(request.clone(), {
+    signal: request.signal,
+  });
+
+  const headers = clonedReq.headers;
+  const originalHeadersGet = headers.get;
+
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  (headers.get as typeof originalHeadersGet) = (name: string): string | null => {
+    const value = originalHeadersGet.call(headers, name);
+    if (!value) {
+      return value;
+    }
+
+    const key = name.toLowerCase();
+    if (HOST_HEADERS_TO_VALIDATE.has(key)) {
+      try {
+        verifyHostAllowed(key, value, allowedHosts);
+      } catch (error) {
+        onError(error as Error);
+
+        return null;
+      }
+    }
+
+    return value;
+  };
+
+  return { request: clonedReq, onError: onErrorPromise };
 }
 
 /**
@@ -149,11 +144,7 @@ function verifyHostAllowed(
 
   const { hostname } = new URL(url);
   if (!isHostAllowed(hostname, allowedHosts)) {
-    const errorMessage =
-      `Header "${headerName}" with value "${value}" is not allowed.` +
-      '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf';
-
-    throw new Error(errorMessage);
+    throw new Error(`Header "${headerName}" with value "${value}" is not allowed.`);
   }
 }
 
@@ -164,23 +155,10 @@ function verifyHostAllowed(
  * @returns `true` if the hostname is allowed, `false` otherwise.
  */
 function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
-  return (
-    // Check the provided allowed hosts first.
-    allowedHosts.has(hostname) ||
-    checkWildcardHostnames(hostname, allowedHosts) ||
-    // Check the default allowed hosts last this is the fallback and should be rarely if ever used in production.
-    DEFAULT_ALLOWED_HOSTS.has(hostname) ||
-    checkWildcardHostnames(hostname, DEFAULT_ALLOWED_HOSTS)
-  );
-}
+  if (allowedHosts.has(hostname)) {
+    return true;
+  }
 
-/**
- * Checks if the hostname matches any of the wildcard hostnames in the allowlist.
- * @param hostname - The hostname to check.
- * @param allowedHosts - A set of allowed hostnames.
- * @returns `true` if the hostname matches any of the wildcard hostnames, `false` otherwise.
- */
-function checkWildcardHostnames(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
   for (const allowedHost of allowedHosts) {
     if (!allowedHost.startsWith('*.')) {
       continue;
@@ -205,10 +183,8 @@ function validateHeaders(request: Request): void {
   const headers = request.headers;
   for (const headerName of HOST_HEADERS_TO_VALIDATE) {
     const headerValue = getFirstHeaderValue(headers.get(headerName));
-
-    // Reject any hostname containing path separators - they're invalid.
-    if (headerValue && PATH_SEPARATOR_REGEX.test(headerValue)) {
-      throw new Error(`Header "${headerName}" contains path separators which is not allowed.`);
+    if (headerValue && !VALID_HOST_REGEX.test(headerValue)) {
+      throw new Error(`Header "${headerName}" contains characters that are not allowed.`);
     }
   }
 
