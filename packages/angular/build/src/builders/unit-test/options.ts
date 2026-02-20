@@ -47,8 +47,7 @@ export async function normalizeOptions(
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
   // Gather persistent caching option and provide a project specific cache location
-  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
-  cacheOptions.path = path.join(cacheOptions.path, projectName);
+  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot, projectName);
 
   // Target specifier defaults to the current project's build target using a development configuration
   const buildTargetSpecifier = options.buildTarget ?? `::development`;

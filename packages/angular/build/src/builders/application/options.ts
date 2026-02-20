@@ -12,6 +12,7 @@ import { realpathSync } from 'node:fs';
 import { access, constants, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { supportColor } from '../../utils/color';
 import { useJSONBuildLogs, usePartialSsrBuild } from '../../utils/environment-options';
@@ -69,6 +70,9 @@ interface InternalOptions {
    * If provided a Map, the key is the name of the output bundle and the value is the entry point file.
    */
   entryPoints?: Set<string> | Map<string, string>;
+
+  /** Allow to programatically provide a shared cache */
+  codeBundleCache?: SourceFileCache;
 
   /** File extension to use for the generated output files. */
   outExtension?: 'js' | 'mjs';
@@ -164,8 +168,11 @@ export async function normalizeOptions(
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
   // Gather persistent caching option and provide a project specific cache location
-  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
-  cacheOptions.path = path.join(cacheOptions.path, projectName);
+  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot, projectName);
+
+  const codeBundleCache =
+    options.codeBundleCache ??
+    new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
 
   const i18nOptions: I18nOptions & {
     duplicateTranslationBehavior?: I18NTranslation;
@@ -446,6 +453,7 @@ export async function normalizeOptions(
     allowedCommonJsDependencies,
     baseHref,
     cacheOptions,
+    codeBundleCache,
     crossOrigin,
     externalDependencies: normalizeExternals(externalDependencies),
     externalPackages:
