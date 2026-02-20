@@ -371,7 +371,7 @@ export class PackageManager {
     this.#version = stdout.trim();
 
     if (!valid(this.#version)) {
-      throw new Error(`Invalid semver version for ${this.name}: ${this.#version}`);
+      throw new Error(`Invalid semver version for ${this.name}: "${this.#version}"`);
     }
 
     return this.#version;
