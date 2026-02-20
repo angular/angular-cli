@@ -124,6 +124,23 @@ describe('Validation Utils', () => {
         'Header "x-forwarded-host" contains path separators which is not allowed.',
       );
     });
+
+    it('should throw error if x-forwarded-prefix starts with multiple slashes or backslashes', () => {
+      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil'];
+
+      for (const prefix of inputs) {
+        const request = new Request('https://example.com', {
+          headers: {
+            'host': 'example.com',
+            'x-forwarded-prefix': prefix,
+          },
+        });
+
+        expect(() => validateRequest(request, allowedHosts))
+          .withContext(`Prefix: "${prefix}"`)
+          .toThrowError('Header "x-forwarded-prefix" must not start with multiple "/" or "\\".');
+      }
+    });
   });
 
   describe('cloneRequestWithPatchedHeaders', () => {
