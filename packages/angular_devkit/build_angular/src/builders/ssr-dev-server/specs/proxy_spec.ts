@@ -52,11 +52,12 @@ describe('Serve SSR Builder', () => {
           }));
 
           server.use((req, res, next) => {
+            const { protocol, originalUrl, baseUrl, headers } = req;
             commonEngine
               .render({
                 bootstrap: AppServerModule,
                 documentFilePath: indexHtml,
-                url: req.originalUrl,
+                url: \`\${protocol}://\${headers.host}\${originalUrl}\`,
                 publicPath: distFolder,
               })
               .then((html) => res.send(html))

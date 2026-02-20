@@ -15,8 +15,12 @@ import { Type } from '@angular/core';
 
 // @public
 export class AngularNodeAppEngine {
-    constructor();
-    handle(request: IncomingMessage | Http2ServerRequest, requestContext?: unknown): Promise<Response | null>;
+    constructor(options?: AngularNodeAppEngineOptions);
+    handle(request: IncomingMessage | Http2ServerRequest | Request, requestContext?: unknown): Promise<Response | null>;
+}
+
+// @public
+export interface AngularNodeAppEngineOptions extends AngularAppEngineOptions {
 }
 
 // @public
@@ -27,6 +31,7 @@ export class CommonEngine {
 
 // @public (undocumented)
 export interface CommonEngineOptions {
+    allowedHosts?: readonly string[];
     bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
     enablePerformanceProfiler?: boolean;
     providers?: StaticProvider[];

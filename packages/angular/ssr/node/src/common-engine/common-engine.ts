@@ -12,6 +12,8 @@ import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/plat
 import * as fs from 'node:fs';
 import { dirname, join, normalize, resolve } from 'node:path';
 import { URL } from 'node:url';
+import { validateUrl } from '../../../src/utils/validation';
+import { getAllowedHostsFromEnv } from '../environment-options';
 import { attachNodeGlobalErrorHandlers } from '../errors';
 import { CommonEngineInlineCriticalCssProcessor } from './inline-css-processor';
 import {
@@ -31,6 +33,9 @@ export interface CommonEngineOptions {
 
   /** Enable request performance profiling data collection and printing the results in the server console. */
   enablePerformanceProfiler?: boolean;
+
+  /** A set of hostnames that are allowed to access the server. */
+  allowedHosts?: readonly string[];
 }
 
 export interface CommonEngineRenderOptions {
@@ -64,8 +69,14 @@ export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
   private readonly pageIsSSG = new Map<string, boolean>();
+  private readonly allowedHosts: ReadonlySet<string>;
 
-  constructor(private options?: CommonEngineOptions | undefined) {
+  constructor(private options?: CommonEngineOptions) {
+    this.allowedHosts = new Set([
+      ...getAllowedHostsFromEnv(),
+      ...(this.options?.allowedHosts ?? []),
+    ]);
+
     attachNodeGlobalErrorHandlers();
   }
 
@@ -74,6 +85,40 @@ export class CommonEngine {
    * render options
    */
   async render(opts: CommonEngineRenderOptions): Promise<string> {
+    const { url } = opts;
+
+    if (url && URL.canParse(url)) {
+      const urlObj = new URL(url);
+      try {
+        validateUrl(urlObj, this.allowedHosts);
+      } catch (error) {
+        const isAllowedHostConfigured = this.allowedHosts.size > 0;
+        // eslint-disable-next-line no-console
+        console.error(
+          `ERROR: ${(error as Error).message}` +
+            'Please provide a list of allowed hosts in the "allowedHosts" option in the "CommonEngine" constructor.',
+          isAllowedHostConfigured
+            ? ''
+            : '\nFallbacking to client side rendering. This will become a 400 Bad Request in a future major version.',
+        );
+
+        if (!isAllowedHostConfigured) {
+          // Fallback to CSR to avoid a breaking change.
+          // TODO(alanagius): Return a 400 and remove this fallback in the next major version (v22).
+          let document = opts.document;
+          if (!document && opts.documentFilePath) {
+            document = opts.document ?? (await this.getDocument(opts.documentFilePath));
+          }
+
+          if (document) {
+            return document;
+          }
+        }
+
+        throw error;
+      }
+    }
+
     const enablePerformanceProfiler = this.options?.enablePerformanceProfiler;
 
     const runMethod = enablePerformanceProfiler

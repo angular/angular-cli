@@ -11,7 +11,6 @@ import {
 import { updateJsonFile, useSha } from '../../../utils/project';
 import { getGlobalVariable } from '../../../utils/env';
 import { findFreePort } from '../../../utils/network';
-import { readFile } from 'node:fs/promises';
 
 export default async function () {
   assert(
@@ -98,6 +97,8 @@ export default async function () {
     const options = buildTarget['options'];
     options['ssr']['experimentalPlatform'] = 'neutral';
     options['outputMode'] = 'server';
+    options['security'] ??= {};
+    options['security']['allowedHosts'] = ['localhost'];
   });
 
   await noSilentNg('build');
