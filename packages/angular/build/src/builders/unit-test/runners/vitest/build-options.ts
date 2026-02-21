@@ -11,6 +11,7 @@ import { toPosixPath } from '../../../../utils/path';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import { OutputHashing } from '../../../application/schema';
 import { NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
+import { Runner } from '../../schema';
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
@@ -145,7 +146,11 @@ export async function getVitestBuildOptions(
     externalDependencies,
   };
 
-  buildOptions.polyfills = injectTestingPolyfills(buildOptions.polyfills);
+  buildOptions.polyfills = injectTestingPolyfills(
+    buildOptions.polyfills,
+    Runner.Vitest,
+    !!providersFile,
+  );
 
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,

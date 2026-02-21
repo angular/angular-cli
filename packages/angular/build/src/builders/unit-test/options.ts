@@ -136,6 +136,18 @@ export async function normalizeOptions(
   };
 }
 
-export function injectTestingPolyfills(polyfills: string[] = []): string[] {
-  return polyfills.includes('zone.js') ? [...polyfills, 'zone.js/testing'] : polyfills;
+export function injectTestingPolyfills(
+  polyfills: string[] = [],
+  runner?: Runner,
+  hasProvidersFile?: boolean,
+): string[] {
+  const testPolyfills = polyfills.includes('zone.js')
+    ? [...polyfills, 'zone.js/testing']
+    : polyfills;
+
+  if (runner === Runner.Vitest && hasProvidersFile) {
+    testPolyfills.push('@angular/compiler');
+  }
+
+  return testPolyfills;
 }
