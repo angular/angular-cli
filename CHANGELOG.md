@@ -1,3 +1,16 @@
+<a name="19.2.21"></a>
+
+# 19.2.21 (2026-02-23)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [288e22816](https://github.com/angular/angular-cli/commit/288e228161e3c0cceb392dd5fc24d07b129a3a64) | fix  | prevent open redirect via X-Forwarded-Prefix header |
+| [2a72d7483](https://github.com/angular/angular-cli/commit/2a72d7483d87ccdcfa0c5148f34a4c6ebb6c6cf9) | fix  | validate host headers to prevent header-based SSRF  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.20"></a>
 
 # 19.2.20 (2026-02-13)
