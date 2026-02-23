@@ -1,3 +1,22 @@
+<a name="21.2.0-rc.1"></a>
+
+# 21.2.0-rc.1 (2026-02-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [cdd26bb66](https://github.com/angular/angular-cli/commit/cdd26bb66d8ab334f76323c2b5cae1aa8ce815f6) | fix  | validate package manager version using `semver.valid` and throw an error if invalid |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [cf5a72d33](https://github.com/angular/angular-cli/commit/cf5a72d33c1753c121f71498c0c415a0f0864492) | fix  | prevent open redirect via X-Forwarded-Prefix header |
+| [f78f38827](https://github.com/angular/angular-cli/commit/f78f38827861cf01471e30fcf81ef14d6265a0f2) | fix  | validate host headers to prevent header-based SSRF  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.1.5"></a>
 
 # 21.1.5 (2026-02-23)
