@@ -11,6 +11,10 @@
 import { createRequire } from 'node:module';
 import { SemVer, satisfies } from 'semver';
 
+// Matches exactly '0.0.0' or any string ending in '.0.0-next.0'
+// This allows FW to bump the package.json to a new major version without requiring a new CLI version.
+const angularVersionRegex = /^0\.0\.0$|\.0\.0-next\.0$/;
+
 export function assertCompatibleAngularVersion(projectRoot: string): void | never {
   let angularPkgJson;
 
@@ -38,7 +42,10 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
   }
 
   const supportedAngularSemver = '0.0.0-ANGULAR-FW-PEER-DEP';
-  if (angularPkgJson['version'] === '0.0.0' || supportedAngularSemver.startsWith('0.0.0')) {
+  if (
+    angularVersionRegex.test(angularPkgJson['version']) ||
+    supportedAngularSemver.startsWith('0.0.0')
+  ) {
     // Internal CLI and FW testing version.
     return;
   }
