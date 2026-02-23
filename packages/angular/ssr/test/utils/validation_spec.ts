@@ -124,6 +124,73 @@ describe('Validation Utils', () => {
         'Header "x-forwarded-host" contains characters that are not allowed.',
       );
     });
+
+    it('should throw error if x-forwarded-prefix starts with multiple slashes or backslashes', () => {
+      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil'];
+
+      for (const prefix of inputs) {
+        const request = new Request('https://example.com', {
+          headers: {
+            'x-forwarded-prefix': prefix,
+          },
+        });
+
+        expect(() => validateRequest(request, allowedHosts))
+          .withContext(`Prefix: "${prefix}"`)
+          .toThrowError(
+            'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+          );
+      }
+    });
+
+    it('should throw error if x-forwarded-prefix contains dot segments', () => {
+      const inputs = [
+        '/./',
+        '/../',
+        '/foo/./bar',
+        '/foo/../bar',
+        '/.',
+        '/..',
+        './',
+        '../',
+        '.\\',
+        '..\\',
+        '/foo/.\\bar',
+        '/foo/..\\bar',
+        '.',
+        '..',
+      ];
+
+      for (const prefix of inputs) {
+        const request = new Request('https://example.com', {
+          headers: {
+            'x-forwarded-prefix': prefix,
+          },
+        });
+
+        expect(() => validateRequest(request, allowedHosts))
+          .withContext(`Prefix: "${prefix}"`)
+          .toThrowError(
+            'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+          );
+      }
+    });
+
+    it('should validate x-forwarded-prefix with valid dot usage', () => {
+      const inputs = ['/foo.bar', '/foo.bar/baz', '/v1.2', '/.well-known'];
+
+      for (const prefix of inputs) {
+        const request = new Request('https://example.com', {
+          headers: {
+            'x-forwarded-prefix': prefix,
+          },
+        });
+
+        expect(() => validateRequest(request, allowedHosts))
+          .withContext(`Prefix: "${prefix}"`)
+          .not.toThrow();
+      }
+    });
   });
 
   describe('cloneRequestAndPatchHeaders', () => {
