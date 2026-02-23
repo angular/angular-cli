@@ -12,7 +12,7 @@ export {
   type CommonEngineOptions,
 } from './src/common-engine/common-engine';
 
-export { AngularNodeAppEngine } from './src/app-engine';
+export { AngularNodeAppEngine, type AngularNodeAppEngineOptions } from './src/app-engine';
 
 export { createNodeRequestHandler, type NodeRequestHandlerFunction } from './src/handler';
 export { writeResponseToNodeResponse } from './src/response';

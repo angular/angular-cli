@@ -11,12 +11,25 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component } from '@angular/core';
+import { Component, REQUEST, inject } from '@angular/core';
 import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app';
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
+
+@Component({
+  selector: 'app-home',
+  template: 'Home works',
+})
+class TestHomeComponent {
+  private request = inject(REQUEST);
+  constructor() {
+    // Force header access to trigger validation
+    this.request?.headers.get('host');
+    this.request?.headers.get('x-forwarded-host');
+  }
+}
 
 function createEntryPoint(locale: string) {
   return async () => {
@@ -81,6 +94,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         // Note: Although we are testing only one locale, we need to configure two or more
         // to ensure that we test a different code path.
         entryPoints: {
@@ -160,6 +174,7 @@ describe('AngularAppEngine', () => {
   describe('Localized app with single locale', () => {
     beforeAll(() => {
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           it: createEntryPoint('it'),
         },
@@ -226,6 +241,7 @@ describe('AngularAppEngine', () => {
       class HomeComponent {}
 
       setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
         entryPoints: {
           '': async () => {
             setAngularAppTestingManifest(
@@ -268,6 +284,146 @@ describe('AngularAppEngine', () => {
       const request = new Request('https://example.com/home/index.html');
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
+    });
+  });
+
+  describe('Invalid host headers', () => {
+    let consoleErrorSpy: jasmine.Spy;
+
+    describe('with allowed hosts configured', () => {
+      beforeAll(() => {
+        setAngularAppEngineManifest({
+          allowedHosts: ['example.com'],
+          entryPoints: {
+            '': async () => {
+              setAngularAppTestingManifest(
+                [{ path: 'home', component: TestHomeComponent }],
+                [{ path: '**', renderMode: RenderMode.Server }],
+              );
+
+              return {
+                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+                ɵdestroyAngularServerApp: destroyAngularServerApp,
+              };
+            },
+          },
+          basePath: '/',
+          supportedLocales: { 'en-US': '' },
+        });
+
+        appEngine = new AngularAppEngine();
+      });
+
+      beforeEach(() => {
+        consoleErrorSpy = spyOn(console, 'error');
+      });
+
+      it('should return 400 when disallowed host', async () => {
+        const request = new Request('https://evil.com');
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(response?.status).toBe(400);
+        expect(await response?.text()).toContain('URL with hostname "evil.com" is not allowed.');
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('URL with hostname "evil.com" is not allowed.'),
+        );
+      });
+
+      it('should return 400 when disallowed host header', async () => {
+        const request = new Request('https://example.com/home', {
+          headers: { 'host': 'evil.com' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(response?.status).toBe(400);
+        expect(await response?.text()).toContain(
+          'Header "host" with value "evil.com" is not allowed.',
+        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+        );
+      });
+
+      it('should return 400 when disallowed x-forwarded-host header', async () => {
+        const request = new Request('https://example.com/home', {
+          headers: { 'x-forwarded-host': 'evil.com' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(response?.status).toBe(400);
+        expect(await response?.text()).toContain(
+          'Header "x-forwarded-host" with value "evil.com" is not allowed.',
+        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('Header "x-forwarded-host" with value "evil.com" is not allowed.'),
+        );
+      });
+
+      it('should return 400 when host with path separator', async () => {
+        const request = new Request('https://example.com/home', {
+          headers: { 'host': 'example.com/evil' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(response?.status).toBe(400);
+        expect(await response?.text()).toContain(
+          'Header "host" contains characters that are not allowed.',
+        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
+        );
+      });
+    });
+
+    describe('without allowed hosts configured', () => {
+      beforeAll(() => {
+        setAngularAppEngineManifest({
+          allowedHosts: [],
+          entryPoints: {
+            '': async () => {
+              setAngularAppTestingManifest(
+                [{ path: 'home', component: TestHomeComponent }],
+                [{ path: '**', renderMode: RenderMode.Server }],
+              );
+
+              return {
+                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+                ɵdestroyAngularServerApp: destroyAngularServerApp,
+              };
+            },
+          },
+          basePath: '/',
+          supportedLocales: { 'en-US': '' },
+        });
+
+        appEngine = new AngularAppEngine();
+      });
+
+      beforeEach(() => {
+        consoleErrorSpy = spyOn(console, 'error');
+      });
+
+      it('should log error and fallback to CSR when disallowed host', async () => {
+        const request = new Request('https://example.com');
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(await response?.text()).toContain('<title>CSR page</title>');
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('URL with hostname "example.com" is not allowed.'),
+        );
+      });
+
+      it('should log error and fallback to CSR when host with path separator', async () => {
+        const request = new Request('https://example.com/home', {
+          headers: { 'host': 'example.com/evil' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response).not.toBeNull();
+        expect(await response?.text()).toContain('<title>CSR page</title>');
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
+        );
+      });
     });
   });
 });
