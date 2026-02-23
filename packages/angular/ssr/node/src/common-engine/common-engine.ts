@@ -99,7 +99,7 @@ export class CommonEngine {
             'Please provide a list of allowed hosts in the "allowedHosts" option in the "CommonEngine" constructor.',
           isAllowedHostConfigured
             ? ''
-            : '\nFallbacking to client side rendering. This will become a 400 Bad Request in a future major version.',
+            : '\nFalling back to client side rendering. This will become a 400 Bad Request in a future major version.',
         );
 
         if (!isAllowedHostConfigured) {

@@ -93,30 +93,86 @@ export function cloneRequestAndPatchHeaders(
   });
 
   const headers = clonedReq.headers;
-  const originalHeadersGet = headers.get;
 
+  const originalGet = headers.get;
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  (headers.get as typeof originalHeadersGet) = (name: string): string | null => {
-    const value = originalHeadersGet.call(headers, name);
+  (headers.get as typeof originalGet) = function (name) {
+    const value = originalGet.call(headers, name);
     if (!value) {
       return value;
     }
 
-    const key = name.toLowerCase();
-    if (HOST_HEADERS_TO_VALIDATE.has(key)) {
-      try {
-        verifyHostAllowed(key, value, allowedHosts);
-      } catch (error) {
-        onError(error as Error);
-
-        return null;
-      }
-    }
+    validateHeader(name, value, allowedHosts, onError);
 
     return value;
   };
 
+  const originalValues = headers.values;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  (headers.values as typeof originalValues) = function () {
+    for (const name of HOST_HEADERS_TO_VALIDATE) {
+      validateHeader(name, originalGet.call(headers, name), allowedHosts, onError);
+    }
+
+    return originalValues.call(headers);
+  };
+
+  const originalEntries = headers.entries;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  (headers.entries as typeof originalEntries) = function () {
+    const iterator = originalEntries.call(headers);
+
+    return {
+      next() {
+        const result = iterator.next();
+        if (!result.done) {
+          const [key, value] = result.value;
+          validateHeader(key, value, allowedHosts, onError);
+        }
+
+        return result;
+      },
+      [Symbol.iterator]() {
+        return this;
+      },
+    };
+  };
+
+  // Ensure for...of loops use the new patched entries
+  (headers[Symbol.iterator] as typeof originalEntries) = headers.entries;
+
   return { request: clonedReq, onError: onErrorPromise };
+}
+
+/**
+ * Validates a specific header value against the allowed hosts.
+ * @param name - The name of the header to validate.
+ * @param value - The value of the header to validate.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @param onError - A callback function to call if the header value is invalid.
+ * @throws Error if the header value is invalid.
+ */
+function validateHeader(
+  name: string,
+  value: string | null,
+  allowedHosts: ReadonlySet<string>,
+  onError: (value: Error) => void,
+): void {
+  if (!value) {
+    return;
+  }
+
+  if (!HOST_HEADERS_TO_VALIDATE.has(name.toLowerCase())) {
+    return;
+  }
+
+  try {
+    verifyHostAllowed(name, value, allowedHosts);
+  } catch (error) {
+    onError(error as Error);
+
+    throw error;
+  }
 }
 
 /**

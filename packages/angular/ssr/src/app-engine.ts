@@ -270,7 +270,7 @@ export class AngularAppEngine {
         errorMessage +
         (isAllowedHostConfigured
           ? ''
-          : '\nFallbacking to client side rendering. This will become a 400 Bad Request in a future major version.') +
+          : '\nFalling back to client side rendering. This will become a 400 Bad Request in a future major version.') +
         '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
     );
 

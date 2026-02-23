@@ -135,7 +135,9 @@ describe('Validation Utils', () => {
       });
       const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
-      expect(secured.headers.get('host')).toBeNull();
+      expect(() => secured.headers.get('host')).toThrowError(
+        'Header "host" with value "evil.com" is not allowed.',
+      );
       await expectAsync(onError).toBeResolvedTo(
         jasmine.objectContaining({
           message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed'),
@@ -157,7 +159,9 @@ describe('Validation Utils', () => {
       });
       const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
-      expect(secured.headers.get('x-forwarded-host')).toBeNull();
+      expect(() => secured.headers.get('x-forwarded-host')).toThrowError(
+        'Header "x-forwarded-host" with value "evil.com" is not allowed.',
+      );
       await expectAsync(onError).toBeResolvedTo(
         jasmine.objectContaining({
           message: jasmine.stringMatching(
@@ -174,6 +178,63 @@ describe('Validation Utils', () => {
       const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
       expect(secured.headers.get('accept')).toBe('application/json');
+    });
+
+    it('should validate headers when iterating with entries()', async () => {
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'evil.com' },
+      });
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect(() => {
+        for (const _ of secured.headers.entries()) {
+          // access the header to trigger the validation
+        }
+      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
+
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+        }),
+      );
+    });
+
+    it('should validate headers when iterating with values()', async () => {
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'evil.com' },
+      });
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect(() => {
+        for (const _ of secured.headers.values()) {
+          // access the header to trigger the validation
+        }
+      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
+
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+        }),
+      );
+    });
+
+    it('should validate headers when iterating with for...of', async () => {
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'evil.com' },
+      });
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect(() => {
+        for (const _ of secured.headers) {
+          // access the header to trigger the validation
+        }
+      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
+
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+        }),
+      );
     });
   });
 });
