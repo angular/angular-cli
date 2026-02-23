@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { BootstrapContext } from '@angular/platform-browser';
 import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
@@ -74,6 +73,11 @@ export interface AngularAppEngineManifest {
    * - `value`: The url segment associated with that locale.
    */
   readonly supportedLocales: Readonly<Record<string, string>>;
+
+  /**
+   * A readonly array of allowed hostnames.
+   */
+  readonly allowedHosts: Readonly<string[]>;
 }
 
 /**

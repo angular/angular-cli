@@ -122,6 +122,7 @@ async function spawnServer(): Promise<number> {
     {
       ...process.env,
       'PORT': String(port),
+      'NG_ALLOWED_HOSTS': 'localhost',
     },
   );
 

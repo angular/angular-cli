@@ -157,6 +157,7 @@ export default async function () {
       /Node Express server listening on/,
       {
         ...process.env,
+        'NG_ALLOWED_HOSTS': 'localhost',
         'PORT': String(port),
       },
     );
