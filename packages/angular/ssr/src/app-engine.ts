@@ -11,6 +11,17 @@ import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { joinUrlParts } from './utils/url';
+import { cloneRequestAndPatchHeaders, validateRequest } from './utils/validation';
+
+/**
+ * Options for the Angular server application engine.
+ */
+export interface AngularAppEngineOptions {
+  /**
+   * A set of allowed hostnames for the server application.
+   */
+  allowedHosts?: readonly string[];
+}
 
 /**
  * Angular server application engine.
@@ -46,6 +57,11 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
+   * A set of allowed hostnames for the server application.
+   */
+  private readonly allowedHosts: ReadonlySet<string>;
+
+  /**
    * A map of supported locales from the server application's manifest.
    */
   private readonly supportedLocales: ReadonlyArray<string> = Object.keys(
@@ -58,6 +74,14 @@ export class AngularAppEngine {
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
 
   /**
+   * Creates a new instance of the Angular server application engine.
+   * @param options Options for the Angular server application engine.
+   */
+  constructor(options?: AngularAppEngineOptions) {
+    this.allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+  }
+
+  /**
    * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
    * or delivering a static file for client-side rendered routes based on the `RenderMode` setting.
    *
@@ -67,12 +91,38 @@ export class AngularAppEngine {
    *
    * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
+   *
+   * @remarks
+   * To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname
+   * of the `request.url` against a list of authorized hosts.
+   * If the hostname is not recognized and `allowedHosts` is not empty, a Client-Side Rendered (CSR) version of the
+   * page is returned otherwise a 400 Bad Request is returned.
+   * Resolution:
+   * Authorize your hostname by configuring `allowedHosts` in `angular.json` in:
+   * `projects.[project-name].architect.build.options.security.allowedHosts`.
+   * Alternatively, you pass it directly through the configuration options of `AngularAppEngine`.
+   *
+   * For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
-    const serverApp = await this.getAngularServerAppForRequest(request);
+    const allowedHost = this.allowedHosts;
 
+    try {
+      validateRequest(request, allowedHost);
+    } catch (error) {
+      return this.handleValidationError(error as Error, request);
+    }
+
+    // Clone request with patched headers to prevent unallowed host header access.
+    const { request: securedRequest, onError: onHeaderValidationError } =
+      cloneRequestAndPatchHeaders(request, allowedHost);
+
+    const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
-      return serverApp.handle(request, requestContext);
+      return Promise.race([
+        onHeaderValidationError.then((error) => this.handleValidationError(error, securedRequest)),
+        serverApp.handle(securedRequest, requestContext),
+      ]);
     }
 
     if (this.supportedLocales.length > 1) {
@@ -200,5 +250,43 @@ export class AngularAppEngine {
     const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
 
     return this.getEntryPointExports(potentialLocale) ?? this.getEntryPointExports('');
+  }
+
+  /**
+   * Handles validation errors by logging the error and returning an appropriate response.
+   *
+   * @param error - The validation error to handle.
+   * @param request - The HTTP request that caused the validation error.
+   * @returns A promise that resolves to a `Response` object with a 400 status code if allowed hosts are configured,
+   * or `null` if allowed hosts are not configured (in which case the request is served client-side).
+   */
+  private async handleValidationError(error: Error, request: Request): Promise<Response | null> {
+    const isAllowedHostConfigured = this.allowedHosts.size > 0;
+    const errorMessage = error.message;
+
+    // eslint-disable-next-line no-console
+    console.error(
+      `ERROR: Bad Request ("${request.url}").\n` +
+        errorMessage +
+        (isAllowedHostConfigured
+          ? ''
+          : '\nFalling back to client side rendering. This will become a 400 Bad Request in a future major version.') +
+        '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
+    );
+
+    if (isAllowedHostConfigured) {
+      // Allowed hosts has been configured incorrectly, thus we can return a 400 bad request.
+      return new Response(errorMessage, {
+        status: 400,
+        statusText: 'Bad Request',
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
+
+    // Fallback to CSR to avoid a breaking change.
+    // TODO(alanagius): Return a 400 and remove this fallback in the next major version (v22).
+    const serverApp = await this.getAngularServerAppForRequest(request);
+
+    return serverApp?.serveClientSidePage() ?? null;
   }
 }

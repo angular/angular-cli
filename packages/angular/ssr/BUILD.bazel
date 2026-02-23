@@ -20,7 +20,7 @@ ts_project(
     ),
     args = [
         "--lib",
-        "dom,es2022",
+        "dom.iterable,dom,es2022",
     ],
     data = [
         "//packages/angular/ssr/third_party/beasties:beasties_bundled",
