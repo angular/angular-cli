@@ -100,6 +100,18 @@ describe('URL Utils', () => {
     it('should handle an all-empty URL parts', () => {
       expect(joinUrlParts('', '')).toBe('/');
     });
+
+    it('should normalize parts with multiple leading and trailing slashes', () => {
+      expect(joinUrlParts('//path//', '///to///', '//resource//')).toBe('/path/to/resource');
+    });
+
+    it('should handle a single part', () => {
+      expect(joinUrlParts('path')).toBe('/path');
+    });
+
+    it('should handle parts containing only slashes', () => {
+      expect(joinUrlParts('//', '///')).toBe('/');
+    });
   });
 
   describe('stripIndexHtmlFromURL', () => {
