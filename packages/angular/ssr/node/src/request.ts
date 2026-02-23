@@ -8,6 +8,7 @@
 
 import type { IncomingHttpHeaders, IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
+import { getFirstHeaderValue } from '../../src/utils/validation';
 
 /**
  * A set containing all the pseudo-headers defined in the HTTP/2 specification.
@@ -102,22 +103,4 @@ export function createRequestUrl(nodeRequest: IncomingMessage | Http2ServerReque
   }
 
   return new URL(`${protocol}://${hostnameWithPort}${originalUrl ?? url}`);
-}
-
-/**
- * Extracts the first value from a multi-value header string.
- *
- * @param value - A string or an array of strings representing the header values.
- *                           If it's a string, values are expected to be comma-separated.
- * @returns The first trimmed value from the multi-value header, or `undefined` if the input is invalid or empty.
- *
- * @example
- * ```typescript
- * getFirstHeaderValue("value1, value2, value3"); // "value1"
- * getFirstHeaderValue(["value1", "value2"]); // "value1"
- * getFirstHeaderValue(undefined); // undefined
- * ```
- */
-function getFirstHeaderValue(value: string | string[] | undefined): string | undefined {
-  return value?.toString().split(',', 1)[0]?.trim();
 }
