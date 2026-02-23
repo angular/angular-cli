@@ -167,6 +167,18 @@ describe('Application Schematic', () => {
     );
   });
 
+  it(`should not add test dependencies with "minimal" enabled`, async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, minimal: true },
+      workspaceTree,
+    );
+
+    const packageJson = JSON.parse(tree.readContent('package.json'));
+    expect(packageJson.devDependencies['vitest']).toBeUndefined();
+    expect(packageJson.devDependencies['jsdom']).toBeUndefined();
+  });
+
   it('should install npm dependencies when `skipInstall` is false', async () => {
     await schematicRunner.runSchematic(
       'application',

@@ -187,7 +187,7 @@ function addDependenciesToPackageJson(options: ApplicationOptions): Rule {
     );
   }
 
-  if (!options.skipTests) {
+  if (!options.skipTests && !options.minimal) {
     rules.push(...addTestRunnerDependencies(options.testRunner, !!options.skipInstall));
   }
 
