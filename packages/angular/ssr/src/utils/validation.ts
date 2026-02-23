@@ -27,6 +27,11 @@ const VALID_PROTO_REGEX = /^https?$/i;
 const VALID_HOST_REGEX = /^[a-z0-9.:-]+$/i;
 
 /**
+ * Regular expression to validate that the prefix is valid.
+ */
+const INVALID_PREFIX_REGEX = /^[/\\]{2}|(?:^|[/\\])\.\.?(?:[/\\]|$)/;
+
+/**
  * Extracts the first value from a multi-value header string.
  *
  * @param value - A string or an array of strings representing the header values.
@@ -252,5 +257,12 @@ function validateHeaders(request: Request): void {
   const xForwardedProto = getFirstHeaderValue(headers.get('x-forwarded-proto'));
   if (xForwardedProto && !VALID_PROTO_REGEX.test(xForwardedProto)) {
     throw new Error('Header "x-forwarded-proto" must be either "http" or "https".');
+  }
+
+  const xForwardedPrefix = getFirstHeaderValue(headers.get('x-forwarded-prefix'));
+  if (xForwardedPrefix && INVALID_PREFIX_REGEX.test(xForwardedPrefix)) {
+    throw new Error(
+      'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+    );
   }
 }

@@ -95,26 +95,32 @@ export function addTrailingSlash(url: string): string {
  * ```
  */
 export function joinUrlParts(...parts: string[]): string {
-  const normalizeParts: string[] = [];
+  const normalizedParts: string[] = [];
+
   for (const part of parts) {
     if (part === '') {
       // Skip any empty parts
       continue;
     }
 
-    let normalizedPart = part;
-    if (part[0] === '/') {
-      normalizedPart = normalizedPart.slice(1);
+    let start = 0;
+    let end = part.length;
+
+    // Use "Pointers" to avoid intermediate slices
+    while (start < end && part[start] === '/') {
+      start++;
     }
-    if (part.at(-1) === '/') {
-      normalizedPart = normalizedPart.slice(0, -1);
+
+    while (end > start && part[end - 1] === '/') {
+      end--;
     }
-    if (normalizedPart !== '') {
-      normalizeParts.push(normalizedPart);
+
+    if (start < end) {
+      normalizedParts.push(part.slice(start, end));
     }
   }
 
-  return addLeadingSlash(normalizeParts.join('/'));
+  return addLeadingSlash(normalizedParts.join('/'));
 }
 
 /**
