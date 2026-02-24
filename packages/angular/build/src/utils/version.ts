@@ -11,10 +11,6 @@
 import { createRequire } from 'node:module';
 import { SemVer, satisfies } from 'semver';
 
-// Matches exactly '0.0.0' or any string ending in '.0.0-next.0'
-// This allows FW to bump the package.json to a new major version without requiring a new CLI version.
-const angularVersionRegex = /^0\.0\.0$|\.0\.0-next\.0$/;
-
 export function assertCompatibleAngularVersion(projectRoot: string): void | never {
   let angularPkgJson;
 
@@ -41,21 +37,35 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     process.exit(2);
   }
 
+  const angularCoreSemVer = new SemVer(angularPkgJson['version']);
+  const { version, build, raw } = angularCoreSemVer;
   const supportedAngularSemver = '0.0.0-ANGULAR-FW-PEER-DEP';
-  if (
-    angularVersionRegex.test(angularPkgJson['version']) ||
-    supportedAngularSemver.startsWith('0.0.0')
-  ) {
+
+  if (version.startsWith('0.0.0') || supportedAngularSemver.startsWith('0.0.0')) {
     // Internal CLI and FW testing version.
     return;
   }
 
-  const angularVersion = new SemVer(angularPkgJson['version']);
+  if (build.length && version.endsWith('.0.0-next.0')) {
+    // Special handle for local builds only when it's prerelease of major version and it's the 0th version.
+    // This happends when we are bumping to a new major version. and the cli has not releated a verion.
 
-  if (!satisfies(angularVersion, supportedAngularSemver, { includePrerelease: true })) {
+    // Example:
+    // raw: '22.0.0-next.0+sha-c7dc705-with-local-changes',
+    // major: 22,
+    // minor: 0,
+    // patch: 0,
+    // prerelease: [ 'next', 0 ],
+    // build: [ 'sha-c7dc705-with-local-changes' ],
+    // version: '22.0.0-next.0'
+
+    return;
+  }
+
+  if (!satisfies(angularCoreSemVer, supportedAngularSemver, { includePrerelease: true })) {
     console.error(
       `Error: The current version of "@angular/build" supports Angular versions ${supportedAngularSemver},\n` +
-        `but detected Angular version ${angularVersion} instead.\n` +
+        `but detected Angular version ${raw} instead.\n` +
         'Please visit the link below to find instructions on how to update Angular.\nhttps://update.angular.dev/',
     );
 
