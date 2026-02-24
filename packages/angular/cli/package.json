@@ -33,7 +33,7 @@
     "algoliasearch": "5.49.0",
     "ini": "6.0.0",
     "jsonc-parser": "3.3.1",
-    "listr2": "9.0.5",
+    "listr2": "10.1.0",
     "npm-package-arg": "13.0.2",
     "pacote": "21.3.1",
     "parse5-html-rewriting-stream": "8.0.0",
