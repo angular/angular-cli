@@ -6,8 +6,6 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { getGlobalVariable } from '../../utils/env';
 
-const isNodeV22orHigher = Number(process.versions.node.split('.', 1)[0]) >= 22;
-
 export default async function () {
   // Update the atime and mtime of the original file.
   // Note: Node.js has different time precision, which may cause mtime-based tests to fail.
@@ -28,7 +26,7 @@ export default async function () {
   await expectToFail(() => expectFileToExist('dist/test-project/browser/.gitkeep'));
 
   // Timestamp preservation only supported with application build system on Node.js v22+
-  if (isNodeV22orHigher && getGlobalVariable('argv')['esbuild']) {
+  if (getGlobalVariable('argv')['esbuild']) {
     const [originalStats, outputStats] = await Promise.all([
       stat('public/favicon.ico'),
       stat('dist/test-project/browser/favicon.ico'),

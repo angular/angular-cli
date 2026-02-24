@@ -28,8 +28,6 @@ import {
 import { Result, ResultKind } from './results';
 import { Schema as ApplicationBuilderOptions } from './schema';
 
-const isNodeV22orHigher = Number(process.versions.node.split('.', 1)[0]) >= 22;
-
 export type { ApplicationBuilderOptions };
 
 export async function* buildApplicationInternal(
@@ -222,17 +220,10 @@ export async function* buildApplication(
         await fs.writeFile(fullFilePath, file.contents);
       } else {
         // Copy file contents
-        if (isNodeV22orHigher) {
-          // Use newer `cp` API on Node.js 22+ (minimum v22 for CLI is 22.11)
-          await fs.cp(file.inputPath, fullFilePath, {
-            mode: fs.constants.COPYFILE_FICLONE,
-            preserveTimestamps: true,
-          });
-        } else {
-          // For Node.js 20 use `copyFile` (`cp` is not stable for v20)
-          // TODO: Remove when Node.js 20 is no longer supported
-          await fs.copyFile(file.inputPath, fullFilePath, fs.constants.COPYFILE_FICLONE);
-        }
+        await fs.cp(file.inputPath, fullFilePath, {
+          mode: fs.constants.COPYFILE_FICLONE,
+          preserveTimestamps: true,
+        });
       }
     });
 
