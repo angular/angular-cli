@@ -403,9 +403,6 @@ importers:
       tinyglobby:
         specifier: 0.2.15
         version: 0.2.15
-      undici:
-        specifier: 7.22.0
-        version: 7.22.0
       vite:
         specifier: 7.3.1
         version: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(less@4.4.2)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2)

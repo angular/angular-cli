@@ -68,31 +68,37 @@ use_repo(
 
 node_dev = use_extension("@rules_nodejs//nodejs:extensions.bzl", "node", dev_dependency = True)
 
-# Node.js 20
-node_dev.toolchain(
-    name = "node20",
-    node_version = "20.19.0",
-)
-
 # Node.js 22
 node_dev.toolchain(
     name = "node22",
-    node_version = "22.12.0",
+    node_repositories = {
+        "22.22.0-darwin_arm64": ("node-v22.22.0-darwin-arm64.tar.gz", "node-v22.22.0-darwin-arm64", "5ed4db0fcf1eaf84d91ad12462631d73bf4576c1377e192d222e48026a902640"),
+        "22.22.0-darwin_amd64": ("node-v22.22.0-darwin-x64.tar.gz", "node-v22.22.0-darwin-x64", "5ea50c9d6dea3dfa3abb66b2656f7a4e1c8cef23432b558d45fb538c7b5dedce"),
+        "22.22.0-linux_arm64": ("node-v22.22.0-linux-arm64.tar.xz", "node-v22.22.0-linux-arm64", "1bf1eb9ee63ffc4e5d324c0b9b62cf4a289f44332dfef9607cea1a0d9596ba6f"),
+        "22.22.0-linux_ppc64le": ("node-v22.22.0-linux-ppc64le.tar.xz", "node-v22.22.0-linux-ppc64le", "d83b9957431cc18e1fc143a4b99f89cde7b8a18f53ef392231b4336afd058865"),
+        "22.22.0-linux_s390x": ("node-v22.22.0-linux-s390x.tar.xz", "node-v22.22.0-linux-s390x", "5aa0e520689448c4233e8d73f284e8e0634fdcd32b479735698494be5641f3e4"),
+        "22.22.0-linux_amd64": ("node-v22.22.0-linux-x64.tar.xz", "node-v22.22.0-linux-x64", "9aa8e9d2298ab68c600bd6fb86a6c13bce11a4eca1ba9b39d79fa021755d7c37"),
+        "22.22.0-windows_amd64": ("node-v22.22.0-win-x64.zip", "node-v22.22.0-win-x64", "c97fa376d2becdc8863fcd3ca2dd9a83a9f3468ee7ccf7a6d076ec66a645c77a"),
+    },
+    node_version = "22.22.0",
 )
 
 # Node.js 24
 node_dev.toolchain(
     name = "node24",
-    node_version = "24.0.0",
+    node_repositories = {
+        "24.13.1-darwin_arm64": ("node-v24.13.1-darwin-arm64.tar.gz", "node-v24.13.1-darwin-arm64", "8c039d59f2fec6195e4281ad5b0d02b9a940897b4df7b849c6fb48be6787bba6"),
+        "24.13.1-darwin_amd64": ("node-v24.13.1-darwin-x64.tar.gz", "node-v24.13.1-darwin-x64", "527f0578d9812e7dfa225121bda0b1546a6a0e4b5f556295fc8299c272de5fbf"),
+        "24.13.1-linux_arm64": ("node-v24.13.1-linux-arm64.tar.xz", "node-v24.13.1-linux-arm64", "c827d3d301e2eed1a51f36d0116b71b9e3d9e3b728f081615270ea40faac34c1"),
+        "24.13.1-linux_ppc64le": ("node-v24.13.1-linux-ppc64le.tar.xz", "node-v24.13.1-linux-ppc64le", "fb712a08d317655dbf776c90f60ac2105109d802e33811df6c9ed33d12f801c6"),
+        "24.13.1-linux_s390x": ("node-v24.13.1-linux-s390x.tar.xz", "node-v24.13.1-linux-s390x", "8e2c0d9b5545c3db22623e8cb8d6f0c28fcd470f29d32dbeabf9432dda289de2"),
+        "24.13.1-linux_amd64": ("node-v24.13.1-linux-x64.tar.xz", "node-v24.13.1-linux-x64", "30215f90ea3cd04dfbc06e762c021393fa173a1d392974298bbc871a8e461089"),
+        "24.13.1-windows_amd64": ("node-v24.13.1-win-x64.zip", "node-v24.13.1-win-x64", "fba577c4bb87df04d54dd87bbdaa5a2272f1f99a2acbf9152e1a91b8b5f0b279"),
+    },
+    node_version = "24.13.1",
 )
 use_repo(
     node_dev,
-    "node20_darwin_amd64",
-    "node20_darwin_arm64",
-    "node20_linux_amd64",
-    "node20_linux_arm64",
-    "node20_toolchains",
-    "node20_windows_amd64",
     "node22_darwin_amd64",
     "node22_darwin_arm64",
     "node22_linux_amd64",

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile } from 'node:fs/promises';
-import { getCACertificates, rootCertificates, setDefaultCACertificates } from 'node:tls';
+import { getCACertificates, setDefaultCACertificates } from 'node:tls';
 import type { Plugin } from 'vite';
 
 export function createAngularServerSideSSLPlugin(): Plugin {
@@ -39,34 +38,8 @@ export function createAngularServerSideSSLPlugin(): Plugin {
       const { cert } = https;
       const additionalCerts = Array.isArray(cert) ? cert : [cert];
 
-      // TODO(alanagius): Remove the `if` check once we only support Node.js 22.18.0+ and 24.5.0+.
-      if (getCACertificates && setDefaultCACertificates) {
-        const currentCerts = getCACertificates('default');
-        setDefaultCACertificates([...currentCerts, ...additionalCerts]);
-
-        return;
-      }
-
-      // TODO(alanagius): Remove the below and `undici` dependency once we only support Node.js 22.18.0+ and 24.5.0+.
-      const { getGlobalDispatcher, setGlobalDispatcher, Agent } = await import('undici');
-      const originalDispatcher = getGlobalDispatcher();
-      const ca = [...rootCertificates, ...additionalCerts];
-      const extraNodeCerts = process.env['NODE_EXTRA_CA_CERTS'];
-      if (extraNodeCerts) {
-        ca.push(await readFile(extraNodeCerts));
-      }
-
-      setGlobalDispatcher(
-        new Agent({
-          connect: {
-            ca,
-          },
-        }),
-      );
-
-      httpServer?.on('close', () => {
-        setGlobalDispatcher(originalDispatcher);
-      });
+      const currentCerts = getCACertificates('default');
+      setDefaultCACertificates([...currentCerts, ...additionalCerts]);
     },
   };
 }

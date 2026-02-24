@@ -105,7 +105,6 @@ ts_project(
         ":node_modules/sass",
         ":node_modules/source-map-support",
         ":node_modules/tinyglobby",
-        ":node_modules/undici",
         ":node_modules/vite",
         ":node_modules/vitest",
         ":node_modules/watchpack",

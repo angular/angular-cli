@@ -78,7 +78,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node: [20, 22, 24]
+        node: [22, 24]
         subset: [esbuild, webpack]
         shard: [0, 1, 2, 3, 4, 5]
     runs-on: ubuntu-latest
