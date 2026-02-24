@@ -56,7 +56,7 @@ project](#building-and-installing-the-cli), then run the desired `ng` command
 as:
 
 ```shell
-node --inspect-brk node_modules/.bin/ng ...
+node --inspect-brk node_modules/.bin/ng <command>
 ```
 
 This will trigger a breakpoint as the CLI starts up. You can connect to this
