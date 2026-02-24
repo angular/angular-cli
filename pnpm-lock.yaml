@@ -454,8 +454,8 @@ importers:
         specifier: 7.10.1
         version: 7.10.1(@types/node@24.10.9)
       '@listr2/prompt-adapter-inquirer':
-        specifier: 3.0.5
-        version: 3.0.5(@inquirer/prompts@7.10.1(@types/node@24.10.9))(@types/node@24.10.9)(listr2@10.1.0)
+        specifier: 4.1.1
+        version: 4.1.1(@inquirer/prompts@7.10.1(@types/node@24.10.9))(@types/node@24.10.9)(listr2@10.1.0)
       '@modelcontextprotocol/sdk':
         specifier: 1.26.0
         version: 1.26.0(zod@4.3.6)
@@ -2622,12 +2622,12 @@ packages:
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
 
-  '@listr2/prompt-adapter-inquirer@3.0.5':
-    resolution: {integrity: sha512-WELs+hj6xcilkloBXYf9XXK8tYEnKsgLj01Xl5ONUJpKjmT5hGVUzNUS5tooUxs7pGMrw+jFD/41WpqW4V3LDA==}
-    engines: {node: '>=20.0.0'}
+  '@listr2/prompt-adapter-inquirer@4.1.1':
+    resolution: {integrity: sha512-hlUMCYxuBrtjsBqzsy9ohzs3SiosQhXQlHltAZepMdLMBsWSPubjzBbBgTWK/glNO2ZJdZp8flhx2uRYf/RFUg==}
+    engines: {node: '>=22.0.0'}
     peerDependencies:
-      '@inquirer/prompts': '>= 3 < 8'
-      listr2: 9.0.5
+      '@inquirer/prompts': '>= 3 < 9'
+      listr2: 10.1.1
 
   '@lmdb/lmdb-darwin-arm64@3.5.1':
     resolution: {integrity: sha512-tpfN4kKrrMpQ+If1l8bhmoNkECJi0iOu6AEdrTJvWVC+32sLxTARX5Rsu579mPImRP9YFWfWgeRQ5oav7zApQQ==}
@@ -11442,10 +11442,10 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@3.0.5(@inquirer/prompts@7.10.1(@types/node@24.10.9))(@types/node@24.10.9)(listr2@10.1.0)':
+  '@listr2/prompt-adapter-inquirer@4.1.1(@inquirer/prompts@7.10.1(@types/node@24.10.9))(@types/node@24.10.9)(listr2@10.1.0)':
     dependencies:
       '@inquirer/prompts': 7.10.1(@types/node@24.10.9)
-      '@inquirer/type': 3.0.10(@types/node@24.10.9)
+      '@inquirer/type': 4.0.3(@types/node@24.10.9)
       listr2: 10.1.0
     transitivePeerDependencies:
       - '@types/node'
