@@ -21,6 +21,26 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
     "import {foo} from 'unresolved'; /* a comment */const foo = `bar`;\n\n\n";
 
   describe('Behavior: "browser builder assets"', () => {
+    it('serves a project extensionless asset unmodified', async () => {
+      await harness.writeFile('src/extensionless', javascriptFileContent);
+
+      setupTarget(harness, {
+        assets: ['src/extensionless'],
+        optimization: {
+          scripts: true,
+        },
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'extensionless');
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.text()).toContain(javascriptFileContent);
+    });
+
     it('serves a project JavaScript asset unmodified', async () => {
       await harness.writeFile('src/extra.js', javascriptFileContent);
 
