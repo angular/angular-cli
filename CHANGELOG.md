@@ -1,3 +1,15 @@
+<a name="21.2.0-rc.2"></a>
+
+# 21.2.0-rc.2 (2026-02-24)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [201a036f2](https://github.com/angular/angular-cli/commit/201a036f204a6940f70a36a507a4a53d144b5768) | fix  | simplify Angular version compatibility checks and add special handling for local builds of new major versions |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.0-rc.1"></a>
 
 # 21.2.0-rc.1 (2026-02-23)
