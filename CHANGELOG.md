@@ -1,37 +1,42 @@
-<a name="21.2.0-rc.2"></a>
+<a name="21.2.0"></a>
 
-# 21.2.0-rc.2 (2026-02-24)
+# 21.2.0 (2026-02-25)
 
 ### @angular/cli
 
 | Commit                                                                                              | Type | Description                                                                                                   |
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [0dd04f289](https://github.com/angular/angular-cli/commit/0dd04f289e555a4a8af7bdadabe300da74701e3b) | feat | add markdown files to Prettier's formatting list                                                              |
+| [fbae1b6ab](https://github.com/angular/angular-cli/commit/fbae1b6ab384186ae69e804c54815cea80e6a600) | feat | automatic formatting files modified by schematics                                                             |
+| [91b9d281f](https://github.com/angular/angular-cli/commit/91b9d281fc88a242aa6e5dd5495e275990d926ef) | feat | integrate file formatting into update migrations                                                              |
+| [98a24d040](https://github.com/angular/angular-cli/commit/98a24d0401f36f484dc9c4d8b0f5284ffa524f19) | feat | standardize MCP tools around workspace/project options                                                        |
+| [d9cd609c5](https://github.com/angular/angular-cli/commit/d9cd609c5d13fe492b1f31973d9be518f8529387) | fix  | correctly parse scoped packages in yarn classic list output                                                   |
+| [5b05f2500](https://github.com/angular/angular-cli/commit/5b05f25005621828565585692b1d7a67c5f0fec8) | fix  | enable shell option for Prettier execution on Windows platforms                                               |
+| [25b8a157d](https://github.com/angular/angular-cli/commit/25b8a157df70fb0d2c4e6c5438a50ec12e3abc0c) | fix  | quote complex range specifiers in package manager                                                             |
+| [6f29a8c35](https://github.com/angular/angular-cli/commit/6f29a8c35abb8928d4e7ea01958192dd2a83491d) | fix  | renamed files by their new path in the schematic workflow                                                     |
 | [201a036f2](https://github.com/angular/angular-cli/commit/201a036f204a6940f70a36a507a4a53d144b5768) | fix  | simplify Angular version compatibility checks and add special handling for local builds of new major versions |
+| [cdd26bb66](https://github.com/angular/angular-cli/commit/cdd26bb66d8ab334f76323c2b5cae1aa8ce815f6) | fix  | validate package manager version using `semver.valid` and throw an error if invalid                           |
+| [bc363af8b](https://github.com/angular/angular-cli/commit/bc363af8bc40f117a4e35ec9eb7eedf69f5b5b37) | perf | optimize package manager discovery with stat-based probing                                                    |
 
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.2.0-rc.1"></a>
-
-# 21.2.0-rc.1 (2026-02-23)
-
-### @angular/cli
+### @schematics/angular
 
 | Commit                                                                                              | Type | Description                                                                         |
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
-| [cdd26bb66](https://github.com/angular/angular-cli/commit/cdd26bb66d8ab334f76323c2b5cae1aa8ce815f6) | fix  | validate package manager version using `semver.valid` and throw an error if invalid |
+| [aa7381efd](https://github.com/angular/angular-cli/commit/aa7381efd213eff70a8004731a7e2b06a60cb8c2) | feat | add a '.prettierrc' file to generated workspaces and add Prettier as dev dependency |
+| [f80db6fb7](https://github.com/angular/angular-cli/commit/f80db6fb714aa326f6ed03a8a51090ca59ad0955) | feat | add ng-add support for Vitest browser providers                                     |
+| [5d1df50d8](https://github.com/angular/angular-cli/commit/5d1df50d8b84b453570ae5fd9ab6f949bbc11649) | fix  | add actionable feedback to vitest-browser schematic                                 |
 
-### @angular/ssr
+### @angular/build
 
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [cf5a72d33](https://github.com/angular/angular-cli/commit/cf5a72d33c1753c121f71498c0c415a0f0864492) | fix  | prevent open redirect via X-Forwarded-Prefix header |
-| [f78f38827](https://github.com/angular/angular-cli/commit/f78f38827861cf01471e30fcf81ef14d6265a0f2) | fix  | validate host headers to prevent header-based SSRF  |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.2.0-rc.0"></a>
-
-# 21.2.0-rc.0 (2026-02-18)
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [ece30f235](https://github.com/angular/angular-cli/commit/ece30f2359c2dc794b0c9272447f623a121e88b0) | feat | add headless option to unit-test builder                 |
+| [cad7a7c0f](https://github.com/angular/angular-cli/commit/cad7a7c0ff3778f04820a99ad0aa9d74f1067fd5) | feat | run vitest browser with playwright with OS theme         |
+| [0b4982720](https://github.com/angular/angular-cli/commit/0b4982720e111bf5029bcf97f7e0ce2658c42d43) | fix  | adjust sourcemap sources when Vitest wrapper is bypassed |
+| [1f114a9e8](https://github.com/angular/angular-cli/commit/1f114a9e8b9bddd53e01016a2d7cb211a04eee48) | fix  | bundle setup files in unit-test builder for Vitest       |
+| [fd5cb28c8](https://github.com/angular/angular-cli/commit/fd5cb28c8082417288a896b89bde659bb0dc92e2) | fix  | explicitly fail when using Vitest runtime mocking        |
+| [dc899e8a5](https://github.com/angular/angular-cli/commit/dc899e8a530979de8e9579f2281b681e6f737a62) | fix  | normalize `allowedHosts` in dev-server                   |
+| [26bbea12f](https://github.com/angular/angular-cli/commit/26bbea12f872c18e59de05d3c51cc11dd0a09cda) | fix  | serve extensionless assets without transformation        |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -44,20 +49,6 @@
 | Commit                                                                                              | Type | Description               |
 | --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
 | [0e5421ba7](https://github.com/angular/angular-cli/commit/0e5421ba78814cf11e4d4510e930eaacc6458662) | fix  | update webpack to 5.105.0 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.2.0-next.2"></a>
-
-# 21.2.0-next.2 (2026-02-11)
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [cad7a7c0f](https://github.com/angular/angular-cli/commit/cad7a7c0ff3778f04820a99ad0aa9d74f1067fd5) | feat | run vitest browser with playwright with OS theme      |
-| [8ae7f59e6](https://github.com/angular/angular-cli/commit/8ae7f59e6f988489fda8c1346e3d2c3768d7a5f0) | fix  | correctly resolve absolute setup file paths in Vitest |
-| [fd5cb28c8](https://github.com/angular/angular-cli/commit/fd5cb28c8082417288a896b89bde659bb0dc92e2) | fix  | explicitly fail when using Vitest runtime mocking     |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -85,34 +76,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="21.2.0-next.1"></a>
-
-# 21.2.0-next.1 (2026-02-05)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [91b9d281f](https://github.com/angular/angular-cli/commit/91b9d281fc88a242aa6e5dd5495e275990d926ef) | feat | integrate file formatting into update migrations           |
-| [6f29a8c35](https://github.com/angular/angular-cli/commit/6f29a8c35abb8928d4e7ea01958192dd2a83491d) | fix  | renamed files by their new path in the schematic workflow  |
-| [bc363af8b](https://github.com/angular/angular-cli/commit/bc363af8bc40f117a4e35ec9eb7eedf69f5b5b37) | perf | optimize package manager discovery with stat-based probing |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
-| [5d1df50d8](https://github.com/angular/angular-cli/commit/5d1df50d8b84b453570ae5fd9ab6f949bbc11649) | fix  | add actionable feedback to vitest-browser schematic              |
-| [51fc77828](https://github.com/angular/angular-cli/commit/51fc77828a33fdf35051b7e18d79ad43f90cba1d) | fix  | warn when production configuration is missing for service worker |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
-| [ece30f235](https://github.com/angular/angular-cli/commit/ece30f2359c2dc794b0c9272447f623a121e88b0) | feat | add headless option to unit-test builder           |
-| [1f114a9e8](https://github.com/angular/angular-cli/commit/1f114a9e8b9bddd53e01016a2d7cb211a04eee48) | fix  | bundle setup files in unit-test builder for Vitest |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="21.1.3"></a>
 
 # 21.1.3 (2026-02-05)
@@ -128,41 +91,6 @@
 | Commit                                                                                              | Type | Description                         |
 | --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
 | [6d05d27ca](https://github.com/angular/angular-cli/commit/6d05d27ca097b16efb139bcee1c45b1b51dfe746) | fix  | address Node.js deprecation DEP0190 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="21.2.0-next.0"></a>
-
-# 21.2.0-next.0 (2026-01-28)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                     |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [0dd04f289](https://github.com/angular/angular-cli/commit/0dd04f289e555a4a8af7bdadabe300da74701e3b) | feat | add markdown files to Prettier's formatting list                |
-| [fbae1b6ab](https://github.com/angular/angular-cli/commit/fbae1b6ab384186ae69e804c54815cea80e6a600) | feat | automatic formatting files modified by schematics               |
-| [98a24d040](https://github.com/angular/angular-cli/commit/98a24d0401f36f484dc9c4d8b0f5284ffa524f19) | feat | standardize MCP tools around workspace/project options          |
-| [d9cd609c5](https://github.com/angular/angular-cli/commit/d9cd609c5d13fe492b1f31973d9be518f8529387) | fix  | correctly parse scoped packages in yarn classic list output     |
-| [5b05f2500](https://github.com/angular/angular-cli/commit/5b05f25005621828565585692b1d7a67c5f0fec8) | fix  | enable shell option for Prettier execution on Windows platforms |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
-| [aa7381efd](https://github.com/angular/angular-cli/commit/aa7381efd213eff70a8004731a7e2b06a60cb8c2) | feat | add a '.prettierrc' file to generated workspaces and add Prettier as dev dependency |
-| [f80db6fb7](https://github.com/angular/angular-cli/commit/f80db6fb714aa326f6ed03a8a51090ca59ad0955) | feat | add ng-add support for Vitest browser providers                                     |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                              | Type | Description                         |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------- |
-| [b4a8d198c](https://github.com/angular/angular-cli/commit/b4a8d198c78aaf0cac7671f26162ce5818a5704c) | fix  | address Node.js deprecation DEP0190 |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                              |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [0b4982720](https://github.com/angular/angular-cli/commit/0b4982720e111bf5029bcf97f7e0ce2658c42d43) | fix  | adjust sourcemap sources when Vitest wrapper is bypassed |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
