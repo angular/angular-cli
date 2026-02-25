@@ -94,9 +94,9 @@ describe('path', () => {
     ];
 
     for (const [input, result] of tests) {
-      const normalizedInput = normalize(input);
+      it(`(${input}) == "${result}"`, () => {
+        const normalizedInput = normalize(input);
 
-      it(`(${JSON.stringify(normalizedInput)}) == "${result}"`, () => {
         expect(split(normalizedInput)).toEqual(result as PathFragment[]);
       });
     }

@@ -11,7 +11,7 @@ import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as E2eOptions } from './schema';
 
-describe('Application Schematic', () => {
+describe('E2E Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     require.resolve('../collection.json'),

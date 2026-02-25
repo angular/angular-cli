@@ -27,10 +27,9 @@ function transform(
   return transformTypescript(input, [transformer], program, compilerHost);
 }
 
-describe('@ngtools/webpack transformers', () => {
-  describe('find_resources', () => {
-    it('should replace resources', () => {
-      const input = tags.stripIndent`
+describe('find_resources', () => {
+  it('should replace resources', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -42,7 +41,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -64,12 +63,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should replace resources with `require()` when module is CommonJs', () => {
-      const input = tags.stripIndent`
+  it('should replace resources with `require()` when module is CommonJs', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -82,7 +81,7 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
 
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         "use strict";
         Object.defineProperty(exports, "__esModule", { value: true });
         exports.AppComponent = void 0;
@@ -100,12 +99,12 @@ describe('@ngtools/webpack transformers', () => {
             styles: [require("./app.component.css?ngResource"), require("./app.component.2.css?ngResource")] }) ], AppComponent);
       `;
 
-      const result = transform(input, true, true, ts.ModuleKind.CommonJS);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input, true, true, ts.ModuleKind.CommonJS);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should support svg as templates', () => {
-      const input = tags.stripIndent`
+  it('should support svg as templates', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -116,7 +115,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.svg?ngResource";
         import { Component } from '@angular/core';
@@ -134,12 +133,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should merge styleUrls with styles', () => {
-      const input = tags.stripIndent`
+  it('should merge styleUrls with styles', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -152,7 +151,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -173,12 +172,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should replace resources with backticks', () => {
-      const input = `
+  it('should replace resources with backticks', () => {
+    const input = `
         import { Component } from '@angular/core';
 
         @Component({
@@ -190,7 +189,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = `
+    const output = `
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -212,12 +211,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should replace resources if Component decorator is aliased', () => {
-      const input = tags.stripIndent`
+  it('should replace resources if Component decorator is aliased', () => {
+    const input = tags.stripIndent`
         import { Component as NgComponent } from '@angular/core';
 
         @NgComponent({
@@ -229,7 +228,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -251,16 +250,16 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const { program } = createTypescriptContext(input);
-      const getTypeChecker = () => program.getTypeChecker();
-      const transformer = replaceResources(() => true, getTypeChecker);
-      const result = transformTypescript(input, [transformer]);
+    const { program } = createTypescriptContext(input);
+    const getTypeChecker = () => program.getTypeChecker();
+    const transformer = replaceResources(() => true, getTypeChecker);
+    const result = transformTypescript(input, [transformer]);
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should replace resources if Angular Core import is namespaced', () => {
-      const input = tags.stripIndent`
+  it('should replace resources if Angular Core import is namespaced', () => {
+    const input = tags.stripIndent`
         import * as ng from '@angular/core';
 
         @ng.Component({
@@ -272,7 +271,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -294,12 +293,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should replace resources specified as string literals', () => {
-      const input = tags.stripIndent`
+  it('should replace resources specified as string literals', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -312,7 +311,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -333,12 +332,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should not replace resources if not in Component decorator', () => {
-      const input = tags.stripIndent`
+  it('should not replace resources if not in Component decorator', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -356,7 +355,7 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
 
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import __NG_CLI_RESOURCE__0 from "./app.component.html?ngResource";
         import __NG_CLI_RESOURCE__1 from "./app.component.css?ngResource";
@@ -384,12 +383,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should not replace resources if not in an NG Component decorator', () => {
-      const input = tags.stripIndent`
+  it('should not replace resources if not in an NG Component decorator', () => {
+    const input = tags.stripIndent`
         import { Component } from 'foo';
 
         @Component({
@@ -407,7 +406,7 @@ describe('@ngtools/webpack transformers', () => {
         }
       `;
 
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { __decorate } from "tslib";
         import { Component } from 'foo';
 
@@ -432,12 +431,12 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should not replace resources if shouldTransform returns false', () => {
-      const input = tags.stripIndent`
+  it('should not replace resources if shouldTransform returns false', () => {
+    const input = tags.stripIndent`
         import { Component } from '@angular/core';
 
         @Component({
@@ -449,7 +448,7 @@ describe('@ngtools/webpack transformers', () => {
           title = 'app';
         }
       `;
-      const output = `
+    const output = `
         import { __decorate } from "tslib";
         import { Component } from '@angular/core';
         let AppComponent = class AppComponent {
@@ -467,8 +466,7 @@ describe('@ngtools/webpack transformers', () => {
         export { AppComponent };
       `;
 
-      const result = transform(input, false);
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    const result = transform(input, false);
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
 });

@@ -19,16 +19,10 @@ describe('dependencies', () => {
   describe('addDependency', () => {
     let tree: UnitTestTree;
     const pkgJsonPath = '/package.json';
-    let dependency: NodeDependency;
+
     beforeEach(() => {
       tree = new UnitTestTree(new EmptyTree());
       tree.create(pkgJsonPath, '{}');
-
-      dependency = {
-        type: NodeDependencyType.Default,
-        name: 'my-pkg',
-        version: '1.2.3',
-      };
     });
 
     [
@@ -36,29 +30,39 @@ describe('dependencies', () => {
       { type: NodeDependencyType.Dev, key: 'devDependencies' },
       { type: NodeDependencyType.Optional, key: 'optionalDependencies' },
       { type: NodeDependencyType.Peer, key: 'peerDependencies' },
-    ].forEach((type) => {
-      describe(`Type: ${type.toString()}`, () => {
-        beforeEach(() => {
-          dependency.type = type.type;
-        });
+    ].forEach(({ type, key }) => {
+      describe(`Type: ${type}`, () => {
+        const dependency: NodeDependency = {
+          type,
+          name: 'my-pkg',
+          version: '1.2.3',
+        };
 
         it('should add a dependency', () => {
           addPackageJsonDependency(tree, dependency);
           const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
-          expect(pkgJson[type.key][dependency.name]).toEqual(dependency.version);
+
+          expect(pkgJson[key][dependency.name]).toEqual(dependency.version);
         });
 
         it('should handle an existing dependency (update version)', () => {
           addPackageJsonDependency(tree, { ...dependency, version: '0.0.0' });
           addPackageJsonDependency(tree, { ...dependency, overwrite: true });
           const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
-          expect(pkgJson[type.key][dependency.name]).toEqual(dependency.version);
+
+          expect(pkgJson[key][dependency.name]).toEqual(dependency.version);
         });
       });
     });
 
     it('should throw when missing package.json', () => {
-      expect(() => addPackageJsonDependency(new EmptyTree(), dependency)).toThrow();
+      expect(() =>
+        addPackageJsonDependency(new EmptyTree(), {
+          type: NodeDependencyType.Default,
+          name: 'my-pkg',
+          version: '1.2.3',
+        }),
+      ).toThrow();
     });
   });
 

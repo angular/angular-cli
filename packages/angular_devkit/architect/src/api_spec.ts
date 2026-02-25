@@ -40,7 +40,7 @@ describe('Architect API', () => {
     for (const ts of Object.getOwnPropertyNames(goldens)) {
       const t: Target = goldens[ts];
 
-      it(`works for ${JSON.stringify(t)}`, () => {
+      it(`works for ${JSON.stringify(ts)}`, () => {
         // We have some invalid goldens. Remove everything after the second :.
         const goldenTs = ts.replace(/(\w+:\w+(:\w*)?).*/, '$1');
         expect(targetStringFromTarget(t)).toEqual(goldenTs);

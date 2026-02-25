@@ -19,7 +19,7 @@ describe('Browser Builder tsconfig paths', () => {
   });
   afterEach(async () => host.restore().toPromise());
 
-  it('works', async () => {
+  it('should resolve basic tsconfig paths', async () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
     host.replaceInFile(
       'tsconfig.json',
@@ -37,7 +37,7 @@ describe('Browser Builder tsconfig paths', () => {
     await browserBuild(architect, host, target);
   });
 
-  it('works', async () => {
+  it('should resolve complex tsconfig paths with wildcards', async () => {
     host.writeMultipleFiles({
       'src/meaning-too.ts': 'export var meaning = 42;',
       'src/app/shared/meaning.ts': 'export var meaning = 42;',

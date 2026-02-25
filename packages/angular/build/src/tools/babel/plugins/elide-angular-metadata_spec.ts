@@ -188,7 +188,7 @@ describe('elide-angular-metadata Babel plugin', () => {
   );
 
   it(
-    'elides arrow-function-based ɵsetClassMetadataAsync',
+    'elides ɵsetClassDebugInfo',
     testCase({
       input: `
         import { Component } from '@angular/core';

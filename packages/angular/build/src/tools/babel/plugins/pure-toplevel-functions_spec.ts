@@ -100,7 +100,7 @@ describe('pure-toplevel-functions Babel plugin', () => {
   );
 
   it(
-    'does not annotate call expressions inside function expressions',
+    'does not annotate call expressions inside arrow functions',
     testCaseNoChange('const foo = () => { const result = someFunction(); }'),
   );
 
@@ -115,7 +115,7 @@ describe('pure-toplevel-functions Babel plugin', () => {
   );
 
   it(
-    'does not annotate new expressions inside function expressions',
+    'does not annotate new expressions inside arrow functions',
     testCaseNoChange('const foo = () => { const result = new SomeClass(); }'),
   );
 

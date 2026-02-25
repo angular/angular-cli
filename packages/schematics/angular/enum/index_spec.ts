@@ -44,13 +44,6 @@ describe('Enum Schematic', () => {
   it('should create an enumeration', async () => {
     const tree = await schematicRunner.runSchematic('enum', defaultOptions, appTree);
 
-    const files = tree.files;
-    expect(files).toContain('/projects/bar/src/app/foo.ts');
-  });
-
-  it('should create an enumeration', async () => {
-    const tree = await schematicRunner.runSchematic('enum', defaultOptions, appTree);
-
     const content = tree.readContent('/projects/bar/src/app/foo.ts');
     expect(content).toMatch('export enum Foo {');
   });

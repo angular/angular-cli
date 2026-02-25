@@ -12,6 +12,7 @@ import { readFileSync } from 'node:fs';
 import { JasmineBuilderHarness, host, setupApplicationTarget } from './setup';
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
+let counter = 0;
 
 export function describeServeBuilder<T>(
   builderHandler: BuilderHandlerFn<T & json.JsonObject>,
@@ -32,7 +33,8 @@ export function describeServeBuilder<T>(
     optionSchema,
   });
 
-  describe(options.name || builderHandler.name, () => {
+  // The counter is needed to avoid duplicate describe names as they are not allowed.
+  describe((options.name || builderHandler.name) + ` (${counter++})`, () => {
     beforeEach(() => host.initialize().toPromise());
     afterEach(() => host.restore().toPromise());
 

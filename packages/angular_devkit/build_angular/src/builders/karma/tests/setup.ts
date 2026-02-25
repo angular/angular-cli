@@ -140,6 +140,8 @@ export async function setupApplicationTarget<T>(
   await harness.appendToFile('src/polyfills.ts', `import '@angular/localize/init';`);
 }
 
+let counter = 0;
+
 /** Runs the test against both an application- and a browser-builder context. */
 export function describeKarmaBuilder<T>(
   builderHandler: BuilderHandlerFn<T & json.JsonObject>,
@@ -161,7 +163,8 @@ export function describeKarmaBuilder<T>(
     optionSchema,
   });
 
-  describe(options.name || builderHandler.name, () => {
+  // The counter is needed to avoid duplicate describe names as they are not allowed.
+  describe((options.name || builderHandler.name) + ` (${counter++})`, () => {
     for (const isApplicationTarget of [true, false]) {
       describe(isApplicationTarget ? 'with application builder' : 'with browser builder', () => {
         beforeEach(() => host.initialize().toPromise());

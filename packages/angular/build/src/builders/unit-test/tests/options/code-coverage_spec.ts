@@ -42,7 +42,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.expectFile('coverage/test/index.html').toExist();
     });
 
-    it('should generate a code coverage report when coverage is true', async () => {
+    it('should generate a code coverage report when coverage is true and coverageReporters is set to json', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         coverage: true,

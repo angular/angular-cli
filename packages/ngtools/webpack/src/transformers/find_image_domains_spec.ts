@@ -82,42 +82,43 @@ function inputTemplateComponent(provider: string) {
   `;
 }
 
-function runSharedTests(template: (povider: string) => string) {
-  it('should find a domain when a built-in loader is used with a string-literal-like argument', () => {
-    // Intentionally inconsistent use of quote styles in this data structure:
-    const builtInLoaders: Array<[string, string]> = [
-      ['provideCloudflareLoader("www.cloudflaredomain.com")', 'www.cloudflaredomain.com'],
-      [
-        "provideCloudinaryLoader('https://www.cloudinarydomain.net')",
-        'https://www.cloudinarydomain.net',
-      ],
-      ['provideImageKitLoader("www.imageKitdomain.com")', 'www.imageKitdomain.com'],
-      ['provideImgixLoader(`www.imgixdomain.com/images/`)', 'www.imgixdomain.com/images/'],
-    ];
-    for (const loader of builtInLoaders) {
-      const input = template(loader[0]);
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(1);
-      expect(result[0]).toBe(loader[1]);
-    }
-  });
+function runSharedTests(name: string, template: (povider: string) => string) {
+  describe(name, () => {
+    it(`should find a domain when a built-in loader is used with a string-literal-like argument`, () => {
+      // Intentionally inconsistent use of quote styles in this data structure:
+      const builtInLoaders: Array<[string, string]> = [
+        ['provideCloudflareLoader("www.cloudflaredomain.com")', 'www.cloudflaredomain.com'],
+        [
+          "provideCloudinaryLoader('https://www.cloudinarydomain.net')",
+          'https://www.cloudinarydomain.net',
+        ],
+        ['provideImageKitLoader("www.imageKitdomain.com")', 'www.imageKitdomain.com'],
+        ['provideImgixLoader(`www.imgixdomain.com/images/`)', 'www.imgixdomain.com/images/'],
+      ];
+      for (const loader of builtInLoaders) {
+        const input = template(loader[0]);
+        const result = Array.from(findDomains(input));
+        expect(result.length).toBe(1);
+        expect(result[0]).toBe(loader[1]);
+      }
+    });
 
-  it('should find a domain in a custom loader function with a template literal', () => {
-    const customLoader = tags.stripIndent`
+    it(`should find a domain in a custom loader function with a template literal`, () => {
+      const customLoader = tags.stripIndent`
       {
           provide: IMAGE_LOADER,
           useValue: (config: ImageLoaderConfig) => {
             return ${'`https://customLoaderTemplate.com/images?src=${config.src}&width=${config.width}`'};
           },
         },`;
-    const input = template(customLoader);
-    const result = Array.from(findDomains(input));
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe('https://customLoaderTemplate.com/');
-  });
+      const input = template(customLoader);
+      const result = Array.from(findDomains(input));
+      expect(result.length).toBe(1);
+      expect(result[0]).toBe('https://customLoaderTemplate.com/');
+    });
 
-  it('should find a domain when provider is alongside other providers', () => {
-    const customLoader = tags.stripIndent`
+    it('should find a domain when provider is alongside other providers', () => {
+      const customLoader = tags.stripIndent`
           {
               provide: SOME_OTHER_PROVIDER,
               useValue: (config: ImageLoaderConfig) => {
@@ -137,71 +138,70 @@ function runSharedTests(template: (povider: string) => string) {
               return ${'`https://notacustomloadertemplate.com/images?src=${config.src}&width=${config.width}`'};
               },
           },`;
-    const input = template(customLoader);
-    const result = Array.from(findDomains(input));
-    expect(result.length).toBe(1);
-    expect(result[0]).toBe('https://customloadertemplate.com/');
+      const input = template(customLoader);
+      const result = Array.from(findDomains(input));
+      expect(result.length).toBe(1);
+      expect(result[0]).toBe('https://customloadertemplate.com/');
+    });
   });
 }
 
-describe('@ngtools/webpack transformers', () => {
-  describe('find_image_domains (app module)', () => {
-    runSharedTests(inputTemplateAppModule);
-    runSharedTests(inputTemplateComponent);
+describe('find_image_domains (app module)', () => {
+  runSharedTests('inputTemplateAppModule', inputTemplateAppModule);
+  runSharedTests('inputTemplateComponent', inputTemplateComponent);
 
-    it('should not find a domain when a built-in loader is used with a variable', () => {
-      const input = inputTemplateAppModule(`provideCloudflareLoader(myImageCDN)`);
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(0);
-    });
+  it('should not find a domain when a built-in loader is used with a variable', () => {
+    const input = inputTemplateAppModule(`provideCloudflareLoader(myImageCDN)`);
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(0);
+  });
 
-    it('should not find a domain when a built-in loader is used with an expression', () => {
-      const input = inputTemplateAppModule(
-        `provideCloudflareLoader("https://www." + (dev ? "dev." : "") + "cloudinarydomain.net")`,
-      );
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(0);
-    });
+  it('should not find a domain when a built-in loader is used with an expression', () => {
+    const input = inputTemplateAppModule(
+      `provideCloudflareLoader("https://www." + (dev ? "dev." : "") + "cloudinarydomain.net")`,
+    );
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(0);
+  });
 
-    it('should not find a domain when a built-in loader is used with a template literal', () => {
-      const input = inputTemplateAppModule(
-        'provideCloudflareLoader(`https://www.${dev ? "dev." : ""}cloudinarydomain.net`)',
-      );
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(0);
-    });
+  it('should not find a domain when a built-in loader is used with a template literal', () => {
+    const input = inputTemplateAppModule(
+      'provideCloudflareLoader(`https://www.${dev ? "dev." : ""}cloudinarydomain.net`)',
+    );
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(0);
+  });
 
-    it('should not find a domain in a function that is not a built-in loader', () => {
-      const input = inputTemplateAppModule('provideNotARealLoader("https://www.foo.com")');
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(0);
-    });
+  it('should not find a domain in a function that is not a built-in loader', () => {
+    const input = inputTemplateAppModule('provideNotARealLoader("https://www.foo.com")');
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(0);
+  });
 
-    it('should find a domain in a custom loader function with string concatenation', () => {
-      const customLoader = tags.stripIndent`
+  it('should find a domain in a custom loader function with string concatenation', () => {
+    const customLoader = tags.stripIndent`
         {
             provide: IMAGE_LOADER,
             useValue: (config: ImageLoaderConfig) => {
               return "https://customLoaderString.com/images?src=" + config.src + "&width=" + config.width;
             },
           },`;
-      const input = inputTemplateAppModule(customLoader);
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(1);
-      expect(result[0]).toBe('https://customLoaderString.com/');
-    });
+    const input = inputTemplateAppModule(customLoader);
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(1);
+    expect(result[0]).toBe('https://customLoaderString.com/');
+  });
 
-    it('should not find a domain if not an IMAGE_LOADER provider', () => {
-      const customLoader = tags.stripIndent`
+  it('should not find a domain if not an IMAGE_LOADER provider', () => {
+    const customLoader = tags.stripIndent`
         {
             provide: SOME_OTHER_PROVIDER,
             useValue: (config: ImageLoaderConfig) => {
               return "https://customLoaderString.com/images?src=" + config.src + "&width=" + config.width;
             },
           },`;
-      const input = inputTemplateAppModule(customLoader);
-      const result = Array.from(findDomains(input));
-      expect(result.length).toBe(0);
-    });
+    const input = inputTemplateAppModule(customLoader);
+    const result = Array.from(findDomains(input));
+    expect(result.length).toBe(0);
   });
 });

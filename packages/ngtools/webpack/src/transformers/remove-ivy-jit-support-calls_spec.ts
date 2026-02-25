@@ -187,10 +187,9 @@ const inputDebugInfo = tags.stripIndent`
   (() => { (typeof ngDevMode === "undefined" || ngDevMode) && i0.ɵsetClassDebugInfo(TestCmp, { className: "TestCmp" }); })();
 `;
 
-describe('@ngtools/webpack transformers', () => {
-  describe('remove-ivy-dev-calls', () => {
-    it('should allow removing only set class metadata with pure annotation', () => {
-      const output = tags.stripIndent`
+describe('remove-ivy-dev-calls', () => {
+  it('should allow removing only set class metadata with pure annotation', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -203,15 +202,15 @@ describe('@ngtools/webpack transformers', () => {
                 AppRoutingModule] }); })();
       `;
 
-      const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
-      );
+    const result = transform(input, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing only set class metadata', () => {
-      const output = tags.stripIndent`
+  it('should allow removing only set class metadata', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -224,15 +223,15 @@ describe('@ngtools/webpack transformers', () => {
                 AppRoutingModule] }); })();
       `;
 
-      const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
-      );
+    const result = transform(inputNoPure, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing only ng module scope with pure annotation', () => {
-      const output = tags.stripIndent`
+  it('should allow removing only ng module scope with pure annotation', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -257,15 +256,15 @@ describe('@ngtools/webpack transformers', () => {
             }], null, null); })();
       `;
 
-      const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, true, false, getTypeChecker),
-      );
+    const result = transform(input, (getTypeChecker) =>
+      removeIvyJitSupportCalls(false, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing only ng module scope', () => {
-      const output = tags.stripIndent`
+  it('should allow removing only ng module scope', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -290,15 +289,15 @@ describe('@ngtools/webpack transformers', () => {
             }], null, null); })();
       `;
 
-      const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, true, false, getTypeChecker),
-      );
+    const result = transform(inputNoPure, (getTypeChecker) =>
+      removeIvyJitSupportCalls(false, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing both set class metadata and ng module scope with pure annotation', () => {
-      const output = tags.stripIndent`
+  it('should allow removing both set class metadata and ng module scope with pure annotation', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -308,15 +307,15 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(input, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing both set class metadata and ng module scope', () => {
-      const output = tags.stripIndent`
+  it('should allow removing both set class metadata and ng module scope', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -326,31 +325,31 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(inputNoPure, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should allow removing neither set class metadata nor ng module scope with pure annotation', () => {
-      const result = transform(input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, false, false, getTypeChecker),
-      );
+  it('should allow removing neither set class metadata nor ng module scope with pure annotation', () => {
+    const result = transform(input, (getTypeChecker) =>
+      removeIvyJitSupportCalls(false, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${input}`);
+  });
 
-    it('should allow removing neither set class metadata nor ng module scope', () => {
-      const result = transform(inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(false, false, false, getTypeChecker),
-      );
+  it('should allow removing neither set class metadata nor ng module scope', () => {
+    const result = transform(inputNoPure, (getTypeChecker) =>
+      removeIvyJitSupportCalls(false, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${inputNoPure}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${inputNoPure}`);
+  });
 
-    it('should strip unused imports when removing set class metadata and ng module scope with pure annotation', () => {
-      const imports = tags.stripIndent`
+  it('should strip unused imports when removing set class metadata and ng module scope with pure annotation', () => {
+    const imports = tags.stripIndent`
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { AppRoutingModule } from './app-routing.module';
@@ -359,7 +358,7 @@ describe('@ngtools/webpack transformers', () => {
         import * as i0 from "@angular/core";
       `;
 
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { BrowserModule } from '@angular/platform-browser';
         import { AppRoutingModule } from './app-routing.module';
         import { AppComponent } from './app.component';
@@ -373,15 +372,15 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(imports + input, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(imports + input, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should strip unused imports when removing set class metadata and ng module scope', () => {
-      const imports = tags.stripIndent`
+  it('should strip unused imports when removing set class metadata and ng module scope', () => {
+    const imports = tags.stripIndent`
         import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
         import { AppRoutingModule } from './app-routing.module';
@@ -390,7 +389,7 @@ describe('@ngtools/webpack transformers', () => {
         import * as i0 from "@angular/core";
       `;
 
-      const output = tags.stripIndent`
+    const output = tags.stripIndent`
         import { BrowserModule } from '@angular/platform-browser';
         import { AppRoutingModule } from './app-routing.module';
         import { AppComponent } from './app.component';
@@ -404,15 +403,15 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(imports + inputNoPure, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(imports + inputNoPure, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have bodies', () => {
-      const output = tags.stripIndent`
+  it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have bodies', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -422,15 +421,15 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(inputArrowFnWithBody, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(inputArrowFnWithBody, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have an implicit return', () => {
-      const output = tags.stripIndent`
+  it('should remove setClassMetadata and setNgModuleScope calls inside arrow-function-based IIFEs that have an implicit return', () => {
+    const output = tags.stripIndent`
         export class AppModule {
         }
         AppModule.ɵmod = i0.ɵɵdefineNgModule({ type: AppModule, bootstrap: [AppComponent] });
@@ -440,56 +439,55 @@ describe('@ngtools/webpack transformers', () => {
                 ]] });
       `;
 
-      const result = transform(inputArrowFnWithImplicitReturn, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, true, false, getTypeChecker),
-      );
+    const result = transform(inputArrowFnWithImplicitReturn, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, true, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should remove setClassMetadataAsync calls', () => {
-      const output = tags.stripIndent`
+  it('should remove setClassMetadataAsync calls', () => {
+    const output = tags.stripIndent`
         export class TestCmp {
         }
         TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
         TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
       `;
 
-      const result = transform(inputAsync, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
-      );
+    const result = transform(inputAsync, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should remove arrow-function-based setClassMetadataAsync calls', () => {
-      const output = tags.stripIndent`
+  it('should remove arrow-function-based setClassMetadataAsync calls', () => {
+    const output = tags.stripIndent`
         export class TestCmp {
         }
         TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
         TestCmp.ɵcmp = i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], standalone: true, features: [i0.ɵɵStandaloneFeature], decls: 3, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
       `;
 
-      const result = transform(inputAsyncArrowFn, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, false, getTypeChecker),
-      );
+    const result = transform(inputAsyncArrowFn, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, false, false, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
 
-    it('should remove setClassDebugInfo calls', () => {
-      const output = tags.stripIndent`
+  it('should remove setClassDebugInfo calls', () => {
+    const output = tags.stripIndent`
         import * as i0 from "@angular/core";
         export class TestCmp { }
         TestCmp.ɵfac = function TestCmp_Factory(t) { return new (t || TestCmp)(); };
         TestCmp.ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({ type: TestCmp, selectors: [["test-cmp"]], decls: 0, vars: 0, template: function TestCmp_Template(rf, ctx) { }, encapsulation: 2 });
       `;
 
-      const result = transform(inputDebugInfo, (getTypeChecker) =>
-        removeIvyJitSupportCalls(true, false, true, getTypeChecker),
-      );
+    const result = transform(inputDebugInfo, (getTypeChecker) =>
+      removeIvyJitSupportCalls(true, false, true, getTypeChecker),
+    );
 
-      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
-    });
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
 });

@@ -8,60 +8,59 @@
 
 import { expectTransformation } from './test-helpers';
 
-describe('Jasmine to Vitest Transformer', () => {
-  describe('addImports option', () => {
-    it('should add value imports when addImports is true', async () => {
-      const input = `spyOn(foo, 'bar');`;
-      const expected = `
+describe('Jasmine to Vitest Transformer - addImports option', () => {
+  it('should add value imports when addImports is true', async () => {
+    const input = `spyOn(foo, 'bar');`;
+    const expected = `
         import { vi } from 'vitest';
         vi.spyOn(foo, 'bar');
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should generate a single, combined import for value and type imports when addImports is true', async () => {
-      const input = `
+  it('should generate a single, combined import for value and type imports when addImports is true', async () => {
+    const input = `
         let mySpy: jasmine.Spy;
         spyOn(foo, 'bar');
       `;
-      const expected = `
+    const expected = `
         import { type Mock, vi } from 'vitest';
 
         let mySpy: Mock;
         vi.spyOn(foo, 'bar');
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should only add type imports when addImports is false', async () => {
-      const input = `
+  it('should only add type imports when addImports is false', async () => {
+    const input = `
         let mySpy: jasmine.Spy;
         spyOn(foo, 'bar');
       `;
-      const expected = `
+    const expected = `
         import type { Mock } from 'vitest';
 
         let mySpy: Mock;
         vi.spyOn(foo, 'bar');
       `;
-      await expectTransformation(input, expected, false);
-    });
+    await expectTransformation(input, expected, false);
+  });
 
-    it('should not add an import if no Vitest APIs are used, even when addImports is true', async () => {
-      const input = `const a = 1;`;
-      const expected = `const a = 1;`;
-      await expectTransformation(input, expected, true);
-    });
+  it('should not add an import if no Vitest APIs are used, even when addImports is true', async () => {
+    const input = `const a = 1;`;
+    const expected = `const a = 1;`;
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should add imports for top-level describe and it when addImports is true', async () => {
-      const input = `
+  it('should add imports for top-level describe and it when addImports is true', async () => {
+    const input = `
         describe('My Suite', () => {
           it('should do something', () => {
             // test content
           });
         });
       `;
-      const expected = `
+    const expected = `
         import { describe, it } from 'vitest';
 
         describe('My Suite', () => {
@@ -70,26 +69,26 @@ describe('Jasmine to Vitest Transformer', () => {
           });
         });
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should add imports for top-level expect when addImports is true', async () => {
-      const input = `expect(true).toBe(true);`;
-      const expected = `
+  it('should add imports for top-level expect when addImports is true', async () => {
+    const input = `expect(true).toBe(true);`;
+    const expected = `
         import { expect } from 'vitest';
         expect(true).toBe(true);
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should add imports for beforeEach and afterEach when addImports is true', async () => {
-      const input = `
+  it('should add imports for beforeEach and afterEach when addImports is true', async () => {
+    const input = `
         describe('My Suite', () => {
           beforeEach(() => {});
           afterEach(() => {});
         });
       `;
-      const expected = `
+    const expected = `
         import { afterEach, beforeEach, describe } from 'vitest';
 
         describe('My Suite', () => {
@@ -97,17 +96,17 @@ describe('Jasmine to Vitest Transformer', () => {
           afterEach(() => {});
         });
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
+  });
 
-    it('should add imports for beforeAll and afterAll when addImports is true', async () => {
-      const input = `
+  it('should add imports for beforeAll and afterAll when addImports is true', async () => {
+    const input = `
         describe('My Suite', () => {
           beforeAll(() => {});
           afterAll(() => {});
         });
       `;
-      const expected = `
+    const expected = `
         import { afterAll, beforeAll, describe } from 'vitest';
 
         describe('My Suite', () => {
@@ -115,7 +114,6 @@ describe('Jasmine to Vitest Transformer', () => {
           afterAll(() => {});
         });
       `;
-      await expectTransformation(input, expected, true);
-    });
+    await expectTransformation(input, expected, true);
   });
 });

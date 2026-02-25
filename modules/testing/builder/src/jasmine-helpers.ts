@@ -25,6 +25,8 @@ export const BUILD_TIMEOUT = 30_000;
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
 
+let counter = 0;
+
 export function describeBuilder<T>(
   builderHandler: BuilderHandlerFn<T & json.JsonObject>,
   options: { name?: string; schemaPath: string },
@@ -40,10 +42,8 @@ export function describeBuilder<T>(
     optionSchema,
   });
 
-  // This is needed as there are multiple describe calls for the same builder.
-  jasmine.getEnv().configure({ forbidDuplicateNames: false });
-
-  describe(options.name || builderHandler.name, () => {
+  // The counter is needed to avoid duplicate describe names as they are not allowed.
+  describe((options.name || builderHandler.name) + ` (Suite: ${counter++})`, () => {
     beforeEach(async () => {
       harness.resetProjectMetadata();
 

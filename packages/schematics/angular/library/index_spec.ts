@@ -414,7 +414,7 @@ describe('Library Schematic', () => {
     expect(workspace.projects.foo.architect.test.builder).toBe('@angular/build:unit-test');
   });
 
-  it(`should add 'unit-test' test builder`, async () => {
+  it(`should add 'unit-test' test builder when vitest is available`, async () => {
     const packageJson = getJsonFileContent(workspaceTree, 'package.json');
     packageJson['devDependencies']['vitest'] = '^4.0.0';
     workspaceTree.overwrite('package.json', JSON.stringify(packageJson));

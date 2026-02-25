@@ -14,6 +14,7 @@ import { host } from '../../../testing/test-utils';
 import { setupApplicationTarget, setupBrowserTarget } from './setup';
 
 const optionSchemaCache = new Map<string, json.schema.JsonSchema>();
+let counter = 0;
 
 export function describeServeBuilder<T extends json.JsonObject>(
   builderHandler: BuilderHandlerFn<T>,
@@ -39,7 +40,8 @@ export function describeServeBuilder<T extends json.JsonObject>(
     optionSchema,
   });
 
-  describe(options.name || builderHandler.name, () => {
+  // The counter is needed to avoid duplicate describe names as they are not allowed.
+  describe((options.name || builderHandler.name) + ` (${counter++})`, () => {
     for (const isViteRun of [true, false]) {
       describe(isViteRun ? 'vite' : 'webpack-dev-server', () => {
         beforeEach(() => host.initialize().toPromise());

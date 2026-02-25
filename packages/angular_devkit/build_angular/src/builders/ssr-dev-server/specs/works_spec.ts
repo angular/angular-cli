@@ -12,7 +12,7 @@ import * as browserSync from 'browser-sync';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { SSRDevServerBuilderOutput } from '../index';
 
-describe('Serve SSR Builder', () => {
+describe('Serve SSR Builder - Works', () => {
   const target = { project: 'app', target: 'serve-ssr' };
   const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   let architect: Architect;
