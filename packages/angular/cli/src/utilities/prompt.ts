@@ -43,7 +43,7 @@ export async function askQuestion(
   const answer = await select({
     message,
     choices,
-    default: defaultResponseIndex,
+    default: choices[defaultResponseIndex].value,
     theme: {
       prefix: '',
     },
