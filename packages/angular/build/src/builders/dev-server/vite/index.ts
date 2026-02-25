@@ -97,8 +97,10 @@ export async function* serveWithVite(
     browserOptions.ssr ||= true;
   }
 
+  // Vite allowedHost syntax doesn't allow `*.` but `.` acts as `*.`
+  // Angular SSR supports `*.`.
   const allowedHosts = Array.isArray(serverOptions.allowedHosts)
-    ? [...serverOptions.allowedHosts]
+    ? serverOptions.allowedHosts.map((host) => (host[0] === '.' ? '*' + host : host))
     : [];
 
   // Always allow the dev server host
