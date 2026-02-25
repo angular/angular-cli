@@ -505,7 +505,9 @@ function _usageMessage(
   logger.info(
     '  ' + ['Name', 'Version', 'Command to update'].map((x, i) => x.padEnd(pads[i])).join(''),
   );
-  logger.info(' ' + '-'.repeat(pads.reduce((s, x) => (s += x), 0) + 20));
+
+  const totalWidth = pads.reduce((sum, width) => sum + width, 20);
+  logger.info(` ${'-'.repeat(totalWidth)}`);
 
   packagesToUpdate.forEach((fields) => {
     if (!fields) {
@@ -681,7 +683,7 @@ function _addPackageGroup(
   if (!packageGroup) {
     return;
   }
-  let packageGroupNormalized: Record<string, string> = {};
+  let packageGroupNormalized: Record<string, string>;
   if (Array.isArray(packageGroup) && !packageGroup.some((x) => typeof x != 'string')) {
     packageGroupNormalized = packageGroup.reduce(
       (acc, curr) => {

@@ -331,7 +331,6 @@ describe('architect', () => {
 
     // Use an invalid target and check for error.
     target.target = 'invalid';
-    options = {};
 
     // This should not error.
     const run2 = await architect.scheduleBuilder('package:getTargetOptions', {});
@@ -375,7 +374,6 @@ describe('architect', () => {
 
     // Use an invalid target and check for error.
     target.target = 'invalid';
-    actualBuilderName = '';
 
     // This should not error.
     const run2 = await architect.scheduleBuilder('package:do-it', {});

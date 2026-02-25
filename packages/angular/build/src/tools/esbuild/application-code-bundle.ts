@@ -701,7 +701,6 @@ function getEsBuildCommonPolyfillsOptions(
       cache: loadResultCache,
       loadContent: async (_, build) => {
         let polyfillPaths = polyfills;
-        let warnings: PartialMessage[] | undefined;
 
         if (tryToResolvePolyfillsAsRelative) {
           polyfillPaths = await Promise.all(
@@ -736,7 +735,6 @@ function getEsBuildCommonPolyfillsOptions(
         return {
           contents,
           loader: 'js',
-          warnings,
           resolveDir: workspaceRoot,
         };
       },

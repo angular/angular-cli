@@ -21,8 +21,7 @@ export function findBootstrapModuleCall(host: Tree, mainPath: string): ts.CallEx
   let bootstrapCall: ts.CallExpression | null = null;
 
   for (const node of allNodes) {
-    let bootstrapCallNode: ts.Node | null = null;
-    bootstrapCallNode = findNode(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
+    let bootstrapCallNode = findNode(node, ts.SyntaxKind.Identifier, 'bootstrapModule');
 
     // Walk up the parent until CallExpression is found.
     while (

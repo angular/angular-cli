@@ -137,7 +137,7 @@ async function discoverAndCategorizeFiles(
     isDirectory = statSync(fileOrDirPath).isDirectory();
   } catch (e) {
     // Re-throw to be handled by the main function as a user input error
-    throw new Error(`Failed to access path: ${fileOrDirPath}`);
+    throw new Error(`Failed to access path: ${fileOrDirPath}`, { cause: e });
   }
 
   if (isDirectory) {

@@ -47,7 +47,7 @@ export async function runBuild(input: BuildToolInput, context: McpToolContext) {
   const args = ['build', projectName, '-c', input.configuration ?? DEFAULT_CONFIGURATION];
 
   let status: BuildStatus = 'success';
-  let logs: string[] = [];
+  let logs: string[];
   let outputPath: string | undefined;
 
   try {

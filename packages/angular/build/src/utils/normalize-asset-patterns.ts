@@ -45,7 +45,7 @@ export function normalizeAssetPatterns(
       }
 
       let glob: string, input: string;
-      let isDirectory = false;
+      let isDirectory: boolean;
 
       try {
         isDirectory = statSync(resolvedAssetPath).isDirectory();

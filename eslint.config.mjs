@@ -12,7 +12,7 @@ import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import header from 'eslint-plugin-header';
+import header from '@tony.ganchev/eslint-plugin-header';
 import _import from 'eslint-plugin-import';
 import globals from 'globals';
 
@@ -21,9 +21,6 @@ const compat = new FlatCompat({
   recommendedConfig: js.configs.recommended,
   allConfig: js.configs.all,
 });
-
-// See: https://github.com/Stuk/eslint-plugin-header/issues/57
-header.rules.header.meta.schema = false;
 
 export default [
   {
@@ -59,7 +56,7 @@ export default [
       '@stylistic': stylistic,
       '@typescript-eslint': fixupPluginRules(typescriptEslint),
       import: fixupPluginRules(_import),
-      header,
+      '@tony.ganchev': header,
     },
 
     languageOptions: {
@@ -106,7 +103,7 @@ export default [
       '@typescript-eslint/no-unused-expressions': 'error',
       curly: 'error',
 
-      'header/header': [
+      '@tony.ganchev/header': [
         'error',
         'block',
         [

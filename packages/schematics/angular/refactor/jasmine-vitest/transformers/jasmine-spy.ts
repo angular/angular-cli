@@ -232,7 +232,7 @@ export function transformCreateSpyObj(
   const baseName = hasBaseName ? firstArg.text : undefined;
   const methods = hasBaseName ? node.arguments[1] : firstArg;
   const propertiesArg = hasBaseName ? node.arguments[2] : node.arguments[1];
-  let properties: ts.PropertyAssignment[] = [];
+  let properties: ts.PropertyAssignment[];
 
   if (node.arguments.length < 2 && hasBaseName) {
     const category = 'createSpyObj-single-argument';

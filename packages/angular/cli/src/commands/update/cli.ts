@@ -287,14 +287,13 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     packageManager: PackageManager,
   ): Promise<number | void> {
     const { logger } = this.context;
-    let packageDependency = rootDependencies.get(packageName);
+    const packageDependency = rootDependencies.get(packageName);
     let packagePath = packageDependency?.path;
     let packageNode: PackageManifest | undefined;
 
     if (!packageDependency) {
       const installed = await packageManager.getInstalledPackage(packageName);
       if (installed) {
-        packageDependency = installed;
         packagePath = installed.path;
       }
     }
@@ -450,7 +449,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     for (const { identifier: requestIdentifier, node } of requests) {
       const packageName = requestIdentifier.name;
 
-      let manifest: PackageManifest | null = null;
+      let manifest: PackageManifest | null;
       try {
         manifest = await packageManager.getManifest(requestIdentifier);
       } catch (e) {

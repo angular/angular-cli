@@ -123,11 +123,7 @@ export async function resolveWorkspaceAndProject({
     try {
       workspace = await AngularWorkspace.load(configPath);
     } catch (e) {
-      throw new Error(
-        `Failed to load workspace configuration at ${configPath}: ${
-          e instanceof Error ? e.message : e
-        }`,
-      );
+      throw new Error(`Failed to load workspace configuration at ${configPath}`, { cause: e });
     }
   } else if (mcpWorkspace) {
     workspace = mcpWorkspace;
@@ -146,11 +142,7 @@ export async function resolveWorkspaceAndProject({
     try {
       workspace = await AngularWorkspace.load(configPath);
     } catch (e) {
-      throw new Error(
-        `Failed to load workspace configuration at ${configPath}: ${
-          e instanceof Error ? e.message : e
-        }`,
-      );
+      throw new Error(`Failed to load workspace configuration at ${configPath}.`, { cause: e });
     }
   }
 

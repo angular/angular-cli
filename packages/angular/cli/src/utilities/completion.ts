@@ -244,7 +244,7 @@ export async function initializeAutocomplete(): Promise<string> {
     );
   } catch (err) {
     assertIsError(err);
-    throw new Error(`Failed to append autocompletion setup to \`${rcFile}\`:\n${err.message}`);
+    throw new Error(`Failed to append autocompletion setup to \`${rcFile}\`.`, { cause: err });
   }
 
   return rcFile;

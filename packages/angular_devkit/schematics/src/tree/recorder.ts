@@ -32,7 +32,7 @@ export class UpdateRecorderBase implements UpdateRecorder {
       text = new TextDecoder(encoding, { fatal: true, ignoreBOM: false }).decode(data);
     } catch (e) {
       if (e instanceof TypeError) {
-        throw new Error(`Failed to decode "${path}" as ${encoding} text.`);
+        throw new Error(`Failed to decode "${path}" as ${encoding} text.`, { cause: e });
       }
 
       throw e;

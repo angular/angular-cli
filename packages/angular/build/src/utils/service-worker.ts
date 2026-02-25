@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type {
-  Config,
-  Filesystem,
-} from '@angular/service-worker/config' with { 'resolution-mode': 'import' };
+import type { Config, Filesystem } from '@angular/service-worker/config' with {
+  'resolution-mode': 'import',
+};
 import * as crypto from 'node:crypto';
 import { existsSync, promises as fsPromises } from 'node:fs';
 import * as path from 'node:path';
@@ -149,6 +148,7 @@ export async function augmentAppWithServiceWorker(
         'Error: Expected to find an ngsw-config.json configuration file' +
           ` in the ${appRoot} folder. Either provide one or` +
           ' disable Service Worker in the angular.json configuration file.',
+        { cause: error },
       );
     } else {
       throw error;
@@ -200,7 +200,7 @@ export async function augmentAppWithServiceWorkerEsbuild(
         workspaceRoot,
         configPath,
       )}" could not be found.`;
-      throw new Error(message);
+      throw new Error(message, { cause: error });
     } else {
       throw error;
     }

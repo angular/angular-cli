@@ -313,7 +313,7 @@ export class HostTree implements Tree {
         e instanceof TypeError ||
         (e as NodeJS.ErrnoException).code === 'ERR_ENCODING_INVALID_ENCODED_DATA'
       ) {
-        throw new Error(`Failed to decode "${path}" as UTF-8 text.`);
+        throw new Error(`Failed to decode "${path}" as UTF-8 text.`, { cause: e });
       }
       throw e;
     }

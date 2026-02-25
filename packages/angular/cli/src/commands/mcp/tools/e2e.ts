@@ -58,7 +58,7 @@ export async function runE2e(input: E2eToolInput, host: Host, context: McpToolCo
   const args = ['e2e', projectName];
 
   let status: E2eStatus = 'success';
-  let logs: string[] = [];
+  let logs: string[];
 
   try {
     logs = (await host.runCommand('ng', args, { cwd: workspacePath })).logs;

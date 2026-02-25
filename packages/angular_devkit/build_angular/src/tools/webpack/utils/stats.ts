@@ -75,7 +75,6 @@ function statsToString(
   const w = (x: string) => (colors ? ansiColors.bold.white(x) : x);
 
   const changedChunksStats: BundleStats[] = [];
-  let unchangedChunkNumber = 0;
   let hasEstimatedTransferSizes = false;
 
   const isFirstRun = !runsCache.has(json.outputPath || '');
@@ -109,7 +108,7 @@ function statsToString(
     }
     changedChunksStats.push(generateBundleStats({ ...chunk, rawSize, estimatedTransferSize }));
   }
-  unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
+  const unchangedChunkNumber = json.chunks.length - changedChunksStats.length;
 
   runsCache.add(json.outputPath || '');
 

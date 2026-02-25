@@ -168,7 +168,6 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
       throw new SchematicsException(`Cannot find "${configFilePath}".`);
     }
 
-    let recorder = host.beginUpdate(configFilePath);
     const configSourceFile = getSourceFile(host, configFilePath);
     const functionCall = findNodes(
       configSourceFile,
@@ -185,7 +184,7 @@ function addServerRoutingConfig(options: AppShellOptions, isStandalone: boolean)
       );
     }
 
-    recorder = host.beginUpdate(configFilePath);
+    const recorder = host.beginUpdate(configFilePath);
     recorder.insertLeft(functionCall.end - 1, `, withAppShell(AppShell)`);
 
     applyToUpdateRecorder(recorder, [

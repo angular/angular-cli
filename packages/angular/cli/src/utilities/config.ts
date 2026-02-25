@@ -207,10 +207,7 @@ export async function getWorkspace(
 
     return workspace;
   } catch (error) {
-    throw new Error(
-      `Workspace config file cannot be loaded: ${configPath}` +
-        `\n${error instanceof Error ? error.message : error}`,
-    );
+    throw new Error(`Workspace config file cannot be loaded: ${configPath}`, { cause: error });
   }
 }
 

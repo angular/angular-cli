@@ -185,6 +185,7 @@ export class VitestExecutor implements TestExecutor {
       }
       throw new Error(
         'The `vitest` package was not found. Please install the package and rerun the test command.',
+        { cause: error },
       );
     }
     const { startVitest } = vitestNodeModule;

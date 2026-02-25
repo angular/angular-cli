@@ -261,7 +261,7 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
   }
 
   const sourceRoot = join(normalize(projectRoot), 'src');
-  let budgets: { type: string; maximumWarning: string; maximumError: string }[] = [];
+  let budgets: { type: string; maximumWarning: string; maximumError: string }[];
   if (options.strict) {
     budgets = [
       {

@@ -47,6 +47,9 @@ function loadFSWatcher() {
         throw new Error(
           'As of angular-devkit version 8.0, the "chokidar" package ' +
             'must be installed in order to use watch() features.',
+          {
+            cause: e,
+          },
         );
       }
       throw e;

@@ -198,6 +198,7 @@ async function checkForEsbuild(
     // If we can't find a development builder, we can't use 'detect'.
     throw new Error(
       'Failed to detect the builder used by the application. Please set builderMode explicitly.',
+      { cause: e },
     );
   }
 }

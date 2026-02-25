@@ -14,8 +14,11 @@ import { Readwrite } from './types';
 /**
  * A JobDispatcher can be used to dispatch between multiple jobs.
  */
-export interface JobDispatcher<A extends JsonValue, I extends JsonValue, O extends JsonValue>
-  extends JobHandler<A, I, O> {
+export interface JobDispatcher<
+  A extends JsonValue,
+  I extends JsonValue,
+  O extends JsonValue,
+> extends JobHandler<A, I, O> {
   /**
    * Set the default job if all conditionals failed.
    * @param name The default name if all conditions are false.
@@ -43,7 +46,7 @@ export function createDispatcher<A extends JsonValue, I extends JsonValue, O ext
   const job: JobHandler<JsonValue, JsonValue, JsonValue> = Object.assign(
     (argument: JsonValue, context: JobHandlerContext) => {
       const maybeDelegate = conditionalDelegateList.find(([predicate]) => predicate(argument));
-      let delegate: Job<JsonValue, JsonValue, JsonValue> | null = null;
+      let delegate: Job<JsonValue, JsonValue, JsonValue>;
 
       if (maybeDelegate) {
         delegate = context.scheduler.schedule(maybeDelegate[1], argument);
