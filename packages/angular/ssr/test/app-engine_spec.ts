@@ -290,140 +290,87 @@ describe('AngularAppEngine', () => {
   describe('Invalid host headers', () => {
     let consoleErrorSpy: jasmine.Spy;
 
-    describe('with allowed hosts configured', () => {
-      beforeAll(() => {
-        setAngularAppEngineManifest({
-          allowedHosts: ['example.com'],
-          entryPoints: {
-            '': async () => {
-              setAngularAppTestingManifest(
-                [{ path: 'home', component: TestHomeComponent }],
-                [{ path: '**', renderMode: RenderMode.Server }],
-              );
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: TestHomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
 
-              return {
-                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
-                ɵdestroyAngularServerApp: destroyAngularServerApp,
-              };
-            },
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
           },
-          basePath: '/',
-          supportedLocales: { 'en-US': '' },
-        });
-
-        appEngine = new AngularAppEngine();
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
       });
 
-      beforeEach(() => {
-        consoleErrorSpy = spyOn(console, 'error');
-      });
-
-      it('should return 400 when disallowed host', async () => {
-        const request = new Request('https://evil.com');
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(response?.status).toBe(400);
-        expect(await response?.text()).toContain('URL with hostname "evil.com" is not allowed.');
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('URL with hostname "evil.com" is not allowed.'),
-        );
-      });
-
-      it('should return 400 when disallowed host header', async () => {
-        const request = new Request('https://example.com/home', {
-          headers: { 'host': 'evil.com' },
-        });
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(response?.status).toBe(400);
-        expect(await response?.text()).toContain(
-          'Header "host" with value "evil.com" is not allowed.',
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
-        );
-      });
-
-      it('should return 400 when disallowed x-forwarded-host header', async () => {
-        const request = new Request('https://example.com/home', {
-          headers: { 'x-forwarded-host': 'evil.com' },
-        });
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(response?.status).toBe(400);
-        expect(await response?.text()).toContain(
-          'Header "x-forwarded-host" with value "evil.com" is not allowed.',
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "x-forwarded-host" with value "evil.com" is not allowed.'),
-        );
-      });
-
-      it('should return 400 when host with path separator', async () => {
-        const request = new Request('https://example.com/home', {
-          headers: { 'host': 'example.com/evil' },
-        });
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(response?.status).toBe(400);
-        expect(await response?.text()).toContain(
-          'Header "host" contains characters that are not allowed.',
-        );
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
-        );
-      });
+      appEngine = new AngularAppEngine();
     });
 
-    describe('without allowed hosts configured', () => {
-      beforeAll(() => {
-        setAngularAppEngineManifest({
-          allowedHosts: [],
-          entryPoints: {
-            '': async () => {
-              setAngularAppTestingManifest(
-                [{ path: 'home', component: TestHomeComponent }],
-                [{ path: '**', renderMode: RenderMode.Server }],
-              );
+    beforeEach(() => {
+      consoleErrorSpy = spyOn(console, 'error');
+    });
 
-              return {
-                ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
-                ɵdestroyAngularServerApp: destroyAngularServerApp,
-              };
-            },
-          },
-          basePath: '/',
-          supportedLocales: { 'en-US': '' },
-        });
+    it('should return 400 when disallowed host', async () => {
+      const request = new Request('https://evil.com');
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain('URL with hostname "evil.com" is not allowed.');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('URL with hostname "evil.com" is not allowed.'),
+      );
+    });
 
-        appEngine = new AngularAppEngine();
+    it('should return 400 when disallowed host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'evil.com' },
       });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" with value "evil.com" is not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+      );
+    });
 
-      beforeEach(() => {
-        consoleErrorSpy = spyOn(console, 'error');
+    it('should return 400 when disallowed x-forwarded-host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'x-forwarded-host': 'evil.com' },
       });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "x-forwarded-host" with value "evil.com" is not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "x-forwarded-host" with value "evil.com" is not allowed.'),
+      );
+    });
 
-      it('should log error and fallback to CSR when disallowed host', async () => {
-        const request = new Request('https://example.com');
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(await response?.text()).toContain('<title>CSR page</title>');
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('URL with hostname "example.com" is not allowed.'),
-        );
+    it('should return 400 when host with path separator', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'example.com/evil' },
       });
-
-      it('should log error and fallback to CSR when host with path separator', async () => {
-        const request = new Request('https://example.com/home', {
-          headers: { 'host': 'example.com/evil' },
-        });
-        const response = await appEngine.handle(request);
-        expect(response).not.toBeNull();
-        expect(await response?.text()).toContain('<title>CSR page</title>');
-        expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
-        );
-      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" contains characters that are not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
+      );
     });
   });
 });

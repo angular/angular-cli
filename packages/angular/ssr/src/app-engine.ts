@@ -95,8 +95,8 @@ export class AngularAppEngine {
    * @remarks
    * To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname
    * of the `request.url` against a list of authorized hosts.
-   * If the hostname is not recognized and `allowedHosts` is not empty, a Client-Side Rendered (CSR) version of the
-   * page is returned otherwise a 400 Bad Request is returned.
+   * If the hostname is not recognized a 400 Bad Request is returned.
+   *
    * Resolution:
    * Authorize your hostname by configuring `allowedHosts` in `angular.json` in:
    * `projects.[project-name].architect.build.options.security.allowedHosts`.
@@ -110,7 +110,7 @@ export class AngularAppEngine {
     try {
       validateRequest(request, allowedHost);
     } catch (error) {
-      return this.handleValidationError(error as Error, request);
+      return this.handleValidationError(request.url, error as Error);
     }
 
     // Clone request with patched headers to prevent unallowed host header access.
@@ -120,7 +120,9 @@ export class AngularAppEngine {
     const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
       return Promise.race([
-        onHeaderValidationError.then((error) => this.handleValidationError(error, securedRequest)),
+        onHeaderValidationError.then((error) =>
+          this.handleValidationError(securedRequest.url, error),
+        ),
         serverApp.handle(securedRequest, requestContext),
       ]);
     }
@@ -255,38 +257,23 @@ export class AngularAppEngine {
   /**
    * Handles validation errors by logging the error and returning an appropriate response.
    *
+   * @param url - The URL of the request.
    * @param error - The validation error to handle.
-   * @param request - The HTTP request that caused the validation error.
-   * @returns A promise that resolves to a `Response` object with a 400 status code if allowed hosts are configured,
-   * or `null` if allowed hosts are not configured (in which case the request is served client-side).
+   * @returns A `Response` object with a 400 status code.
    */
-  private async handleValidationError(error: Error, request: Request): Promise<Response | null> {
-    const isAllowedHostConfigured = this.allowedHosts.size > 0;
+  private handleValidationError(url: string, error: Error): Response {
     const errorMessage = error.message;
-
     // eslint-disable-next-line no-console
     console.error(
-      `ERROR: Bad Request ("${request.url}").\n` +
+      `ERROR: Bad Request ("${url}").\n` +
         errorMessage +
-        (isAllowedHostConfigured
-          ? ''
-          : '\nFalling back to client side rendering. This will become a 400 Bad Request in a future major version.') +
         '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
     );
 
-    if (isAllowedHostConfigured) {
-      // Allowed hosts has been configured incorrectly, thus we can return a 400 bad request.
-      return new Response(errorMessage, {
-        status: 400,
-        statusText: 'Bad Request',
-        headers: { 'Content-Type': 'text/plain' },
-      });
-    }
-
-    // Fallback to CSR to avoid a breaking change.
-    // TODO(alanagius): Return a 400 and remove this fallback in the next major version (v22).
-    const serverApp = await this.getAngularServerAppForRequest(request);
-
-    return serverApp?.serveClientSidePage() ?? null;
+    return new Response(errorMessage, {
+      status: 400,
+      statusText: 'Bad Request',
+      headers: { 'Content-Type': 'text/plain' },
+    });
   }
 }

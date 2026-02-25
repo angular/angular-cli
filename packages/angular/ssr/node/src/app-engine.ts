@@ -60,8 +60,7 @@ export class AngularNodeAppEngine {
    * @remarks
    * To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname
    * of the `request.url` against a list of authorized hosts.
-   * If the hostname is not recognized and `allowedHosts` is not empty, a Client-Side Rendered (CSR) version of the
-   * page is returned otherwise a 400 Bad Request is returned.
+   * If the hostname is not recognized a 400 Bad Request is returned.
    *
    * Resolution:
    * Authorize your hostname by configuring `allowedHosts` in `angular.json` in:

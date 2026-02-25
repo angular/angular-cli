@@ -484,27 +484,6 @@ export class AngularServerApp {
 
     return html;
   }
-
-  /**
-   * Serves the client-side version of the application.
-   * TODO(alanagius): Remove this method in version 22.
-   * @internal
-   */
-  async serveClientSidePage(): Promise<Response> {
-    const {
-      manifest: { locale },
-      assets,
-    } = this;
-
-    const html = await assets.getServerAsset('index.csr.html').text();
-
-    return new Response(html, {
-      headers: new Headers({
-        'Content-Type': 'text/html;charset=UTF-8',
-        ...(locale !== undefined ? { 'Content-Language': locale } : {}),
-      }),
-    });
-  }
 }
 
 let angularServerApp: AngularServerApp | undefined;
