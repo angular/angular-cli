@@ -66,7 +66,6 @@
   },
   "devDependencies": {
     "@angular/ssr": "workspace:*",
-    "@web/test-runner": "0.20.2",
     "browser-sync": "3.0.4",
     "ng-packagr": "21.2.0-next.0",
     "undici": "7.22.0"
@@ -79,10 +78,7 @@
     "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
-    "@web/test-runner": "^0.20.0",
     "browser-sync": "^3.0.2",
-    "jest": "^30.2.0",
-    "jest-environment-jsdom": "^30.2.0",
     "karma": "^6.3.0",
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "protractor": "^7.0.0",
@@ -108,16 +104,7 @@
     "@angular/ssr": {
       "optional": true
     },
-    "@web/test-runner": {
-      "optional": true
-    },
     "browser-sync": {
-      "optional": true
-    },
-    "jest": {
-      "optional": true
-    },
-    "jest-environment-jsdom": {
       "optional": true
     },
     "karma": {

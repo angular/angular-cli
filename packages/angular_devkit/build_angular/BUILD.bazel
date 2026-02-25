@@ -40,11 +40,6 @@ ts_json_schema(
 )
 
 ts_json_schema(
-    name = "jest_schema",
-    src = "src/builders/jest/schema.json",
-)
-
-ts_json_schema(
     name = "karma_schema",
     src = "src/builders/karma/schema.json",
 )
@@ -74,11 +69,6 @@ ts_json_schema(
     src = "src/builders/prerender/schema.json",
 )
 
-ts_json_schema(
-    name = "web_test_runner_schema",
-    src = "src/builders/web-test-runner/schema.json",
-)
-
 copy_to_bin(
     name = "schemas",
     srcs = glob(["**/schema.json"]),
@@ -88,7 +78,6 @@ RUNTIME_ASSETS = glob(
     include = [
         "src/**/schema.json",
         "src/**/*.js",
-        "src/**/*.mjs",
         "src/**/*.html",
     ],
 ) + [
@@ -117,14 +106,12 @@ ts_project(
         "//packages/angular_devkit/build_angular:src/builders/browser/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/dev-server/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/extract-i18n/schema.ts",
-        "//packages/angular_devkit/build_angular:src/builders/jest/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/karma/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/ng-packagr/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/prerender/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/protractor/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/server/schema.ts",
         "//packages/angular_devkit/build_angular:src/builders/ssr-dev-server/schema.ts",
-        "//packages/angular_devkit/build_angular:src/builders/web-test-runner/schema.ts",
     ],
     data = RUNTIME_ASSETS,
     deps = [
@@ -145,7 +132,6 @@ ts_project(
         ":node_modules/@babel/runtime",
         ":node_modules/@discoveryjs/json-ext",
         ":node_modules/@ngtools/webpack",
-        ":node_modules/@web/test-runner",
         ":node_modules/ansi-colors",
         ":node_modules/autoprefixer",
         ":node_modules/babel-loader",
