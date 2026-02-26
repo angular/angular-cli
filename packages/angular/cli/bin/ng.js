@@ -42,7 +42,7 @@ if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completi
 // This node version check ensures that extremely old versions of node are not used.
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
-const [major, minor] = process.versions.node.split('.', 2).map((part) => Number(part));
+const [major, minor, patch] = process.versions.node.split('.', 3).map((part) => Number(part));
 
 if (major % 2 === 1) {
   // Allow new odd numbered releases with a warning (currently v17+)
@@ -55,13 +55,17 @@ if (major % 2 === 1) {
   );
 
   require('./bootstrap');
-} else if (major < 20 || (major === 20 && minor < 19) || (major === 22 && minor < 12)) {
-  // Error and exit if less than 20.19 or 22.12
+} else if (
+  major < 22 ||
+  (major === 22 && minor < 22) ||
+  (major === 24 && minor < 13 && patch < 1)
+) {
+  // Error and exit if less than 22.22 or 24.13.1
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of v20.19 or v22.12.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of v22.22 or v24.13.1.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 
