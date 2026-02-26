@@ -47,8 +47,8 @@ importers:
         specifier: 21.2.0-rc.0
         version: 21.2.0-rc.0(4ac7caab525408b0a8d5509a5a82c8db)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#99c925a35a7decb22cb0dc7b5fb83b2f41876179
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/99c925a35a7decb22cb0dc7b5fb83b2f41876179(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#32f536bae2ff587a75b3ec6be9f730011ae91e18
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/32f536bae2ff587a75b3ec6be9f730011ae91e18(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.0-rc.0
         version: 21.2.0-rc.0(@angular/animations@21.2.0-rc.0(@angular/core@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.0)))(@angular/common@21.2.0-rc.0(@angular/core@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.0))(rxjs@7.8.2))(@angular/core@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.0))
@@ -423,8 +423,8 @@ importers:
         specifier: 4.4.2
         version: 4.4.2
       ng-packagr:
-        specifier: 21.2.0-next.0
-        version: 21.2.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        specifier: 22.0.0-next.0
+        version: 22.0.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -729,8 +729,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 21.2.0-next.0
-        version: 21.2.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        specifier: 22.0.0-next.0
+        version: 22.0.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
       undici:
         specifier: 7.22.0
         version: 7.22.0
@@ -1014,9 +1014,9 @@ packages:
       '@angular/platform-browser': ^21.0.0-0 || ^21.1.0-0 || ^21.2.0-0 || ^21.3.0-0 || ^22.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/99c925a35a7decb22cb0dc7b5fb83b2f41876179':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/99c925a35a7decb22cb0dc7b5fb83b2f41876179}
-    version: 0.0.0-c69b5bccf6661668b2c160f63c02b42f4f400d5a
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/32f536bae2ff587a75b3ec6be9f730011ae91e18':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/32f536bae2ff587a75b3ec6be9f730011ae91e18}
+    version: 0.0.0-16c5f6e199e3e1b67ae5a62385d36366bb9a429d
     hasBin: true
 
   '@angular/platform-browser@21.2.0-rc.0':
@@ -6745,15 +6745,15 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng-packagr@21.2.0-next.0:
-    resolution: {integrity: sha512-BkRAqx1ZljIYpBbjDi/+3y8AMo9S19vm8zx3YWpqMAaIpDb7cvsT+Une9b4oyEK/7p+XvWw+LaPVleTAQtQEMQ==}
-    engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+  ng-packagr@22.0.0-next.0:
+    resolution: {integrity: sha512-AHq15yteBa2u/8OQYLlbD+gaHDfKSz9wfIsCKi/3UOX1BwJXQSXDSnSSAZh0etAw21XxxXTkbEy+2uNj7Ss+Jw==}
+    engines: {node: ^22.22.0 || >=24.13.1}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': ^21.0.0 || ^21.1.0-next || ^21.2.0-next
+      '@angular/compiler-cli': ^22.0.0-next
       tailwindcss: ^2.0.0 || ^3.0.0 || ^4.0.0
       tslib: ^2.3.0
-      typescript: '>=5.9 <6.0'
+      typescript: '>=5.9 <6.1'
     peerDependenciesMeta:
       tailwindcss:
         optional: true
@@ -9004,7 +9004,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/99c925a35a7decb22cb0dc7b5fb83b2f41876179(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/32f536bae2ff587a75b3ec6be9f730011ae91e18(@modelcontextprotocol/sdk@1.27.1(zod@4.3.6))':
     dependencies:
       '@actions/core': 3.0.0
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -11362,12 +11362,6 @@ snapshots:
     optionalDependencies:
       rollup: 4.59.0
 
-  '@rollup/plugin-json@6.1.0(rollup@4.57.1)':
-    dependencies:
-      '@rollup/pluginutils': 5.3.0(rollup@4.57.1)
-    optionalDependencies:
-      rollup: 4.57.1
-
   '@rollup/plugin-json@6.1.0(rollup@4.59.0)':
     dependencies:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
@@ -11383,14 +11377,6 @@ snapshots:
       resolve: 1.22.11
     optionalDependencies:
       rollup: 4.59.0
-
-  '@rollup/pluginutils@5.3.0(rollup@4.57.1)':
-    dependencies:
-      '@types/estree': 1.0.8
-      estree-walker: 2.0.2
-      picomatch: 4.0.3
-    optionalDependencies:
-      rollup: 4.57.1
 
   '@rollup/pluginutils@5.3.0(rollup@4.59.0)':
     dependencies:
@@ -14233,7 +14219,7 @@ snapshots:
       fs.realpath: 1.0.0
       inflight: 1.0.6
       inherits: 2.0.4
-      minimatch: 3.1.2
+      minimatch: 3.1.4
       once: 1.4.0
       path-is-absolute: 1.0.1
 
@@ -15495,11 +15481,11 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng-packagr@21.2.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
+  ng-packagr@22.0.0-next.0(@angular/compiler-cli@21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 21.2.0-rc.0(@angular/compiler@21.2.0-rc.0)(typescript@5.9.3)
-      '@rollup/plugin-json': 6.1.0(rollup@4.57.1)
+      '@rollup/plugin-json': 6.1.0(rollup@4.59.0)
       '@rollup/wasm-node': 4.57.1
       ajv: 8.18.0
       ansi-colors: 4.1.3
@@ -15515,14 +15501,14 @@ snapshots:
       ora: 9.3.0
       piscina: 5.1.4
       postcss: 8.5.6
-      rollup-plugin-dts: 6.3.0(rollup@4.57.1)(typescript@5.9.3)
+      rollup-plugin-dts: 6.3.0(rollup@4.59.0)(typescript@5.9.3)
       rxjs: 7.8.2
       sass: 1.97.3
       tinyglobby: 0.2.15
       tslib: 2.8.1
       typescript: 5.9.3
     optionalDependencies:
-      rollup: 4.57.1
+      rollup: 4.59.0
 
   nock@14.0.11:
     dependencies:
@@ -16413,14 +16399,6 @@ snapshots:
       node-fetch: 3.3.2
       semver: 7.7.4
       spdx-expression-validate: 2.0.0
-
-  rollup-plugin-dts@6.3.0(rollup@4.57.1)(typescript@5.9.3):
-    dependencies:
-      magic-string: 0.30.21
-      rollup: 4.57.1
-      typescript: 5.9.3
-    optionalDependencies:
-      '@babel/code-frame': 7.29.0
 
   rollup-plugin-dts@6.3.0(rollup@4.59.0)(typescript@5.9.3):
     dependencies:
