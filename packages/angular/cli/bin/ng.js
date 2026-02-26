@@ -12,6 +12,7 @@
 'use strict';
 
 const path = require('path');
+const nodeUtils = require('../src/utilities/node-version');
 
 // Error if the external CLI appears to be used inside a google3 context.
 if (process.cwd().split(path.sep).includes('google3')) {
@@ -42,10 +43,10 @@ if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completi
 // This node version check ensures that extremely old versions of node are not used.
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
-const [major, minor, patch] = process.versions.node.split('.', 3).map((part) => Number(part));
+const [major] = process.versions.node.split('.', 1).map((part) => Number(part));
 
 if (major % 2 === 1) {
-  // Allow new odd numbered releases with a warning (currently v17+)
+  // Allow new odd numbered releases with a warning.
   console.warn(
     'Node.js version ' +
       process.version +
@@ -55,17 +56,15 @@ if (major % 2 === 1) {
   );
 
   require('./bootstrap');
-} else if (
-  major < 22 ||
-  (major === 22 && minor < 22) ||
-  (major === 24 && minor < 13 && patch < 1)
-) {
+} else if (!nodeUtils.isNodeVersionSupported()) {
   // Error and exit if less than 22.22 or 24.13.1
   console.error(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'The Angular CLI requires a minimum Node.js version of v22.22 or v24.13.1.\n\n' +
+      'The Angular CLI requires a minimum Node.js version of ' +
+      nodeUtils.supportedNodeVersions.map((v) => 'v' + v).join(' or ') +
+      '.\n\n' +
       'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
   );
 

@@ -172,6 +172,7 @@ npm_package(
     ],
     stamp_files = [
         "src/utilities/version.js",
+        "src/utilities/node-version.js",
     ],
     tags = ["release-package"],
     deps = RUNTIME_ASSETS + [

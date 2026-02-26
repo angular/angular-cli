@@ -8,7 +8,7 @@
 
 import { createRequire } from 'node:module';
 import { CommandContext } from '../../command-builder/definitions';
-import { PackageManager } from '../../package-managers';
+import { isNodeVersionSupported } from '../../utilities/node-version';
 import { VERSION } from '../../utilities/version';
 
 /**
@@ -57,12 +57,6 @@ export interface VersionInfo {
 }
 
 /**
- * Major versions of Node.js that are officially supported by Angular.
- * @see https://angular.dev/reference/versions#supported-node-js-versions
- */
-const SUPPORTED_NODE_MAJORS = [22, 24];
-
-/**
  * A list of regular expression patterns that match package names that should be included in the
  * version output.
  */
@@ -92,9 +86,6 @@ export async function gatherVersionInfo(context: CommandContext): Promise<Versio
     workspacePackage = workspaceRequire('./package.json');
   } catch {}
 
-  const [nodeMajor] = process.versions.node.split('.').map((part) => Number(part));
-  const unsupportedNodeVersion = !SUPPORTED_NODE_MAJORS.includes(nodeMajor);
-
   const allDependencies = {
     ...workspacePackage?.dependencies,
     ...workspacePackage?.devDependencies,
@@ -123,7 +114,7 @@ export async function gatherVersionInfo(context: CommandContext): Promise<Versio
     system: {
       node: {
         version: process.versions.node,
-        unsupported: unsupportedNodeVersion,
+        unsupported: !isNodeVersionSupported(),
       },
       os: {
         platform: process.platform,

@@ -13,22 +13,18 @@ import { runCommand } from '../../src/command-builder/command-runner';
 import { colors, supportColor } from '../../src/utilities/color';
 import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
+import { isNodeVersionMinSupported, supportedNodeVersions } from '../../src/utilities/node-version';
 
 export { VERSION } from '../../src/utilities/version';
-
-const MIN_NODEJS_VERSION = [22, 22] as const;
 
 /* eslint-disable no-console */
 export default async function (options: { cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
-  const [major, minor] = process.versions.node.split('.').map((part) => Number(part));
-  if (
-    major < MIN_NODEJS_VERSION[0] ||
-    (major === MIN_NODEJS_VERSION[0] && minor < MIN_NODEJS_VERSION[1])
-  ) {
+
+  if (!isNodeVersionMinSupported()) {
     process.stderr.write(
       `Node.js version ${process.version} detected.\n` +
-        `The Angular CLI requires a minimum of v${MIN_NODEJS_VERSION[0]}.${MIN_NODEJS_VERSION[1]}.\n\n` +
+        `The Angular CLI requires a minimum of v${supportedNodeVersions[0]}.\n\n` +
         'Please update your Node.js version or visit https://nodejs.org/ for additional instructions.\n',
     );
 
