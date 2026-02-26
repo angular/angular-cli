@@ -9,7 +9,7 @@
 import { JsonObject, schema } from '@angular-devkit/core';
 import yargs from 'yargs';
 
-import { addSchemaOptionsToCommand, parseJsonSchemaToOptions } from './json-schema';
+import { Option, addSchemaOptionsToCommand, parseJsonSchemaToOptions } from './json-schema';
 
 describe('parseJsonSchemaToOptions', () => {
   describe('without required fields in schema', () => {
@@ -21,10 +21,9 @@ describe('parseJsonSchemaToOptions', () => {
     };
 
     let localYargs: yargs.Argv<unknown>;
-    beforeEach(async () => {
-      // Create a fresh yargs for each call. The yargs object is stateful and
-      // calling .parse multiple times on the same instance isn't safe.
-      localYargs = yargs().exitProcess(false).strict().fail(false).wrap(1_000);
+    let options: Option[];
+
+    beforeAll(async () => {
       const jsonSchema = {
         'type': 'object',
         'properties': {
@@ -118,12 +117,20 @@ describe('parseJsonSchemaToOptions', () => {
           },
         },
       };
+
       const registry = new schema.CoreSchemaRegistry();
-      const options = await parseJsonSchemaToOptions(
+      options = await parseJsonSchemaToOptions(
         registry,
         jsonSchema as unknown as JsonObject,
         false,
       );
+    });
+
+    beforeEach(async () => {
+      // Create a fresh yargs for each call. The yargs object is stateful and
+      // calling .parse multiple times on the same instance isn't safe.
+      localYargs = yargs().exitProcess(false).strict().fail(false).wrap(1_000);
+
       addSchemaOptionsToCommand(localYargs, options, true);
     });
 
