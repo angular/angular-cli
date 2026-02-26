@@ -139,9 +139,7 @@ describe('parseJsonSchemaToOptions', () => {
 
     describe('type=array, enum', () => {
       it('parses valid option value', async () => {
-        expect(
-          await parse(['--arrayWithChoices', 'always', '--arrayWithChoices', 'never']),
-        ).toEqual(
+        expect(await parse(['--arrayWithChoices', 'always', 'never'])).toEqual(
           jasmine.objectContaining({
             'arrayWithChoices': ['always', 'never'],
           }),
@@ -161,14 +159,7 @@ describe('parseJsonSchemaToOptions', () => {
 
     describe('type=array, enum in oneOf', () => {
       it('parses valid option value', async () => {
-        expect(
-          await parse([
-            '--arrayWithChoicesInOneOf',
-            'default',
-            '--arrayWithChoicesInOneOf',
-            'verbose',
-          ]),
-        ).toEqual(
+        expect(await parse(['--arrayWithChoicesInOneOf', 'default', 'verbose'])).toEqual(
           jasmine.objectContaining({
             'arrayWithChoicesInOneOf': ['default', 'verbose'],
           }),
@@ -184,14 +175,7 @@ describe('parseJsonSchemaToOptions', () => {
 
     describe('type=array, anyOf', () => {
       it('parses valid option value', async () => {
-        expect(
-          await parse([
-            '--arrayWithComplexAnyOf',
-            'default',
-            '--arrayWithComplexAnyOf',
-            'something-else',
-          ]),
-        ).toEqual(
+        expect(await parse(['--arrayWithComplexAnyOf', 'default', 'something-else'])).toEqual(
           jasmine.objectContaining({
             'arrayWithComplexAnyOf': ['default', 'something-else'],
           }),
