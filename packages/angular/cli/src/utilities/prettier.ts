@@ -44,7 +44,7 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
 
   await execFileAsync(
     process.execPath,
-    [prettierCliPath, '--write', '--no-error-on-unmatched-pattern', ...files],
+    [prettierCliPath, '--write', '--no-error-on-unmatched-pattern', '--ignore-unknown', ...files],
     {
       cwd,
       shell: false,
