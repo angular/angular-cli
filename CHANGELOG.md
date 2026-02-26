@@ -1,3 +1,21 @@
+<a name="20.3.18"></a>
+
+# 20.3.18 (2026-02-26)
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------ |
+| [39596d529](https://github.com/angular/angular-cli/commit/39596d529f831f72a2134bc3c9ac163867ff5702) | fix  | update `ajv` to `8.18.0` |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [f668e2778](https://github.com/angular/angular-cli/commit/f668e2778c4c4dbecc8a1c6831c092f5512d1ec1) | fix  | update rollup to 4.59.0 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.17"></a>
 
 # 20.3.17 (2026-02-23)
