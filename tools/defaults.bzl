@@ -65,9 +65,22 @@ def jasmine_test(data = [], args = [], **kwargs):
     # we change the `chdir` below to the package directory.
     relative_to_root = "/".join([".."] * len(native.package_name().split("/")))
 
+    # Chromium browser toolchain
+    env = kwargs.pop("env", {})
+    env.update({
+        "CHROME_BIN": "$(CHROME-HEADLESS-SHELL)",
+        "CHROME_PATH": "$(CHROME-HEADLESS-SHELL)",
+        "CHROMEDRIVER_BIN": "$(CHROMEDRIVER)",
+    })
+    toolchains = kwargs.pop("toolchains", [])
+    toolchains = toolchains + ["@rules_browsers//browsers/chromium:toolchain_alias"]
+    data = data + ["@rules_browsers//browsers/chromium"]
+
     _jasmine_test(
         node_modules = "//:node_modules",
         chdir = native.package_name(),
+        env = env,
+        toolchains = toolchains,
         args = [
             "--require=%s/node_modules/source-map-support/register.js" % relative_to_root,
             # Escape so that the `js_binary` launcher triggers Bash expansion.

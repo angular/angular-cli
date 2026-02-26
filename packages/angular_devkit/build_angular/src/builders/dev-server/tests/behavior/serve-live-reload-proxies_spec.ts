@@ -9,6 +9,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { tags } from '@angular-devkit/core';
 import { createServer } from 'node:http';
+import path from 'node:path';
 import { createProxyServer } from 'http-proxy';
 import { AddressInfo } from 'node:net';
 import { setTimeout as setTimeoutPromise } from 'node:timers/promises';
@@ -156,12 +157,10 @@ describeServeBuilder(
 
         beforeAll(async () => {
           browser = await puppeteer.launch({
-            // MacOSX users need to set the local binary manually because Chrome has lib files with
-            // spaces in them which Bazel does not support in runfiles
-            // See: https://github.com/angular/angular-cli/pull/17624
-            // eslint-disable-next-line max-len
-            // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-            ignoreHTTPSErrors: true,
+            executablePath: process.env.CHROME_BIN
+              ? path.resolve(path.join(process.cwd(), '..', '..', '..'), process.env.CHROME_BIN)
+              : undefined,
+            acceptInsecureCerts: true,
             args: ['--no-sandbox', '--disable-gpu'],
           });
         });

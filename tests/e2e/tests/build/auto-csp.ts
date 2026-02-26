@@ -97,7 +97,7 @@ export default async function () {
     checkFn: async (page) => {
       const warnMessages: string[] = [];
       page.on('console', (msg) => {
-        if (msg.type() === 'warning') {
+        if (msg.type() === 'warn') {
           warnMessages.push(msg.text());
         }
       });

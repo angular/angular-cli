@@ -53,7 +53,7 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
         }
       });
       page.on('pageerror', (err) => {
-        errors.push(err.toString());
+        errors.push(`${err}`);
       });
 
       await page.goto(url);
