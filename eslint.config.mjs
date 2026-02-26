@@ -10,9 +10,9 @@ import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import stylistic from '@stylistic/eslint-plugin';
+import header from '@tony.ganchev/eslint-plugin-header';
 import typescriptEslint from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
-import header from '@tony.ganchev/eslint-plugin-header';
 import _import from 'eslint-plugin-import';
 import globals from 'globals';
 
@@ -24,7 +24,13 @@ const compat = new FlatCompat({
 
 export default [
   {
+    files: ['**/*.ts', '**/*.mts', '**/*.cts'],
+  },
+  {
     ignores: [
+      '**/*.js',
+      '**/*.mjs',
+      '**/*.cjs',
       '**/bazel-out',
       '**/dist-schema',
       'goldens/public-api',
