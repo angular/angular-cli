@@ -39,7 +39,7 @@ git_override(
 bazel_dep(name = "rules_browsers")
 git_override(
     module_name = "rules_browsers",
-    commit = "ceb52751831f3e6249aba83f688a612e57a8d14a",
+    commit = "8231142fc5516323b040883bf774ba8362645387",
     remote = "https://github.com/devversion/rules_browsers.git",
 )
 
