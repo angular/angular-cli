@@ -13,7 +13,6 @@
 
 /**
  * The supported Node.js version for the Angular CLI.
- * @type {[string, number]} The supported Node.js version.
  */
 
 const SUPPORTED_NODE_VERSIONS = '0.0.0-ENGINES-NODE';
