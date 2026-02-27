@@ -77,13 +77,19 @@ describe('Validation Utils', () => {
         },
       });
 
-      expect(() => validateRequest(req, allowedHosts)).not.toThrow();
+      expect(() => validateRequest(req, allowedHosts, false)).not.toThrow();
+    });
+
+    it('should pass for valid request when disableHostCheck is true', () => {
+      const req = new Request('http://evil.com');
+
+      expect(() => validateRequest(req, allowedHosts, true)).not.toThrow();
     });
 
     it('should throw if URL hostname is invalid', () => {
       const req = new Request('http://evil.com');
 
-      expect(() => validateRequest(req, allowedHosts)).toThrowError(
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         /URL with hostname "evil.com" is not allowed/,
       );
     });
@@ -93,7 +99,7 @@ describe('Validation Utils', () => {
         headers: { 'x-forwarded-port': 'abc' },
       });
 
-      expect(() => validateRequest(req, allowedHosts)).toThrowError(
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         'Header "x-forwarded-port" must be a numeric value.',
       );
     });
@@ -102,16 +108,32 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'x-forwarded-proto': 'ftp' },
       });
-      expect(() => validateRequest(req, allowedHosts)).toThrowError(
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         'Header "x-forwarded-proto" must be either "http" or "https".',
       );
+    });
+
+    it('should pass for valid x-forwarded-proto (case-insensitive)', () => {
+      const req = new Request('http://example.com', {
+        headers: { 'x-forwarded-proto': 'HTTP' },
+      });
+      expect(() => validateRequest(req, allowedHosts, false)).not.toThrow();
     });
 
     it('should throw if host contains path separators', () => {
       const req = new Request('http://example.com', {
         headers: { 'host': 'example.com/bad' },
       });
-      expect(() => validateRequest(req, allowedHosts)).toThrowError(
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        'Header "host" contains characters that are not allowed.',
+      );
+    });
+
+    it('should throw if host contains invalid characters', () => {
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'example.com?query=1' },
+      });
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         'Header "host" contains characters that are not allowed.',
       );
     });
@@ -120,7 +142,7 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'x-forwarded-host': 'example.com/bad' },
       });
-      expect(() => validateRequest(req, allowedHosts)).toThrowError(
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         'Header "x-forwarded-host" contains characters that are not allowed.',
       );
     });
@@ -135,7 +157,7 @@ describe('Validation Utils', () => {
           },
         });
 
-        expect(() => validateRequest(request, allowedHosts))
+        expect(() => validateRequest(request, allowedHosts, false))
           .withContext(`Prefix: "${prefix}"`)
           .toThrowError(
             'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
@@ -168,7 +190,7 @@ describe('Validation Utils', () => {
           },
         });
 
-        expect(() => validateRequest(request, allowedHosts))
+        expect(() => validateRequest(request, allowedHosts, false))
           .withContext(`Prefix: "${prefix}"`)
           .toThrowError(
             'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
@@ -186,7 +208,7 @@ describe('Validation Utils', () => {
           },
         });
 
-        expect(() => validateRequest(request, allowedHosts))
+        expect(() => validateRequest(request, allowedHosts, false))
           .withContext(`Prefix: "${prefix}"`)
           .not.toThrow();
       }

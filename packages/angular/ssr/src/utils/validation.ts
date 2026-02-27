@@ -56,11 +56,19 @@ export function getFirstHeaderValue(
  *
  * @param request - The incoming `Request` object to validate.
  * @param allowedHosts - A set of allowed hostnames.
+ * @param disableHostCheck - Whether to disable the host check.
  * @throws Error if any of the validated headers contain invalid values.
  */
-export function validateRequest(request: Request, allowedHosts: ReadonlySet<string>): void {
+export function validateRequest(
+  request: Request,
+  allowedHosts: ReadonlySet<string>,
+  disableHostCheck: boolean,
+): void {
   validateHeaders(request);
-  validateUrl(new URL(request.url), allowedHosts);
+
+  if (!disableHostCheck) {
+    validateUrl(new URL(request.url), allowedHosts);
+  }
 }
 
 /**
