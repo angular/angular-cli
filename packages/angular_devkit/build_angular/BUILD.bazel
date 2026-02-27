@@ -154,7 +154,6 @@ ts_project(
         ":node_modules/source-map-support",
         ":node_modules/terser",
         ":node_modules/tinyglobby",
-        ":node_modules/tree-kill",
         ":node_modules/webpack",
         ":node_modules/webpack-dev-middleware",
         ":node_modules/webpack-dev-server",

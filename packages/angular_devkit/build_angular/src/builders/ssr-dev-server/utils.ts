@@ -9,7 +9,6 @@
 import { SpawnOptions, spawn } from 'node:child_process';
 import { AddressInfo, createConnection, createServer } from 'node:net';
 import { Observable, mergeMap, retryWhen, throwError, timer } from 'rxjs';
-import treeKill from 'tree-kill';
 
 export function getAvailablePort(): Promise<number> {
   return new Promise((resolve, reject) => {
@@ -50,8 +49,8 @@ export function spawnAsObservable(
       });
 
     return () => {
-      if (!proc.killed && proc.pid) {
-        treeKill(proc.pid, 'SIGTERM');
+      if (!proc.killed) {
+        proc.kill();
       }
     };
   });
