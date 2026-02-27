@@ -137,6 +137,9 @@ export const NodeJS_HOST: Host = {
         env: {
           ...process.env,
           ...options.env,
+          //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
+          NO_UPDATE_NOTIFIER: '1',
+          NPM_CONFIG_UPDATE_NOTIFIER: 'false',
         },
       } satisfies SpawnOptions;
       const childProcess = isWin32
