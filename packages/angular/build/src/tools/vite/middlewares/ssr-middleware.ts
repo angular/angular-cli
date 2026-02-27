@@ -90,6 +90,10 @@ export async function createAngularSsrExternalMiddleware(
     '@angular/ssr/node' as string
   )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
 
+  // Disable host check if allowed hosts is true meaning allow all hosts.
+  const { allowedHosts } = server.config.server;
+  const disableAllowedHostsCheck = allowedHosts === true;
+
   return function angularSsrExternalMiddleware(
     req: Connect.IncomingMessage,
     res: ServerResponse,
@@ -123,6 +127,7 @@ export async function createAngularSsrExternalMiddleware(
       }
 
       if (cachedAngularAppEngine !== AngularAppEngine) {
+        AngularAppEngine.ɵdisableAllowedHostsCheck = disableAllowedHostsCheck;
         AngularAppEngine.ɵallowStaticRouteRender = true;
         AngularAppEngine.ɵhooks.on('html:transform:pre', async ({ html, url }) => {
           const processedHtml = await server.transformIndexHtml(url.pathname, html);

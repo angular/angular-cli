@@ -43,6 +43,15 @@ export class AngularAppEngine {
   static ɵallowStaticRouteRender = false;
 
   /**
+   * A flag to enable or disable the allowed hosts check.
+   *
+   * Typically used during development to avoid the allowed hosts check.
+   *
+   * @private
+   */
+  static ɵdisableAllowedHostsCheck = false;
+
+  /**
    * Hooks for extending or modifying the behavior of the server application.
    * These hooks are used by the Angular CLI when running the development server and
    * provide extensibility points for the application lifecycle.
@@ -106,25 +115,33 @@ export class AngularAppEngine {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const allowedHost = this.allowedHosts;
+    const disableAllowedHostsCheck = AngularAppEngine.ɵdisableAllowedHostsCheck;
 
     try {
-      validateRequest(request, allowedHost);
+      validateRequest(request, allowedHost, disableAllowedHostsCheck);
     } catch (error) {
       return this.handleValidationError(request.url, error as Error);
     }
 
     // Clone request with patched headers to prevent unallowed host header access.
-    const { request: securedRequest, onError: onHeaderValidationError } =
-      cloneRequestAndPatchHeaders(request, allowedHost);
+    const { request: securedRequest, onError: onHeaderValidationError } = disableAllowedHostsCheck
+      ? { request, onError: null }
+      : cloneRequestAndPatchHeaders(request, allowedHost);
 
     const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
-      return Promise.race([
-        onHeaderValidationError.then((error) =>
-          this.handleValidationError(securedRequest.url, error),
-        ),
-        serverApp.handle(securedRequest, requestContext),
-      ]);
+      const promises: Promise<Response | null>[] = [];
+      if (onHeaderValidationError) {
+        promises.push(
+          onHeaderValidationError.then((error) =>
+            this.handleValidationError(securedRequest.url, error),
+          ),
+        );
+      }
+
+      promises.push(serverApp.handle(securedRequest, requestContext));
+
+      return Promise.race(promises);
     }
 
     if (this.supportedLocales.length > 1) {

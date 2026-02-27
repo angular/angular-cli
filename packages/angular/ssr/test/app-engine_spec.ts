@@ -373,4 +373,61 @@ describe('AngularAppEngine', () => {
       );
     });
   });
+
+  describe('Disable host check', () => {
+    let consoleErrorSpy: jasmine.Spy;
+
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: TestHomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
+
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine();
+
+      AngularAppEngine.ɵdisableAllowedHostsCheck = true;
+    });
+
+    afterAll(() => {
+      AngularAppEngine.ɵdisableAllowedHostsCheck = false;
+    });
+
+    beforeEach(() => {
+      consoleErrorSpy = spyOn(console, 'error');
+    });
+
+    it('should allow requests to disallowed hosts', async () => {
+      const request = new Request('https://evil.com/home');
+      const response = await appEngine.handle(request);
+      expect(response).toBeDefined();
+      expect(response?.status).toBe(200);
+      expect(await response?.text()).toContain('Home works');
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+
+    it('should allow requests with disallowed host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'evil.com' },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).toBeDefined();
+      expect(response?.status).toBe(200);
+      expect(await response?.text()).toContain('Home works');
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+  });
 });
