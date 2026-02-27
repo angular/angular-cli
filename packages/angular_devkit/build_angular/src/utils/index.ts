@@ -8,7 +8,6 @@
 
 export * from './default-progress';
 export { deleteOutputDir, loadProxyConfiguration } from '@angular/build/private';
-export * from './run-module-as-observable-fork';
 export * from './normalize-file-replacements';
 export * from './normalize-asset-patterns';
 export * from './normalize-source-maps';

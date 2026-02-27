@@ -72,7 +72,6 @@ copy_to_bin(
 RUNTIME_ASSETS = glob(
     include = [
         "src/**/schema.json",
-        "src/**/*.js",
         "src/**/*.html",
     ],
 ) + [
