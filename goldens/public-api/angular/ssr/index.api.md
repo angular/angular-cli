@@ -14,6 +14,7 @@ export class AngularAppEngine {
     constructor(options?: AngularAppEngineOptions);
     handle(request: Request, requestContext?: unknown): Promise<Response | null>;
     static ɵallowStaticRouteRender: boolean;
+    static ɵdisableAllowedHostsCheck: boolean;
     static ɵhooks: Hooks;
 }
 
