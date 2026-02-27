@@ -145,8 +145,18 @@ describe('parseJsonSchemaToOptions', () => {
     });
 
     describe('type=array, enum', () => {
-      it('parses valid option value', async () => {
+      it('parses valid option value when specified once', async () => {
         expect(await parse(['--arrayWithChoices', 'always', 'never'])).toEqual(
+          jasmine.objectContaining({
+            'arrayWithChoices': ['always', 'never'],
+          }),
+        );
+      });
+
+      it('parses valid option value when specified multiple times', async () => {
+        expect(
+          await parse(['--arrayWithChoices', 'always', '--arrayWithChoices', 'never']),
+        ).toEqual(
           jasmine.objectContaining({
             'arrayWithChoices': ['always', 'never'],
           }),
@@ -165,8 +175,23 @@ describe('parseJsonSchemaToOptions', () => {
     });
 
     describe('type=array, enum in oneOf', () => {
-      it('parses valid option value', async () => {
+      it('parses valid option value when specified once', async () => {
         expect(await parse(['--arrayWithChoicesInOneOf', 'default', 'verbose'])).toEqual(
+          jasmine.objectContaining({
+            'arrayWithChoicesInOneOf': ['default', 'verbose'],
+          }),
+        );
+      });
+
+      it('parses valid option value when specified multiple times', async () => {
+        expect(
+          await parse([
+            '--arrayWithChoicesInOneOf',
+            'default',
+            '--arrayWithChoicesInOneOf',
+            'verbose',
+          ]),
+        ).toEqual(
           jasmine.objectContaining({
             'arrayWithChoicesInOneOf': ['default', 'verbose'],
           }),
@@ -181,8 +206,23 @@ describe('parseJsonSchemaToOptions', () => {
     });
 
     describe('type=array, anyOf', () => {
-      it('parses valid option value', async () => {
+      it('parses valid option value when specified once', async () => {
         expect(await parse(['--arrayWithComplexAnyOf', 'default', 'something-else'])).toEqual(
+          jasmine.objectContaining({
+            'arrayWithComplexAnyOf': ['default', 'something-else'],
+          }),
+        );
+      });
+
+      it('parses valid option value when specified multiple times', async () => {
+        expect(
+          await parse([
+            '--arrayWithComplexAnyOf',
+            'default',
+            '--arrayWithComplexAnyOf',
+            'something-else',
+          ]),
+        ).toEqual(
           jasmine.objectContaining({
             'arrayWithComplexAnyOf': ['default', 'something-else'],
           }),
