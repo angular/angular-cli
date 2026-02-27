@@ -133,145 +133,138 @@ async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
   await client.detach();
 }
 
-describeServeBuilder(
-  executeDevServer,
-  DEV_SERVER_BUILDER_INFO,
-  (harness, setupTarget, isViteRun) => {
-    // TODO(fix-vite): currently this is broken in vite.
-    (isViteRun ? xdescribe : describe)(
-      'Behavior: "Dev-server builder live-reload with proxies"',
-      () => {
-        let browser: Browser;
-        let page: Page;
+describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
+  // TODO(fix-vite): currently this is broken in vite.
+  xdescribe('Behavior: "Dev-server builder live-reload with proxies"', () => {
+    let browser: Browser;
+    let page: Page;
 
-        const SERVE_OPTIONS = Object.freeze({
-          ...BASE_OPTIONS,
-          hmr: false,
-          watch: true,
-          liveReload: true,
-        });
+    const SERVE_OPTIONS = Object.freeze({
+      ...BASE_OPTIONS,
+      hmr: false,
+      watch: true,
+      liveReload: true,
+    });
 
-        beforeAll(async () => {
-          browser = await puppeteer.launch({
-            // MacOSX users need to set the local binary manually because Chrome has lib files with
-            // spaces in them which Bazel does not support in runfiles
-            // See: https://github.com/angular/angular-cli/pull/17624
-            // eslint-disable-next-line max-len
-            // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
-            ignoreHTTPSErrors: true,
-            args: ['--no-sandbox', '--disable-gpu'],
-          });
-        });
+    beforeAll(async () => {
+      browser = await puppeteer.launch({
+        // MacOSX users need to set the local binary manually because Chrome has lib files with
+        // spaces in them which Bazel does not support in runfiles
+        // See: https://github.com/angular/angular-cli/pull/17624
+        // eslint-disable-next-line max-len
+        // executablePath: '/Users/<USERNAME>/git/angular-cli/node_modules/puppeteer/.local-chromium/mac-818858/chrome-mac/Chromium.app/Contents/MacOS/Chromium',
+        ignoreHTTPSErrors: true,
+        args: ['--no-sandbox', '--disable-gpu'],
+      });
+    });
 
-        afterAll(async () => {
-          await browser.close();
-        });
+    afterAll(async () => {
+      await browser.close();
+    });
 
-        beforeEach(async () => {
-          setupTarget(harness, {
-            polyfills: ['src/polyfills.ts'],
-          });
+    beforeEach(async () => {
+      setupTarget(harness, {
+        polyfills: ['src/polyfills.ts'],
+      });
 
-          page = await browser.newPage();
-        });
+      page = await browser.newPage();
+    });
 
-        afterEach(async () => {
-          await page.close();
-        });
+    afterEach(async () => {
+      await page.close();
+    });
 
-        it('works without proxy', async () => {
-          harness.useTarget('serve', {
-            ...SERVE_OPTIONS,
-          });
+    it('works without proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
 
-          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-          await harness.executeWithCases([
-            async ({ result }) => {
-              expect(result?.success).toBeTrue();
-              if (typeof result?.baseUrl !== 'string') {
-                throw new Error('Expected "baseUrl" to be a string.');
-              }
-
-              await goToPageAndWaitForWS(page, result.baseUrl);
-              await harness.modifyFile('src/app/app.component.ts', (content) =>
-                content.replace(`'app'`, `'app-live-reload'`),
-              );
-            },
-            async ({ result }) => {
-              expect(result?.success).toBeTrue();
-              const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-              expect(innerText).toBe('app-live-reload');
-            },
-          ]);
-        });
-
-        it('works without http -> http proxy', async () => {
-          harness.useTarget('serve', {
-            ...SERVE_OPTIONS,
-          });
-
-          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
-
-          let proxy: ProxyInstance | undefined;
-          try {
-            await harness.executeWithCases([
-              async ({ result }) => {
-                expect(result?.success).toBeTrue();
-                if (typeof result?.baseUrl !== 'string') {
-                  throw new Error('Expected "baseUrl" to be a string.');
-                }
-
-                proxy = await createProxy(result.baseUrl, false);
-                await goToPageAndWaitForWS(page, proxy.url);
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`'app'`, `'app-live-reload'`),
-                );
-              },
-              async ({ result }) => {
-                expect(result?.success).toBeTrue();
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-              },
-            ]);
-          } finally {
-            proxy?.server.close();
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          if (typeof result?.baseUrl !== 'string') {
+            throw new Error('Expected "baseUrl" to be a string.');
           }
-        });
 
-        it('works without https -> http proxy', async () => {
-          harness.useTarget('serve', {
-            ...SERVE_OPTIONS,
-          });
+          await goToPageAndWaitForWS(page, result.baseUrl);
+          await harness.modifyFile('src/app/app.component.ts', (content) =>
+            content.replace(`'app'`, `'app-live-reload'`),
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+          expect(innerText).toBe('app-live-reload');
+        },
+      ]);
+    });
 
-          await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+    it('works without http -> http proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
 
-          let proxy: ProxyInstance | undefined;
-          try {
-            await harness.executeWithCases([
-              async ({ result }) => {
-                expect(result?.success).toBeTrue();
-                if (typeof result?.baseUrl !== 'string') {
-                  throw new Error('Expected "baseUrl" to be a string.');
-                }
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
 
-                proxy = await createProxy(result.baseUrl, true);
-                await goToPageAndWaitForWS(page, proxy.url);
-                await harness.modifyFile('src/app/app.component.ts', (content) =>
-                  content.replace(`'app'`, `'app-live-reload'`),
-                );
-              },
-              async ({ result }) => {
-                expect(result?.success).toBeTrue();
-                const innerText = await page.evaluate(() => document.querySelector('p').innerText);
-                expect(innerText).toBe('app-live-reload');
-              },
-            ]);
-          } finally {
-            proxy?.server.close();
-          }
-        });
-      },
-    );
-  },
-);
+      let proxy: ProxyInstance | undefined;
+      try {
+        await harness.executeWithCases([
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            if (typeof result?.baseUrl !== 'string') {
+              throw new Error('Expected "baseUrl" to be a string.');
+            }
+
+            proxy = await createProxy(result.baseUrl, false);
+            await goToPageAndWaitForWS(page, proxy.url);
+            await harness.modifyFile('src/app/app.component.ts', (content) =>
+              content.replace(`'app'`, `'app-live-reload'`),
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+            expect(innerText).toBe('app-live-reload');
+          },
+        ]);
+      } finally {
+        proxy?.server.close();
+      }
+    });
+
+    it('works without https -> http proxy', async () => {
+      harness.useTarget('serve', {
+        ...SERVE_OPTIONS,
+      });
+
+      await harness.writeFile('src/app/app.component.html', '<p>{{ title }}</p>');
+
+      let proxy: ProxyInstance | undefined;
+      try {
+        await harness.executeWithCases([
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            if (typeof result?.baseUrl !== 'string') {
+              throw new Error('Expected "baseUrl" to be a string.');
+            }
+
+            proxy = await createProxy(result.baseUrl, true);
+            await goToPageAndWaitForWS(page, proxy.url);
+            await harness.modifyFile('src/app/app.component.ts', (content) =>
+              content.replace(`'app'`, `'app-live-reload'`),
+            );
+          },
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const innerText = await page.evaluate(() => document.querySelector('p').innerText);
+            expect(innerText).toBe('app-live-reload');
+          },
+        ]);
+      } finally {
+        proxy?.server.close();
+      }
+    });
+  });
+});

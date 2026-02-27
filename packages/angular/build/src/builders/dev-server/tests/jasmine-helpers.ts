@@ -20,7 +20,6 @@ export function describeServeBuilder<T>(
   specDefinitions: (
     harness: JasmineBuilderHarness<T>,
     setupTarget: typeof setupApplicationTarget,
-    isViteRun: true,
   ) => void,
 ): void {
   let optionSchema = optionSchemaCache.get(options.schemaPath);
@@ -38,6 +37,6 @@ export function describeServeBuilder<T>(
     beforeEach(() => host.initialize().toPromise());
     afterEach(() => host.restore().toPromise());
 
-    specDefinitions(harness, setupApplicationTarget, true);
+    specDefinitions(harness, setupApplicationTarget);
   });
 }

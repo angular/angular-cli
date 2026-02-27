@@ -12,7 +12,7 @@ import { executeOnceAndFetch } from '../execute-fetch';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO, BuilderHarness } from '../setup';
 
-describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget, isVite) => {
+describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupTarget) => {
   describe('option: "proxyConfig"', () => {
     beforeEach(async () => {
       setupTarget(harness);
@@ -236,14 +236,51 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       }
     });
 
-    /**
-     * ****************************************************************************************************
-     * ********************************** Below only Vite specific tests **********************************
-     * ****************************************************************************************************
-     */
-    if (isVite) {
-      viteOnlyTests(harness);
-    }
+    it('proxies support regexp as context', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = await createProxyServer();
+      try {
+        await harness.writeFiles({
+          'proxy.config.json': `
+              { "^/api/.*": { "target": "http://127.0.0.1:${proxyServer.address.port}" } }
+            `,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('TEST_API_RETURN');
+      } finally {
+        await proxyServer.close();
+      }
+    });
+
+    it('proxies support negated regexp as context', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = await createProxyServer();
+      try {
+        await harness.writeFiles({
+          'proxy.config.json': `
+              { "^\\/(?!something).*": { "target": "http://127.0.0.1:${proxyServer.address.port}" } }
+            `,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('TEST_API_RETURN');
+      } finally {
+        await proxyServer.close();
+      }
+    });
   });
 });
 
@@ -269,55 +306,4 @@ async function createProxyServer() {
     address: proxyServer.address() as import('net').AddressInfo,
     close: () => new Promise<void>((resolve) => proxyServer.close(() => resolve())),
   };
-}
-
-/**
- * Vite specific tests
- */
-function viteOnlyTests(harness: BuilderHarness<unknown>): void {
-  it('proxies support regexp as context', async () => {
-    harness.useTarget('serve', {
-      ...BASE_OPTIONS,
-      proxyConfig: 'proxy.config.json',
-    });
-
-    const proxyServer = await createProxyServer();
-    try {
-      await harness.writeFiles({
-        'proxy.config.json': `
-              { "^/api/.*": { "target": "http://127.0.0.1:${proxyServer.address.port}" } }
-            `,
-      });
-
-      const { result, response } = await executeOnceAndFetch(harness, '/api/test');
-
-      expect(result?.success).toBeTrue();
-      expect(await response?.text()).toContain('TEST_API_RETURN');
-    } finally {
-      await proxyServer.close();
-    }
-  });
-
-  it('proxies support negated regexp as context', async () => {
-    harness.useTarget('serve', {
-      ...BASE_OPTIONS,
-      proxyConfig: 'proxy.config.json',
-    });
-
-    const proxyServer = await createProxyServer();
-    try {
-      await harness.writeFiles({
-        'proxy.config.json': `
-              { "^\\/(?!something).*": { "target": "http://127.0.0.1:${proxyServer.address.port}" } }
-            `,
-      });
-
-      const { result, response } = await executeOnceAndFetch(harness, '/api/test');
-
-      expect(result?.success).toBeTrue();
-      expect(await response?.text()).toContain('TEST_API_RETURN');
-    } finally {
-      await proxyServer.close();
-    }
-  });
 }
