@@ -83,9 +83,8 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   // Once TypeScript provides support for keeping the dynamic import this workaround can be
   // changed to a direct dynamic import.
   const { VERSION: NG_VERSION } = await import('@angular/compiler-cli');
-  const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } = await import(
-    '@angular/compiler-cli/private/tooling'
-  );
+  const { GLOBAL_DEFS_FOR_TERSER, GLOBAL_DEFS_FOR_TERSER_WITH_AOT } =
+    await import('@angular/compiler-cli/private/tooling');
 
   // determine hashing format
   const hashFormat = getOutputHashFormat(buildOptions.outputHashing);
@@ -245,7 +244,7 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
 
   if (buildOptions.statsJson) {
     extraPlugins.push(
-      new JsonStatsPlugin(path.resolve(root, buildOptions.outputPath, 'stats.json')),
+      new JsonStatsPlugin(path.resolve(root, buildOptions.outputPath, 'browser-stats.json')),
     );
   }
 
