@@ -1,7 +1,7 @@
 import { spawn, SpawnOptions } from 'node:child_process';
 import * as child_process from 'node:child_process';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
-import treeKill from 'tree-kill';
+import { setTimeout as sleep } from 'node:timers/promises';
 import { delimiter, join, resolve } from 'node:path';
 import { stripVTControlCharacters, styleText } from 'node:util';
 
@@ -255,29 +255,37 @@ export async function waitForAnyProcessOutputToMatch(
   return matchingProcess;
 }
 
-export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
-  const processesToKill: Promise<void>[] = [];
+/**
+ * Kills all tracked processes with a retry mechanism.
+ */
+export async function killAllProcesses(signal: NodeJS.Signals = 'SIGTERM'): Promise<void> {
+  let attempts = 0;
+  const maxRetries = 3;
 
-  while (_processes.length) {
-    const childProc = _processes.pop();
-    if (!childProc || childProc.pid === undefined) {
-      continue;
+  while (_processes.length > 0 && attempts < maxRetries) {
+    attempts++;
+
+    // Iterate backwards so we can remove elements while looping if needed.
+    for (let i = _processes.length - 1; i >= 0; i--) {
+      const childProc = _processes[i];
+
+      if (!childProc || childProc.killed) {
+        _processes.splice(i, 1);
+        continue;
+      }
+
+      const killed = childProc.kill(signal);
+      if (killed) {
+        _processes.splice(i, 1);
+        continue;
+      }
     }
 
-    processesToKill.push(
-      new Promise<void>((resolve) => {
-        treeKill(childProc.pid!, signal, () => {
-          // Ignore all errors.
-          // This is due to a race condition with the `waitForMatch` logic.
-          // where promises are resolved on matches and not when the process terminates.
-          // Also in some cases in windows we get `The operation attempted is not supported`.
-          resolve();
-        });
-      }),
-    );
+    // If still have processes, wait a bit before the next retry (e.g., 100ms)
+    if (_processes.length > 0 && attempts < maxRetries) {
+      await sleep(100);
+    }
   }
-
-  await Promise.all(processesToKill);
 }
 
 export function exec(cmd: string, ...args: string[]) {
