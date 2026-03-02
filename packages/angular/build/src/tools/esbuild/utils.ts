@@ -32,8 +32,12 @@ import {
 export function buildMetafileForType(
   metafile: Metafile,
   type: 'browser' | 'server',
+  initial: boolean,
   outputFiles: BuildOutputFile[],
+  initialFiles?: Map<string, InitialFileRecord>,
 ): Metafile {
+  const isServer = type === 'server';
+
   const outputPathsForType = new Set(
     outputFiles
       .filter(({ type: fileType }) => {
@@ -41,16 +45,20 @@ export function buildMetafileForType(
           fileType === BuildOutputFileType.ServerApplication ||
           fileType === BuildOutputFileType.ServerRoot;
 
-        return type === 'server' ? isServerFile : !isServerFile;
+        return isServer ? isServerFile : !isServerFile;
       })
       .map(({ path }) => path),
   );
 
   const filteredOutputs: Metafile['outputs'] = {};
   for (const [outputPath, output] of Object.entries(metafile.outputs)) {
-    if (outputPathsForType.has(outputPath)) {
-      filteredOutputs[outputPath] = output;
+    if (!outputPathsForType.has(outputPath)) {
+      continue;
     }
+    if (initial && !initialFiles?.has(outputPath)) {
+      continue;
+    }
+    filteredOutputs[outputPath] = output;
   }
 
   const referencedInputs = new Set<string>();

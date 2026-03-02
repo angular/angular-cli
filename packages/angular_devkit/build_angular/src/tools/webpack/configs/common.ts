@@ -245,6 +245,9 @@ export async function getCommonConfig(wco: WebpackConfigOptions): Promise<Config
   if (buildOptions.statsJson) {
     extraPlugins.push(
       new JsonStatsPlugin(path.resolve(root, buildOptions.outputPath, 'browser-stats.json')),
+      new JsonStatsPlugin(
+        path.resolve(root, buildOptions.outputPath, 'browser-initial-stats.json'),
+      ),
     );
   }
 

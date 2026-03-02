@@ -26,9 +26,15 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      if (harness.expectFile('dist/stats.json').toExist()) {
-        const content = harness.readFile('dist/stats.json');
+      if (harness.expectFile('dist/browser-stats.json').toExist()) {
+        const content = harness.readFile('dist/browser-stats.json');
         expect(() => JSON.parse(content))
+          .withContext('Expected Webpack Stats file to be valid JSON.')
+          .not.toThrow();
+      }
+      if (harness.expectFile('dist/browser-initial-stats.json').toExist()) {
+        const initialContent = harness.readFile('dist/browser-initial-stats.json');
+        expect(() => JSON.parse(initialContent))
           .withContext('Expected Webpack Stats file to be valid JSON.')
           .not.toThrow();
       }
@@ -45,8 +51,8 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      if (harness.expectFile('dist/stats.json').toExist()) {
-        const stats = JSON.parse(harness.readFile('dist/stats.json'));
+      if (harness.expectFile('dist/browser-stats.json').toExist()) {
+        const stats = JSON.parse(harness.readFile('dist/browser-stats.json'));
         expect(stats?.chunks?.[0]?.modules?.[0]?.profile?.building).toBeDefined();
       }
     });
@@ -61,7 +67,8 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/stats.json').toNotExist();
+      harness.expectFile('dist/browser-stats.json').toNotExist();
+      harness.expectFile('dist/browser-initial-stats.json').toNotExist();
     });
 
     it('does not generate a Webpack Stats file in output when not present', async () => {
@@ -73,7 +80,8 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
       expect(result?.success).toBe(true);
 
-      harness.expectFile('dist/stats.json').toNotExist();
+      harness.expectFile('dist/browser-stats.json').toNotExist();
+      harness.expectFile('dist/browser-initial-stats.json').toNotExist();
     });
   });
 });

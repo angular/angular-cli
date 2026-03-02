@@ -308,13 +308,31 @@ export async function executeBuild(
   if (options.stats) {
     executionResult.addOutputFile(
       'browser-stats.json',
-      JSON.stringify(buildMetafileForType(metafile, 'browser', outputFiles), null, 2),
+      JSON.stringify(buildMetafileForType(metafile, 'browser', false, outputFiles), null, 2),
+      BuildOutputFileType.Root,
+    );
+    executionResult.addOutputFile(
+      'browser-initial-stats.json',
+      JSON.stringify(
+        buildMetafileForType(metafile, 'browser', true, outputFiles, initialFiles),
+        null,
+        2,
+      ),
       BuildOutputFileType.Root,
     );
     if (ssrOutputEnabled) {
       executionResult.addOutputFile(
         'server-stats.json',
-        JSON.stringify(buildMetafileForType(metafile, 'server', outputFiles), null, 2),
+        JSON.stringify(buildMetafileForType(metafile, 'server', false, outputFiles), null, 2),
+        BuildOutputFileType.Root,
+      );
+      executionResult.addOutputFile(
+        'server-initial-stats.json',
+        JSON.stringify(
+          buildMetafileForType(metafile, 'server', true, outputFiles, initialFiles),
+          null,
+          2,
+        ),
         BuildOutputFileType.Root,
       );
     }
