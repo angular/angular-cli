@@ -7,6 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
+import { normalize, virtualFs } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder tsconfig paths', () => {
@@ -21,18 +22,16 @@ describe('Browser Builder tsconfig paths', () => {
 
   it('should resolve basic tsconfig paths', async () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
-    host.replaceInFile(
-      'tsconfig.json',
-      /"baseUrl": ".\/",/,
-      `
-      "baseUrl": "./",
-      "paths": {
-        "@root/*": [
-          "./src/*"
-        ]
-      },
-    `,
-    );
+
+    const tsconfigPath = normalize('tsconfig.json');
+    const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
+    tsconfig.compilerOptions ??= {};
+    tsconfig.compilerOptions.paths = {
+      '@root/*': ['./src/*'],
+    };
+    host
+      .scopedSync()
+      .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
 
     await browserBuild(architect, host, target);
   });
@@ -43,25 +42,17 @@ describe('Browser Builder tsconfig paths', () => {
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
       'src/app/shared/index.ts': `export * from './meaning'`,
     });
-    host.replaceInFile(
-      'tsconfig.json',
-      /"baseUrl": ".\/",/,
-      `
-      "baseUrl": "./",
-      "paths": {
-        "@shared": [
-          "src/app/shared"
-        ],
-        "@shared/*": [
-          "src/app/shared/*"
-        ],
-        "*": [
-          "*",
-          "src/app/shared/*"
-        ]
-      },
-    `,
-    );
+    const tsconfigPath = normalize('tsconfig.json');
+    const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
+    tsconfig.compilerOptions ??= {};
+    tsconfig.compilerOptions.paths = {
+      '@shared': ['src/app/shared'],
+      '@shared/*': ['src/app/shared/*'],
+      '*': ['*', 'src/app/shared/*'],
+    };
+    host
+      .scopedSync()
+      .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
     host.appendToFile(
       'src/app/app.component.ts',
       `
