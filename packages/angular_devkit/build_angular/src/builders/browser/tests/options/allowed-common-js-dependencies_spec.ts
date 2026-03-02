@@ -119,17 +119,13 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
 
     it('should not show warning in JIT for templateUrl and styleUrl when using paths', async () => {
       await harness.modifyFile('tsconfig.json', (content) => {
-        return content.replace(
-          /"baseUrl": ".\/",/,
-          `
-            "baseUrl": "./",
-            "paths": {
-              "@app/*": [
-                "src/app/*"
-              ]
-            },
-          `,
-        );
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions ??= {};
+        tsconfig.compilerOptions.paths = {
+          '@app/*': ['src/app/*'],
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
       });
 
       await harness.modifyFile('src/app/app.module.ts', (content) =>

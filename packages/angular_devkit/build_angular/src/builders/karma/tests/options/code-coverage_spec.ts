@@ -88,19 +88,15 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
           }
         `,
       });
-      await harness.modifyFile('tsconfig.json', (content) =>
-        content.replace(
-          /"baseUrl": ".\/",/,
-          `
-            "baseUrl": "./",
-            "paths": {
-              "my-lib": [
-                "./dist/my-lib"
-              ]
-            },
-          `,
-        ),
-      );
+      await harness.modifyFile('tsconfig.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions ??= {};
+        tsconfig.compilerOptions.paths = {
+          'my-lib': ['./dist/my-lib'],
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
 
       harness.useTarget('test', {
         ...BASE_OPTIONS,
