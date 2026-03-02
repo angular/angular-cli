@@ -1,9 +1,10 @@
 import { assertIsError } from '../../../utils/utils';
-import { expectFileToMatch, rimraf } from '../../../utils/fs';
+import { readFile, rimraf } from '../../../utils/fs';
 import { getActivePackageManager, uninstallPackage } from '../../../utils/packages';
 import { ng } from '../../../utils/process';
 import { isPrereleaseCli } from '../../../utils/project';
 import { appendFile } from 'node:fs/promises';
+import assert from 'node:assert';
 
 export default async function () {
   // forcibly remove in case another test doesn't clean itself up
@@ -32,7 +33,12 @@ export default async function () {
     '--verbose',
     '--skip-confirmation',
   );
-  await expectFileToMatch('package.json', /@angular\/material/);
+
+  const { dependencies } = JSON.parse(await readFile('package.json'));
+  assert.ok(
+    dependencies['@angular/material'],
+    '`@angular/material` was not found added to dependencies',
+  );
 
   // Clean up existing cdk package
   // Not doing so can cause adding material to fail if an incompatible cdk is present
