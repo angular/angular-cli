@@ -138,7 +138,6 @@ npm.npm_translate_lock(
         "//packages/angular/pwa:package.json",
         "//packages/angular/ssr:package.json",
         "//packages/angular_devkit/architect:package.json",
-        "//packages/angular_devkit/architect_cli:package.json",
         "//packages/angular_devkit/build_angular:package.json",
         "//packages/angular_devkit/build_webpack:package.json",
         "//packages/angular_devkit/core:package.json",

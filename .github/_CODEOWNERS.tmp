@@ -1,7 +1,6 @@
 /packages/_/                                @hansl @clydin
 /packages/angular/pwa                       @hansl @Brocco
 /packages/angular_devkit/architect/         @filipesilva @hansl
-/packages/angular_devkit/architect_cli/     @filipesilva @hansl 
 /packages/angular_devkit/build_angular/     @filipesilva @clydin
 /packages/angular_devkit/build_ng_packagr/  @filipesilva @clydin
 /packages/angular_devkit/build_optimizer/   @filipesilva @clydin
