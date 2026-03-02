@@ -23,12 +23,7 @@ export const release = {
     await assertValidDependencyRanges(newVersion, releasePackages);
   },
   releaseNotes: {
-    groupOrder: [
-      '@angular/cli',
-      '@schematics/angular',
-      '@angular-devkit/architect-cli',
-      '@angular-devkit/schematics-cli',
-    ],
+    groupOrder: ['@angular/cli', '@schematics/angular', '@angular-devkit/schematics-cli'],
   },
   publishRegistry: 'https://wombat-dressing-room.appspot.com',
   releasePrLabels: ['action: merge'],

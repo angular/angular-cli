@@ -21,7 +21,6 @@ SNAPSHOT_REPOS = {
     "@angular/build": "angular/angular-build-builds",
     "@angular/ssr": "angular/angular-ssr-builds",
     "@angular-devkit/architect": "angular/angular-devkit-architect-builds",
-    "@angular-devkit/architect-cli": "angular/angular-devkit-architect-cli-builds",
     "@angular-devkit/build-angular": "angular/angular-devkit-build-angular-builds",
     "@angular-devkit/build-webpack": "angular/angular-devkit-build-webpack-builds",
     "@angular-devkit/core": "angular/angular-devkit-core-builds",
