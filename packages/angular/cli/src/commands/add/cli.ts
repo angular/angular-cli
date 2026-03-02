@@ -583,7 +583,7 @@ export default class AddCommandModule
         await packageManager.add(
           packageIdentifier.toString(),
           'none',
-          savePackage !== 'dependencies',
+          savePackage === 'devDependencies',
           false,
           true,
           {
