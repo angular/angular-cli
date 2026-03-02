@@ -335,4 +335,57 @@ describe('@schematics/update', () => {
     const resultTreeContent = resultTree.readContent('/package.json');
     expect(resultTreeContent.endsWith('}')).toBeTrue();
   });
+
+  it('updates group members to the same version as the targeted package', async () => {
+    const packageJsonContent = `{
+      "name": "test",
+      "dependencies": {
+        "@angular/cdk": "^19.2.19",
+        "@angular/common": "^19.2.0",
+        "@angular/compiler": "^19.2.0",
+        "@angular/core": "^19.2.0",
+        "@angular/forms": "^19.2.0",
+        "@angular/platform-browser": "^19.2.0",
+        "@angular/platform-browser-dynamic": "^19.2.0",
+        "@angular/router": "^19.2.0",
+        "rxjs": "~7.8.0",
+        "tslib": "^2.3.0",
+        "zone.js": "~0.15.0"
+      },
+      "devDependencies": {
+        "@angular-devkit/build-angular": "^19.2.21",
+        "@angular/cli": "^19.2.21",
+        "@angular/compiler-cli": "^19.2.0",
+        "typescript": "~5.7.2"
+      }
+    }`;
+
+    const inputTree = new UnitTestTree(
+      new HostTree(
+        new virtualFs.test.TestHost({
+          '/package.json': packageJsonContent,
+        }),
+      ),
+    );
+
+    const resultTree = await schematicRunner.runSchematic(
+      'update',
+      { force: true, packages: ['@angular/cli@20', '@angular/cdk@20', '@angular/core@20'] },
+      inputTree,
+    );
+
+    const { devDependencies, dependencies } = resultTree.readJson('/package.json') as {
+      devDependencies: Record<string, string>;
+      dependencies: Record<string, string>;
+    };
+
+    const version20Regexp = /^\^20.\d+.\d+$/;
+
+    expect(devDependencies['typescript']).toMatch(/5\.9\.\d+/);
+    expect(devDependencies['@angular/cli']).toMatch(version20Regexp);
+    expect(devDependencies['@angular/compiler-cli']).toMatch(version20Regexp);
+    expect(dependencies['@angular/cdk']).toMatch(version20Regexp);
+    expect(dependencies['@angular/common']).toMatch(version20Regexp);
+    expect(dependencies['@angular/core']).toMatch(version20Regexp);
+  });
 });
