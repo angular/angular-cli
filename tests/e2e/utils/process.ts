@@ -261,29 +261,28 @@ export async function waitForAnyProcessOutputToMatch(
 export async function killAllProcesses(signal: NodeJS.Signals = 'SIGTERM'): Promise<void> {
   let attempts = 0;
   const maxRetries = 3;
-  const processes = [..._processes];
 
-  while (processes.length > 0 && attempts < maxRetries) {
+  while (_processes.length > 0 && attempts < maxRetries) {
     attempts++;
 
     // Iterate backwards so we can remove elements while looping if needed.
-    for (let i = processes.length - 1; i >= 0; i--) {
-      const childProc = processes[i];
+    for (let i = _processes.length - 1; i >= 0; i--) {
+      const childProc = _processes[i];
 
       if (!childProc || childProc.killed) {
-        processes.splice(i, 1);
+        _processes.splice(i, 1);
         continue;
       }
 
       const killed = childProc.kill(signal);
       if (killed) {
-        processes.splice(i, 1);
+        _processes.splice(i, 1);
         continue;
       }
     }
 
     // If still have processes, wait a bit before the next retry (e.g., 100ms)
-    if (processes.length > 0 && attempts < maxRetries) {
+    if (_processes.length > 0 && attempts < maxRetries) {
       await sleep(100);
     }
   }
