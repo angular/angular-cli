@@ -47,8 +47,8 @@ importers:
         specifier: 21.2.0
         version: 21.2.0(16f55f8bfdd6508e9b3d27b33a1d1b40)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#c78d7a03ae1ca76d2946651d0dd7f476f09b4374
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c78d7a03ae1ca76d2946651d0dd7f476f09b4374(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#72a753761afb29f85cf372bd2c2e8321cfc8adfc
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/72a753761afb29f85cf372bd2c2e8321cfc8adfc(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.0
         version: 21.2.0(@angular/animations@21.2.0(@angular/core@21.2.0(@angular/compiler@21.2.0)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@21.2.0(@angular/core@21.2.0(@angular/compiler@21.2.0)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@21.2.0(@angular/compiler@21.2.0)(rxjs@7.8.2)(zone.js@0.16.1))
@@ -1020,9 +1020,9 @@ packages:
       '@angular/platform-browser': ^21.0.0 || ^22.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c78d7a03ae1ca76d2946651d0dd7f476f09b4374':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c78d7a03ae1ca76d2946651d0dd7f476f09b4374}
-    version: 0.0.0-61f9fe81614db102d95bb9bcb9909a304c6e6d10
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/72a753761afb29f85cf372bd2c2e8321cfc8adfc':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/72a753761afb29f85cf372bd2c2e8321cfc8adfc}
+    version: 0.0.0-aa8e4d0303e0d48337a2d84ac421663638b4db67
     hasBin: true
 
   '@angular/platform-browser@21.2.0':
@@ -9538,7 +9538,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c78d7a03ae1ca76d2946651d0dd7f476f09b4374(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/72a753761afb29f85cf372bd2c2e8321cfc8adfc(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))':
     dependencies:
       '@actions/core': 3.0.0
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
@@ -16611,7 +16611,7 @@ snapshots:
     dependencies:
       array-differ: 4.0.0
       array-union: 3.0.1
-      minimatch: 10.2.3
+      minimatch: 10.2.4
 
   mute-stream@2.0.0: {}
 
