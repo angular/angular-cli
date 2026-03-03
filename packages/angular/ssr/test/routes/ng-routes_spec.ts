@@ -18,7 +18,7 @@ import {
   provideRouter,
   withEnabledBlockingInitialNavigation,
 } from '@angular/router';
-import { extractRoutesAndCreateRouteTree } from '../../src/routes/ng-routes';
+import { IS_DISCOVERING_ROUTES, extractRoutesAndCreateRouteTree } from '../../src/routes/ng-routes';
 import { PrerenderFallback, RenderMode } from '../../src/routes/route-config';
 import { setAngularAppTestingManifest } from '../testing-utils';
 
@@ -789,5 +789,27 @@ describe('extractRoutesAndCreateRouteTree', () => {
       { route: '/', renderMode: RenderMode.Server },
       { route: '/home', renderMode: RenderMode.Server },
     ]);
+  });
+
+  it('should provide `IS_DISCOVERING_ROUTES` as `true` during route discovery', async () => {
+    let isDiscoveringRoutes: boolean | undefined;
+
+    setAngularAppTestingManifest(
+      [
+        {
+          path: 'lazy',
+          loadChildren: () => {
+            isDiscoveringRoutes = inject(IS_DISCOVERING_ROUTES);
+
+            return [];
+          },
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    await extractRoutesAndCreateRouteTree({ url });
+
+    expect(isDiscoveringRoutes).toBeTrue();
   });
 });
