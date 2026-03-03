@@ -132,7 +132,7 @@
     "typescript": "5.9.3",
     "undici": "7.22.0",
     "unenv": "^1.10.0",
-    "verdaccio": "6.2.5",
+    "verdaccio": "6.2.9",
     "verdaccio-auth-memory": "^10.0.0",
     "zone.js": "^0.16.0"
   },
