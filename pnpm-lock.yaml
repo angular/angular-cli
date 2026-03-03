@@ -290,8 +290,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       verdaccio:
-        specifier: 6.2.5
-        version: 6.2.5(encoding@0.1.13)
+        specifier: 6.2.9
+        version: 6.2.9(encoding@0.1.13)
       verdaccio-auth-memory:
         specifier: ^10.0.0
         version: 10.3.1
@@ -1645,8 +1645,8 @@ packages:
     resolution: {integrity: sha512-QxULHAm7cNu72w97JUNCBFODFaXpbDg+dP8b/oWFAZ2MTRppA3U00Y2L1HqaS4J6yBqxwa/Y3nMBaxVKbB/NsA==}
     engines: {node: '>=20.19.0'}
 
-  '@cypress/request@3.0.9':
-    resolution: {integrity: sha512-I3l7FdGRXluAS44/0NguwWlO83J18p0vlr2FYHrJkWdNYhgVoiYo61IXPqaOsL+vNxU1ZqMACzItGK3/KKDsdw==}
+  '@cypress/request@3.0.10':
+    resolution: {integrity: sha512-hauBrOdvu08vOsagkZ/Aju5XuiZx6ldsLfByg1htFeldhex+PeMrYauANzFsMJeAA0+dyPLbDoX2OYuvVoLDkQ==}
     engines: {node: '>= 6'}
 
   '@discoveryjs/json-ext@0.6.3':
@@ -4895,10 +4895,6 @@ packages:
   core-util-is@1.0.3:
     resolution: {integrity: sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==}
 
-  cors@2.8.5:
-    resolution: {integrity: sha512-KIHbLJqu73RGr/hnbrO9uBeixNGuvSQjul/jdFvS/KFSIH1hWVd1ng7zOHx+YrEfInLG7q4n6GHQ9cDtxv/P6g==}
-    engines: {node: '>= 0.10'}
-
   cors@2.8.6:
     resolution: {integrity: sha512-tJtZBBHA6vjIAaF6EnIaq6laBBP9aq/Y3ouVJjEfoHbRBcHBAHYcMh/w8LDrk2PvIMMq8gmopa5D4V8RmbrxGw==}
     engines: {node: '>= 0.10'}
@@ -7784,10 +7780,6 @@ packages:
     resolution: {integrity: sha512-8YOJEHtxpySA3fFDyCRxA+UUV+fA+rTWnuWvylOK/NCjhY+b4ocCtmu8TtsWb+mYeU+GCHf/S66KZF/AsteKHg==}
     engines: {node: '>=0.9'}
 
-  qs@6.14.0:
-    resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
-    engines: {node: '>=0.6'}
-
   qs@6.14.2:
     resolution: {integrity: sha512-V/yCWTTF7VJ9hIh18Ugr2zhJMP01MY7c5kh4J870L7imm6/DIzBsNLTXzMwUA3yZ5b/KBqLx8Kp3uRvd7xSe3Q==}
     engines: {node: '>=0.6'}
@@ -8910,8 +8902,8 @@ packages:
     resolution: {integrity: sha512-JBYCaSTQSUws/EXOqNrh7iOyWPrGLTYSeufCS3Y6BOCJbfDiy2Nh8PbstoZn/L9ZbzUesjPPiIZ4Ou3eUaK0Mw==}
     engines: {node: '>=18'}
 
-  verdaccio@6.2.5:
-    resolution: {integrity: sha512-sIek+ZF0a1aaRwHo9I5vbONGXzcAgbf5psEmbGVMG9M/MslblIae2wdehG6a2lSxsk4B9c8Ar0j/ZmliTjiStA==}
+  verdaccio@6.2.9:
+    resolution: {integrity: sha512-w1LYqM/wuvtiUedF9eSTsIC1yEI0nShIX48OqG1R6xzS4eEt0Pe1NYl5oPC/d7UyVSOufpjE8QVgd1CqauyhXQ==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -10373,7 +10365,7 @@ snapshots:
 
   '@csstools/css-tokenizer@4.0.0': {}
 
-  '@cypress/request@3.0.9':
+  '@cypress/request@3.0.10':
     dependencies:
       aws-sign2: 0.7.0
       aws4: 1.13.2
@@ -10388,7 +10380,7 @@ snapshots:
       json-stringify-safe: 5.0.1
       mime-types: 2.1.35
       performance-now: 2.1.0
-      qs: 6.14.0
+      qs: 6.14.2
       safe-buffer: 5.2.1
       tough-cookie: 5.1.2
       tunnel-agent: 0.6.0
@@ -14064,11 +14056,6 @@ snapshots:
 
   core-util-is@1.0.3: {}
 
-  cors@2.8.5:
-    dependencies:
-      object-assign: 4.1.1
-      vary: 1.1.2
-
   cors@2.8.6:
     dependencies:
       object-assign: 4.1.1
@@ -14871,7 +14858,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@10.2.2)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -17388,10 +17375,6 @@ snapshots:
 
   qjobs@1.2.0: {}
 
-  qs@6.14.0:
-    dependencies:
-      side-channel: 1.1.0
-
   qs@6.14.2:
     dependencies:
       side-channel: 1.1.0
@@ -18747,9 +18730,9 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  verdaccio@6.2.5(encoding@0.1.13):
+  verdaccio@6.2.9(encoding@0.1.13):
     dependencies:
-      '@cypress/request': 3.0.9
+      '@cypress/request': 3.0.10
       '@verdaccio/auth': 8.0.0-next-8.29
       '@verdaccio/config': 8.0.0-next-8.29
       '@verdaccio/core': 8.0.0-next-8.29
@@ -18769,14 +18752,14 @@ snapshots:
       async: 3.2.6
       clipanion: 4.0.0-rc.4
       compression: 1.8.1
-      cors: 2.8.5
+      cors: 2.8.6
       debug: 4.4.3(supports-color@10.2.2)
       envinfo: 7.15.0
       express: 4.22.1
-      lodash: 4.17.21
+      lodash: 4.17.23
       lru-cache: 7.18.3
       mime: 3.0.0
-      semver: 7.7.3
+      semver: 7.7.4
       verdaccio-audit: 13.0.0-next-8.29(encoding@0.1.13)
       verdaccio-htpasswd: 13.0.0-next-8.29
     transitivePeerDependencies:
