@@ -54,10 +54,14 @@ export async function normalizeOptions(
   const buildTargetSpecifier = options.buildTarget ?? `::development`;
   const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
-  const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig } = options;
+  const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig, update } = options;
 
   if (ui && runner !== Runner.Vitest) {
     throw new Error('The "ui" option is only available for the "vitest" runner.');
+  }
+
+  if (update && runner !== Runner.Vitest) {
+    throw new Error('The "update" option is only available for the "vitest" runner.');
   }
 
   const [width, height] = browserViewport?.split('x').map(Number) ?? [];
@@ -133,6 +137,7 @@ export async function normalizeOptions(
           ? true
           : path.resolve(workspaceRoot, runnerConfig)
         : runnerConfig,
+    update: update ?? false,
   };
 }
 
