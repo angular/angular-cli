@@ -156,13 +156,32 @@ export async function getVitestBuildOptions(
 
   const mockPatchContents = `
     import { vi } from 'vitest';
+
     const error = new Error(
-    'The "vi.mock" and related methods are not supported with the Angular unit-test system. Please use Angular TestBed for mocking.');
-    vi.mock = () => { throw error; };
-    vi.doMock = () => { throw error; };
-    vi.importMock = () => { throw error; };
-    vi.unmock = () => { throw error; };
-    vi.doUnmock = () => { throw error; };
+      'The "vi.mock" and related methods are not supported for relative imports with the Angular unit-test system. ' +
+      'Please use Angular TestBed for mocking dependencies.'
+    );
+
+    // Store original implementations
+    const { mock, doMock, importMock, unmock, doUnmock } = vi;
+
+    function patch(original) {
+      return (path, ...args) => {
+        // Check if the path is a string and starts with a character that indicates a relative path.
+        if (typeof path === 'string' && /^[./]/.test(path)) {
+          throw error;
+        }
+
+        // Call the original function for non-relative paths.
+        return original(path, ...args);
+      };
+    }
+
+    vi.mock = patch(mock);
+    vi.doMock = patch(doMock);
+    vi.importMock = patch(importMock);
+    vi.unmock = patch(unmock);
+    vi.doUnmock = patch(doUnmock);
   `;
 
   return {
