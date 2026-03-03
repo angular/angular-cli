@@ -6,6 +6,7 @@
 
 import { DefaultExport } from '@angular/router';
 import { EnvironmentProviders } from '@angular/core';
+import { InjectionToken } from '@angular/core';
 import { Provider } from '@angular/core';
 import { Type } from '@angular/core';
 
@@ -25,6 +26,9 @@ export interface AngularAppEngineOptions {
 
 // @public
 export function createRequestHandler(handler: RequestHandlerFunction): RequestHandlerFunction;
+
+// @public
+export const IS_DISCOVERING_ROUTES: InjectionToken<boolean>;
 
 // @public
 export enum PrerenderFallback {
