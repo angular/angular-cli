@@ -1,3 +1,37 @@
+<a name="21.2.1"></a>
+
+# 21.2.1 (2026-03-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [ae4c28d00](https://github.com/angular/angular-cli/commit/ae4c28d0083d948489f4ba38c571b7f955400226) | fix  | correct dev dependency detection logic in `ng add`     |
+| [465073bc1](https://github.com/angular/angular-cli/commit/465073bc1b2b0e9fa594698651a9e0afe747a74a) | fix  | disable npm update notifier in package manager host    |
+| [36270634f](https://github.com/angular/angular-cli/commit/36270634f6ff5ab15896a8c2b345659511a8a276) | fix  | ensure group members are updated to targeted version   |
+| [d87dba6af](https://github.com/angular/angular-cli/commit/d87dba6af1116de0838d8683cd69fd31ed9811fd) | fix  | ignore unknown files when formatting schematic changes |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [72d466aa0](https://github.com/angular/angular-cli/commit/72d466aa04d4d0cc4d654410bcb6dd44f0de3357) | fix  | prevent adding test dependencies when minimal option is enabled |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [6ad860863](https://github.com/angular/angular-cli/commit/6ad8608636ad48ae140cc7299a32e0358c761fcc) | fix  | bundle polyfills to preserve execution order in dev server |
+| [6699cdc9b](https://github.com/angular/angular-cli/commit/6699cdc9bfbabc3de2ff0cf03acfd6989dc5596c) | perf | fix memory leak in `ng serve` with i18n                    |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------- |
+| [43a9dfa66](https://github.com/angular/angular-cli/commit/43a9dfa663c386217c9a654f0e80af74823fcf6a) | fix  | improve header validation logic |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.0"></a>
 
 # 21.2.0 (2026-02-25)
