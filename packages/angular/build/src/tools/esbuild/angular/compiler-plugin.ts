@@ -73,11 +73,11 @@ export function createCompilerPlugin(
 
       // Initialize a worker pool for JavaScript transformations.
       // Webcontainers currently do not support this persistent cache store.
-      let cacheStore: import('../lmdb-cache-store').LmdbCacheStore | undefined;
+      let cacheStore: import('../sqlite-cache-store').SqliteCacheStore | undefined;
       if (pluginOptions.sourceFileCache?.persistentCachePath && !process.versions.webcontainer) {
         try {
-          const { LmdbCacheStore } = await import('../lmdb-cache-store');
-          cacheStore = new LmdbCacheStore(
+          const { SqliteCacheStore } = await import('../sqlite-cache-store');
+          cacheStore = new SqliteCacheStore(
             path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
           );
         } catch (e) {
@@ -85,7 +85,7 @@ export function createCompilerPlugin(
             text: 'Unable to initialize JavaScript cache storage.',
             location: null,
             notes: [
-              // Only show first line of lmdb load error which has platform support listed
+              // Only show first line of sqlite load error
               { text: (e as Error)?.message.split('\n')[0] ?? `${e}` },
               {
                 text: 'This will not affect the build output content but may result in slower builds.',

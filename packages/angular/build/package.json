@@ -45,9 +45,6 @@
     "vite": "7.3.1",
     "watchpack": "2.5.1"
   },
-  "optionalDependencies": {
-    "lmdb": "3.5.1"
-  },
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",

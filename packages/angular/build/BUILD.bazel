@@ -93,7 +93,6 @@ ts_project(
         ":node_modules/jsonc-parser",
         ":node_modules/less",
         ":node_modules/listr2",
-        ":node_modules/lmdb",
         ":node_modules/magic-string",
         ":node_modules/mrmime",
         ":node_modules/ng-packagr",
