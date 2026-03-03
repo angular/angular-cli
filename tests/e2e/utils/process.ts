@@ -1,9 +1,9 @@
 import { spawn, SpawnOptions } from 'node:child_process';
 import * as child_process from 'node:child_process';
 import { getGlobalVariable, getGlobalVariablesEnv } from './env';
-import treeKill from 'tree-kill';
 import { delimiter, join, resolve } from 'node:path';
 import { stripVTControlCharacters, styleText } from 'node:util';
+import { assertIsError } from './utils';
 
 interface ExecOptions {
   silent?: boolean;
@@ -255,26 +255,43 @@ export async function waitForAnyProcessOutputToMatch(
   return matchingProcess;
 }
 
-export async function killAllProcesses(signal = 'SIGTERM'): Promise<void> {
+/**
+ * Kills a process by PID
+ * @param pid The PID of the process to kill
+ * @param signal The signal to send to the process
+ */
+async function killProcess(pid: number, signal: NodeJS.Signals): Promise<void> {
+  if (process.platform === 'win32') {
+    // /T kills child processes, /F forces it
+    await new Promise<void>((resolve) => {
+      child_process.exec(`taskkill /pid ${pid} /T /F`, () => resolve());
+    });
+  } else {
+    // Use -pid to signal the entire process group
+    try {
+      process.kill(-pid, signal);
+    } catch (error) {
+      assertIsError(error);
+      if (error.code !== 'ESRCH') {
+        throw error;
+      }
+    }
+  }
+}
+
+/**
+ * Kills all tracked processes
+ */
+export async function killAllProcesses(signal: NodeJS.Signals = 'SIGTERM'): Promise<void> {
   const processesToKill: Promise<void>[] = [];
 
   while (_processes.length) {
     const childProc = _processes.pop();
-    if (!childProc || childProc.pid === undefined) {
+    if (!childProc || childProc.pid === undefined || childProc.killed) {
       continue;
     }
 
-    processesToKill.push(
-      new Promise<void>((resolve) => {
-        treeKill(childProc.pid!, signal, () => {
-          // Ignore all errors.
-          // This is due to a race condition with the `waitForMatch` logic.
-          // where promises are resolved on matches and not when the process terminates.
-          // Also in some cases in windows we get `The operation attempted is not supported`.
-          resolve();
-        });
-      }),
-    );
+    processesToKill.push(killProcess(childProc.pid, signal));
   }
 
   await Promise.all(processesToKill);
