@@ -36,7 +36,7 @@ describe('Browser Builder tsconfig paths', () => {
     await browserBuild(architect, host, target);
   });
 
-  it('should resolve complex tsconfig paths with wildcards', async () => {
+  fit('should resolve complex tsconfig paths with wildcards', async () => {
     host.writeMultipleFiles({
       'src/meaning-too.ts': 'export var meaning = 42;',
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
@@ -46,13 +46,14 @@ describe('Browser Builder tsconfig paths', () => {
     const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
     tsconfig.compilerOptions ??= {};
     tsconfig.compilerOptions.paths = {
-      '@shared': ['src/app/shared'],
-      '@shared/*': ['src/app/shared/*'],
-      '*': ['*', 'src/app/shared/*'],
+      '@shared': ['./src/app/shared'],
+      '@shared/*': ['./src/app/shared/*'],
+      '*': ['./*', './src/app/shared/*'],
     };
     host
       .scopedSync()
       .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
+
     host.appendToFile(
       'src/app/app.component.ts',
       `

@@ -122,7 +122,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         const tsconfig = JSON.parse(content);
         tsconfig.compilerOptions ??= {};
         tsconfig.compilerOptions.paths = {
-          '@app/*': ['src/app/*'],
+          '@app/*': ['./src/app/*'],
         };
 
         return JSON.stringify(tsconfig, null, 2);
