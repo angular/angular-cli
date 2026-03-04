@@ -29,7 +29,6 @@ export default function (
       const errorStream = ignoreErrorStream ? 'ignore' : process.stderr;
       const spawnOptions: SpawnOptions = {
         stdio: [process.stdin, outputStream, errorStream],
-        shell: true,
         cwd: path.join(rootDirectory, options.workingDirectory || ''),
         env: {
           ...process.env,
@@ -41,7 +40,7 @@ export default function (
       };
 
       return new Promise<void>((resolve, reject) => {
-        spawn(`git ${args.join(' ')}`, spawnOptions).on('close', (code: number) => {
+        spawn('git', args, spawnOptions).on('close', (code: number) => {
           if (code === 0) {
             resolve();
           } else {
@@ -82,7 +81,7 @@ export default function (
       if (options.commit) {
         const message = options.message || 'initial commit';
 
-        await execute(['commit', `-m "${message}"`]);
+        await execute(['commit', '-m', message]);
       }
 
       context.logger.info('Successfully initialized git.');
