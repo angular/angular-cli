@@ -36,12 +36,12 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
     it('should include the setup files', async () => {
       await harness.writeFiles({
-        'src/setup.ts': `globalThis['TEST_SETUP_RAN'] = true;`,
+        'src/setup.ts': `(globalThis as any)['TEST_SETUP_RAN'] = true;`,
         'src/app/app.component.spec.ts': `
         import { describe, expect, test } from 'vitest'
         describe('AppComponent', () => {
           test('should have run setup file', () => {
-            expect(globalThis['TEST_SETUP_RAN']).toBe(true);
+            expect((globalThis as any)['TEST_SETUP_RAN']).toBe(true);
           });
         });`,
       });

@@ -158,7 +158,8 @@ export function execute(
     }),
     concatMap(async (output) => {
       if (!output.success) {
-        return output as ServerBuilderOutput;
+        // The `as unknown` is here primarily for the linter.
+        return output as unknown as ServerBuilderOutput;
       }
 
       return {

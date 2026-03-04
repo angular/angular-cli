@@ -73,7 +73,7 @@ describe('Webpack Builder basic test', () => {
 
     it('works and returns emitted files', async () => {
       const run = await architect.scheduleTarget({ project: 'app', target: 'build' });
-      const output = (await run.result) as BuildResult;
+      const output = await run.result;
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain({
@@ -114,7 +114,7 @@ describe('Webpack Builder basic test', () => {
 
     it('works and returns emitted files', async () => {
       const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' });
-      const output = (await run.result) as BuildResult;
+      const output = await run.result;
 
       expect(output.success).toBe(true);
       expect(output.emittedFiles).toContain(

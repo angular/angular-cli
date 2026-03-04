@@ -36,7 +36,7 @@ describe('Browser Builder allow js', () => {
     );
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
@@ -63,7 +63,7 @@ describe('Browser Builder allow js', () => {
     const overrides = { aot: true };
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
 
     const content = virtualFs.fileBufferToString(
@@ -93,7 +93,7 @@ describe('Browser Builder allow js', () => {
     const run = await architect.scheduleTarget(targetSpec, overrides);
 
     await lastValueFrom(
-      (run.output as Observable<BrowserBuilderOutput>).pipe(
+      run.output.pipe(
         tap((output) => {
           const path = relative(host.root(), join(normalize(output.outputs[0].path), 'main.js'));
           const content = virtualFs.fileBufferToString(host.scopedSync().read(path));

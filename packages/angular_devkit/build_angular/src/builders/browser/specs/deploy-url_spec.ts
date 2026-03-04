@@ -34,7 +34,7 @@ describe('Browser Builder deploy url', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(output.outputs[0].path).not.toBeUndefined();
     const outputPath = normalize(output.outputs[0].path);
@@ -51,7 +51,7 @@ describe('Browser Builder deploy url', () => {
     expect(runtimeContent).toContain('deployUrl/');
 
     const run2 = await architect.scheduleTarget(targetSpec, overrides2);
-    const output2 = (await run2.result) as BrowserBuilderOutput;
+    const output2 = await run2.result;
     expect(output2.outputs[0].path).toEqual(outputPath); // These should be the same.
 
     const content2 = virtualFs.fileBufferToString(

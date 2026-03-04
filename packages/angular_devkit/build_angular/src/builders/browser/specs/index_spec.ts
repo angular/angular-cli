@@ -31,7 +31,7 @@ describe('Browser Builder index HTML processing', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -56,7 +56,7 @@ describe('Browser Builder index HTML processing', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -81,7 +81,7 @@ describe('Browser Builder index HTML processing', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -105,7 +105,7 @@ describe('Browser Builder index HTML processing', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(

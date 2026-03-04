@@ -48,7 +48,7 @@ function files(tree: Tree) {
 }
 
 describe('Schematic', () => {
-  it('works with a rule', (done) => {
+  it('works with a rule', async () => {
     let inner: Tree | null = null;
     const desc: SchematicDescription<CollectionT, SchematicT> = {
       collection,
@@ -64,15 +64,12 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
-      .then((x) => {
-        expect(files(inner!)).toEqual([]);
-        expect(files(x)).toEqual(['/a/b/c']);
-      })
-      .then(done, done.fail);
+    const x = await lastValueFrom(schematic.call({}, observableOf(empty())));
+    expect(files(inner!)).toEqual([]);
+    expect(files(x)).toEqual(['/a/b/c']);
   });
 
-  it('works with a rule that returns an observable', (done) => {
+  it('works with a rule that returns an observable', async () => {
     let inner: Tree | null = null;
     const desc: SchematicDescription<CollectionT, SchematicT> = {
       collection,
@@ -87,16 +84,13 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
-      .then((x) => {
-        expect(files(inner!)).toEqual([]);
-        expect(files(x)).toEqual([]);
-        expect(inner).not.toBe(x);
-      })
-      .then(done, done.fail);
+    const x = await lastValueFrom(schematic.call({}, observableOf(empty())));
+    expect(files(inner!)).toEqual([]);
+    expect(files(x)).toEqual([]);
+    expect(inner!).not.toBe(x);
   });
 
-  it('works with nested chained function rules', (done) => {
+  it('works with nested chained function rules', async () => {
     let chainCount = 0;
     let oneCount = 0;
     let twoCount = 0;
@@ -137,17 +131,14 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty())))
-      .then((_x) => {
-        expect(chainCount).toBe(1);
-        expect(oneCount).toBe(1);
-        expect(twoCount).toBe(1);
-        expect(threeCount).toBe(1);
-      })
-      .then(done, done.fail);
+    await lastValueFrom(schematic.call({}, observableOf(empty())));
+    expect(chainCount).toBe(1);
+    expect(oneCount).toBe(1);
+    expect(twoCount).toBe(1);
+    expect(threeCount).toBe(1);
   });
 
-  it('can be called with a scope', (done) => {
+  it('can be called with a scope', async () => {
     const desc: SchematicDescription<CollectionT, SchematicT> = {
       collection,
       name: 'test',
@@ -159,10 +150,7 @@ describe('Schematic', () => {
     };
 
     const schematic = new SchematicImpl(desc, desc.factory, null!, engine);
-    lastValueFrom(schematic.call({}, observableOf(empty()), {}, { scope: 'base' }))
-      .then((x) => {
-        expect(files(x)).toEqual(['/base/a/b/c']);
-      })
-      .then(done, done.fail);
+    const x = await lastValueFrom(schematic.call({}, observableOf(empty()), {}, { scope: 'base' }));
+    expect(files(x)).toEqual(['/base/a/b/c']);
   });
 });

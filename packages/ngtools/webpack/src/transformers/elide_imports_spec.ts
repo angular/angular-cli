@@ -421,6 +421,8 @@ describe('elide_imports', () => {
       jsxFactory: 'createElement',
       experimentalDecorators: true,
       jsx: ts.JsxEmit.React,
+      // The TS elements are implicitly `any`, because we don't include the React types.
+      noImplicitAny: false,
     };
 
     const input = tags.stripIndent`
@@ -543,7 +545,7 @@ describe('elide_imports', () => {
           import { Service } from './service';
 
           export class Foo {
-            @Decorator() foo: Service;
+            @Decorator() foo!: Service;
           }
 
           ${dummyNode}
@@ -576,7 +578,7 @@ describe('elide_imports', () => {
           import { Service } from './service';
 
           export class Foo {
-            _foo: Service;
+            _foo!: Service;
 
             @Decorator()
             set name(f: Service) {
@@ -613,7 +615,7 @@ describe('elide_imports', () => {
           import { Service } from './service';
 
           export class Foo {
-            _foo: Service;
+            _foo!: Service;
 
             @Decorator()
             get name(): Service {
@@ -652,7 +654,7 @@ describe('elide_imports', () => {
           export class Foo {
             @Decorator()
             name(): Service {
-              return undefined;
+              return undefined!;
             }
           }
 

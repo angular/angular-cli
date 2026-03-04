@@ -34,7 +34,7 @@ describe('Browser Builder crossOrigin', () => {
   it('works with use-credentials', async () => {
     const overrides = { crossOrigin: CrossOrigin.UseCredentials };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -54,7 +54,7 @@ describe('Browser Builder crossOrigin', () => {
   it('works with anonymous', async () => {
     const overrides = { crossOrigin: CrossOrigin.Anonymous };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -75,7 +75,7 @@ describe('Browser Builder crossOrigin', () => {
   it('works with none', async () => {
     const overrides = { crossOrigin: CrossOrigin.None };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(
@@ -101,7 +101,7 @@ describe('Browser Builder crossOrigin', () => {
 
     const overrides = { crossOrigin: CrossOrigin.UseCredentials };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
 
     const fileName = join(normalize(output.outputs[0].path), 'runtime.js');

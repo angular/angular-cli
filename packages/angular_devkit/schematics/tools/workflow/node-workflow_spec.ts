@@ -13,17 +13,16 @@ import { NodeWorkflow } from './node-workflow';
 
 describe('NodeWorkflow', () => {
   // TODO: this test seems to either not work on windows or on linux.
-  xit('works', (done) => {
+  xit('works', async () => {
     const workflow = new NodeWorkflow(new NodeJsSyncHost(), { dryRun: true });
     const collection = path.join(__dirname, '../../../../schematics/angular/package.json');
 
-    workflow
+    await workflow
       .execute({
         collection,
         schematic: 'ng-new',
         options: { name: 'workflow-test', version: '6.0.0-rc.4' },
       })
-      .toPromise()
-      .then(done, done.fail);
+      .toPromise();
   });
 });

@@ -30,7 +30,7 @@ describe('Browser Builder unused files warnings', () => {
     logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
@@ -49,7 +49,7 @@ describe('Browser Builder unused files warnings', () => {
     logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join().includes(`unused-file.ts ${warningMessageSuffix}`)).toBe(true);
 
@@ -82,7 +82,7 @@ describe('Browser Builder unused files warnings', () => {
     logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, { aot: true }, { logger });
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
@@ -105,7 +105,7 @@ describe('Browser Builder unused files warnings', () => {
     logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 
@@ -129,7 +129,7 @@ describe('Browser Builder unused files warnings', () => {
     logger.subscribe((e) => logs.push(e.message));
 
     const run = await architect.scheduleTarget(targetSpec, undefined, { logger });
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     expect(logs.join().includes(warningMessageSuffix)).toBe(false);
 

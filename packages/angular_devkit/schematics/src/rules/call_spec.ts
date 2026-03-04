@@ -25,70 +25,42 @@ const context: SchematicContext = {
 } as {} as SchematicContext;
 
 describe('callSource', () => {
-  it('errors if undefined source', (done) => {
+  it('errors if undefined source', async () => {
     const source0: any = () => undefined;
 
-    callSource(source0, context)
-      .toPromise()
-      .then(
-        () => done.fail(),
-        (err) => {
-          expect(err).toEqual(new InvalidSourceResultException());
-        },
-      )
-      .then(done, done.fail);
+    await expectAsync(callSource(source0, context).toPromise()).toBeRejectedWithError(
+      InvalidSourceResultException,
+    );
   });
 
-  it('errors if invalid source object', (done) => {
+  it('errors if invalid source object', async () => {
     const source0: Source = () => ({}) as Tree;
 
-    callSource(source0, context)
-      .toPromise()
-      .then(
-        () => done.fail(),
-        (err) => {
-          expect(err).toEqual(new InvalidSourceResultException({}));
-        },
-      )
-      .then(done, done.fail);
+    await expectAsync(callSource(source0, context).toPromise()).toBeRejectedWithError(
+      InvalidSourceResultException,
+    );
   });
 
-  it('errors if Observable of invalid source object', (done) => {
+  it('errors if Observable of invalid source object', async () => {
     const source0: Source = () => observableOf({} as Tree);
 
-    callSource(source0, context)
-      .toPromise()
-      .then(
-        () => done.fail(),
-        (err) => {
-          expect(err).toEqual(new InvalidSourceResultException({}));
-        },
-      )
-      .then(done, done.fail);
+    await expectAsync(callSource(source0, context).toPromise()).toBeRejectedWithError(
+      InvalidSourceResultException,
+    );
   });
 
-  it('works with a Tree', (done) => {
+  it('works with a Tree', async () => {
     const tree0 = empty();
     const source0: Source = () => tree0;
-
-    callSource(source0, context)
-      .toPromise()
-      .then((tree) => {
-        expect(tree).toBe(tree0);
-      })
-      .then(done, done.fail);
+    const tree = await callSource(source0, context).toPromise();
+    expect(tree).toBe(tree0);
   });
 
-  it('works with an Observable', (done) => {
+  it('works with an Observable', async () => {
     const tree0 = empty();
     const source0: Source = () => observableOf(tree0);
-
-    callSource(source0, context)
-      .toPromise()
-      .then((tree) => {
-        expect(tree).toBe(tree0);
-      })
-      .then(done, done.fail);
+    const tree = await callSource(source0, context).toPromise();
+    expect(tree).toBe(tree0);
   });
 });
 
@@ -109,39 +81,24 @@ describe('callRule', () => {
     );
   });
 
-  it('works with undefined result', (done) => {
+  it('works with undefined result', async () => {
     const tree0 = empty();
     const rule0: Rule = () => undefined;
-
-    callRule(rule0, observableOf(tree0), context)
-      .toPromise()
-      .then((tree) => {
-        expect(tree).toBe(tree0);
-      })
-      .then(done, done.fail);
+    const tree = await callRule(rule0, observableOf(tree0), context).toPromise();
+    expect(tree).toBe(tree0);
   });
 
-  it('works with a Tree', (done) => {
+  it('works with a Tree', async () => {
     const tree0 = empty();
     const rule0: Rule = () => tree0;
-
-    callRule(rule0, observableOf(tree0), context)
-      .toPromise()
-      .then((tree) => {
-        expect(tree).toBe(tree0);
-      })
-      .then(done, done.fail);
+    const tree = await callRule(rule0, observableOf(tree0), context).toPromise();
+    expect(tree).toBe(tree0);
   });
 
-  it('works with an Observable', (done) => {
+  it('works with an Observable', async () => {
     const tree0 = empty();
     const rule0: Rule = () => observableOf(tree0);
-
-    callRule(rule0, observableOf(tree0), context)
-      .toPromise()
-      .then((tree) => {
-        expect(tree).toBe(tree0);
-      })
-      .then(done, done.fail);
+    const tree = await callRule(rule0, observableOf(tree0), context).toPromise();
+    expect(tree).toBe(tree0);
   });
 });

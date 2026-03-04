@@ -194,10 +194,10 @@ async function _appShellBuilder(
   let spinner: Spinner | undefined;
 
   try {
-    const [browserResult, serverResult] = await Promise.all([
-      browserTargetRun.result as Promise<BrowserBuilderOutput>,
-      serverTargetRun.result as Promise<ServerBuilderOutput>,
-    ]);
+    const [browserResult, serverResult] = (await Promise.all([
+      browserTargetRun.result,
+      serverTargetRun.result,
+    ])) as [BrowserBuilderOutput, ServerBuilderOutput];
 
     if (browserResult.success === false || browserResult.baseOutputPath === undefined) {
       return browserResult;

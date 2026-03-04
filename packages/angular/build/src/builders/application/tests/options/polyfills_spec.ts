@@ -26,6 +26,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             const tsconfig = JSON.parse(content);
             tsconfig.compilerOptions.baseUrl = baseUrl;
 
+            // The test is specifically testing `baseUrl` which is deprecated in TS6.
+            tsconfig.compilerOptions.ignoreDeprecations = '6.0';
+
             return JSON.stringify(tsconfig);
           });
         });

@@ -55,6 +55,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         tsconfig.compilerOptions.isolatedModules = true;
         tsconfig.compilerOptions.jsx = 'react-jsx';
 
+        // There's an implicit `any`, because we don't include the React typings.
+        tsconfig.compilerOptions.noImplicitAny = false;
+
         return JSON.stringify(tsconfig);
       });
 

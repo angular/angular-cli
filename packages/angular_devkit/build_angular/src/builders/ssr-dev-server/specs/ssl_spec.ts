@@ -11,7 +11,6 @@ import { Architect } from '@angular-devkit/architect';
 import * as browserSync from 'browser-sync';
 import { Agent } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
-import { SSRDevServerBuilderOutput } from '../index';
 
 describe('Serve SSR Builder - SSL', () => {
   const target = { project: 'app', target: 'serve-ssr' };
@@ -33,7 +32,7 @@ describe('Serve SSR Builder - SSL', () => {
     host.writeMultipleFiles({
       'src/main.server.ts': `
         import { CommonEngine } from '@angular/ssr/node';
-        import * as express from 'express';
+        import express from 'express';
         import { resolve, join } from 'node:path';
         import { AppServerModule } from './app/app.module.server';
 
@@ -81,7 +80,7 @@ describe('Serve SSR Builder - SSL', () => {
 
   it('works with SSL', async () => {
     const run = await architect.scheduleTarget(target, { ssl: true, port: 0 });
-    const output = (await run.result) as SSRDevServerBuilderOutput;
+    const output = await run.result;
 
     expect(output.success).toBe(true);
     expect(output.baseUrl).toBe(`https://localhost:${output.port}`);

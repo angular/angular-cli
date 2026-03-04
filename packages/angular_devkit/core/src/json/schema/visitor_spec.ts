@@ -84,13 +84,13 @@ describe('visitJson', () => {
     expect(result).toEqual({ a: { b: { c: ['_1', '_2', '_3'] } } });
   });
 
-  it('goes through all replacements recursively (async)', (done) => {
+  it('goes through all replacements recursively (async)', async () => {
     const json = { a: 1 };
     const newJson = { b: '' };
     const newJson2 = { c: [] };
     const newJson3 = [1, 2, 3];
 
-    visitJson(json, (value, ptr) => {
+    const result = await visitJson(json, (value, ptr) => {
       if (ptr.endsWith('a')) {
         return from(Promise.resolve(newJson));
       } else if (ptr.endsWith('b')) {
@@ -104,12 +104,9 @@ describe('visitJson', () => {
       } else {
         return from(Promise.resolve('abc'));
       }
-    })
-      .toPromise()
-      .then((result) => {
-        expect(result).toEqual({ a: { b: { c: ['_1', '_2', '_3'] } } });
-        done();
-      }, done.fail);
+    }).toPromise();
+
+    expect(result).toEqual({ a: { b: { c: ['_1', '_2', '_3'] } } });
   });
 
   it('works with schema', () => {

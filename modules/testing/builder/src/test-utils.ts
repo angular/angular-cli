@@ -80,7 +80,7 @@ export async function browserBuild(
   scheduleOptions?: ScheduleOptions,
 ): Promise<BrowserBuildOutput> {
   const run = await architect.scheduleTarget(target, overrides, scheduleOptions);
-  const output = (await run.result) as BuilderOutput & { outputs: { path: string }[] };
+  const output = await run.result;
   expect(output.success).toBe(true);
 
   if (!output.success) {

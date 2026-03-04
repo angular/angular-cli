@@ -23,7 +23,7 @@ const context: SchematicContext = {
 } as {} as SchematicContext;
 
 describe('chain', () => {
-  it('works with simple rules', (done) => {
+  it('works with simple rules', async () => {
     const rulesCalled: Tree[] = [];
 
     const tree0 = empty();
@@ -35,18 +35,17 @@ describe('chain', () => {
     const rule1: Rule = (tree: Tree) => ((rulesCalled[1] = tree), tree2);
     const rule2: Rule = (tree: Tree) => ((rulesCalled[2] = tree), tree3);
 
-    lastValueFrom(callRule(chain([rule0, rule1, rule2]), observableOf(tree0), context))
-      .then((result) => {
-        expect(result).not.toBe(tree0);
-        expect(rulesCalled[0]).toBe(tree0);
-        expect(rulesCalled[1]).toBe(tree1);
-        expect(rulesCalled[2]).toBe(tree2);
-        expect(result).toBe(tree3);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(
+      callRule(chain([rule0, rule1, rule2]), observableOf(tree0), context),
+    );
+    expect(result).not.toBe(tree0);
+    expect(rulesCalled[0]).toBe(tree0);
+    expect(rulesCalled[1]).toBe(tree1);
+    expect(rulesCalled[2]).toBe(tree2);
+    expect(result).toBe(tree3);
   });
 
-  it('works with async rules', (done) => {
+  it('works with async rules', async () => {
     const rulesCalled: Tree[] = [];
 
     const tree0 = empty();
@@ -58,15 +57,12 @@ describe('chain', () => {
     const rule1: Rule = async (tree: Tree) => ((rulesCalled[1] = tree), tree2);
     const rule2: Rule = async (tree: Tree) => ((rulesCalled[2] = tree), tree3);
 
-    lastValueFrom(callRule(chain([rule0, rule1, rule2]), tree0, context))
-      .then((result) => {
-        expect(result).not.toBe(tree0);
-        expect(rulesCalled[0]).toBe(tree0);
-        expect(rulesCalled[1]).toBe(tree1);
-        expect(rulesCalled[2]).toBe(tree2);
-        expect(result).toBe(tree3);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(callRule(chain([rule0, rule1, rule2]), tree0, context));
+    expect(result).not.toBe(tree0);
+    expect(rulesCalled[0]).toBe(tree0);
+    expect(rulesCalled[1]).toBe(tree1);
+    expect(rulesCalled[2]).toBe(tree2);
+    expect(result).toBe(tree3);
   });
 
   it('works with a sync generator of rules', async () => {
@@ -123,7 +119,7 @@ describe('chain', () => {
     expect(result).toBe(tree3);
   });
 
-  it('works with observable rules', (done) => {
+  it('works with observable rules', async () => {
     const rulesCalled: Tree[] = [];
 
     const tree0 = empty();
@@ -135,20 +131,19 @@ describe('chain', () => {
     const rule1: Rule = (tree: Tree) => ((rulesCalled[1] = tree), observableOf(tree2));
     const rule2: Rule = (tree: Tree) => ((rulesCalled[2] = tree), tree3);
 
-    lastValueFrom(callRule(chain([rule0, rule1, rule2]), observableOf(tree0), context))
-      .then((result) => {
-        expect(result).not.toBe(tree0);
-        expect(rulesCalled[0]).toBe(tree0);
-        expect(rulesCalled[1]).toBe(tree1);
-        expect(rulesCalled[2]).toBe(tree2);
-        expect(result).toBe(tree3);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(
+      callRule(chain([rule0, rule1, rule2]), observableOf(tree0), context),
+    );
+    expect(result).not.toBe(tree0);
+    expect(rulesCalled[0]).toBe(tree0);
+    expect(rulesCalled[1]).toBe(tree1);
+    expect(rulesCalled[2]).toBe(tree2);
+    expect(result).toBe(tree3);
   });
 });
 
 describe('apply', () => {
-  it('works with simple rules', (done) => {
+  it('works with simple rules', async () => {
     const rulesCalled: Tree[] = [];
     const tree0 = empty();
     const tree1 = empty();
@@ -160,18 +155,15 @@ describe('apply', () => {
     const rule1: Rule = (tree: Tree) => ((rulesCalled[1] = tree), tree2);
     const rule2: Rule = (tree: Tree) => ((rulesCalled[2] = tree), tree3);
 
-    lastValueFrom(callSource(apply(source, [rule0, rule1, rule2]), context))
-      .then((result) => {
-        expect(result).not.toBe(tree0);
-        expect(rulesCalled[0]).toBe(tree0);
-        expect(rulesCalled[1]).toBe(tree1);
-        expect(rulesCalled[2]).toBe(tree2);
-        expect(result).toBe(tree3);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(callSource(apply(source, [rule0, rule1, rule2]), context));
+    expect(result).not.toBe(tree0);
+    expect(rulesCalled[0]).toBe(tree0);
+    expect(rulesCalled[1]).toBe(tree1);
+    expect(rulesCalled[2]).toBe(tree2);
+    expect(result).toBe(tree3);
   });
 
-  it('works with observable rules', (done) => {
+  it('works with observable rules', async () => {
     const rulesCalled: Tree[] = [];
     const tree0 = empty();
     const tree1 = empty();
@@ -183,20 +175,17 @@ describe('apply', () => {
     const rule1: Rule = (tree: Tree) => ((rulesCalled[1] = tree), observableOf(tree2));
     const rule2: Rule = (tree: Tree) => ((rulesCalled[2] = tree), tree3);
 
-    lastValueFrom(callSource(apply(source, [rule0, rule1, rule2]), context))
-      .then((result) => {
-        expect(result).not.toBe(tree0);
-        expect(rulesCalled[0]).toBe(tree0);
-        expect(rulesCalled[1]).toBe(tree1);
-        expect(rulesCalled[2]).toBe(tree2);
-        expect(result).toBe(tree3);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(callSource(apply(source, [rule0, rule1, rule2]), context));
+    expect(result).not.toBe(tree0);
+    expect(rulesCalled[0]).toBe(tree0);
+    expect(rulesCalled[1]).toBe(tree1);
+    expect(rulesCalled[2]).toBe(tree2);
+    expect(result).toBe(tree3);
   });
 });
 
 describe('partitionApplyMerge', () => {
-  it('works with simple rules', (done) => {
+  it('works with simple rules', async () => {
     const host = new virtualFs.test.TestHost({
       '/test1': '',
       '/test2': '',
@@ -217,30 +206,26 @@ describe('partitionApplyMerge', () => {
       return empty();
     };
 
-    lastValueFrom(
+    const result = await lastValueFrom(
       callRule(partitionApplyMerge(predicate, ruleYes, ruleNo), observableOf(tree), context),
-    )
-      .then((result) => {
-        expect(result.exists('/test1')).toBe(false);
-        expect(result.exists('/test2')).toBe(false);
-      })
-      .then(done, done.fail);
+    );
+    expect(result.exists('/test1')).toBe(false);
+    expect(result.exists('/test2')).toBe(false);
   });
 });
 
 describe('applyToSubtree', () => {
-  it('works', (done) => {
+  it('works', async () => {
     const tree = new HostTree();
     tree.create('a/b/file1', 'hello world');
     tree.create('a/b/file2', 'hello world');
     tree.create('a/c/file3', 'hello world');
 
-    lastValueFrom(callRule(applyToSubtree('a/b', [move('x')]), observableOf(tree), context))
-      .then((result) => {
-        expect(result.exists('a/b/x/file1')).toBe(true);
-        expect(result.exists('a/b/x/file2')).toBe(true);
-        expect(result.exists('a/c/file3')).toBe(true);
-      })
-      .then(done, done.fail);
+    const result = await lastValueFrom(
+      callRule(applyToSubtree('a/b', [move('x')]), observableOf(tree), context),
+    );
+    expect(result.exists('a/b/x/file1')).toBe(true);
+    expect(result.exists('a/b/x/file2')).toBe(true);
+    expect(result.exists('a/c/file3')).toBe(true);
   });
 });

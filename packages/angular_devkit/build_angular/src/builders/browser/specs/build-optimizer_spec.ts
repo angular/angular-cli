@@ -40,7 +40,7 @@ describe('Browser Builder build optimizer', () => {
     const boOverrides = { ...noBoOverrides, buildOptimizer: true };
 
     const run = await architect.scheduleTarget(targetSpec, noBoOverrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
 
     expect(output.success).toBe(true);
 
@@ -54,7 +54,7 @@ describe('Browser Builder build optimizer', () => {
     await run.stop();
 
     const boRun = await architect.scheduleTarget(targetSpec, boOverrides);
-    const boOutput = (await run.result) as BrowserBuilderOutput;
+    const boOutput = await run.result;
     expect(boOutput.success).toBe(true);
 
     const boStats = await lastValueFrom(
