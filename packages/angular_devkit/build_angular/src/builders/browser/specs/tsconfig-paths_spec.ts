@@ -46,13 +46,14 @@ describe('Browser Builder tsconfig paths', () => {
     const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
     tsconfig.compilerOptions ??= {};
     tsconfig.compilerOptions.paths = {
-      '@shared': ['src/app/shared'],
-      '@shared/*': ['src/app/shared/*'],
-      '*': ['*', 'src/app/shared/*'],
+      '@shared': ['./src/app/shared'],
+      '@shared/*': ['./src/app/shared/*'],
+      '*': ['./*', './src/app/shared/*'],
     };
     host
       .scopedSync()
       .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
+
     host.appendToFile(
       'src/app/app.component.ts',
       `

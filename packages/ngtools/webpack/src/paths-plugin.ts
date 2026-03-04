@@ -45,7 +45,7 @@ export class TypeScriptPathsPlugin {
    * @param options The `paths` and `baseUrl` options from TypeScript's `CompilerOptions`.
    */
   update(options: TypeScriptPathsPluginOptions): void {
-    this.baseUrl = options.baseUrl;
+    this.baseUrl = options.baseUrl ?? (options as Record<string, string>)['pathsBasePath'];
     this.patterns = undefined;
 
     if (options.paths) {
