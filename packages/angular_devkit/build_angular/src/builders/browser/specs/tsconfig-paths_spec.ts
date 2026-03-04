@@ -36,7 +36,7 @@ describe('Browser Builder tsconfig paths', () => {
     await browserBuild(architect, host, target);
   });
 
-  fit('should resolve complex tsconfig paths with wildcards', async () => {
+  it('should resolve complex tsconfig paths with wildcards', async () => {
     host.writeMultipleFiles({
       'src/meaning-too.ts': 'export var meaning = 42;',
       'src/app/shared/meaning.ts': 'export var meaning = 42;',
