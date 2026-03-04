@@ -20,6 +20,42 @@ import { platform, tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { PackageManagerError } from './error';
 
+// cmd.exe metacharacters that need ^ escaping.
+// Reference: http://www.robvanderwoude.com/escapechars.php
+const metaCharsRegExp = /([()\][%!^"`<>&|;, *?])/g;
+
+/** Escapes a command name for safe use in cmd.exe. */
+function escapeCommandForCmd(cmd: string): string {
+  return cmd.replace(metaCharsRegExp, '^$1');
+}
+
+/**
+ * Escapes an argument for safe use in cmd.exe.
+ * Based on the algorithm from cross-spawn (https://github.com/moxystudio/node-cross-spawn)
+ * and https://qntm.org/cmd
+ */
+function escapeArgForCmd(arg: string): string {
+  // Convert to string
+  arg = `${arg}`;
+
+  // Sequence of backslashes followed by a double quote:
+  // double up all the backslashes and escape the double quote
+  arg = arg.replace(/(?=(\\+?)?)\1"/g, '$1$1\\"');
+
+  // Sequence of backslashes followed by the end of the string
+  // (which will become a double quote later):
+  // double up all the backslashes
+  arg = arg.replace(/(?=(\\+?)?)\1$/, '$1$1');
+
+  // Quote the whole thing
+  arg = `"${arg}"`;
+
+  // Escape cmd.exe meta chars with ^
+  arg = arg.replace(metaCharsRegExp, '^$1');
+
+  return arg;
+}
+
 /**
  * An abstraction layer for side-effectful operations.
  */
@@ -130,7 +166,6 @@ export const NodeJS_HOST: Host = {
 
     return new Promise((resolve, reject) => {
       const spawnOptions = {
-        shell: isWin32,
         stdio: options.stdio ?? 'pipe',
         signal,
         cwd: options.cwd,
@@ -139,9 +174,27 @@ export const NodeJS_HOST: Host = {
           ...options.env,
         },
       } satisfies SpawnOptions;
-      const childProcess = isWin32
-        ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
-        : spawn(command, args, spawnOptions);
+
+      let childProcess;
+      if (isWin32) {
+        // On Windows, package managers (npm, yarn, pnpm) are .cmd scripts that
+        // require a shell to execute. Instead of using shell: true (which is
+        // vulnerable to command injection), we invoke cmd.exe directly with
+        // properly escaped arguments.
+        // This approach is based on cross-spawn:
+        // https://github.com/moxystudio/node-cross-spawn
+        const escapedCmd = escapeCommandForCmd(command);
+        const escapedArgs = args.map((a) => escapeArgForCmd(a));
+        const shellCommand = [escapedCmd, ...escapedArgs].join(' ');
+
+        childProcess = spawn(
+          process.env.comspec || 'cmd.exe',
+          ['/d', '/s', '/c', `"${shellCommand}"`],
+          { ...spawnOptions, windowsVerbatimArguments: true },
+        );
+      } else {
+        childProcess = spawn(command, args, spawnOptions);
+      }
 
       let stdout = '';
       childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
