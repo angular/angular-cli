@@ -8,7 +8,11 @@ import { releasePackages } from '../scripts/packages.mts';
  */
 export const release = {
   representativeNpmPackage: '@angular/cli',
-  npmPackages: releasePackages.map(({ name, experimental }) => ({ name, experimental })),
+  npmPackages: releasePackages.map(({ name, experimental, deprecated }) => ({
+    name,
+    experimental,
+    deprecated,
+  })),
   buildPackages: async () => {
     // The `performNpmReleaseBuild` function is loaded at runtime to avoid loading additional
     // files and dependencies unless a build is required.
