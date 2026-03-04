@@ -1,12 +1,9 @@
 import assert from 'node:assert/strict';
 import { updateJsonFile } from '../../utils/project';
-import { ng, silentNpm } from '../../utils/process';
-import { createDir, writeFile } from '../../utils/fs';
+import { ng } from '../../utils/process';
+import { appendToFile, createDir, writeFile } from '../../utils/fs';
 
 export default async function (): Promise<void> {
-  // Install Vitest deps
-  await silentNpm('install', 'vitest@^4.0.8', 'jsdom@^27.1.0', '--save-dev');
-
   // Generate a library
   await ng('generate', 'library', 'my-lib', '--test-runner', 'vitest');
 
@@ -25,17 +22,10 @@ export default async function (): Promise<void> {
 
   // 3. Update the component to use SCSS and import the shared file
   // Rename CSS to SCSS
-  await ng(
-    'generate',
-    'component',
-    'styled-comp',
-    '--project=my-lib',
-    '--style=scss',
-    '--skip-import',
-  );
+  await ng('generate', 'component', 'styled-comp', '--project=my-lib', '--style=scss');
 
-  await writeFile(
-    'projects/my-lib/src/lib/styled-comp/styled-comp.component.scss',
+  await appendToFile(
+    'projects/my-lib/src/lib/styled-comp/styled-comp.scss',
     `
       @use 'vars';
       p { color: vars.$primary-color; }
