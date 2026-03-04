@@ -1,3 +1,15 @@
+<a name="20.3.19"></a>
+
+# 20.3.19 (2026-03-04)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [0299b4d1a](https://github.com/angular/angular-cli/commit/0299b4d1aca13f11a06e2e92c593fe3e20906d23) | fix  | update copy-webpack-plugin to v14.0.0 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.18"></a>
 
 # 20.3.18 (2026-02-26)
