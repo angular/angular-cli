@@ -13,6 +13,10 @@ import { dirname } from 'node:path';
 export interface PackageInfo {
   name: string;
   root: string;
+  deprecated?: {
+    version: string;
+    message: string;
+  };
   experimental: boolean;
   packageJson: Record<string, boolean | number | string | object>;
 }
@@ -31,6 +35,7 @@ function getPackages(): PackageInfo[] {
     packages.push({
       name: packageJson.name,
       experimental: !!packageJson.experimental,
+      deprecated: monorepoData.packages[packageJson.name].deprecated,
       root: dirname(pkg),
       packageJson,
     });
