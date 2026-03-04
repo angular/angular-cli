@@ -410,7 +410,6 @@ export class AngularWebpackPlugin {
       this.pluginOptions.tsconfig,
       this.pluginOptions.compilerOptions,
     );
-    compilerOptions.baseUrl ??= compilerOptions['pathsBasePath'];
     compilerOptions.composite = false;
     compilerOptions.noEmitOnError = false;
     compilerOptions.suppressOutputPathCheck = true;
