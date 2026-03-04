@@ -3,6 +3,8 @@ name: DevInfra
 on:
   pull_request_target:
     types: [opened, synchronize, reopened]
+  issues:
+    types: [opened, reopened]
 
 # Declare default permissions as read only.
 permissions:
@@ -10,6 +12,7 @@ permissions:
 
 jobs:
   labels:
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -17,9 +20,18 @@ jobs:
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
   post_approval_changes:
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: angular/dev-infra/github-actions/post-approval-changes@63fd18d4726829e65f6abe6f15c0fe79f63f1dec
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
+  issue_labels:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: angular/dev-infra/github-actions/labeling/issue@c4344a4e20dbdf9cb8eeb7a7eb91431b98eabd99
+        with:
+          angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
+          google-generative-ai-key: ${{ secrets.GOOGLE_GENERATIVE_AI_KEY }}
