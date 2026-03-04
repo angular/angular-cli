@@ -11,7 +11,6 @@ import { Architect } from '@angular-devkit/architect';
 import * as browserSync from 'browser-sync';
 import * as http from 'node:http';
 import { createArchitect, host } from '../../../testing/test-utils';
-import { SSRDevServerBuilderOutput } from '../index';
 
 describe('Serve SSR Builder - Proxy', () => {
   const target = { project: 'app', target: 'serve-ssr' };
@@ -33,7 +32,7 @@ describe('Serve SSR Builder - Proxy', () => {
     host.writeMultipleFiles({
       'src/main.server.ts': `
         import { CommonEngine } from '@angular/ssr/node';
-        import * as express from 'express';
+        import express from 'express';
         import { resolve, join } from 'node:path';
         import { AppServerModule } from './app/app.module.server';
 
@@ -103,7 +102,7 @@ describe('Serve SSR Builder - Proxy', () => {
         proxyConfig: 'proxy.config.json',
       });
 
-      const output = (await run.result) as SSRDevServerBuilderOutput;
+      const output = await run.result;
 
       expect(output.success).toBe(true);
       expect(output.baseUrl).toBe(`http://localhost:${output.port}`);

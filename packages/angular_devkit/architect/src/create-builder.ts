@@ -92,9 +92,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
 
       function onInput(i: BuilderInput) {
         const builder = i.info as BuilderInfo;
-        const loggerName = i.target
-          ? targetStringFromTarget(i.target as Target)
-          : builder.builderName;
+        const loggerName = i.target ? targetStringFromTarget(i.target) : builder.builderName;
         const logger = new logging.Logger(loggerName);
 
         subscriptions.push(logger.subscribe((entry) => log(entry)));
@@ -103,7 +101,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
           builder,
           workspaceRoot: i.workspaceRoot,
           currentDirectory: i.currentDirectory,
-          target: i.target as Target,
+          target: i.target,
           logger: logger,
           id: i.id,
           async scheduleTarget(

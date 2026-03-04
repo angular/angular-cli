@@ -33,7 +33,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         import { Directive, Input } from '@angular/core';
         @Directive({ selector: 'dir', standalone: false })
         export class Dir {
-          @Input() foo: number;
+          @Input() foo!: number;
         }
       `;
 

@@ -23,7 +23,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         import { Directive, Input } from '@angular/core';
         @Directive({ selector: 'dir', standalone: false })
         export class Dir {
-          @Input() foo: number;
+          @Input() foo!: number;
         }
       `;
 
@@ -150,7 +150,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         import { Directive, Input } from '@angular/core';
         @Directive({ selector: 'dir', standalone: false })
         export class Dir {
-          @Input() foo: number;
+          @Input() foo!: number;
         }
       `,
       );
@@ -160,7 +160,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         import { Directive } from '@angular/core';
         @Directive({ selector: 'dir', standalone: false })
         export class Dir2 {
-          foo: string;
+          foo!: string;
         }
       `;
       await harness.writeFile('src/app/dir2.ts', goodDirectiveContents);
@@ -216,7 +216,7 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
                   import { Directive, Input } from '@angular/core';
                   @Directive({ selector: 'dir', standalone: false })
                   export class Dir2 {
-                    @Input() foo: string;
+                    @Input() foo!: string;
                   }
                 `,
             );

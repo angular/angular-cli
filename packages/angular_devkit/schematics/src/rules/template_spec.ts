@@ -174,7 +174,7 @@ describe('contentTemplate', () => {
 });
 
 describe('applyTemplateFiles', () => {
-  it('works with template files exclusively', (done) => {
+  it('works with template files exclusively', async () => {
     const tree = new UnitTestTree(new HostTree());
     tree.create('a/b/file1', 'hello world');
     tree.create('a/b/file2', 'hello world');
@@ -188,20 +188,16 @@ describe('applyTemplateFiles', () => {
     } as SchematicContext;
 
     // Rename all files that contain 'b' to 'hello'.
-    callRule(applyTemplates({ a: 'foo' }), observableOf(tree), context)
-      .toPromise()
-      .then(() => {
-        expect([...tree.files].sort()).toEqual([
-          '/a/b/file1',
-          '/a/b/file2',
-          '/a/b/file3',
-          '/a/b/file__norename__',
-          '/a/b/filefoo',
-          '/a/c/file4',
-        ]);
+    await callRule(applyTemplates({ a: 'foo' }), observableOf(tree), context).toPromise();
 
-        expect(tree.readContent('/a/b/file3')).toBe('hello 1 world');
-      })
-      .then(done, done.fail);
+    expect([...tree.files].sort()).toEqual([
+      '/a/b/file1',
+      '/a/b/file2',
+      '/a/b/file3',
+      '/a/b/file__norename__',
+      '/a/b/filefoo',
+      '/a/c/file4',
+    ]);
+    expect(tree.readContent('/a/b/file3')).toBe('hello 1 world');
   });
 });

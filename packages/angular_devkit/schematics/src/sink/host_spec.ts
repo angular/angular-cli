@@ -11,7 +11,7 @@ import { HostCreateTree, HostTree } from '../tree/host-tree';
 import { HostSink } from './host';
 
 describe('FileSystemSink', () => {
-  it('works', (done) => {
+  it('works', async () => {
     const host = new virtualFs.test.TestHost({
       '/hello': 'world',
       '/sub/directory/file2': '',
@@ -32,19 +32,14 @@ describe('FileSystemSink', () => {
 
     const outputHost = new virtualFs.test.TestHost();
     const sink = new HostSink(outputHost);
-    sink
-      .commit(tree)
-      .toPromise()
-      .then(() => {
-        const tmpFiles = outputHost.files.sort();
-        expect(tmpFiles as string[]).toEqual(files);
-        expect(outputHost.sync.read(normalize('/test')).toString()).toBe('testing testing 1 2');
-      })
-      .then(done, done.fail);
+    await sink.commit(tree).toPromise();
+    const tmpFiles = outputHost.files.sort();
+    expect(tmpFiles as string[]).toEqual(files);
+    expect(outputHost.sync.read(normalize('/test')).toString()).toBe('testing testing 1 2');
   });
 
   describe('complex tests', () => {
-    beforeEach((done) => {
+    beforeEach(async () => {
       // Commit a version of the tree.
       const host = new virtualFs.test.TestHost({
         '/file0': '/file0',
@@ -55,10 +50,10 @@ describe('FileSystemSink', () => {
 
       const outputHost = new virtualFs.test.TestHost();
       const sink = new HostSink(outputHost);
-      sink.commit(tree).toPromise().then(done, done.fail);
+      await sink.commit(tree).toPromise();
     });
 
-    it('can rename files', (done) => {
+    it('can rename files', async () => {
       const host = new virtualFs.test.TestHost({
         '/file0': '/file0',
       });
@@ -66,17 +61,12 @@ describe('FileSystemSink', () => {
       tree.rename('/file0', '/file1');
 
       const sink = new HostSink(host);
-      sink
-        .commit(tree)
-        .toPromise()
-        .then(() => {
-          expect(host.sync.exists(normalize('/file0'))).toBe(false);
-          expect(host.sync.exists(normalize('/file1'))).toBe(true);
-        })
-        .then(done, done.fail);
+      await sink.commit(tree).toPromise();
+      expect(host.sync.exists(normalize('/file0'))).toBe(false);
+      expect(host.sync.exists(normalize('/file1'))).toBe(true);
     });
 
-    it('can rename nested files', (done) => {
+    it('can rename nested files', async () => {
       const host = new virtualFs.test.TestHost({
         '/sub/directory/file2': '',
       });
@@ -84,17 +74,12 @@ describe('FileSystemSink', () => {
       tree.rename('/sub/directory/file2', '/another-directory/file2');
 
       const sink = new HostSink(host);
-      sink
-        .commit(tree)
-        .toPromise()
-        .then(() => {
-          expect(host.sync.exists(normalize('/sub/directory/file2'))).toBe(false);
-          expect(host.sync.exists(normalize('/another-directory/file2'))).toBe(true);
-        })
-        .then(done, done.fail);
+      await sink.commit(tree).toPromise();
+      expect(host.sync.exists(normalize('/sub/directory/file2'))).toBe(false);
+      expect(host.sync.exists(normalize('/another-directory/file2'))).toBe(true);
     });
 
-    it('can delete and create the same file', (done) => {
+    it('can delete and create the same file', async () => {
       const host = new virtualFs.test.TestHost({
         '/file0': 'world',
       });
@@ -103,16 +88,11 @@ describe('FileSystemSink', () => {
       tree.create('/file0', 'hello');
 
       const sink = new HostSink(host);
-      sink
-        .commit(tree)
-        .toPromise()
-        .then(() => {
-          expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
-        })
-        .then(done, done.fail);
+      await sink.commit(tree).toPromise();
+      expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
     });
 
-    it('can rename then create the same file', (done) => {
+    it('can rename then create the same file', async () => {
       const host = new virtualFs.test.TestHost({
         '/file0': 'world',
       });
@@ -126,14 +106,9 @@ describe('FileSystemSink', () => {
       expect(tree.exists('/file0')).toBeTruthy();
 
       const sink = new HostSink(host);
-      sink
-        .commit(tree)
-        .toPromise()
-        .then(() => {
-          expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
-          expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
-        })
-        .then(done, done.fail);
+      await sink.commit(tree).toPromise();
+      expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
+      expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
     });
 
     it('can rename then modify the same file', async () => {

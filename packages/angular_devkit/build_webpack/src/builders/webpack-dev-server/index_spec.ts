@@ -50,7 +50,7 @@ describe('Dev Server Builder', () => {
     const run = await architect.scheduleTarget(webpackTargetSpec, {
       webpackConfig: 'webpack.config.cjs',
     });
-    const output = (await run.result) as DevServerBuildOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
 
     const response = await fetch(`http://localhost:${output.port}/bundle.js`);
@@ -63,7 +63,7 @@ describe('Dev Server Builder', () => {
     const run = await architect.scheduleTarget(webpackTargetSpec, {
       webpackConfig: 'webpack.config.mjs',
     });
-    const output = (await run.result) as DevServerBuildOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
 
     const response = await fetch(`http://localhost:${output.port}/bundle.js`);
@@ -74,7 +74,7 @@ describe('Dev Server Builder', () => {
 
   it('works and returns emitted files', async () => {
     const run = await architect.scheduleTarget(webpackTargetSpec);
-    const output = (await run.result) as DevServerBuildOutput;
+    const output = await run.result;
 
     expect(output.success).toBe(true);
     expect(output.emittedFiles).toContain({

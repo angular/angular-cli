@@ -83,6 +83,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         tsconfig.compilerOptions.paths = {
           'app-module': ['./a.js'],
         };
+        tsconfig.compilerOptions.allowJs = true;
 
         return JSON.stringify(tsconfig);
       });

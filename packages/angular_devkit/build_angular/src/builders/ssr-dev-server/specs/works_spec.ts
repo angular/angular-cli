@@ -10,7 +10,6 @@ import { Architect } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as browserSync from 'browser-sync';
 import { createArchitect, host } from '../../../testing/test-utils';
-import { SSRDevServerBuilderOutput } from '../index';
 
 describe('Serve SSR Builder - Works', () => {
   const target = { project: 'app', target: 'serve-ssr' };
@@ -32,7 +31,7 @@ describe('Serve SSR Builder - Works', () => {
     host.writeMultipleFiles({
       'src/main.server.ts': `
       import { CommonEngine } from '@angular/ssr/node';
-      import * as express from 'express';
+      import express from 'express';
       import { resolve, join } from 'node:path';
       import { AppServerModule } from './app/app.module.server';
 
@@ -90,7 +89,7 @@ describe('Serve SSR Builder - Works', () => {
 
   it('works with port 0', async () => {
     const run = await architect.scheduleTarget(target, { port: 0 });
-    const output = (await run.result) as SSRDevServerBuilderOutput;
+    const output = await run.result;
     await run.stop();
 
     expect(output.success).toBe(true);

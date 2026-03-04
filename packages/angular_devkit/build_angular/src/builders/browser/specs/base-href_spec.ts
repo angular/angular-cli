@@ -10,7 +10,6 @@ import { Architect } from '@angular-devkit/architect';
 import { join, normalize, tags, virtualFs } from '@angular-devkit/core';
 import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
-import { BrowserBuilderOutput } from '../index';
 
 describe('Browser Builder base href', () => {
   const targetSpec = { project: 'app', target: 'build' };
@@ -23,6 +22,12 @@ describe('Browser Builder base href', () => {
   afterEach(async () => host.restore().toPromise());
 
   it('works', async () => {
+    host.replaceInFile(
+      'tsconfig.json',
+      '"target": "es2022"',
+      '"target": "es2022", "allowJs": true',
+    );
+
     host.writeMultipleFiles({
       'src/my-js-file.js': `console.log(1); export const a = 2;`,
       'src/main.ts': `import { a } from './my-js-file'; console.log(a);`,
@@ -30,7 +35,7 @@ describe('Browser Builder base href', () => {
 
     const overrides = { baseHref: '/myUrl' };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
 
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
@@ -51,7 +56,7 @@ describe('Browser Builder base href', () => {
     });
 
     const run = await architect.scheduleTarget(targetSpec);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
 
     expect(output.success).toBeTrue();
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
@@ -71,7 +76,7 @@ describe('Browser Builder base href', () => {
 
     const overrides = { baseHref: '/myUrl' };
     const run = await architect.scheduleTarget(targetSpec, overrides);
-    const output = (await run.result) as BrowserBuilderOutput;
+    const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
     const content = virtualFs.fileBufferToString(

@@ -297,7 +297,7 @@ describe('FileSystemEngineHost', () => {
     expect(() => collection.createSchematic('private-schematic')).toThrow();
   });
 
-  it('allows extra properties on schema', (done) => {
+  it('allows extra properties on schema', async () => {
     const engineHost = new FileSystemEngineHost(root);
     const engine = new SchematicEngine(engineHost);
     const host = new virtualFs.test.TestHost();
@@ -305,17 +305,12 @@ describe('FileSystemEngineHost', () => {
     const collection = engine.createCollection('extra-properties');
     const schematic = collection.createSchematic('schematic1');
 
-    lastValueFrom(schematic.call({}, observableOf(new HostTree(host))))
-      .then((tree) => {
-        return lastValueFrom(new HostSink(host).commit(tree));
-      })
-      .then(() => {
-        expect(host.files as string[]).toEqual(['/extra-schematic']);
-        expect(host.sync.read(normalize('/extra-schematic')).toString()).toEqual(
-          'extra-collection',
-        );
-      })
-      .then(done, done.fail);
+    await lastValueFrom(schematic.call({}, observableOf(new HostTree(host)))).then((tree) => {
+      return lastValueFrom(new HostSink(host).commit(tree));
+    });
+
+    expect(host.files as string[]).toEqual(['/extra-schematic']);
+    expect(host.sync.read(normalize('/extra-schematic')).toString()).toEqual('extra-collection');
   });
 
   it('discovers a file-based task', () => {
