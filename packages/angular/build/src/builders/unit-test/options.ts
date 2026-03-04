@@ -116,7 +116,7 @@ export async function normalizeOptions(
     buildProgress: progress,
     reporters: normalizeReporterOption(options.reporters),
     outputFile: options.outputFile,
-    browsers,
+    browsers: browsers?.length ? browsers : undefined,
     browserViewport: width && height ? { width, height } : undefined,
     watch,
     debug: options.debug ?? false,
