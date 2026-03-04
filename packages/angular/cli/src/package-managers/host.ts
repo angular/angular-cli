@@ -31,29 +31,23 @@ function escapeCommandForCmd(cmd: string): string {
 
 /**
  * Escapes an argument for safe use in cmd.exe.
- * Based on the algorithm from cross-spawn (https://github.com/moxystudio/node-cross-spawn)
- * and https://qntm.org/cmd
+ * Adapted from cross-spawn's `lib/util/escape.js`:
+ * https://github.com/moxystudio/node-cross-spawn/blob/master/lib/util/escape.js
+ *
+ * Algorithm based on https://learn.microsoft.com/en-us/archive/blogs/twistylittlepassagesallalike/everyone-quotes-command-line-arguments-the-wrong-way
  */
 function escapeArgForCmd(arg: string): string {
-  // Convert to string
-  arg = `${arg}`;
+  const processed = arg
+    // Sequence of backslashes followed by a double quote:
+    // double up all the backslashes and escape the double quote
+    .replace(/(?=(\\+?)?)\1"/g, '$1$1\\"')
+    // Sequence of backslashes followed by the end of the string
+    // (which will become a double quote later):
+    // double up all the backslashes
+    .replace(/(?=(\\+?)?)\1$/, '$1$1');
 
-  // Sequence of backslashes followed by a double quote:
-  // double up all the backslashes and escape the double quote
-  arg = arg.replace(/(?=(\\+?)?)\1"/g, '$1$1\\"');
-
-  // Sequence of backslashes followed by the end of the string
-  // (which will become a double quote later):
-  // double up all the backslashes
-  arg = arg.replace(/(?=(\\+?)?)\1$/, '$1$1');
-
-  // Quote the whole thing
-  arg = `"${arg}"`;
-
-  // Escape cmd.exe meta chars with ^
-  arg = arg.replace(metaCharsRegExp, '^$1');
-
-  return arg;
+  // Quote the whole thing and escape cmd.exe meta chars with ^
+  return `"${processed}"`.replace(metaCharsRegExp, '^$1');
 }
 
 /**
