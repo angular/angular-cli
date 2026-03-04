@@ -373,16 +373,15 @@ async function transformNgPackagrOptions(
     throw new Error(`Could not read ng-package.json at ${ngPackagePath}: ${e.message}`);
   }
 
-  const lib = ngPackageJson['lib'] || {};
-  const styleIncludePaths = lib['styleIncludePaths'] || [];
-  const assets = ngPackageJson['assets'] || [];
-  const inlineStyleLanguage = ngPackageJson['inlineStyleLanguage'];
+  const { lib: { styleIncludePaths = [] } = {}, assets = [], inlineStyleLanguage } = ngPackageJson;
+
+  const includePaths = styleIncludePaths.map((includePath: string) =>
+    path.resolve(path.dirname(ngPackagePath), includePath),
+  );
 
   return {
-    stylePreprocessorOptions: styleIncludePaths.length
-      ? { includePaths: styleIncludePaths }
-      : undefined,
+    stylePreprocessorOptions: includePaths.length ? { includePaths } : undefined,
     assets: assets.length ? assets : undefined,
-    inlineStyleLanguage: typeof inlineStyleLanguage === 'string' ? inlineStyleLanguage : undefined,
+    inlineStyleLanguage,
   } as ApplicationBuilderInternalOptions;
 }
