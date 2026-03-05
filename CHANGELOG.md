@@ -1,3 +1,47 @@
+<a name="21.2.1"></a>
+
+# 21.2.1 (2026-03-05)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [ae4c28d00](https://github.com/angular/angular-cli/commit/ae4c28d0083d948489f4ba38c571b7f955400226) | fix  | correct dev dependency detection logic in `ng add`     |
+| [465073bc1](https://github.com/angular/angular-cli/commit/465073bc1b2b0e9fa594698651a9e0afe747a74a) | fix  | disable npm update notifier in package manager host    |
+| [36270634f](https://github.com/angular/angular-cli/commit/36270634f6ff5ab15896a8c2b345659511a8a276) | fix  | ensure group members are updated to targeted version   |
+| [d87dba6af](https://github.com/angular/angular-cli/commit/d87dba6af1116de0838d8683cd69fd31ed9811fd) | fix  | ignore unknown files when formatting schematic changes |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [72d466aa0](https://github.com/angular/angular-cli/commit/72d466aa04d4d0cc4d654410bcb6dd44f0de3357) | fix  | prevent adding test dependencies when minimal option is enabled |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [0019d1c8e](https://github.com/angular/angular-cli/commit/0019d1c8e1494295a754063dbf936e1cd40d05bd) | fix  | update copy-webpack-plugin to v14.0.0 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------ |
+| [6ad860863](https://github.com/angular/angular-cli/commit/6ad8608636ad48ae140cc7299a32e0358c761fcc) | fix  | bundle polyfills to preserve execution order in dev server                     |
+| [d17397375](https://github.com/angular/angular-cli/commit/d1739737564fbcc3e4c5a6c3369046cccf0f6120) | fix  | conditionally allow `vi.mock` for non-relative imports                         |
+| [0d49f86ed](https://github.com/angular/angular-cli/commit/0d49f86edf5592f0266c6d6689ab4d55b27b2d8d) | fix  | resolve style include paths relative to `ng-package.json` in unit-test builder |
+| [584f6a2d9](https://github.com/angular/angular-cli/commit/584f6a2d95ac4bdd9f20d918c6700ea79227cc92) | fix  | treat empty browsers array as undefined in unit-test builder                   |
+| [6699cdc9b](https://github.com/angular/angular-cli/commit/6699cdc9bfbabc3de2ff0cf03acfd6989dc5596c) | perf | fix memory leak in `ng serve` with i18n                                        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [43a9dfa66](https://github.com/angular/angular-cli/commit/43a9dfa663c386217c9a654f0e80af74823fcf6a) | fix  | improve header validation logic                      |
+| [dee3717b3](https://github.com/angular/angular-cli/commit/dee3717b3faae9ea75d0a5e53c925f915949b8d0) | fix  | introduce DI token to signal route discovery process |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.19"></a>
 
 # 20.3.19 (2026-03-04)
