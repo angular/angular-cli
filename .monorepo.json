@@ -64,7 +64,7 @@
       "section": "Tooling",
       "snapshotRepo": "angular/angular-devkit-architect-cli-builds",
       "deprecated": {
-        "version": ">=21.2.0",
+        "version": ">=0.2102.0",
         "message": "The Architect CLI is now available directly via '@angular-devkit/architect'."
       }
     },
