@@ -4,7 +4,7 @@
   "description": "Angular Build Facade",
   "experimental": true,
   "bin": {
-    "architect": "./bin/cli.js"
+    "architect": "bin/cli.js"
   },
   "main": "src/index.js",
   "typings": "src/index.d.ts",
