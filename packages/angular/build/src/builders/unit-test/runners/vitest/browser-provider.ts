@@ -88,24 +88,14 @@ export async function setupBrowserConfiguration(
       // Validate that the imported module has the expected structure
       const providerFactory = providerModule[providerName];
       if (typeof providerFactory === 'function') {
-        if (
-          providerName === 'playwright' &&
-          process.env['CHROME_BIN']?.includes('rules_browsers')
-        ) {
-          // Use the Chrome binary from the 'rules_browsers' toolchain (via CHROME_BIN)
-          // for Playwright when available to ensure hermetic testing, preventing reliance
-          // on locally installed or NPM-managed browser versions.
+        if (providerName === 'playwright') {
+          const executablePath = process.env['CHROME_BIN'];
           provider = providerFactory({
-            launchOptions: {
-              executablePath: process.env.CHROME_BIN,
-            },
-            contextOptions: {
-              // Enables `prefer-color-scheme` for Vitest browser instead of `light`
-              colorScheme: null,
-            },
-          });
-        } else if (providerName === 'playwright') {
-          provider = providerFactory({
+            launchOptions: executablePath
+              ? {
+                  executablePath,
+                }
+              : undefined,
             contextOptions: {
               // Enables `prefer-color-scheme` for Vitest browser instead of `light`
               colorScheme: null,
