@@ -1,3 +1,48 @@
+<a name="22.0.0-next.0"></a>
+
+# 22.0.0-next.0 (2026-03-05)
+
+## Breaking Changes
+
+###
+
+- Node.js v20 is no longer supported. The minimum supported Node.js versions are now v22.22.0 and v24.13.1.
+- The `@angular-devkit/architect-cli` package is no longer available. The `architect` CLI tool has been moved to the `@angular-devkit/architect` package.
+- The experimental `@angular-devkit/build-angular:jest` and `@angular-devkit/build-angular:web-test-runner` builders have been removed.
+
+### @angular/ssr
+
+- The server no longer falls back to Client-Side Rendering (CSR) when a request fails host validation. Requests with unrecognized 'Host' headers will now return a 400 Bad Request status code. Users must ensure all valid hosts are correctly configured in the 'allowedHosts' option.
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [a5c7c0b5f](https://github.com/angular/angular-cli/commit/a5c7c0b5fda4ae0c00351ba34e5f39dab2c6baee) | fix  | reflect new minimum supported Node version in ng.js |
+
+###
+
+| Commit                                                                                              | Type     | Description                                           |
+| --------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------- |
+| [d0e9e8163](https://github.com/angular/angular-cli/commit/d0e9e81639be33c453f1ef66c7c1c8ea4fe543c2) | build    | update minimum supported Node.js versions             |
+| [1f21e89d9](https://github.com/angular/angular-cli/commit/1f21e89d99c191642627df6842402644a1bf26ee) | refactor | remove `@angular-devkit/architect-cli` package        |
+| [b4885b851](https://github.com/angular/angular-cli/commit/b4885b851226709ae4146070122806e14a3d5eb9) | refactor | remove experimental Jest and Web Test Runner builders |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [414320d02](https://github.com/angular/angular-cli/commit/414320d02a090b7b36720051569cba7563bf9ac6) | feat | support runtime Zone.js detection in Vitest unit test runner |
+| [f190263a4](https://github.com/angular/angular-cli/commit/f190263a4010a4f7b9ae85806b5d70a16b57b9fa) | fix  | allow any `CHROME_BIN` for vitest playwright provider        |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type     | Description                           |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------- |
+| [27cd35561](https://github.com/angular/angular-cli/commit/27cd355619aad140dfc221c6bd161f4a981e0f3b) | refactor | remove CSR fallback for invalid hosts |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.1"></a>
 
 # 21.2.1 (2026-03-05)
