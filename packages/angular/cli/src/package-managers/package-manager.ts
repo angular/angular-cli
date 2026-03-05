@@ -323,7 +323,9 @@ export class PackageManager {
       ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
     ].filter((flag) => flag);
 
-    const args = [this.descriptor.addCommand, packageName, ...flags];
+    const specifier = this.host.requiresQuoting ? `"${packageName}"` : packageName;
+    const args = [this.descriptor.addCommand, specifier, ...flags];
+
     await this.#run(args, options);
 
     this.#dependencyCache = null;
