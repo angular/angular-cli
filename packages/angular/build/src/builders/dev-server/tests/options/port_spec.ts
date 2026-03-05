@@ -42,7 +42,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         port: undefined,
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      const { result, response } = await executeOnceAndFetch(harness, '/');
 
       expect(result?.success).toBeTrue();
       expect(getResultPort(result)).toBe('4200');
@@ -55,7 +55,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         port: 0,
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      const { result, response } = await executeOnceAndFetch(harness, '/');
 
       expect(result?.success).toBeTrue();
       const port = getResultPort(result);
@@ -73,11 +73,30 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         port: 8000,
       });
 
-      const { result, response, logs } = await executeOnceAndFetch(harness, '/');
+      const { result, response } = await executeOnceAndFetch(harness, '/');
 
       expect(result?.success).toBeTrue();
       expect(getResultPort(result)).toBe('8000');
       expect(await response?.text()).toContain('<title>');
+    });
+
+    it('should be overwritten by process.env.PORT if it exists', async () => {
+      try {
+        harness.useTarget('serve', {
+          ...BASE_OPTIONS,
+          port: 8000,
+        });
+
+        process.env.PORT = '4201';
+
+        const { result, response } = await executeOnceAndFetch(harness, '/');
+
+        expect(result?.success).toBeTrue();
+        expect(getResultPort(result)).toBe('4201');
+        expect(await response?.text()).toContain('<title>');
+      } finally {
+        delete process.env.PORT;
+      }
     });
   });
 });

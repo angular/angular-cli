@@ -86,10 +86,20 @@ export async function normalizeOptions(
     }
   }
 
+  let port = options.port ?? 4200;
+  // Overwrite port, if process.env.PORT is available.
+  if (process.env.PORT) {
+    const envPort = Number(process.env.PORT);
+
+    if (!isNaN(envPort)) {
+      port = envPort;
+      logger.info(`Environment variable "PORT" detected. Using port ${envPort}.`);
+    }
+  }
+
   // Initial options to keep
   const {
     host,
-    port,
     poll,
     open,
     verbose,
@@ -111,7 +121,7 @@ export async function normalizeOptions(
   return {
     buildTarget,
     host: host ?? 'localhost',
-    port: port ?? 4200,
+    port,
     poll,
     open,
     verbose,
