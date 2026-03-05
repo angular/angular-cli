@@ -4,7 +4,7 @@
   "description": "Angular Schematics - CLI",
   "homepage": "https://github.com/angular/angular-cli",
   "bin": {
-    "schematics": "./bin/schematics.js"
+    "schematics": "bin/schematics.js"
   },
   "keywords": [
     "blueprints",
