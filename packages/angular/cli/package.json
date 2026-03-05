@@ -4,7 +4,7 @@
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
   "bin": {
-    "ng": "./bin/ng.js"
+    "ng": "bin/ng.js"
   },
   "keywords": [
     "angular",
@@ -13,7 +13,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/angular/angular-cli.git"
+    "url": "git+https://github.com/angular/angular-cli.git"
   },
   "author": "Angular Authors",
   "license": "MIT",
