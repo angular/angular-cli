@@ -52,12 +52,7 @@ function isJavascriptMimeType(mimeType: string): boolean {
  * @returns whether to add the script tag to the dynamically loaded script tag
  */
 function shouldDynamicallyLoadScriptTagBasedOnType(scriptType: string | undefined): boolean {
-  return (
-    scriptType === undefined ||
-    scriptType === '' ||
-    scriptType === 'module' ||
-    isJavascriptMimeType(scriptType)
-  );
+  return !scriptType || scriptType === 'module' || isJavascriptMimeType(scriptType);
 }
 
 /**
@@ -67,7 +62,11 @@ function shouldDynamicallyLoadScriptTagBasedOnType(scriptType: string | undefine
  * @returns The hash of the text formatted appropriately for CSP.
  */
 export function hashTextContent(scriptText: string): string {
-  const hash = crypto.createHash(HASH_FUNCTION).update(scriptText, 'utf-8').digest('base64');
+  // Normalize CRLF to LF to ensure consistent since the rewriter might normalize the line endings.
+  const hash = crypto
+    .createHash(HASH_FUNCTION)
+    .update(scriptText.replace(/\r\n?/g, '\n'), 'utf-8')
+    .digest('base64');
 
   return `'${HASH_FUNCTION}-${hash}'`;
 }
