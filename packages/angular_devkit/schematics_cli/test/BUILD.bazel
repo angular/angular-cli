@@ -17,7 +17,6 @@ npm_link_package(
     name = "node_modules/@angular-devkit/schematics-cli",
     src = "//packages/angular_devkit/schematics_cli:pkg",
     package = "@angular-devkit/schematics-cli",
-    root_package = package_name(),
 )
 
 jasmine_test(
