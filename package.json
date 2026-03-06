@@ -118,7 +118,7 @@
     "lodash": "^4.17.21",
     "magic-string": "0.30.21",
     "prettier": "^3.0.0",
-    "puppeteer": "24.37.5",
+    "puppeteer": "24.38.0",
     "quicktype-core": "23.2.6",
     "rollup": "4.59.0",
     "rollup-license-plugin": "~3.1.0",
