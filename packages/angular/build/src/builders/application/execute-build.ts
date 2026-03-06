@@ -20,6 +20,7 @@ import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
 import {
+  buildMetafileForType,
   calculateEstimatedTransferSizes,
   logBuildStats,
   transformSupportedBrowsersToTargets,
@@ -301,13 +302,40 @@ export async function executeBuild(
     BuildOutputFileType.Root,
   );
 
+  const ssrOutputEnabled: boolean = !!ssrOptions;
+
   // Write metafile if stats option is enabled
   if (options.stats) {
     executionResult.addOutputFile(
-      'stats.json',
-      JSON.stringify(metafile, null, 2),
+      'browser-stats.json',
+      JSON.stringify(buildMetafileForType(metafile, 'browser', false, outputFiles), null, 2),
       BuildOutputFileType.Root,
     );
+    executionResult.addOutputFile(
+      'browser-initial-stats.json',
+      JSON.stringify(
+        buildMetafileForType(metafile, 'browser', true, outputFiles, initialFiles),
+        null,
+        2,
+      ),
+      BuildOutputFileType.Root,
+    );
+    if (ssrOutputEnabled) {
+      executionResult.addOutputFile(
+        'server-stats.json',
+        JSON.stringify(buildMetafileForType(metafile, 'server', false, outputFiles), null, 2),
+        BuildOutputFileType.Root,
+      );
+      executionResult.addOutputFile(
+        'server-initial-stats.json',
+        JSON.stringify(
+          buildMetafileForType(metafile, 'server', true, outputFiles, initialFiles),
+          null,
+          2,
+        ),
+        BuildOutputFileType.Root,
+      );
+    }
   }
 
   if (!jsonLogs) {
@@ -322,7 +350,7 @@ export async function executeBuild(
         colors,
         changedFiles,
         estimatedTransferSizes,
-        !!ssrOptions,
+        ssrOutputEnabled,
         verbose,
       ),
     );

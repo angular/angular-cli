@@ -394,7 +394,7 @@
     },
     "statsJson": {
       "type": "boolean",
-      "description": "Generates a 'stats.json' file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
+      "description": "Generates a 'browser-stats.json' (and 'server-stats.json' when SSR is enabled) file which can be analyzed using tools such as 'webpack-bundle-analyzer'.",
       "default": false
     },
     "budgets": {

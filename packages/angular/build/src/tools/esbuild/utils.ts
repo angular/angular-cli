@@ -29,6 +29,58 @@ import {
   PrerenderedRoutesRecord,
 } from './bundler-execution-result';
 
+export function buildMetafileForType(
+  metafile: Metafile,
+  type: 'browser' | 'server',
+  initial: boolean,
+  outputFiles: BuildOutputFile[],
+  initialFiles?: Map<string, InitialFileRecord>,
+): Metafile {
+  const isServer = type === 'server';
+
+  const outputPathsForType = new Set(
+    outputFiles
+      .filter(({ type: fileType }) => {
+        const isServerFile =
+          fileType === BuildOutputFileType.ServerApplication ||
+          fileType === BuildOutputFileType.ServerRoot;
+
+        return isServer ? isServerFile : !isServerFile;
+      })
+      .map(({ path }) => path),
+  );
+
+  const filteredOutputs: Metafile['outputs'] = {};
+  for (const [outputPath, output] of Object.entries(metafile.outputs)) {
+    if (!outputPathsForType.has(outputPath)) {
+      continue;
+    }
+    if (initial && !initialFiles?.has(outputPath)) {
+      continue;
+    }
+    filteredOutputs[outputPath] = output;
+  }
+
+  const referencedInputs = new Set<string>();
+  for (const output of Object.values(filteredOutputs)) {
+    for (const inputPath of Object.keys(output.inputs)) {
+      referencedInputs.add(inputPath);
+    }
+  }
+
+  const filteredInputs: Metafile['inputs'] = {};
+  for (const [inputPath, input] of Object.entries(metafile.inputs)) {
+    if (referencedInputs.has(inputPath)) {
+      filteredInputs[inputPath] = input;
+    }
+  }
+
+  return {
+    inputs: filteredInputs,
+    outputs: filteredOutputs,
+  };
+}
+
 export function logBuildStats(
   metafile: Metafile,
   outputFiles: BuildOutputFile[],
