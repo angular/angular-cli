@@ -42,6 +42,10 @@ describe('parseJsonSchemaToOptions', () => {
               'enum': ['always', 'never', 'default-array'],
             },
           },
+          'arrayWithNumbers': {
+            'type': 'array',
+            'items': { 'type': 'number' },
+          },
           'extendable': {
             'type': 'object',
             'properties': {},
@@ -114,6 +118,9 @@ describe('parseJsonSchemaToOptions', () => {
                 },
               ],
             },
+          },
+          'oneOfAtRoot': {
+            'oneOf': [{ 'type': 'array', 'items': { 'type': 'string' } }, { 'type': 'boolean' }],
           },
         },
       };
@@ -226,6 +233,35 @@ describe('parseJsonSchemaToOptions', () => {
           jasmine.objectContaining({
             'arrayWithComplexAnyOf': ['default', 'something-else'],
           }),
+        );
+      });
+    });
+
+    describe('type=array, oneOf at root', () => {
+      it('parses valid option value', async () => {
+        expect(
+          await parse([
+            '--oneOfAtRoot',
+            'first',
+            '--oneOfAtRoot',
+            'second',
+            '--oneOfAtRoot',
+            'third',
+          ]),
+        ).toEqual(jasmine.objectContaining({ 'oneOfAtRoot': ['first', 'second', 'third'] }));
+      });
+
+      it('parses --no prefix', async () => {
+        expect(await parse(['--no-oneOfAtRoot'])).toEqual(
+          jasmine.objectContaining({ 'oneOfAtRoot': false }),
+        );
+      });
+    });
+
+    describe('type=Array<number>', () => {
+      it('parses valid option value', async () => {
+        expect(await parse(['--arrayWithNumbers', '42', '--arrayWithNumbers', '24'])).toEqual(
+          jasmine.objectContaining({ 'arrayWithNumbers': [42, 24] }),
         );
       });
     });
