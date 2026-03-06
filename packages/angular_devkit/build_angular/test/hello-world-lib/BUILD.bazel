@@ -9,7 +9,6 @@ npm_link_package(
     name = "node_modules/@angular-devkit/build-angular",
     src = "//packages/angular_devkit/build_angular:pkg",
     package = "@angular-devkit/build-angular",
-    root_package = package_name(),
 )
 
 copy_to_bin(
