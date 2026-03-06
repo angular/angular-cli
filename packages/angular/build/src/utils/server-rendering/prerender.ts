@@ -96,7 +96,9 @@ export async function prerenderPages(
 
   const assetsReversed: Record</** Destination */ string, /** Source */ string> = {};
   for (const { source, destination } of assets) {
-    assetsReversed[addLeadingSlash(toPosixPath(destination))] = source;
+    // Assets are not stored with baseHref when using i18n,
+    // we append the base href so that requests are resolved correctly.
+    assetsReversed[joinUrlParts(baseHref, toPosixPath(destination))] = source;
   }
 
   // Get routes to prerender
