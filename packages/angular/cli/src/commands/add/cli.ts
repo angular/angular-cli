@@ -8,9 +8,10 @@
 
 import { Listr, ListrRenderer, ListrTaskWrapper, color, figures } from 'listr2';
 import assert from 'node:assert';
+import { existsSync } from 'node:fs';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import npa from 'npm-package-arg';
 import semver, { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
@@ -107,6 +108,7 @@ export default class AddCommandModule
   private readonly schematicName = 'ng-add';
   private rootRequire = createRequire(this.context.root + '/');
   #projectVersionCache = new Map<string, string | null>();
+  #rootManifestCache: PackageManifest | null = null;
 
   override async builder(argv: Argv): Promise<Argv<AddCommandArgs>> {
     const localYargs = (await super.builder(argv))
@@ -156,6 +158,7 @@ export default class AddCommandModule
 
   async run(options: Options<AddCommandArgs> & OtherOptions): Promise<number | void> {
     this.#projectVersionCache.clear();
+    this.#rootManifestCache = null;
     const { logger } = this.context;
     const { collection, skipConfirmation } = options;
 
@@ -665,18 +668,7 @@ export default class AddCommandModule
   }
 
   private isPackageInstalled(name: string): boolean {
-    try {
-      this.rootRequire.resolve(join(name, 'package.json'));
-
-      return true;
-    } catch (e) {
-      assertIsError(e);
-      if (e.code !== 'MODULE_NOT_FOUND') {
-        throw e;
-      }
-    }
-
-    return false;
+    return !!this.resolvePackageJson(name);
   }
 
   private executeSchematic(
@@ -715,12 +707,7 @@ export default class AddCommandModule
       return cachedVersion;
     }
 
-    const { root } = this.context;
-    let installedPackagePath;
-    try {
-      installedPackagePath = this.rootRequire.resolve(join(name, 'package.json'));
-    } catch {}
-
+    const installedPackagePath = this.resolvePackageJson(name);
     if (installedPackagePath) {
       try {
         const installedPackage = JSON.parse(
@@ -732,13 +719,7 @@ export default class AddCommandModule
       } catch {}
     }
 
-    let projectManifest;
-    try {
-      projectManifest = JSON.parse(
-        await fs.readFile(join(root, 'package.json'), 'utf-8'),
-      ) as PackageManifest;
-    } catch {}
-
+    const projectManifest = await this.getProjectManifest();
     if (projectManifest) {
       const version =
         projectManifest.dependencies?.[name] || projectManifest.devDependencies?.[name];
@@ -752,6 +733,58 @@ export default class AddCommandModule
     this.#projectVersionCache.set(name, null);
 
     return null;
+  }
+
+  private async getProjectManifest(): Promise<PackageManifest | null> {
+    if (this.#rootManifestCache) {
+      return this.#rootManifestCache;
+    }
+
+    const { root } = this.context;
+    try {
+      this.#rootManifestCache = JSON.parse(
+        await fs.readFile(join(root, 'package.json'), 'utf-8'),
+      ) as PackageManifest;
+
+      return this.#rootManifestCache;
+    } catch {
+      return null;
+    }
+  }
+
+  private resolvePackageJson(name: string): string | undefined {
+    try {
+      return this.rootRequire.resolve(join(name, 'package.json'));
+    } catch (e) {
+      assertIsError(e);
+      if (e.code === 'ERR_PACKAGE_PATH_NOT_EXPORTED') {
+        try {
+          const mainPath = this.rootRequire.resolve(name);
+          let directory = dirname(mainPath);
+
+          // Stop at the node_modules boundary or the root of the file system
+          while (directory && basename(directory) !== 'node_modules') {
+            const packageJsonPath = join(directory, 'package.json');
+            if (existsSync(packageJsonPath)) {
+              return packageJsonPath;
+            }
+
+            const parent = dirname(directory);
+            if (parent === directory) {
+              break;
+            }
+            directory = parent;
+          }
+        } catch (e) {
+          assertIsError(e);
+          this.context.logger.debug(
+            `Failed to resolve package '${name}' during fallback: ${e.message}`,
+          );
+        }
+      }
+    }
+
+    return undefined;
   }
 
   private async getPeerDependencyConflicts(manifest: PackageManifest): Promise<string[] | false> {
