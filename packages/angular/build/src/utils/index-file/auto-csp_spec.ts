@@ -15,13 +15,13 @@ const getCsps = (html: string) => {
   ).map((m) => m[1]); // Only capture group.
 };
 
-const ONE_HASH_CSP =
+const CSP_SINGLE_HASH_REGEX =
   /script-src 'strict-dynamic' 'sha256-[^']+' https: 'unsafe-inline';object-src 'none';base-uri 'self';/;
 
-const TWO_HASH_CSP =
+const CSP_TWO_HASHES_REGEX =
   /script-src 'strict-dynamic' (?:'sha256-[^']+' ){2}https: 'unsafe-inline';object-src 'none';base-uri 'self';/;
 
-const FOUR_HASH_CSP =
+const CSP_FOUR_HASHES_REGEX =
   /script-src 'strict-dynamic' (?:'sha256-[^']+' ){4}https: 'unsafe-inline';object-src 'none';base-uri 'self';/;
 
 describe('auto-csp', () => {
@@ -38,8 +38,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(ONE_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(csps[0]).toContain(hashTextContent("console.log('foo');"));
   });
 
@@ -56,8 +56,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(ONE_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(`var scripts = [['./main.js', '', false, false]];`);
   });
 
@@ -74,8 +74,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(ONE_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     // Our loader script appears after the HTML text content.
     expect(result).toMatch(
       /Some text<\/div>\s*<script>\s*var scripts = \[\['.\/main.js', '', false, false\]\];/,
@@ -99,8 +99,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(TWO_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_TWO_HASHES_REGEX);
     expect(result).toContain(
       // eslint-disable-next-line max-len
       `var scripts = [['./main1.js', '', false, false],['./main2.js', '', true, false],['./main3.js', 'module', true, true]];`,
@@ -127,8 +127,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(ONE_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     // &amp; encodes correctly
     expect(result).toContain(`'/foo&bar'`);
     // Impossible to escape a string and create invalid loader JS with a '
@@ -158,9 +158,9 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
+    expect(csps).toHaveSize(1);
     // Exactly four hashes for the four scripts that remain (inline, loader, inline, loader).
-    expect(csps[0]).toMatch(FOUR_HASH_CSP);
+    expect(csps[0]).toMatch(CSP_FOUR_HASHES_REGEX);
     expect(csps[0]).toContain(hashTextContent("console.log('foo');"));
     expect(csps[0]).toContain(hashTextContent("console.log('bar');"));
     // Loader script for main.js and main2.js appear after 'foo' and before 'bar'.
@@ -190,8 +190,8 @@ describe('auto-csp', () => {
     `);
 
     const csps = getCsps(result);
-    expect(csps.length).toBe(1);
-    expect(csps[0]).toMatch(ONE_HASH_CSP);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
 
     expect(result).toContain(
       // eslint-disable-next-line max-len
@@ -201,5 +201,24 @@ describe('auto-csp', () => {
     expect(result).toContain(`</script></head>`);
     // Only one loader script is created.
     expect(Array.from(result.matchAll(/<script>/g)).length).toEqual(1);
+  });
+
+  it('should rewrite a single inline script with CRLF', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script>\r\nconsole.log('foo');\r\n</script>
+          <div>Some text </div>
+        </body>
+      </html>\r\n
+    `);
+
+    const csps = getCsps(result);
+    expect(result).not.toContain(`\r\n`);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(csps[0]).toContain(hashTextContent(`\r\nconsole.log('foo');\r\n`));
   });
 });
