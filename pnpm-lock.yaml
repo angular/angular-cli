@@ -321,7 +321,7 @@ importers:
         version: 28.1.0
       ng-packagr:
         specifier: 22.0.0-next.0
-        version: 22.0.0-next.0(@angular/compiler-cli@22.0.0-next.0(@angular/compiler@22.0.0-next.0)(typescript@6.0.0-beta))(tslib@2.8.1)(typescript@6.0.0-beta)
+        version: 22.0.0-next.0(@angular/compiler-cli@22.0.0-next.0(@angular/compiler@22.0.0-next.0)(typescript@6.0.1-rc))(tslib@2.8.1)(typescript@6.0.1-rc)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
