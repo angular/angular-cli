@@ -1,12 +1,13 @@
 {
   "devDependencies": {
-    "@angular-devkit/core": "workspace:*",
     "@angular-devkit/architect": "workspace:*",
-    "@angular/ssr": "workspace:*",
     "@angular-devkit/build-angular": "workspace:*",
-    "browser-sync": "3.0.4",
+    "@angular-devkit/core": "workspace:*",
+    "@angular/ssr": "workspace:*",
     "@vitest/coverage-v8": "4.0.18",
+    "browser-sync": "3.0.4",
     "jsdom": "28.1.0",
+    "ng-packagr": "22.0.0-next.0",
     "rxjs": "7.8.2",
     "vitest": "4.0.18"
   }

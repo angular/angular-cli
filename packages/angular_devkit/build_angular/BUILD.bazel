@@ -197,9 +197,6 @@ ts_project(
             "src/builders/**/*_spec.ts",
         ],
     ),
-    data = [
-        "//packages/angular_devkit/build_angular/test/hello-world-lib",
-    ],
     deps = [
         ":build_angular",
         ":build_angular_test_utils",
@@ -268,9 +265,6 @@ ts_project(
             "src/**/*_spec.ts",
         ],
     ),
-    data = [
-        "//packages/angular_devkit/build_angular/test/hello-world-lib",
-    ],
     deps = [
         ":build_angular",
         ":node_modules/@angular-devkit/architect",
@@ -319,7 +313,8 @@ LARGE_SPECS = {
             "//:node_modules/@angular/animations",
         ],
     },
-    "ng-packagr": {},
+    "ng-packagr": {
+    },
     "browser": {
         "shards": 10,
         "size": "large",

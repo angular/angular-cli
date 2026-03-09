@@ -2,8 +2,8 @@
 #
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
-load("@aspect_bazel_lib//lib:jq.bzl", "jq")
-load("@aspect_bazel_lib//lib:utils.bzl", "to_label")
+load("@bazel_lib//lib:utils.bzl", "to_label")
+load("@jq.bzl//jq:jq.bzl", "jq")
 
 def link_package_json_to_tarballs(name, src, pkg_deps, out):
     """Substitute tar paths into a package.json file for the packages it depends on.
