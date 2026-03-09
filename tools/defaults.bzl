@@ -1,6 +1,6 @@
-load("@aspect_bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@aspect_rules_jasmine//jasmine:defs.bzl", _jasmine_test = "jasmine_test")
 load("@aspect_rules_js//js:defs.bzl", _js_binary = "js_binary")
+load("@bazel_lib//lib:copy_to_bin.bzl", _copy_to_bin = "copy_to_bin")
 load("@devinfra//bazel/ts_project:index.bzl", "strict_deps_test")
 load("@rules_angular//src/ng_examples_db:index.bzl", _ng_examples_db = "ng_examples_db")
 load("@rules_angular//src/ng_package:index.bzl", _ng_package = "ng_package")

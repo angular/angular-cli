@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:directory_path.bzl", "directory_path")
+load("@bazel_lib//lib:directory_path.bzl", "directory_path")
 load("@npm//:@rollup/wasm-node/package_json.bzl", rollup = "bin")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults.bzl", "ts_project")
