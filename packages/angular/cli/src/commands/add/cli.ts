@@ -44,6 +44,7 @@ interface AddCommandArgs extends SchematicsCommandArgs {
 
 interface AddCommandTaskContext {
   packageIdentifier: npa.Result;
+  isExactVersion: boolean;
   savePackage?: NgAddSaveDependency;
   collectionName?: string;
   executeSchematic: AddCommandModule['executeSchematic'];
@@ -185,6 +186,7 @@ export default class AddCommandModule
 
     const taskContext = {
       packageIdentifier,
+      isExactVersion: packageIdentifier.type === 'version',
       executeSchematic: this.executeSchematic.bind(this),
       getPeerDependencyConflicts: this.getPeerDependencyConflicts.bind(this),
       dryRun: options.dryRun,
@@ -512,7 +514,7 @@ export default class AddCommandModule
         context.packageIdentifier.name,
         // `save-prefix` option is ignored by some package managers so the caret is needed to ensure
         // that the value in the project package.json is correct.
-        '^' + manifest.version,
+        (context.isExactVersion ? '' : '^') + manifest.version,
       );
     }
 
