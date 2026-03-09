@@ -1,4 +1,4 @@
-load("@aspect_bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_file")
 load("//tools:defaults.bzl", "jasmine_test", "ts_project")
 
 ts_project(
