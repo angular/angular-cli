@@ -26,7 +26,9 @@ export class WorkerPool extends Piscina {
     // Enable compile code caching if enabled for the main process (only exists on Node.js v22.8+).
     // Skip if running inside Bazel via a RUNFILES environment variable check. The cache does not work
     // well with Bazel's hermeticity requirements.
-    const compileCacheDirectory = process.env['RUNFILES'] ? undefined : getCompileCacheDir?.();
+    const compileCacheDirectory = process.env['JS_BINARY__RUNFILES']
+      ? undefined
+      : getCompileCacheDir?.();
     if (compileCacheDirectory) {
       if (typeof piscinaOptions.env === 'object') {
         piscinaOptions.env['NODE_COMPILE_CACHE'] = compileCacheDirectory;
