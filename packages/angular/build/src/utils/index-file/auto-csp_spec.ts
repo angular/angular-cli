@@ -108,7 +108,7 @@ describe('auto-csp', () => {
     // Head loader script is in the head.
     expect(result).toContain(`</script></head>`);
     // Only two loader scripts are created.
-    expect(Array.from(result.matchAll(/<script>/g)).length).toEqual(2);
+    expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(2);
   });
 
   it('should rewrite source scripts with weird URLs', async () => {
@@ -174,7 +174,7 @@ describe('auto-csp', () => {
       /console.log\('bar'\);<\/script>\s*<script>\s*var scripts = \[\['.\/main3.js', '', false, false\],\['.\/main4.js', '', false, false\]\];/,
     );
     // Exactly 4 scripts should be left.
-    expect(Array.from(result.matchAll(/<script>/g)).length).toEqual(4);
+    expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(4);
   });
 
   it('should write a loader script that appends to head', async () => {
@@ -200,6 +200,6 @@ describe('auto-csp', () => {
     // Head loader script is in the head.
     expect(result).toContain(`</script></head>`);
     // Only one loader script is created.
-    expect(Array.from(result.matchAll(/<script>/g)).length).toEqual(1);
+    expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(1);
   });
 });
