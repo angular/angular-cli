@@ -9,6 +9,7 @@
 import { purgeStaleBuildCache } from '@angular/build/private';
 import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import type { NgPackagrOptions } from 'ng-packagr';
+import { createRequire } from 'node:module';
 import { join, resolve } from 'node:path';
 import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
@@ -27,7 +28,9 @@ export function execute(
       await purgeStaleBuildCache(context);
 
       const root = context.workspaceRoot;
-      const packager = (await import('ng-packagr')).ngPackagr();
+      const workspaceRequire = createRequire(root + '/');
+      const ngPackagePath = workspaceRequire.resolve('ng-packagr');
+      const packager = (await import(ngPackagePath)).ngPackagr();
 
       packager.forProject(resolve(root, options.project));
 

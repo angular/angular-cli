@@ -66,6 +66,7 @@
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "16.0.3",
+    "@rollup/wasm-node": "4.59.0",
     "@stylistic/eslint-plugin": "^5.0.0",
     "@types/babel__core": "7.20.5",
     "@types/babel__generator": "^7.6.8",

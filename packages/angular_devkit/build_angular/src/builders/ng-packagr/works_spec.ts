@@ -20,7 +20,10 @@ import {
 import { debounceTime, map, take, tap } from 'rxjs';
 
 describe('NgPackagr Builder', () => {
-  const workspaceRoot = join(normalize(__dirname), `../../../test/hello-world-lib/`);
+  const workspaceRoot = join(
+    normalize(__dirname),
+    `../../../../../../modules/testing/builder/projects/hello-world-lib/`,
+  );
   const host = new TestProjectHost(workspaceRoot);
   let architect: Architect;
 
