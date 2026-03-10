@@ -85,7 +85,7 @@ describe('migrateSingleFile', () => {
     expect(result).toBeNull();
   });
 
-  it('should return null if component has ChangeDetectionStrategy.Default', async () => {
+  it('should return null if component has ChangeDetectionStrategy.Eager', async () => {
     const fileName = 'app.component.ts';
     const content = `
       import { Component, ChangeDetectionStrategy } from '@angular/core';
@@ -93,7 +93,7 @@ describe('migrateSingleFile', () => {
       @Component({
         selector: 'app-root',
         template: 'Hello',
-        changeDetection: ChangeDetectionStrategy.Default,
+        changeDetection: ChangeDetectionStrategy.Eager,
       })
       export class AppComponent {}
     `;

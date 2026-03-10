@@ -130,11 +130,11 @@ export function generateZonelessMigrationInstructionsForComponent(
     *   **(Preferred) Convert to Signal**: The best approach is to convert the property to an Angular Signal. This is the most idiomatic and future-proof way to handle state in zoneless applications.
     *   **(Alternative) Use \`markForCheck()\`**: If converting to a signal is too complex or would require extensive refactoring, you can instead inject \`ChangeDetectorRef\` and call \`this.cdr.markForCheck()\` immediately after the property is updated.
 
-  #### Step 2: Add \`ChangeDetectionStrategy.Default\`
+  #### Step 2: Add \`ChangeDetectionStrategy.Eager\`
   After you have refactored all necessary properties, you must update the component's decorator to explicitly set the change detection strategy.
 
   1.  Add \`ChangeDetectionStrategy\` to the import from \`@angular/core\`.
-  2.  In the \`@Component\` decorator, add the property \`changeDetection: ChangeDetectionStrategy.Default\`.
+  2.  In the \`@Component\` decorator, add the property \`changeDetection: ChangeDetectionStrategy.Eager\`.
   3.  Add a \`// TODO\` comment above this line explaining that the component should be fully migrated to \`OnPush\` after the application has been tested with these changes.
 
   Example:
@@ -143,14 +143,14 @@ export function generateZonelessMigrationInstructionsForComponent(
     ...
     // TODO: This component has been partially migrated to be zoneless-compatible.
     // After testing, this should be updated to ChangeDetectionStrategy.OnPush.
-    changeDetection: ChangeDetectionStrategy.Default,
+    changeDetection: ChangeDetectionStrategy.Eager,
   })
   \`\`\`
 
   ### IMPORTANT: Rules and Constraints
   You must follow these rules without exception:
   1.  **DO** apply one of the two refactoring strategies (signals or \`markForCheck()\`) for all relevant component properties.
-  2.  **DO** add \`changeDetection: ChangeDetectionStrategy.Default\` with the specified TODO comment as the final code change.
+  2.  **DO** add \`changeDetection: ChangeDetectionStrategy.Eager\` with the specified TODO comment as the final code change.
   3.  **DO NOT** use \`ChangeDetectionStrategy.OnPush\`. This will be the next step in the migration, but it is not part of this task.
   4.  **DO NOT** modify properties that are already signals or are used with the \`async\` pipe in the template, as they are already zoneless-compatible.
   5.  **DO NOT** make any changes to files other than the component file at \`${filePath}\` and its direct template/style files if necessary.
