@@ -228,6 +228,7 @@ async function renderPages(
     } as RenderWorkerData,
     execArgv: workerExecArgv,
     env: {
+      ...process.env,
       'NG_ALLOWED_HOSTS': 'localhost',
     },
   });
@@ -343,6 +344,7 @@ async function getAllRoutes(
     } as RoutesExtractorWorkerData,
     execArgv: workerExecArgv,
     env: {
+      ...process.env,
       'NG_ALLOWED_HOSTS': 'localhost',
     },
   });
