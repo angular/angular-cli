@@ -65,9 +65,9 @@
     },
     "changeDetection": {
       "description": "Configures the change detection strategy for the component.",
-      "enum": ["Default", "OnPush"],
+      "enum": ["Eager", "OnPush"],
       "type": "string",
-      "default": "Default",
+      "default": "Eager",
       "alias": "c"
     },
     "prefix": {

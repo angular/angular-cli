@@ -23,7 +23,7 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     displayBlock: false,
-    changeDetection: ChangeDetection.Default,
+    changeDetection: ChangeDetection.Eager,
     style: Style.Css,
     type: 'Component',
     skipTests: false,
