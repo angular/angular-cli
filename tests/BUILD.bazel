@@ -19,8 +19,6 @@ ts_project(
     deps = [
         "//:node_modules/@types/node",
         "//:node_modules/fast-glob",
-        "//packages/angular_devkit/core",
-        "//packages/angular_devkit/core/node",
         "//tests/e2e/utils",
     ],
 )
@@ -31,7 +29,6 @@ rollup.rollup(
     srcs = [
         "rollup.config.mjs",
         ":runner",
-        "//:node_modules/@rollup/plugin-alias",
         "//:node_modules/@rollup/plugin-commonjs",
         "//:node_modules/@rollup/plugin-json",
         "//:node_modules/@rollup/plugin-node-resolve",

@@ -1,5 +1,4 @@
 import { parseArgs, styleText } from 'node:util';
-import { createConsoleLogger } from '../packages/angular_devkit/core/node';
 import glob from 'fast-glob';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -108,19 +107,6 @@ if (process.env.GIT_BIN) {
  */
 if (process.env.CHROME_BIN) {
   process.env.PATH = process.env.PATH! + delimiter + dirname(process.env.CHROME_BIN!);
-}
-
-const logger = createConsoleLogger(argv.verbose, process.stdout, process.stderr, {
-  info: (s) => s,
-  debug: (s) => s,
-  warn: (s) => styleText(['bold', 'yellow'], s),
-  error: (s) => styleText(['bold', 'red'], s),
-  fatal: (s) => styleText(['bold', 'red'], s),
-});
-
-const logStack = [logger];
-function lastLogger() {
-  return logStack.at(-1)!;
 }
 
 // Under bazel the compiled file (.js) and types (.d.ts) are available.
@@ -303,8 +289,7 @@ async function runSteps(
 
     printHeader(name, stepIndex, steps.length, type);
 
-    // Run the test function with the current file on the logStack.
-    logStack.push(lastLogger().createChild(absoluteName));
+    // Run the test function with the current file.
     try {
       await run(absoluteName);
     } catch (e) {
@@ -312,8 +297,6 @@ async function runSteps(
       console.error(styleText(['red'], `${capsType} "${name}" failed...`));
 
       throw e;
-    } finally {
-      logStack.pop();
     }
 
     console.log('----');
