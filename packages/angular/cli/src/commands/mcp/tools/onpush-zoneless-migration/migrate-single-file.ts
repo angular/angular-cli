@@ -16,6 +16,8 @@ import { sendDebugMessage } from './send-debug-message';
 import { getImportSpecifier, loadTypescript } from './ts-utils';
 import type { MigrationResponse } from './types';
 
+const supportedStrategies: ReadonlySet<string> = new Set(['OnPush', 'Default', 'Eager']);
+
 export async function migrateSingleFile(
   sourceFile: SourceFile,
   extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
@@ -31,7 +33,7 @@ export async function migrateSingleFile(
     return unsupportedZoneUseResponse;
   }
 
-  let detectedStrategy: 'OnPush' | 'Default' | undefined;
+  let detectedStrategy: string | undefined;
   let hasComponentDecorator = false;
 
   const componentSpecifier = await getImportSpecifier(sourceFile, '@angular/core', 'Component');
@@ -63,7 +65,7 @@ export async function migrateSingleFile(
                 prop.initializer.expression.getText(sourceFile) === 'ChangeDetectionStrategy'
               ) {
                 const strategy = prop.initializer.name.text;
-                if (strategy === 'OnPush' || strategy === 'Default') {
+                if (supportedStrategies.has(strategy)) {
                   detectedStrategy = strategy;
 
                   return;
@@ -77,13 +79,7 @@ export async function migrateSingleFile(
     ts.forEachChild(node, visit);
   });
 
-  if (
-    !hasComponentDecorator ||
-    // component uses OnPush. We don't have anything more to do here.
-    detectedStrategy === 'OnPush' ||
-    // Explicit default strategy, assume there's a reason for it (already migrated, or is a library that hosts Default components) and skip.
-    detectedStrategy === 'Default'
-  ) {
+  if (!hasComponentDecorator || (detectedStrategy && supportedStrategies.has(detectedStrategy))) {
     sendDebugMessage(
       `Component decorator found with strategy: ${detectedStrategy} in file: ${sourceFile.fileName}. Skipping migration for file.`,
       extras,
