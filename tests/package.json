@@ -1,7 +1,9 @@
 {
   "devDependencies": {
-    "@types/tar-stream": "3.1.4",
     "@angular-devkit/schematics": "workspace:*",
-    "tar-stream": "3.1.8"
+    "@types/tar-stream": "3.1.4",
+    "tar-stream": "3.1.8",
+    "verdaccio": "6.2.9",
+    "verdaccio-auth-memory": "^10.0.0"
   }
 }

@@ -131,8 +131,6 @@
     "typescript": "6.0.1-rc",
     "undici": "7.22.0",
     "unenv": "^1.10.0",
-    "verdaccio": "6.2.9",
-    "verdaccio-auth-memory": "^10.0.0",
     "zone.js": "^0.16.0"
   },
   "dependenciesMeta": {

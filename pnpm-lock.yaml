@@ -286,12 +286,6 @@ importers:
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
-      verdaccio:
-        specifier: 6.2.9
-        version: 6.2.9(encoding@0.1.13)
-      verdaccio-auth-memory:
-        specifier: ^10.0.0
-        version: 10.3.1
       zone.js:
         specifier: ^0.16.0
         version: 0.16.1
@@ -848,6 +842,12 @@ importers:
       tar-stream:
         specifier: 3.1.8
         version: 3.1.8
+      verdaccio:
+        specifier: 6.2.9
+        version: 6.2.9(encoding@0.1.13)
+      verdaccio-auth-memory:
+        specifier: ^10.0.0
+        version: 10.3.1
 
 packages:
 
