@@ -95,7 +95,7 @@ export default async function () {
   await updateJsonFile('angular.json', (json) => {
     const buildTarget = json['projects']['test-project']['architect']['build'];
     const options = buildTarget['options'];
-    options['ssr']['experimentalPlatform'] = 'neutral';
+    options['ssr']['platform'] = 'neutral';
     options['outputMode'] = 'server';
     options['security'] ??= {};
     options['security']['allowedHosts'] = ['localhost'];

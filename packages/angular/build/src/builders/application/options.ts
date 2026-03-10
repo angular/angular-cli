@@ -28,11 +28,11 @@ import { getProjectRootPaths, normalizeDirectoryPath } from '../../utils/project
 import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
-  ExperimentalPlatform,
   I18NTranslation,
   OutputHashing,
   OutputMode,
   OutputPathClass,
+  Platform,
 } from './schema';
 
 /**
@@ -292,11 +292,11 @@ export async function normalizeOptions(
   if (options.ssr === true) {
     ssrOptions = {};
   } else if (typeof options.ssr === 'object') {
-    const { entry, experimentalPlatform = ExperimentalPlatform.Node } = options.ssr;
+    const { entry, platform = Platform.Node } = options.ssr;
 
     ssrOptions = {
       entry: entry && path.join(workspaceRoot, entry),
-      platform: experimentalPlatform,
+      platform,
     };
   }
 
