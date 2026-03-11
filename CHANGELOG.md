@@ -1,3 +1,41 @@
+<a name="22.0.0-next.1"></a>
+
+# 22.0.0-next.1 (2026-03-11)
+
+## Breaking Changes
+
+### @angular/build
+
+- The `@angular/build:dev-server (ng serve)` now assigns the highest priority to the `PORT` environment variable. This value will override any port configurations specified in `angular.json` or via the `--port` command-line flag. This includes the default port 4200.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [b3d838dfd](https://github.com/angular/angular-cli/commit/b3d838dfdb2adc3bd035b495f7f9457d742d73a4) | fix  | replace deprecated `ChangeDetectionStrategy.Default` with `Eager` |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
+| [598a690a0](https://github.com/angular/angular-cli/commit/598a690a0baea5cd54af5cea38e673c33605a627) | fix  | conditionally quote package names when adding dependencies based on host requirements |
+| [b5fb457e1](https://github.com/angular/angular-cli/commit/b5fb457e157fa78b61565eaba6b88e9f80b3b288) | fix  | preserve exact version in ng add when requested                                       |
+| [93c3eb8fb](https://github.com/angular/angular-cli/commit/93c3eb8fb2a0d531f18779152b0a62e9b73dbb23) | fix  | update zoneless migration tool to handle `ChangeDetectionStrategy.Eager`              |
+| [ad0fd5f41](https://github.com/angular/angular-cli/commit/ad0fd5f41fc6ee5d920fb3c725f09f17d86d2ab4) | perf | avoid redundant package version resolution in ng add                                  |
+| [a39a33128](https://github.com/angular/angular-cli/commit/a39a33128fb56e9c65ea89e06c4f127252d3b220) | perf | cache root manifest and resolve restricted package exports in ng add                  |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [fe720cab6](https://github.com/angular/angular-cli/commit/fe720cab64bbc8bcc2db583188e32ad938e63a23) | feat | add process.env.PORT support to the dev server                     |
+| [af2c7e944](https://github.com/angular/angular-cli/commit/af2c7e9444fba81d3b1fd2d37dc4412f8305b5ed) | feat | rename `experimentalPlatform` to `platform` in application builder |
+| [6324133c2](https://github.com/angular/angular-cli/commit/6324133c282f5e04ee6e9e46fc5f387cbbefad8e) | fix  | normalize line endings for CSP hash generation                     |
+| [839c725c2](https://github.com/angular/angular-cli/commit/839c725c234b2c1c3e44d52e3a1442ad1b538be9) | fix  | pass process environment variables to prerender workers            |
+| [f30f8900e](https://github.com/angular/angular-cli/commit/f30f8900efb8ad9a835630f57e3667346926dc4d) | fix  | resolve assets correctly during i18n prerendering                  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.2"></a>
 
 # 21.2.2 (2026-03-11)
