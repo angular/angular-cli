@@ -1,3 +1,26 @@
+<a name="21.2.2"></a>
+
+# 21.2.2 (2026-03-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------- |
+| [8447d9132](https://github.com/angular/angular-cli/commit/8447d913280a8fa09a842d11193ce77527d0f7a6) | fix  | conditionally quote package names when adding dependencies based on host requirements |
+| [d2f209823](https://github.com/angular/angular-cli/commit/d2f209823a524a6effde4910017547675c7a6166) | fix  | preserve exact version in ng add when requested                                       |
+| [28f4d684a](https://github.com/angular/angular-cli/commit/28f4d684ae12f0e0860bf0ace8851fdddad1c068) | perf | avoid redundant package version resolution in ng add                                  |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [06010294f](https://github.com/angular/angular-cli/commit/06010294f8fe7a4843f802aafba51703ce810f61) | fix  | allow any `CHROME_BIN` for vitest playwright provider   |
+| [8dec0c62b](https://github.com/angular/angular-cli/commit/8dec0c62ba40af339f4fd0fa34f20cbed545cd71) | fix  | normalize line endings for CSP hash generation          |
+| [58688ebd7](https://github.com/angular/angular-cli/commit/58688ebd727fe295adcb538a33b525867caf82bd) | fix  | pass process environment variables to prerender workers |
+| [4ca61647f](https://github.com/angular/angular-cli/commit/4ca61647f208ec0ab9bc06f64583696b0619c259) | fix  | resolve assets correctly during i18n prerendering       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.20"></a>
 
 # 20.3.20 (2026-03-11)
