@@ -23,7 +23,7 @@ describe('Component Schematic', () => {
     inlineStyle: false,
     inlineTemplate: false,
     displayBlock: false,
-    changeDetection: ChangeDetection.Eager,
+    changeDetection: ChangeDetection.OnPush,
     style: Style.Css,
     type: 'Component',
     skipTests: false,
@@ -64,12 +64,23 @@ describe('Component Schematic', () => {
     expect(tsContent).toContain('compileComponents()');
   });
 
-  it('should set change detection to OnPush', async () => {
-    const options = { ...defaultOptions, changeDetection: 'OnPush' };
+  it('should not set change detection when default is OnPush', async () => {
+    const options = { ...defaultOptions };
 
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
-    expect(tsContent).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+    expect(tsContent).not.toMatch(/import.*ChangeDetectionStrategy/);
+    expect(tsContent).not.toMatch(/changeDetection:/);
+    expect(tsContent).not.toMatch(/ChangeDetectionStrategy/);
+  });
+
+  it('should set changeDetection to Eager when requested', async () => {
+    const options = { ...defaultOptions, changeDetection: 'Eager' };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(tsContent).toMatch(/import .*ChangeDetectionStrategy/);
+    expect(tsContent).toContain('changeDetection: ChangeDetectionStrategy.Eager,');
   });
 
   it('should not set view encapsulation', async () => {
@@ -348,27 +359,27 @@ describe('Component Schematic', () => {
     expect(tree.files).not.toContain('/projects/bar/src/app/foo/foo.component.spec.ts');
   });
 
-  it('should respect templateUrl when style=none and changeDetection=OnPush', async () => {
-    const options = { ...defaultOptions, style: Style.None, changeDetection: 'OnPush' };
+  it('should respect templateUrl when style=none and changeDetection=Eager', async () => {
+    const options = { ...defaultOptions, style: Style.None, changeDetection: 'Eager' };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(content).not.toMatch(/styleUrls: /);
     expect(content).toMatch(/templateUrl: '.\/foo.component.html',\n/);
-    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.Eager/);
   });
 
-  it('should respect inlineTemplate when style=none and changeDetection=OnPush', async () => {
+  it('should respect inlineTemplate when style=none and changeDetection=Eager', async () => {
     const options = {
       ...defaultOptions,
       style: Style.None,
-      changeDetection: 'OnPush',
+      changeDetection: 'Eager',
       inlineTemplate: true,
     };
     const tree = await schematicRunner.runSchematic('component', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
     expect(content).not.toMatch(/styleUrls: /);
     expect(content).toMatch(/template: `(\n(.|)*){3}\n\s*`,\n/);
-    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
+    expect(content).toMatch(/changeDetection: ChangeDetectionStrategy.Eager,/);
   });
 
   it('should create a standalone component', async () => {

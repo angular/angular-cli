@@ -1,4 +1,4 @@
-import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%>Component<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';
+import { <% if(changeDetection !== 'OnPush') { %>ChangeDetectionStrategy, <% }%>Component<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';
 
 @Component({<% if(!skipSelector) {%>
   selector: '<%= selector %>',<%}%><% if(standalone) {%>
@@ -16,7 +16,7 @@ import { <% if(changeDetection !== 'Default') { %>ChangeDetectionStrategy, <% }%
     }
   <% } %>`,<% } else if (style !== 'none') { %>
   styleUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>',<% } %><% if(!!viewEncapsulation) { %>
-  encapsulation: ViewEncapsulation.<%= viewEncapsulation %>,<% } if (changeDetection !== 'Default') { %>
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %>,<% } if (changeDetection !== 'OnPush') { %>
   changeDetection: ChangeDetectionStrategy.<%= changeDetection %>,<% } %>
 })
 export <% if(exportDefault) {%>default <%}%>class <%= classifiedName %> {
