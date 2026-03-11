@@ -72,6 +72,15 @@ describe('Component Schematic', () => {
     expect(tsContent).toMatch(/changeDetection: ChangeDetectionStrategy.OnPush/);
   });
 
+  it('should not set changeDetection by default', async () => {
+    const options = { ...defaultOptions };
+
+    const tree = await schematicRunner.runSchematic('component', options, appTree);
+    const tsContent = tree.readContent('/projects/bar/src/app/foo/foo.component.ts');
+    expect(tsContent).not.toMatch(/changeDetection:/);
+    expect(tsContent).not.toMatch(/ChangeDetectionStrategy/);
+  });
+
   it('should not set view encapsulation', async () => {
     const options = { ...defaultOptions };
 
