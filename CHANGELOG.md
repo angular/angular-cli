@@ -1,3 +1,15 @@
+<a name="20.3.20"></a>
+
+# 20.3.20 (2026-03-11)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [0fd6823af](https://github.com/angular/angular-cli/commit/0fd6823af0adec23f7c3f1d531f45f6432afe555) | fix  | pass process environment variables to prerender workers |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.19"></a>
 
 # 20.3.19 (2026-03-04)
