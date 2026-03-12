@@ -85,6 +85,7 @@ export class AngularWebpackPlugin {
   private readonly requiredFilesToEmit = new Set<string>();
   private readonly requiredFilesToEmitCache = new Map<string, EmitFileResult | undefined>();
   private readonly fileEmitHistory = new Map<string, FileEmitHistoryItem>();
+  private compilerOptions!: CompilerOptions;
 
   constructor(options: Partial<AngularWebpackPluginOptions> = {}) {
     this.pluginOptions = {
@@ -186,6 +187,7 @@ export class AngularWebpackPlugin {
 
     // Setup and read TypeScript and Angular compiler configuration
     const { compilerOptions, rootNames, errors } = this.loadConfiguration();
+    this.compilerOptions = compilerOptions;
 
     // Create diagnostics reporter and report configuration file errors
     const diagnosticsReporter = createDiagnosticsReporter(compilation, (diagnostic) =>
@@ -325,6 +327,8 @@ export class AngularWebpackPlugin {
       compilation.compiler.webpack.NormalModule.getCompilationHooks(compilation).loader.tap(
         PLUGIN_NAME,
         (context) => {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          fileEmitters!.compilerOptions = this.compilerOptions;
           const loaderContext = context as typeof context & {
             [AngularPluginSymbol]?: FileEmitterCollection;
           };

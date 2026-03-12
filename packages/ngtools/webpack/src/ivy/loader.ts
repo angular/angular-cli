@@ -74,8 +74,16 @@ export function angularWebpackLoader(
       }
 
       // Write the declaration file in the target dir
-      if (result.declaration) {
-        fs.writeFileSync(this.resourcePath.replace('.ts', '.d.ts'), result.declaration);
+      if (result.declaration && fileEmitter.compilerOptions.declaration) {
+        let target = this.resourcePath.replace('.ts', '.d.ts');
+        if (fileEmitter.compilerOptions.declarationDir) {
+          if (!fileEmitter.compilerOptions.baseUrl) {
+            throw new Error('When declarationDir is specified, baseUrl is required as well');
+          }
+          const relDir = path.relative(fileEmitter.compilerOptions.baseUrl, target);
+          target = path.join(fileEmitter.compilerOptions.declarationDir, relDir);
+        }
+        fs.writeFileSync(target, result.declaration);
       }
       callback(undefined, resultContent, resultMap);
     })
