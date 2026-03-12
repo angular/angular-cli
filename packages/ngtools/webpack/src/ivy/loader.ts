@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { LoaderContext } from 'webpack';
 import { AngularPluginSymbol, FileEmitterCollection } from './symbol';
@@ -72,6 +73,10 @@ export function angularWebpackLoader(
         );
       }
 
+      // Write the declaration file in the target dir
+      if (result.declaration) {
+        fs.writeFileSync(this.resourcePath.replace('.ts', '.d.ts'), result.declaration);
+      }
       callback(undefined, resultContent, resultMap);
     })
     .catch((err) => {
