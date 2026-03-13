@@ -535,7 +535,7 @@
     },
     "statsJson": {
       "type": "boolean",
-      "description": "Generates a 'stats.json' file which can be analyzed with https://esbuild.github.io/analyze/.",
+      "description": "Generates a 'browser-stats.json' (and 'server-stats.json' when SSR is enabled) file which can be analyzed with https://esbuild.github.io/analyze/.",
       "default": false
     },
     "budgets": {
