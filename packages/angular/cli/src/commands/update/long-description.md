@@ -13,10 +13,10 @@ ng update @angular/cli@^<major_version> @angular/core@^<major_version>
 ```
 
 We recommend that you always update to the latest patch version, as it contains fixes we released since the initial major release.
-For example, use the following command to take the latest 10.x.x version and use that to update.
+For example, use the following command to take the latest 21.x.x version and use that to update.
 
 ```
-ng update @angular/cli@^10 @angular/core@^10
+ng update @angular/cli@^21 @angular/core@^21
 ```
 
-For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](https://update.angular.dev/).
+For detailed information and guidance on updating your application, see the interactive [Angular Update Guide](/update-guide).
