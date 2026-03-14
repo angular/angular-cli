@@ -130,21 +130,22 @@ function isStringMap(node: json.JsonObject): boolean {
   );
 }
 
-const SUPPORTED_PRIMITIVE_TYPES = new Set(['boolean', 'number', 'string']);
+const SUPPORTED_PRIMITIVE_TYPES = new Set(['boolean', 'number', 'string'] as const);
+type SupportedPrimitiveType = Parameters<typeof SUPPORTED_PRIMITIVE_TYPES.add>[0];
 
 /**
  * Checks if a string is a supported primitive type.
  * @param value The string to check.
  * @returns `true` if the string is a supported primitive type, otherwise `false`.
  */
-function isSupportedPrimitiveType(value: string): boolean {
-  return SUPPORTED_PRIMITIVE_TYPES.has(value);
+function isSupportedPrimitiveType(value: string): value is SupportedPrimitiveType {
+  return SUPPORTED_PRIMITIVE_TYPES.has(value as any);
 }
 
 /**
  * Recursively checks if a JSON schema for an array's items is a supported primitive type.
  * It supports `oneOf` and `anyOf` keywords.
- * @param schema The JSON schema for the array's items.
+ * @param schema The JSON schema to check.
  * @returns `true` if the schema is a supported primitive type, otherwise `false`.
  */
 function isSupportedArrayItemSchema(schema: json.JsonObject): boolean {
@@ -154,6 +155,10 @@ function isSupportedArrayItemSchema(schema: json.JsonObject): boolean {
 
   if (json.isJsonArray(schema.enum)) {
     return true;
+  }
+
+  if (isJsonObject(schema.items)) {
+    return isSupportedArrayItemSchema(schema.items);
   }
 
   if (json.isJsonArray(schema.items)) {
@@ -178,6 +183,40 @@ function isSupportedArrayItemSchema(schema: json.JsonObject): boolean {
 }
 
 /**
+ * Recursively finds the first supported array primitive type for the given JSON schema.
+ * It supports `oneOf` and `anyOf` keywords.
+ * @param schema The JSON schema to inspect.
+ * @returns The supported primitive type or 'string' if none is found.
+ */
+function getSupportedArrayType(schema: json.JsonObject): SupportedPrimitiveType {
+  if (typeof schema.type === 'string' && isSupportedPrimitiveType(schema.type)) {
+    return schema.type;
+  }
+
+  if (json.isJsonArray(schema.enum)) {
+    return 'string';
+  }
+
+  if (isJsonObject(schema.items)) {
+    const result = getSupportedArrayType(schema.items);
+    if (result) return result;
+  }
+
+  for (const key of ['items', 'oneOf', 'anyOf']) {
+    if (json.isJsonArray(schema[key])) {
+      for (const item in schema[key]) {
+        if (isJsonObject(item)) {
+          const result = getSupportedArrayType(item);
+          if (result) return result;
+        }
+      }
+    }
+  }
+
+  return 'string';
+}
+
+/**
  * Gets the supported types for a JSON schema node.
  * @param current The JSON schema node to get the supported types for.
  * @returns An array of supported types.
@@ -198,7 +237,7 @@ function getSupportedTypes(
       case 'string':
         return true;
       case 'array':
-        return isJsonObject(current.items) && isSupportedArrayItemSchema(current.items);
+        return isSupportedArrayItemSchema(current);
       case 'object':
         return isStringMap(current);
       default:
@@ -377,9 +416,13 @@ export async function parseJsonSchemaToOptions(
             type: 'array',
             itemValueType: 'string',
           }
-        : {
-            type,
-          }),
+        : type === 'array'
+          ? {
+              type: getSupportedArrayType(current),
+            }
+          : {
+              type,
+            }),
     };
 
     options.push(option);
