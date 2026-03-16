@@ -6,10 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { HttpsProxyAgent } from 'https-proxy-agent';
 import { createHash } from 'node:crypto';
 import { readFile, rm, writeFile } from 'node:fs/promises';
-import { get as httpsGet } from 'node:https';
+import { type Agent, get as httpsGet } from 'node:https';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { htmlRewritingStream } from './html-rewriting-stream';
@@ -195,12 +194,28 @@ export class InlineFontsProcessor {
     }
 
     const httpsProxy = process.env.HTTPS_PROXY ?? process.env.https_proxy;
+    let agent: Agent | undefined;
+    if (httpsProxy) {
+      // TODO: Remove `https-proxy-agent` usage once the min supported version of Node.js is 24.5.0
+      // https.globalAgent = new https.Agent({
+      //   proxyEnv: { HTTPS_PROXY: 'http://proxy.company.com:8080' },
+      // });
+      // See: https://nodejs.org/en/learn/http/enterprise-network-configuration
+      // See: https://nodejs.org/docs/latest/api/https.html
+
+      const { HttpsProxyAgent } = (await import('https-proxy-agent' as string)) as typeof import(
+        'https-proxy-agent',
+        { with: { 'resolution-mode': 'import' } }
+      );
+      agent = new HttpsProxyAgent(httpsProxy) as unknown as Agent;
+    }
+
     const data = await new Promise<string>((resolve, reject) => {
       let rawResponse = '';
       httpsGet(
         url,
         {
-          agent: httpsProxy ? new HttpsProxyAgent(httpsProxy) : undefined,
+          agent,
           headers: {
             /**
              * Always use a Windows UA. This is because Google fonts will including hinting in fonts for Windows.
