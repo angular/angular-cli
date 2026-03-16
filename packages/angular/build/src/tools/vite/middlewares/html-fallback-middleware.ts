@@ -27,6 +27,15 @@ export function angularHtmlFallbackMiddleware(
   }
 
   if (req.url) {
+    // No fallback for dotfile requests (e.g., .env, .npmrc)
+    const pathname = req.url.split('?')[0];
+    const lastSegment = pathname.substring(pathname.lastIndexOf('/') + 1);
+    if (lastSegment.startsWith('.')) {
+      next();
+
+      return;
+    }
+
     const mimeType = lookupMimeTypeFromRequest(req.url);
     if (
       (mimeType === 'text/html' || mimeType === 'application/xhtml+xml') &&
