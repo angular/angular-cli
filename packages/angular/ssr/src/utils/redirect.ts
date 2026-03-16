@@ -27,9 +27,14 @@ export function isValidRedirectResponseCode(code: number): boolean {
  * @param location - The URL to which the response should redirect.
  * @param status - The HTTP status code for the redirection. Defaults to 302 (Found).
  *                 See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
+ * @param headers - Additional headers to include in the response.
  * @returns A `Response` object representing the HTTP redirect.
  */
-export function createRedirectResponse(location: string, status = 302): Response {
+export function createRedirectResponse(
+  location: string,
+  status = 302,
+  headers?: Record<string, string>,
+): Response {
   if (ngDevMode && !isValidRedirectResponseCode(status)) {
     throw new Error(
       `Invalid redirect status code: ${status}. ` +
@@ -37,10 +42,25 @@ export function createRedirectResponse(location: string, status = 302): Response
     );
   }
 
+  const resHeaders = new Headers(headers);
+  if (ngDevMode && resHeaders.has('location')) {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `Location header "${resHeaders.get('location')}" will ignored and set to "${location}".`,
+    );
+  }
+
+  let vary = resHeaders.get('Vary') ?? '';
+  if (vary) {
+    vary += ', ';
+  }
+  vary += 'X-Forwarded-Prefix';
+
+  resHeaders.set('Vary', vary);
+  resHeaders.set('Location', location);
+
   return new Response(null, {
     status,
-    headers: {
-      'Location': location,
-    },
+    headers: resHeaders,
   });
 }
