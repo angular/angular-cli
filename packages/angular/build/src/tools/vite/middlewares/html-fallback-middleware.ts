@@ -7,6 +7,7 @@
  */
 
 import type { ServerResponse } from 'node:http';
+import { basename } from 'node:path/posix';
 import type { Connect } from 'vite';
 import { lookupMimeTypeFromRequest } from '../utils';
 
@@ -29,7 +30,7 @@ export function angularHtmlFallbackMiddleware(
   if (req.url) {
     // No fallback for dotfile requests (e.g., .env, .npmrc)
     const pathname = req.url.split('?')[0];
-    const lastSegment = pathname.substring(pathname.lastIndexOf('/') + 1);
+    const lastSegment = basename(pathname);
     if (lastSegment.startsWith('.')) {
       next();
 
