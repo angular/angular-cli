@@ -125,8 +125,8 @@ describe('Validation Utils', () => {
       );
     });
 
-    it('should throw error if x-forwarded-prefix starts with multiple slashes or backslashes', () => {
-      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil'];
+    it('should throw error if x-forwarded-prefix starts with a backslash or multiple slashes', () => {
+      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil', '\\evil'];
 
       for (const prefix of inputs) {
         const request = new Request('https://example.com', {
@@ -138,7 +138,7 @@ describe('Validation Utils', () => {
         expect(() => validateRequest(request, allowedHosts))
           .withContext(`Prefix: "${prefix}"`)
           .toThrowError(
-            'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+            'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
           );
       }
     });
@@ -171,7 +171,7 @@ describe('Validation Utils', () => {
         expect(() => validateRequest(request, allowedHosts))
           .withContext(`Prefix: "${prefix}"`)
           .toThrowError(
-            'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+            'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
           );
       }
     });

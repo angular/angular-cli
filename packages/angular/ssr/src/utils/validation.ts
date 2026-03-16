@@ -29,7 +29,7 @@ const VALID_HOST_REGEX = /^[a-z0-9.:-]+$/i;
 /**
  * Regular expression to validate that the prefix is valid.
  */
-const INVALID_PREFIX_REGEX = /^[/\\]{2}|(?:^|[/\\])\.\.?(?:[/\\]|$)/;
+const INVALID_PREFIX_REGEX = /^(?:\\|\/[/\\])|(?:^|[/\\])\.\.?(?:[/\\]|$)/;
 
 /**
  * Extracts the first value from a multi-value header string.
@@ -262,7 +262,7 @@ function validateHeaders(request: Request): void {
   const xForwardedPrefix = getFirstHeaderValue(headers.get('x-forwarded-prefix'));
   if (xForwardedPrefix && INVALID_PREFIX_REGEX.test(xForwardedPrefix)) {
     throw new Error(
-      'Header "x-forwarded-prefix" must not start with multiple "/" or "\\" or contain ".", ".." path segments.',
+      'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
     );
   }
 }
