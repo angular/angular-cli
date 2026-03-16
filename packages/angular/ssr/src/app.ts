@@ -190,7 +190,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo, status, renderMode } = matchedRoute;
+    const { redirectTo, status, renderMode, headers } = matchedRoute;
 
     if (redirectTo !== undefined) {
       return createRedirectResponse(
@@ -199,6 +199,7 @@ export class AngularServerApp {
           buildPathWithParams(redirectTo, url.pathname),
         ),
         status,
+        headers,
       );
     }
 
@@ -352,7 +353,7 @@ export class AngularServerApp {
     }
 
     if (result.redirectTo) {
-      return createRedirectResponse(result.redirectTo, responseInit.status);
+      return createRedirectResponse(result.redirectTo, responseInit.status, headers);
     }
 
     if (renderMode === RenderMode.Prerender) {
