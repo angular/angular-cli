@@ -14,16 +14,15 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import { addVitestValueImport, createViCallExpression } from '../utils/ast-helpers';
+import { addVitestValueImport } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
+import { createViCallExpression } from '../utils/refactor-helpers';
 import { TodoCategory } from '../utils/todo-notes';
 
-export function transformTimerMocks(
-  node: ts.Node,
-  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
-): ts.Node {
+export function transformTimerMocks(node: ts.Node, ctx: RefactorContext): ts.Node {
+  const { sourceFile, reporter, pendingVitestValueImports } = ctx;
   if (
     !ts.isCallExpression(node) ||
     !ts.isPropertyAccessExpression(node.expression) ||
@@ -71,7 +70,7 @@ export function transformTimerMocks(
       ];
     }
 
-    return createViCallExpression(newMethodName, newArgs);
+    return createViCallExpression(ctx, newMethodName, newArgs);
   }
 
   return node;
@@ -101,10 +100,8 @@ export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorC
   return node;
 }
 
-export function transformDefaultTimeoutInterval(
-  node: ts.Node,
-  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
-): ts.Node {
+export function transformDefaultTimeoutInterval(node: ts.Node, ctx: RefactorContext): ts.Node {
+  const { sourceFile, reporter, pendingVitestValueImports } = ctx;
   if (
     ts.isExpressionStatement(node) &&
     ts.isBinaryExpression(node.expression) &&
@@ -124,7 +121,7 @@ export function transformDefaultTimeoutInterval(
         'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.',
       );
       const timeoutValue = assignment.right;
-      const setConfigCall = createViCallExpression('setConfig', [
+      const setConfigCall = createViCallExpression(ctx, 'setConfig', [
         ts.factory.createObjectLiteralExpression(
           [ts.factory.createPropertyAssignment('testTimeout', timeoutValue)],
           false,

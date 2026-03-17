@@ -14,14 +14,11 @@
  */
 
 import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
-import {
-  addVitestValueImport,
-  createPropertyAccess,
-  createViCallExpression,
-} from '../utils/ast-helpers';
+import { addVitestValueImport, createPropertyAccess } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
+import { createViCallExpression } from '../utils/refactor-helpers';
 
 export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
@@ -194,7 +191,11 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
       );
 
       // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn)
-      return createViCallExpression('fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
+      return createViCallExpression(
+        refactorCtx,
+        'fn',
+        node.arguments.length > 1 ? [node.arguments[1]] : [],
+      );
     case 'spyOnAllFunctions': {
       reporter.reportTransformation(
         sourceFile,
@@ -212,10 +213,8 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
   return node;
 }
 
-export function transformCreateSpyObj(
-  node: ts.Node,
-  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
-): ts.Node {
+export function transformCreateSpyObj(node: ts.Node, ctx: RefactorContext): ts.Node {
+  const { sourceFile, reporter, pendingVitestValueImports } = ctx;
   if (!isJasmineCallExpression(node, 'createSpyObj')) {
     return node;
   }
@@ -243,9 +242,9 @@ export function transformCreateSpyObj(
   }
 
   if (ts.isArrayLiteralExpression(methods)) {
-    properties = createSpyObjWithArray(methods, baseName);
+    properties = createSpyObjWithArray(ctx, methods, baseName);
   } else if (ts.isObjectLiteralExpression(methods)) {
-    properties = createSpyObjWithObject(methods, baseName);
+    properties = createSpyObjWithObject(ctx, methods, baseName);
   } else {
     const category = 'createSpyObj-dynamic-variable';
     reporter.recordTodo(category, sourceFile, node);
@@ -268,13 +267,14 @@ export function transformCreateSpyObj(
 }
 
 function createSpyObjWithArray(
+  ctx: RefactorContext,
   methods: ts.ArrayLiteralExpression,
   baseName: string | undefined,
 ): ts.PropertyAssignment[] {
   return methods.elements
     .map((element) => {
       if (ts.isStringLiteral(element)) {
-        const mockFn = createViCallExpression('fn');
+        const mockFn = createViCallExpression(ctx, 'fn');
         const methodName = element.text;
         let finalExpression: ts.Expression = mockFn;
 
@@ -298,6 +298,7 @@ function createSpyObjWithArray(
 }
 
 function createSpyObjWithObject(
+  ctx: RefactorContext,
   methods: ts.ObjectLiteralExpression,
   baseName: string | undefined,
 ): ts.PropertyAssignment[] {
@@ -306,7 +307,7 @@ function createSpyObjWithObject(
       if (ts.isPropertyAssignment(prop) && ts.isIdentifier(prop.name)) {
         const methodName = prop.name.text;
         const returnValue = prop.initializer;
-        let mockFn = createViCallExpression('fn');
+        let mockFn = createViCallExpression(ctx, 'fn');
 
         if (baseName) {
           mockFn = ts.factory.createCallExpression(

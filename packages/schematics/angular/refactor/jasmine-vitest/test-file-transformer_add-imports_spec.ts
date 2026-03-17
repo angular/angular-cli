@@ -116,4 +116,26 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
       `;
     await expectTransformation(input, expected, true);
   });
+
+  it('should add imports for `onTestFinished` and `vi` when addImports is true', async () => {
+    const input = `
+        import { fakeAsync } from '@angular/core/testing';
+        
+        it('works', fakeAsync(() => {
+          expect(1).toBe(1);
+        }));
+      `;
+    const expected = `
+        import { expect, it, onTestFinished, vi } from 'vitest';
+
+        it('works', async () => {
+          vi.useFakeTimers();
+          onTestFinished(() => {
+            vi.useRealTimers();
+          });
+          expect(1).toBe(1);
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
 });
