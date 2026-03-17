@@ -150,4 +150,32 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
       true,
     );
   });
+
+  it('should add imports for `vi` when addImports is true', async () => {
+    const input = `
+        import { fakeAsync } from '@angular/core/testing';
+
+        describe('My fakeAsync suite', () => {
+          it('works', fakeAsync(() => {
+            expect(1).toBe(1);
+          }));
+        });
+      `;
+    const expected = `
+        import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+
+        describe('My fakeAsync suite', () => {
+          beforeAll(() => {
+            vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+          });
+          afterAll(() => {
+            vi.useRealTimers();
+          });
+          it('works', async () => {
+            expect(1).toBe(1);
+          });
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
 });

@@ -33,6 +33,7 @@ export async function expectTransformation(
   const transformed = transformJasmineToVitest('spec.ts', input, reporter, {
     addImports,
     browserMode: false,
+    fakeAsync: true,
   });
   const formattedTransformed = await format(transformed, { parser: 'typescript' });
   const formattedExpected = await format(expected, { parser: 'typescript' });
