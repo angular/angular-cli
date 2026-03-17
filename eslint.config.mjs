@@ -75,7 +75,8 @@ export default [
       sourceType: 'module',
 
       parserOptions: {
-        project: 'tsconfig.json',
+        projectService: true, // v8 recommended alternative to "project"
+        tsconfigRootDir: import.meta.dirname,
       },
     },
 
