@@ -59,13 +59,13 @@
       "default": "projects"
     },
     "inlineStyle": {
-      "description": "Include the styles for the initial application's root component directly within the `app.component.ts` file. By default, a separate stylesheet file (e.g., `app.component.css`) is created.",
+      "description": "Include the styles for the initial application's root component directly within the `app.ts` file. By default, a separate stylesheet file (e.g., `app.css`) is created.",
       "type": "boolean",
       "alias": "s",
       "x-user-analytics": "ep.ng_inline_style"
     },
     "inlineTemplate": {
-      "description": "Include the HTML template for the initial application's root component directly within the `app.component.ts` file. By default, a separate template file (e.g., `app.component.html`) is created.",
+      "description": "Include the HTML template for the initial application's root component directly within the `app.ts` file. By default, a separate template file (e.g., `app.html`) is created.",
       "type": "boolean",
       "alias": "t",
       "x-user-analytics": "ep.ng_inline_template"
