@@ -14,7 +14,7 @@ import { RefactorReporter } from './utils/refactor-reporter';
 async function expectTransformation(
   input: string,
   expected: string,
-  options: { addImports: boolean; browserMode: boolean } = {
+  options: { addImports: boolean; browserMode: boolean; fakeAsync?: boolean } = {
     addImports: false,
     browserMode: false,
   },
@@ -533,5 +533,67 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
     `;
 
     await expectTransformation(jasmineCode, vitestCode);
+  });
+
+  it('should not transform `fakeAsync`', async () => {
+    const jasmineCode = `
+      import { fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
+      
+      describe('My fakeAsync suite', () => {
+        it('works', fakeAsync(() => {
+          flush();
+          flushMicrotasks();
+          tick(100);
+        }));
+      });
+    `;
+    const vitestCode = `
+      import { fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
+
+      describe('My fakeAsync suite', () => {
+        it('works', fakeAsync(() => {
+          flush();
+          flushMicrotasks();
+          tick(100);
+        }));
+      });
+    `;
+
+    await expectTransformation(jasmineCode, vitestCode);
+  });
+
+  it('should transform `fakeAsync` if `fakeAsync` option is true', async () => {
+    const jasmineCode = `
+      import { fakeAsync, flush, flushMicrotasks, tick } from '@angular/core/testing';
+
+      describe('My fakeAsync suite', () => {
+        it('works', fakeAsync(() => {
+          flush();
+          flushMicrotasks();
+          tick(100);
+        }));
+      });
+    `;
+    const vitestCode = `
+      describe('My fakeAsync suite', () => {
+        beforeAll(() => {
+          vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+        });
+        afterAll(() => {
+          vi.useRealTimers();
+        });
+        it('works', async () => {
+          await vi.runAllTimersAsync();
+          await vi.advanceTimersByTimeAsync(0);
+          await vi.advanceTimersByTimeAsync(100);
+        });
+      });
+    `;
+
+    await expectTransformation(jasmineCode, vitestCode, {
+      addImports: false,
+      browserMode: false,
+      fakeAsync: true,
+    });
   });
 });

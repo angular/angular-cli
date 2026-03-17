@@ -14,6 +14,10 @@
  */
 
 import ts from 'typescript';
+import { transformFakeAsyncFlush } from './transformers/fake-async-flush';
+import { transformFakeAsyncFlushMicrotasks } from './transformers/fake-async-flush-microtasks';
+import { transformFakeAsyncTest } from './transformers/fake-async-test';
+import { transformFakeAsyncTick } from './transformers/fake-async-tick';
 import {
   transformDoneCallback,
   transformFocusedAndSkippedTests,
@@ -48,7 +52,11 @@ import {
   transformSpyReset,
 } from './transformers/jasmine-spy';
 import { transformJasmineTypes } from './transformers/jasmine-type';
-import { addVitestValueImport, getVitestAutoImports } from './utils/ast-helpers';
+import {
+  addVitestValueImport,
+  getVitestAutoImports,
+  removeImportSpecifiers,
+} from './utils/ast-helpers';
 import { RefactorContext } from './utils/refactor-context';
 import { RefactorReporter } from './utils/refactor-reporter';
 
@@ -129,6 +137,10 @@ const callExpressionTransformers = [
   transformToHaveBeenCalledBefore,
   transformToHaveClass,
   transformToBeNullish,
+  transformFakeAsyncTest,
+  transformFakeAsyncTick,
+  transformFakeAsyncFlush,
+  transformFakeAsyncFlushMicrotasks,
 
   // **Stage 3: Global Functions & Cleanup**
   // These handle global Jasmine functions and catch-alls for unsupported APIs.
@@ -173,8 +185,10 @@ export function transformJasmineToVitest(
   filePath: string,
   content: string,
   reporter: RefactorReporter,
-  options: { addImports: boolean; browserMode: boolean },
+  options: { addImports: boolean; browserMode: boolean; fakeAsync?: boolean },
 ): string {
+  options.fakeAsync ??= false;
+
   const contentWithPlaceholders = preserveBlankLines(content);
 
   const sourceFile = ts.createSourceFile(
@@ -187,6 +201,7 @@ export function transformJasmineToVitest(
 
   const pendingVitestValueImports = new Set<string>();
   const pendingVitestTypeImports = new Set<string>();
+  const pendingImportSpecifierRemovals = new Map<string, Set<string>>();
 
   const transformer: ts.TransformerFactory<ts.SourceFile> = (context) => {
     const refactorCtx: RefactorContext = {
@@ -195,6 +210,7 @@ export function transformJasmineToVitest(
       tsContext: context,
       pendingVitestValueImports,
       pendingVitestTypeImports,
+      pendingImportSpecifierRemovals,
     };
 
     const visitor: ts.Visitor = (node) => {
@@ -211,7 +227,18 @@ export function transformJasmineToVitest(
         }
 
         for (const transformer of callExpressionTransformers) {
-          if (!(options.browserMode && transformer === transformToHaveClass)) {
+          if (
+            !(
+              (options.browserMode && transformer === transformToHaveClass) ||
+              (options.fakeAsync === false &&
+                [
+                  transformFakeAsyncFlush,
+                  transformFakeAsyncFlushMicrotasks,
+                  transformFakeAsyncTick,
+                  transformFakeAsyncTest,
+                ].includes(transformer))
+            )
+          ) {
             transformedNode = transformer(transformedNode, refactorCtx);
           }
         }
@@ -249,14 +276,23 @@ export function transformJasmineToVitest(
 
   const hasPendingValueImports = pendingVitestValueImports.size > 0;
   const hasPendingTypeImports = pendingVitestTypeImports.size > 0;
+  const hasPendingImportSpecifierRemovals = pendingImportSpecifierRemovals.size > 0;
 
   if (
     transformedSourceFile === sourceFile &&
     !reporter.hasTodos &&
     !hasPendingValueImports &&
-    !hasPendingTypeImports
+    !hasPendingTypeImports &&
+    !hasPendingImportSpecifierRemovals
   ) {
     return content;
+  }
+
+  if (hasPendingImportSpecifierRemovals) {
+    transformedSourceFile = removeImportSpecifiers(
+      transformedSourceFile,
+      pendingImportSpecifierRemovals,
+    );
   }
 
   if (hasPendingTypeImports || (options.addImports && hasPendingValueImports)) {

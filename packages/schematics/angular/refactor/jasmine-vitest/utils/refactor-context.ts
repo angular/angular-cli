@@ -28,6 +28,12 @@ export interface RefactorContext {
 
   /** A set of Vitest type imports to be added to the file. */
   readonly pendingVitestTypeImports: Set<string>;
+
+  /**
+   * Map of module specifier -> names to remove from that import.
+   * Used when transforming identifiers that become inlined (e.g. flush -> vi.runAllTimersAsync).
+   */
+  readonly pendingImportSpecifierRemovals: Map<string, Set<string>>;
 }
 
 /**

@@ -122,6 +122,7 @@ export default function (options: Schema): Rule {
       const newContent = transformJasmineToVitest(file, content, reporter, {
         addImports: !!options.addImports,
         browserMode: !!options.browerMode,
+        fakeAsync: !!options.fakeAsync,
       });
 
       if (content !== newContent) {

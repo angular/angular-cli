@@ -178,6 +178,13 @@ export const TODO_NOTES = {
   'unhandled-done-usage': {
     message: "The 'done' callback was used in an unhandled way. Please migrate manually.",
   },
+  'flush-max-turns': {
+    message:
+      'flush(maxTurns) was called but maxTurns parameter is not migrated. Please migrate manually.',
+  },
+  'flush-return-value': {
+    message: 'flush() return value is not migrated. Please migrate manually.',
+  },
 } as const;
 
 /**
