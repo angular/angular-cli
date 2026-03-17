@@ -265,7 +265,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     return options.migrateOnly
       ? this.migrateOnly(
           workflow,
-          (options.packages ?? [])[0],
+          packages[0].name as string,
           rootDependencies,
           options,
           packageManager,
