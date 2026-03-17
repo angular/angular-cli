@@ -36,7 +36,14 @@ describe('Redirect Utils', () => {
         'Vary': 'Host',
       });
       expect(response.headers.get('Location')).toBe('/home');
-      expect(response.headers.get('Vary')).toBe('Host, X-Forwarded-Prefix');
+      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
+    });
+
+    it('should NOT add duplicate X-Forwarded-Prefix if already present in Vary header', () => {
+      const response = createRedirectResponse('/home', 302, {
+        'Vary': 'X-Forwarded-Prefix, Host',
+      });
+      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
     });
 
     it('should warn if Location header is provided in extra headers in dev mode', () => {
