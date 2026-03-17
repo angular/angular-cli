@@ -50,13 +50,18 @@ export function createRedirectResponse(
     );
   }
 
-  let vary = resHeaders.get('Vary') ?? '';
-  if (vary) {
-    vary += ', ';
-  }
-  vary += 'X-Forwarded-Prefix';
+  // Ensure unique values for Vary header
+  const varyArray = resHeaders.get('Vary')?.split(',') ?? [];
+  const varySet = new Set(['X-Forwarded-Prefix']);
+  for (const vary of varyArray) {
+    const value = vary.trim();
 
-  resHeaders.set('Vary', vary);
+    if (value) {
+      varySet.add(value);
+    }
+  }
+
+  resHeaders.set('Vary', [...varySet].join(', '));
   resHeaders.set('Location', location);
 
   return new Response(null, {
