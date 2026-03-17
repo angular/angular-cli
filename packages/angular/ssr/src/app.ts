@@ -25,6 +25,7 @@ import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
 import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
+import { createRedirectResponse } from './utils/redirect';
 import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 
 /**
@@ -174,7 +175,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo, status, renderMode } = matchedRoute;
+    const { redirectTo, status, renderMode, headers } = matchedRoute;
 
     if (redirectTo !== undefined) {
       return createRedirectResponse(
@@ -183,6 +184,7 @@ export class AngularServerApp {
           buildPathWithParams(redirectTo, url.pathname),
         ),
         status,
+        headers,
       );
     }
 
@@ -336,7 +338,7 @@ export class AngularServerApp {
     }
 
     if (result.redirectTo) {
-      return createRedirectResponse(result.redirectTo, status);
+      return createRedirectResponse(result.redirectTo, responseInit.status, headers);
     }
 
     if (renderMode === RenderMode.Prerender) {
@@ -551,21 +553,4 @@ function appendPreloadHintsToHtml(html: string, preload: readonly string[]): str
     ...preload.map((val) => `<link rel="modulepreload" href="${val}">`),
     html.slice(bodyCloseIdx),
   ].join('\n');
-}
-
-/**
- * Creates an HTTP redirect response with a specified location and status code.
- *
- * @param location - The URL to which the response should redirect.
- * @param status - The HTTP status code for the redirection. Defaults to 302 (Found).
- *                 See: https://developer.mozilla.org/en-US/docs/Web/API/Response/redirect_static#status
- * @returns A `Response` object representing the HTTP redirect.
- */
-function createRedirectResponse(location: string, status = 302): Response {
-  return new Response(null, {
-    status,
-    headers: {
-      'Location': location,
-    },
-  });
 }
