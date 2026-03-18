@@ -1,3 +1,36 @@
+<a name="22.0.0-next.2"></a>
+
+# 22.0.0-next.2 (2026-03-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [c9f07db8f](https://github.com/angular/angular-cli/commit/c9f07db8fcb0b3f8400fbbf0e131be7f9857a987) | fix  | use parsed package name for migrate-only updates |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [6572a6944](https://github.com/angular/angular-cli/commit/6572a69443356ff0022e6ce162915125fee0e3bb) | fix  | default components to OnPush change detection |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [9b33e1781](https://github.com/angular/angular-cli/commit/9b33e1781328d3b42665145bf580fb8e06c8ad2b) | fix  | alias createRequire banner import to avoid duplicate binding             |
+| [4643a8a3b](https://github.com/angular/angular-cli/commit/4643a8a3b3e2a3bcf7baae9f812ae8a9ef10ebad) | fix  | only use external packages for polyfills when no local files are present |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [4d564f66f](https://github.com/angular/angular-cli/commit/4d564f66f694011724d4933bf025f1c4fed55bca) | fix  | disallow x-forwarded-prefix starting with a backslash |
+| [ff1160e30](https://github.com/angular/angular-cli/commit/ff1160e3015eb321971e398cbedff80f4c053166) | fix  | ensure unique values in redirect response Vary header |
+| [998b8298e](https://github.com/angular/angular-cli/commit/998b8298e3106c95d77ced8090ab815365c462c7) | fix  | support custom headers in redirect responses          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.3"></a>
 
 # 21.2.3 (2026-03-18)
