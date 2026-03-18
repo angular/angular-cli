@@ -95,7 +95,46 @@ async function transformWithBabel(
   // If no additional transformations are needed, return the data directly
   if (plugins.length === 0) {
     // Strip sourcemaps if they should not be used
-    return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+    if (!useInputSourcemap) {
+      return data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+    }
+
+    // Inline any external sourceMappingURL so esbuild can chain through to the original source.
+    // When no Babel plugins run, external map references are preserved in the returned data but
+    // esbuild does not follow them. Converting to an inline base64 map allows esbuild to compose
+    // the full sourcemap chain from bundle output back to the original TypeScript source.
+    const externalMapMatch = /^\/\/# sourceMappingURL=(?!data:)([^\r\n]+)/m.exec(data);
+    if (externalMapMatch) {
+      const mapRef = externalMapMatch[1];
+      const fileDir = path.dirname(filename);
+      const mapPath = path.resolve(fileDir, mapRef);
+      // Reject path traversal — the resolved map file must remain within the source
+      // file's directory tree and must be a .map file. This prevents a crafted
+      // sourceMappingURL from reading arbitrary files from disk.
+      const fileDirPrefix = fileDir.endsWith(path.sep) ? fileDir : fileDir + path.sep;
+      if (!mapPath.startsWith(fileDirPrefix) || !mapPath.endsWith('.map')) {
+        return data;
+      }
+      try {
+        const mapContent = await fs.promises.readFile(mapPath, 'utf-8');
+        const inlineMap = Buffer.from(mapContent).toString('base64');
+        // Strip ALL sourceMappingURL comments before appending the composed inline map.
+        // When allowJs + inlineSourceMap are enabled, the TypeScript compiler preserves
+        // the original external reference AND appends its own data: inline sourcemap.
+        // esbuild uses the last comment, so leaving both would cause it to follow the
+        // TS-generated map (which only traces back to the compiled JS, not TypeScript).
+        const stripped = data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+        return stripped.trimEnd() + '\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,' + inlineMap + '\n';
+      } catch (error) {
+        // Map file not readable; return data with the original external reference
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Unable to inline sourcemap for '${filename}': ${error instanceof Error ? error.message : error}`,
+        );
+      }
+    }
+
+    return data;
   }
 
   const result = await transformAsync(data, {
