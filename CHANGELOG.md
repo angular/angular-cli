@@ -1,3 +1,30 @@
+<a name="21.2.3"></a>
+
+# 21.2.3 (2026-03-18)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [1505164bb](https://github.com/angular/angular-cli/commit/1505164bb2703254a2b25a76c7b3a1ff2fd76a85) | fix  | use parsed package name for migrate-only updates |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [75fa94cad](https://github.com/angular/angular-cli/commit/75fa94cad26b0947e687ef94d50653cb7651d18c) | fix  | alias createRequire banner import to avoid duplicate binding             |
+| [d009aa1ec](https://github.com/angular/angular-cli/commit/d009aa1ec7411b67b61b81003eb6181cde6f306f) | fix  | only use external packages for polyfills when no local files are present |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [f3e0e82c2](https://github.com/angular/angular-cli/commit/f3e0e82c2cecc3d9ebb5b8acc6e64d2d88c4efbd) | fix  | disallow x-forwarded-prefix starting with a backslash |
+| [b8bcd59b4](https://github.com/angular/angular-cli/commit/b8bcd59b40496369a57de0b0b39d85f323af30c7) | fix  | ensure unique values in redirect response Vary header |
+| [84385411d](https://github.com/angular/angular-cli/commit/84385411d4542d60d635aea9063c1fd751deb607) | fix  | support custom headers in redirect responses          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.2"></a>
 
 # 21.2.2 (2026-03-11)
