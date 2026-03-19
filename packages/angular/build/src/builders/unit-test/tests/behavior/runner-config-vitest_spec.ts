@@ -92,6 +92,31 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.expectFile('coverage/test/coverage-final.json').toExist();
     });
 
+    it('should enable coverage when set in runnerConfig file without builder option', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            coverage: {
+              enabled: true,
+            },
+          },
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('coverage/test/coverage-final.json').toExist();
+    });
+
     it('should exclude test files based on runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
