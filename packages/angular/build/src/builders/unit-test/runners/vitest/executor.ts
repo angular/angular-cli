@@ -377,6 +377,7 @@ export class VitestExecutor implements TestExecutor {
           setupFiles: testSetupFiles,
           projectPlugins,
           include,
+          watch,
         }),
       ],
     };
