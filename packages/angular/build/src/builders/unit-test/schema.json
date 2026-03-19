@@ -75,8 +75,7 @@
     },
     "coverage": {
       "type": "boolean",
-      "description": "Enables coverage reporting for tests.",
-      "default": false
+      "description": "Enables coverage reporting for tests. If not specified, the coverage configuration from a runner configuration file will be used if present. Otherwise, coverage is disabled by default."
     },
     "coverageInclude": {
       "type": "array",
