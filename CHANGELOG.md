@@ -1,3 +1,17 @@
+<a name="20.3.21"></a>
+
+# 20.3.21 (2026-03-19)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [1dc6992a5](https://github.com/angular/angular-cli/commit/1dc6992a5ae6c5a1f16f22f6c94690d5cf218c38) | fix  | disallow x-forwarded-prefix starting with a backslash |
+| [0a2ff0b2b](https://github.com/angular/angular-cli/commit/0a2ff0b2b3aceb228c9447c19fb762df742d7265) | fix  | ensure unique values in redirect response Vary header |
+| [cdbac82a8](https://github.com/angular/angular-cli/commit/cdbac82a85b35f24c70a062eeb8a13b521831019) | fix  | support custom headers in redirect responses          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.20"></a>
 
 # 20.3.20 (2026-03-11)
