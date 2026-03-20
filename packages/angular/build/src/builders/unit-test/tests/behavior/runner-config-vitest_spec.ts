@@ -42,6 +42,21 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.expectFile('vitest-results.xml').toExist();
     });
 
+    it('should override reporters defined in runnerConfig file when CLI option is present', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+        reporters: ['default'],
+      });
+
+      harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      // The CLI option 'default' should override the 'junit' reporter in VITEST_CONFIG_CONTENT
+      harness.expectFile('vitest-results.xml').toNotExist();
+    });
+
     it('should use custom reportsDirectory defined in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
