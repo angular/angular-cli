@@ -64,19 +64,48 @@ export const TODO_NOTES = {
     message:
       'expect().nothing() has been removed because it is redundant in Vitest. Tests without assertions pass by default.',
   },
-  'unsupported-global-function': {
-    message: (context: { name: string }): string =>
-      `Unsupported global function \`${context.name}\` found. This function is used for custom reporters in Jasmine ` +
+  'unsupported-jasmine-member': {
+    message: (context: { name: string }): string => `jasmine.${context.name} is not supported.`,
+  },
+  'setSpecProperty': {
+    message:
+      'Unsupported global function `setSpecProperty` found. This function is used for custom reporters in Jasmine ' +
       'and has no direct equivalent in Vitest.',
+  },
+  'setSuiteProperty': {
+    message:
+      'Unsupported global function `setSuiteProperty` found. This function is used for custom reporters in Jasmine ' +
+      'and has no direct equivalent in Vitest.',
+  },
+  'throwUnless': {
+    message:
+      'Unsupported global function `throwUnless` found. Please migrate manually to a direct assertion.',
+  },
+  'throwUnlessAsync': {
+    message:
+      'Unsupported global function `throwUnlessAsync` found. Please migrate manually to a direct assertion.',
+  },
+  'getSpecProperty': {
+    message: 'Unsupported global function `getSpecProperty` found. Please migrate manually.',
   },
   'addMatchers': {
     message: 'jasmine.addMatchers is not supported. Please manually migrate to expect.extend().',
+    url: 'https://vitest.dev/api/expect.html#expect-extend',
+  },
+  'addAsyncMatchers': {
+    message:
+      'jasmine.addAsyncMatchers is not supported. Please manually migrate to expect.extend().',
     url: 'https://vitest.dev/api/expect.html#expect-extend',
   },
   'addCustomEqualityTester': {
     message:
       'jasmine.addCustomEqualityTester is not supported. Please manually migrate to expect.addEqualityTesters().',
     url: 'https://vitest.dev/api/expect.html#expect-addequalitytesters',
+  },
+  'addCustomObjectFormatter': {
+    message:
+      'jasmine.addCustomObjectFormatter is not supported. May be possible to migrate to expect.addSnapshotSerializer().',
+    url: 'https://vitest.dev/api/expect.html#expect-addsnapshotserializer',
   },
   'mapContaining': {
     message:
@@ -87,6 +116,11 @@ export const TODO_NOTES = {
     message:
       'jasmine.setContaining is not supported. Vitest does not have a built-in matcher for Sets.' +
       ' Please manually assert the contents of the Set.',
+  },
+  'addSpyStrategy': {
+    message:
+      'jasmine.addSpyStrategy is not supported. Please manually migrate to spy.mockImplementation().',
+    url: 'https://vitest.dev/api/mock.html#mockimplementation',
   },
   'unknown-jasmine-property': {
     message: (context: { name: string }): string =>
@@ -124,6 +158,23 @@ export const TODO_NOTES = {
       ' Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.',
     url: 'https://vitest.dev/api/mocked.html#mock-lastcall',
   },
+  'saveArgumentsByValue': {
+    message:
+      'Vitest does not have a direct equivalent for spy.calls.saveArgumentsByValue().' +
+      ' Please migrate this manually by cloning and storing the arguments in a local variable.',
+  },
+  'clockAutoTick': {
+    message:
+      'Vitest does not have a direct equivalent for jasmine.clock().autoTick(). Please migrate this manually.',
+    url: 'https://vitest.dev/api/vi.html#fake-timers',
+  },
+  'clockWithMock': {
+    message:
+      'Vitest does not have a direct equivalent for jasmine.clock().withMock().' +
+      ' Please migrate this manually via vi.useFakeTimers() and vi.useRealTimers().',
+    url: 'https://vitest.dev/api/vi.html#vi-usefaketimers',
+  },
+
   'unhandled-done-usage': {
     message: "The 'done' callback was used in an unhandled way. Please migrate manually.",
   },

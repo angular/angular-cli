@@ -92,3 +92,32 @@ export function createPropertyAccess(
     name,
   );
 }
+
+export function getPromiseResolveRejectMethod(node: ts.Node): {
+  methodName: 'resolve' | 'reject';
+  arguments: ts.NodeArray<ts.Expression>;
+} | null {
+  if (!ts.isCallExpression(node)) {
+    return null;
+  }
+
+  const expr = node.expression;
+  if (
+    !ts.isPropertyAccessExpression(expr) ||
+    !ts.isIdentifier(expr.expression) ||
+    expr.expression.escapedText !== 'Promise'
+  ) {
+    return null;
+  }
+
+  const methodName = expr.name.escapedText as string;
+  const isResolveReject = methodName === 'resolve' || methodName === 'reject';
+  if (!isResolveReject) {
+    return null;
+  }
+
+  return {
+    methodName,
+    arguments: node.arguments,
+  };
+}

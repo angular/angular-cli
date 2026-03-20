@@ -121,7 +121,7 @@ export function transformAsymmetricMatchers(
   return node;
 }
 
-export function transformtoHaveBeenCalledBefore(
+export function transformToHaveBeenCalledBefore(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
@@ -205,7 +205,7 @@ export function transformToHaveClass(
     expectExpression = expectExpression.expression;
   }
 
-  if (matcherName !== 'toHaveClass') {
+  if (matcherName !== 'toHaveClass' || !ts.isCallExpression(expectExpression)) {
     return node;
   }
 
@@ -218,21 +218,17 @@ export function transformToHaveClass(
   const [className] = node.arguments;
   const newExpectArgs: ts.Expression[] = [];
 
-  if (ts.isCallExpression(expectExpression)) {
-    const [element] = expectExpression.arguments;
-    const classListContains = ts.factory.createCallExpression(
-      createPropertyAccess(createPropertyAccess(element, 'classList'), 'contains'),
-      undefined,
-      [className],
-    );
-    newExpectArgs.push(classListContains);
+  const [element] = expectExpression.arguments;
+  const classListContains = ts.factory.createCallExpression(
+    createPropertyAccess(createPropertyAccess(element, 'classList'), 'contains'),
+    undefined,
+    [className],
+  );
+  newExpectArgs.push(classListContains);
 
-    // Pass the context message from withContext to the new expect call
-    if (expectExpression.arguments.length > 1) {
-      newExpectArgs.push(expectExpression.arguments[1]);
-    }
-  } else {
-    return node;
+  // Pass the context message from withContext to the new expect call
+  if (expectExpression.arguments.length > 1) {
+    newExpectArgs.push(expectExpression.arguments[1]);
   }
 
   const newExpect = createExpectCallExpression(newExpectArgs);
@@ -625,4 +621,52 @@ export function transformExpectNothing(
   );
 
   return replacement;
+}
+
+export function transformToBeNullish(
+  node: ts.Node,
+  { sourceFile, reporter }: RefactorContext,
+): ts.Node {
+  if (
+    !ts.isCallExpression(node) ||
+    !ts.isPropertyAccessExpression(node.expression) ||
+    node.arguments.length !== 0
+  ) {
+    return node;
+  }
+
+  const pae = node.expression;
+  const matcherName = pae.name.text;
+  let isNegated = false;
+
+  let expectExpression = pae.expression;
+  if (ts.isPropertyAccessExpression(expectExpression) && expectExpression.name.text === 'not') {
+    isNegated = true;
+    expectExpression = expectExpression.expression;
+  }
+
+  if (matcherName !== 'toBeNullish' || !ts.isCallExpression(expectExpression)) {
+    return node;
+  }
+
+  reporter.reportTransformation(
+    sourceFile,
+    node,
+    'Transformed `.toBeNullish()` to a `element == null` check.',
+  );
+
+  const element = expectExpression.arguments[0];
+
+  const nullCheckExpression = ts.factory.createBinaryExpression(
+    element,
+    ts.SyntaxKind.EqualsEqualsToken,
+    ts.factory.createNull(),
+  );
+
+  const newExpect = createExpectCallExpression([nullCheckExpression]);
+  const newMatcher = isNegated ? ts.factory.createFalse() : ts.factory.createTrue();
+
+  return ts.factory.createCallExpression(createPropertyAccess(newExpect, 'toBe'), undefined, [
+    newMatcher,
+  ]);
 }

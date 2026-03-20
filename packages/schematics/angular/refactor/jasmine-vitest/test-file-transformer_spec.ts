@@ -28,7 +28,7 @@ describe('Jasmine to Vitest Transformer - Nested Transformations', () => {
           await expectAsync(service.myProp).toBeResolvedTo(42);
         `,
       expected: `
-          vi.spyOn(service, 'myProp', 'get').mockReturnValue(Promise.resolve(42));
+          vi.spyOn(service, 'myProp', 'get').mockResolvedValue(42);
           await expect(service.myProp).resolves.toEqual(42);
         `,
     },

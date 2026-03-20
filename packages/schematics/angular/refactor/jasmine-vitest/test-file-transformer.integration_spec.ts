@@ -243,7 +243,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
 
         it('should handle spy call order', () => {
           const spyA = jasmine.createSpy('spyA');
-          const spyB = jasmine.createSpy('spyB');
+          const spyB = jasmine.createSpy();
           spyA();
           spyB();
           expect(spyA).toHaveBeenCalledBefore(spyB);
@@ -288,7 +288,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
         });
 
         it('should handle spy call order', () => {
-          const spyA = vi.fn();
+          const spyA = vi.fn().mockName('spyA');
           const spyB = vi.fn();
           spyA();
           spyB();
@@ -340,10 +340,26 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
           }
         });
 
+        it('should handle fail() with a specific error', () => {
+          try {
+            expect(1).toBe(2);
+            fail(new Error('Expected test to fail'));
+          } catch (err) {
+            expect(err.message).toBe('1 !== 2');
+          }
+        });
+
         it('should handle spyOnProperty', () => {
           const obj = { get myProp() { return 'original'; } };
           spyOnProperty(obj, 'myProp', 'get').and.returnValue('mocked');
           expect(obj.myProp).toBe('mocked');
+        });
+
+        it('should handle async spies', async () => {
+          const ctx = { myMethod: () => Promise.resolve('real') };
+          spyOn(ctx, 'myMethod').and.returnValue(Promise.resolve('mocked'));
+
+          expect(await ctx.myMethod()).toBe('mocked');
         });
 
         it('should handle spies throwing errors', () => {
@@ -380,14 +396,30 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
           }
         });
 
+        it('should handle fail() with a specific error', () => {
+          try {
+            expect(1).toBe(2);
+            throw new Error('Expected test to fail');
+          } catch (err) {
+            expect(err.message).toBe('1 !== 2');
+          }
+        });
+
         it('should handle spyOnProperty', () => {
           const obj = { get myProp() { return 'original'; } };
           vi.spyOn(obj, 'myProp', 'get').mockReturnValue('mocked');
           expect(obj.myProp).toBe('mocked');
         });
 
+        it('should handle async spies', async () => {
+          const ctx = { myMethod: () => Promise.resolve('real') };
+          vi.spyOn(ctx, 'myMethod').mockResolvedValue('mocked');
+
+          expect(await ctx.myMethod()).toBe('mocked');
+        });
+
         it('should handle spies throwing errors', () => {
-          const spy = vi.fn().mockImplementation(() => { throw new Error('Test Error') });
+          const spy = vi.fn().mockName('mySpy').mockImplementation(() => { throw new Error('Test Error') });
           expect(() => spy()).toThrowError('Test Error');
         });
       });
@@ -438,6 +470,8 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
     const jasmineCode = `
       describe('Unsupported Features', () => {
         beforeAll(() => {
+          jasmine.MAX_PRETTY_PRINT_CHARS = 100;
+
           jasmine.addMatchers({
             toBeAwesome: () => ({
               compare: (actual) => ({ pass: actual === 'awesome' })
@@ -467,6 +501,8 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
     const vitestCode = `
       describe('Unsupported Features', () => {
         beforeAll(() => {
+          // TODO: vitest-migration: jasmine.MAX_PRETTY_PRINT_CHARS is not supported.
+          // jasmine.MAX_PRETTY_PRINT_CHARS = 100;
           // TODO: vitest-migration: jasmine.addMatchers is not supported. Please manually migrate to expect.extend(). See: https://vitest.dev/api/expect.html#expect-extend
           jasmine.addMatchers({
             toBeAwesome: () => ({

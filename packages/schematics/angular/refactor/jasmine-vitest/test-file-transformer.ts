@@ -27,19 +27,21 @@ import {
   transformExpectAsync,
   transformExpectNothing,
   transformSyntacticSugarMatchers,
+  transformToBeNullish,
+  transformToHaveBeenCalledBefore,
   transformToHaveClass,
   transformWithContext,
-  transformtoHaveBeenCalledBefore,
 } from './transformers/jasmine-matcher';
 import {
-  transformDefaultTimeoutInterval,
   transformFail,
-  transformGlobalFunctions,
+  transformJasmineMembers,
   transformTimerMocks,
   transformUnknownJasmineProperties,
+  transformUnsupportedGlobalFunctions,
   transformUnsupportedJasmineCalls,
 } from './transformers/jasmine-misc';
 import {
+  transformCreateSpy,
   transformCreateSpyObj,
   transformSpies,
   transformSpyCallInspection,
@@ -116,16 +118,18 @@ const callExpressionTransformers = [
   transformSyntacticSugarMatchers,
   transformComplexMatchers,
   transformSpies,
+  transformCreateSpy,
   transformCreateSpyObj,
   transformSpyReset,
   transformSpyCallInspection,
-  transformtoHaveBeenCalledBefore,
+  transformToHaveBeenCalledBefore,
   transformToHaveClass,
+  transformToBeNullish,
 
   // **Stage 3: Global Functions & Cleanup**
   // These handle global Jasmine functions and catch-alls for unsupported APIs.
   transformTimerMocks,
-  transformGlobalFunctions,
+  transformUnsupportedGlobalFunctions,
   transformUnsupportedJasmineCalls,
 ];
 
@@ -149,7 +153,7 @@ const expressionStatementTransformers = [
   transformArrayWithExactContents,
   transformExpectNothing,
   transformFail,
-  transformDefaultTimeoutInterval,
+  transformJasmineMembers,
 ];
 
 /**

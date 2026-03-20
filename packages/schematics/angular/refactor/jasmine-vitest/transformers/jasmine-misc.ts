@@ -52,6 +52,20 @@ export function transformTimerMocks(
     case 'mockDate':
       newMethodName = 'setSystemTime';
       break;
+    case 'autoTick': {
+      const category = 'clockAutoTick';
+      reporter.recordTodo(category, sourceFile, node);
+      addTodoComment(node, category);
+
+      return node;
+    }
+    case 'withMock': {
+      const category = 'clockWithMock';
+      reporter.recordTodo(category, sourceFile, node);
+      addTodoComment(node, category);
+
+      return node;
+    }
   }
 
   if (newMethodName) {
@@ -85,15 +99,21 @@ export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorC
     node.expression.expression.text === 'fail'
   ) {
     reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
-    const reason = node.expression.arguments[0];
 
-    const replacement = ts.factory.createThrowStatement(
-      ts.factory.createNewExpression(
+    const arg = node.expression.arguments[0];
+    let throwExpression: ts.Expression;
+
+    if (arg && ts.isNewExpression(arg)) {
+      throwExpression = arg;
+    } else {
+      throwExpression = ts.factory.createNewExpression(
         ts.factory.createIdentifier('Error'),
         undefined,
-        reason ? [reason] : [],
-      ),
-    );
+        arg ? [arg] : [],
+      );
+    }
+
+    const replacement = ts.factory.createThrowStatement(throwExpression);
 
     return ts.setOriginalNode(ts.setTextRange(replacement, node), node);
   }
@@ -101,10 +121,9 @@ export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorC
   return node;
 }
 
-export function transformDefaultTimeoutInterval(
-  node: ts.Node,
-  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
-): ts.Node {
+export function transformJasmineMembers(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
+  const { sourceFile, reporter } = refactorCtx;
+
   if (
     ts.isExpressionStatement(node) &&
     ts.isBinaryExpression(node.expression) &&
@@ -114,38 +133,92 @@ export function transformDefaultTimeoutInterval(
     if (
       ts.isPropertyAccessExpression(assignment.left) &&
       ts.isIdentifier(assignment.left.expression) &&
-      assignment.left.expression.text === 'jasmine' &&
-      assignment.left.name.text === 'DEFAULT_TIMEOUT_INTERVAL'
+      assignment.left.expression.text === 'jasmine'
     ) {
-      addVitestValueImport(pendingVitestValueImports, 'vi');
-      reporter.reportTransformation(
-        sourceFile,
-        node,
-        'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.',
-      );
-      const timeoutValue = assignment.right;
-      const setConfigCall = createViCallExpression('setConfig', [
-        ts.factory.createObjectLiteralExpression(
-          [ts.factory.createPropertyAssignment('testTimeout', timeoutValue)],
-          false,
-        ),
-      ]);
+      const memberName = assignment.left.name.text;
 
-      return ts.factory.updateExpressionStatement(node, setConfigCall);
+      switch (memberName) {
+        case 'DEFAULT_TIMEOUT_INTERVAL':
+          return transformJasmineDefaultTimeoutInterval(node, assignment.right, refactorCtx);
+        case 'MAX_PRETTY_PRINT_ARRAY_LENGTH':
+        case 'MAX_PRETTY_PRINT_DEPTH':
+        case 'MAX_PRETTY_PRINT_CHARS': {
+          const replacement = ts.factory.createEmptyStatement();
+          const originalText = node.getFullText().trim();
+
+          reporter.reportTransformation(
+            sourceFile,
+            node,
+            `Removed \`${memberName}\` member assignment.`,
+          );
+          const category = 'unsupported-jasmine-member';
+          reporter.recordTodo(category, sourceFile, node);
+          addTodoComment(replacement, category, { name: memberName });
+          ts.addSyntheticLeadingComment(
+            replacement,
+            ts.SyntaxKind.SingleLineCommentTrivia,
+            ` ${originalText}`,
+            true,
+          );
+
+          return replacement;
+        }
+      }
     }
   }
 
   return node;
 }
 
-export function transformGlobalFunctions(
+function transformJasmineDefaultTimeoutInterval(
+  expression: ts.ExpressionStatement,
+  timeoutValue: ts.Expression,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
+): ts.Node {
+  addVitestValueImport(pendingVitestValueImports, 'vi');
+  reporter.reportTransformation(
+    sourceFile,
+    expression,
+    'Transformed `jasmine.DEFAULT_TIMEOUT_INTERVAL` to `vi.setConfig()`.',
+  );
+  const setConfigCall = createViCallExpression('setConfig', [
+    ts.factory.createObjectLiteralExpression(
+      [ts.factory.createPropertyAssignment('testTimeout', timeoutValue)],
+      false,
+    ),
+  ]);
+
+  return ts.factory.updateExpressionStatement(expression, setConfigCall);
+}
+
+const UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES = new Set<TodoCategory>([
+  'setSpecProperty',
+  'setSuiteProperty',
+  'throwUnless',
+  'throwUnlessAsync',
+  'getSpecProperty',
+]);
+
+// A type guard to ensure that the methodName is one of the categories handled by this transformer.
+function isUnsupportedGlobalFunction(
+  methodName: string,
+): methodName is
+  | 'setSpecProperty'
+  | 'setSuiteProperty'
+  | 'throwUnless'
+  | 'throwUnlessAsync'
+  | 'getSpecProperty' {
+  return UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES.has(methodName as TodoCategory);
+}
+
+export function transformUnsupportedGlobalFunctions(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
   if (
     ts.isCallExpression(node) &&
     ts.isIdentifier(node.expression) &&
-    (node.expression.text === 'setSpecProperty' || node.expression.text === 'setSuiteProperty')
+    isUnsupportedGlobalFunction(node.expression.text)
   ) {
     const functionName = node.expression.text;
     reporter.reportTransformation(
@@ -153,9 +226,8 @@ export function transformGlobalFunctions(
       node,
       `Found unsupported global function \`${functionName}\`.`,
     );
-    const category = 'unsupported-global-function';
-    reporter.recordTodo(category, sourceFile, node);
-    addTodoComment(node, category, { name: functionName });
+    reporter.recordTodo(functionName, sourceFile, node);
+    addTodoComment(node, functionName);
   }
 
   return node;
@@ -163,15 +235,25 @@ export function transformGlobalFunctions(
 
 const UNSUPPORTED_JASMINE_CALLS_CATEGORIES = new Set<TodoCategory>([
   'addMatchers',
+  'addAsyncMatchers',
   'addCustomEqualityTester',
+  'addCustomObjectFormatter',
   'mapContaining',
   'setContaining',
+  'addSpyStrategy',
 ]);
 
 // A type guard to ensure that the methodName is one of the categories handled by this transformer.
 function isUnsupportedJasmineCall(
   methodName: string,
-): methodName is 'addMatchers' | 'addCustomEqualityTester' | 'mapContaining' | 'setContaining' {
+): methodName is
+  | 'addMatchers'
+  | 'addAsyncMatchers'
+  | 'addCustomEqualityTester'
+  | 'addCustomObjectFormatter'
+  | 'mapContaining'
+  | 'setContaining'
+  | 'addSpyStrategy' {
   return UNSUPPORTED_JASMINE_CALLS_CATEGORIES.has(methodName as TodoCategory);
 }
 
@@ -200,6 +282,7 @@ const HANDLED_JASMINE_PROPERTIES = new Set([
   'createSpy',
   'createSpyObj',
   'spyOnAllFunctions',
+  'addSpyStrategy',
   // Clock
   'clock',
   // Matchers
@@ -217,8 +300,13 @@ const HANDLED_JASMINE_PROPERTIES = new Set([
   'setContaining',
   // Other
   'DEFAULT_TIMEOUT_INTERVAL',
+  'MAX_PRETTY_PRINT_ARRAY_LENGTH',
+  'MAX_PRETTY_PRINT_DEPTH',
+  'MAX_PRETTY_PRINT_CHARS',
   'addMatchers',
+  'addAsyncMatchers',
   'addCustomEqualityTester',
+  'addCustomObjectFormatter',
 ]);
 
 export function transformUnknownJasmineProperties(
