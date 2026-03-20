@@ -82,6 +82,18 @@ export async function createVitestConfigPlugin(
     async config(config) {
       const testConfig = config.test;
 
+      if (reporters !== undefined) {
+        delete testConfig?.reporters;
+      }
+
+      if (
+        options.coverage.reporters !== undefined &&
+        testConfig?.coverage &&
+        'reporter' in testConfig.coverage
+      ) {
+        delete testConfig.coverage.reporter;
+      }
+
       if (testConfig?.projects?.length) {
         this.warn(
           'The "test.projects" option in the Vitest configuration file is not supported. ' +
