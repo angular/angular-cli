@@ -21,6 +21,18 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `vi.spyOn(service, 'myMethod').mockReturnValue(42);`,
     },
     {
+      description:
+        'should transform .and.returnValue(Promise.resolve(...)) to .mockResolvedValue(...)',
+      input: `spyOn(service, 'myMethod').and.returnValue(Promise.resolve(42));`,
+      expected: `vi.spyOn(service, 'myMethod').mockResolvedValue(42);`,
+    },
+    {
+      description:
+        'should transform .and.returnValue(Promise.reject(...)) to .mockRejectedValue(...)',
+      input: `spyOn(service, 'myMethod').and.returnValue(Promise.reject(42));`,
+      expected: `vi.spyOn(service, 'myMethod').mockRejectedValue(42);`,
+    },
+    {
       description: 'should transform .and.returnValues() to chained .mockReturnValueOnce() calls',
       input: `spyOn(service, 'myMethod').and.returnValues('a', 'b', 'c');`,
       expected: `vi.spyOn(service, 'myMethod').mockReturnValueOnce('a').mockReturnValueOnce('b').mockReturnValueOnce('c');`,
@@ -36,14 +48,14 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `vi.spyOn(service, 'myMethod');`,
     },
     {
-      description: 'should transform jasmine.createSpy("name") to vi.fn()',
+      description: 'should transform jasmine.createSpy("name") to vi.fn().mockName("name")',
       input: `const mySpy = jasmine.createSpy('mySpy');`,
-      expected: `const mySpy = vi.fn();`,
+      expected: `const mySpy = vi.fn().mockName('mySpy');`,
     },
     {
-      description: 'should transform jasmine.createSpy("name", fn) to vi.fn(fn)',
+      description: 'should transform jasmine.createSpy("name", fn) to vi.fn(fn).mockName("name")',
       input: `const mySpy = jasmine.createSpy('mySpy', () => 'foo');`,
-      expected: `const mySpy = vi.fn(() => 'foo');`,
+      expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy');`,
     },
     {
       description: 'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop")',
@@ -65,7 +77,7 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
     {
       description: 'should handle chained calls on jasmine.createSpy()',
       input: `const mySpy = jasmine.createSpy('mySpy').and.returnValue(true);`,
-      expected: `const mySpy = vi.fn().mockReturnValue(true);`,
+      expected: `const mySpy = vi.fn().mockName('mySpy').mockReturnValue(true);`,
     },
     {
       description: 'should handle .and.returnValues() with no arguments',
@@ -93,6 +105,11 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       description: 'should transform .and.rejectWith(error) to .mockRejectedValue(error)',
       input: `spyOn(service, 'myMethod').and.rejectWith('some error');`,
       expected: `vi.spyOn(service, 'myMethod').mockRejectedValue('some error');`,
+    },
+    {
+      description: 'should transform .and.identity() to .getMockName()',
+      input: `spyOn(service, 'myMethod').and.identity();`,
+      expected: `vi.spyOn(service, 'myMethod').getMockName();`,
     },
     {
       description: 'should add a TODO for an unsupported spy strategy',
@@ -259,6 +276,11 @@ describe('transformSpyCallInspection', () => {
       expected: `const recentArgs = vi.mocked(mySpy).mock.lastCall;`,
     },
     {
+      description: 'should transform spy.calls.thisFor(index)',
+      input: `const context = mySpy.calls.thisFor(1337);`,
+      expected: `const context = vi.mocked(mySpy).mock.contexts[1337];`,
+    },
+    {
       description: 'should transform spy.calls.first()',
       input: `const firstCall = mySpy.calls.first();`,
       expected: `const firstCall = vi.mocked(mySpy).mock.calls[0];`,
@@ -268,6 +290,14 @@ describe('transformSpyCallInspection', () => {
       input: `const mostRecent = mySpy.calls.mostRecent();`,
       expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall. See: https://vitest.dev/api/mocked.html#mock-lastcall
 const mostRecent = mySpy.calls.mostRecent();`,
+    },
+    {
+      description: 'should add a TODO for spy.calls.saveArgumentsByValue()',
+      input: `const saveArgs = mySpy.calls.saveArgumentsByValue();`,
+      expected:
+        '// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.calls.saveArgumentsByValue().' +
+        ' Please migrate this manually by cloning and storing the arguments in a local variable.' +
+        '\nconst saveArgs = mySpy.calls.saveArgumentsByValue();',
     },
   ];
 

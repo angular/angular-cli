@@ -18,6 +18,7 @@ import {
   addVitestValueImport,
   createPropertyAccess,
   createViCallExpression,
+  getPromiseResolveRejectMethod,
 } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';
@@ -58,11 +59,25 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
     ) {
       const spyCall = pae.expression.expression;
       let newMethodName: string | undefined;
+      let args = node.arguments;
+
       if (ts.isIdentifier(pae.name)) {
         const strategyName = pae.name.text;
         switch (strategyName) {
           case 'returnValue':
-            newMethodName = 'mockReturnValue';
+            {
+              const result = getPromiseResolveRejectMethod(args[0]);
+              if (result) {
+                const methodMapping = {
+                  'resolve': 'mockResolvedValue',
+                  'reject': 'mockRejectedValue',
+                };
+                newMethodName = methodMapping[result.methodName];
+                args = result.arguments;
+              } else {
+                newMethodName = 'mockReturnValue';
+              }
+            }
             break;
           case 'resolveTo':
             newMethodName = 'mockResolvedValue';
@@ -151,6 +166,16 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
 
             return ts.factory.createCallExpression(newExpression, undefined, [arrowFunction]);
           }
+          case 'identity': {
+            reporter.reportTransformation(
+              sourceFile,
+              node,
+              'Transformed `.and.identity()` to `.getMockName()`.',
+            );
+            const newExpression = createPropertyAccess(spyCall, 'getMockName');
+
+            return ts.factory.createCallExpression(newExpression, undefined, undefined);
+          }
           default: {
             const category = 'unsupported-spy-strategy';
             reporter.recordTodo(category, sourceFile, node);
@@ -172,44 +197,58 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
             ts.factory.createIdentifier(newMethodName),
           );
 
-          return ts.factory.updateCallExpression(
-            node,
-            newExpression,
-            node.typeArguments,
-            node.arguments,
-          );
+          return ts.factory.updateCallExpression(node, newExpression, node.typeArguments, args);
         }
       }
     }
   }
 
-  const jasmineMethodName = getJasmineMethodName(node);
-  switch (jasmineMethodName) {
-    case 'createSpy':
-      addVitestValueImport(pendingVitestValueImports, 'vi');
-      reporter.reportTransformation(
-        sourceFile,
-        node,
-        'Transformed `jasmine.createSpy()` to `vi.fn()`.',
-      );
+  if (getJasmineMethodName(node) === 'spyOnAllFunctions') {
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      'Found unsupported `jasmine.spyOnAllFunctions()`.',
+    );
+    const category = 'spyOnAllFunctions';
+    reporter.recordTodo(category, sourceFile, node);
+    addTodoComment(node, category);
 
-      // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn)
-      return createViCallExpression('fn', node.arguments.length > 1 ? [node.arguments[1]] : []);
-    case 'spyOnAllFunctions': {
-      reporter.reportTransformation(
-        sourceFile,
-        node,
-        'Found unsupported `jasmine.spyOnAllFunctions()`.',
-      );
-      const category = 'spyOnAllFunctions';
-      reporter.recordTodo(category, sourceFile, node);
-      addTodoComment(node, category);
-
-      return node;
-    }
+    return node;
   }
 
   return node;
+}
+
+export function transformCreateSpy(
+  node: ts.Node,
+  { reporter, sourceFile, pendingVitestValueImports }: RefactorContext,
+): ts.Node {
+  if (!isJasmineCallExpression(node, 'createSpy')) {
+    return node;
+  }
+
+  addVitestValueImport(pendingVitestValueImports, 'vi');
+  reporter.reportTransformation(
+    sourceFile,
+    node,
+    'Transformed `jasmine.createSpy()` to `vi.fn()`.',
+  );
+
+  const spyName = node.arguments[0];
+  const viFnCallExpression = createViCallExpression(
+    'fn',
+    node.arguments.length > 1 ? [node.arguments[1]] : [],
+  );
+
+  // jasmine.createSpy() -> vi.fn()
+  // jasmine.createSpy(name, originalFn) -> vi.fn(originalFn).mockName(name)
+  return !spyName
+    ? viFnCallExpression
+    : ts.factory.createCallExpression(
+        createPropertyAccess(viFnCallExpression, 'mockName'),
+        undefined,
+        [node.arguments[0]],
+      );
 }
 
 export function transformCreateSpyObj(
@@ -428,10 +467,54 @@ function transformMostRecentArgs(
   return createPropertyAccess(mockProperty, 'lastCall');
 }
 
+function transformThisFor(
+  node: ts.Node,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
+): ts.Node {
+  // Check 1: Is the node is a call expression?
+  if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
+    return node;
+  }
+
+  // Check 2: Is it a call to `.thisFor`?
+  const thisForPae = node.expression;
+  if (
+    !ts.isIdentifier(thisForPae.name) ||
+    thisForPae.name.text !== 'thisFor' ||
+    !ts.isPropertyAccessExpression(thisForPae.expression)
+  ) {
+    return node;
+  }
+
+  // Check 3: Can we get the spy identifier from `spy.calls`?
+  const spyIdentifier = getSpyIdentifierFromCalls(thisForPae.expression);
+  if (!spyIdentifier) {
+    return node;
+  }
+
+  // If all checks pass, perform the transformation.
+  reporter.reportTransformation(
+    sourceFile,
+    node,
+    'Transformed `spy.calls.thisFor(index)` to `vi.mocked(spy).mock.contexts[index]`.',
+  );
+  const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
+
+  return ts.factory.createElementAccessExpression(
+    createPropertyAccess(mockProperty, 'contexts'),
+    node.arguments[0] ?? ts.factory.createNumericLiteral(0),
+  );
+}
+
 export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const mostRecentArgsTransformed = transformMostRecentArgs(node, refactorCtx);
   if (mostRecentArgsTransformed !== node) {
     return mostRecentArgsTransformed;
+  }
+
+  const thisForTransformed = transformThisFor(node, refactorCtx);
+  if (thisForTransformed !== node) {
+    return thisForTransformed;
   }
 
   if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
@@ -478,6 +561,13 @@ export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorC
       case 'argsFor':
         message = 'Transformed `spy.calls.argsFor()` to `mock.calls[i]`.';
         newExpression = ts.factory.createElementAccessExpression(callsProperty, node.arguments[0]);
+        break;
+      case 'saveArgumentsByValue':
+        {
+          const category = 'saveArgumentsByValue';
+          reporter.recordTodo(category, sourceFile, node);
+          addTodoComment(node, category);
+        }
         break;
       case 'mostRecent':
         if (

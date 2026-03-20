@@ -35,6 +35,18 @@ describe('Jasmine to Vitest Transformer - transformTimerMocks', () => {
       input: `jasmine.clock().mockDate();`,
       expected: `vi.setSystemTime(new Date());`,
     },
+    {
+      description: 'should add a TODO for jasmine.clock().autoTick()',
+      input: 'jasmine.clock().autoTick();',
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.clock().autoTick(). Please migrate this manually. See: https://vitest.dev/api/vi.html#fake-timers
+jasmine.clock().autoTick();`,
+    },
+    {
+      description: 'should add a TODO for jasmine.clock().withMock()',
+      input: 'jasmine.clock().withMock(noop);',
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for jasmine.clock().withMock(). Please migrate this manually via vi.useFakeTimers() and vi.useRealTimers(). See: https://vitest.dev/api/vi.html#vi-usefaketimers
+jasmine.clock().withMock(noop);`,
+    },
   ];
 
   testCases.forEach(({ description, input, expected }) => {
@@ -56,21 +68,10 @@ describe('transformFail', () => {
       input: `fail();`,
       expected: `throw new Error();`,
     },
-  ];
-
-  testCases.forEach(({ description, input, expected }) => {
-    it(description, async () => {
-      await expectTransformation(input, expected);
-    });
-  });
-});
-
-describe('transformDefaultTimeoutInterval', () => {
-  const testCases = [
     {
-      description: 'should transform jasmine.DEFAULT_TIMEOUT_INTERVAL',
-      input: `jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;`,
-      expected: `vi.setConfig({ testTimeout: 10000 });`,
+      description: 'should transform fail() with an Error object',
+      input: `fail(new TypeError('Invalid input'));`,
+      expected: `throw new TypeError('Invalid input');`,
     },
   ];
 
@@ -81,7 +82,41 @@ describe('transformDefaultTimeoutInterval', () => {
   });
 });
 
-describe('transformAddMatchers', () => {
+describe('transformJasmineMembers', () => {
+  const testCases = [
+    {
+      description: 'should transform jasmine.DEFAULT_TIMEOUT_INTERVAL',
+      input: `jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;`,
+      expected: `vi.setConfig({ testTimeout: 10000 });`,
+    },
+    {
+      description: 'should remove jasmine.MAX_PRETTY_PRINT_ARRAY_LENGTH',
+      input: `jasmine.MAX_PRETTY_PRINT_ARRAY_LENGTH = 10;`,
+      expected: `// TODO: vitest-migration: jasmine.MAX_PRETTY_PRINT_ARRAY_LENGTH is not supported.
+// jasmine.MAX_PRETTY_PRINT_ARRAY_LENGTH = 10;`,
+    },
+    {
+      description: 'should remove jasmine.MAX_PRETTY_PRINT_DEPTH',
+      input: `jasmine.MAX_PRETTY_PRINT_DEPTH = 10;`,
+      expected: `// TODO: vitest-migration: jasmine.MAX_PRETTY_PRINT_DEPTH is not supported.
+// jasmine.MAX_PRETTY_PRINT_DEPTH = 10;`,
+    },
+    {
+      description: 'should remove jasmine.MAX_PRETTY_PRINT_CHARS',
+      input: `jasmine.MAX_PRETTY_PRINT_CHARS = 100;`,
+      expected: `// TODO: vitest-migration: jasmine.MAX_PRETTY_PRINT_CHARS is not supported.
+// jasmine.MAX_PRETTY_PRINT_CHARS = 100;`,
+    },
+  ];
+
+  testCases.forEach(({ description, input, expected }) => {
+    it(description, async () => {
+      await expectTransformation(input, expected);
+    });
+  });
+});
+
+describe('transformUnsupportedJasmineCalls', () => {
   const testCases = [
     {
       description: 'should add a TODO for jasmine.addMatchers',
@@ -113,17 +148,24 @@ describe('transformAddMatchers', () => {
           });
         `,
     },
-  ];
-
-  testCases.forEach(({ description, input, expected }) => {
-    it(description, async () => {
-      await expectTransformation(input, expected);
-    });
-  });
-});
-
-describe('transformAddCustomEqualityTester', () => {
-  const testCases = [
+    {
+      description: 'should add a TODO for jasmine.addAsyncMatchers',
+      input: `
+          jasmine.addAsyncMatchers({
+            toEventuallyEqual: () => ({
+              compare: async (actual, expected) => ({ pass: actual === expected }),
+            }),
+          });
+        `,
+      expected: `
+          // TODO: vitest-migration: jasmine.addAsyncMatchers is not supported. Please manually migrate to expect.extend(). See: https://vitest.dev/api/expect.html#expect-extend
+          jasmine.addAsyncMatchers({
+            toEventuallyEqual: () => ({
+              compare: async (actual, expected) => ({ pass: actual === expected }),
+            }),
+          });
+        `,
+    },
     {
       description: 'should add a TODO for jasmine.addCustomEqualityTester',
       input: `
@@ -136,6 +178,39 @@ describe('transformAddCustomEqualityTester', () => {
             return a.toString() === b.toString();
           });
         `,
+    },
+    {
+      description: 'should add a TODO for jasmine.addCustomObjectFormatter',
+      input: `
+          jasmine.addCustomObjectFormatter((val) => {
+            if (val instanceof MyClass) return 'MyClass(' + val.id + '})';
+          });
+        `,
+      expected: `// TODO: vitest-migration: jasmine.addCustomObjectFormatter is not supported. May be possible to migrate to expect.addSnapshotSerializer(). See: https://vitest.dev/api/expect.html#expect-addsnapshotserializer
+          jasmine.addCustomObjectFormatter((val) => {
+            if (val instanceof MyClass) return 'MyClass(' + val.id + '})';
+          });
+        `,
+    },
+    {
+      description: 'should add a TODO for jasmine.mapContaining',
+      input: `expect(myMap).toEqual(jasmine.mapContaining(new Map()));`,
+      // eslint-disable-next-line max-len
+      expected: `// TODO: vitest-migration: jasmine.mapContaining is not supported. Vitest does not have a built-in matcher for Maps. Please manually assert the contents of the Map.
+expect(myMap).toEqual(jasmine.mapContaining(new Map()));`,
+    },
+    {
+      description: 'should add a TODO for jasmine.setContaining',
+      input: `expect(mySet).toEqual(jasmine.setContaining(new Set()));`,
+      // eslint-disable-next-line max-len
+      expected: `// TODO: vitest-migration: jasmine.setContaining is not supported. Vitest does not have a built-in matcher for Sets. Please manually assert the contents of the Set.
+expect(mySet).toEqual(jasmine.setContaining(new Set()));`,
+    },
+    {
+      description: 'should add a TODO for jasmine.addSpyStrategy',
+      input: `jasmine.addSpyStrategy('returnZero', () => () => 0);`,
+      expected: `// TODO: vitest-migration: jasmine.addSpyStrategy is not supported. Please manually migrate to spy.mockImplementation(). See: https://vitest.dev/api/mock.html#mockimplementation
+jasmine.addSpyStrategy('returnZero', () => () => 0);`,
     },
   ];
 
@@ -168,7 +243,7 @@ const env = jasmine.getEnv();`,
   });
 });
 
-describe('transformGlobalFunctions', () => {
+describe('transformUnsupportedGlobalFunctions', () => {
   const testCases = [
     {
       description: 'should add a TODO for setSpecProperty',
@@ -184,30 +259,25 @@ setSpecProperty('myKey', 'myValue');`,
       expected: `// TODO: vitest-migration: Unsupported global function \`setSuiteProperty\` found. This function is used for custom reporters in Jasmine and has no direct equivalent in Vitest.
 setSuiteProperty('myKey', 'myValue');`,
     },
-  ];
-
-  testCases.forEach(({ description, input, expected }) => {
-    it(description, async () => {
-      await expectTransformation(input, expected);
-    });
-  });
-});
-
-describe('transformUnsupportedJasmineCalls', () => {
-  const testCases = [
     {
-      description: 'should add a TODO for jasmine.mapContaining',
-      input: `expect(myMap).toEqual(jasmine.mapContaining(new Map()));`,
+      description: 'should add a TODO for throwUnless',
+      input: `throwUnless(x).toBe(y);`,
       // eslint-disable-next-line max-len
-      expected: `// TODO: vitest-migration: jasmine.mapContaining is not supported. Vitest does not have a built-in matcher for Maps. Please manually assert the contents of the Map.
-expect(myMap).toEqual(jasmine.mapContaining(new Map()));`,
+      expected: `// TODO: vitest-migration: Unsupported global function \`throwUnless\` found. Please migrate manually to a direct assertion.
+throwUnless(x).toBe(y);`,
     },
     {
-      description: 'should add a TODO for jasmine.setContaining',
-      input: `expect(mySet).toEqual(jasmine.setContaining(new Set()));`,
+      description: 'should add a TODO for throwUnlessAsync',
+      input: `await throwUnlessAsync(promise).toBeResolved();`,
       // eslint-disable-next-line max-len
-      expected: `// TODO: vitest-migration: jasmine.setContaining is not supported. Vitest does not have a built-in matcher for Sets. Please manually assert the contents of the Set.
-expect(mySet).toEqual(jasmine.setContaining(new Set()));`,
+      expected: `// TODO: vitest-migration: Unsupported global function \`throwUnlessAsync\` found. Please migrate manually to a direct assertion.
+await throwUnlessAsync(promise).toBeResolved();`,
+    },
+    {
+      description: 'should add a TODO for getSpecProperty',
+      input: `const val = getSpecProperty('myKey');`,
+      expected: `// TODO: vitest-migration: Unsupported global function \`getSpecProperty\` found. Please migrate manually.
+const val = getSpecProperty('myKey');`,
     },
   ];
 

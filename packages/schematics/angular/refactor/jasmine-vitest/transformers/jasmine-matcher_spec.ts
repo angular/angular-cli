@@ -356,3 +356,24 @@ describe('transformToHaveClass', () => {
     });
   });
 });
+
+describe('transformToBeNullish', () => {
+  const testCases = [
+    {
+      description: 'should transform toBeNullish',
+      input: `expect(element).toBeNullish();`,
+      expected: `expect(element == null).toBe(true);`,
+    },
+    {
+      description: 'should transform not.toBeNullish',
+      input: `expect(element).not.toBeNullish();`,
+      expected: `expect(element == null).toBe(false);`,
+    },
+  ];
+
+  testCases.forEach(({ description, input, expected }) => {
+    it(description, async () => {
+      await expectTransformation(input, expected);
+    });
+  });
+});
