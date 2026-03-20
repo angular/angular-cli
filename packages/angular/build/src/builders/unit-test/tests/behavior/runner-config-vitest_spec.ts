@@ -164,6 +164,59 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       expect(results.numPassedTests).toBe(1);
     });
 
+    it('should correctly merge coverage.exclude arrays from builder and runner options', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        coverage: true,
+        runnerConfig: 'vitest.config.ts',
+        coverageExclude: ['src/app/cli-excluded.ts'],
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            coverage: {
+              exclude: ['src/app/config-excluded.ts'],
+            },
+          },
+        });
+        `,
+      );
+
+      // Create two files that would normally be covered
+      harness.writeFile('src/app/cli-excluded.ts', 'export const cliExcluded = true;');
+      harness.writeFile('src/app/config-excluded.ts', 'export const configExcluded = true;');
+
+      // Update the test file to import them so they're picked up by coverage
+      harness.writeFile(
+        'src/app/app.component.spec.ts',
+        `
+        import { test, expect } from 'vitest';
+        import './cli-excluded';
+        import './config-excluded';
+        test('should pass', () => {
+          expect(true).toBe(true);
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('coverage/test/coverage-final.json').toExist();
+
+      const coverageMap = JSON.parse(harness.readFile('coverage/test/coverage-final.json'));
+      const coveredFiles = Object.keys(coverageMap);
+
+      const hasCliExcluded = coveredFiles.some((f) => f.includes('cli-excluded.ts'));
+      const hasConfigExcluded = coveredFiles.some((f) => f.includes('config-excluded.ts'));
+
+      expect(hasCliExcluded).withContext('CLI target should be excluded').toBeFalse();
+      expect(hasConfigExcluded).withContext('Config file target should be excluded').toBeFalse();
+    });
+
     it('should allow overriding globals to false via runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
