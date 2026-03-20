@@ -348,6 +348,38 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       // );
     });
 
+    it('should warn about performance when "test.exclude" option is in runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            exclude: ['src/app/non-existent.spec.ts'],
+          },
+        });
+        `,
+      );
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      // TODO: Re-enable once Vite logs are remapped through build system
+      // expect(logs).toContain(
+      //   jasmine.objectContaining({
+      //     level: 'warn',
+      //     message: jasmine.stringMatching(
+      //       'The "test.exclude" option in the Vitest configuration file is evaluated after',
+      //     ),
+      //   }),
+      // );
+    });
+
     it(`should append "test.setupFiles" (string) from runnerConfig to the CLI's setup`, async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
