@@ -106,6 +106,14 @@ export async function createVitestConfigPlugin(
         delete testConfig.watch;
       }
 
+      if (testConfig?.exclude) {
+        this.warn(
+          'The "test.exclude" option in the Vitest configuration file is evaluated after ' +
+            'tests are compiled. For better build performance, please use the Angular CLI ' +
+            '"exclude" option instead.',
+        );
+      }
+
       // Merge user-defined plugins from the Vitest config with the CLI's internal plugins.
       if (config.plugins) {
         const userPlugins = config.plugins.filter(
