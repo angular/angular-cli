@@ -406,6 +406,9 @@ async function generateCoverageOption(
   projectName: string,
 ): Promise<VitestCoverageOption> {
   let defaultExcludes: string[] = [];
+  // When a coverage exclude option is provided, Vitest's default coverage excludes
+  // will be overridden. To retain them, we manually fetch the defaults to append to the
+  // user's provided exclusions.
   if (optionsCoverage.exclude) {
     try {
       const vitestConfig = await import('vitest/config');
@@ -437,12 +440,15 @@ async function generateCoverageOption(
     // Special handling for `exclude`/`reporters` due to an undefined value causing upstream failures
     ...(optionsCoverage.exclude
       ? {
-          exclude: [
-            // Augment the default exclude https://vitest.dev/config/#coverage-exclude
-            // with the user defined exclusions
-            ...optionsCoverage.exclude,
-            ...defaultExcludes,
-          ],
+          exclude: Array.from(
+            new Set([
+              // Augment the default exclude https://vitest.dev/config/#coverage-exclude
+              // with the user defined exclusions
+              ...(configCoverage?.exclude || []),
+              ...optionsCoverage.exclude,
+              ...defaultExcludes,
+            ]),
+          ),
         }
       : {}),
     ...(optionsCoverage.reporters
