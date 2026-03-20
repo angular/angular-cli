@@ -47,8 +47,8 @@ importers:
         specifier: 21.2.3
         version: 21.2.3(e6759571ef2790e1353b8981da9a3f81)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#ae3393e8549a472a9fb199222eeebb387b5769e6
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae3393e8549a472a9fb199222eeebb387b5769e6(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#8c8738198c84813aa21a220ad28fd95ec94c56ed
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8c8738198c84813aa21a220ad28fd95ec94c56ed(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))
       '@angular/platform-browser':
         specifier: 21.2.5
         version: 21.2.5(@angular/animations@21.2.5(@angular/core@21.2.5(@angular/compiler@21.2.5)(rxjs@7.8.2)(zone.js@0.16.1)))(@angular/common@21.2.5(@angular/core@21.2.5(@angular/compiler@21.2.5)(rxjs@7.8.2)(zone.js@0.16.1))(rxjs@7.8.2))(@angular/core@21.2.5(@angular/compiler@21.2.5)(rxjs@7.8.2)(zone.js@0.16.1))
@@ -1026,9 +1026,9 @@ packages:
       '@angular/platform-browser': ^21.0.0 || ^22.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae3393e8549a472a9fb199222eeebb387b5769e6':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae3393e8549a472a9fb199222eeebb387b5769e6}
-    version: 0.0.0-9de194d77b66b6b3294e0f041e29985d2916e911
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8c8738198c84813aa21a220ad28fd95ec94c56ed':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8c8738198c84813aa21a220ad28fd95ec94c56ed}
+    version: 0.0.0-56ab9ee58ce4c81f32d0f2661474d5d7fdf83db8
     hasBin: true
 
   '@angular/platform-browser@21.2.5':
@@ -2134,8 +2134,8 @@ packages:
     resolution: {integrity: sha512-IJn+8A3QZJfe7FUtWqHVNo3xJs7KFpurCWGWCiCz3oEh+BkRymKZ1QxfAbU2yGMDzTytLGQ2IV6T2r3cuo75/w==}
     engines: {node: '>=18'}
 
-  '@google/genai@1.45.0':
-    resolution: {integrity: sha512-+sNRWhKiRibVgc4OKi7aBJJ0A7RcoVD8tGG+eFkqxAWRjASDW+ktS9lLwTDnAxZICzCVoeAdu8dYLJVTX60N9w==}
+  '@google/genai@1.46.0':
+    resolution: {integrity: sha512-ewPMN5JkKfgU5/kdco9ZhXBHDPhVqZpMQqIFQhwsHLf8kyZfx1cNpw1pHo1eV6PGEW7EhIBFi3aYZraFndAXqg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -2376,8 +2376,8 @@ packages:
       '@types/node':
         optional: true
 
-  '@inquirer/prompts@8.3.0':
-    resolution: {integrity: sha512-JAj66kjdH/F1+B7LCigjARbwstt3SNUOSzMdjpsvwJmzunK88gJeXmcm95L9nw1KynvFVuY4SzXh/3Y0lvtgSg==}
+  '@inquirer/prompts@8.3.2':
+    resolution: {integrity: sha512-yFroiSj2iiBFlm59amdTvAcQFvWS6ph5oKESls/uqPBect7rTU2GbjyZO2DqxMGuIwVA8z0P4K6ViPcd/cp+0w==}
     engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
     peerDependencies:
       '@types/node': '>=18'
@@ -2442,15 +2442,6 @@ packages:
   '@inquirer/type@3.0.10':
     resolution: {integrity: sha512-BvziSRxfz5Ov8ch0z/n3oijRSEcEsHnhggm4xFZe93DHcUCTlutlq9Ox4SVENAfcRD22UQq7T/atg9Wr3k09eA==}
     engines: {node: '>=18'}
-    peerDependencies:
-      '@types/node': '>=18'
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-
-  '@inquirer/type@4.0.3':
-    resolution: {integrity: sha512-cKZN7qcXOpj1h+1eTTcGDVLaBIHNMT1Rz9JqJP5MnEJ0JhgVWllx7H/tahUp5YEK1qaByH2Itb8wLG/iScD5kw==}
-    engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
     peerDependencies:
       '@types/node': '>=18'
     peerDependenciesMeta:
@@ -9563,14 +9554,14 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ae3393e8549a472a9fb199222eeebb387b5769e6(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/8c8738198c84813aa21a220ad28fd95ec94c56ed(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))':
     dependencies:
       '@actions/core': 3.0.0
       '@conventional-changelog/git-client': 2.6.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.3.0)
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
-      '@google/genai': 1.45.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)
-      '@inquirer/prompts': 8.3.0(@types/node@24.12.0)
-      '@inquirer/type': 4.0.3(@types/node@24.12.0)
+      '@google/genai': 1.46.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)
+      '@inquirer/prompts': 8.3.2(@types/node@24.12.0)
+      '@inquirer/type': 4.0.4(@types/node@24.12.0)
       '@octokit/auth-app': 8.2.0
       '@octokit/core': 7.0.6
       '@octokit/graphql': 9.0.3
@@ -10950,7 +10941,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.45.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)':
+  '@google/genai@1.46.0(@modelcontextprotocol/sdk@1.26.0(zod@4.3.6))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)':
     dependencies:
       google-auth-library: 10.6.1(supports-color@10.2.2)
       p-retry: 4.6.2
@@ -11177,7 +11168,7 @@ snapshots:
     optionalDependencies:
       '@types/node': 24.12.0
 
-  '@inquirer/prompts@8.3.0(@types/node@24.12.0)':
+  '@inquirer/prompts@8.3.2(@types/node@24.12.0)':
     dependencies:
       '@inquirer/checkbox': 5.1.2(@types/node@24.12.0)
       '@inquirer/confirm': 6.0.10(@types/node@24.12.0)
@@ -11244,10 +11235,6 @@ snapshots:
       '@types/node': 24.12.0
 
   '@inquirer/type@3.0.10(@types/node@24.12.0)':
-    optionalDependencies:
-      '@types/node': 24.12.0
-
-  '@inquirer/type@4.0.3(@types/node@24.12.0)':
     optionalDependencies:
       '@types/node': 24.12.0
 
@@ -14891,7 +14878,7 @@ snapshots:
 
   extract-zip@2.0.1:
     dependencies:
-      debug: 4.3.4
+      debug: 4.4.3(supports-color@10.2.2)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
