@@ -213,6 +213,36 @@ describe('Validation Utils', () => {
           .not.toThrow();
       }
     });
+
+    it('should throw error if x-forwarded-prefix contains percent-encoded invalid prefixes', () => {
+      const inputs = ['%5Cevil.com', '%2F%2Fevil.com', '%2F..%2Fevil.com'];
+
+      for (const prefix of inputs) {
+        const request = new Request('https://example.com', {
+          headers: {
+            'x-forwarded-prefix': prefix,
+          },
+        });
+
+        expect(() => validateRequest(request, allowedHosts, false))
+          .withContext(`Prefix: "${prefix}"`)
+          .toThrowError(
+            'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
+          );
+      }
+    });
+
+    it('should throw error if x-forwarded-prefix contains malformed percent-encoding', () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'x-forwarded-prefix': '/%ZZ',
+        },
+      });
+
+      expect(() => validateRequest(request, allowedHosts, false)).toThrowError(
+        'Header "x-forwarded-prefix" contains an invalid percent-encoded sequence.',
+      );
+    });
   });
 
   describe('cloneRequestAndPatchHeaders', () => {

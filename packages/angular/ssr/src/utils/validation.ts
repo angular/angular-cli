@@ -268,9 +268,18 @@ function validateHeaders(request: Request): void {
   }
 
   const xForwardedPrefix = getFirstHeaderValue(headers.get('x-forwarded-prefix'));
-  if (xForwardedPrefix && INVALID_PREFIX_REGEX.test(xForwardedPrefix)) {
-    throw new Error(
-      'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
-    );
+  if (xForwardedPrefix) {
+    let decodedXForwardedPrefix: string;
+    try {
+      decodedXForwardedPrefix = decodeURIComponent(xForwardedPrefix);
+    } catch {
+      throw new Error('Header "x-forwarded-prefix" contains an invalid percent-encoded sequence.');
+    }
+
+    if (INVALID_PREFIX_REGEX.test(decodedXForwardedPrefix)) {
+      throw new Error(
+        'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
+      );
+    }
   }
 }
