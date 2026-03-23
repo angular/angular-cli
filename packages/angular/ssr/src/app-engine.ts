@@ -147,7 +147,7 @@ export class AngularAppEngine {
 
     if (this.supportedLocales.length > 1) {
       // Redirect to the preferred language if i18n is enabled.
-      return this.redirectBasedOnAcceptLanguage(request);
+      return this.redirectBasedOnAcceptLanguage(securedRequest);
     }
 
     return null;
