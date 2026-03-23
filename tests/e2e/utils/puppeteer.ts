@@ -53,7 +53,10 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
         }
       });
       page.on('pageerror', (err) => {
-        errors.push(`${err}`);
+        const error = `${err}`;
+        if (!error.includes('Hot Module Replacement is disabled')) {
+          errors.push(error);
+        }
       });
 
       await page.goto(url);
