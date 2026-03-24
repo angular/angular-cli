@@ -18,8 +18,8 @@
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false<% if (strict) { %>,
     "strictInjectionParameters": true,
-    "strictInputAccessModifiers": true,
-    "strictTemplates": true<% } %>
+    "strictInputAccessModifiers": true<% } else { %>,
+    "strictTemplates": false<% } %>
   },
   "files": []
 }

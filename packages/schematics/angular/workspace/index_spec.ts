@@ -99,9 +99,9 @@ describe('Workspace Schematic', () => {
       tree.readContent('tsconfig.json').toString(),
     );
     expect(compilerOptions.strict).toBeUndefined();
-    expect(
-      Object.keys(angularCompilerOptions).filter((option) => option.startsWith('strict')),
-    ).toEqual([]);
+    expect(angularCompilerOptions.strictTemplates).toBeFalse();
+    expect(angularCompilerOptions.strictInputAccessModifiers).toBeUndefined();
+    expect(angularCompilerOptions.strictInjectionParameters).toBeUndefined();
   });
 
   it('should add strict compiler options when true', async () => {
@@ -112,8 +112,10 @@ describe('Workspace Schematic', () => {
     const { compilerOptions, angularCompilerOptions } = parseJson(
       tree.readContent('tsconfig.json').toString(),
     );
-    expect(compilerOptions.strict).toBe(true);
-    expect(angularCompilerOptions.strictTemplates).toBe(true);
+    expect(compilerOptions.strict).toBeTrue();
+    expect(angularCompilerOptions.strictTemplates).toBeUndefined();
+    expect(angularCompilerOptions.strictInputAccessModifiers).toBeTrue();
+    expect(angularCompilerOptions.strictInjectionParameters).toBeTrue();
   });
 
   it('should add vscode testing configuration', async () => {
