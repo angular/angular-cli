@@ -10,6 +10,7 @@ import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
+import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
 import { cloneRequestAndPatchHeaders, validateRequest } from './utils/validation';
 
@@ -146,7 +147,7 @@ export class AngularAppEngine {
 
     if (this.supportedLocales.length > 1) {
       // Redirect to the preferred language if i18n is enabled.
-      return this.redirectBasedOnAcceptLanguage(request);
+      return this.redirectBasedOnAcceptLanguage(securedRequest);
     }
 
     return null;
@@ -179,13 +180,14 @@ export class AngularAppEngine {
     if (preferredLocale) {
       const subPath = supportedLocales[preferredLocale];
       if (subPath !== undefined) {
-        return new Response(null, {
-          status: 302, // Use a 302 redirect as language preference may change.
-          headers: {
-            'Location': joinUrlParts(pathname, subPath),
-            'Vary': 'Accept-Language',
-          },
-        });
+        const prefix = request.headers.get('X-Forwarded-Prefix') ?? '';
+
+        return createRedirectResponse(
+          joinUrlParts(prefix, pathname, subPath),
+          302,
+          // Use a 302 redirect as language preference may change.
+          { 'Vary': 'Accept-Language' },
+        );
       }
     }
 
