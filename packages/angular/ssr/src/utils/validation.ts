@@ -224,7 +224,7 @@ function verifyHostAllowed(
  * @returns `true` if the hostname is allowed, `false` otherwise.
  */
 function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
-  if (allowedHosts.has(hostname)) {
+  if (allowedHosts.has('*') || allowedHosts.has(hostname)) {
     return true;
   }
 

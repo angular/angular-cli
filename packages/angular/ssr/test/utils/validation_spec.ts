@@ -64,6 +64,13 @@ describe('Validation Utils', () => {
         /URL with hostname "google.com" is not allowed/,
       );
     });
+
+    it('should pass for all hostnames when "*" is used', () => {
+      const allowedHosts = new Set(['*']);
+      expect(() => validateUrl(new URL('http://example.com'), allowedHosts)).not.toThrow();
+      expect(() => validateUrl(new URL('http://google.com'), allowedHosts)).not.toThrow();
+      expect(() => validateUrl(new URL('http://evil.com'), allowedHosts)).not.toThrow();
+    });
   });
 
   describe('validateRequest', () => {
@@ -240,6 +247,15 @@ describe('Validation Utils', () => {
       });
       const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
       expect(secured.headers.get('host')).toBe('example.com');
+    });
+
+    it('should allow any host header when "*" is used', () => {
+      const allowedHosts = new Set(['*']);
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'evil.com' },
+      });
+      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
+      expect(secured.headers.get('host')).toBe('evil.com');
     });
 
     it('should validate x-forwarded-host header', async () => {
