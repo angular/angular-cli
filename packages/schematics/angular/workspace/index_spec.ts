@@ -114,6 +114,8 @@ describe('Workspace Schematic', () => {
     );
     expect(compilerOptions.strict).toBeTrue();
     expect(angularCompilerOptions.strictTemplates).toBeUndefined();
+    expect(angularCompilerOptions.strictInputAccessModifiers).toBeTrue();
+    expect(angularCompilerOptions.strictInjectionParameters).toBeTrue();
   });
 
   it('should add vscode testing configuration', async () => {
