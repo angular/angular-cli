@@ -19,7 +19,7 @@ import {
   createRemoveIdPrefixPlugin,
 } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
-import { loadProxyConfiguration } from '../../../utils';
+import { loadMiddlewareConfiguration, loadProxyConfiguration } from '../../../utils';
 import { type ApplicationBuilderInternalOptions, JavaScriptTransformer } from '../internal';
 import type { NormalizedDevServerOptions } from '../options';
 import { DevServerExternalResultMetadata, OutputAssetRecord, OutputFileRecord } from './utils';
@@ -152,6 +152,19 @@ export async function setupServer(
   const virtualProjectRoot = normalizePath(
     join(serverOptions.workspaceRoot, `.angular/vite-root`, serverOptions.buildTarget.project),
   );
+
+  if (serverOptions.middlewareConfig) {
+    const middleware = await loadMiddlewareConfiguration(
+      serverOptions.workspaceRoot,
+      serverOptions.middlewareConfig,
+    );
+
+    if (extensionMiddleware) {
+      extensionMiddleware.push(...middleware);
+    } else {
+      extensionMiddleware = middleware;
+    }
+  }
 
   /**
    * Required when using `externalDependencies` to prevent Vite load errors.
