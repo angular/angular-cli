@@ -40,6 +40,7 @@ export default async function (options: { cliArgs: string[] }) {
   };
   const logger = new logging.IndentLogger('cli-main-logger');
   const logInfo = console.log;
+  const logWarn = console.warn;
   const logError = console.error;
   const useColor = supportColor();
 
@@ -109,5 +110,11 @@ export default async function (options: { cliArgs: string[] }) {
   } finally {
     logger.complete();
     await loggerFinished;
+
+    // Restore original console methods so that late consumers
+    // (e.g. process.on('exit') handlers) still produce output.
+    console.log = console.info = logInfo;
+    console.warn = logWarn;
+    console.error = logError;
   }
 }
