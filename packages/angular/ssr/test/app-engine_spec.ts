@@ -160,7 +160,21 @@ describe('AngularAppEngine', () => {
         const response = await appEngine.handle(request);
         expect(response?.status).toBe(302);
         expect(response?.headers.get('Location')).toBe('/it');
-        expect(response?.headers.get('Vary')).toBe('Accept-Language');
+        expect(response?.headers.get('Vary')).toBe('X-Forwarded-Prefix, Accept-Language');
+      });
+
+      it('should include forwarded prefix in locale redirect location when present', async () => {
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/app',
+          },
+        });
+
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/app/it');
+        expect(response?.headers.get('Vary')).toBe('X-Forwarded-Prefix, Accept-Language');
       });
 
       it('should return null for requests to file-like resources in a locale', async () => {
