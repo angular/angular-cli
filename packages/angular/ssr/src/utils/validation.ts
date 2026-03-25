@@ -151,6 +151,19 @@ export function cloneRequestAndPatchHeaders(
     };
   };
 
+  const originalForEach = headers.forEach;
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
+  (headers.forEach as typeof originalForEach) = function (callback, thisArg) {
+    originalForEach.call(
+      headers,
+      (value, key, parent) => {
+        validateHeader(key, value, allowedHosts, onError);
+        callback.call(thisArg, value, key, parent);
+      },
+      thisArg,
+    );
+  };
+
   // Ensure for...of loops use the new patched entries
   (headers[Symbol.iterator] as typeof originalEntries) = headers.entries;
 
