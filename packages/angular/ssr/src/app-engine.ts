@@ -88,7 +88,22 @@ export class AngularAppEngine {
    * @param options Options for the Angular server application engine.
    */
   constructor(options?: AngularAppEngineOptions) {
-    this.allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+    this.allowedHosts = this.getAllowedHosts(options);
+  }
+
+  private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
+    const allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+
+    if (allowedHosts.has('*')) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Allowing all hosts via "*" is a security risk. This configuration should only be used when ' +
+          'validation for "Host" and "X-Forwarded-Host" headers is performed in another layer, such as a load balancer or reverse proxy. ' +
+          'For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
+      );
+    }
+
+    return allowedHosts;
   }
 
   /**
