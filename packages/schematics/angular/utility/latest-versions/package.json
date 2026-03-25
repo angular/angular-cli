@@ -23,7 +23,7 @@
     "tailwindcss": "^4.1.12",
     "@tailwindcss/postcss": "^4.1.12",
     "tslib": "^2.3.0",
-    "typescript": "~5.9.2",
+    "typescript": "~6.0.2",
     "vitest": "^4.0.8",
     "@vitest/browser-playwright": "^4.0.8",
     "@vitest/browser-webdriverio": "^4.0.8",
