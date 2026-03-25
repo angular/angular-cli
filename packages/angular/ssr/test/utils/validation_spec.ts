@@ -341,5 +341,24 @@ describe('Validation Utils', () => {
         }),
       );
     });
+
+    it('should validate headers when iterating with forEach()', async () => {
+      const req = new Request('http://example.com', {
+        headers: { 'host': 'evil.com' },
+      });
+      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect(() => {
+        secured.headers.forEach(() => {
+          // access the header to trigger the validation
+        });
+      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
+
+      await expectAsync(onError).toBeResolvedTo(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+        }),
+      );
+    });
   });
 });
