@@ -4,11 +4,11 @@ import { updateTsConfig } from '../../utils/project';
 
 export default async function () {
   await updateTsConfig((json) => {
-    json['compilerOptions']['baseUrl'] = './src';
     json['compilerOptions']['paths'] = {
-      '@shared': ['app/shared'],
-      '@shared/*': ['app/shared/*'],
-      '@root/*': ['./*'],
+      '@shared': ['./src/app/shared'],
+      '@shared/*': ['./src/app/shared/*'],
+      '@root/*': ['./src/*'],
+      'src/*': ['./src/*'],
     };
   });
 
@@ -23,17 +23,17 @@ export default async function () {
   await ng('build', '--configuration=development');
 
   await updateTsConfig((json) => {
-    json['compilerOptions']['paths']['*'] = ['*', 'app/shared/*'];
+    json['compilerOptions']['paths']['*'] = ['./*', './src/app/shared/*'];
   });
 
   await appendToFile(
     'src/app/app.ts',
     `
-    import { meaning } from 'app/shared/meaning';
+    import { meaning } from 'src/app/shared/meaning';
     import { meaning as meaning2 } from '@shared';
     import { meaning as meaning3 } from '@shared/meaning';
     import { meaning as meaning4 } from 'meaning';
-    import { meaning as meaning5 } from 'meaning-too';
+    import { meaning as meaning5 } from 'src/meaning-too';
 
     // need to use imports otherwise they are ignored and
     // no error is outputted, even if baseUrl/paths don't work

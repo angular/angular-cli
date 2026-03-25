@@ -35,6 +35,6 @@
     "@types/express": "^4.17.24",
     "@types/jasmine": "~4.3.0",
     "@types/node": "^20.17.19",
-    "typescript": "~5.9.2"
+    "typescript": "~6.0.2"
   }
 }
