@@ -35,7 +35,7 @@
     "magic-string": "0.30.21",
     "mrmime": "2.0.1",
     "parse5-html-rewriting-stream": "8.0.0",
-    "picomatch": "4.0.3",
+    "picomatch": "4.0.4",
     "piscina": "5.1.4",
     "rolldown": "1.0.0-rc.4",
     "sass": "1.97.3",
