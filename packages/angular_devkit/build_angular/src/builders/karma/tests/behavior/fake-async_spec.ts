@@ -18,12 +18,13 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
     it('loads zone.js/testing at the right time', async () => {
       await harness.writeFiles({
         './src/app/app.component.ts': `
-            import { Component } from '@angular/core';
+            import { ChangeDetectionStrategy, Component } from '@angular/core';
 
             @Component({
               selector: 'app-root',
               standalone: false,
               template: '<button (click)="changeMessage()" class="change">{{ message }}</button>',
+              changeDetection: ChangeDetectionStrategy.Eager
             })
             export class AppComponent {
               message = 'Initial';
