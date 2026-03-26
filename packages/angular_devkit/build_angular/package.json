@@ -66,7 +66,7 @@
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "browser-sync": "3.0.4",
-    "ng-packagr": "22.0.0-next.0",
+    "ng-packagr": "22.0.0-next.1",
     "undici": "7.24.5"
   },
   "peerDependencies": {
