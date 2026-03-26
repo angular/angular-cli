@@ -1,3 +1,32 @@
+<a name="21.2.4"></a>
+
+# 21.2.4 (2026-03-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [a7787d092](https://github.com/angular/angular-cli/commit/a7787d0925559fe7731034856a872708bcfb78be) | fix  | restore console methods after logger completes |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [7170599ab](https://github.com/angular/angular-cli/commit/7170599ab237691d9208c410363ef7e4ee50db2c) | fix  | deduplicate and merge coverage excludes with vitest                       |
+| [c73f13797](https://github.com/angular/angular-cli/commit/c73f13797afe57fcc98faf6361085e1dd5afae9b) | fix  | prevent reporter duplicates by explicitly overriding Vitest configuration |
+| [956ccaa71](https://github.com/angular/angular-cli/commit/956ccaa71ea8a3626e4139cf7e2f26ee637feeed) | fix  | remove default for unit-test coverage option                              |
+| [36978db7e](https://github.com/angular/angular-cli/commit/36978db7e494e4e5612aa2a8384199eeca7c4c2d) | fix  | warn about performance of test.exclude in vitest configuration            |
+| [6ec36f5be](https://github.com/angular/angular-cli/commit/6ec36f5bee05d97c10ca8d91d5746621ffb1fdb9) | fix  | warn when vitest watch config conflicts with builder                      |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [9bdf782c8](https://github.com/angular/angular-cli/commit/9bdf782c838ab5820ec905d689a62ffc3b3cabe3) | fix  | apply forwarded prefix and vary header in accept-language redirects |
+| [628c58672](https://github.com/angular/angular-cli/commit/628c586728748e1c367fa7e363299eb79b1566ca) | fix  | support '\*' in allowedHosts and warn about security risks          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.3"></a>
 
 # 21.2.3 (2026-03-18)
