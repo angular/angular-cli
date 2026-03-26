@@ -24,7 +24,7 @@ const VALID_PROTO_REGEX = /^https?$/i;
 /**
  * Regular expression to validate that the host is a valid hostname.
  */
-const VALID_HOST_REGEX = /^[a-z0-9.:-]+$/i;
+const VALID_HOST_REGEX = /^[a-z0-9_.-]+(:[0-9]+)?$/i;
 
 /**
  * Regular expression to validate that the prefix is valid.
