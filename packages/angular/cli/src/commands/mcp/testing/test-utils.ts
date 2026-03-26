@@ -27,6 +27,9 @@ export function createMockHost(): MockHost {
     getAvailablePort: jasmine
       .createSpy<Host['getAvailablePort']>('getAvailablePort')
       .and.resolveTo(0),
+    isPortAvailable: jasmine
+      .createSpy<Host['isPortAvailable']>('isPortAvailable')
+      .and.resolveTo(true),
   } as unknown as MockHost;
 }
 

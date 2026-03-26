@@ -64,6 +64,31 @@ describe('Serve Tools', () => {
     expect(mockProcess.kill).toHaveBeenCalled();
   });
 
+  it('should use the provided port number', async () => {
+    const startResult = await startDevserver({ port: 54321 }, mockContext);
+    expect(startResult.structuredContent.message).toBe(
+      `Development server for project 'my-app' started and watching for workspace changes.`,
+    );
+    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'my-app', '--port=54321'], {
+      stdio: 'pipe',
+      cwd: '/test',
+    });
+    expect(mockHost.getAvailablePort).not.toHaveBeenCalled();
+  });
+
+  it('should throw an error if the provided port is taken', async () => {
+    mockHost.isPortAvailable.and.resolveTo(false);
+
+    try {
+      await startDevserver({ port: 55555 }, mockContext);
+      fail('Should have thrown an error');
+    } catch (e) {
+      expect((e as Error).message).toContain(
+        "Port 55555 is unavailable. Try calling this tool again without the 'port' parameter to auto-assign a free port.",
+      );
+    }
+  });
+
   it('should wait for a build to complete', async () => {
     await startDevserver({}, mockContext);
 
