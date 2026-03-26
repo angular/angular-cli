@@ -77,10 +77,8 @@ export function execute(
         }),
       );
 
-      const KARMA_APPLICATION_PATH = '_karma_webpack_';
       webpackConfig.output ??= {};
-      webpackConfig.output.path = `/${KARMA_APPLICATION_PATH}/`;
-      webpackConfig.output.publicPath = `/${KARMA_APPLICATION_PATH}/`;
+      webpackConfig.output.path = '/';
 
       if (karmaOptions.singleRun) {
         webpackConfig.plugins.unshift({

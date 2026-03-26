@@ -32,7 +32,7 @@ export default async function () {
   } catch (error) {
     assertIsError(error);
     assert.match(error.message, /\(src\/app\/app\.spec\.ts:3:27/);
-    assert.doesNotMatch(error.message, /_karma_webpack_/);
+    assert.doesNotMatch(error.message, /webpack/);
   }
 
   // when sourcemaps are 'off' the stacktrace won't point to the spec.ts file.
