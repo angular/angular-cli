@@ -704,8 +704,8 @@ importers:
         specifier: 5.105.4
         version: 5.105.4(esbuild@0.27.3)
       webpack-dev-middleware:
-        specifier: 7.4.5
-        version: 7.4.5(tslib@2.8.1)(webpack@5.105.4(esbuild@0.27.3))
+        specifier: 8.0.2
+        version: 8.0.2(tslib@2.8.1)(webpack@5.105.4(esbuild@0.27.3))
       webpack-dev-server:
         specifier: 5.2.3
         version: 5.2.3(bufferutil@4.1.0)(tslib@2.8.1)(utf-8-validate@6.0.6)(webpack@5.105.4(esbuild@0.27.3))
@@ -8108,6 +8108,15 @@ packages:
     engines: {node: '>= 18.12.0'}
     peerDependencies:
       webpack: ^5.0.0
+    peerDependenciesMeta:
+      webpack:
+        optional: true
+
+  webpack-dev-middleware@8.0.2:
+    resolution: {integrity: sha512-MCBgoI025uJEcIYDT+R3mXUnhZA/GAxqwngADOwmHxMhQUgDztGow6AmyeEfI8L9KG2pDVg2kU6vjFnbCBH5Pg==}
+    engines: {node: '>= 20.9.0'}
+    peerDependencies:
+      webpack: ^5.101.0
     peerDependenciesMeta:
       webpack:
         optional: true
@@ -16757,6 +16766,18 @@ snapshots:
   webpack-dev-middleware@7.4.5(tslib@2.8.1)(webpack@5.105.4(esbuild@0.27.3)):
     dependencies:
       colorette: 2.0.20
+      memfs: 4.57.1(tslib@2.8.1)
+      mime-types: 3.0.2
+      on-finished: 2.4.1
+      range-parser: 1.2.1
+      schema-utils: 4.3.3
+    optionalDependencies:
+      webpack: 5.105.4(esbuild@0.27.3)
+    transitivePeerDependencies:
+      - tslib
+
+  webpack-dev-middleware@8.0.2(tslib@2.8.1)(webpack@5.105.4(esbuild@0.27.3)):
+    dependencies:
       memfs: 4.57.1(tslib@2.8.1)
       mime-types: 3.0.2
       on-finished: 2.4.1
