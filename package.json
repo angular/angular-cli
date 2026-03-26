@@ -168,7 +168,7 @@
     "ora": "5.4.1",
     "pacote": "20.0.0",
     "parse5-html-rewriting-stream": "7.0.0",
-    "picomatch": "4.0.2",
+    "picomatch": "4.0.4",
     "piscina": "4.8.0",
     "postcss": "8.5.2",
     "postcss-loader": "8.1.1",
