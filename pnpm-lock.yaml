@@ -386,8 +386,8 @@ importers:
         specifier: 7.0.0
         version: 7.0.0
       picomatch:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.4
+        version: 4.0.4
       piscina:
         specifier: 4.8.0
         version: 4.8.0
@@ -587,8 +587,8 @@ importers:
         specifier: 7.0.0
         version: 7.0.0
       picomatch:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.4
+        version: 4.0.4
       piscina:
         specifier: 4.8.0
         version: 4.8.0
@@ -864,8 +864,8 @@ importers:
         specifier: 5.4.1
         version: 5.4.1
       picomatch:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.4
+        version: 4.0.4
       piscina:
         specifier: 4.8.0
         version: 4.8.0
@@ -963,8 +963,8 @@ importers:
         specifier: 3.3.1
         version: 3.3.1
       picomatch:
-        specifier: 4.0.2
-        version: 4.0.2
+        specifier: 4.0.4
+        version: 4.0.4
       rxjs:
         specifier: 7.8.1
         version: 7.8.1
@@ -6802,12 +6802,8 @@ packages:
     resolution: {integrity: sha512-JU3teHTNjmE2VCGFzuY8EXzCDVwEqB2a8fsIvwaStHhAWJEeVd1o1QD80CU6+ZdEXXSLbSsuLwJjkCBWqRQUVA==}
     engines: {node: '>=8.6'}
 
-  picomatch@4.0.2:
-    resolution: {integrity: sha512-M7BAV6Rlcy5u+m6oPhAPFgJTzAioX/6B0DxyvDlo9l8+T3nLKbrczg2WLUyzd45L8RqfUMyGPzekbMvX2Ldkwg==}
-    engines: {node: '>=12'}
-
-  picomatch@4.0.3:
-    resolution: {integrity: sha512-5gTmgEY/sqK6gFXLIsQNH19lWb4ebPDLA4SdLP7dsWkIXHWlG66oPuVvXSGFPppYZz8ZDZq0dYYrbHfBCVUb1Q==}
+  picomatch@4.0.4:
+    resolution: {integrity: sha512-QP88BAKvMam/3NxH6vj2o21R6MjxZUAd6nlwAS/pnGvN9IVLocLHxGYIzFhg6fUQ+5th6P4dv4eW9jX3DSIj7A==}
     engines: {node: '>=12'}
 
   pify@2.3.0:
@@ -10461,10 +10457,10 @@ snapshots:
       '@rollup/pluginutils': 5.3.0(rollup@4.59.0)
       commondir: 1.0.1
       estree-walker: 2.0.2
-      fdir: 6.4.3(picomatch@4.0.2)
+      fdir: 6.4.3(picomatch@4.0.4)
       is-reference: 1.2.1
       magic-string: 0.30.17
-      picomatch: 4.0.2
+      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.59.0
 
@@ -10505,7 +10501,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
-      picomatch: 4.0.2
+      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.59.0
 
@@ -10513,7 +10509,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.8
       estree-walker: 2.0.2
-      picomatch: 4.0.3
+      picomatch: 4.0.4
     optionalDependencies:
       rollup: 4.59.0
 
@@ -10677,7 +10673,7 @@ snapshots:
       eslint-visitor-keys: 4.2.0
       espree: 10.3.0
       estraverse: 5.3.0
-      picomatch: 4.0.2
+      picomatch: 4.0.4
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -13260,13 +13256,13 @@ snapshots:
     dependencies:
       pend: 1.2.0
 
-  fdir@6.4.3(picomatch@4.0.2):
+  fdir@6.4.3(picomatch@4.0.4):
     optionalDependencies:
-      picomatch: 4.0.2
+      picomatch: 4.0.4
 
-  fdir@6.5.0(picomatch@4.0.3):
+  fdir@6.5.0(picomatch@4.0.4):
     optionalDependencies:
-      picomatch: 4.0.3
+      picomatch: 4.0.4
 
   fetch-blob@3.2.0:
     dependencies:
@@ -15286,9 +15282,7 @@ snapshots:
 
   picomatch@2.3.1: {}
 
-  picomatch@4.0.2: {}
-
-  picomatch@4.0.3: {}
+  picomatch@4.0.4: {}
 
   pify@2.3.0: {}
 
@@ -16631,8 +16625,8 @@ snapshots:
 
   tinyglobby@0.2.15:
     dependencies:
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
 
   tldts-core@6.1.83: {}
 
@@ -16996,8 +16990,8 @@ snapshots:
   vite@6.4.1(@types/node@18.19.76)(jiti@1.21.7)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.4
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
       postcss: 8.5.3
       rollup: 4.59.0
       tinyglobby: 0.2.15
@@ -17013,8 +17007,8 @@ snapshots:
   vite@6.4.1(@types/node@22.13.10)(jiti@1.21.7)(less@4.2.2)(sass@1.85.0)(terser@5.39.0)(yaml@2.7.0):
     dependencies:
       esbuild: 0.25.4
-      fdir: 6.5.0(picomatch@4.0.3)
-      picomatch: 4.0.3
+      fdir: 6.5.0(picomatch@4.0.4)
+      picomatch: 4.0.4
       postcss: 8.5.3
       rollup: 4.59.0
       tinyglobby: 0.2.15
