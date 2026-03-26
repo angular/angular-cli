@@ -118,6 +118,11 @@ export interface Host {
    * Finds an available TCP port on the system.
    */
   getAvailablePort(): Promise<number>;
+
+  /**
+   * Checks whether a TCP port is available on the system.
+   */
+  isPortAvailable(port: number): Promise<boolean>;
 }
 
 /**
@@ -233,6 +238,18 @@ export const LocalWorkspaceHost: Host = {
         } else {
           reject(new Error('Unable to retrieve address information from server.'));
         }
+      });
+    });
+  },
+
+  isPortAvailable(port: number): Promise<boolean> {
+    return new Promise((resolve) => {
+      const server = createServer();
+      server.once('error', () => resolve(false));
+      server.listen(port, () => {
+        server.close(() => {
+          resolve(true);
+        });
       });
     });
   },
