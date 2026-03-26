@@ -15,6 +15,13 @@ import { type McpToolContext, type McpToolDeclaration, declareTool } from '../to
 
 const devserverStartToolInputSchema = z.object({
   ...workspaceAndProjectOptions,
+  port: z
+    .number()
+    .optional()
+    .describe(
+      'The port number to run the server on. If not provided, a random available port will be chosen. ' +
+        'It is recommended to reuse port numbers across calls within the same workspace to maintain consistency.',
+    ),
 });
 
 export type DevserverStartToolInput = z.infer<typeof devserverStartToolInputSchema>;
@@ -53,7 +60,17 @@ export async function startDevserver(input: DevserverStartToolInput, context: Mc
     });
   }
 
-  const port = await context.host.getAvailablePort();
+  let port: number;
+  if (input.port) {
+    if (!(await context.host.isPortAvailable(input.port))) {
+      throw new Error(
+        `Port ${input.port} is unavailable. Try calling this tool again without the 'port' parameter to auto-assign a free port.`,
+      );
+    }
+    port = input.port;
+  } else {
+    port = await context.host.getAvailablePort();
+  }
 
   devserver = new LocalDevserver({
     host: context.host,
@@ -87,14 +104,18 @@ the first build completes.
   background.
 * **Get Initial Build Logs:** Once a dev server has started, use the "devserver.wait_for_build" tool to ensure it's alive. If there are any
   build errors, "devserver.wait_for_build" would provide them back and you can give them to the user or rely on them to propose a fix.
-* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "devserver.stop" wasn't called), after every time you make a
-  change to the workspace, re-run "devserver.wait_for_build" to see whether the change was successfully built and wait for the devserver to
-  be updated.
+* **Get Updated Build Logs:** Important: as long as a devserver is alive (i.e. "devserver.stop" wasn't called), after every time you
+  make a change to the workspace, re-run "devserver.wait_for_build" to see whether the change was successfully built and wait for the
+  devserver to be updated.
 </Use Cases>
 <Operational Notes>
 * This tool manages development servers by itself. It maintains at most a single dev server instance for each project in the monorepo.
 * This is an asynchronous operation. Subsequent commands can be ran while the server is active.
 * Use 'devserver.stop' to gracefully shut down the server and access the full log output.
+* **Keeping the Server Alive**: It is often better to keep the server alive between tool calls if you expect the user to request more
+  changes or run more tests, as it saves time on restarts and maintains the file watcher state. You must still call
+  'devserver.wait_for_build' after every change to see whether the change was successfully built and be sure that that app was updated.
+* **Consistent Ports**: If making multiple calls, it is recommended to reuse the port you got from the first call for subsequent ones.
 </Operational Notes>
 `,
   isReadOnly: true,

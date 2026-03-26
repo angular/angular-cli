@@ -21,4 +21,5 @@ export class MockHost implements Host {
   resolveModule = jasmine.createSpy('resolveRequest').and.returnValue('/dev/null');
   spawn = jasmine.createSpy('spawn');
   getAvailablePort = jasmine.createSpy('getAvailablePort');
+  isPortAvailable = jasmine.createSpy('isPortAvailable').and.resolveTo(true);
 }
