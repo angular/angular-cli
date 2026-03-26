@@ -1,3 +1,38 @@
+<a name="22.0.0-next.3"></a>
+
+# 22.0.0-next.3 (2026-03-26)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------- |
+| [4bbd1bf53](https://github.com/angular/angular-cli/commit/4bbd1bf532fc2d9c36650121a05eae2fb096eb09) | fix  | restore console methods after logger completes |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [f98cc82eb](https://github.com/angular/angular-cli/commit/f98cc82eb0f46986e61b4f94b57dcd36e4eaf215) | feat | rely on strict template default in generated workspaces |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [01bd5d064](https://github.com/angular/angular-cli/commit/01bd5d06410719f66fcabb0bfd04c809e7db12f7) | fix  | deduplicate and merge coverage excludes with vitest                       |
+| [355ebe8c5](https://github.com/angular/angular-cli/commit/355ebe8c54b58201c8080543e5e04208599f0947) | fix  | prevent reporter duplicates by explicitly overriding Vitest configuration |
+| [1a8376bee](https://github.com/angular/angular-cli/commit/1a8376bee9b7683b84c2ae50d08e50d5c5c7b99a) | fix  | remove default for unit-test coverage option                              |
+| [a203dcf1d](https://github.com/angular/angular-cli/commit/a203dcf1d9a6d544cbae867aa949ab0582e60a88) | fix  | warn about performance of test.exclude in vitest configuration            |
+| [ec10eb365](https://github.com/angular/angular-cli/commit/ec10eb365261549c2181efa98a494a749444a787) | fix  | warn when vitest watch config conflicts with builder                      |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [ca6f08c6e](https://github.com/angular/angular-cli/commit/ca6f08c6e59820160f7ae496a9d8775c78ce1a58) | fix  | apply forwarded prefix and vary header in accept-language redirects |
+| [3b99ee140](https://github.com/angular/angular-cli/commit/3b99ee140db82c8ddae3f6e48f9fc38eca204a53) | fix  | support '\*' in allowedHosts and warn about security risks          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.4"></a>
 
 # 21.2.4 (2026-03-26)
