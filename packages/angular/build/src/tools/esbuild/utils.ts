@@ -471,13 +471,13 @@ export async function logMessages(
 
 /**
  * Ascertain whether the application operates without `zone.js`, we currently rely on the polyfills setting to determine its status.
- * If a file with an extension is provided or if `zone.js` is included in the polyfills, the application is deemed as not zoneless.
+ * If `zone.js` is included in the polyfills, the application is deemed as not zoneless.
  * @param polyfills An array of polyfills
  * @returns true, when the application is considered as zoneless.
  */
 export function isZonelessApp(polyfills: string[] | undefined): boolean {
   // TODO: Instead, we should rely on the presence of zone.js in the polyfills build metadata.
-  return !polyfills?.some((p) => p === 'zone.js' || /\.[mc]?[jt]s$/.test(p));
+  return !polyfills?.some((p) => p === 'zone.js');
 }
 
 export function getEntryPointName(entryPoint: string): string {
