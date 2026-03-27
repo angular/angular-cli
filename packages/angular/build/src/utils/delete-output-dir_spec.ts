@@ -58,4 +58,11 @@ describe('deleteOutputDir', () => {
   it('should not throw when output directory does not exist', async () => {
     await expectAsync(deleteOutputDir(root, 'nonexistent')).toBeResolved();
   });
+
+  it('should not throw when output path is an absolute path outside the project', async () => {
+    const externalDir = await mkdtemp(join(tmpdir(), 'ng-test-external-'));
+    await writeFile(join(externalDir, 'old-file.txt'), 'content');
+
+    await expectAsync(deleteOutputDir(root, externalDir)).toBeResolved();
+  });
 });
