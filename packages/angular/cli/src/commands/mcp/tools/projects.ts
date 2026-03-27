@@ -544,6 +544,31 @@ async function processConfigFile(
   }
 }
 
+/**
+ * Deduplicates overlapping search roots (e.g., if one is a child of another).
+ * Sorting by length ensures parent directories are processed before children.
+ * @param roots A list of normalized absolute paths used as search roots.
+ * @returns A deduplicated list of search roots.
+ */
+function deduplicateSearchRoots(roots: string[]): string[] {
+  const sortedRoots = [...roots].sort((a, b) => a.length - b.length);
+  const deduplicated: string[] = [];
+
+  for (const root of sortedRoots) {
+    const isSubdirectory = deduplicated.some((existing) => {
+      const rel = relative(existing, root);
+
+      return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+    });
+
+    if (!isSubdirectory) {
+      deduplicated.push(root);
+    }
+  }
+
+  return deduplicated;
+}
+
 async function createListProjectsHandler({ server }: McpToolContext) {
   return async () => {
     const workspaces: WorkspaceData[] = [];
@@ -561,6 +586,8 @@ async function createListProjectsHandler({ server }: McpToolContext) {
       // Fallback to the current working directory if client does not support roots
       searchRoots = [process.cwd()];
     }
+
+    searchRoots = deduplicateSearchRoots(searchRoots);
 
     // Pre-resolve allowed roots to handle their own symlinks or normalizations.
     // We ignore failures here; if a root is broken, we simply won't match against it.
