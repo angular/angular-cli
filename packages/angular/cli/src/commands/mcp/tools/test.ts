@@ -29,8 +29,16 @@ const testToolOutputSchema = z.object({
 
 export type TestToolOutput = z.infer<typeof testToolOutputSchema>;
 
+function shouldUseHeadlessOption(
+  testTarget: import('@angular-devkit/core').workspaces.TargetDefinition | undefined,
+): boolean {
+  return (
+    testTarget?.builder === '@angular/build:unit-test' && testTarget.options?.['runner'] !== 'karma'
+  );
+}
+
 export async function runTest(input: TestToolInput, context: McpToolContext) {
-  const { workspacePath, projectName } = await resolveWorkspaceAndProject({
+  const { workspace, workspacePath, projectName } = await resolveWorkspaceAndProject({
     host: context.host,
     workspacePathInput: input.workspace,
     projectNameInput: input.project,
@@ -40,8 +48,13 @@ export async function runTest(input: TestToolInput, context: McpToolContext) {
   // Build "ng"'s command line.
   const args = ['test', projectName];
 
-  // This is ran by the agent so we want a non-watched, headless test.
-  args.push('--browsers', 'ChromeHeadless');
+  if (shouldUseHeadlessOption(workspace.projects.get(projectName)?.targets.get('test'))) {
+    args.push('--headless', 'true');
+  } else {
+    // Karma-based projects need an explicit headless browser for non-interactive MCP execution.
+    args.push('--browsers', 'ChromeHeadless');
+  }
+
   args.push('--watch', 'false');
 
   if (input.filter) {
@@ -83,7 +96,8 @@ Perform a one-off, non-watched unit test execution with ng test.
 <Operational Notes>
 * This tool uses "ng test".
 * It supports filtering by spec name if the underlying builder supports it (e.g., 'unit-test' builder).
-* This runs a headless Chrome as a browser, so requires Chrome to be installed.
+* For the "@angular/build:unit-test" builder with Vitest, this tool requests headless execution via "--headless true".
+* For Karma-based projects, this tool forces headless Chrome with "--browsers ChromeHeadless", so Chrome must be installed.
 </Operational Notes>
 `,
   isReadOnly: false,
