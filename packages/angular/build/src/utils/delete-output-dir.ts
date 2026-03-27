@@ -7,7 +7,7 @@
  */
 
 import { readdir, rm } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, relative, resolve } from 'node:path';
 
 /**
  * Delete an output directory, but error out if it's the root of the project.
@@ -18,8 +18,11 @@ export async function deleteOutputDir(
   emptyOnlyDirectories?: string[],
 ): Promise<void> {
   const resolvedOutputPath = resolve(root, outputPath);
-  if (resolvedOutputPath === root) {
-    throw new Error('Output path MUST not be project root directory!');
+  const relativePath = relative(resolvedOutputPath, root);
+  if (!relativePath || !relativePath.startsWith('..')) {
+    throw new Error(
+      `Output path "${resolvedOutputPath}" MUST not be the project root directory or a parent of it.`,
+    );
   }
 
   const directoriesToEmpty = emptyOnlyDirectories
