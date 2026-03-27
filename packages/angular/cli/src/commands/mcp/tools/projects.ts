@@ -467,7 +467,7 @@ async function loadAndParseWorkspace(
     const projects = [];
     const workspaceRoot = dirname(configFile);
     for (const [name, project] of ws.projects.entries()) {
-      const sourceRoot = posix.join(project.root, project.sourceRoot ?? 'src');
+      const sourceRoot = project.sourceRoot ?? posix.join(project.root, 'src');
       const fullSourceRoot = join(workspaceRoot, sourceRoot);
       const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
       const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
