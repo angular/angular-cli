@@ -20,19 +20,19 @@ describe('deleteOutputDir', () => {
 
   it('should throw when output path is the project root', async () => {
     await expectAsync(deleteOutputDir(root, '.')).toBeRejectedWithError(
-      /MUST not be the project root directory or a parent of it/,
+      /MUST not be the project root directory or its parent/,
     );
   });
 
   it('should throw when output path is a parent of the project root', async () => {
     await expectAsync(deleteOutputDir(root, '..')).toBeRejectedWithError(
-      /MUST not be the project root directory or a parent of it/,
+      /MUST not be the project root directory or its parent/,
     );
   });
 
   it('should throw when output path is a grandparent of the project root', async () => {
     await expectAsync(deleteOutputDir(root, '../..')).toBeRejectedWithError(
-      /MUST not be the project root directory or a parent of it/,
+      /MUST not be the project root directory or its parent/,
     );
   });
 

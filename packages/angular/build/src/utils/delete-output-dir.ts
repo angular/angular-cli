@@ -21,7 +21,7 @@ export async function deleteOutputDir(
   const relativePath = relative(resolvedOutputPath, root);
   if (!relativePath || !relativePath.startsWith('..')) {
     throw new Error(
-      `Output path "${resolvedOutputPath}" MUST not be the project root directory or a parent of it.`,
+      `Output path "${resolvedOutputPath}" MUST not be the project root directory or its parent.`,
     );
   }
 
