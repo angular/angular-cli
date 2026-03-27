@@ -58,5 +58,85 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         ]);
       });
     }
+
+    it('rebuilds component after error on rebuild from transitive import', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.modifyFile('src/app/app.component.ts', (content) =>
+        content.replace('app.component.css', 'app.component.scss'),
+      );
+      await harness.writeFile('src/app/app.component.scss', "@import './a';");
+      await harness.writeFile('src/app/a.scss', '$primary: aqua;\\nh1 { color: $primary; }');
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+
+          harness.expectFile('dist/browser/main.js').content.toContain('color: aqua');
+
+          // Introduce a syntax error
+          await harness.writeFile(
+            'src/app/a.scss',
+            'invalid-invalid-invalid\\nh1 { color: $primary; }',
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBe(false);
+
+          // Fix the syntax error
+          await harness.writeFile('src/app/a.scss', '$primary: blue;\\nh1 { color: $primary; }');
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+
+          harness.expectFile('dist/browser/main.js').content.toContain('color: blue');
+        },
+      ]);
+    });
+
+    it('rebuilds component after error on rebuild from deep transitive import with partials', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.modifyFile('src/app/app.component.ts', (content) =>
+        content.replace('app.component.css', 'app.component.scss'),
+      );
+      await harness.writeFile('src/app/app.component.scss', "@import './intermediary';");
+      await harness.writeFile('src/app/_intermediary.scss', "@import './partial';");
+      await harness.writeFile('src/app/_partial.scss', '$primary: aqua;\\nh1 { color: $primary; }');
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+
+          harness.expectFile('dist/browser/main.js').content.toContain('color: aqua');
+
+          // Introduce a syntax error deeply
+          await harness.writeFile(
+            'src/app/_partial.scss',
+            'invalid-invalid-invalid\\nh1 { color: $primary; }',
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBe(false);
+
+          // Fix the syntax error deeply
+          await harness.writeFile(
+            'src/app/_partial.scss',
+            '$primary: blue;\\nh1 { color: $primary; }',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+
+          harness.expectFile('dist/browser/main.js').content.toContain('color: blue');
+        },
+      ]);
+    });
   });
 });
