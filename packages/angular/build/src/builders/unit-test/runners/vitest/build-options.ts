@@ -6,6 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+/**
+ * @fileoverview
+ * Provides Vitest-specific build options and virtual file contents for Angular unit testing.
+ */
+
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import { toPosixPath } from '../../../../utils/path';
@@ -15,6 +20,15 @@ import { NormalizedUnitTestBuilderOptions } from '../../options';
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
+/**
+ * Creates the virtual file contents to initialize the Angular testing environment (TestBed).
+ *
+ * @param providersFile Optional path to a file that exports default providers.
+ * @param projectSourceRoot The root directory of the project source.
+ * @param teardown Whether to configure TestBed to destroy after each test.
+ * @param zoneTestingStrategy How zone.js should be loaded during initialization.
+ * @returns The string content of the virtual initialization file.
+ */
 function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
@@ -29,6 +43,17 @@ function createTestBedInitVirtualFile(
     providersImport = `import providers from './${importPath}';`;
   }
 
+  let zoneTestingSnippet = '';
+  if (zoneTestingStrategy === 'static') {
+    zoneTestingSnippet = `import 'zone.js/testing';`;
+  } else if (zoneTestingStrategy === 'dynamic') {
+    zoneTestingSnippet = `if (typeof Zone !== 'undefined') {
+      // 'zone.js/testing' is used to initialize the ZoneJS testing environment.
+      // It must be imported dynamically to avoid a static dependency on 'zone.js'.
+      await import('zone.js/testing');
+    }`;
+  }
+
   return `
     // Initialize the Angular testing environment
     import { NgModule, provideZoneChangeDetection } from '@angular/core';
@@ -37,18 +62,7 @@ function createTestBedInitVirtualFile(
     import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
 
-    ${
-      zoneTestingStrategy === 'static'
-        ? `import 'zone.js/testing';`
-        : zoneTestingStrategy === 'dynamic'
-          ? `
-    if (typeof Zone !== 'undefined') {
-      // 'zone.js/testing' is used to initialize the ZoneJS testing environment.
-      // It must be imported dynamically to avoid a static dependency on 'zone.js'.
-      await import('zone.js/testing');
-    }`
-          : ''
-    }
+    ${zoneTestingSnippet}
 
     // The beforeEach and afterEach hooks are registered outside the globalThis guard.
     // This ensures that the hooks are always applied, even in non-isolated browser environments.
@@ -81,6 +95,13 @@ function createTestBedInitVirtualFile(
   `;
 }
 
+/**
+ * Adjusts output hashing settings for testing purposes. For example, ensuring media
+ * is continued to be hashed to avoid overwriting assets, but turning off JavaScript hashing.
+ *
+ * @param hashing The original OutputHashing configuration.
+ * @returns The adjusted OutputHashing configuration.
+ */
 function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
   switch (hashing) {
     case OutputHashing.All:
@@ -92,6 +113,45 @@ function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
   }
 }
 
+/**
+ * Resolves the Zone.js testing strategy by inspecting polyfills and resolving zone.js package.
+ *
+ * @param buildOptions The partial application builder options.
+ * @param projectSourceRoot The root directory of the project source.
+ * @returns The resolved zone testing strategy ('none', 'static', 'dynamic').
+ */
+function getZoneTestingStrategy(
+  buildOptions: Partial<ApplicationBuilderInternalOptions>,
+  projectSourceRoot: string,
+): 'none' | 'static' | 'dynamic' {
+  if (buildOptions.polyfills?.includes('zone.js/testing')) {
+    return 'none';
+  }
+
+  if (buildOptions.polyfills?.includes('zone.js')) {
+    return 'static';
+  }
+
+  try {
+    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
+    projectRequire.resolve('zone.js');
+
+    return 'dynamic';
+  } catch {
+    return 'none';
+  }
+}
+
+/**
+ * Generates options and virtual files for the Vitest test runner.
+ *
+ * Discovers specs matchers, creates entry points, decides polyfills strategy, and orchestrates
+ * internal ApplicationBuilder options.
+ *
+ * @param options The normalized unit test builder options.
+ * @param baseBuildOptions The base build config to derive testing config from.
+ * @returns An async RunnerOptions configuration.
+ */
 export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
@@ -162,20 +222,7 @@ export async function getVitestBuildOptions(
   };
 
   // Inject the zone.js testing polyfill if Zone.js is installed.
-  let zoneTestingStrategy: 'none' | 'static' | 'dynamic';
-  if (buildOptions.polyfills?.includes('zone.js/testing')) {
-    zoneTestingStrategy = 'none';
-  } else if (buildOptions.polyfills?.includes('zone.js')) {
-    zoneTestingStrategy = 'static';
-  } else {
-    try {
-      const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
-      projectRequire.resolve('zone.js');
-      zoneTestingStrategy = 'dynamic';
-    } catch {
-      zoneTestingStrategy = 'none';
-    }
-  }
+  const zoneTestingStrategy = getZoneTestingStrategy(buildOptions, projectSourceRoot);
 
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,
