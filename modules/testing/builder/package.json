@@ -4,11 +4,11 @@
     "@angular-devkit/build-angular": "workspace:*",
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
-    "@vitest/coverage-v8": "4.1.0",
+    "@vitest/coverage-v8": "4.1.2",
     "browser-sync": "3.0.4",
     "jsdom": "29.0.1",
     "ng-packagr": "22.0.0-next.1",
     "rxjs": "7.8.2",
-    "vitest": "4.1.0"
+    "vitest": "4.1.2"
   }
 }

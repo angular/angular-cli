@@ -37,10 +37,10 @@
     "less-loader": "12.3.2",
     "license-webpack-plugin": "4.0.2",
     "loader-utils": "3.3.1",
-    "mini-css-extract-plugin": "2.10.1",
+    "mini-css-extract-plugin": "2.10.2",
     "open": "11.0.0",
     "ora": "9.3.0",
-    "picomatch": "4.0.3",
+    "picomatch": "4.0.4",
     "piscina": "5.1.4",
     "postcss": "8.5.8",
     "postcss-loader": "8.2.1",
@@ -67,7 +67,7 @@
     "@angular/ssr": "workspace:*",
     "browser-sync": "3.0.4",
     "ng-packagr": "22.0.0-next.1",
-    "undici": "7.24.5"
+    "undici": "7.24.6"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
