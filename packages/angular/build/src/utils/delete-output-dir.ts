@@ -7,7 +7,7 @@
  */
 
 import { readdir, rm } from 'node:fs/promises';
-import { isAbsolute, join, relative, resolve } from 'node:path';
+import { isAbsolute, join, resolve, sep } from 'node:path';
 
 /**
  * Delete an output directory, but error out if it's the root of the project.
@@ -18,12 +18,13 @@ export async function deleteOutputDir(
   emptyOnlyDirectories?: string[],
 ): Promise<void> {
   const resolvedOutputPath = resolve(root, outputPath);
-  const relativePath = relative(resolvedOutputPath, root);
-  // When relative() returns an absolute path, the paths are on different drives/roots
-  // (e.g. Windows drive letters or UNC paths), so it cannot be an ancestor.
-  if (!relativePath || (!isAbsolute(relativePath) && !relativePath.startsWith('..'))) {
+  if (resolvedOutputPath === root) {
+    throw new Error('Output path MUST not be the workspace root directory.');
+  }
+
+  if (!isAbsolute(outputPath) && !resolvedOutputPath.startsWith(root + sep)) {
     throw new Error(
-      `Output path "${resolvedOutputPath}" MUST not be the project root directory or its parent.`,
+      `Output path "${resolvedOutputPath}" MUST not be a parent of the workspace root directory.`,
     );
   }
 
