@@ -58,6 +58,33 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         );
     });
 
+    it('should prepend deploy URL to file loader import URLs', async () => {
+      await harness.writeFile(
+        './src/types.d.ts',
+        'declare module "*.svg" { const url: string; export default url; }',
+      );
+      await harness.writeFile('./src/app/test.svg', '<svg></svg>');
+      await harness.writeFile(
+        'src/main.ts',
+        `import svgUrl from './app/test.svg';\nconsole.log(svgUrl);`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        loader: {
+          '.svg': 'file',
+        },
+        deployUrl: 'https://example.com/some/path/',
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness
+        .expectFile('dist/browser/main.js')
+        .content.toContain('https://example.com/some/path/media/test.svg');
+    });
+
     it('should update resources component stylesheets to reference deployURL', async () => {
       await harness.writeFile('src/app/test.svg', '<svg></svg>');
       await harness.writeFile(
