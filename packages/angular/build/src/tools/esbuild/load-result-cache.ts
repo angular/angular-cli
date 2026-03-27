@@ -70,7 +70,8 @@ export class MemoryLoadResultCache implements LoadResultCache {
   }
 
   invalidate(path: string): boolean {
-    const affectedPaths = this.#fileDependencies.get(path);
+    const normalizedPath = normalize(path);
+    const affectedPaths = this.#fileDependencies.get(normalizedPath);
     let found = false;
 
     if (affectedPaths) {
@@ -79,7 +80,7 @@ export class MemoryLoadResultCache implements LoadResultCache {
           found = true;
         }
       }
-      this.#fileDependencies.delete(path);
+      this.#fileDependencies.delete(normalizedPath);
     }
 
     return found;
