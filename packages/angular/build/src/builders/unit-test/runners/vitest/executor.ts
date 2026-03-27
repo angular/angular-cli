@@ -141,6 +141,7 @@ export class VitestExecutor implements TestExecutor {
     if (buildResult.kind === ResultKind.Incremental) {
       // To rerun tests, Vitest needs the original test file paths, not the output paths.
       const modifiedSourceFiles = new Set<string>();
+      const modifiedNonTestFiles = new Set<string>();
       for (const modifiedFile of [...buildResult.modified, ...buildResult.added]) {
         // The `modified` files in the build result are the output paths.
         // We need to find the original source file path to pass to Vitest.
@@ -156,6 +157,10 @@ export class VitestExecutor implements TestExecutor {
             DebugLogLevel.Verbose,
             `Could not map output file '${modifiedFile}' to a source file. It may not be a test file.`,
           );
+          // Track non-test output files so we can find dependent test specs later.
+          modifiedNonTestFiles.add(
+            this.normalizePath(path.join(this.options.workspaceRoot, modifiedFile)),
+          );
         }
         vitest.invalidateFile(
           this.normalizePath(path.join(this.options.workspaceRoot, modifiedFile)),
@@ -167,6 +172,19 @@ export class VitestExecutor implements TestExecutor {
         vitest.invalidateFile(file);
         const specs = vitest.getModuleSpecifications(file);
         if (specs) {
+          specsToRerun.push(...specs);
+        }
+      }
+
+      // For non-test files (e.g., services, components), find dependent test specs
+      // via Vitest's module graph so that changes to these files trigger test re-runs.
+      for (const file of modifiedNonTestFiles) {
+        const specs = vitest.getModuleSpecifications(file);
+        if (specs) {
+          this.debugLog(
+            DebugLogLevel.Verbose,
+            `Found ${specs.length} dependent test specification(s) for non-test file '${file}'.`,
+          );
           specsToRerun.push(...specs);
         }
       }
