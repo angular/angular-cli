@@ -93,4 +93,40 @@ describe('Test Tool', () => {
     expect(structuredContent.status).toBe('failure');
     expect(structuredContent.logs).toEqual([...testLogs, 'Test failed']);
   });
+
+  it('should use the headless option for the unit-test builder when using Vitest', async () => {
+    addProjectToWorkspace(mockContext.workspace.projects, 'my-vitest-app', {
+      test: {
+        builder: '@angular/build:unit-test',
+        options: {
+          runner: 'vitest',
+        },
+      },
+    });
+
+    await runTest({ project: 'my-vitest-app' }, mockContext);
+
+    expect(mockHost.runCommand).toHaveBeenCalledWith(
+      'ng',
+      ['test', 'my-vitest-app', '--headless', 'true', '--watch', 'false'],
+      { cwd: '/test' },
+    );
+  });
+
+  it('should use the headless option for the unit-test builder when the runner is omitted', async () => {
+    addProjectToWorkspace(mockContext.workspace.projects, 'my-default-vitest-app', {
+      test: {
+        builder: '@angular/build:unit-test',
+        options: {},
+      },
+    });
+
+    await runTest({ project: 'my-default-vitest-app' }, mockContext);
+
+    expect(mockHost.runCommand).toHaveBeenCalledWith(
+      'ng',
+      ['test', 'my-default-vitest-app', '--headless', 'true', '--watch', 'false'],
+      { cwd: '/test' },
+    );
+  });
 });
