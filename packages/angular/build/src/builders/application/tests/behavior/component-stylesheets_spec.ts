@@ -64,6 +64,25 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it('should generate an error when a styleUrl points to a TypeScript file', async () => {
+      await harness.modifyFile('src/app/app.component.ts', (content) => {
+        return content.replace('./app.component.css', './app.component.ts');
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
+          message: jasmine.stringContaining(`Could not find stylesheet file './app.component.ts'`),
+        }),
+      );
+    });
+
     it('should generate an error for a missing stylesheet with JIT', async () => {
       await harness.modifyFile('src/app/app.component.ts', (content) => {
         return content.replace('./app.component.css', './not-present.css');
