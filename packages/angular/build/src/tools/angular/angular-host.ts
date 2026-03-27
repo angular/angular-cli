@@ -212,6 +212,12 @@ export function createAngularCompilerHost(
       return null;
     }
 
+    // Reject TypeScript files used as component resources (e.g., styleUrl pointing to a .ts file).
+    // Processing a TypeScript file as a stylesheet or template causes confusing downstream errors.
+    if (hasTypeScriptExtension(resolvedPath)) {
+      return null;
+    }
+
     // All resource names that have template file extensions are assumed to be templates
     // TODO: Update compiler to provide the resource type to avoid extension matching here.
     if (!hostOptions.externalStylesheets || hasTemplateExtension(resolvedPath)) {
@@ -262,6 +268,20 @@ function hasTemplateExtension(file: string): boolean {
     case '.htm':
     case '.html':
     case '.svg':
+      return true;
+  }
+
+  return false;
+}
+
+function hasTypeScriptExtension(file: string): boolean {
+  const extension = nodePath.extname(file).toLowerCase();
+
+  switch (extension) {
+    case '.ts':
+    case '.tsx':
+    case '.mts':
+    case '.cts':
       return true;
   }
 
