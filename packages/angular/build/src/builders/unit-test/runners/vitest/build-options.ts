@@ -187,31 +187,36 @@ export async function getVitestBuildOptions(
   const mockPatchContents = `
     import { vi } from 'vitest';
 
-    const error = new Error(
-      'The "vi.mock" and related methods are not supported for relative imports with the Angular unit-test system. ' +
-      'Please use Angular TestBed for mocking dependencies.'
-    );
+    const ANGULAR_VITEST_MOCK_PATCH = Symbol.for('@angular/cli/vitest-mock-patch');
+    if (!globalThis[ANGULAR_VITEST_MOCK_PATCH]) {
+      globalThis[ANGULAR_VITEST_MOCK_PATCH] = true;
 
-    // Store original implementations
-    const { mock, doMock, importMock, unmock, doUnmock } = vi;
+      const error = new Error(
+        'The "vi.mock" and related methods are not supported for relative imports with the Angular unit-test system. ' +
+        'Please use Angular TestBed for mocking dependencies.'
+      );
 
-    function patch(original) {
-      return (path, ...args) => {
-        // Check if the path is a string and starts with a character that indicates a relative path.
-        if (typeof path === 'string' && /^[./]/.test(path)) {
-          throw error;
-        }
+      // Store original implementations
+      const { mock, doMock, importMock, unmock, doUnmock } = vi;
 
-        // Call the original function for non-relative paths.
-        return original(path, ...args);
-      };
+      function patch(original) {
+        return (path, ...args) => {
+          // Check if the path is a string and starts with a character that indicates a relative path.
+          if (typeof path === 'string' && /^[./]/.test(path)) {
+            throw error;
+          }
+
+          // Call the original function for non-relative paths.
+          return original(path, ...args);
+        };
+      }
+
+      vi.mock = patch(mock);
+      vi.doMock = patch(doMock);
+      vi.importMock = patch(importMock);
+      vi.unmock = patch(unmock);
+      vi.doUnmock = patch(doUnmock);
     }
-
-    vi.mock = patch(mock);
-    vi.doMock = patch(doMock);
-    vi.importMock = patch(importMock);
-    vi.unmock = patch(unmock);
-    vi.doUnmock = patch(doUnmock);
   `;
 
   return {
