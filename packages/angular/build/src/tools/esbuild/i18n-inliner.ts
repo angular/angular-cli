@@ -179,28 +179,88 @@ export class I18nInliner {
     // Convert raw results to output file objects and include all unmodified files
     const errors: string[] = [];
     const warnings: string[] = [];
-    const outputFiles = [
-      ...rawResults.flatMap(({ file, code, map, messages }) => {
-        const type = this.#localizeFiles.get(file)?.type;
-        assert(type !== undefined, 'localized file should always have a type' + file);
 
-        const resultFiles = [createOutputFile(file, code, type)];
-        if (map) {
-          resultFiles.push(createOutputFile(file + '.map', map, type));
+    // Build a map of old filename to new filename for files whose content changed
+    // during inlining. This ensures output filenames reflect the actual inlined
+    // content rather than using stale hashes from the pre-inlining esbuild build.
+    // Without this, all localized files would share identical filenames across builds
+    // even when their translated content differs, leading to browser caching issues.
+    const filenameRenameMap = new Map<string, string>();
+
+    // Regex to extract the hash portion from filenames like "chunk-HASH.js" or "name-HASH.js"
+    const hashPattern = /^(.+)-([A-Z0-9]{8})(\.[a-z]+)$/;
+
+    const inlinedFiles: Array<{
+      file: string;
+      code: string;
+      map: string | undefined;
+      type: BuildOutputFileType;
+    }> = [];
+
+    for (const { file, code, map, messages } of rawResults) {
+      const type = this.#localizeFiles.get(file)?.type;
+      assert(type !== undefined, 'localized file should always have a type' + file);
+
+      for (const message of messages) {
+        if (message.type === 'error') {
+          errors.push(message.message);
+        } else {
+          warnings.push(message.message);
         }
+      }
 
-        for (const message of messages) {
-          if (message.type === 'error') {
-            errors.push(message.message);
-          } else {
-            warnings.push(message.message);
+      // Check if the file content actually changed during inlining by comparing
+      // the inlined code hash against the original file's hash.
+      const originalFile = this.#localizeFiles.get(file);
+      const originalHash = originalFile?.hash;
+      const newContentHash = createHash('sha256').update(code).digest('hex');
+
+      if (originalHash !== newContentHash) {
+        // Content changed during inlining - compute a new filename hash
+        const match = file.match(hashPattern);
+        if (match) {
+          const [, prefix, oldHash, ext] = match;
+          // Generate a new 8-character uppercase alphanumeric hash from the inlined content.
+          // Uses base-36 encoding to match esbuild's hash format (A-Z, 0-9).
+          const hashBytes = createHash('sha256').update(code).digest();
+          const hashValue = hashBytes.readBigUInt64BE(0);
+          const newHash = hashValue.toString(36).slice(0, 8).toUpperCase().padStart(8, '0');
+          if (oldHash !== newHash) {
+            // Use the base filename (without directory) for replacement in file content
+            const baseName = prefix.includes('/') ? prefix.slice(prefix.lastIndexOf('/') + 1) : prefix;
+            const oldBaseName = `${baseName}-${oldHash}`;
+            const newBaseName = `${baseName}-${newHash}`;
+            filenameRenameMap.set(oldBaseName, newBaseName);
           }
         }
+      }
 
-        return resultFiles;
-      }),
-      ...this.#unmodifiedFiles.map((file) => file.clone()),
-    ];
+      inlinedFiles.push({ file, code, map, type });
+    }
+
+    // Apply filename renames to file paths and content for all output files
+    const outputFiles: BuildOutputFile[] = [];
+    for (const { file, code, map, type } of inlinedFiles) {
+      const updatedPath = applyFilenameRenames(file, filenameRenameMap);
+      const updatedCode = applyFilenameRenames(code, filenameRenameMap);
+      outputFiles.push(createOutputFile(updatedPath, updatedCode, type));
+      if (map) {
+        const updatedMap = applyFilenameRenames(map, filenameRenameMap);
+        outputFiles.push(createOutputFile(updatedPath + '.map', updatedMap, type));
+      }
+    }
+
+    // Also apply filename renames to unmodified files (they may reference renamed chunks)
+    for (const file of this.#unmodifiedFiles) {
+      const clone = file.clone();
+      if (filenameRenameMap.size > 0) {
+        const updatedPath = applyFilenameRenames(clone.path, filenameRenameMap);
+        const updatedText = applyFilenameRenames(clone.text, filenameRenameMap);
+        outputFiles.push(createOutputFile(updatedPath, updatedText, clone.type));
+      } else {
+        outputFiles.push(clone);
+      }
+    }
 
     return {
       outputFiles,
@@ -287,4 +347,23 @@ export class I18nInliner {
       );
     }
   }
+}
+
+/**
+ * Applies filename renames to a string by replacing all occurrences of old filenames with new ones.
+ * This is used to update file paths and file contents (e.g., dynamic import references like
+ * `import("./chunk-OLDHASH.js")`) after i18n inlining has changed file content hashes.
+ * Uses full base filenames (e.g., "chunk-ABCD1234") rather than bare hashes to minimize
+ * the risk of accidental replacements in unrelated content.
+ */
+function applyFilenameRenames(content: string, renameMap: Map<string, string>): string {
+  if (renameMap.size === 0) {
+    return content;
+  }
+
+  for (const [oldName, newName] of renameMap) {
+    content = content.replaceAll(oldName, newName);
+  }
+
+  return content;
 }

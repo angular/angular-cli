@@ -8,7 +8,6 @@
 
 import type { BuildOptions, Plugin } from 'esbuild';
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import { extname, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { Platform } from '../../builders/application/schema';
@@ -547,25 +546,9 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     jit,
     loaderExtensions,
     jsonLogs,
-    i18nOptions,
     customConditions,
     frameworkVersion,
   } = options;
-
-  // Ensure unique hashes for i18n translation changes when using post-process inlining.
-  // This hash value is added as a footer to each file and ensures that the output file names (with hashes)
-  // change when translation files have changed. If this is not done the post processed files may have
-  // different content but would retain identical production file names which would lead to browser caching problems.
-  let footer;
-  if (i18nOptions.shouldInline) {
-    // Update file hashes to include translation file content
-    const i18nHash = Object.values(i18nOptions.locales).reduce(
-      (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),
-      '',
-    );
-
-    footer = { js: `/**i18n:${createHash('sha256').update(i18nHash).digest('hex')}*/` };
-  }
 
   // Core conditions that are always included
   const conditions = [
@@ -653,7 +636,6 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       'ngHmrMode': options.templateUpdates ? 'true' : 'false',
     },
     loader: loaderExtensions,
-    footer,
     plugins,
   };
 }
