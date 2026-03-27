@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { mkdir, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, readdir, writeFile } from 'node:fs/promises';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { deleteOutputDir } from './delete-output-dir';
 
@@ -14,9 +15,6 @@ describe('deleteOutputDir', () => {
   let root: string;
 
   beforeEach(async () => {
-    // Use a unique temp directory for each test
-    const { mkdtemp } = await import('node:fs/promises');
-    const { tmpdir } = await import('node:os');
     root = await mkdtemp(join(tmpdir(), 'ng-test-'));
   });
 
@@ -53,7 +51,6 @@ describe('deleteOutputDir', () => {
 
     await deleteOutputDir(root, 'dist');
 
-    const { readdir } = await import('node:fs/promises');
     const entries = await readdir(outputDir);
     expect(entries.length).toBe(0);
   });
