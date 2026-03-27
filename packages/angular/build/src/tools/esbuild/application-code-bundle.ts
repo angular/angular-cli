@@ -550,6 +550,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     i18nOptions,
     customConditions,
     frameworkVersion,
+    publicPath,
   } = options;
 
   // Ensure unique hashes for i18n translation changes when using post-process inlining.
@@ -654,6 +655,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     },
     loader: loaderExtensions,
     footer,
+    publicPath,
     plugins,
   };
 }
