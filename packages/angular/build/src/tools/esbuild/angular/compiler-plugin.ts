@@ -220,10 +220,19 @@ export function createCompilerPlugin(
             if (stylesheetResult.errors) {
               (result.errors ??= []).push(...stylesheetResult.errors);
 
+              const { referencedFiles } = stylesheetResult;
+              if (referencedFiles) {
+                referencedFileTracker.add(containingFile, referencedFiles);
+                if (stylesheetFile) {
+                  referencedFileTracker.add(stylesheetFile, referencedFiles);
+                }
+              }
+
               return '';
             }
 
             const { contents, outputFiles, metafile, referencedFiles } = stylesheetResult;
+
             additionalResults.set(resultSource, {
               outputFiles,
               metafile,
