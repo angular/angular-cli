@@ -41,6 +41,7 @@ export function replaceResources(
                 resourceImportDeclarations,
                 moduleKind,
                 inlineStyleFileExtension,
+                node,
               ),
             ),
             ...(ts.getModifiers(node) ?? []),
@@ -87,6 +88,7 @@ function visitDecorator(
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind?: ts.ModuleKind,
   inlineStyleFileExtension?: string,
+  classDeclaration?: ts.ClassDeclaration,
 ): ts.Decorator {
   if (!isComponentDecorator(node, typeChecker)) {
     return node;
@@ -106,6 +108,8 @@ function visitDecorator(
   const objectExpression = args[0];
   const styleReplacements: ts.Expression[] = [];
 
+  const className = classDeclaration?.name?.text ?? 'Unknown';
+
   // visit all properties
   let properties = ts.visitNodes(objectExpression.properties, (node) =>
     ts.isObjectLiteralElementLike(node)
@@ -116,6 +120,7 @@ function visitDecorator(
           resourceImportDeclarations,
           moduleKind,
           inlineStyleFileExtension,
+          className,
         )
       : node,
   ) as ts.NodeArray<ts.ObjectLiteralElementLike>;
@@ -148,6 +153,7 @@ function visitComponentMetadata(
   resourceImportDeclarations: ts.ImportDeclaration[],
   moduleKind: ts.ModuleKind = ts.ModuleKind.ES2015,
   inlineStyleFileExtension?: string,
+  className?: string,
 ): ts.ObjectLiteralElementLike | undefined {
   if (!ts.isPropertyAssignment(node) || ts.isComputedPropertyName(node.name)) {
     return node;
@@ -161,7 +167,14 @@ function visitComponentMetadata(
     case 'templateUrl': {
       const url = getResourceUrl(node.initializer);
       if (!url) {
-        return node;
+        const sourceFile = node.getSourceFile();
+        const { line } = sourceFile.getLineAndCharacterOfPosition(node.initializer.getStart());
+
+        throw new Error(
+          `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal ` +
+            `'templateUrl' value at line ${line + 1}. The 'templateUrl' property must be a ` +
+            `string literal. Expressions, variables, or other dynamic values are not supported.`,
+        );
       }
 
       const importName = createResourceImport(

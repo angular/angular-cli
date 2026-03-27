@@ -469,4 +469,46 @@ describe('find_resources', () => {
     const result = transform(input, false);
     expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
   });
+
+  it('should throw an error when templateUrl is a conditional expression', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: true === true
+            ? './app.component.html'
+            : './app.component.copy.html',
+          styleUrls: ['./app.component.css', './app.component.2.css']
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'templateUrl' value/,
+    );
+  });
+
+  it('should throw an error when templateUrl is a variable reference', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        const myTemplate = './app.component.html';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: myTemplate,
+          styleUrls: ['./app.component.css']
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'templateUrl' value/,
+    );
+  });
 });
