@@ -1,3 +1,22 @@
+<a name="21.2.5"></a>
+
+# 21.2.5 (2026-03-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [cadf9b201](https://github.com/angular/angular-cli/commit/cadf9b201bd1055a6e3cc016eb01e0196b028080) | feat | support custom port in MCP devserver start tool |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [bbc255419](https://github.com/angular/angular-cli/commit/bbc255419b346e5152391b47f310922f86e9e383) | fix  | allow underscores in host validation                 |
+| [b1fe66a7f](https://github.com/angular/angular-cli/commit/b1fe66a7f8650ce021b4070394bc31848fc64ca5) | fix  | patch Headers.forEach in cloneRequestAndPatchHeaders |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.22"></a>
 
 # 20.3.22 (2026-03-27)
