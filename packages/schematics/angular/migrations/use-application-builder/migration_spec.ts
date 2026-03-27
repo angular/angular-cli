@@ -467,6 +467,24 @@ describe(`Migration to use the application builder`, () => {
     expect(devDependencies['@angular-devkit/build-angular']).toBeUndefined();
   });
 
+  it('should preserve an existing "@angular/build" version when migrating', async () => {
+    tree.overwrite(
+      '/package.json',
+      JSON.stringify({
+        devDependencies: {
+          '@angular-devkit/build-angular': '~18.2.20',
+          '@angular/build': '~18.2.10',
+        },
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(devDependencies['@angular/build']).toBe('~18.2.10');
+    expect(devDependencies['@angular-devkit/build-angular']).toBeUndefined();
+  });
+
   it('it should not add esModuleInterop and moduleResolution when module is preserve', async () => {
     tree.overwrite(
       'tsconfig.json',
