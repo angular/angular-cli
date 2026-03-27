@@ -15,6 +15,7 @@ import {
   externalSchematic,
 } from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
+import { getPackageJsonDependency } from '../../utility/dependencies';
 import {
   DependencyType,
   ExistingBehavior,
@@ -270,8 +271,11 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       }
 
       // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
+      const buildDependency =
+        getPackageJsonDependency(tree, '@angular-devkit/build-angular') ??
+        getPackageJsonDependency(tree, '@angular/build');
       rules.push(
-        addDependency('@angular/build', latestVersions.DevkitBuildAngular, {
+        addDependency('@angular/build', buildDependency?.version ?? latestVersions.AngularBuild, {
           type: DependencyType.Dev,
           existing: ExistingBehavior.Replace,
         }),
