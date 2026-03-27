@@ -1,3 +1,33 @@
+<a name="19.2.23"></a>
+
+# 19.2.23 (2026-03-27)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [67cfbe32f](https://github.com/angular/angular-cli/commit/67cfbe32ff013d7c9763253c8ccd383d8ee2416c) | fix  | update picomatch to 4.0.4 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [771b979e7](https://github.com/angular/angular-cli/commit/771b979e78af079242bea607470b3ad3b6162659) | fix  | update picomatch to 4.0.4 |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [de2da4874](https://github.com/angular/angular-cli/commit/de2da4874026bb47d08de828b6b4b44fd7d9a3c4) | fix  | update picomatch to 4.0.4 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [27a9ce4a7](https://github.com/angular/angular-cli/commit/27a9ce4a7446db0533e4a7ef64301eeccc5e21e1) | fix  | update picomatch to 4.0.4 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="19.2.22"></a>
 
 # 19.2.22 (2026-02-26)
@@ -906,7 +936,6 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
-
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -4541,7 +4570,6 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
-
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -4571,7 +4599,6 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
-
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -4580,7 +4607,6 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
-
   - `.css`
   - `.less`
   - `.sass`
