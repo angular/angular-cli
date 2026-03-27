@@ -112,6 +112,18 @@ const listProjectsOutputSchema = {
     )
     .default([])
     .describe('A list of workspaces for which the framework version could not be determined.'),
+  validationErrors: z
+    .array(
+      z.object({
+        filePath: z.string().describe('The path to the workspace `angular.json` file.'),
+        projectName: z.string().describe('The name of the project with invalid schema.'),
+        message: z.string().describe('The reason why validation failed or fell back.'),
+      }),
+    )
+    .default([])
+    .describe(
+      'A list of projects within workspaces that had invalid or malformed schema elements.',
+    ),
 };
 
 export const LIST_PROJECTS_TOOL = declareTool({
@@ -331,6 +343,7 @@ async function findAngularCoreVersion(
 type WorkspaceData = z.infer<typeof listProjectsOutputSchema.workspaces>[number];
 type ParsingError = z.infer<typeof listProjectsOutputSchema.parsingErrors>[number];
 type VersioningError = z.infer<typeof listProjectsOutputSchema.versioningErrors>[number];
+type ValidationError = z.infer<typeof listProjectsOutputSchema.validationErrors>[number];
 
 /**
  * Determines the unit test framework for a project based on its 'test' target configuration.
@@ -446,6 +459,41 @@ async function getProjectStyleLanguage(
 }
 
 /**
+ * Validates a property using a type guard and pushes a validation error if it fails.
+ * @param raw The raw value to validate.
+ * @param isValid A type guard function to validate the value.
+ * @param errorContext Context for the error message (filePath, projectName, propertyName, expectedDesc).
+ * @param validationErrors The array to push errors to.
+ * @returns The validated value or undefined if invalid.
+ */
+function validateProperty<T>(
+  raw: unknown,
+  isValid: (val: unknown) => val is T,
+  errorContext: {
+    configFile: string;
+    projectName: string;
+    propertyName: string;
+    expectedDesc: string;
+  },
+  validationErrors: ValidationError[],
+): T | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+  if (isValid(raw)) {
+    return raw;
+  }
+
+  validationErrors.push({
+    filePath: errorContext.configFile,
+    projectName: errorContext.projectName,
+    message: `Invalid \`${errorContext.propertyName}\` '${raw}'. Expected ${errorContext.expectedDesc}. Falling back to undefined.`,
+  });
+
+  return undefined;
+}
+
+/**
  * Loads, parses, and transforms a single angular.json file into the tool's output format.
  * It checks a set of seen paths to avoid processing the same workspace multiple times.
  * @param configFile The path to the angular.json file.
@@ -455,16 +503,21 @@ async function getProjectStyleLanguage(
 async function loadAndParseWorkspace(
   configFile: string,
   seenPaths: Set<string>,
-): Promise<{ workspace: WorkspaceData | null; error: ParsingError | null }> {
+): Promise<{
+  workspace: WorkspaceData | null;
+  error: ParsingError | null;
+  validationErrors: ValidationError[];
+}> {
   try {
     const resolvedPath = resolve(configFile);
     if (seenPaths.has(resolvedPath)) {
-      return { workspace: null, error: null }; // Already processed, skip.
+      return { workspace: null, error: null, validationErrors: [] }; // Already processed, skip.
     }
     seenPaths.add(resolvedPath);
 
     const ws = await AngularWorkspace.load(configFile);
-    const projects = [];
+    const projects: WorkspaceData['projects'] = [];
+    const validationErrors: ValidationError[] = [];
     const workspaceRoot = dirname(configFile);
     for (const [name, project] of ws.projects.entries()) {
       const sourceRoot = posix.join(project.root, project.sourceRoot ?? 'src');
@@ -472,19 +525,45 @@ async function loadAndParseWorkspace(
       const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
       const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
 
+      const type = validateProperty(
+        project.extensions['projectType'],
+        (val): val is 'application' | 'library' => val === 'application' || val === 'library',
+        {
+          configFile,
+          projectName: name,
+          propertyName: 'projectType',
+          expectedDesc: "'application' or 'library'",
+        },
+        validationErrors,
+      );
+
+      const selectorPrefix = validateProperty(
+        project.extensions['prefix'],
+        (val): val is string => typeof val === 'string',
+        { configFile, projectName: name, propertyName: 'prefix', expectedDesc: 'a string' },
+        validationErrors,
+      );
+
+      const builder = validateProperty(
+        project.targets.get('build')?.builder,
+        (val): val is string => typeof val === 'string',
+        { configFile, projectName: name, propertyName: 'builder', expectedDesc: 'a string' },
+        validationErrors,
+      );
+
       projects.push({
         name,
-        type: project.extensions['projectType'] as 'application' | 'library' | undefined,
-        builder: project.targets.get('build')?.builder,
+        type,
+        builder,
         root: project.root,
         sourceRoot,
-        selectorPrefix: project.extensions['prefix'] as string,
+        selectorPrefix,
         unitTestFramework,
         styleLanguage,
       });
     }
 
-    return { workspace: { path: configFile, projects }, error: null };
+    return { workspace: { path: configFile, projects }, error: null, validationErrors };
   } catch (error) {
     let message;
     if (error instanceof Error) {
@@ -493,7 +572,7 @@ async function loadAndParseWorkspace(
       message = 'An unknown error occurred while parsing the file.';
     }
 
-    return { workspace: null, error: { filePath: configFile, message } };
+    return { workspace: null, error: { filePath: configFile, message }, validationErrors: [] };
   }
 }
 
@@ -514,14 +593,15 @@ async function processConfigFile(
   workspace?: WorkspaceData;
   parsingError?: ParsingError;
   versioningError?: VersioningError;
+  validationErrors?: ValidationError[];
 }> {
-  const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
+  const { workspace, error, validationErrors } = await loadAndParseWorkspace(configFile, seenPaths);
   if (error) {
     return { parsingError: error };
   }
 
   if (!workspace) {
-    return {}; // Skipped as it was already seen.
+    return { validationErrors }; // If already seen, we still group validation errors if any (unlikely to be any if seen).
   }
 
   try {
@@ -532,10 +612,11 @@ async function processConfigFile(
       searchRoot,
     );
 
-    return { workspace };
+    return { workspace, validationErrors };
   } catch (e) {
     return {
       workspace,
+      validationErrors,
       versioningError: {
         filePath: workspace.path,
         message: e instanceof Error ? e.message : 'An unknown error occurred.',
@@ -544,11 +625,37 @@ async function processConfigFile(
   }
 }
 
+/**
+ * Deduplicates overlapping search roots (e.g., if one is a child of another).
+ * Sorting by length ensures parent directories are processed before children.
+ * @param roots A list of normalized absolute paths used as search roots.
+ * @returns A deduplicated list of search roots.
+ */
+function deduplicateSearchRoots(roots: string[]): string[] {
+  const sortedRoots = [...roots].sort((a, b) => a.length - b.length);
+  const deduplicated: string[] = [];
+
+  for (const root of sortedRoots) {
+    const isSubdirectory = deduplicated.some((existing) => {
+      const rel = relative(existing, root);
+
+      return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+    });
+
+    if (!isSubdirectory) {
+      deduplicated.push(root);
+    }
+  }
+
+  return deduplicated;
+}
+
 async function createListProjectsHandler({ server }: McpToolContext) {
   return async () => {
     const workspaces: WorkspaceData[] = [];
     const parsingErrors: ParsingError[] = [];
     const versioningErrors: z.infer<typeof listProjectsOutputSchema.versioningErrors> = [];
+    const validationErrors: ValidationError[] = [];
     const seenPaths = new Set<string>();
     const versionCache = new Map<string, string | undefined>();
 
@@ -561,6 +668,8 @@ async function createListProjectsHandler({ server }: McpToolContext) {
       // Fallback to the current working directory if client does not support roots
       searchRoots = [process.cwd()];
     }
+
+    searchRoots = deduplicateSearchRoots(searchRoots);
 
     // Pre-resolve allowed roots to handle their own symlinks or normalizations.
     // We ignore failures here; if a root is broken, we simply won't match against it.
@@ -576,12 +685,12 @@ async function createListProjectsHandler({ server }: McpToolContext) {
 
     for (const root of searchRoots) {
       for await (const configFile of findAngularJsonFiles(root, realAllowedRoots)) {
-        const { workspace, parsingError, versioningError } = await processConfigFile(
-          configFile,
-          root,
-          seenPaths,
-          versionCache,
-        );
+        const {
+          workspace,
+          parsingError,
+          versioningError,
+          validationErrors: currentValidationErrors,
+        } = await processConfigFile(configFile, root, seenPaths, versionCache);
 
         if (workspace) {
           workspaces.push(workspace);
@@ -591,6 +700,9 @@ async function createListProjectsHandler({ server }: McpToolContext) {
         }
         if (versioningError) {
           versioningErrors.push(versioningError);
+        }
+        if (currentValidationErrors) {
+          validationErrors.push(...currentValidationErrors);
         }
       }
     }
@@ -619,10 +731,16 @@ async function createListProjectsHandler({ server }: McpToolContext) {
       text += `\n\nWarning: The framework version for the following ${versioningErrors.length} workspace(s) could not be determined:\n`;
       text += versioningErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
     }
+    if (validationErrors.length > 0) {
+      text += `\n\nWarning: The following ${validationErrors.length} project validation issue(s) were found (defaults used):\n`;
+      text += validationErrors
+        .map((e) => `- ${e.filePath} [Project: ${e.projectName}]: ${e.message}`)
+        .join('\n');
+    }
 
     return {
       content: [{ type: 'text' as const, text }],
-      structuredContent: { workspaces, parsingErrors, versioningErrors },
+      structuredContent: { workspaces, parsingErrors, versioningErrors, validationErrors },
     };
   };
 }
