@@ -273,7 +273,7 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
       const buildAngularVersion =
         getDependency(tree, '@angular-devkit/build-angular')?.version ??
-        latestVersions.DevkitBuildAngular;
+        latestVersions.AngularBuild;
       rules.push(
         addDependency('@angular/build', buildAngularVersion, {
           type: DependencyType.Dev,

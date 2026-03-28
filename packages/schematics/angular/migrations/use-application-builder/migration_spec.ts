@@ -9,6 +9,7 @@
 import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { latestVersions } from '../../utility/latest-versions';
 import { Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
 
 function createWorkSpaceConfig(tree: UnitTestTree) {
@@ -464,6 +465,14 @@ describe(`Migration to use the application builder`, () => {
 
     const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
     expect(devDependencies['@angular/build']).toBe('~18.2.20');
+    expect(devDependencies['@angular-devkit/build-angular']).toBeUndefined();
+  });
+
+  it('should use the latest "@angular/build" version when no builder is installed', async () => {
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
+    expect(devDependencies['@angular/build']).toBe(latestVersions.AngularBuild);
     expect(devDependencies['@angular-devkit/build-angular']).toBeUndefined();
   });
 
