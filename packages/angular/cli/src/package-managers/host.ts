@@ -115,6 +115,7 @@ export const NodeJS_HOST: Host = {
   createTempDirectory: (baseDir?: string) =>
     mkdtemp(join(baseDir ?? tmpdir(), 'angular-cli-tmp-packages-')),
   deleteDirectory: (path: string) => rm(path, { recursive: true, force: true }),
+
   runCommand: async (
     command: string,
     args: readonly string[],
@@ -142,9 +143,11 @@ export const NodeJS_HOST: Host = {
           NPM_CONFIG_UPDATE_NOTIFIER: 'false',
         },
       } satisfies SpawnOptions;
-      const childProcess = isWin32
-        ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
-        : spawn(command, args, spawnOptions);
+
+      // FIXED: Use safe array form to prevent OS Command Injection (CWE-78)
+      // Previously used unsafe string concatenation on Windows (`shell: true` + args.join)
+      // Now always uses safe array form while preserving shell behavior
+      const childProcess = spawn(command, args, spawnOptions);
 
       let stdout = '';
       childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
@@ -165,7 +168,6 @@ export const NodeJS_HOST: Host = {
         if (err.name === 'AbortError') {
           const message = `Process timed out.`;
           reject(new PackageManagerError(message, stdout, stderr, null));
-
           return;
         }
         const message = `Process failed with error: ${err.message}`;

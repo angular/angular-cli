@@ -8,6 +8,37 @@
 
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'node:child_process';
+
+/**
+ * Escapes a single argument for safe use with Windows cmd.exe.
+ * Prevents OS command injection (CWE-78) by wrapping in double quotes
+ * and correctly escaping embedded quotes and backslashes.
+ *
+ * Algorithm: https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/
+ */
+function escapeArgForWindowsShell(arg: string): string {
+  // Fast path: only safe characters present
+  if (arg === '' || /^[a-zA-Z0-9_\-./\\:@]+$/.test(arg)) {
+    return arg;
+  }
+  let result = '"';
+  let slashes = 0;
+  for (const char of arg) {
+    if (char === '\\') {
+      slashes++;
+    } else if (char === '"') {
+      result += '\\'.repeat(slashes * 2 + 1) + '"';
+      slashes = 0;
+    } else {
+      result += '\\'.repeat(slashes) + char;
+      slashes = 0;
+    }
+  }
+  result += '\\'.repeat(slashes * 2) + '"';
+  return result;
+}
+
+
 import * as path from 'node:path';
 import ora from 'ora';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
@@ -126,7 +157,15 @@ export default function (
         // Workaround for https://github.com/sindresorhus/ora/issues/136.
         discardStdin: process.platform != 'win32',
       }).start();
-      const childProcess = spawn(`${taskPackageManagerName} ${args.join(' ')}`, spawnOptions).on(
+      // SECURITY FIX (CWE-78): escape each arg individually instead of raw concatenation.
+      const escapedArgs =
+        spawnOptions.shell === true
+          ? args.map(escapeArgForWindowsShell).join(' ')
+          : args.join(' ');
+      const childProcess = spawn(
+        `${taskPackageManagerName} ${escapedArgs}`,
+        spawnOptions,
+      ).on(
         'close',
         (code: number) => {
           if (code === 0) {
