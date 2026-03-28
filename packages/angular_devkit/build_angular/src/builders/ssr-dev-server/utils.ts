@@ -7,6 +7,7 @@
  */
 
 import { SpawnOptions, spawn } from 'node:child_process';
+import { platform } from 'node:os';
 import { AddressInfo, createConnection, createServer } from 'node:net';
 import { Observable, mergeMap, retryWhen, throwError, timer } from 'rxjs';
 
@@ -29,7 +30,13 @@ export function spawnAsObservable(
   options: SpawnOptions = {},
 ): Observable<{ stdout?: string; stderr?: string }> {
   return new Observable((obs) => {
-    const proc = spawn(`${command} ${args.join(' ')}`, options);
+    // FIXED (CWE-78): raw args.join + shell:true allows injection via
+    // a crafted outputPath/serverScript value in angular.json.
+    // Invoke cmd.exe directly on Windows (shell:false) — no escaping needed.
+    const isWin32 = platform() === 'win32';
+    const proc = isWin32
+      ? spawn('cmd.exe', ['/d', '/s', '/c', command, ...args], { ...options, shell: false })
+      : spawn(command, args, { ...options, shell: false });
     if (proc.stdout) {
       proc.stdout.on('data', (data) => obs.next({ stdout: data.toString() }));
     }

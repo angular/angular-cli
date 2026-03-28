@@ -238,7 +238,8 @@ function startNodeServer(
 
   return of(null).pipe(
     delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-    switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
+    // shell:true removed — spawnAsObservable handles Windows safely via cmd.exe
+    switchMap(() => spawnAsObservable('node', args, { env })),
     tap((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)),
     ignoreElements(),
     // Emit a signal after the process has been started

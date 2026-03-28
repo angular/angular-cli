@@ -17,10 +17,19 @@ import { SpawnOptions, spawn } from 'node:child_process';
  * Algorithm: https://blogs.msdn.microsoft.com/twistylittlepassagesallalike/2011/04/23/
  */
 function escapeArgForWindowsShell(arg: string): string {
-  // Fast path: only safe characters present
-  if (arg === '' || /^[a-zA-Z0-9_\-./\\:@]+$/.test(arg)) {
+  // FIX A: empty string must produce a quoted empty token.
+  // Returning bare '' causes cmd.exe to drop the arg silently,
+  // shifting all subsequent args by one (argument confusion).
+  if (!arg) return '""';
+  // Fast path: only shell-safe chars, no quoting needed
+  if (/^[a-zA-Z0-9_\-./\\:@]+$/.test(arg)) {
     return arg;
   }
+  // FIX B: escape % BEFORE wrapping in double-quotes.
+  // cmd.exe expands %VAR% before evaluating quote context, so
+  // %COMSPEC% inside "..." still expands (BatBadBut / CVE-2024-3566).
+  // %% disables expansion and becomes a literal percent sign.
+  arg = arg.replace(/%/g, '%%');
   let result = '"';
   let slashes = 0;
   for (const char of arg) {

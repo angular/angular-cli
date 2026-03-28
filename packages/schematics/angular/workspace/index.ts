@@ -25,7 +25,15 @@ export default function (options: WorkspaceOptions): Rule {
     const packageManager = options.packageManager;
     let packageManagerWithVersion: string | undefined;
 
+    const ALLOWED_PKG_MANAGERS = new Set(['npm', 'yarn', 'pnpm', 'bun', 'cnpm']);
     if (packageManager) {
+      // FIXED (CWE-78): packageManager is user-supplied with no runtime enum
+      // validation (SCAN C = zero hits). Enforce an allowlist before execSync.
+      if (!ALLOWED_PKG_MANAGERS.has(packageManager)) {
+        throw new Error(
+          `Invalid packageManager: "${packageManager}". Allowed: npm, yarn, pnpm, bun, cnpm`,
+        );
+      }
       let packageManagerVersion: string | undefined;
       try {
         packageManagerVersion = execSync(`${packageManager} --version`, {

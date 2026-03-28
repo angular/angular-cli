@@ -131,7 +131,7 @@ export const NodeJS_HOST: Host = {
 
     return new Promise((resolve, reject) => {
       const spawnOptions = {
-        shell: isWin32,
+        shell: false,
         stdio: options.stdio ?? 'pipe',
         signal,
         cwd: options.cwd,
@@ -144,10 +144,14 @@ export const NodeJS_HOST: Host = {
         },
       } satisfies SpawnOptions;
 
-      // FIXED: Use safe array form to prevent OS Command Injection (CWE-78)
-      // Previously used unsafe string concatenation on Windows (`shell: true` + args.join)
-      // Now always uses safe array form while preserving shell behavior
-      const childProcess = spawn(command, args, spawnOptions);
+      // FIXED (CWE-78): On Windows npm/yarn/pnpm are .cmd scripts that need a shell.
+      // spawn(cmd, args, {shell:true}) has Node.js join the args internally — the
+      // previous PR only removed the explicit join; injection still existed.
+      // Correct fix: invoke cmd.exe directly with shell:false. cmd.exe is a real
+      // .exe so no shell wrapper is needed. Args as array = no metachar injection.
+      const childProcess = isWin32
+        ? spawn('cmd.exe', ['/d', '/s', '/c', command, ...args], spawnOptions)
+        : spawn(command, args, spawnOptions);
 
       let stdout = '';
       childProcess.stdout?.on('data', (data) => (stdout += data.toString()));
