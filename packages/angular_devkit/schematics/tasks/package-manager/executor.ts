@@ -117,7 +117,7 @@ export default function (
 
     const bufferedOutput: { stream: NodeJS.WriteStream; data: Buffer }[] = [];
     const spawnOptions: SpawnOptions = {
-      shell: true,
+      shell: false,
       cwd: path.join(rootDirectory, options.workingDirectory || ''),
     };
     if (options.hideOutput) {
@@ -166,15 +166,20 @@ export default function (
         // Workaround for https://github.com/sindresorhus/ora/issues/136.
         discardStdin: process.platform != 'win32',
       }).start();
-      // SECURITY FIX (CWE-78): escape each arg individually instead of raw concatenation.
-      const escapedArgs =
-        spawnOptions.shell === true
-          ? args.map(escapeArgForWindowsShell).join(' ')
-          : args.join(' ');
-      const childProcess = spawn(
-        `${taskPackageManagerName} ${escapedArgs}`,
-        spawnOptions,
-      ).on(
+      // SECURITY FIX (CWE-78): never concatenate args as a raw shell string.
+      // On Windows, package managers are .cmd scripts requiring a shell, but
+      // instead of shell:true + string concat (injection vector), we invoke
+      // cmd.exe directly with shell:false and pass each arg as an array element.
+      // Node.js then controls quoting — metacharacters in args are never
+      // interpreted by cmd.exe as shell operators.
+      const isWin32 = process.platform === 'win32';
+      const childProcess = isWin32
+        ? spawn(
+            'cmd.exe',
+            ['/d', '/s', '/c', taskPackageManagerName, ...args],
+            { ...spawnOptions, shell: false },
+          ).on(
+        : spawn(taskPackageManagerName, args, { ...spawnOptions, shell: false }).on(
         'close',
         (code: number) => {
           if (code === 0) {
