@@ -136,13 +136,15 @@ export default function (
       // Node.js then controls quoting — metacharacters in args are never
       // interpreted by cmd.exe as shell operators.
       const isWin32 = process.platform === 'win32';
-      const childProcess = isWin32
-        ? spawn(
-            'cmd.exe',
-            ['/d', '/s', '/c', taskPackageManagerName, ...args],
-            { ...spawnOptions, shell: false },
-          ).on(
-        : spawn(taskPackageManagerName, args, { ...spawnOptions, shell: false }).on(
+      const childProcess = (
+        isWin32
+          ? spawn(
+              'cmd.exe',
+              ['/d', '/s', '/c', taskPackageManagerName, ...args],
+              { ...spawnOptions, shell: false },
+            )
+          : spawn(taskPackageManagerName, args, { ...spawnOptions, shell: false })
+      ).on(
         'close',
         (code: number) => {
           if (code === 0) {
