@@ -231,7 +231,7 @@ function startNodeServer(
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port, NG_ALLOWED_HOSTS: host ?? 'localhost' };
 
-  const args = ['--enable-source-maps', `"${path}"`];
+  const args = ['--enable-source-maps', path];
   if (inspectMode) {
     args.unshift('--inspect-brk');
   }

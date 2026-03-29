@@ -116,7 +116,7 @@ export default function (
     }
 
     if (factoryOptions.registry) {
-      args.push(`--registry="${factoryOptions.registry}"`);
+      args.push('--registry', factoryOptions.registry);
     }
 
     if (factoryOptions.force) {
