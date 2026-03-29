@@ -7,8 +7,8 @@
  */
 
 import { SpawnOptions, spawn } from 'node:child_process';
-import { platform } from 'node:os';
 import { AddressInfo, createConnection, createServer } from 'node:net';
+import { platform } from 'node:os';
 import { Observable, mergeMap, retryWhen, throwError, timer } from 'rxjs';
 
 export function getAvailablePort(): Promise<number> {

@@ -172,6 +172,7 @@ export const NodeJS_HOST: Host = {
         if (err.name === 'AbortError') {
           const message = `Process timed out.`;
           reject(new PackageManagerError(message, stdout, stderr, null));
+
           return;
         }
         const message = `Process failed with error: ${err.message}`;

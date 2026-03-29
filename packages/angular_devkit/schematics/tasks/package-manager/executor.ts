@@ -9,8 +9,6 @@
 import { BaseException } from '@angular-devkit/core';
 import { SpawnOptions, spawn } from 'node:child_process';
 
-
-
 import * as path from 'node:path';
 import ora from 'ora';
 import { TaskExecutor, UnsuccessfulWorkflowExecution } from '../../src';
