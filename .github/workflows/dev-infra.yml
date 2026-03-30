@@ -15,21 +15,21 @@ jobs:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/labeling/pull-request@2f6d3ae5b1db37b5165f200fb53f30b9330983e4
+      - uses: angular/dev-infra/github-actions/labeling/pull-request@55af1f65dbeb0fe6a3de1d1134bd0dd8bc5e60cc
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
   post_approval_changes:
     if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/post-approval-changes@2f6d3ae5b1db37b5165f200fb53f30b9330983e4
+      - uses: angular/dev-infra/github-actions/post-approval-changes@55af1f65dbeb0fe6a3de1d1134bd0dd8bc5e60cc
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
   issue_labels:
     if: github.event_name == 'issues'
     runs-on: ubuntu-latest
     steps:
-      - uses: angular/dev-infra/github-actions/labeling/issue@2f6d3ae5b1db37b5165f200fb53f30b9330983e4
+      - uses: angular/dev-infra/github-actions/labeling/issue@55af1f65dbeb0fe6a3de1d1134bd0dd8bc5e60cc
         with:
           angular-robot-key: ${{ secrets.ANGULAR_ROBOT_PRIVATE_KEY }}
           google-generative-ai-key: ${{ secrets.GOOGLE_GENERATIVE_AI_KEY }}
