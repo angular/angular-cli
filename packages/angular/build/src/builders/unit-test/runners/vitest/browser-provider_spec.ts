@@ -47,8 +47,8 @@ describe('setupBrowserConfiguration', () => {
 
     expect(browser?.enabled).toBeTrue();
     expect(browser?.instances).toEqual([
-      { browser: 'chrome', headless: true },
-      { browser: 'firefox', headless: false },
+      jasmine.objectContaining({ browser: 'chrome', headless: true }),
+      jasmine.objectContaining({ browser: 'firefox', headless: false }),
     ]);
   });
 
@@ -66,8 +66,8 @@ describe('setupBrowserConfiguration', () => {
       );
 
       expect(browser?.instances).toEqual([
-        { browser: 'chrome', headless: true },
-        { browser: 'firefox', headless: true },
+        jasmine.objectContaining({ browser: 'chrome', headless: true }),
+        jasmine.objectContaining({ browser: 'firefox', headless: true }),
       ]);
     } finally {
       if (originalCI === undefined) {
@@ -196,8 +196,8 @@ describe('setupBrowserConfiguration', () => {
     );
 
     expect(browser?.instances).toEqual([
-      { browser: 'chrome', headless: true },
-      { browser: 'firefox', headless: true },
+      jasmine.objectContaining({ browser: 'chrome', headless: true }),
+      jasmine.objectContaining({ browser: 'firefox', headless: true }),
     ]);
     expect(messages).toEqual([]);
   });
@@ -214,5 +214,69 @@ describe('setupBrowserConfiguration', () => {
     expect(messages).toEqual([
       'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
     ]);
+  });
+
+  describe('CHROME_BIN usage', () => {
+    let originalChromeBin: string | undefined;
+
+    beforeEach(() => {
+      originalChromeBin = process.env['CHROME_BIN'];
+      process.env['CHROME_BIN'] = '/custom/path/to/chrome';
+    });
+
+    afterEach(() => {
+      if (originalChromeBin === undefined) {
+        delete process.env['CHROME_BIN'];
+      } else {
+        process.env['CHROME_BIN'] = originalChromeBin;
+      }
+    });
+
+    it('should set executablePath on the individual chrome instance', async () => {
+      const { browser } = await setupBrowserConfiguration(
+        ['ChromeHeadless', 'Chromium'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+      );
+
+      // Verify the global provider does NOT have executablePath
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((browser?.provider as any)?.options?.launchOptions?.executablePath).toBeUndefined();
+
+      // Verify the individual instances have executablePath
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (browser?.instances?.[0]?.provider as any)?.options?.launchOptions?.executablePath,
+      ).toBe('/custom/path/to/chrome');
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (browser?.instances?.[1]?.provider as any)?.options?.launchOptions?.executablePath,
+      ).toBe('/custom/path/to/chrome');
+    });
+
+    it('should set executablePath for chrome instances but not for others when mixed browsers are requested', async () => {
+      const { browser } = await setupBrowserConfiguration(
+        ['ChromeHeadless', 'Firefox'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+      );
+
+      // Verify the global provider does NOT have executablePath
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      expect((browser?.provider as any)?.options?.launchOptions?.executablePath).toBeUndefined();
+
+      // Verify chrome gets it
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (browser?.instances?.[0]?.provider as any)?.options?.launchOptions?.executablePath,
+      ).toBe('/custom/path/to/chrome');
+
+      // Verify firefox does not
+      expect(browser?.instances?.[1]?.provider).toBeUndefined();
+    });
   });
 });
