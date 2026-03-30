@@ -9,7 +9,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { setupBrowserConfiguration } from './browser-provider';
+import { applyHeadlessConfiguration, setupBrowserConfiguration } from './browser-provider';
 
 describe('setupBrowserConfiguration', () => {
   let workspaceRoot: string;
@@ -277,6 +277,44 @@ describe('setupBrowserConfiguration', () => {
 
       // Verify firefox does not
       expect(browser?.instances?.[1]?.provider).toBeUndefined();
+    });
+  });
+
+  describe('applyHeadlessConfiguration', () => {
+    it('should set headless false and issue warning when using preview provider with headless true', () => {
+      const instances = [{ browser: 'chrome', headless: true }];
+      const messages = applyHeadlessConfiguration(instances, 'preview', true, false);
+
+      expect(instances[0].headless).toBeFalse();
+      expect(messages).toEqual([
+        'The "headless" option is ignored when using the "preview" provider.',
+      ]);
+    });
+
+    it('should force headless mode when headless option is true', () => {
+      const instances = [{ browser: 'chrome', headless: false }];
+      const messages = applyHeadlessConfiguration(instances, 'playwright', true, false);
+
+      expect(instances[0].headless).toBeTrue();
+      expect(messages).toEqual([]);
+    });
+
+    it('should return information message when headless option is redundant', () => {
+      const instances = [{ browser: 'chrome', headless: true }];
+      const messages = applyHeadlessConfiguration(instances, 'playwright', true, false);
+
+      expect(instances[0].headless).toBeTrue();
+      expect(messages).toEqual([
+        'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
+      ]);
+    });
+
+    it('should force headless mode in CI environment when headless is undefined', () => {
+      const instances = [{ browser: 'chrome', headless: false }];
+      const messages = applyHeadlessConfiguration(instances, 'playwright', undefined, true);
+
+      expect(instances[0].headless).toBeTrue();
+      expect(messages).toEqual([]);
     });
   });
 });

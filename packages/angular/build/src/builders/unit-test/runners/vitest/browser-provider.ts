@@ -7,7 +7,11 @@
  */
 
 import { createRequire } from 'node:module';
-import type { BrowserBuiltinProvider, BrowserConfigOptions } from 'vitest/node';
+import type {
+  BrowserBuiltinProvider,
+  BrowserConfigOptions,
+  BrowserProviderOption,
+} from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 
 export interface BrowserConfiguration {
@@ -40,7 +44,7 @@ function findBrowserProvider(
 export interface BrowserInstanceConfiguration {
   browser: string;
   headless: boolean;
-  provider?: import('vitest/node').BrowserProviderOption;
+  provider?: BrowserProviderOption;
 }
 
 function normalizeBrowserName(browserName: string): BrowserInstanceConfiguration {
@@ -56,6 +60,67 @@ function normalizeBrowserName(browserName: string): BrowserInstanceConfiguration
   };
 }
 
+/**
+ * Mutates the provided browser instances to apply standard headless execution
+ * constraints based on the chosen provider, user options, and CI environment presence.
+ *
+ * @param instances The normalized browser instances to mutate.
+ * @param providerName The identifier for the chosen Vitest browser provider.
+ * @param headless The user-provided headless configuration option.
+ * @param isCI Whether the current environment is running in CI.
+ * @returns An array of informational messages generated during evaluation.
+ */
+export function applyHeadlessConfiguration(
+  instances: BrowserInstanceConfiguration[],
+  providerName: BrowserBuiltinProvider | undefined,
+  headless: boolean | undefined,
+  isCI: boolean,
+): string[] {
+  const messages: string[] = [];
+
+  if (providerName === 'preview') {
+    instances.forEach((instance) => {
+      // Preview mode only supports headed execution
+      instance.headless = false;
+    });
+
+    if (headless) {
+      messages.push('The "headless" option is ignored when using the "preview" provider.');
+    }
+  } else if (headless !== undefined) {
+    if (headless) {
+      const allHeadlessByDefault = isCI || instances.every((i) => i.headless);
+      if (allHeadlessByDefault) {
+        messages.push(
+          'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
+        );
+      }
+    }
+
+    instances.forEach((instance) => {
+      instance.headless = headless;
+    });
+  } else if (isCI) {
+    instances.forEach((instance) => {
+      instance.headless = true;
+    });
+  }
+
+  return messages;
+}
+
+/**
+ * Resolves and configures the Vitest browser provider for the unit test builder.
+ * Dynamically discovers and imports the necessary provider (Playwright, WebdriverIO, or Preview),
+ * maps the requested browser instances, and applies environment-specific execution logic.
+ *
+ * @param browsers An array of requested browser names (e.g., 'chrome', 'firefox').
+ * @param headless User-provided configuration for headless execution.
+ * @param debug Whether the builder is running in watch or debug mode.
+ * @param projectSourceRoot The root directory of the project being tested for resolving installed packages.
+ * @param viewport Optional viewport dimensions to apply to the launched browser instances.
+ * @returns A fully resolved Vitest browser configuration object alongside any generated warning or error messages.
+ */
 export async function setupBrowserConfiguration(
   browsers: string[] | undefined,
   headless: boolean | undefined,
@@ -149,35 +214,7 @@ export async function setupBrowserConfiguration(
   }
 
   const isCI = !!process.env['CI'];
-  const messages: string[] = [];
-
-  if (providerName === 'preview') {
-    instances.forEach((instance) => {
-      // Preview mode only supports headed execution
-      instance.headless = false;
-    });
-
-    if (headless) {
-      messages.push('The "headless" option is ignored when using the "preview" provider.');
-    }
-  } else if (headless !== undefined) {
-    if (headless) {
-      const allHeadlessByDefault = isCI || instances.every((i) => i.headless);
-      if (allHeadlessByDefault) {
-        messages.push(
-          'The "headless" option is unnecessary as all browsers are already configured to run in headless mode.',
-        );
-      }
-    }
-
-    instances.forEach((instance) => {
-      instance.headless = headless;
-    });
-  } else if (isCI) {
-    instances.forEach((instance) => {
-      instance.headless = true;
-    });
-  }
+  const messages = applyHeadlessConfiguration(instances, providerName, headless, isCI);
 
   const browser = {
     enabled: true,
