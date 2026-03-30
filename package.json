@@ -156,6 +156,11 @@
         "peerDependencies": {
           "protobufjs": "*"
         }
+      },
+      "vitest": {
+        "peerDependencies": {
+          "@vitest/coverage-v8": "*"
+        }
       }
     }
   },

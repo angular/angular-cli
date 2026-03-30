@@ -8,7 +8,7 @@ overrides:
   undici-types: ^7.16.0
   '@angular/build': workspace:*
 
-packageExtensionsChecksum: sha256-3L73Fw32UVtE6x5BJxJPBtQtH/mgsr31grNpdhHP1IY=
+packageExtensionsChecksum: sha256-V29Z7ZDJEQFju55ZS5zQ23Kb0736+P+eGNolWn/T274=
 
 importers:
 
@@ -315,7 +315,7 @@ importers:
         version: link:../../../packages/angular/ssr
       '@vitest/coverage-v8':
         specifier: 4.1.2
-        version: 4.1.2(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+        version: 4.1.2(vitest@4.1.2)
       browser-sync:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
@@ -330,7 +330,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.1.2
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(@vitest/coverage-v8@4.1.2)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
 
   packages/angular/build:
     dependencies:
@@ -436,7 +436,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.1.2
-        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+        version: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(@vitest/coverage-v8@4.1.2)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
     optionalDependencies:
       lmdb:
         specifier: 3.5.2
@@ -8044,6 +8044,7 @@ packages:
       '@vitest/browser-playwright': 4.1.2
       '@vitest/browser-preview': 4.1.2
       '@vitest/browser-webdriverio': 4.1.2
+      '@vitest/coverage-v8': '*'
       '@vitest/ui': 4.1.2
       happy-dom: '*'
       jsdom: '*'
@@ -11639,7 +11640,7 @@ snapshots:
     dependencies:
       vite: 7.3.1(@types/node@24.12.0)(jiti@2.6.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
 
-  '@vitest/coverage-v8@4.1.2(vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
+  '@vitest/coverage-v8@4.1.2(vitest@4.1.2)':
     dependencies:
       '@bcoe/v8-coverage': 1.0.2
       '@vitest/utils': 4.1.2
@@ -11651,7 +11652,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.0.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
+      vitest: 4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(@vitest/coverage-v8@4.1.2)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3)
 
   '@vitest/expect@4.1.2':
     dependencies:
@@ -16685,8 +16686,9 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.8.3
 
-  vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3):
+  vitest@4.1.2(@opentelemetry/api@1.9.0)(@types/node@24.12.0)(@vitest/coverage-v8@4.1.2)(jiti@2.6.1)(jsdom@29.0.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3):
     dependencies:
+      '@vitest/coverage-v8': 4.1.2(vitest@4.1.2)
       '@vitest/expect': 4.1.2
       '@vitest/mocker': 4.1.2(vite@7.3.1(@types/node@24.12.0)(jiti@2.6.1)(less@4.6.4)(sass@1.98.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
       '@vitest/pretty-format': 4.1.2
