@@ -33,12 +33,16 @@ process.chdir(path.join(scriptDir, '..'));
 
 const originalConsole = { ...console };
 console.warn = function (...args) {
-  const [m, ...rest] = args;
-  originalConsole.warn(styleText(['yellow'], m), ...rest);
+  if (typeof args[0] === 'string') {
+    args[0] = styleText(['yellow'], args[0]);
+  }
+  originalConsole.warn(...args);
 };
 console.error = function (...args) {
-  const [m, ...rest] = args;
-  originalConsole.error(styleText(['red'], m), ...rest);
+  if (typeof args[0] === 'string') {
+    args[0] = styleText(['red'], args[0]);
+  }
+  originalConsole.error(...args);
 };
 
 try {
@@ -47,6 +51,6 @@ try {
   process.exitCode = typeof exitCode === 'number' ? exitCode : 0;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 } catch (err: any) {
-  console.error(err.stack);
+  console.error(err.stack ?? err);
   process.exitCode = 99;
 }
