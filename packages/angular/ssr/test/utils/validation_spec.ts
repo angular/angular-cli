@@ -197,6 +197,8 @@ describe('Validation Utils', () => {
         '/foo/..\\bar',
         '.',
         '..',
+        '%2e',
+        '%2e%2e/foo',
       ];
 
       for (const prefix of inputs) {

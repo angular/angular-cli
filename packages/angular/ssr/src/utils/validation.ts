@@ -284,7 +284,7 @@ function validateHeaders(request: Request): void {
   if (xForwardedPrefix) {
     let xForwardedPrefixDecoded: string;
     try {
-      xForwardedPrefixDecoded = decodeURIComponent(xForwardedPrefix);
+      xForwardedPrefixDecoded = decodeURIComponent(xForwardedPrefix).trim();
     } catch (e) {
       throw new Error(
         'Header "x-forwarded-prefix" contains an invalid value and cannot be decoded.',
