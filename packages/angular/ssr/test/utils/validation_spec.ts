@@ -154,8 +154,17 @@ describe('Validation Utils', () => {
       );
     });
 
-    it('should throw error if x-forwarded-prefix starts with a backslash or multiple slashes', () => {
-      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil', '\\evil'];
+    it('should throw error if x-forwarded-prefix starts with a backslash or multiple slashes including encoded', () => {
+      const inputs = [
+        '//evil',
+        '\\\\evil',
+        '/\\evil',
+        '\\/evil',
+        '\\evil',
+        '%5Cevil',
+        '%2F%2Fevil',
+        '%2F..%2Fevil',
+      ];
 
       for (const prefix of inputs) {
         const request = new Request('https://example.com', {
@@ -219,6 +228,18 @@ describe('Validation Utils', () => {
           .withContext(`Prefix: "${prefix}"`)
           .not.toThrow();
       }
+    });
+
+    it('should throw error if x-forwarded-prefix contains malformed encoding', () => {
+      const request = new Request('https://example.com', {
+        headers: {
+          'x-forwarded-prefix': '/%invalid',
+        },
+      });
+
+      expect(() => validateRequest(request, allowedHosts, false)).toThrowError(
+        'Header "x-forwarded-prefix" contains an invalid value and cannot be decoded.',
+      );
     });
   });
 
