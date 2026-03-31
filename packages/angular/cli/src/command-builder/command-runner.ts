@@ -18,7 +18,7 @@ import {
   RootCommands,
   RootCommandsAliases,
 } from '../commands/command-config';
-import { createPackageManager } from '../package-managers';
+import { PackageManager, createPackageManager } from '../package-managers';
 import { ConfiguredPackageManagerInfo } from '../package-managers/factory';
 import { colors } from '../utilities/color';
 import { AngularWorkspace, getProjectByCwd, getWorkspace } from '../utilities/config';
@@ -65,20 +65,8 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
   }
 
   const root = workspace?.basePath ?? process.cwd();
-  const cacheConfig = workspace && getCacheConfig(workspace);
-  const packageManager = await createPackageManager({
-    cwd: root,
-    logger,
-    dryRun: dryRun || help || jsonHelp || getYargsCompletions,
-    tempDirectory: cacheConfig?.enabled ? cacheConfig.path : undefined,
-    configuredPackageManager: await getConfiguredPackageManager(
-      root,
-      workspace,
-      globalConfiguration,
-    ),
-  });
-
   const localYargs = yargs(args);
+  let packageManager: Promise<PackageManager> | undefined;
   const context: CommandContext = {
     globalConfiguration,
     workspace,
@@ -86,7 +74,23 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     currentDirectory: process.cwd(),
     yargsInstance: localYargs,
     root,
-    packageManager,
+    get packageManager() {
+      return (packageManager ??= (async () => {
+        const cacheConfig = workspace && getCacheConfig(workspace);
+
+        return createPackageManager({
+          cwd: root,
+          logger,
+          dryRun: dryRun || help || jsonHelp || getYargsCompletions,
+          tempDirectory: cacheConfig?.enabled ? cacheConfig.path : undefined,
+          configuredPackageManager: await getConfiguredPackageManager(
+            root,
+            workspace,
+            globalConfiguration,
+          ),
+        });
+      })());
+    },
     args: {
       positional: positional.map((v) => v.toString()),
       options: {

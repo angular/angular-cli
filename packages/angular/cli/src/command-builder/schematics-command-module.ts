@@ -108,9 +108,9 @@ export abstract class SchematicsCommandModule
     collectionName: string,
     options: SchematicsExecutionOptions,
   ): Promise<NodeWorkflow> {
-    const { logger, root, packageManager } = this.context;
+    const { logger, root } = this.context;
+    const packageManager = await this.context.packageManager;
     const { force, dryRun, packageRegistry } = options;
-
     const workflow = new NodeWorkflow(root, {
       force,
       dryRun,

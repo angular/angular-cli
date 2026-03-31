@@ -28,7 +28,7 @@ export interface CommandContext {
   workspace?: AngularWorkspace;
   globalConfiguration: AngularWorkspace;
   logger: logging.Logger;
-  packageManager: PackageManager;
+  readonly packageManager: Promise<PackageManager>;
   yargsInstance: Argv<{}>;
 
   /** Arguments parsed in free-from without parser configuration. */

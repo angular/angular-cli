@@ -153,12 +153,23 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       ['version', 'update', 'analytics'].includes(this.commandName),
     );
 
-    return userId
-      ? new AnalyticsCollector(this.context.logger, userId, {
-          name: this.context.packageManager.name,
-          version: await this.context.packageManager.getVersion(),
-        })
-      : undefined;
+    if (!userId) {
+      return undefined;
+    }
+
+    try {
+      const packageManager = await this.context.packageManager;
+
+      return new AnalyticsCollector(this.context.logger, userId, {
+        name: packageManager.name,
+        version: await packageManager.getVersion(),
+      });
+    } catch (e) {
+      // If this fails it shouldn't be a fatal error.
+      this.context.logger.error(`Failed to get package manager info for analytics: ${e}`);
+
+      return undefined;
+    }
   }
 
   /**

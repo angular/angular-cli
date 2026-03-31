@@ -99,7 +99,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
   private _smartDefaultKeyword = false;
   private _promptProvider?: PromptProvider;
-  private _sourceMap = new Map<string, SmartDefaultProvider<{}>>();
+  private _sourceProvider = new Map<string, SmartDefaultProvider<{}>>();
 
   constructor(formats: SchemaFormat[] = []) {
     this._ajv = new Ajv({
@@ -387,11 +387,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   }
 
   addSmartDefaultProvider<T>(source: string, provider: SmartDefaultProvider<T>): void {
-    if (this._sourceMap.has(source)) {
+    if (this._sourceProvider.has(source)) {
       throw new Error(source);
     }
 
-    this._sourceMap.set(source, provider as unknown as SmartDefaultProvider<{}>);
+    this._sourceProvider.set(source, provider as unknown as SmartDefaultProvider<{}>);
 
     if (!this._smartDefaultKeyword) {
       this._smartDefaultKeyword = true;
@@ -632,17 +632,17 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   ): Promise<void> {
     for (const [pointer, schema] of smartDefaults.entries()) {
       const fragments = JSON.parse(pointer) as string[];
-      const source = this._sourceMap.get(schema.$source as string);
+      const source = this._sourceProvider.get(schema.$source as string);
       if (!source) {
         continue;
       }
 
       let value = source(schema);
       if (isObservable(value)) {
-        value = (await lastValueFrom(value)) as {};
+        value = lastValueFrom(value) as {};
       }
 
-      CoreSchemaRegistry._set(data, fragments, value);
+      CoreSchemaRegistry._set(data, fragments, await value);
     }
   }
 

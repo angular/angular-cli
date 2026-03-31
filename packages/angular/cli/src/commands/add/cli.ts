@@ -199,8 +199,8 @@ export default class AddCommandModule
       [
         {
           title: 'Determining Package Manager',
-          task: (_context, task) =>
-            (task.output = `Using package manager: ${color.dim(this.context.packageManager.name)}`),
+          task: async (_context, task) =>
+            (task.output = `Using package manager: ${color.dim((await this.context.packageManager).name)}`),
           rendererOptions: { persistentOutput: true },
         },
         {
@@ -318,7 +318,7 @@ export default class AddCommandModule
   ): Promise<void> {
     const { registry, verbose } = options;
     const { packageIdentifier } = context;
-    const { packageManager } = this.context;
+    const packageManager = await this.context.packageManager;
     const packageName = packageIdentifier.name;
 
     assert(packageName, 'Registry package identifiers should always have a name.');
@@ -416,7 +416,7 @@ export default class AddCommandModule
     },
   ): Promise<PackageManifest | null> {
     const { packageIdentifier } = context;
-    const { packageManager } = this.context;
+    const packageManager = await this.context.packageManager;
     const { registry, verbose, rejectionReasons } = options;
     const packageName = packageIdentifier.name;
     assert(packageName, 'Package name must be defined.');
@@ -491,10 +491,11 @@ export default class AddCommandModule
     options: Options<AddCommandArgs>,
   ): Promise<void> {
     const { registry } = options;
-
+    const packageManager = await this.context.packageManager;
     let manifest;
+
     try {
-      manifest = await this.context.packageManager.getManifest(context.packageIdentifier, {
+      manifest = await packageManager.getManifest(context.packageIdentifier, {
         registry,
       });
     } catch (e) {
@@ -567,7 +568,7 @@ export default class AddCommandModule
   ): Promise<void> {
     const { registry } = options;
     const { packageIdentifier, savePackage } = context;
-    const { packageManager } = this.context;
+    const packageManager = await this.context.packageManager;
 
     // Only show if installation will actually occur
     task.title = 'Installing package';

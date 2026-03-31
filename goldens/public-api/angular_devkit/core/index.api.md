@@ -982,7 +982,7 @@ interface SimpleMemoryHostStats {
 // @public (undocumented)
 interface SmartDefaultProvider<T> {
     // (undocumented)
-    (schema: JsonObject): T | Observable<T>;
+    (schema: JsonObject): T | Observable<T> | Promise<T>;
 }
 
 // @public

@@ -189,7 +189,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     } catch (e) {
       assertIsError(e);
       if (e.code === 'MODULE_NOT_FOUND') {
-        this.warnOnMissingNodeModules();
+        await this.warnOnMissingNodeModules();
         throw new CommandModuleError(`Could not find the '${builderConf}' builder's node package.`);
       }
 
@@ -203,7 +203,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     );
   }
 
-  private warnOnMissingNodeModules(): void {
+  private async warnOnMissingNodeModules(): Promise<void> {
     const basePath = this.context.workspace?.basePath;
     if (!basePath) {
       return;
@@ -218,7 +218,9 @@ export abstract class ArchitectBaseCommandModule<T extends object>
     } catch {}
 
     this.context.logger.warn(
-      `Node packages may not be installed. Try installing with '${this.context.packageManager.name} install'.`,
+      `Node packages may not be installed. Try installing with '${
+        (await this.context.packageManager).name
+      } install'.`,
     );
   }
 

@@ -39,7 +39,7 @@ export interface SchemaFormat {
 }
 
 export interface SmartDefaultProvider<T> {
-  (schema: JsonObject): T | Observable<T>;
+  (schema: JsonObject): T | Observable<T> | Promise<T>;
 }
 
 export interface SchemaKeywordValidator {
