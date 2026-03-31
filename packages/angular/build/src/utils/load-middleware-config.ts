@@ -29,7 +29,7 @@ export async function loadMiddlewareConfiguration(
   let middlewareConfiguration;
 
   try {
-    middlewareConfiguration = await import(middlewarePath);
+    middlewareConfiguration = await import(pathToFileURL(middlewarePath).href);
   } catch (e) {
     assertIsError(e);
     if (e.code !== 'ERR_REQUIRE_ASYNC_MODULE') {
