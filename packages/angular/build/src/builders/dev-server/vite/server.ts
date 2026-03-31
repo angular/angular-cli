@@ -160,7 +160,7 @@ export async function setupServer(
     );
 
     if (extensionMiddleware) {
-      extensionMiddleware.push(...middleware);
+      extensionMiddleware = [...extensionMiddleware, ...middleware];
     } else {
       extensionMiddleware = middleware;
     }
