@@ -1,3 +1,24 @@
+<a name="21.2.6"></a>
+
+# 21.2.6 (2026-04-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [ea14f28cc](https://github.com/angular/angular-cli/commit/ea14f28ccfc6e5534eaef516bf1bfbe21582da04) | fix  | fix sourceRoot resolution for MCP projects tool |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [9136eb376](https://github.com/angular/angular-cli/commit/9136eb37630d6315891b3c881cd0ba4037c3254c) | fix  | ensure transitive SCSS partial errors are tracked in watch mode     |
+| [8186faa11](https://github.com/angular/angular-cli/commit/8186faa117803ffb6ac8e2c4cd6ab7873502308d) | fix  | ensure Vitest mock patching is executed only once                   |
+| [107d1a9e2](https://github.com/angular/angular-cli/commit/107d1a9e26fc59c7878254e563758818866f0f6e) | fix  | preserve error stack traces during prerendering                     |
+| [b7f457253](https://github.com/angular/angular-cli/commit/b7f4572533675729e87532bdc23509feb2f3a28d) | fix  | scope CHROME_BIN executable path to individual playwright instances |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.5"></a>
 
 # 21.2.5 (2026-03-27)
