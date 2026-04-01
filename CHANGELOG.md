@@ -1,3 +1,32 @@
+<a name="22.0.0-next.4"></a>
+
+# 22.0.0-next.4 (2026-04-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [87d99e98b](https://github.com/angular/angular-cli/commit/87d99e98b178c8f7d5e944a346faf70c51bdfcef) | feat | support custom port in MCP devserver start tool |
+| [4815a5417](https://github.com/angular/angular-cli/commit/4815a5417c7a0135fb66149c2e4c1008e21e3a26) | fix  | fix sourceRoot resolution for MCP projects tool |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [21d8aa474](https://github.com/angular/angular-cli/commit/21d8aa4747573132476c3a0a4b7ea1f6405a71ef) | fix  | ensure transitive SCSS partial errors are tracked in watch mode     |
+| [e558117b7](https://github.com/angular/angular-cli/commit/e558117b748ee5837324d49466108d21db596b2e) | fix  | ensure Vitest mock patching is executed only once                   |
+| [81e4faae7](https://github.com/angular/angular-cli/commit/81e4faae7699e2ed1eb8f4656dc115ca9c20f416) | fix  | preserve error stack traces during prerendering                     |
+| [8dd341e21](https://github.com/angular/angular-cli/commit/8dd341e21b8f44e8e2bf3f322cced8ff6e861098) | fix  | scope CHROME_BIN executable path to individual playwright instances |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [e7e434ca3](https://github.com/angular/angular-cli/commit/e7e434ca3d78a8369b592bf870c9466962f77c94) | fix  | allow underscores in host validation                 |
+| [bcd99f944](https://github.com/angular/angular-cli/commit/bcd99f944ecb90f896040030b98f1d03692b5b6f) | fix  | patch Headers.forEach in cloneRequestAndPatchHeaders |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.6"></a>
 
 # 21.2.6 (2026-04-01)
