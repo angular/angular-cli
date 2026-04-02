@@ -413,5 +413,43 @@ async function configureKarma(
     parsedKarmaConfig.reporters = (parsedKarmaConfig.reporters ?? []).concat(['coverage']);
   }
 
+  // Adjust coverage reporter `overrides` paths to be relative to the karma `basePath`
+  // (the temporary build output directory). Users write override patterns relative to the
+  // workspace root, but karma-coverage normalises coverage-map keys using `basePath`, so the
+  // patterns must be expressed as paths relative to that same directory.
+  // See https://github.com/angular/angular-cli/issues/30956
+  if ('coverageReporter' in parsedKarmaConfig) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const coverageReporterOptions = (parsedKarmaConfig as any)['coverageReporter'] as {
+      check?: {
+        global?: { overrides?: Record<string, unknown> };
+        each?: { overrides?: Record<string, unknown> };
+      };
+    };
+
+    const rebaseOverrides = (overrides: Record<string, unknown>): Record<string, unknown> => {
+      const rebased: Record<string, unknown> = {};
+      for (const [pattern, thresholds] of Object.entries(overrides)) {
+        // Resolve the user pattern from the workspace root, then make it relative
+        // to the karma basePath (outputPath) so it matches how karma-coverage
+        // normalises coverage-map keys.
+        const absolutePattern = path.isAbsolute(pattern)
+          ? pattern
+          : path.join(context.workspaceRoot, pattern);
+        const rebasedPattern = path.relative(outputPath, absolutePattern);
+        rebased[rebasedPattern] = thresholds;
+      }
+      return rebased;
+    };
+
+    const check = coverageReporterOptions?.check;
+    if (check?.global?.overrides && typeof check.global.overrides === 'object') {
+      check.global.overrides = rebaseOverrides(check.global.overrides);
+    }
+    if (check?.each?.overrides && typeof check.each.overrides === 'object') {
+      check.each.overrides = rebaseOverrides(check.each.overrides);
+    }
+  }
+
   return parsedKarmaConfig;
 }
