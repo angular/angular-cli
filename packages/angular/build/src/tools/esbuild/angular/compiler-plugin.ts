@@ -771,15 +771,11 @@ function createCompilerOptionsTransformer(
  * Rewrites static import/export specifiers in a TypeScript/JavaScript source file to apply
  * file replacements. For each relative or absolute specifier that resolves to a path present
  * in the `fileReplacements` map, the specifier is replaced with the corresponding replacement
- * path. This allows file replacements to be honoured inside web worker bundles, where the
+ * path. This allows file replacements to be honoured inside web worker entry files, where the
  * esbuild synchronous API does not support plugins.
  *
- * Only the entry-file level is rewritten; transitive imports are handled because the rewritten
- * specifiers point directly to the replacement files on disk, so esbuild will bundle them
- * normally.
- *
- * @param contents Raw source text of the worker entry file.
- * @param workerDir Absolute directory of the worker entry file (used to resolve relative specifiers).
+ * @param contents Raw source text of the source file.
+ * @param workerDir Absolute directory of the source file (used to resolve relative specifiers).
  * @param fileReplacements Map from original absolute path to replacement absolute path.
  * @returns The rewritten source text, or the original text if no replacements are needed.
  */
@@ -788,63 +784,47 @@ function applyFileReplacementsToContent(
   workerDir: string,
   fileReplacements: Record<string, string>,
 ): string {
-  // Matches static import/export specifiers:
-  //   import ... from 'specifier'
-  //   export ... from 'specifier'
-  //   import 'specifier'
-  // Captures the quote character (group 1) and the specifier (group 2).
-  const importExportRe = /\b(?:import|export)\b[^;'"]*?(['"])([^'"]+)\1/g;
-
   // Extensions to try when resolving a specifier without an explicit extension.
   const candidateExtensions = ['.ts', '.tsx', '.mts', '.cts', '.js', '.mjs', '.cjs'];
 
-  let result = contents;
-  let match: RegExpExecArray | null;
+  // Use a line-anchored regex with a callback to replace import/export specifiers in-place.
+  // The pattern matches static import and export-from statements (including multiline forms)
+  // and captures the specifier. `[\s\S]*?` is used instead of `.*?` so that multiline import
+  // lists (common in TypeScript) are matched correctly.
+  return contents.replace(
+    /^(import|export)([\s\S]*?\s+from\s+|\s+)(['"])([^'"]+)\3/gm,
+    (match, _keyword, _middle, quote, specifier) => {
+      // Only process relative specifiers; bare package-name imports are not file-path replacements.
+      if (!specifier.startsWith('.') && !path.isAbsolute(specifier)) {
+        return match;
+      }
 
-  while ((match = importExportRe.exec(contents)) !== null) {
-    const specifier = match[2];
+      const resolvedBase = path.isAbsolute(specifier)
+        ? specifier
+        : path.join(workerDir, specifier);
 
-    // Only process relative specifiers; bare package-name imports are not file-path replacements.
-    if (!specifier.startsWith('.') && !path.isAbsolute(specifier)) {
-      continue;
-    }
+      // First check if the specifier already includes an extension and resolves directly.
+      let replacementPath: string | undefined = fileReplacements[path.normalize(resolvedBase)];
 
-    const resolvedBase = path.isAbsolute(specifier)
-      ? specifier
-      : path.join(workerDir, specifier);
-
-    let replacementPath: string | undefined;
-
-    // First check if the specifier already includes an extension and resolves directly.
-    const directCandidate = path.normalize(resolvedBase);
-    replacementPath = fileReplacements[directCandidate];
-
-    if (!replacementPath) {
-      // Try appending each supported extension to resolve extensionless specifiers.
-      for (const ext of candidateExtensions) {
-        const candidate = path.normalize(resolvedBase + ext);
-        replacementPath = fileReplacements[candidate];
-        if (replacementPath) {
-          break;
+      if (!replacementPath) {
+        // Try appending each supported extension to resolve extensionless specifiers.
+        for (const ext of candidateExtensions) {
+          replacementPath = fileReplacements[path.normalize(resolvedBase + ext)];
+          if (replacementPath) {
+            break;
+          }
         }
       }
-    }
 
-    if (replacementPath) {
-      // Replace only the specifier part within the matched import/export statement.
-      const fullMatch = match[0];
-      const quote = match[1];
+      if (!replacementPath) {
+        return match;
+      }
+
       const newSpecifier = replacementPath.replaceAll('\\', '/');
-      const escapedSpecifier = specifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      const newMatch = fullMatch.replace(
-        new RegExp(`${quote}${escapedSpecifier}${quote}`),
-        `${quote}${newSpecifier}${quote}`,
-      );
-      result = result.replace(fullMatch, newMatch);
-    }
-  }
 
-  return result;
+      return match.replace(`${quote}${specifier}${quote}`, `${quote}${newSpecifier}${quote}`);
+    },
+  );
 }
 
 function bundleWebWorker(
@@ -853,21 +833,44 @@ function bundleWebWorker(
   workerFile: string,
 ) {
   try {
-    // If file replacements are configured, apply them to the worker entry file so that the
+    // If file replacements are configured, apply them to the worker bundle so that the
     // synchronous esbuild build honours the same substitutions as the main application build.
-    // The esbuild synchronous API does not support plugins (which normally handle file
-    // replacements for the main build), so we rewrite the entry file's import specifiers
-    // before bundling. Imports in the rewritten file point directly to the replacement paths,
-    // which esbuild then resolves and bundles normally.
+    //
+    // Because the esbuild synchronous API does not support plugins, file replacements are
+    // applied via two complementary mechanisms:
+    //
+    // 1. `alias`: esbuild's built-in alias option intercepts every resolve call across the
+    //    entire bundle graph — entry file and all transitive imports — and redirects any
+    //    import whose specifier exactly matches an original path to the replacement path.
+    //    This covers imports that use a path form identical to the fileReplacements key
+    //    (e.g. TypeScript path-mapped or absolute imports).
+    //
+    // 2. stdin rewriting: for relative specifiers in the worker entry file (the most common
+    //    case), `applyFileReplacementsToContent` resolves each specifier to an absolute path,
+    //    looks it up in the fileReplacements map, and rewrites the source text before passing
+    //    it to esbuild via stdin. The rewritten specifiers now point directly to the
+    //    replacement files, so esbuild bundles them without needing further intervention.
     let entryPoints: string[] | undefined;
     let stdin: { contents: string; resolveDir: string; loader: Loader } | undefined;
+    let alias: Record<string, string> | undefined;
 
     if (pluginOptions.fileReplacements) {
+      // Pass all file replacements as esbuild aliases so that every import in the worker
+      // bundle graph — not just the entry — is subject to replacement at resolve time.
+      alias = Object.fromEntries(
+        Object.entries(pluginOptions.fileReplacements).map(([original, replacement]) => [
+          original.replaceAll('\\', '/'),
+          replacement.replaceAll('\\', '/'),
+        ]),
+      );
+
       // Check whether the worker entry file itself is being replaced.
       const entryReplacement = pluginOptions.fileReplacements[path.normalize(workerFile)];
       const effectiveWorkerFile = entryReplacement ?? workerFile;
 
-      // Rewrite any direct imports that are covered by file replacements.
+      // Rewrite relative import specifiers in the entry file that resolve to a replaced path.
+      // This handles the common case where transitive-dependency imports inside the entry use
+      // relative paths that esbuild alias (which matches raw specifier text) would not catch.
       const workerDir = path.dirname(effectiveWorkerFile);
       const originalContents = readFileSync(effectiveWorkerFile, 'utf-8');
       const rewrittenContents = applyFileReplacementsToContent(
@@ -899,6 +902,7 @@ function bundleWebWorker(
       entryNames: 'worker-[hash]',
       entryPoints,
       stdin,
+      alias,
       sourcemap: pluginOptions.sourcemap,
       // Zone.js is not used in Web workers so no need to disable
       supported: undefined,
