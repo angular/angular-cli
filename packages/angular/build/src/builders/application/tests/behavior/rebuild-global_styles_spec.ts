@@ -87,6 +87,69 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it('recovers from error in SCSS partial after fix on rebuild using @use', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+        styles: ['src/styles.scss'],
+      });
+
+      await harness.writeFile('src/styles.scss', "@use './variables' as v;\nh1 { color: v.$primary; }");
+      await harness.writeFile('src/variables.scss', '$primary: aqua;');
+
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+
+            // Introduce a syntax error in the imported partial
+            await harness.writeFile('src/variables.scss', '$primary: aqua\n$broken;');
+          },
+          async ({ result }) => {
+            expect(result?.success).toBe(false);
+
+            // Fix the partial — the cached error should be cleared
+            await harness.writeFile('src/variables.scss', '$primary: blue;');
+          },
+          ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
+
+    it('recovers from error in SCSS partial after fix on initial build using @use', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+        styles: ['src/styles.scss'],
+      });
+
+      await harness.writeFile('src/styles.scss', "@use './variables' as v;\nh1 { color: v.$primary; }");
+      // Start with an error in the partial
+      await harness.writeFile('src/variables.scss', '$primary: aqua\n$broken;');
+
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBe(false);
+
+            // Fix the partial
+            await harness.writeFile('src/variables.scss', '$primary: aqua;');
+          },
+          ({ result }) => {
+            expect(result?.success).toBe(true);
+            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
+
     it('rebuilds dependent Sass stylesheets after error on initial build from import', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
