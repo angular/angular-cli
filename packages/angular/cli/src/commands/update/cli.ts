@@ -716,12 +716,16 @@ export async function supplementWithLocalDependencies(
     ...localManifest.peerDependencies,
   };
 
+  const projectRequire = createRequire(path.join(projectRoot, 'package.json'));
+
   for (const depName of Object.keys(localDeps)) {
     if (dependencies.has(depName)) {
       continue;
     }
-    const pkgJsonPath = findPackageJson(projectRoot, depName);
-    if (!pkgJsonPath) {
+    let pkgJsonPath: string;
+    try {
+      pkgJsonPath = projectRequire.resolve(`${depName}/package.json`);
+    } catch {
       continue;
     }
     const installed = await readPackageManifest(pkgJsonPath);
@@ -740,17 +744,6 @@ async function readPackageManifest(manifestPath: string): Promise<PackageManifes
     const content = await fs.readFile(manifestPath, 'utf8');
 
     return JSON.parse(content) as PackageManifest;
-  } catch {
-    return undefined;
-  }
-}
-
-function findPackageJson(workspaceDir: string, packageName: string): string | undefined {
-  try {
-    const projectRequire = createRequire(path.join(workspaceDir, 'package.json'));
-    const packageJsonPath = projectRequire.resolve(`${packageName}/package.json`);
-
-    return packageJsonPath;
   } catch {
     return undefined;
   }
