@@ -38,6 +38,10 @@ import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundling';
 
+/** The esbuild error text prefix used to detect top-level await errors. */
+const TOP_LEVEL_AWAIT_ERROR_TEXT =
+  'Top-level await is not available in the configured target environment';
+
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
@@ -162,11 +166,7 @@ export async function executeBuild(
     // the actual reason is that async/await is downleveled for Zone.js compatibility.
     if (!isZonelessApp(options.polyfills)) {
       for (const error of bundlingResult.errors) {
-        if (
-          error.text?.startsWith(
-            'Top-level await is not available in the configured target environment',
-          )
-        ) {
+        if (error.text?.startsWith(TOP_LEVEL_AWAIT_ERROR_TEXT)) {
           error.notes = [
             {
               text:
