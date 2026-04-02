@@ -336,6 +336,48 @@ describe('@schematics/update', () => {
     expect(resultTreeContent.endsWith('}')).toBeTrue();
   });
 
+  it('skips packages that cannot be fetched from the registry and continues updating others', async () => {
+    // Regression test for https://github.com/angular/angular-cli/issues/28834
+    // Packages from private registries, JSR, AWS CodeArtifact, or local workspaces
+    // may resolve as npm-registry packages (pass isPkgFromRegistry) but fail to fetch
+    // with a 404.  The schematic should warn and skip them rather than hard-failing.
+    const inputTree = new UnitTestTree(
+      new HostTree(
+        new virtualFs.test.TestHost({
+          '/package.json': JSON.stringify({
+            name: 'blah',
+            dependencies: {
+              // A real package that can be updated:
+              '@angular-devkit-tests/update-base': '1.0.0',
+              // A scoped package that does not exist on the npm registry (simulates a
+              // private / JSR / CodeArtifact package that passes the registry specifier
+              // check but returns a 404 when fetched):
+              '@private-nonexistent/package-ng-update-issue-28834': '1.0.0',
+            },
+          }),
+        }),
+      ),
+    );
+
+    const messages: string[] = [];
+    schematicRunner.logger.subscribe((x) => messages.push(x.message));
+
+    // Should NOT throw even though one package cannot be fetched.
+    const resultTree = await schematicRunner.runSchematic('update', undefined, inputTree);
+
+    // The unfetchable package should be warned about.
+    expect(
+      messages.some((m) => m.includes('@private-nonexistent/package-ng-update-issue-28834')),
+    ).toBeTrue();
+
+    // The package.json should be unchanged (nothing to update in no-packages mode).
+    const { dependencies } = resultTree.readJson('/package.json') as {
+      dependencies: Record<string, string>;
+    };
+    expect(dependencies['@angular-devkit-tests/update-base']).toBe('1.0.0');
+    expect(dependencies['@private-nonexistent/package-ng-update-issue-28834']).toBe('1.0.0');
+  }, 45000);
+
   it('updates group members to the same version as the targeted package', async () => {
     const packageJsonContent = `{
       "name": "test",

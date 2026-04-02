@@ -854,6 +854,16 @@ export default function (options: UpdateSchema): Rule {
           registry: options.registry,
           usingYarn,
           verbose: options.verbose,
+        }).catch((error: unknown) => {
+          // If the package cannot be fetched (e.g. private registry, JSR, AWS CodeArtifact,
+          // or local workspace packages), return a partial object so the reduce below can
+          // decide whether to warn or hard-fail based on whether it was explicitly requested.
+          const message = error instanceof Error ? error.message : String(error);
+          logger.warn(
+            `Package '${depName}' could not be fetched from the registry: ${message}`,
+          );
+
+          return { requestedName: depName } as Partial<NpmRepositoryPackageJson>;
         }),
       ),
     );
