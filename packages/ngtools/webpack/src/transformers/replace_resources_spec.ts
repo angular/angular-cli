@@ -511,4 +511,84 @@ describe('find_resources', () => {
       /Component 'AppComponent'.*contains a non-string literal 'templateUrl' value/,
     );
   });
+
+  it('should throw an error when styleUrls contains a conditional expression', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: [true === true ? './app.component.css' : './app.component.dark.css']
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'styleUrls' value/,
+    );
+  });
+
+  it('should throw an error when styleUrls contains a variable reference', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        const myStyle = './app.component.css';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrls: [myStyle]
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'styleUrls' value/,
+    );
+  });
+
+  it('should throw an error when styleUrl is a conditional expression', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrl: true === true ? './app.component.css' : './app.component.dark.css'
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'styleUrl' value/,
+    );
+  });
+
+  it('should throw an error when styleUrl is a variable reference', () => {
+    const input = tags.stripIndent`
+        import { Component } from '@angular/core';
+
+        const myStyle = './app.component.css';
+
+        @Component({
+          selector: 'app-root',
+          templateUrl: './app.component.html',
+          styleUrl: myStyle
+        })
+        export class AppComponent {
+          title = 'app';
+        }
+      `;
+
+    expect(() => transform(input)).toThrowError(
+      /Component 'AppComponent'.*contains a non-string literal 'styleUrl' value/,
+    );
+  });
 });
