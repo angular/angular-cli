@@ -19,6 +19,7 @@ import type {
 } from 'esbuild';
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
@@ -278,12 +279,21 @@ export function createCompilerPlugin(
               metafile: workerResult.metafile,
             });
 
-            referencedFileTracker.add(
-              containingFile,
-              Object.keys(workerResult.metafile.inputs).map((input) =>
-                path.join(build.initialOptions.absWorkingDir ?? '', input),
-              ),
-            );
+            const metafileInputPaths = Object.keys(workerResult.metafile.inputs)
+              // When file replacements are used, the worker entry is passed via stdin and
+              // esbuild reports it as "<stdin>" in the metafile. Exclude this virtual entry
+              // since it does not correspond to a real file path.
+              .filter((input) => input !== '<stdin>')
+              .map((input) => path.join(build.initialOptions.absWorkingDir ?? '', input));
+
+            // Always ensure the actual worker entry file is tracked as a dependency even when
+            // the build used stdin (e.g. due to file replacements). This guarantees rebuilds
+            // are triggered when the source worker file changes.
+            if (!metafileInputPaths.includes(fullWorkerPath)) {
+              metafileInputPaths.push(fullWorkerPath);
+            }
+
+            referencedFileTracker.add(containingFile, metafileInputPaths);
 
             // Return bundled worker file entry name to be used in the built output
             const workerCodeFile = workerResult.outputFiles.find((file) =>
@@ -757,13 +767,129 @@ function createCompilerOptionsTransformer(
   };
 }
 
+/**
+ * Rewrites static import/export specifiers in a TypeScript/JavaScript source file to apply
+ * file replacements. For each relative or absolute specifier that resolves to a path present
+ * in the `fileReplacements` map, the specifier is replaced with the corresponding replacement
+ * path. This allows file replacements to be honoured inside web worker bundles, where the
+ * esbuild synchronous API does not support plugins.
+ *
+ * Only the entry-file level is rewritten; transitive imports are handled because the rewritten
+ * specifiers point directly to the replacement files on disk, so esbuild will bundle them
+ * normally.
+ *
+ * @param contents Raw source text of the worker entry file.
+ * @param workerDir Absolute directory of the worker entry file (used to resolve relative specifiers).
+ * @param fileReplacements Map from original absolute path to replacement absolute path.
+ * @returns The rewritten source text, or the original text if no replacements are needed.
+ */
+function applyFileReplacementsToContent(
+  contents: string,
+  workerDir: string,
+  fileReplacements: Record<string, string>,
+): string {
+  // Matches static import/export specifiers:
+  //   import ... from 'specifier'
+  //   export ... from 'specifier'
+  //   import 'specifier'
+  // Captures the quote character (group 1) and the specifier (group 2).
+  const importExportRe = /\b(?:import|export)\b[^;'"]*?(['"])([^'"]+)\1/g;
+
+  // Extensions to try when resolving a specifier without an explicit extension.
+  const candidateExtensions = ['.ts', '.tsx', '.mts', '.cts', '.js', '.mjs', '.cjs'];
+
+  let result = contents;
+  let match: RegExpExecArray | null;
+
+  while ((match = importExportRe.exec(contents)) !== null) {
+    const specifier = match[2];
+
+    // Only process relative specifiers; bare package-name imports are not file-path replacements.
+    if (!specifier.startsWith('.') && !path.isAbsolute(specifier)) {
+      continue;
+    }
+
+    const resolvedBase = path.isAbsolute(specifier)
+      ? specifier
+      : path.join(workerDir, specifier);
+
+    let replacementPath: string | undefined;
+
+    // First check if the specifier already includes an extension and resolves directly.
+    const directCandidate = path.normalize(resolvedBase);
+    replacementPath = fileReplacements[directCandidate];
+
+    if (!replacementPath) {
+      // Try appending each supported extension to resolve extensionless specifiers.
+      for (const ext of candidateExtensions) {
+        const candidate = path.normalize(resolvedBase + ext);
+        replacementPath = fileReplacements[candidate];
+        if (replacementPath) {
+          break;
+        }
+      }
+    }
+
+    if (replacementPath) {
+      // Replace only the specifier part within the matched import/export statement.
+      const fullMatch = match[0];
+      const quote = match[1];
+      const newSpecifier = replacementPath.replaceAll('\\', '/');
+      const escapedSpecifier = specifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const newMatch = fullMatch.replace(
+        new RegExp(`${quote}${escapedSpecifier}${quote}`),
+        `${quote}${newSpecifier}${quote}`,
+      );
+      result = result.replace(fullMatch, newMatch);
+    }
+  }
+
+  return result;
+}
+
 function bundleWebWorker(
   build: PluginBuild,
   pluginOptions: CompilerPluginOptions,
   workerFile: string,
 ) {
   try {
-    return build.esbuild.buildSync({
+    // If file replacements are configured, apply them to the worker entry file so that the
+    // synchronous esbuild build honours the same substitutions as the main application build.
+    // The esbuild synchronous API does not support plugins (which normally handle file
+    // replacements for the main build), so we rewrite the entry file's import specifiers
+    // before bundling. Imports in the rewritten file point directly to the replacement paths,
+    // which esbuild then resolves and bundles normally.
+    let entryPoints: string[] | undefined;
+    let stdin: { contents: string; resolveDir: string; loader: Loader } | undefined;
+
+    if (pluginOptions.fileReplacements) {
+      // Check whether the worker entry file itself is being replaced.
+      const entryReplacement = pluginOptions.fileReplacements[path.normalize(workerFile)];
+      const effectiveWorkerFile = entryReplacement ?? workerFile;
+
+      // Rewrite any direct imports that are covered by file replacements.
+      const workerDir = path.dirname(effectiveWorkerFile);
+      const originalContents = readFileSync(effectiveWorkerFile, 'utf-8');
+      const rewrittenContents = applyFileReplacementsToContent(
+        originalContents,
+        workerDir,
+        pluginOptions.fileReplacements,
+      );
+
+      if (rewrittenContents !== originalContents || entryReplacement) {
+        // Use stdin to pass the rewritten content so that the correct bundle is produced.
+        // Infer the esbuild loader from the effective worker file extension.
+        const stdinLoader: Loader =
+          path.extname(effectiveWorkerFile).toLowerCase() === '.tsx' ? 'tsx' : 'ts';
+        stdin = { contents: rewrittenContents, resolveDir: workerDir, loader: stdinLoader };
+      } else {
+        entryPoints = [workerFile];
+      }
+    } else {
+      entryPoints = [workerFile];
+    }
+
+    const result = build.esbuild.buildSync({
       ...build.initialOptions,
       platform: 'browser',
       write: false,
@@ -771,13 +897,16 @@ function bundleWebWorker(
       metafile: true,
       format: 'esm',
       entryNames: 'worker-[hash]',
-      entryPoints: [workerFile],
+      entryPoints,
+      stdin,
       sourcemap: pluginOptions.sourcemap,
       // Zone.js is not used in Web workers so no need to disable
       supported: undefined,
       // Plugins are not supported in sync esbuild calls
       plugins: undefined,
     });
+
+    return result;
   } catch (error) {
     if (error && typeof error === 'object' && 'errors' in error && 'warnings' in error) {
       return error as BuildFailure;

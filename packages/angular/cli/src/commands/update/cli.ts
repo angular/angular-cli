@@ -231,6 +231,17 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     logger.info('Collecting installed dependencies...');
 
     const rootDependencies = await packageManager.getProjectDependencies();
+
+    // In npm/pnpm/yarn workspace setups the package manager's `list` command is
+    // executed against the workspace root, so it may only surface the root
+    // workspace's direct dependencies.  When the Angular project lives inside a
+    // workspace member its own `package.json` entries (e.g. `@angular/core`) will
+    // be absent from that list.  To preserve the pre-v21 behaviour we supplement
+    // the map with any packages declared in the Angular project root's
+    // `package.json` that are resolvable from `node_modules` but were not already
+    // returned by the package manager.
+    await supplementWithLocalDependencies(rootDependencies, this.context.root);
+
     logger.info(`Found ${rootDependencies.size} dependencies.`);
 
     const workflow = new NodeWorkflow(this.context.root, {
@@ -672,6 +683,55 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     }
 
     return success ? 0 : 1;
+  }
+}
+
+/**
+ * Supplements the given dependency map with packages that are declared in the
+ * Angular project root's `package.json` but were not returned by the package
+ * manager's `list` command.
+ *
+ * In npm/pnpm/yarn workspace setups the package manager runs against the
+ * workspace root, which may not include dependencies that only appear in a
+ * workspace member's `package.json`.  Reading the member's `package.json`
+ * directly and resolving the installed version from `node_modules` restores
+ * the behaviour that was present before the package-manager abstraction was
+ * introduced in v21.
+ *
+ * @param dependencies The map to supplement in place.
+ * @param projectRoot The root directory of the Angular project (workspace member).
+ */
+export async function supplementWithLocalDependencies(
+  dependencies: Map<string, InstalledPackage>,
+  projectRoot: string,
+): Promise<void> {
+  const localManifest = await readPackageManifest(path.join(projectRoot, 'package.json'));
+  if (!localManifest) {
+    return;
+  }
+
+  const localDeps: Record<string, string> = {
+    ...localManifest.dependencies,
+    ...localManifest.devDependencies,
+    ...localManifest.peerDependencies,
+  };
+
+  for (const depName of Object.keys(localDeps)) {
+    if (dependencies.has(depName)) {
+      continue;
+    }
+    const pkgJsonPath = findPackageJson(projectRoot, depName);
+    if (!pkgJsonPath) {
+      continue;
+    }
+    const installed = await readPackageManifest(pkgJsonPath);
+    if (installed?.version) {
+      dependencies.set(depName, {
+        name: depName,
+        version: installed.version,
+        path: path.dirname(pkgJsonPath),
+      });
+    }
   }
 }
 
