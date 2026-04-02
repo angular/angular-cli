@@ -262,6 +262,11 @@
       "type": "boolean",
       "description": "Shows build progress information in the console. Defaults to the `progress` setting of the specified `buildTarget`."
     },
+    "update": {
+      "type": "boolean",
+      "description": "Updates existing snapshots when they fail instead of failing the test. Only available for the Vitest runner.",
+      "default": false
+    },
     "listTests": {
       "type": "boolean",
       "description": "Lists all discovered test files and exits the process without building or executing the tests.",

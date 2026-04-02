@@ -240,6 +240,7 @@ export class VitestExecutor implements TestExecutor {
       runnerConfig,
       projectSourceRoot,
       cacheOptions,
+      update,
     } = this.options;
     const projectName = this.projectName;
 
@@ -355,6 +356,7 @@ export class VitestExecutor implements TestExecutor {
       cache: cacheOptions.enabled ? undefined : (false as const),
       testNamePattern: this.options.filter,
       watch,
+      ...(update ? { update } : {}),
       ...(typeof ui === 'boolean' ? { ui } : {}),
       ...debugOptions,
     };

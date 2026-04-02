@@ -127,6 +127,7 @@ export async function normalizeOptions(
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
+    update: options.update ?? false,
     runnerConfig:
       typeof runnerConfig === 'string'
         ? runnerConfig.length === 0
