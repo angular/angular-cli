@@ -54,35 +54,28 @@ describe('Vitest Browser Provider Schematic', () => {
     expect(tsConfig.compilerOptions.types).not.toContain('jasmine');
   });
 
-  it('should add browsers option to angular.json for playwright', async () => {
-    const options = {
-      project: 'app',
-      package: '@vitest/browser-playwright',
-      skipInstall: true,
-    };
+  const browserProviderCases: { provider: string; expectedBrowser: string }[] = [
+    { provider: '@vitest/browser-playwright', expectedBrowser: 'chromium' },
+    { provider: '@vitest/browser-webdriverio', expectedBrowser: 'chrome' },
+    { provider: '@vitest/browser-preview', expectedBrowser: 'chromium' },
+  ];
 
-    const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
+  for (const { provider, expectedBrowser } of browserProviderCases) {
+    it(`should add browsers option to angular.json for ${provider}`, async () => {
+      const options = {
+        project: 'app',
+        package: provider,
+        skipInstall: true,
+      };
 
-    const angularJson = parse(resultTree.readContent('/angular.json'));
-    const project = angularJson.projects.app;
-    const targets = project.architect || project.targets;
-    expect(targets.test.options.browsers).toEqual(['chromium']);
-  });
+      const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
 
-  it('should add browsers option to angular.json for webdriverio', async () => {
-    const options = {
-      project: 'app',
-      package: '@vitest/browser-webdriverio',
-      skipInstall: true,
-    };
-
-    const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
-
-    const angularJson = parse(resultTree.readContent('/angular.json'));
-    const project = angularJson.projects.app;
-    const targets = project.architect || project.targets;
-    expect(targets.test.options.browsers).toEqual(['chrome']);
-  });
+      const angularJson = parse(resultTree.readContent('/angular.json'));
+      const project = angularJson.projects.app;
+      const targets = project.architect || project.targets;
+      expect(targets.test.options.browsers).toEqual([expectedBrowser]);
+    });
+  }
 
   it('should not overwrite existing browsers option in angular.json', async () => {
     // Set up existing browsers option
