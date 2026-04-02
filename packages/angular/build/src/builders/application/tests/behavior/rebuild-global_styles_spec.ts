@@ -87,6 +87,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    const SCSS_AQUA = '$primary: aqua;';
+    const SCSS_BROKEN = '$primary: aqua\n$broken;';
+    const CSS_AQUA = 'color: aqua';
+    const CSS_BLUE = 'color: blue';
+
     it('recovers from error in SCSS partial after fix on rebuild using @use', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
@@ -95,16 +100,16 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       });
 
       await harness.writeFile('src/styles.scss', "@use './variables' as v;\nh1 { color: v.$primary; }");
-      await harness.writeFile('src/variables.scss', '$primary: aqua;');
+      await harness.writeFile('src/variables.scss', SCSS_AQUA);
 
       await harness.executeWithCases(
         [
           async ({ result }) => {
             expect(result?.success).toBe(true);
-            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain(CSS_AQUA);
 
             // Introduce a syntax error in the imported partial
-            await harness.writeFile('src/variables.scss', '$primary: aqua\n$broken;');
+            await harness.writeFile('src/variables.scss', SCSS_BROKEN);
           },
           async ({ result }) => {
             expect(result?.success).toBe(false);
@@ -114,8 +119,8 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           },
           ({ result }) => {
             expect(result?.success).toBe(true);
-            harness.expectFile('dist/browser/styles.css').content.not.toContain('color: aqua');
-            harness.expectFile('dist/browser/styles.css').content.toContain('color: blue');
+            harness.expectFile('dist/browser/styles.css').content.not.toContain(CSS_AQUA);
+            harness.expectFile('dist/browser/styles.css').content.toContain(CSS_BLUE);
           },
         ],
         { outputLogsOnFailure: false },
@@ -131,7 +136,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       await harness.writeFile('src/styles.scss', "@use './variables' as v;\nh1 { color: v.$primary; }");
       // Start with an error in the partial
-      await harness.writeFile('src/variables.scss', '$primary: aqua\n$broken;');
+      await harness.writeFile('src/variables.scss', SCSS_BROKEN);
 
       await harness.executeWithCases(
         [
@@ -139,11 +144,11 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             expect(result?.success).toBe(false);
 
             // Fix the partial
-            await harness.writeFile('src/variables.scss', '$primary: aqua;');
+            await harness.writeFile('src/variables.scss', SCSS_AQUA);
           },
           ({ result }) => {
             expect(result?.success).toBe(true);
-            harness.expectFile('dist/browser/styles.css').content.toContain('color: aqua');
+            harness.expectFile('dist/browser/styles.css').content.toContain(CSS_AQUA);
           },
         ],
         { outputLogsOnFailure: false },
