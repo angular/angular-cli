@@ -97,6 +97,7 @@ export function addTestRunnerDependencies(
           'karma-jasmine-html-reporter',
           'jasmine-core',
           '@types/jasmine',
+          'istanbul-lib-instrument',
         ];
 
   return dependencies.map((name) =>
