@@ -319,6 +319,9 @@ importers:
       browser-sync:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+      istanbul-lib-instrument:
+        specifier: 6.0.3
+        version: 6.0.3
       jsdom:
         specifier: 29.0.1
         version: 29.0.1
@@ -367,9 +370,6 @@ importers:
       https-proxy-agent:
         specifier: 8.0.0
         version: 8.0.0
-      istanbul-lib-instrument:
-        specifier: 6.0.3
-        version: 6.0.3
       jsonc-parser:
         specifier: 3.3.1
         version: 3.3.1
@@ -419,6 +419,9 @@ importers:
       '@angular/ssr':
         specifier: workspace:*
         version: link:../ssr
+      istanbul-lib-instrument:
+        specifier: 6.0.3
+        version: 6.0.3
       jsdom:
         specifier: 29.0.1
         version: 29.0.1

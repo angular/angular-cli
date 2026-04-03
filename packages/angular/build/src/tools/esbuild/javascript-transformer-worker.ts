@@ -8,6 +8,7 @@
 
 import { type PluginItem, transformAsync } from '@babel/core';
 import fs from 'node:fs';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import Piscina from 'piscina';
 
@@ -66,8 +67,31 @@ async function transformWithBabel(
   const plugins: PluginItem[] = [];
 
   if (options.instrumentForCoverage) {
-    const { default: coveragePlugin } = await import('../babel/plugins/add-code-coverage.js');
-    plugins.push(coveragePlugin);
+    try {
+      let resolvedPath = 'istanbul-lib-instrument';
+      try {
+        const requireFn = createRequire(filename);
+        resolvedPath = requireFn.resolve('istanbul-lib-instrument');
+      } catch {
+        // Fallback to pool worker import traversal
+      }
+
+      const istanbul = await import(resolvedPath);
+      const programVisitor = istanbul.programVisitor ?? istanbul.default?.programVisitor;
+
+      if (!programVisitor) {
+        throw new Error('programVisitor is not available in istanbul-lib-instrument.');
+      }
+
+      const { default: coveragePluginFactory } =
+        await import('../babel/plugins/add-code-coverage.js');
+      plugins.push(coveragePluginFactory(programVisitor));
+    } catch (error) {
+      throw new Error(
+        `The 'istanbul-lib-instrument' package is required for code coverage but was not found. Please install the package.`,
+        { cause: error },
+      );
+    }
   }
 
   if (shouldLink) {
