@@ -1,6 +1,11 @@
 {
   "encapsulation": false,
   "schematics": {
+    "add-istanbul-instrumenter": {
+      "version": "22.0.0",
+      "factory": "./add-istanbul-instrumenter/migration",
+      "description": "Add istanbul-lib-instrument to devDependencies if Karma unit testing is used."
+    },
     "use-application-builder": {
       "version": "22.0.0",
       "factory": "./use-application-builder/migration",
