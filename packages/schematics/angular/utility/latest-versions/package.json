@@ -8,6 +8,7 @@
     "@types/node": "^20.17.19",
     "browser-sync": "^3.0.0",
     "express": "^5.1.0",
+    "istanbul-lib-instrument": "^6.0.3",
     "jasmine-core": "~6.1.0",
     "jasmine-spec-reporter": "~7.0.0",
     "karma-chrome-launcher": "~3.2.0",
