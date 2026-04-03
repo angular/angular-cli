@@ -21,6 +21,7 @@ ts_project(
         # resolvable in the test project.
         ":node_modules/@angular/ssr",
         ":node_modules/browser-sync",
+        ":node_modules/istanbul-lib-instrument",
         ":node_modules/jsdom",
         ":node_modules/ng-packagr",
         ":node_modules/vitest",

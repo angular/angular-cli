@@ -29,7 +29,6 @@
     "browserslist": "^4.26.0",
     "esbuild": "0.27.3",
     "https-proxy-agent": "8.0.0",
-    "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
     "listr2": "10.2.1",
     "magic-string": "0.30.21",
@@ -51,6 +50,7 @@
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
+    "istanbul-lib-instrument": "6.0.3",
     "jsdom": "29.0.1",
     "less": "4.6.4",
     "ng-packagr": "22.0.0-next.1",
@@ -67,6 +67,7 @@
     "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
     "@angular/ssr": "^0.0.0-PLACEHOLDER",
+    "istanbul-lib-instrument": "^6.0.0",
     "karma": "^6.4.0",
     "less": "^4.2.0",
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
@@ -93,6 +94,9 @@
       "optional": true
     },
     "@angular/ssr": {
+      "optional": true
+    },
+    "istanbul-lib-instrument": {
       "optional": true
     },
     "karma": {

@@ -7,7 +7,7 @@
  */
 
 import { NodePath, PluginObj, types } from '@babel/core';
-import { Visitor, programVisitor } from 'istanbul-lib-instrument';
+import type { Visitor } from 'istanbul-lib-instrument';
 import assert from 'node:assert';
 
 /**
@@ -15,7 +15,9 @@ import assert from 'node:assert';
  *
  * @returns A babel plugin object instance.
  */
-export default function (): PluginObj {
+export default function (
+  programVisitor: typeof import('istanbul-lib-instrument').programVisitor,
+): PluginObj {
   const visitors = new WeakMap<NodePath, Visitor>();
 
   return {
