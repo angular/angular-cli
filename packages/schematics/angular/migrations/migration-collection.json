@@ -14,6 +14,12 @@
       "factory": "./karma/migration",
       "description": "Remove any karma configuration files that only contain the default content. The default configuration is automatically available without a specific project file."
     },
+    "migrate-karma-to-vitest": {
+      "version": "22.0.0",
+      "factory": "./migrate-karma-to-vitest/migration",
+      "description": "Migrate projects using legacy Karma unit-test builder to the new unit-test builder with Vitest.",
+      "optional": true
+    },
     "update-workspace-config": {
       "version": "22.0.0",
       "factory": "./update-workspace-config/migration",
