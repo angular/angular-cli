@@ -286,8 +286,9 @@ export function createCompilerPlugin(
             );
 
             // Return bundled worker file entry name to be used in the built output
+            // Match both hashed (worker-ABCD1234.js) and non-hashed (worker-<name>.js) patterns
             const workerCodeFile = workerResult.outputFiles.find((file) =>
-              /^worker-[A-Z0-9]{8}.[cm]?js$/.test(path.basename(file.path)),
+              /^worker-.+\.[cm]?js$/.test(path.basename(file.path)),
             );
             assert(workerCodeFile, 'Web Worker bundled code file should always be present.');
             const workerCodePath = path.relative(
@@ -763,6 +764,13 @@ function bundleWebWorker(
   workerFile: string,
 ) {
   try {
+    // Use content hashing only when the parent build uses hashing in entry names.
+    // During dev server (ng serve), hashing is disabled and using it for workers
+    // causes the filename hash to change on every rebuild even when the worker
+    // content hasn't changed, breaking debugging sessions.
+    const parentEntryNames = build.initialOptions.entryNames ?? '';
+    const useHashing = parentEntryNames.includes('[hash]');
+
     return build.esbuild.buildSync({
       ...build.initialOptions,
       platform: 'browser',
@@ -770,13 +778,18 @@ function bundleWebWorker(
       bundle: true,
       metafile: true,
       format: 'esm',
-      entryNames: 'worker-[hash]',
+      entryNames: useHashing ? 'worker-[hash]' : 'worker-[name]',
       entryPoints: [workerFile],
       sourcemap: pluginOptions.sourcemap,
       // Zone.js is not used in Web workers so no need to disable
       supported: undefined,
       // Plugins are not supported in sync esbuild calls
       plugins: undefined,
+      // Splitting is not needed for workers and can cause non-deterministic output
+      splitting: false,
+      // Footer may contain build-specific data (e.g., i18n hashes) that changes
+      // between rebuilds, causing unnecessary hash changes for workers
+      footer: undefined,
     });
   } catch (error) {
     if (error && typeof error === 'object' && 'errors' in error && 'warnings' in error) {

@@ -11,9 +11,10 @@ import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setu
 
 /**
  * A regular expression used to check if a built worker is correctly referenced in application code.
+ * Matches both hashed (worker-ABCD1234.js) and non-hashed (worker-worker.js) filenames.
  */
 const REFERENCED_WORKER_REGEXP =
-  /new Worker\(new URL\("worker-[A-Z0-9]{8}\.js", import\.meta\.url\)/;
+  /new Worker\(new URL\("worker-.+\.js", import\.meta\.url\)/;
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Bundles web worker files within application code"', () => {
