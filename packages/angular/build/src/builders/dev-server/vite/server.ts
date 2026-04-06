@@ -162,7 +162,14 @@ export async function setupServer(
    */
   const preTransformRequests =
     externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
-  const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
+  // Include the build configuration in the cache path to prevent conflicts when running
+  // multiple dev server instances with different configurations (e.g., different locales).
+  const cacheDir = join(
+    serverOptions.cacheOptions.path,
+    serverOptions.buildTarget.project,
+    'vite',
+    serverOptions.buildTarget.configuration ?? '',
+  );
 
   const configuration: InlineConfig = {
     configFile: false,
