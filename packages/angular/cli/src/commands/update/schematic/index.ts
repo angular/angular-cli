@@ -804,6 +804,13 @@ function _formatVersion(version: string | undefined) {
  * @throws When the specifier cannot be parsed.
  */
 function isPkgFromRegistry(name: string, specifier: string): boolean {
+  // npm: aliases (e.g., "npm:real-package@^1.0.0") resolve as registry packages
+  // but the dependency key name differs from the actual package name, so registry
+  // lookups using the alias name would fail with a 404.
+  if (specifier.startsWith('npm:')) {
+    return false;
+  }
+
   const result = npa.resolve(name, specifier);
 
   return !!result.registry;
@@ -854,6 +861,12 @@ export default function (options: UpdateSchema): Rule {
           registry: options.registry,
           usingYarn,
           verbose: options.verbose,
+        }).catch(() => {
+          // Package metadata could not be fetched (e.g. private registry, npm: alias,
+          // JSR package, or AWS CodeArtifact). Return a partial result so the reduce
+          // below can decide whether to warn or error based on whether it was explicitly
+          // requested.
+          return { requestedName: depName } as Partial<NpmRepositoryPackageJson>;
         }),
       ),
     );
