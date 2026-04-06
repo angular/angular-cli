@@ -146,9 +146,11 @@ export async function* serveWithVite(
     browserOptions.forceI18nFlatOutput = true;
   }
 
-  const { vendor: thirdPartySourcemaps, scripts: scriptsSourcemaps } = normalizeSourceMaps(
-    browserOptions.sourceMap ?? false,
-  );
+  const {
+    vendor: thirdPartySourcemaps,
+    scripts: scriptsSourcemaps,
+    styles: stylesSourcemaps,
+  } = normalizeSourceMaps(browserOptions.sourceMap ?? false);
 
   if (scriptsSourcemaps && browserOptions.server) {
     // https://nodejs.org/api/process.html#processsetsourcemapsenabledval
@@ -184,7 +186,7 @@ export async function* serveWithVite(
     // Always enable JIT linking to support applications built with and without AOT.
     // In a development environment the additional scope information does not
     // have a negative effect unlike production where final output size is relevant.
-    { sourcemap: true, jit: true, thirdPartySourcemaps },
+    { sourcemap: scriptsSourcemaps, jit: true, thirdPartySourcemaps },
     1,
   );
 
@@ -428,6 +430,7 @@ export async function* serveWithVite(
         extensions?.middleware,
         transformers?.indexHtml,
         thirdPartySourcemaps,
+        stylesSourcemaps,
       );
 
       server = await createServer(serverConfiguration);

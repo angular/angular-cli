@@ -145,6 +145,7 @@ export async function setupServer(
   extensionMiddleware?: Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
+  stylesSourcemaps = true,
 ): Promise<InlineConfig> {
   const { normalizePath } = await import('vite');
 
@@ -175,7 +176,7 @@ export async function setupServer(
     // We use custom as we do not rely on Vite's htmlFallbackMiddleware and indexHtmlMiddleware.
     appType: 'custom',
     css: {
-      devSourcemap: true,
+      devSourcemap: stylesSourcemaps,
     },
     // Ensure custom 'file' loader build option entries are handled by Vite in application code that
     // reference third-party libraries. Relative usage is handled directly by the build and not Vite.
