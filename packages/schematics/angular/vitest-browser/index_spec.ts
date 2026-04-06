@@ -35,36 +35,15 @@ describe('Vitest Browser Provider Schematic', () => {
     );
   });
 
-  it('should add dependencies and update tsconfig.spec.json', async () => {
-    const options = {
-      project: 'app',
-      package: '@vitest/browser-playwright',
-      skipInstall: true,
-    };
-
-    const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
-
-    const packageJson = parse(resultTree.readContent('/package.json'));
-    expect(packageJson.devDependencies['@vitest/browser-playwright']).toBeDefined();
-    expect(packageJson.devDependencies['playwright']).toBeDefined();
-
-    const tsConfig = parse(resultTree.readContent('/projects/app/tsconfig.spec.json'));
-    expect(tsConfig.compilerOptions.types).toContain('vitest/globals');
-    expect(tsConfig.compilerOptions.types).toContain('@vitest/browser-playwright');
-    expect(tsConfig.compilerOptions.types).not.toContain('jasmine');
-  });
-
-  const browserProviderCases: { provider: string; expectedBrowser: string }[] = [
-    { provider: '@vitest/browser-playwright', expectedBrowser: 'chromium' },
-    { provider: '@vitest/browser-webdriverio', expectedBrowser: 'chrome' },
-    { provider: '@vitest/browser-preview', expectedBrowser: 'chromium' },
-  ];
-
-  for (const { provider, expectedBrowser } of browserProviderCases) {
-    it(`should add browsers option to angular.json for ${provider}`, async () => {
+  [
+    { pkg: '@vitest/browser-playwright', browser: 'chromium', extraDeps: ['playwright'] },
+    { pkg: '@vitest/browser-webdriverio', browser: 'chrome', extraDeps: ['webdriverio'] },
+    { pkg: '@vitest/browser-preview', browser: 'chromium', extraDeps: [] as string[] },
+  ].forEach(({ pkg, browser, extraDeps }) => {
+    it(`should add ${browser} to browsers option in angular.json for ${pkg}`, async () => {
       const options = {
         project: 'app',
-        package: provider,
+        package: pkg,
         skipInstall: true,
       };
 
@@ -73,9 +52,30 @@ describe('Vitest Browser Provider Schematic', () => {
       const angularJson = parse(resultTree.readContent('/angular.json'));
       const project = angularJson.projects.app;
       const targets = project.architect || project.targets;
-      expect(targets.test.options.browsers).toEqual([expectedBrowser]);
+      expect(targets.test.options.browsers).toEqual([browser]);
     });
-  }
+
+    it(`should add dependencies and update tsconfig.spec.json for ${pkg}`, async () => {
+      const options = {
+        project: 'app',
+        package: pkg,
+        skipInstall: true,
+      };
+
+      const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
+
+      const packageJson = parse(resultTree.readContent('/package.json'));
+      expect(packageJson.devDependencies[pkg]).toBeDefined();
+      for (const dep of extraDeps) {
+        expect(packageJson.devDependencies[dep]).toBeDefined();
+      }
+
+      const tsConfig = parse(resultTree.readContent('/projects/app/tsconfig.spec.json'));
+      expect(tsConfig.compilerOptions.types).toContain('vitest/globals');
+      expect(tsConfig.compilerOptions.types).toContain(pkg);
+      expect(tsConfig.compilerOptions.types).not.toContain('jasmine');
+    });
+  });
 
   it('should not overwrite existing browsers option in angular.json', async () => {
     // Set up existing browsers option
@@ -98,20 +98,6 @@ describe('Vitest Browser Provider Schematic', () => {
     const updatedProject = updatedAngularJson.projects.app;
     const updatedTargets = updatedProject.architect || updatedProject.targets;
     expect(updatedTargets.test.options.browsers).toEqual(['firefox']);
-  });
-
-  it('should add webdriverio dependency when @vitest/browser-webdriverio is used', async () => {
-    const options = {
-      project: 'app',
-      package: '@vitest/browser-webdriverio',
-      skipInstall: true,
-    };
-
-    const resultTree = await schematicRunner.runSchematic('vitest-browser', options, tree);
-
-    const packageJson = parse(resultTree.readContent('/package.json'));
-    expect(packageJson.devDependencies['@vitest/browser-webdriverio']).toBeDefined();
-    expect(packageJson.devDependencies['webdriverio']).toBeDefined();
   });
 
   it('should update tsconfig.spec.json for a library project', async () => {
