@@ -167,7 +167,9 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
     // Check if the current installed CLI version is older than the latest compatible version.
     // Skip when running `ng update` without a package name as this will not trigger an actual update.
-    if (!disableVersionCheck && options.packages?.length) {
+    // Also skip when using migrate-only mode (--name or --migrate-only) since migrations run
+    // against the currently installed package version, not a remote one.
+    if (!disableVersionCheck && options.packages?.length && !options.migrateOnly) {
       const cliVersionToInstall = await checkCLIVersion(
         options.packages,
         logger,
