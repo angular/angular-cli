@@ -26,6 +26,7 @@ import { createAngularLocalizeInitWarningPlugin } from './angular-localize-init-
 import { BundlerOptionsFactory } from './bundler-context';
 import { createCompilerPluginOptions } from './compiler-plugin-options';
 import { createExternalPackagesPlugin } from './external-packages-plugin';
+import { createFileLoaderPublicPathPlugin } from './file-loader-public-path-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import type { LoadResultCache } from './load-result-cache';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
@@ -550,6 +551,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     i18nOptions,
     customConditions,
     frameworkVersion,
+    publicPath,
   } = options;
 
   // Ensure unique hashes for i18n translation changes when using post-process inlining.
@@ -594,6 +596,13 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
     createLoaderImportAttributePlugin(),
     createSourcemapIgnorelistPlugin(),
   ];
+
+  // Prepend publicPath (deploy-url) to file loader output paths in JS bundles.
+  // This is done as a targeted post-process step rather than setting esbuild's global
+  // `publicPath` option which would also incorrectly affect code-splitting chunk paths.
+  if (publicPath) {
+    plugins.push(createFileLoaderPublicPathPlugin(publicPath));
+  }
 
   let packages: BuildOptions['packages'] = 'bundle';
   if (options.externalPackages) {
