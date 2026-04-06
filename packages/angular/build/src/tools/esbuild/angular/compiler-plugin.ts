@@ -822,7 +822,9 @@ function applyFileReplacementsToContent(
 
       const newSpecifier = replacementPath.replaceAll('\\', '/');
 
-      return match.replace(`${quote}${specifier}${quote}`, `${quote}${newSpecifier}${quote}`);
+      // Use a callback to avoid special replacement patterns (e.g. `$&`, `$'`) being
+      // interpreted when the replacement path happens to contain `$` characters.
+      return match.replace(`${quote}${specifier}${quote}`, () => `${quote}${newSpecifier}${quote}`);
     },
   );
 }
