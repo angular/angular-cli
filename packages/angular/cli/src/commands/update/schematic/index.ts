@@ -773,11 +773,31 @@ function _getAllDependencies(tree: Tree): Array<readonly [string, VersionRange]>
     '/package.json',
   ) as PackageManifest;
 
-  return [
+  const allDeps = [
     ...(Object.entries(peerDependencies || {}) as Array<[string, VersionRange]>),
     ...(Object.entries(devDependencies || {}) as Array<[string, VersionRange]>),
     ...(Object.entries(dependencies || {}) as Array<[string, VersionRange]>),
   ];
+
+  // Resolve pnpm catalog: protocol references to actual version ranges.
+  // The catalog: protocol is not a valid semver range and must be resolved
+  // before downstream processing.
+  return allDeps.map(([name, specifier]) => {
+    if (!specifier.startsWith('catalog:')) {
+      return [name, specifier] as const;
+    }
+
+    // Fall back to the installed version from node_modules
+    const pkgJsonPath = `/node_modules/${name}/package.json`;
+    if (tree.exists(pkgJsonPath)) {
+      const { version } = tree.readJson(pkgJsonPath) as PackageManifest;
+      if (version) {
+        return [name, `^${version}` as VersionRange] as const;
+      }
+    }
+
+    return [name, specifier] as const;
+  });
 }
 
 function _formatVersion(version: string | undefined) {
@@ -804,6 +824,11 @@ function _formatVersion(version: string | undefined) {
  * @throws When the specifier cannot be parsed.
  */
 function isPkgFromRegistry(name: string, specifier: string): boolean {
+  // pnpm catalog: protocol always references registry packages
+  if (specifier.startsWith('catalog:')) {
+    return true;
+  }
+
   const result = npa.resolve(name, specifier);
 
   return !!result.registry;

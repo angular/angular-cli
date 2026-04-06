@@ -97,6 +97,35 @@ describe('@schematics/update', () => {
     expect(dependencies['@angular-devkit-tests/update-base']).toBe('1.1.0');
   });
 
+  it('should not error with pnpm catalog: protocol', async () => {
+    const newTree = new UnitTestTree(
+      new HostTree(
+        new virtualFs.test.TestHost({
+          '/package.json': `{
+        "name": "blah",
+        "dependencies": {
+          "@angular-devkit-tests/update-base": "catalog:"
+        }
+      }`,
+          '/node_modules/@angular-devkit-tests/update-base/package.json': `{
+        "name": "@angular-devkit-tests/update-base",
+        "version": "1.0.0"
+      }`,
+        }),
+      ),
+    );
+
+    const resultTree = await schematicRunner.runSchematic(
+      'update',
+      {
+        packages: ['@angular-devkit-tests/update-base'],
+      },
+      newTree,
+    );
+    const { dependencies } = JSON.parse(resultTree.readContent('/package.json'));
+    expect(dependencies['@angular-devkit-tests/update-base']).toBe('1.1.0');
+  });
+
   it('updates Angular as compatible with Angular N-1', async () => {
     // Add the basic migration package.
     const content = virtualFs.fileBufferToString(host.sync.read(normalize('/package.json')));
