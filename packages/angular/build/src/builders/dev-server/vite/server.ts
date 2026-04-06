@@ -8,7 +8,7 @@
 
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Connect, InlineConfig, SSROptions, ServerOptions } from 'vite';
+import { type Connect, type InlineConfig, type SSROptions, type ServerOptions, searchForPackageRoot } from 'vite';
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import {
   ServerSsrMode,
@@ -75,9 +75,12 @@ async function createServerConfig(
       // The first two are required for Vite to function in prebundling mode (the default) and to load
       // the Vite client-side code for browser reloading. These would be available by default but when
       // the `allow` option is explicitly configured, they must be included manually.
+      // The package root search handles monorepo setups where node_modules may be hoisted
+      // to a parent directory above the Angular workspace root.
       allow: [
         cacheDir,
         join(serverOptions.workspaceRoot, 'node_modules'),
+        searchForPackageRoot(serverOptions.workspaceRoot),
         ...[...assets.values()].map(({ source }) => source),
       ],
     },
