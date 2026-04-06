@@ -171,9 +171,7 @@ function visitComponentMetadata(
         const { line } = sourceFile.getLineAndCharacterOfPosition(node.initializer.getStart());
 
         throw new Error(
-          `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal` +
-            ` 'templateUrl' value at line ${line + 1}. The 'templateUrl' property must be a` +
-            ` string literal. Expressions, variables, or other dynamic values are not supported.`,
+          `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal 'templateUrl' value at line ${line + 1}. The 'templateUrl' property must be a string literal. Expressions, variables, or other dynamic values are not supported.`,
         );
       }
 
@@ -219,10 +217,7 @@ function visitComponentMetadata(
               const { line } = sourceFile.getLineAndCharacterOfPosition(element.getStart());
 
               throw new Error(
-                `Component '${className}' in '${sourceFile.fileName}' contains a non-string` +
-                  ` literal '${name}' value at line ${line + 1}. The '${name}' property must` +
-                  ` contain string literals. Expressions, variables, or other dynamic values` +
-                  ` are not supported.`,
+                `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal '${name}' value at line ${line + 1}. The '${name}' property must contain string literals. Expressions, variables, or other dynamic values are not supported.`,
               );
             }
           }
@@ -243,9 +238,7 @@ function visitComponentMetadata(
         const { line } = sourceFile.getLineAndCharacterOfPosition(node.initializer.getStart());
 
         throw new Error(
-          `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal` +
-            ` '${name}' value at line ${line + 1}. The '${name}' property must be a` +
-            ` string literal. Expressions, variables, or other dynamic values are not supported.`,
+          `Component '${className}' in '${sourceFile.fileName}' contains a non-string literal '${name}' value at line ${line + 1}. The '${name}' property must be a string literal. Expressions, variables, or other dynamic values are not supported.`,
         );
       } else {
         return node;
