@@ -28,7 +28,7 @@
     "beasties": "0.4.1",
     "browserslist": "^4.26.0",
     "esbuild": "0.27.3",
-    "https-proxy-agent": "8.0.0",
+    "https-proxy-agent": "9.0.0",
     "jsonc-parser": "3.3.1",
     "listr2": "10.2.1",
     "magic-string": "0.30.21",
