@@ -391,9 +391,9 @@ importers:
       piscina:
         specifier: 5.1.4
         version: 5.1.4
-      rolldown:
-        specifier: 1.0.0-rc.12
-        version: 1.0.0-rc.12
+      rollup:
+        specifier: 4.60.0
+        version: 4.60.0
       sass:
         specifier: 1.98.0
         version: 1.98.0
@@ -434,6 +434,9 @@ importers:
       postcss:
         specifier: 8.5.8
         version: 8.5.8
+      rolldown:
+        specifier: 1.0.0-rc.12
+        version: 1.0.0-rc.12
       rxjs:
         specifier: 7.8.2
         version: 7.8.2

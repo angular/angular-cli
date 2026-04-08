@@ -11,7 +11,13 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { platform } from 'node:os';
 import path from 'node:path';
-import type { ExistingRawSourceMap } from 'rolldown';
+
+interface ExistingRawSourceMap {
+  sources?: string[];
+  sourcesContent?: string[];
+  mappings?: string;
+}
+
 import type {
   BrowserConfigOptions,
   InlineConfig,
