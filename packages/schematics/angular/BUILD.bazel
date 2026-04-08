@@ -50,10 +50,9 @@ genrule(
     srcs = [
         "//:node_modules/@angular/core/dir",
     ],
-    outs = ["ai-config/files/__rulesName__.template"],
+    outs = ["ai-config/files/__bestPracticesName__.template"],
     cmd = """
-        echo -e "<% if (frontmatter) { %><%= frontmatter %>\\n<% } %>" > $@
-        cat "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" >> $@
+        cp "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" $@
     """,
 )
 
