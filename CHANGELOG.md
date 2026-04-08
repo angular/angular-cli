@@ -1,3 +1,15 @@
+<a name="20.3.23"></a>
+
+# 20.3.23 (2026-04-08)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------- |
+| [ccab02ba0](https://github.com/angular/angular-cli/commit/ccab02ba0413f25464a6e4cb5871716b221013b7) | fix  | update vite to `7.3.2` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.22"></a>
 
 # 20.3.22 (2026-03-27)
