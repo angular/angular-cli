@@ -36,7 +36,7 @@
     "parse5-html-rewriting-stream": "8.0.0",
     "picomatch": "4.0.4",
     "piscina": "5.1.4",
-    "rolldown": "1.0.0-rc.12",
+    "rollup": "4.60.0",
     "sass": "1.98.0",
     "semver": "7.7.4",
     "source-map-support": "0.5.21",
@@ -55,6 +55,7 @@
     "less": "4.6.4",
     "ng-packagr": "22.0.0-next.1",
     "postcss": "8.5.8",
+    "rolldown": "1.0.0-rc.12",
     "rxjs": "7.8.2",
     "vitest": "4.1.2"
   },

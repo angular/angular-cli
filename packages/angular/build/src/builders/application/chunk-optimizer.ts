@@ -19,7 +19,8 @@
 
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
-import { type OutputAsset, type OutputChunk, rolldown } from 'rolldown';
+import { rollup } from 'rollup';
+import { useRolldownChunks } from '../../utils/environment-options';
 import {
   BuildOutputFile,
   BuildOutputFileType,
@@ -30,13 +31,45 @@ import { createOutputFile } from '../../tools/esbuild/utils';
 import { assertIsError } from '../../utils/error';
 
 /**
- * Converts the output of a rolldown build into an esbuild-compatible metafile.
- * @param rolldownOutput The output of a rolldown build.
+ * Represents a minimal subset of a Rollup/Rolldown output asset.
+ * This is manually defined to avoid hard dependencies on both bundlers' types
+ * and to ensure compatibility since Rolldown and Rollup types have slight differences
+ * but share these core properties.
+ */
+interface OutputAsset {
+  type: 'asset';
+  fileName: string;
+  source: string | Uint8Array;
+}
+
+/**
+ * Represents a minimal subset of a Rollup/Rolldown output chunk.
+ * This is manually defined to avoid hard dependencies on both bundlers' types
+ * and to ensure compatibility since Rolldown and Rollup types have slight differences
+ * but share these core properties.
+ */
+interface OutputChunk {
+  type: 'chunk';
+  fileName: string;
+  code: string;
+  modules: Record<string, { renderedLength: number }>;
+  imports: string[];
+  dynamicImports?: string[];
+  exports: string[];
+  isEntry: boolean;
+  facadeModuleId: string | null | undefined;
+  map?: { toString(): string } | null;
+  sourcemapFileName?: string | null;
+}
+
+/**
+ * Converts the output of a bundle build into an esbuild-compatible metafile.
+ * @param bundleOutput The output of a bundle build.
  * @param originalMetafile The original esbuild metafile from the build.
  * @returns An esbuild-compatible metafile.
  */
-function rolldownToEsbuildMetafile(
-  rolldownOutput: (OutputChunk | OutputAsset)[],
+function bundleOutputToEsbuildMetafile(
+  bundleOutput: (OutputChunk | OutputAsset)[],
   originalMetafile: Metafile,
 ): Metafile {
   const newMetafile: Metafile = {
@@ -52,7 +85,7 @@ function rolldownToEsbuildMetafile(
     );
   }
 
-  for (const chunk of rolldownOutput) {
+  for (const chunk of bundleOutput) {
     if (chunk.type === 'asset') {
       newMetafile.outputs[chunk.fileName] = {
         bytes:
@@ -214,49 +247,65 @@ export async function optimizeChunks(
   const usedChunks = new Set<string>();
 
   let bundle;
-  let optimizedOutput;
+  let optimizedOutput: (OutputChunk | OutputAsset)[];
   try {
-    bundle = await rolldown({
-      input: mainFile,
-      plugins: [
-        {
-          name: 'angular-bundle',
-          resolveId(source) {
-            // Remove leading `./` if present
-            const file = source[0] === '.' && source[1] === '/' ? source.slice(2) : source;
+    const plugins = [
+      {
+        name: 'angular-bundle',
+        resolveId(source: string) {
+          // Remove leading `./` if present
+          const file = source[0] === '.' && source[1] === '/' ? source.slice(2) : source;
 
-            if (chunks[file]) {
-              return file;
-            }
+          if (chunks[file]) {
+            return file;
+          }
 
-            // All other identifiers are considered external to maintain behavior
-            return { id: source, external: true };
-          },
-          load(id) {
-            assert(
-              chunks[id],
-              `Angular chunk content should always be present in chunk optimizer [${id}].`,
-            );
-
-            usedChunks.add(id);
-
-            const result = {
-              code: chunks[id].text,
-              map: maps[id]?.text,
-            };
-
-            return result;
-          },
+          // All other identifiers are considered external to maintain behavior
+          return { id: source, external: true };
         },
-      ],
-    });
+        load(id: string) {
+          assert(
+            chunks[id],
+            `Angular chunk content should always be present in chunk optimizer [${id}].`,
+          );
 
-    const result = await bundle.generate({
-      minify: { mangle: false, compress: false },
-      sourcemap,
-      chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
-    });
-    optimizedOutput = result.output;
+          usedChunks.add(id);
+
+          const result = {
+            code: chunks[id].text,
+            map: maps[id]?.text,
+          };
+
+          return result;
+        },
+      },
+    ];
+
+    if (useRolldownChunks) {
+      const { rolldown } = await import('rolldown');
+      bundle = await rolldown({
+        input: mainFile,
+        plugins,
+      });
+
+      const result = await bundle.generate({
+        minify: { mangle: false, compress: false },
+        sourcemap,
+        chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+      });
+      optimizedOutput = result.output;
+    } else {
+      bundle = await rollup({
+        input: mainFile,
+        plugins: plugins as any,
+      });
+
+      const result = await bundle.generate({
+        sourcemap,
+        chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+      });
+      optimizedOutput = result.output;
+    }
   } catch (e) {
     assertIsError(e);
 
@@ -269,7 +318,7 @@ export async function optimizeChunks(
   }
 
   // Update metafile
-  const newMetafile = rolldownToEsbuildMetafile(optimizedOutput, original.metafile);
+  const newMetafile = bundleOutputToEsbuildMetafile(optimizedOutput, original.metafile);
   // Add back the outputs that were not part of the optimization
   for (const [path, output] of Object.entries(original.metafile.outputs)) {
     if (usedChunks.has(path)) {
