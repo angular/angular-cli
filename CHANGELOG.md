@@ -1,3 +1,38 @@
+<a name="22.0.0-next.5"></a>
+
+# 22.0.0-next.5 (2026-04-08)
+
+## Breaking Changes
+
+### @angular/build
+
+- `istanbul-lib-instrument` is now an optional peer dependency.
+  Projects using karma with code coverage enabled will need to ensure that istanbul-lib-instrument is installed. Note: `ng update` will automatically add this dependency during the update process.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [be60a63b7](https://github.com/angular/angular-cli/commit/be60a63b7b8fdea26bfd3329ce54d321334db2d2) | feat | add migrate-karma-to-vitest update migration                              |
+| [43505066e](https://github.com/angular/angular-cli/commit/43505066e2350ca875051bb0f9991da8003c9247) | feat | add migration to add istanbul-lib-instrument                              |
+| [470e1f937](https://github.com/angular/angular-cli/commit/470e1f937492e73971dea9c39af83368caf74e42) | fix  | add istanbul-lib-instrument to application/library generator dependencies |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [422c8183e](https://github.com/angular/angular-cli/commit/422c8183ea3596660475491b9630df34276c468e) | fix  | handle missing package manager during analytics initialization |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [3007f46b7](https://github.com/angular/angular-cli/commit/3007f46b7e077227b17d8bb1090edd2f8ff19ae3) | feat | move istanbul-lib-instrument to optional peer dependency   |
+| [829bdc61d](https://github.com/angular/angular-cli/commit/829bdc61dd77231bb13f01efd052811661fe4f48) | fix  | preserve coverage ignore comments in development           |
+| [e2f95fc19](https://github.com/angular/angular-cli/commit/e2f95fc19a648f3da84b58ace91283d0fa422cc1) | fix  | show clear error when styleUrl points to a TypeScript file |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.7"></a>
 
 # 21.2.7 (2026-04-08)
