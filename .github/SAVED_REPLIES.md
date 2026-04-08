@@ -99,3 +99,13 @@ I'd like to remind everyone that **you only have reproducible installs if you us
 
 **It is your responsibility as a library consumer to use lockfiles**. No one wants to do a release with bugs but it sometimes happens, and the best we can do is to fix it as fast as possible with a new release. When you have a couple of thousand total dependencies it is only a matter of time until one of them has a bad release.
 ```
+
+## Angular CLI: Spam (v1)
+
+```
+Woah, looks like you've opened a lot of issues/PRs recently. While we appreciate contributions from the community, triaging and reviewing a large influx of content in a short time period takes time away from other ongoing projects. As a result, we're closing these issues/PRs to maintain the team's focus.
+
+Note that this is not necessarily a rejection of the goals or direction of any of these contributions in particular, so much as a reflection of the team's current capacity and priorities.
+
+You are welcome to open a smaller subset of issues/PRs in accordance with [our policy](https://github.com/angular/angular-cli/blob/main/CONTRIBUTING.md#spam-policy) focused on the most important and impactful contributions and we will do our best to prioritize a response as soon as possible.
+```
