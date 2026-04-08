@@ -5,7 +5,4 @@ import { Directive } from '@angular/core';
   standalone: false,<%}%>
 })
 export class <%= classifiedName %> {
-
-  constructor() { }
-
 }
