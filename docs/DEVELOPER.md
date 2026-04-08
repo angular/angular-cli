@@ -168,7 +168,7 @@ Adding a package to this repository means running two separate commands:
 
 1. `schematics devkit:package PACKAGE_NAME`. This will update the `.monorepo` file, and create the
    base files for the new package (package.json, src/index, etc).
-1. `devkit-admin templates`. This will update the README and all other template files that might
+1. `pnpm admin templates`. This will update the README and all other template files that might
    have changed when adding a new package.
 
 For private packages, you will need to add a `"private": true` key to your package.json manually.
