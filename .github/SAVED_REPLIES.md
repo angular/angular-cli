@@ -107,5 +107,5 @@ Woah, looks like you've opened a lot of issues/PRs recently. While we appreciate
 
 Note that this is not necessarily a rejection of the goals or direction of any of these contributions in particular, so much as a reflection of the team's current capacity and priorities.
 
-You are welcome to open a smaller subset of issues/PRs in accordance with [our policy](https://github.com/angular/angular-cli/blob/main/CONTRIBUTING.md#spam-policy) focused on the most important and impactful contributions and we will do our best to prioritize a response as soon as possible.
+You are welcome to open a smaller subset of issues/PRs in accordance with [our policy](https://github.com/angular/angular/blob/main/contributing-docs/spam.md) focused on the most important and impactful contributions and we will do our best to prioritize a response as soon as possible.
 ```
