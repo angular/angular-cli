@@ -12,7 +12,7 @@ to follow:
  - [Coding Rules](#rules)
  - [Commit Message Guidelines](#commit)
  - [Signing the CLA](#cla)
- - [Updating the Public API](#public-api)
+ - [Spam Policy](#spam-policy)
 
 ## <a name="coc"></a> Code of Conduct
 Help us keep Angular open and inclusive. Please read and follow our [Code of Conduct][coc].
@@ -290,6 +290,9 @@ changes to be accepted, the CLA must be signed. It's a quick process, we promise
 * For corporations we'll need you to
   [print, sign and one of scan+email, fax or mail the form][corporate-cla].
 
+## <a name="spam-policy"></a> Spam Policy
+
+See [Spam Policy](https://github.com/angular/angular/blob/main/contributing-docs/spam.md) for details.
 
 [coc]: https://github.com/angular/code-of-conduct/blob/main/CODE_OF_CONDUCT.md
 [commit-message-format]: https://docs.google.com/document/d/1QrDFcIiPjSLDn3EL15IJygNPiHORgU1_OOAqWjiDU5Y/edit#

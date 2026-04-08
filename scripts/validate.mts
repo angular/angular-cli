@@ -27,7 +27,7 @@ export default async function (options: { verbose: boolean }) {
   await templates();
   if (execSync(`git status --porcelain`).toString()) {
     console.error(
-      'Running templates updated files... Please run "devkit-admin templates" before submitting a PR.',
+      'Running templates updated files... Please run "pnpm admin templates" before submitting a PR.',
     );
     if (!options.verbose) {
       process.exit(2);
