@@ -1,3 +1,22 @@
+<a name="21.2.7"></a>
+
+# 21.2.7 (2026-04-08)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [971041aa1](https://github.com/angular/angular-cli/commit/971041aa11e4546772e4677b77ceec2ad1374496) | fix  | handle missing package manager during analytics initialization |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [365cce81d](https://github.com/angular/angular-cli/commit/365cce81dde91463d4f0049a69feaed018902585) | fix  | preserve coverage ignore comments in development           |
+| [9f74660c3](https://github.com/angular/angular-cli/commit/9f74660c3688bb1f0d6a7608a136a30dbfe4d7e9) | fix  | show clear error when styleUrl points to a TypeScript file |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.6"></a>
 
 # 21.2.6 (2026-04-01)
