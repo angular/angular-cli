@@ -155,7 +155,29 @@ export const useJSONBuildLogs = parseTristate(process.env['NG_BUILD_LOGS_JSON'])
 /**
  * When `NG_BUILD_OPTIMIZE_CHUNKS` is enabled, the build will optimize chunks.
  */
-export const shouldOptimizeChunks = parseTristate(process.env['NG_BUILD_OPTIMIZE_CHUNKS']) === true;
+/**
+ * The threshold of lazy chunks required to enable the chunk optimization pass.
+ * Can be configured via the `NG_BUILD_OPTIMIZE_CHUNKS` environment variable.
+ * - `false` or `0` disables the feature.
+ * - `true` or `1` forces the feature on (threshold 0).
+ * - A number sets the specific threshold.
+ * - Default is 3.
+ */
+const optimizeChunksEnv = process.env['NG_BUILD_OPTIMIZE_CHUNKS'];
+export const optimizeChunksThreshold = (() => {
+  if (optimizeChunksEnv === undefined) {
+    return 3;
+  }
+  if (optimizeChunksEnv === 'false' || optimizeChunksEnv === '0') {
+    return Infinity;
+  }
+  if (optimizeChunksEnv === 'true' || optimizeChunksEnv === '1') {
+    return 0;
+  }
+  const num = Number.parseInt(optimizeChunksEnv, 10);
+
+  return Number.isNaN(num) || num < 0 ? 3 : num;
+})();
 
 /**
  * When `NG_HMR_CSTYLES` is enabled, component styles will be hot-reloaded.

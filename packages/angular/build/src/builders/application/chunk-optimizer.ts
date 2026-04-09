@@ -19,8 +19,7 @@
 
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
-import { rollup } from 'rollup';
-import { useRolldownChunks } from '../../utils/environment-options';
+import { type Plugin, rollup } from 'rollup';
 import {
   BuildOutputFile,
   BuildOutputFileType,
@@ -28,7 +27,9 @@ import {
   InitialFileRecord,
 } from '../../tools/esbuild/bundler-context';
 import { createOutputFile } from '../../tools/esbuild/utils';
+import { useRolldownChunks } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
+import { toPosixPath } from '../../utils/path';
 
 /**
  * Represents a minimal subset of a Rollup/Rolldown output asset.
@@ -137,15 +138,23 @@ function bundleOutputToEsbuildMetafile(
       ...(chunk.dynamicImports?.map((path) => ({ path, kind: 'dynamic-import' as const })) ?? []),
     ];
 
+    let entryPoint: string | undefined;
+    if (chunk.facadeModuleId) {
+      const posixFacadeModuleId = toPosixPath(chunk.facadeModuleId);
+      for (const [outputPath, output] of Object.entries(originalMetafile.outputs)) {
+        if (posixFacadeModuleId.endsWith(outputPath)) {
+          entryPoint = output.entryPoint;
+          break;
+        }
+      }
+    }
+
     newMetafile.outputs[chunk.fileName] = {
       bytes: Buffer.byteLength(chunk.code, 'utf8'),
       inputs: newOutputInputs,
       imports,
       exports: chunk.exports ?? [],
-      entryPoint:
-        chunk.isEntry && chunk.facadeModuleId
-          ? originalMetafile.outputs[chunk.facadeModuleId]?.entryPoint
-          : undefined,
+      entryPoint,
     };
   }
 
@@ -201,6 +210,7 @@ function createChunkOptimizationFailureMessage(message: string): Message {
  * @param sourcemap A boolean or 'hidden' to control sourcemap generation.
  * @returns A promise that resolves to the updated build result with optimized chunks.
  */
+// eslint-disable-next-line max-lines-per-function
 export async function optimizeChunks(
   original: BundleContextResult,
   sourcemap: boolean | 'hidden',
@@ -291,18 +301,20 @@ export async function optimizeChunks(
       const result = await bundle.generate({
         minify: { mangle: false, compress: false },
         sourcemap,
-        chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+        chunkFileNames: (chunkInfo) =>
+          `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
       });
       optimizedOutput = result.output;
     } else {
       bundle = await rollup({
         input: mainFile,
-        plugins: plugins as any,
+        plugins: plugins as Plugin[],
       });
 
       const result = await bundle.generate({
         sourcemap,
-        chunkFileNames: (chunkInfo) => `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+        chunkFileNames: (chunkInfo) =>
+          `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
       });
       optimizedOutput = result.output;
     }

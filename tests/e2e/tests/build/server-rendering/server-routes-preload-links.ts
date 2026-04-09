@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { replaceInFile, writeMultipleFiles } from '../../../utils/fs';
-import { execAndWaitForOutputToMatch, ng, noSilentNg, silentNg } from '../../../utils/process';
+import { execAndWaitForOutputToMatch, execWithEnv, ng, silentNg } from '../../../utils/process';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';
 import { ngServe, updateJsonFile, useSha } from '../../../utils/project';
 import { getGlobalVariable } from '../../../utils/env';
@@ -117,8 +117,27 @@ export default async function () {
   // Test both vite and `ng build`
   await runTests(await ngServe());
 
-  await noSilentNg('build', '--output-mode=server');
+  // Disable chunk optimization to ensure specific chunks like `ssg.routes` are not merged.
+  // This test asserts on specific chunk names which optimization may change.
+  await execWithEnv('ng', ['build', '--output-mode=server'], {
+    ...process.env,
+    NG_BUILD_OPTIMIZE_CHUNKS: 'false',
+  });
   await runTests(await spawnServer());
+
+  // Test with default build behavior (chunk optimization enabled)
+  // Only check the preload for the first entry (home)
+  await ng('build', '--output-mode=server');
+  const defaultServerPort = await spawnServer();
+
+  const res = await fetch(`http://localhost:${defaultServerPort}/`);
+  const text = await res.text();
+  const homeMatch = /<link rel="modulepreload" href="(home-[a-zA-Z0-9]{8}\.js)">/;
+  assert.match(text, homeMatch, `Response for '/': ${homeMatch} was not matched in content.`);
+
+  const link = text.match(homeMatch)?.[1];
+  const preloadRes = await fetch(`http://localhost:${defaultServerPort}/${link}`);
+  assert.equal(preloadRes.status, 200);
 }
 
 const RESPONSE_EXPECTS: Record<
