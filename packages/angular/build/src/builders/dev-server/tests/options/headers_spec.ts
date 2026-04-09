@@ -37,6 +37,20 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(await response?.headers.get('x-custom')).toBe('foo');
     });
 
+    it('should include configured Access-Control-Allow-Origin header', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        headers: {
+          'Access-Control-Allow-Origin': 'http://example.com',
+        },
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, '/main.js');
+
+      expect(result?.success).toBeTrue();
+      expect(await response?.headers.get('access-control-allow-origin')).toBe('http://example.com');
+    });
+
     it('media resource response headers should include configured header', async () => {
       await harness.writeFiles({
         'src/styles.css': `h1 { background: url('./test.svg')}`,
