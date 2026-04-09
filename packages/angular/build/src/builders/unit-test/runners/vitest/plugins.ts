@@ -12,12 +12,6 @@ import { createRequire } from 'node:module';
 import { platform } from 'node:os';
 import path from 'node:path';
 
-interface ExistingRawSourceMap {
-  sources?: string[];
-  sourcesContent?: string[];
-  mappings?: string;
-}
-
 import type {
   BrowserConfigOptions,
   InlineConfig,
@@ -29,6 +23,12 @@ import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/
 import { toPosixPath } from '../../../../utils/path';
 import type { ResultFile } from '../../../application/results';
 import type { NormalizedUnitTestBuilderOptions } from '../../options';
+
+interface ExistingRawSourceMap {
+  sources?: string[];
+  sourcesContent?: string[];
+  mappings?: string;
+}
 
 type VitestPlugins = Awaited<ReturnType<typeof VitestPlugin>>;
 

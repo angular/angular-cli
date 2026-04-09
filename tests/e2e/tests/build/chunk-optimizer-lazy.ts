@@ -28,7 +28,10 @@ export default async function () {
   );
 
   // Build without chunk optimization
-  await ng('build', '--output-hashing=none');
+  await execWithEnv('ng', ['build', '--output-hashing=none'], {
+    ...process.env,
+    NG_BUILD_OPTIMIZE_CHUNKS: 'false',
+  });
   const unoptimizedFiles = await readdir('dist/test-project/browser');
   const unoptimizedJsFiles = unoptimizedFiles.filter((f) => f.endsWith('.js'));
 
