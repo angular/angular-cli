@@ -36,7 +36,7 @@
     "@angular/platform-server": "22.0.0-next.6",
     "@angular/router": "22.0.0-next.6",
     "@schematics/angular": "workspace:*",
-    "beasties": "0.4.1"
+    "beasties": "0.4.2"
   },
   "sideEffects": false,
   "schematics": "./schematics/collection.json",
