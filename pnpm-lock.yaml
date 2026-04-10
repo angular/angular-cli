@@ -13,6 +13,13 @@ packageExtensionsChecksum: sha256-V29Z7ZDJEQFju55ZS5zQ23Kb0736+P+eGNolWn/T274=
 importers:
 
   .:
+    dependencies:
+      '@angular/compiler-cli':
+        specifier: 22.0.0-next.6
+        version: 22.0.0-next.6(@angular/compiler@22.0.0-next.6)(typescript@6.0.2)
+      typescript:
+        specifier: 6.0.2
+        version: 6.0.2
     dependenciesMeta:
       esbuild:
         built: true
@@ -31,9 +38,6 @@ importers:
       '@angular/compiler':
         specifier: 22.0.0-next.6
         version: 22.0.0-next.6
-      '@angular/compiler-cli':
-        specifier: 22.0.0-next.6
-        version: 22.0.0-next.6(@angular/compiler@22.0.0-next.6)(typescript@6.0.2)
       '@angular/core':
         specifier: 22.0.0-next.6
         version: 22.0.0-next.6(@angular/compiler@22.0.0-next.6)(rxjs@7.8.2)(zone.js@0.16.1)
@@ -280,9 +284,6 @@ importers:
       tslib:
         specifier: 2.8.1
         version: 2.8.1
-      typescript:
-        specifier: 6.0.2
-        version: 6.0.2
       undici:
         specifier: 7.24.7
         version: 7.24.7
