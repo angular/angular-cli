@@ -224,7 +224,12 @@ function verifyHostAllowed(
     throw new Error(`Header "${headerName}" contains an invalid value and cannot be parsed.`);
   }
 
-  const { hostname } = new URL(url);
+  const { hostname, port } = new URL(url);
+  if (port) {
+    throw new Error(
+      `Header "${headerName}" with value "${value}" contains a port and is not allowed.`,
+    );
+  }
   if (!isHostAllowed(hostname, allowedHosts)) {
     throw new Error(`Header "${headerName}" with value "${value}" is not allowed.`);
   }
