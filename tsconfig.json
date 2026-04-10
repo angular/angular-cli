@@ -4,6 +4,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "noEmitOnError": true,
     "stripInternal": true,
     "noFallthroughCasesInSwitch": true,
