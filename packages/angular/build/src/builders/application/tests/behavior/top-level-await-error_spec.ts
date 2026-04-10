@@ -56,9 +56,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const zoneJsErrorPresent = logs.some(
         (log) =>
           typeof log.message === 'string' &&
-          log.message.includes(
-            'Top-level await is not supported in applications that use Zone.js',
-          ),
+          log.message.includes('Top-level await is not supported in applications that use Zone.js'),
       );
       expect(zoneJsErrorPresent).toBeFalse();
     });
