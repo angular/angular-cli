@@ -7,19 +7,25 @@
  */
 
 import { readdir, rm } from 'node:fs/promises';
-import { join, resolve } from 'node:path';
+import { join, resolve, sep } from 'node:path';
 
 /**
- * Delete an output directory, but error out if it's the root of the project.
+ * Delete an output directory, but error out if it's the root of the project or outside it.
  */
 export async function deleteOutputDir(
   root: string,
   outputPath: string,
   emptyOnlyDirectories?: string[],
 ): Promise<void> {
+  const resolvedRoot = resolve(root);
   const resolvedOutputPath = resolve(root, outputPath);
-  if (resolvedOutputPath === root) {
+  if (resolvedOutputPath === resolvedRoot) {
     throw new Error('Output path MUST not be project root directory!');
+  }
+  if (!resolvedOutputPath.startsWith(resolvedRoot + sep)) {
+    throw new Error(
+      `Output path '${resolvedOutputPath}' MUST be inside the project root '${resolvedRoot}'.`,
+    );
   }
 
   const directoriesToEmpty = emptyOnlyDirectories

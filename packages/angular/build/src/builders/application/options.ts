@@ -308,14 +308,21 @@ export async function normalizeOptions(
   }
 
   const outputPath = options.outputPath ?? path.join(workspaceRoot, 'dist', projectName);
+  const resolvedOutputBase = path.resolve(
+    workspaceRoot,
+    typeof outputPath === 'string' ? outputPath : outputPath.base,
+  );
+  if (!resolvedOutputBase.startsWith(workspaceRoot + path.sep)) {
+    throw new Error(
+      `Output path '${resolvedOutputBase}' must be inside the project root directory '${workspaceRoot}'.`,
+    );
+  }
   const outputOptions: NormalizedOutputOptions = {
     browser: 'browser',
     server: 'server',
     media: 'media',
     ...(typeof outputPath === 'string' ? undefined : outputPath),
-    base: normalizeDirectoryPath(
-      path.resolve(workspaceRoot, typeof outputPath === 'string' ? outputPath : outputPath.base),
-    ),
+    base: normalizeDirectoryPath(resolvedOutputBase),
     clean: options.deleteOutputPath ?? true,
     // For app-shell and SSG server files are not required by users.
     // Omit these when SSR is not enabled.
