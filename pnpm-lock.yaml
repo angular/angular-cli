@@ -13,6 +13,13 @@ packageExtensionsChecksum: sha256-3L73Fw32UVtE6x5BJxJPBtQtH/mgsr31grNpdhHP1IY=
 importers:
 
   .:
+    dependencies:
+      '@angular/compiler-cli':
+        specifier: 21.2.7
+        version: 21.2.7(@angular/compiler@21.2.7)(typescript@5.9.3)
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
     dependenciesMeta:
       esbuild:
         built: true
@@ -31,9 +38,6 @@ importers:
       '@angular/compiler':
         specifier: 21.2.7
         version: 21.2.7
-      '@angular/compiler-cli':
-        specifier: 21.2.7
-        version: 21.2.7(@angular/compiler@21.2.7)(typescript@5.9.3)
       '@angular/core':
         specifier: 21.2.7
         version: 21.2.7(@angular/compiler@21.2.7)(rxjs@7.8.2)(zone.js@0.16.1)
@@ -283,9 +287,6 @@ importers:
       tslib:
         specifier: 2.8.1
         version: 2.8.1
-      typescript:
-        specifier: 5.9.3
-        version: 5.9.3
       undici:
         specifier: 7.24.4
         version: 7.24.4
@@ -6998,10 +6999,6 @@ packages:
 
   minimalistic-assert@1.0.1:
     resolution: {integrity: sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==}
-
-  minimatch@10.2.4:
-    resolution: {integrity: sha512-oRjTw/97aTBN0RHbYCdtF1MQfvusSIBQM0IZEgzl6426+8jSC0nF1a/GmnVLpfB9yyr6g6FTqWqiZVbxrtaCIg==}
-    engines: {node: 18 || 20 || >=22}
 
   minimatch@10.2.5:
     resolution: {integrity: sha512-MULkVLfKGYDFYejP07QOurDLLQpcjk7Fw+7jXS2R2czRQzR56yHRveU5NDJEOviH+hETZKSkIk5c+T23GjFUMg==}
@@ -16486,10 +16483,6 @@ snapshots:
       webpack: 5.105.2(esbuild@0.27.3)
 
   minimalistic-assert@1.0.1: {}
-
-  minimatch@10.2.4:
-    dependencies:
-      brace-expansion: 5.0.5
 
   minimatch@10.2.5:
     dependencies:
