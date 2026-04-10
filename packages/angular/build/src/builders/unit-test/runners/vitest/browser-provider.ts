@@ -47,7 +47,7 @@ export interface BrowserInstanceConfiguration {
   provider?: BrowserProviderOption;
 }
 
-function normalizeBrowserName(browserName: string): BrowserInstanceConfiguration {
+export function normalizeBrowserName(browserName: string): BrowserInstanceConfiguration {
   // Normalize browser names to match Vitest's expectations for headless but also supports karma's names
   // e.g., 'ChromeHeadless' -> 'chrome', 'FirefoxHeadless' -> 'firefox'
   // and 'Chrome' -> 'chrome', 'Firefox' -> 'firefox'.
