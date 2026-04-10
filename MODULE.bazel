@@ -19,28 +19,21 @@ bazel_dep(name = "aspect_rules_jasmine", version = "2.0.4")
 bazel_dep(name = "rules_angular")
 git_override(
     module_name = "rules_angular",
-    commit = "0d390186270572cf0e56f826ca420cb21011a10c",
+    commit = "46fdabe25ad865093d1be752c778ca4d81f222f5",
     remote = "https://github.com/angular/rules_angular.git",
 )
 
 bazel_dep(name = "devinfra")
 git_override(
     module_name = "devinfra",
-    commit = "ba726e7bca0b08b125ccc6f93c233749e1213c17",
+    commit = "583cd52fbbadae28ca7a4dd55d63978a984c371a",
     remote = "https://github.com/angular/dev-infra.git",
-)
-
-bazel_dep(name = "rules_sass")
-git_override(
-    module_name = "rules_sass",
-    commit = "b5ddaa8e77509bcce35158ad20009636d3da4fbc",
-    remote = "https://github.com/angular/rules_sass.git",
 )
 
 bazel_dep(name = "rules_browsers")
 git_override(
     module_name = "rules_browsers",
-    commit = "652b57c41218be318f33fc92032696f53d3aa0ef",
+    commit = "dc3e432662fe9f99eb7f030a35a22d4ff77d54c7",
     remote = "https://github.com/angular/rules_browsers.git",
 )
 
@@ -182,11 +175,11 @@ use_repo(rules_ts_ext, **{"npm_typescript": "angular_cli_npm_typescript"})
 
 rules_angular = use_extension("@rules_angular//setup:extensions.bzl", "rules_angular")
 rules_angular.setup(
-    name = "components_rules_angular_configurable_deps",
+    name = "angular_cli_rules_angular_configurable_deps",
     angular_compiler_cli = "//:node_modules/@angular/compiler-cli",
     typescript = "//:node_modules/typescript",
 )
-use_repo(rules_angular, **{"rules_angular_configurable_deps": "components_rules_angular_configurable_deps"})
+use_repo(rules_angular, **{"rules_angular_configurable_deps": "angular_cli_rules_angular_configurable_deps"})
 
 register_toolchains(
     "@devinfra//bazel/git-toolchain:git_linux_toolchain",

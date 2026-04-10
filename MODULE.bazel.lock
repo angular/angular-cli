@@ -427,7 +427,7 @@
     "@@aspect_rules_ts+//ts:extensions.bzl%ext": {
       "general": {
         "bzlTransitiveDigest": "dhTbv9E6UfT1WJmmu3ORRPO6AKFJvgBjBxu+BO+u1RY=",
-        "usagesDigest": "ixhEGTq9m8RnVX8NzQrTSzJTXApIjZ/AKMZnWquJj8Q=",
+        "usagesDigest": "mnWOxbm/kIwuW9HmcBRVBhHU3ThlGE832G0JAy/sn+4=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -455,8 +455,8 @@
           "npm_typescript": {
             "repoRuleId": "@@aspect_rules_ts+//ts/private:npm_repositories.bzl%http_archive_version",
             "attributes": {
-              "version": "5.9.3",
-              "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+              "version": "6.0.2",
+              "integrity": "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==",
               "urls": [
                 "https://registry.npmjs.org/typescript/-/typescript-{}.tgz"
               ]
@@ -465,8 +465,8 @@
           "npm_rules_browsers_typescript": {
             "repoRuleId": "@@aspect_rules_ts+//ts/private:npm_repositories.bzl%http_archive_version",
             "attributes": {
-              "version": "5.9.3",
-              "integrity": "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==",
+              "version": "6.0.2",
+              "integrity": "sha512-bGdAIrZ0wiGDo5l8c++HWtbaNCWTS4UTv7RaTH/ThVIgjkveJt83m74bBHMJkuCbslY8ixgLBVZJIOiQlQTjfQ==",
               "urls": [
                 "https://registry.npmjs.org/typescript/-/typescript-{}.tgz"
               ]
@@ -558,31 +558,24 @@
     },
     "@@rules_angular+//setup:extensions.bzl%rules_angular": {
       "general": {
-        "bzlTransitiveDigest": "fkaH7HMicL3g7/NDaFzlq39kcLopMyQ3KdbDn+5CRzA=",
-        "usagesDigest": "it5nR/3UaQWj2eaaMj+EnoZuL2z/AeTuz7uOnqd+nxo=",
+        "bzlTransitiveDigest": "aS7Uud1IzoU7PPLzH3s6IfFS4b2fa0SRWDi2/fS4bQU=",
+        "usagesDigest": "NK6UKnTWfOFl5i+flt6LxviEbMHgJEH+JyjGkTh3Vjo=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
         "generatedRepoSpecs": {
-          "components_rules_angular_configurable_deps": {
+          "angular_cli_rules_angular_configurable_deps": {
             "repoRuleId": "@@rules_angular+//setup:repositories.bzl%configurable_deps_repo",
             "attributes": {
-              "angular_compiler_cli": "@@rules_angular+//:node_modules/@angular/compiler-cli",
-              "typescript": "@@rules_angular+//:node_modules/typescript"
+              "angular_compiler_cli": "@@//:node_modules/@angular/compiler-cli",
+              "typescript": "@@//:node_modules/typescript"
             }
           },
           "rules_angular_configurable_deps": {
             "repoRuleId": "@@rules_angular+//setup:repositories.bzl%configurable_deps_repo",
             "attributes": {
-              "angular_compiler_cli": "@@rules_angular+//:node_modules/@angular/compiler-cli",
-              "typescript": "@@rules_angular+//:node_modules/typescript"
-            }
-          },
-          "dev_infra_rules_angular_configurable_deps": {
-            "repoRuleId": "@@rules_angular+//setup:repositories.bzl%configurable_deps_repo",
-            "attributes": {
-              "angular_compiler_cli": "@@rules_angular+//:node_modules/@angular/compiler-cli",
-              "typescript": "@@rules_angular+//:node_modules/typescript"
+              "angular_compiler_cli": "@@//:node_modules/@angular/compiler-cli",
+              "typescript": "@@//:node_modules/typescript"
             }
           }
         },
@@ -4926,62 +4919,6 @@
             "rules_python++python+python_3_9_host"
           ]
         ]
-      }
-    },
-    "@@rules_sass+//src/toolchain:extensions.bzl%sass": {
-      "general": {
-        "bzlTransitiveDigest": "mOfuR8PsNuUWEq7JZ4MpIRbwyAGAqrCvkXXGaRNnlPQ=",
-        "usagesDigest": "R0KshhzIouLWuexMUCrl4HY+FUDwlVVgF9Z7UnwyUWA=",
-        "recordedFileInputs": {},
-        "recordedDirentsInputs": {},
-        "envVariables": {},
-        "generatedRepoSpecs": {
-          "linux_amd64_sass": {
-            "repoRuleId": "@@rules_sass+//src/toolchain:configure_sass.bzl%configure_sass",
-            "attributes": {
-              "file": "@rules_sass//src/compiler/built:sass_linux_x64",
-              "sha256": "",
-              "constraints": [
-                "@@platforms//os:linux",
-                "@@platforms//cpu:x86_64"
-              ]
-            }
-          },
-          "linux_arm64_sass": {
-            "repoRuleId": "@@rules_sass+//src/toolchain:configure_sass.bzl%configure_sass",
-            "attributes": {
-              "file": "@rules_sass//src/compiler/built:sass_linux_arm",
-              "sha256": "",
-              "constraints": [
-                "@@platforms//os:linux",
-                "@@platforms//cpu:arm64"
-              ]
-            }
-          },
-          "darwin_amd64_sass": {
-            "repoRuleId": "@@rules_sass+//src/toolchain:configure_sass.bzl%configure_sass",
-            "attributes": {
-              "file": "@rules_sass//src/compiler/built:sass_mac_x64",
-              "sha256": "",
-              "constraints": [
-                "@@platforms//os:macos",
-                "@@platforms//cpu:x86_64"
-              ]
-            }
-          },
-          "darwin_arm64_sass": {
-            "repoRuleId": "@@rules_sass+//src/toolchain:configure_sass.bzl%configure_sass",
-            "attributes": {
-              "file": "@rules_sass//src/compiler/built:sass_mac_arm",
-              "sha256": "",
-              "constraints": [
-                "@@platforms//os:macos",
-                "@@platforms//cpu:arm64"
-              ]
-            }
-          }
-        },
-        "recordedRepoMappingEntries": []
       }
     },
     "@@yq.bzl+//yq:extensions.bzl%yq": {
