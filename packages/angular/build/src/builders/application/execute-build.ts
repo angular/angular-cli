@@ -167,19 +167,14 @@ export async function executeBuild(
     if (!isZonelessApp(options.polyfills)) {
       for (const error of bundlingResult.errors) {
         if (error.text?.startsWith(TOP_LEVEL_AWAIT_ERROR_TEXT)) {
-          error.notes = [
-            {
-              text:
-                'Top-level await is not supported in applications that use Zone.js. ' +
-                'Consider removing Zone.js or moving this code into an async function.',
-              location: null,
-            },
-            {
-              text: 'For more information about zoneless Angular applications, visit: https://angular.dev/guide/zoneless',
-              location: null,
-            },
-            ...(error.notes ?? []),
-          ];
+          error.notes ??= [];
+          error.notes.push({
+            text:
+              'Top-level await is not supported in applications that use Zone.js. ' +
+              'Consider removing Zone.js or moving this code into an async function. \n' +
+              'For more information about zoneless Angular applications, visit: https://angular.dev/guide/zoneless',
+            location: null,
+          });
         }
       }
     }
