@@ -260,6 +260,22 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           }),
         );
       });
+
+      it('should error when the output path escapes the workspace root', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          polyfills: [],
+          outputPath: '../dist',
+        });
+
+        const { result, error } = await harness.executeOnce({
+          outputLogsOnException: false,
+          outputLogsOnFailure: false,
+        });
+
+        expect(result).toBeUndefined();
+        expect(error?.message).toMatch(/must be inside the project root directory/);
+      });
     });
   });
 });
