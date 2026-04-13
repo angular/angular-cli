@@ -13,7 +13,7 @@
  * includes logic to identify and add TODO comments for unsupported Jasmine features.
  */
 
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 import { addVitestValueImport, createViCallExpression } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
 import { addTodoComment } from '../utils/comment-helpers';

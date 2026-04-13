@@ -13,7 +13,7 @@
  * and the inspection of spy calls (`spy.calls.reset`, `spy.calls.mostRecent`).
  */
 
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 import {
   addVitestValueImport,
   createPropertyAccess,

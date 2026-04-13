@@ -8,7 +8,7 @@
 
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import * as ts from '../third_party/typescript';
 import { findNode, getSourceNodes } from '../utility/ast-utils';
 import { findBootstrapApplicationCall } from './standalone/util';
 

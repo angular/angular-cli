@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 import { RefactorReporter } from './refactor-reporter';
 
 describe('RefactorReporter', () => {

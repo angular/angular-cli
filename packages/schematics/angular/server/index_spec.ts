@@ -9,7 +9,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
 import { Schema as ApplicationOptions, Style } from '../application/schema';
-import { CompilerOptions } from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import { CompilerOptions } from '../third_party/typescript';
 import { NodeDependencyType, addPackageJsonDependency } from '../utility/dependencies';
 import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';

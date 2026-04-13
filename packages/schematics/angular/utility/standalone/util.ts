@@ -8,7 +8,7 @@
 
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
-import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../third_party/typescript';
 import { Change, applyToUpdateRecorder } from '../change';
 import { targetBuildNotFoundError } from '../project-targets';
 import { getWorkspace } from '../workspace';

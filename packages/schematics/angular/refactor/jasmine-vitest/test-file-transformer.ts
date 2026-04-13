@@ -13,7 +13,7 @@
  * blank line preservation, and reporting of transformation details.
  */
 
-import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../third_party/typescript';
 import {
   transformDoneCallback,
   transformFocusedAndSkippedTests,
