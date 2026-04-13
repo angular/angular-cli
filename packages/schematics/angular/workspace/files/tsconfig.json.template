@@ -3,11 +3,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {<% if (strict) { %>
-    "strict": true,
     "noImplicitOverride": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": true,<% } %>
+    "noFallthroughCasesInSwitch": true,<% } else { %>
+    "strict": false,<% } %>
     "skipLibCheck": true,
     "isolatedModules": true,
     "experimentalDecorators": true,
