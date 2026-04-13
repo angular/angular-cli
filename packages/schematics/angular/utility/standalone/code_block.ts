@@ -7,7 +7,7 @@
  */
 
 import { Rule, Tree } from '@angular-devkit/schematics';
-import ts from '../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../third_party/typescript';
 import { hasTopLevelIdentifier, insertImport } from '../ast-utils';
 import { applyToUpdateRecorder } from '../change';
 

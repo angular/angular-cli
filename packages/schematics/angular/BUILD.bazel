@@ -108,7 +108,7 @@ ts_project(
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/jsonc-parser",
         "//:node_modules/@types/node",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
+        "//packages/schematics/angular/third_party/typescript",
     ],
 )
 
@@ -142,7 +142,7 @@ ts_project(
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/prettier",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript",
+        "//packages/schematics/angular/third_party/typescript",
     ],
 )
 
@@ -173,8 +173,6 @@ npm_package(
         ":README.md",
         ":angular",
         ":license",
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:LICENSE",
-        # Force typescript library to be included.
-        "//packages/schematics/angular/third_party/github.com/Microsoft/TypeScript:lib/typescript.js",
+        "//packages/schematics/angular/third_party/typescript",
     ],
 )

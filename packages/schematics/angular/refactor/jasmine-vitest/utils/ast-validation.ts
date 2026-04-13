@@ -11,7 +11,7 @@
  * TypeScript AST nodes, particularly for identifying specific patterns in Jasmine tests.
  */
 
-import ts from '../../../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import ts from '../../../third_party/typescript';
 
 /**
  * If a node is a `jasmine.method()` call, returns the method name.

@@ -23,7 +23,7 @@ import {
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
 import { Schema as ComponentOptions } from '../component/schema';
-import * as ts from '../third_party/github.com/Microsoft/TypeScript/lib/typescript';
+import * as ts from '../third_party/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import {
