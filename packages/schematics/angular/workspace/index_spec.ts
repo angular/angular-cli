@@ -98,7 +98,7 @@ describe('Workspace Schematic', () => {
     const { compilerOptions, angularCompilerOptions } = parseJson(
       tree.readContent('tsconfig.json').toString(),
     );
-    expect(compilerOptions.strict).toBeUndefined();
+    expect(compilerOptions.strict).toBeFalse();
     expect(angularCompilerOptions.strictTemplates).toBeFalse();
     expect(angularCompilerOptions.strictInputAccessModifiers).toBeUndefined();
     expect(angularCompilerOptions.strictInjectionParameters).toBeUndefined();
@@ -112,7 +112,7 @@ describe('Workspace Schematic', () => {
     const { compilerOptions, angularCompilerOptions } = parseJson(
       tree.readContent('tsconfig.json').toString(),
     );
-    expect(compilerOptions.strict).toBeTrue();
+    expect(compilerOptions.strict).toBeUndefined();
     expect(angularCompilerOptions.strictTemplates).toBeUndefined();
     expect(angularCompilerOptions.strictInputAccessModifiers).toBeTrue();
     expect(angularCompilerOptions.strictInjectionParameters).toBeTrue();
