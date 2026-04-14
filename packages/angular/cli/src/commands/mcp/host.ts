@@ -19,6 +19,7 @@ import { Stats } from 'node:fs';
 import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
+import { dirname, join, resolve } from 'node:path';
 
 /**
  * An error thrown when a command fails to execute.
@@ -125,6 +126,36 @@ export interface Host {
   isPortAvailable(port: number): Promise<boolean>;
 }
 
+function resolveCommand(
+  command: string,
+  args: readonly string[],
+  cwd?: string,
+): { command: string; args: readonly string[] } {
+  if (command !== 'ng' || !cwd) {
+    return { command, args };
+  }
+
+  try {
+    const workspaceRequire = createRequire(join(cwd, 'package.json'));
+    const pkgJsonPath = workspaceRequire.resolve('@angular/cli/package.json');
+    const pkgJson = workspaceRequire(pkgJsonPath) as { bin?: string | Record<string, string> };
+    const binPath = typeof pkgJson.bin === 'string' ? pkgJson.bin : pkgJson.bin?.['ng'];
+
+    if (binPath) {
+      const ngJsPath = resolve(dirname(pkgJsonPath), binPath);
+
+      return {
+        command: process.execPath,
+        args: [ngJsPath, ...args],
+      };
+    }
+  } catch {
+    // Failed to resolve the CLI binary, fall back to assuming `ng` is on PATH.
+  }
+
+  return { command, args };
+}
+
 /**
  * A concrete implementation of the `Host` interface that runs on a local workspace.
  */
@@ -156,10 +187,11 @@ export const LocalWorkspaceHost: Host = {
       env?: Record<string, string>;
     } = {},
   ): Promise<{ logs: string[] }> => {
+    const resolved = resolveCommand(command, args, options.cwd);
     const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
 
     return new Promise((resolve, reject) => {
-      const childProcess = spawn(command, args, {
+      const childProcess = spawn(resolved.command, resolved.args, {
         shell: false,
         stdio: options.stdio ?? 'pipe',
         signal,
@@ -205,7 +237,9 @@ export const LocalWorkspaceHost: Host = {
       env?: Record<string, string>;
     } = {},
   ): ChildProcess {
-    return spawn(command, args, {
+    const resolved = resolveCommand(command, args, options.cwd);
+
+    return spawn(resolved.command, resolved.args, {
       shell: false,
       stdio: options.stdio ?? 'pipe',
       cwd: options.cwd,
