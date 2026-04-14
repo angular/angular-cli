@@ -248,10 +248,7 @@ const serverSchematic: RuleFactory<ServerOptions> = createProjectSchematic(
       addRootProvider(
         options.project,
         ({ code, external }) =>
-          code`${external('provideClientHydration', '@angular/platform-browser')}(${external(
-            'withEventReplay',
-            '@angular/platform-browser',
-          )}())`,
+          code`${external('provideClientHydration', '@angular/platform-browser')}()`,
       ),
     ]);
   },
