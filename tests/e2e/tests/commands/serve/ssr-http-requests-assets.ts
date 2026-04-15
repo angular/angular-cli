@@ -1,5 +1,5 @@
 import assert from 'node:assert';
-import { Agent } from 'undici';
+import { Agent, fetch } from 'undici';
 import { killAllProcesses, ng } from '../../../utils/process';
 import { writeMultipleFiles } from '../../../utils/fs';
 import { installWorkspacePackages, uninstallPackage } from '../../../utils/packages';

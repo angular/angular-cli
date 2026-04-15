@@ -8,7 +8,7 @@
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { tags } from '@angular-devkit/core';
-import { Agent } from 'undici';
+import { Agent, fetch } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { DevServerBuilderOutput } from '../index';
 
