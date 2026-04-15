@@ -9,7 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as browserSync from 'browser-sync';
-import { Agent } from 'undici';
+import { Agent, fetch } from 'undici';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Serve SSR Builder - SSL', () => {

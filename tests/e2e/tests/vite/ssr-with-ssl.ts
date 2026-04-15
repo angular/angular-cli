@@ -1,4 +1,4 @@
-import { Agent } from 'undici';
+import { Agent, fetch } from 'undici';
 import assert from 'node:assert';
 import { writeMultipleFiles } from '../../utils/fs';
 import { ng, silentNg } from '../../utils/process';
