@@ -1,3 +1,15 @@
+<a name="20.3.24"></a>
+
+# 20.3.24 (2026-04-15)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------- |
+| [10c09c77b](https://github.com/angular/angular-cli/commit/10c09c77b75602293377b962b2a8397a2819036c) | fix  | update esbuild to `0.28.0` |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0-next.5"></a>
 
 # 22.0.0-next.5 (2026-04-08)
