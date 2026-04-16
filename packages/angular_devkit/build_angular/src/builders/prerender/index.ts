@@ -217,7 +217,7 @@ async function _renderUniversal(
               inlineCriticalCss: !!normalizedStylesOptimization.inlineCritical,
               minifyCss: !!normalizedStylesOptimization.minify,
               outputPath,
-              route,
+              route: route[0] === '/' ? route : '/' + route,
               serverBundlePath,
             };
 
