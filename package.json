@@ -167,6 +167,6 @@
     }
   },
   "resolutions": {
-    "undici-types": "^7.16.0"
+    "undici-types": "^8.0.0"
   }
 }
