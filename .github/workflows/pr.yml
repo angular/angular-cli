@@ -38,7 +38,7 @@ jobs:
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@ba726e7bca0b08b125ccc6f93c233749e1213c17
       - name: Setup ESLint Caching
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: .eslintcache
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
@@ -82,7 +82,7 @@ jobs:
       - name: Build release targets
         run: pnpm ng-dev release build
       - name: Store PR release packages
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: packages
           path: dist/releases/*.tgz
@@ -142,7 +142,7 @@ jobs:
             //tests:e2e.esbuild_node24 \
             --platforms=tools:windows_x64
       - name: Store built Windows E2E tests
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: win-e2e-build-artifacts
           path: |
