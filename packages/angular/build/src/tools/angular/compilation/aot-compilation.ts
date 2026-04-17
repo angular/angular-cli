@@ -152,7 +152,10 @@ export class AotCompilation extends AngularCompilation {
           continue;
         }
         const componentFilename = node.getSourceFile().fileName;
-        let relativePath = relative(host.getCurrentDirectory(), componentFilename);
+        let relativePath = relative(
+          compilerOptions.rootDir ?? host.getCurrentDirectory(),
+          componentFilename,
+        );
         if (relativePath.startsWith('..')) {
           relativePath = componentFilename;
         }
