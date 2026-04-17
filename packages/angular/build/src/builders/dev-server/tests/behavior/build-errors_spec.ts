@@ -29,7 +29,6 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         [
           async ({ result, logs }) => {
             expect(result?.success).toBeFalse();
-            debugger;
             expectLog(logs, 'Unexpected character "EOF"');
 
             await harness.appendToFile('src/app/app.component.html', '>');
