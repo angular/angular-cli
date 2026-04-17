@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { NodePath, PluginObj } from '@babel/core';
+import type { types as BabelTypes, NodePath, PluginObj } from '@babel/core';
 
 /**
  * The name of the Angular class metadata function created by the Angular compiler.
@@ -48,7 +48,7 @@ const angularMetadataFunctions: Record<string, (args: NodePath[]) => boolean> = 
  *
  * @returns A babel plugin object instance.
  */
-export default function (): PluginObj {
+export default function ({ types: t }: { types: typeof BabelTypes }): PluginObj {
   return {
     visitor: {
       CallExpression(path) {
@@ -79,7 +79,7 @@ export default function (): PluginObj {
           if (parent && (parent.isFunctionExpression() || parent.isArrowFunctionExpression())) {
             // Replace the metadata function with `void 0` which is the equivalent return value
             // of the metadata function.
-            path.replaceWith(path.scope.buildUndefinedNode());
+            path.replaceWith(t.buildUndefinedNode());
           }
         }
       },
