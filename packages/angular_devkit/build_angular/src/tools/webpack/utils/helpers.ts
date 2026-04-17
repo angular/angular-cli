@@ -8,6 +8,7 @@
 
 import type { ObjectPattern } from 'copy-webpack-plugin';
 import { createHash } from 'node:crypto';
+import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { globSync } from 'tinyglobby';
 import type { Configuration, WebpackOptionsNormalized } from 'webpack';
@@ -314,7 +315,8 @@ export function getStatsOptions(verbose = false): WebpackStatsOptions {
  */
 export function isPackageInstalled(root: string, name: string): boolean {
   try {
-    require.resolve(name, { paths: [root] });
+    const resolve = createRequire(root + '/').resolve;
+    resolve(name);
 
     return true;
   } catch {
