@@ -54,6 +54,59 @@ interface VitestConfigPluginOptions {
   include: string[];
   optimizeDepsInclude: string[];
   watch: boolean;
+  /** Absolute path to the tsconfig file. When provided, its `paths` are forwarded
+   *  as Vite resolve aliases so that import analysis during coverage does not fail
+   *  to resolve tsconfig path aliases (e.g. `#/util`). */
+  tsConfigPath?: string;
+}
+
+/**
+ * Escapes special regex characters in a string so it can be used inside a RegExp.
+ */
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+/**
+ * Reads a tsconfig file and converts its `compilerOptions.paths` entries to
+ * Vite-compatible resolve aliases.  This ensures that path aliases such as
+ * `"#/util": ["./src/util"]` are honoured during Vitest coverage processing
+ * where `vite:import-analysis` re-resolves imports from the original source
+ * files (see https://github.com/angular/angular-cli/issues/32891).
+ */
+async function readTsconfigPathAliases(
+  tsConfigPath: string,
+): Promise<{ find: string | RegExp; replacement: string }[]> {
+  try {
+    const raw = await readFile(tsConfigPath, 'utf-8');
+    // tsconfig files may contain C-style comments – strip them before parsing.
+    const json = JSON.parse(raw.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, ''));
+    const paths: Record<string, string[]> = json?.compilerOptions?.paths ?? {};
+    const rawBaseUrl: string = json?.compilerOptions?.baseUrl ?? '.';
+    const baseDir = path.isAbsolute(rawBaseUrl)
+      ? rawBaseUrl
+      : path.join(path.dirname(tsConfigPath), rawBaseUrl);
+
+    return Object.entries(paths).flatMap(([pattern, targets]) => {
+      if (!targets.length) {
+        return [];
+      }
+      const target = targets[0];
+      if (pattern.endsWith('/*')) {
+        // Wildcard alias: "@app/*" -> "./src/app/*"
+        const prefix = pattern.slice(0, -2);
+        const targetDir = path.join(baseDir, target.replace(/\/\*$/, ''));
+        return [{
+          find: new RegExp(`^${escapeRegExp(prefix)}\/(.*)$`),
+          replacement: `${targetDir}/$1`,
+        }];
+      }
+      // Exact alias: "#/util" -> "./src/util"
+      return [{ find: pattern, replacement: path.join(baseDir, target) }];
+    });
+  } catch {
+    return [];
+  }
 }
 
 async function findTestEnvironment(
@@ -164,6 +217,10 @@ export async function createVitestConfigPlugin(
 
       const projectResolver = createRequire(projectSourceRoot + '/').resolve;
 
+      const tsconfigAliases = options.tsConfigPath
+        ? await readTsconfigPathAliases(options.tsConfigPath)
+        : [];
+
       const projectDefaults: UserWorkspaceConfig = {
         test: {
           setupFiles,
@@ -179,6 +236,7 @@ export async function createVitestConfigPlugin(
         resolve: {
           mainFields: ['es2020', 'module', 'main'],
           conditions: ['es2015', 'es2020', 'module', ...(browser ? ['browser'] : [])],
+          ...(tsconfigAliases.length ? { alias: tsconfigAliases } : {}),
         },
       };
 

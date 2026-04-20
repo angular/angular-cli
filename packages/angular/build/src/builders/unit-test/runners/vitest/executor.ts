@@ -378,6 +378,9 @@ export class VitestExecutor implements TestExecutor {
           projectPlugins,
           include,
           watch,
+          tsConfigPath: this.options.tsConfig
+            ? path.join(workspaceRoot, this.options.tsConfig)
+            : undefined,
         }),
       ],
     };
