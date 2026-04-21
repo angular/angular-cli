@@ -120,6 +120,11 @@ interface InternalOptions {
    * Used exclusively for tests and shouldn't be used for other kinds of builds.
    */
   instrumentForCoverage?: (filename: string) => boolean;
+
+  /**
+   * Suppress build summary and stats table.
+   */
+  quiet?: boolean;
 }
 
 /** Full set of options for `application` builder. */
@@ -502,6 +507,7 @@ export async function normalizeOptions(
     plugins: extensions?.codePlugins?.length ? extensions?.codePlugins : undefined,
     loaderExtensions,
     jsonLogs: useJSONBuildLogs,
+    quiet: options.quiet,
     colors: supportColor(),
     clearScreen,
     define,

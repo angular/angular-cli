@@ -325,6 +325,7 @@ export async function* execute(
       ...runnerBuildOptions,
       watch: normalizedOptions.watch,
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
+      quiet: normalizedOptions.quiet,
       ...(normalizedOptions.tsConfig ? { tsConfig: normalizedOptions.tsConfig } : {}),
     } satisfies ApplicationBuilderInternalOptions;
 

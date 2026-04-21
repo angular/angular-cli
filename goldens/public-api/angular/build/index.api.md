@@ -237,6 +237,7 @@ export type UnitTestBuilderOptions = {
     outputFile?: string;
     progress?: boolean;
     providersFile?: string;
+    quiet?: boolean;
     reporters?: SchemaReporter[];
     runner?: Runner;
     runnerConfig?: RunnerConfig;
