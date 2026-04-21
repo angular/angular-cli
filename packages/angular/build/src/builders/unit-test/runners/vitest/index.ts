@@ -9,6 +9,7 @@
 import assert from 'node:assert';
 import type { TestRunner } from '../api';
 import { DependencyChecker } from '../dependency-checker';
+import { normalizeBrowserName } from './browser-provider';
 import { getVitestBuildOptions } from './build-options';
 import { VitestExecutor } from './executor';
 
@@ -50,7 +51,10 @@ const VitestTestRunner: TestRunner = {
     }
 
     if (options.coverage.enabled) {
-      checker.check('@vitest/coverage-v8');
+      checker.checkAny(
+        ['@vitest/coverage-v8', '@vitest/coverage-istanbul'],
+        'Code coverage requires either "@vitest/coverage-v8" or "@vitest/coverage-istanbul" to be installed.',
+      );
     }
 
     checker.report();
