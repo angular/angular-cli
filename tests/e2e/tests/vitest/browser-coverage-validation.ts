@@ -10,10 +10,9 @@ import { unlink } from 'node:fs/promises';
 export default async function (): Promise<void> {
   await applyVitestBuilder();
 
-  // Install necessary packages to pass the provider check
+  // Install necessary packages to pass the browser provider check
   await installPackage('playwright@1');
   await installPackage('@vitest/browser-playwright@4');
-  await installPackage('@vitest/coverage-v8@4');
 
   // === Case 1: Browser configured via CLI option ===
   const error1 = await execAndCaptureError('ng', [
@@ -26,9 +25,11 @@ export default async function (): Promise<void> {
   const output1 = stripVTControlCharacters(error1.message);
   assert.match(
     output1,
-    /Code coverage is enabled, but the following configured browsers do not support the V8 coverage provider: firefox/,
-    'Expected validation error for unsupported browser with coverage (CLI option).',
+    /Code coverage requires either "@vitest\/coverage-v8" or "@vitest\/coverage-istanbul" to be installed./,
+    'Expected validation error for missing coverage packages.',
   );
+
+  await installPackage('@vitest/coverage-v8@4');
 
   const configPath = 'vitest.config.ts';
   const absoluteConfigPath = path.resolve(configPath);
@@ -41,6 +42,7 @@ export default async function (): Promise<void> {
       import { defineConfig } from 'vitest/config';
       export default defineConfig({
         test: {
+          coverage: { provider: 'v8' },
           browser: {
             enabled: true,
             name: 'firefox',
@@ -71,6 +73,7 @@ export default async function (): Promise<void> {
       import { defineConfig } from 'vitest/config';
       export default defineConfig({
         test: {
+          coverage: { provider: 'v8' },
           browser: {
             enabled: true,
             provider: 'playwright',

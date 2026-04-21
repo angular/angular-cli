@@ -69,6 +69,81 @@ async function findTestEnvironment(
   }
 }
 
+function determineCoverageProvider(
+  browser: BrowserConfigOptions | undefined,
+  testConfig: InlineConfig | undefined,
+  optionsCoverageEnabled: boolean | undefined,
+  projectSourceRoot: string,
+): 'istanbul' | 'v8' | 'custom' | undefined {
+  let determinedProvider = testConfig?.coverage?.provider;
+  if (!determinedProvider && (optionsCoverageEnabled || testConfig?.coverage?.enabled)) {
+    const browsersToCheck = getBrowsersToCheck(browser, testConfig?.browser);
+
+    const hasNonChromium = browsersToCheck.some(
+      (b) => !['chrome', 'chromium', 'edge'].includes(normalizeBrowserName(b).browser),
+    );
+
+    if (hasNonChromium) {
+      determinedProvider = 'istanbul';
+    } else {
+      const projectRequire = createRequire(projectSourceRoot + '/');
+      const checkInstalled = (pkg: string) => {
+        try {
+          projectRequire.resolve(pkg);
+
+          return true;
+        } catch {
+          return false;
+        }
+      };
+      const hasIstanbul = checkInstalled('@vitest/coverage-istanbul');
+      const hasV8 = checkInstalled('@vitest/coverage-v8');
+
+      if (hasIstanbul && !hasV8) {
+        determinedProvider = 'istanbul';
+      } else {
+        determinedProvider = 'v8';
+      }
+    }
+  }
+
+  return determinedProvider;
+}
+
+function getBrowsersToCheck(
+  browser: BrowserConfigOptions | undefined,
+  testConfigBrowser: BrowserConfigOptions | undefined,
+): string[] {
+  const browsersToCheck: string[] = [];
+
+  const cliBrowser = browser as CustomBrowserConfigOptions | undefined;
+  const userBrowser = testConfigBrowser as CustomBrowserConfigOptions | undefined;
+
+  // 1. CLI options override the Vitest configuration completely.
+  if (cliBrowser) {
+    if (cliBrowser.instances) {
+      browsersToCheck.push(...cliBrowser.instances.map((i) => i.browser));
+    }
+    if (cliBrowser.name) {
+      browsersToCheck.push(cliBrowser.name);
+    }
+
+    return browsersToCheck;
+  }
+
+  // 2. Fall back to Vitest configuration ONLY if browser testing is enabled.
+  if (userBrowser && userBrowser.enabled !== false) {
+    if (userBrowser.instances) {
+      browsersToCheck.push(...userBrowser.instances.map((i) => i.browser));
+    }
+    if (userBrowser.name) {
+      browsersToCheck.push(userBrowser.name);
+    }
+  }
+
+  return browsersToCheck;
+}
+
 export async function createVitestConfigPlugin(
   options: VitestConfigPluginOptions,
 ): Promise<VitestPlugins[0]> {
@@ -88,6 +163,13 @@ export async function createVitestConfigPlugin(
     name: 'angular:vitest-configuration',
     async config(config) {
       const testConfig = config.test;
+
+      const determinedProvider = determineCoverageProvider(
+        browser,
+        testConfig,
+        options.coverage.enabled,
+        projectSourceRoot,
+      );
 
       if (reporters !== undefined) {
         delete testConfig?.reporters;
@@ -155,8 +237,8 @@ export async function createVitestConfigPlugin(
         (browser || testConfig?.browser?.enabled) &&
         (options.coverage.enabled || testConfig?.coverage?.enabled)
       ) {
-        // Validate that enabled browsers support V8 coverage
-        validateBrowserCoverage(browser, testConfig?.browser);
+        // Validate that enabled browsers support the selected coverage provider
+        validateBrowserCoverage(browser, testConfig?.browser, determinedProvider);
 
         projectPlugins.unshift(createSourcemapSupportPlugin());
         setupFiles.unshift('virtual:source-map-support');
@@ -208,6 +290,7 @@ export async function createVitestConfigPlugin(
             options.coverage,
             testConfig?.coverage,
             projectName,
+            determinedProvider,
           ),
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...(reporters ? ({ reporters } as any) : {}),
@@ -423,6 +506,7 @@ function createSourcemapSupportPlugin(): VitestPlugins[0] {
 }
 
 interface CustomBrowserConfigOptions {
+  enabled?: boolean;
   instances?: { browser: string }[];
   name?: string;
 }
@@ -434,25 +518,12 @@ interface CustomBrowserConfigOptions {
 function validateBrowserCoverage(
   browser: BrowserConfigOptions | undefined,
   testConfigBrowser: BrowserConfigOptions | undefined,
+  provider?: string,
 ): void {
-  const browsersToCheck: string[] = [];
-
-  // 1. Check browsers passed by the Angular CLI options
-  const cliBrowser = browser as CustomBrowserConfigOptions | undefined;
-  if (cliBrowser?.instances) {
-    browsersToCheck.push(...cliBrowser.instances.map((i) => i.browser));
+  if (provider === 'istanbul') {
+    return;
   }
-
-  // 2. Check browsers defined in the user's vitest.config.ts
-  const userBrowser = testConfigBrowser as CustomBrowserConfigOptions | undefined;
-  if (userBrowser) {
-    if (userBrowser.instances) {
-      browsersToCheck.push(...userBrowser.instances.map((i) => i.browser));
-    }
-    if (userBrowser.name) {
-      browsersToCheck.push(userBrowser.name);
-    }
-  }
+  const browsersToCheck = getBrowsersToCheck(browser, testConfigBrowser);
 
   // Normalize and filter unsupported browsers
   const unsupportedBrowsers = browsersToCheck
@@ -473,6 +544,7 @@ async function generateCoverageOption(
   optionsCoverage: NormalizedUnitTestBuilderOptions['coverage'],
   configCoverage: VitestCoverageOption | undefined,
   projectName: string,
+  provider?: 'istanbul' | 'v8' | 'custom',
 ): Promise<VitestCoverageOption> {
   let defaultExcludes: string[] = [];
   // When a coverage exclude option is provided, Vitest's default coverage excludes
@@ -486,6 +558,7 @@ async function generateCoverageOption(
   }
 
   return {
+    provider,
     excludeAfterRemap: true,
     reportsDirectory:
       configCoverage?.reportsDirectory ?? toPosixPath(path.join('coverage', projectName)),
