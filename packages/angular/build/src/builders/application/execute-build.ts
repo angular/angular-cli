@@ -331,7 +331,7 @@ export async function executeBuild(
     );
   }
 
-  if (!jsonLogs) {
+  if (!jsonLogs && !options.quiet) {
     const changedFiles =
       rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputInfo);
     executionResult.addLog(

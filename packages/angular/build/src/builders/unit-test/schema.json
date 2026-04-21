@@ -73,6 +73,10 @@
       "type": "boolean",
       "description": "Enables the Vitest UI for interactive test execution. This option is only available for the Vitest runner."
     },
+    "quiet": {
+      "type": "boolean",
+      "description": "Suppresses the verbose build summary and stats table on each rebuild. Defaults to `true` locally and `false` in CI environments."
+    },
     "coverage": {
       "type": "boolean",
       "description": "Enables coverage reporting for tests. If not specified, the coverage configuration from a runner configuration file will be used if present. Otherwise, coverage is disabled by default."
