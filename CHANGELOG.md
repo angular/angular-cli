@@ -1,3 +1,31 @@
+<a name="21.2.8"></a>
+
+# 21.2.8 (2026-04-22)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [e91280c05](https://github.com/angular/angular-cli/commit/e91280c05afe7b35b4f01e0eb2800f1ee21fd2ea) | fix  | dynamically resolve project Angular CLI executable inside MCP tools |
+| [01af6741b](https://github.com/angular/angular-cli/commit/01af6741bfe489c3c8fd86feab8b5f14cdb92562) | fix  | ignore EBADF file system errors during MCP project scan             |
+| [f7a3e6ed8](https://github.com/angular/angular-cli/commit/f7a3e6ed871ff711723dcfdbaa8c3ae497f89a5b) | fix  | use headless option in MCP test tool                                |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [00336c037](https://github.com/angular/angular-cli/commit/00336c037dd77d2b441f797580eb8a12c044006b) | fix  | ensure route has leading slash in prerender builder |
+| [e87d302d6](https://github.com/angular/angular-cli/commit/e87d302d6df3f4d9fa9338e3d377e09a2e161fc1) | fix  | fix app-shell route format and                      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [c93140a54](https://github.com/angular/angular-cli/commit/c93140a545869901ec7c24ea10be3073b8899b0d) | fix  | use rootDir for HMR component updates path resolution |
+| [6df2b1488](https://github.com/angular/angular-cli/commit/6df2b14884cffb986977636a84b7868bf8b63f0e) | fix  | validate V8 coverage support for browsers in Vitest   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.7"></a>
 
 # 21.2.7 (2026-04-08)
