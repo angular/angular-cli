@@ -7,8 +7,8 @@
  */
 
 import {
-  cloneRequestAndPatchHeaders,
   getFirstHeaderValue,
+  sanitizeRequestHeaders,
   validateRequest,
   validateUrl,
 } from '../../src/utils/validation';
@@ -132,7 +132,7 @@ describe('Validation Utils', () => {
         headers: { 'host': 'example.com/bad' },
       });
       expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
-        'Header "host" contains characters that are not allowed.',
+        'Header "host" with value "example.com/bad" contains characters that are not allowed.',
       );
     });
 
@@ -141,7 +141,7 @@ describe('Validation Utils', () => {
         headers: { 'host': 'example.com?query=1' },
       });
       expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
-        'Header "host" contains characters that are not allowed.',
+        'Header "host" with value "example.com?query=1" contains characters that are not allowed.',
       );
     });
 
@@ -150,30 +150,17 @@ describe('Validation Utils', () => {
         headers: { 'x-forwarded-host': 'example.com/bad' },
       });
       expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
-        'Header "x-forwarded-host" contains characters that are not allowed.',
+        'Header "x-forwarded-host" with value "example.com/bad" contains characters that are not allowed.',
       );
     });
 
-    it('should throw error if x-forwarded-prefix starts with a backslash or multiple slashes', () => {
-      const inputs = ['//evil', '\\\\evil', '/\\evil', '\\/evil', '\\evil'];
-
-      for (const prefix of inputs) {
-        const request = new Request('https://example.com', {
-          headers: {
-            'x-forwarded-prefix': prefix,
-          },
-        });
-
-        expect(() => validateRequest(request, allowedHosts, false))
-          .withContext(`Prefix: "${prefix}"`)
-          .toThrowError(
-            'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
-          );
-      }
-    });
-
-    it('should throw error if x-forwarded-prefix contains dot segments', () => {
+    it('should throw error if x-forwarded-prefix is invalid', () => {
       const inputs = [
+        '//evil',
+        '\\\\evil',
+        '/\\evil',
+        '\\/evil',
+        '\\evil',
         '/./',
         '/../',
         '/foo/./bar',
@@ -188,6 +175,11 @@ describe('Validation Utils', () => {
         '/foo/..\\bar',
         '.',
         '..',
+        'https://attacker.com',
+        '%2f%2f',
+        '%5C',
+        'http://localhost',
+        'foo',
       ];
 
       for (const prefix of inputs) {
@@ -200,13 +192,14 @@ describe('Validation Utils', () => {
         expect(() => validateRequest(request, allowedHosts, false))
           .withContext(`Prefix: "${prefix}"`)
           .toThrowError(
-            'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
+            'Header "x-forwarded-prefix" is invalid. It must start with a "/" and contain ' +
+              'only alphanumeric characters, hyphens, and underscores, separated by single slashes.',
           );
       }
     });
 
-    it('should validate x-forwarded-prefix with valid dot usage', () => {
-      const inputs = ['/foo.bar', '/foo.bar/baz', '/v1.2', '/.well-known'];
+    it('should validate x-forwarded-prefix with valid usage', () => {
+      const inputs = ['/foo', '/foo/baz', '/v1', '/app_name', '/', '/my-app'];
 
       for (const prefix of inputs) {
         const request = new Request('https://example.com', {
@@ -222,143 +215,61 @@ describe('Validation Utils', () => {
     });
   });
 
-  describe('cloneRequestAndPatchHeaders', () => {
-    const allowedHosts = new Set(['example.com', '*.valid.com']);
-
-    it('should validate host header when accessed via get()', async () => {
+  describe('sanitizeRequestHeaders', () => {
+    it('should scrub unallowed proxy headers by default', () => {
       const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'evil.com',
+          'x-forwarded-proto': 'https',
+        },
       });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+      const secured = sanitizeRequestHeaders(req);
 
-      expect(() => secured.headers.get('host')).toThrowError(
-        'Header "host" with value "evil.com" is not allowed.',
-      );
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed'),
-        }),
-      );
-    });
-
-    it('should allow valid host header', () => {
-      const req = new Request('http://example.com', {
-        headers: { 'host': 'example.com' },
-      });
-      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
       expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.has('x-forwarded-host')).toBeFalse();
+      expect(secured.headers.has('x-forwarded-proto')).toBeFalse();
     });
 
-    it('should allow any host header when "*" is used', () => {
-      const allowedHosts = new Set(['*']);
+    it('should retain allowed proxy headers when explicitly provided', () => {
+      const trustProxyHeaders = new Set(['x-forwarded-host']);
       const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'proxy.com',
+          'x-forwarded-proto': 'https',
+        },
       });
-      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
-      expect(secured.headers.get('host')).toBe('evil.com');
+      const secured = sanitizeRequestHeaders(req, trustProxyHeaders);
+
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
+      expect(secured.headers.has('x-forwarded-proto')).toBeFalse();
     });
 
-    it('should validate x-forwarded-host header', async () => {
+    it('should retain all proxy headers when trustProxyHeaders is true', () => {
       const req = new Request('http://example.com', {
-        headers: { 'x-forwarded-host': 'evil.com' },
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'proxy.com',
+          'x-forwarded-proto': 'https',
+        },
       });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
+      const secured = sanitizeRequestHeaders(req, true);
 
-      expect(() => secured.headers.get('x-forwarded-host')).toThrowError(
-        'Header "x-forwarded-host" with value "evil.com" is not allowed.',
-      );
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching(
-            'Header "x-forwarded-host" with value "evil.com" is not allowed',
-          ),
-        }),
-      );
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
+      expect(secured.headers.get('x-forwarded-proto')).toBe('https');
     });
 
-    it('should allow accessing other headers without validation', () => {
+    it('should not clone the request if no proxy headers need to be removed', () => {
       const req = new Request('http://example.com', {
         headers: { 'accept': 'application/json' },
       });
-      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
+      const secured = sanitizeRequestHeaders(req);
 
+      expect(secured).toBe(req);
       expect(secured.headers.get('accept')).toBe('application/json');
-    });
-
-    it('should validate headers when iterating with entries()', async () => {
-      const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
-      });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
-
-      expect(() => {
-        for (const _ of secured.headers.entries()) {
-          // access the header to trigger the validation
-        }
-      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
-
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
-        }),
-      );
-    });
-
-    it('should validate headers when iterating with values()', async () => {
-      const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
-      });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
-
-      expect(() => {
-        for (const _ of secured.headers.values()) {
-          // access the header to trigger the validation
-        }
-      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
-
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
-        }),
-      );
-    });
-
-    it('should validate headers when iterating with for...of', async () => {
-      const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
-      });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
-
-      expect(() => {
-        for (const _ of secured.headers) {
-          // access the header to trigger the validation
-        }
-      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
-
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
-        }),
-      );
-    });
-
-    it('should validate headers when iterating with forEach()', async () => {
-      const req = new Request('http://example.com', {
-        headers: { 'host': 'evil.com' },
-      });
-      const { request: secured, onError } = cloneRequestAndPatchHeaders(req, allowedHosts);
-
-      expect(() => {
-        secured.headers.forEach(() => {
-          // access the header to trigger the validation
-        });
-      }).toThrowError('Header "host" with value "evil.com" is not allowed.');
-
-      await expectAsync(onError).toBeResolvedTo(
-        jasmine.objectContaining({
-          message: jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
-        }),
-      );
     });
   });
 });

@@ -12,7 +12,7 @@ import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
-import { cloneRequestAndPatchHeaders, validateRequest } from './utils/validation';
+import { sanitizeRequestHeaders, validateRequest } from './utils/validation';
 
 /**
  * Options for the Angular server application engine.
@@ -22,6 +22,22 @@ export interface AngularAppEngineOptions {
    * A set of allowed hostnames for the server application.
    */
   allowedHosts?: readonly string[];
+
+  /**
+   * Extends the scope of trusted proxy headers (`X-Forwarded-*`).
+   *
+   * @remarks
+   * When `trustProxyHeaders` is enabled, headers such as `X-Forwarded-Host` and
+   * `X-Forwarded-Prefix` should ideally be strictly validated at a higher infrastructure
+   * level (e.g., at the reverse proxy or API gateway) before reaching the application.
+   *
+   * If a `string[]` is provided, only those proxy headers are allowed.
+   * If `true`, all proxy headers are allowed.
+   * If `false` or not provided, proxy headers are ignored.
+   *
+   * @default false
+   */
+  trustProxyHeaders?: boolean | readonly string[];
 }
 
 /**
@@ -79,6 +95,11 @@ export class AngularAppEngine {
   );
 
   /**
+   * The normalized allowed proxy headers.
+   */
+  private readonly trustProxyHeaders: ReadonlySet<string> | boolean;
+
+  /**
    * A cache that holds entry points, keyed by their potential locale string.
    */
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
@@ -89,6 +110,12 @@ export class AngularAppEngine {
    */
   constructor(options?: AngularAppEngineOptions) {
     this.allowedHosts = this.getAllowedHosts(options);
+
+    const trustProxyHeaders = options?.trustProxyHeaders ?? false;
+    this.trustProxyHeaders =
+      typeof trustProxyHeaders === 'boolean'
+        ? trustProxyHeaders
+        : new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
   }
 
   private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
@@ -131,33 +158,17 @@ export class AngularAppEngine {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const allowedHost = this.allowedHosts;
-    const disableAllowedHostsCheck = AngularAppEngine.ɵdisableAllowedHostsCheck;
+    const securedRequest = sanitizeRequestHeaders(request, this.trustProxyHeaders);
 
     try {
-      validateRequest(request, allowedHost, disableAllowedHostsCheck);
+      validateRequest(securedRequest, allowedHost, AngularAppEngine.ɵdisableAllowedHostsCheck);
     } catch (error) {
-      return this.handleValidationError(request.url, error as Error);
+      return this.handleValidationError(securedRequest.url, error as Error);
     }
-
-    // Clone request with patched headers to prevent unallowed host header access.
-    const { request: securedRequest, onError: onHeaderValidationError } = disableAllowedHostsCheck
-      ? { request, onError: null }
-      : cloneRequestAndPatchHeaders(request, allowedHost);
 
     const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
-      const promises: Promise<Response | null>[] = [];
-      if (onHeaderValidationError) {
-        promises.push(
-          onHeaderValidationError.then((error) =>
-            this.handleValidationError(securedRequest.url, error),
-          ),
-        );
-      }
-
-      promises.push(serverApp.handle(securedRequest, requestContext));
-
-      return Promise.race(promises);
+      return serverApp.handle(securedRequest, requestContext);
     }
 
     if (this.supportedLocales.length > 1) {

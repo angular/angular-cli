@@ -9,7 +9,7 @@
 /**
  * The set of headers that should be validated for host header injection attacks.
  */
-const HOST_HEADERS_TO_VALIDATE: ReadonlySet<string> = new Set(['host', 'x-forwarded-host']);
+const HOST_HEADERS_TO_VALIDATE: ReadonlyArray<string> = ['host', 'x-forwarded-host'];
 
 /**
  * Regular expression to validate that the port is a numeric value.
@@ -22,14 +22,9 @@ const VALID_PORT_REGEX = /^\d+$/;
 const VALID_PROTO_REGEX = /^https?$/i;
 
 /**
- * Regular expression to validate that the host is a valid hostname.
- */
-const VALID_HOST_REGEX = /^[a-z0-9_.-]+(:[0-9]+)?$/i;
-
-/**
  * Regular expression to validate that the prefix is valid.
  */
-const INVALID_PREFIX_REGEX = /^(?:\\|\/[/\\])|(?:^|[/\\])\.\.?(?:[/\\]|$)/;
+const VALID_PREFIX_REGEX = /^\/([a-z0-9_-]+\/)*[a-z0-9_-]*$/i;
 
 /**
  * Extracts the first value from a multi-value header string.
@@ -64,7 +59,7 @@ export function validateRequest(
   allowedHosts: ReadonlySet<string>,
   disableHostCheck: boolean,
 ): void {
-  validateHeaders(request);
+  validateHeaders(request, allowedHosts, disableHostCheck);
 
   if (!disableHostCheck) {
     validateUrl(new URL(request.url), allowedHosts);
@@ -86,119 +81,46 @@ export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
 }
 
 /**
- * Clones a request and patches the `get` method of the request headers to validate the host headers.
- * @param request - The request to validate.
- * @param allowedHosts - A set of allowed hostnames.
- * @returns An object containing the cloned request and a promise that resolves to an error
- * if any of the validated headers contain invalid values.
+ * Sanitizes the proxy headers of a request by removing unallowed `X-Forwarded-*` headers.
+ * If no headers need to be removed, the original request is returned without cloning.
+ *
+ * @param request - The incoming `Request` object to sanitize.
+ * @param trustProxyHeaders - A set of allowed proxy headers or a boolean indicating whether all are allowed.
+ * @returns The sanitized request, or the original request if no changes were needed.
  */
-export function cloneRequestAndPatchHeaders(
+export function sanitizeRequestHeaders(
   request: Request,
-  allowedHosts: ReadonlySet<string>,
-): { request: Request; onError: Promise<Error> } {
-  let onError: (value: Error) => void;
-  const onErrorPromise = new Promise<Error>((resolve) => {
-    onError = resolve;
-  });
+  trustProxyHeaders?: boolean | ReadonlySet<string>,
+): Request {
+  if (trustProxyHeaders === true) {
+    return request;
+  }
+
+  const keysToDelete: string[] = [];
+  for (const [key] of request.headers) {
+    const lowerKey = key.toLowerCase();
+    if (
+      lowerKey.startsWith('x-forwarded-') &&
+      (!trustProxyHeaders || !trustProxyHeaders.has(lowerKey))
+    ) {
+      keysToDelete.push(key);
+    }
+  }
+
+  if (keysToDelete.length === 0) {
+    return request;
+  }
 
   const clonedReq = new Request(request.clone(), {
     signal: request.signal,
   });
 
   const headers = clonedReq.headers;
-
-  const originalGet = headers.get;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  (headers.get as typeof originalGet) = function (name) {
-    const value = originalGet.call(headers, name);
-    if (!value) {
-      return value;
-    }
-
-    validateHeader(name, value, allowedHosts, onError);
-
-    return value;
-  };
-
-  const originalValues = headers.values;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  (headers.values as typeof originalValues) = function () {
-    for (const name of HOST_HEADERS_TO_VALIDATE) {
-      validateHeader(name, originalGet.call(headers, name), allowedHosts, onError);
-    }
-
-    return originalValues.call(headers);
-  };
-
-  const originalEntries = headers.entries;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  (headers.entries as typeof originalEntries) = function () {
-    const iterator = originalEntries.call(headers);
-
-    return {
-      next() {
-        const result = iterator.next();
-        if (!result.done) {
-          const [key, value] = result.value;
-          validateHeader(key, value, allowedHosts, onError);
-        }
-
-        return result;
-      },
-      [Symbol.iterator]() {
-        return this;
-      },
-    };
-  };
-
-  const originalForEach = headers.forEach;
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
-  (headers.forEach as typeof originalForEach) = function (callback, thisArg) {
-    originalForEach.call(
-      headers,
-      (value, key, parent) => {
-        validateHeader(key, value, allowedHosts, onError);
-        callback.call(thisArg, value, key, parent);
-      },
-      thisArg,
-    );
-  };
-
-  // Ensure for...of loops use the new patched entries
-  (headers[Symbol.iterator] as typeof originalEntries) = headers.entries;
-
-  return { request: clonedReq, onError: onErrorPromise };
-}
-
-/**
- * Validates a specific header value against the allowed hosts.
- * @param name - The name of the header to validate.
- * @param value - The value of the header to validate.
- * @param allowedHosts - A set of allowed hostnames.
- * @param onError - A callback function to call if the header value is invalid.
- * @throws Error if the header value is invalid.
- */
-function validateHeader(
-  name: string,
-  value: string | null,
-  allowedHosts: ReadonlySet<string>,
-  onError: (value: Error) => void,
-): void {
-  if (!value) {
-    return;
+  for (const key of keysToDelete) {
+    headers.delete(key);
   }
 
-  if (!HOST_HEADERS_TO_VALIDATE.has(name.toLowerCase())) {
-    return;
-  }
-
-  try {
-    verifyHostAllowed(name, value, allowedHosts);
-  } catch (error) {
-    onError(error as Error);
-
-    throw error;
-  }
+  return clonedReq;
 }
 
 /**
@@ -214,19 +136,20 @@ function verifyHostAllowed(
   headerValue: string,
   allowedHosts: ReadonlySet<string>,
 ): void {
-  const value = getFirstHeaderValue(headerValue);
-  if (!value) {
-    return;
-  }
-
-  const url = `http://${value}`;
+  const url = `http://${headerValue}`;
   if (!URL.canParse(url)) {
     throw new Error(`Header "${headerName}" contains an invalid value and cannot be parsed.`);
   }
 
-  const { hostname } = new URL(url);
+  const { hostname, pathname, search, hash, username, password } = new URL(url);
+  if (pathname !== '/' || search || hash || username || password) {
+    throw new Error(
+      `Header "${headerName}" with value "${headerValue}" contains characters that are not allowed.`,
+    );
+  }
+
   if (!isHostAllowed(hostname, allowedHosts)) {
-    throw new Error(`Header "${headerName}" with value "${value}" is not allowed.`);
+    throw new Error(`Header "${headerName}" with value "${headerValue}" is not allowed.`);
   }
 }
 
@@ -259,14 +182,20 @@ function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boo
  * Validates the headers of an incoming request.
  *
  * @param request - The incoming `Request` object containing the headers to validate.
+ * @param allowedHosts - A set of allowed hostnames.
+ * @param disableHostCheck - Whether to disable the host check.
  * @throws Error if any of the validated headers contain invalid values.
  */
-function validateHeaders(request: Request): void {
+function validateHeaders(
+  request: Request,
+  allowedHosts: ReadonlySet<string>,
+  disableHostCheck: boolean,
+): void {
   const headers = request.headers;
   for (const headerName of HOST_HEADERS_TO_VALIDATE) {
     const headerValue = getFirstHeaderValue(headers.get(headerName));
-    if (headerValue && !VALID_HOST_REGEX.test(headerValue)) {
-      throw new Error(`Header "${headerName}" contains characters that are not allowed.`);
+    if (headerValue && !disableHostCheck) {
+      verifyHostAllowed(headerName, headerValue, allowedHosts);
     }
   }
 
@@ -281,9 +210,10 @@ function validateHeaders(request: Request): void {
   }
 
   const xForwardedPrefix = getFirstHeaderValue(headers.get('x-forwarded-prefix'));
-  if (xForwardedPrefix && INVALID_PREFIX_REGEX.test(xForwardedPrefix)) {
+  if (xForwardedPrefix && !VALID_PREFIX_REGEX.test(xForwardedPrefix)) {
     throw new Error(
-      'Header "x-forwarded-prefix" must not start with "\\" or multiple "/" or contain ".", ".." path segments.',
+      'Header "x-forwarded-prefix" is invalid. It must start with a "/" and contain ' +
+        'only alphanumeric characters, hyphens, and underscores, separated by single slashes.',
     );
   }
 }

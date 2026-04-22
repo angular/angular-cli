@@ -137,6 +137,7 @@ describe('createRequestUrl', () => {
         },
         url: '/test',
       }),
+      true,
     );
     expect(url.href).toBe('https://example.com/test');
   });
@@ -152,6 +153,7 @@ describe('createRequestUrl', () => {
         },
         url: '/test',
       }),
+      true,
     );
     expect(url.href).toBe('https://example.com:8443/test');
   });
