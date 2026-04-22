@@ -59,16 +59,20 @@ import { RefactorReporter } from './utils/refactor-reporter';
 const BLANK_LINE_PLACEHOLDER = '// __PRESERVE_BLANK_LINE__';
 
 /**
- * Vitest function names that should be imported when using the --add-imports option.
+ * Jasmine to Vitest imports map that should be employed when the --add-imports option is used.
  */
-const VITEST_FUNCTION_NAMES = new Set([
-  'describe',
-  'it',
-  'expect',
-  'beforeEach',
-  'afterEach',
-  'beforeAll',
-  'afterAll',
+const JASMINE_TO_VITEST_IMPORT = new Map<string, string>([
+  ['describe', 'describe'],
+  ['fdescribe', 'describe'],
+  ['xdescribe', 'describe'],
+  ['it', 'it'],
+  ['fit', 'it'],
+  ['xit', 'it'],
+  ['expect', 'expect'],
+  ['beforeEach', 'beforeEach'],
+  ['afterEach', 'afterEach'],
+  ['beforeAll', 'beforeAll'],
+  ['afterAll', 'afterAll'],
 ]);
 
 /**
@@ -200,8 +204,9 @@ export function transformJasmineToVitest(
       if (ts.isCallExpression(transformedNode)) {
         if (options.addImports && ts.isIdentifier(transformedNode.expression)) {
           const name = transformedNode.expression.text;
-          if (VITEST_FUNCTION_NAMES.has(name)) {
-            addVitestValueImport(pendingVitestValueImports, name);
+          const importSpecifierName = JASMINE_TO_VITEST_IMPORT.get(name);
+          if (importSpecifierName) {
+            addVitestValueImport(pendingVitestValueImports, importSpecifierName);
           }
         }
 

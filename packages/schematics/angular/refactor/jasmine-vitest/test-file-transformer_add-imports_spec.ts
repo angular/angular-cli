@@ -116,4 +116,38 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
       `;
     await expectTransformation(input, expected, true);
   });
+
+  it('should add imports for transformed global functions with different Vitest names', async () => {
+    await expectTransformation(
+      `
+        fdescribe('My Suite', () => {
+          xit('should skip', () => {});
+        });
+      `,
+      `
+        import { describe, it } from 'vitest';
+
+        describe.only('My Suite', () => {
+          it.skip('should skip', () => {});
+        });
+      `,
+      true,
+    );
+
+    await expectTransformation(
+      `
+        xdescribe('My Suite', () => {
+          fit('should focus', () => {});
+        });
+      `,
+      `
+        import { describe, it } from 'vitest';
+
+        describe.skip('My Suite', () => {
+          it.only('should focus', () => {});
+        });
+      `,
+      true,
+    );
+  });
 });
