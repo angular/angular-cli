@@ -1,3 +1,40 @@
+<a name="22.0.0-next.6"></a>
+
+# 22.0.0-next.6 (2026-04-22)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [cc30034da](https://github.com/angular/angular-cli/commit/cc30034da25f1b873e354c493043fe46f0bfc8dd) | fix  | dynamically resolve project Angular CLI executable inside MCP tools |
+| [ead60d3d5](https://github.com/angular/angular-cli/commit/ead60d3d5fcf7c013392ba25b932b86f0e5cd9d9) | fix  | ignore EBADF file system errors during MCP project scan             |
+| [0d984cf1c](https://github.com/angular/angular-cli/commit/0d984cf1cdfed0a4f74e6bf8efb8a3c999ebc373) | fix  | use headless option in MCP test tool                                |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------- |
+| [de630c2fc](https://github.com/angular/angular-cli/commit/de630c2fcee22622942478c98117d8f473d8c894) | feat | stabilize refactor-jasmine-vitest schematic |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [30d8332ed](https://github.com/angular/angular-cli/commit/30d8332edc10786fc90512809a59189865a5d956) | fix  | ensure route has leading slash in prerender builder |
+| [cf5b49ed7](https://github.com/angular/angular-cli/commit/cf5b49ed7843250607ff0fc49ae6d97f13f4d9ab) | fix  | fix app-shell route format and                      |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [0781f7498](https://github.com/angular/angular-cli/commit/0781f74986e773d143b9bdf5d3f0747de0df6b0a) | feat | add quiet option to suppress build noise in unit tests           |
+| [cd2ad3c19](https://github.com/angular/angular-cli/commit/cd2ad3c1958d9adadc214045b5e59c0c8f8b4499) | feat | enable chunk optimization by default with heuristics             |
+| [b85ec6798](https://github.com/angular/angular-cli/commit/b85ec6798b5c74f778a69a657729e446a2156261) | fix  | allow configuring Access-Control-Allow-Origin via headers option |
+| [59803b12b](https://github.com/angular/angular-cli/commit/59803b12ba69d4ba17c769ee5e81c3175d79ab58) | fix  | use rootDir for HMR component updates path resolution            |
+| [74e7dbe56](https://github.com/angular/angular-cli/commit/74e7dbe56c825c521fc711cf6c0d5ba8fabece75) | fix  | validate V8 coverage support for browsers in Vitest              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.24"></a>
 
 # 20.3.24 (2026-04-15)
