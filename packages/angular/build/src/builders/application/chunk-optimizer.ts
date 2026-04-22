@@ -312,6 +312,7 @@ export async function optimizeChunks(
       });
 
       const result = await bundle.generate({
+        compact: true,
         sourcemap,
         chunkFileNames: (chunkInfo) =>
           `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
