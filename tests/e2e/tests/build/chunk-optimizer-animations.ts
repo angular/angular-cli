@@ -1,19 +1,24 @@
 import assert from 'node:assert/strict';
 import { readdir } from 'node:fs/promises';
+import { getGlobalVariable } from '../../utils/env';
 import { readFile, writeFile } from '../../utils/fs';
 import { installPackage } from '../../utils/packages';
 import { execWithEnv } from '../../utils/process';
+import { readNgVersion } from '../../utils/version';
 
 export default async function () {
-  // Read @angular/core version from test project's package.json
-  const projectJson = JSON.parse(await readFile('package.json'));
-  const ngCoreVersion =
-    projectJson.dependencies?.['@angular/core'] ??
-    projectJson.devDependencies?.['@angular/core'] ??
-    'latest';
+  const isSnapshotBuild = getGlobalVariable('argv')['ng-snapshots'];
+  let animationsSpecifier: string;
+  if (isSnapshotBuild) {
+    const snapshots = require('../../ng-snapshot/package.json');
+    animationsSpecifier = snapshots.dependencies['@angular/animations'];
+  } else {
+    const coreVersion = readNgVersion();
+    animationsSpecifier = `@angular/animations@${coreVersion}`;
+  }
 
-  // Install @angular/animations package with matching version
-  await installPackage(`@angular/animations@${ngCoreVersion}`);
+  // Install @angular/animations package
+  await installPackage(animationsSpecifier);
 
   // Configure app.config.ts with provideAnimationsAsync
   const originalConfig = await readFile('src/app/app.config.ts');
