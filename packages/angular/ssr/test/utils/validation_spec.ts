@@ -8,6 +8,7 @@
 
 import {
   getFirstHeaderValue,
+  normalizeTrustProxyHeaders,
   sanitizeRequestHeaders,
   validateRequest,
   validateUrl,
@@ -224,22 +225,25 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, undefined);
+      const { request: secured } = sanitizeRequestHeaders(
+        req,
+        normalizeTrustProxyHeaders(undefined),
+      );
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
       expect(secured.headers.get('x-forwarded-proto')).toBe('https');
     });
 
-    it('should set x-angular-deopt-csr when x-forwarded-prefix is present and undefined', () => {
+    it('should set deoptToCSR when x-forwarded-prefix is present and undefined', () => {
       const req = new Request('http://example.com', {
         headers: {
           'x-forwarded-prefix': '/prefix',
         },
       });
-      const secured = sanitizeRequestHeaders(req, undefined);
+      const { deoptToCSR } = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
 
-      expect(secured.headers.get('x-angular-deopt-csr')).toBe('true');
+      expect(deoptToCSR).toBeTrue();
     });
 
     it('should retain allowed proxy headers when explicitly provided', () => {
@@ -251,7 +255,7 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, trustProxyHeaders);
+      const { request: secured } = sanitizeRequestHeaders(req, trustProxyHeaders);
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
@@ -266,7 +270,7 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, true);
+      const { request: secured } = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(true));
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
@@ -277,7 +281,10 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'accept': 'application/json' },
       });
-      const secured = sanitizeRequestHeaders(req, undefined);
+      const { request: secured } = sanitizeRequestHeaders(
+        req,
+        normalizeTrustProxyHeaders(undefined),
+      );
 
       expect(secured).toBe(req);
       expect(secured.headers.get('accept')).toBe('application/json');

@@ -12,7 +12,11 @@ import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
-import { sanitizeRequestHeaders, validateRequest } from './utils/validation';
+import {
+  normalizeTrustProxyHeaders,
+  sanitizeRequestHeaders,
+  validateRequest,
+} from './utils/validation';
 
 /**
  * Options for the Angular server application engine.
@@ -97,7 +101,7 @@ export class AngularAppEngine {
   /**
    * The normalized allowed proxy headers.
    */
-  private readonly trustProxyHeaders: ReadonlySet<string> | boolean | undefined;
+  private readonly trustProxyHeaders: ReadonlySet<string>;
 
   /**
    * A cache that holds entry points, keyed by their potential locale string.
@@ -110,14 +114,7 @@ export class AngularAppEngine {
    */
   constructor(options?: AngularAppEngineOptions) {
     this.allowedHosts = this.getAllowedHosts(options);
-
-    const trustProxyHeaders = options?.trustProxyHeaders;
-    this.trustProxyHeaders =
-      trustProxyHeaders === undefined
-        ? undefined
-        : typeof trustProxyHeaders === 'boolean'
-          ? trustProxyHeaders
-          : new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
+    this.trustProxyHeaders = normalizeTrustProxyHeaders(options?.trustProxyHeaders);
   }
 
   private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
@@ -160,7 +157,10 @@ export class AngularAppEngine {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const allowedHost = this.allowedHosts;
-    const securedRequest = sanitizeRequestHeaders(request, this.trustProxyHeaders);
+    const { request: securedRequest, deoptToCSR } = sanitizeRequestHeaders(
+      request,
+      this.trustProxyHeaders,
+    );
 
     try {
       validateRequest(securedRequest, allowedHost, AngularAppEngine.ɵdisableAllowedHostsCheck);
@@ -170,6 +170,10 @@ export class AngularAppEngine {
 
     const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
+      if (deoptToCSR) {
+        return serverApp.serveClientSidePage();
+      }
+
       return serverApp.handle(securedRequest, requestContext);
     }
 

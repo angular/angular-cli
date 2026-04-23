@@ -191,20 +191,6 @@ export class AngularServerApp {
     }
 
     const { redirectTo, status, renderMode, headers, preload } = matchedRoute;
-
-    if (request.headers.get('x-angular-deopt-csr') === 'true') {
-      let html = await this.assets.getServerAsset('index.csr.html').text();
-      html = await this.runTransformsOnHtml(html, url, preload);
-
-      return new Response(html, {
-        status: 200,
-        headers: new Headers({
-          'Content-Type': 'text/html;charset=UTF-8',
-          ...headers,
-        }),
-      });
-    }
-
     if (redirectTo !== undefined) {
       return createRedirectResponse(
         joinUrlParts(

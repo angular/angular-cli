@@ -7,6 +7,17 @@
  */
 
 /**
+ * Common X-Forwarded-* headers.
+ */
+const X_FORWARDED_HEADERS = new Set([
+  'x-forwarded-for',
+  'x-forwarded-host',
+  'x-forwarded-port',
+  'x-forwarded-proto',
+  'x-forwarded-prefix',
+]);
+
+/**
  * The set of headers that should be validated for host header injection attacks.
  */
 const HOST_HEADERS_TO_VALIDATE: ReadonlyArray<string> = ['host', 'x-forwarded-host'];
@@ -85,49 +96,31 @@ export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
  * If no headers need to be removed, the original request is returned without cloning.
  *
  * @param request - The incoming `Request` object to sanitize.
- * @param trustProxyHeaders - A set of allowed proxy headers or a boolean indicating whether all are allowed.
- * @returns The sanitized request, or the original request if no changes were needed.
+ * @param trustProxyHeaders - A set of allowed proxy headers.
+ * @returns An object containing the sanitized request, or the original request if no changes were needed.
  */
 export function sanitizeRequestHeaders(
   request: Request,
-  trustProxyHeaders: boolean | ReadonlySet<string> | undefined,
-): Request {
-  let receivedXForwarded = false;
+  trustProxyHeaders: ReadonlySet<string>,
+): { request: Request; deoptToCSR: boolean } {
   const keysToDelete: string[] = [];
   let deoptToCSR = false;
 
   for (const [key] of request.headers) {
     const lowerKey = key.toLowerCase();
-    if (lowerKey.startsWith('x-forwarded-')) {
-      receivedXForwarded = true;
-
-      if (trustProxyHeaders === true) {
-        continue;
-      }
-
-      if (trustProxyHeaders === undefined) {
-        if (lowerKey === 'x-forwarded-host' || lowerKey === 'x-forwarded-proto') {
-          continue;
-        }
-        if (lowerKey === 'x-forwarded-prefix') {
-          deoptToCSR = true;
-          continue;
-        }
-      } else if (trustProxyHeaders !== false && trustProxyHeaders.has(lowerKey)) {
-        continue;
-      }
-
+    if (lowerKey.startsWith('x-forwarded-') && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Received "${key}" header but "trustProxyHeaders" was not set up to allow it.\n` +
+          `For more information, see https://angular.dev/best-practices/security#configuring-trusted-proxy-headers`,
+      );
+      deoptToCSR = true;
       keysToDelete.push(key);
     }
   }
 
-  if (trustProxyHeaders === undefined && receivedXForwarded) {
-    // eslint-disable-next-line no-console
-    console.warn('Received "X-Forwarded-*" headers but "trustProxyHeaders" was not configured.');
-  }
-
-  if (keysToDelete.length === 0 && !deoptToCSR) {
-    return request;
+  if (keysToDelete.length === 0) {
+    return { request, deoptToCSR };
   }
 
   const clonedReq = new Request(request.clone(), {
@@ -139,11 +132,7 @@ export function sanitizeRequestHeaders(
     headers.delete(key);
   }
 
-  if (deoptToCSR) {
-    headers.set('x-angular-deopt-csr', 'true');
-  }
-
-  return clonedReq;
+  return { request: clonedReq, deoptToCSR };
 }
 
 /**
@@ -239,4 +228,41 @@ function validateHeaders(
         'only alphanumeric characters, hyphens, and underscores, separated by single slashes.',
     );
   }
+}
+
+/**
+ * Checks if a specific proxy header is allowed.
+ *
+ * @param headerName - The name of the proxy header to check.
+ * @param trustProxyHeaders - A set of allowed proxy headers.
+ * @returns `true` if the header is allowed, `false` otherwise.
+ */
+export function isProxyHeaderAllowed(
+  headerName: string,
+  trustProxyHeaders: ReadonlySet<string>,
+): boolean {
+  return trustProxyHeaders.has(headerName.toLowerCase());
+}
+
+/**
+ * Normalizes the `trustProxyHeaders` option to a consistent representation.
+ * @param trustProxyHeaders The input `trustProxyHeaders` value.
+ * @returns A `Set<string>` of normalized header names.
+ */
+export function normalizeTrustProxyHeaders(
+  trustProxyHeaders: boolean | readonly string[] | undefined,
+): ReadonlySet<string> {
+  if (trustProxyHeaders === undefined) {
+    return new Set(['x-forwarded-host', 'x-forwarded-proto']);
+  }
+
+  if (trustProxyHeaders === false) {
+    return new Set();
+  }
+
+  if (trustProxyHeaders === true) {
+    return X_FORWARDED_HEADERS;
+  }
+
+  return new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
 }
