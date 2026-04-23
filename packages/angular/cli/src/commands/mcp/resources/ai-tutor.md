@@ -361,7 +361,6 @@ When teaching or generating code for Phase 5 (Signal Forms), you **must** strict
 
   @Component({
     selector: 'app-example',
-    standalone: true,
     imports: [Field],
     template: `
       <form (submit)="save($event)">
