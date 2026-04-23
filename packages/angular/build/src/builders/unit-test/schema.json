@@ -73,6 +73,10 @@
       "type": "boolean",
       "description": "Enables the Vitest UI for interactive test execution. This option is only available for the Vitest runner."
     },
+    "isolate": {
+      "type": "boolean",
+      "description": "Enables isolation for test execution. When true, Vitest runs tests in separate threads or processes. This option is only available for the Vitest runner. Defaults to false to align with the Karma/Jasmine experience."
+    },
     "quiet": {
       "type": "boolean",
       "description": "Suppresses the verbose build summary and stats table on each rebuild. Defaults to `true` locally and `false` in CI environments."

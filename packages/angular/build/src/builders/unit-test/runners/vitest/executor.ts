@@ -378,6 +378,7 @@ export class VitestExecutor implements TestExecutor {
           projectPlugins,
           include,
           watch,
+          isolate: this.options.isolate,
         }),
       ],
     };
