@@ -8,6 +8,7 @@
 
 import {
   parseBunDependencies,
+  parseNpmLikeDependencies,
   parseNpmLikeError,
   parseNpmLikeManifest,
   parseYarnClassicDependencies,
@@ -16,6 +17,43 @@ import {
 } from './parsers';
 
 describe('parsers', () => {
+  describe('parseNpmLikeDependencies', () => {
+    it('should parse simple dependencies', () => {
+      const stdout = JSON.stringify({
+        dependencies: {
+          rxjs: {
+            version: '7.8.2',
+          },
+        },
+      });
+      const deps = parseNpmLikeDependencies(stdout);
+      expect(deps.size).toBe(1);
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2', path: undefined });
+    });
+
+    it('should parse nested workspace dependencies for npm workspaces', () => {
+      const stdout = JSON.stringify({
+        version: '1.0.0',
+        name: 'npm-workspace-test',
+        dependencies: {
+          app: {
+            version: '1.0.0',
+            resolved: 'file:../packages/app',
+            dependencies: {
+              rxjs: {
+                version: '7.8.1',
+              },
+            },
+          },
+        },
+      });
+      const deps = parseNpmLikeDependencies(stdout);
+      expect(deps.size).toBe(2);
+      expect(deps.get('app')).toEqual({ name: 'app', version: '1.0.0', path: undefined });
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.1', path: undefined });
+    });
+  });
+
   describe('parseNpmLikeError', () => {
     it('should parse a structured JSON error from modern yarn', () => {
       const stdout = JSON.stringify({

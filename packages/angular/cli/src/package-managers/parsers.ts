@@ -108,13 +108,32 @@ export function parseNpmLikeDependencies(
     return dependencies;
   }
 
-  for (const dependencyMap of dependencyMaps) {
-    for (const [name, info] of Object.entries(dependencyMap as Record<string, NpmListDependency>)) {
-      dependencies.set(name, {
-        name,
-        version: info.version,
-        path: info.path,
-      });
+  // Perform a breadth-first traversal to collect dependencies.
+  // The queue size is bounded because `npm list` is executed with `--depth=0`,
+  // which limits the traversal to top-level dependencies of the workspaces.
+  const queue = [...dependencyMaps];
+  let index = 0;
+  while (index < queue.length) {
+    const currentMap = queue[index++] as Record<string, NpmListDependency> | undefined;
+    if (!currentMap) {
+      continue;
+    }
+    for (const [name, info] of Object.entries(currentMap)) {
+      if (info && typeof info === 'object') {
+        if (info.version && !dependencies.has(name)) {
+          dependencies.set(name, {
+            name,
+            version: info.version,
+            path: info.path,
+          });
+        }
+        const nestedMaps = [
+          info.dependencies,
+          info.devDependencies,
+          info.unsavedDependencies,
+        ].filter((d) => !!d);
+        queue.push(...nestedMaps);
+      }
     }
   }
 
