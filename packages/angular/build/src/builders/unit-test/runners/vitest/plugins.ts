@@ -54,6 +54,7 @@ interface VitestConfigPluginOptions {
   include: string[];
   optimizeDepsInclude: string[];
   watch: boolean;
+  isolate: boolean;
 }
 
 async function findTestEnvironment(
@@ -271,6 +272,8 @@ export async function createVitestConfigPlugin(
           include,
           // CLI provider browser options override, if present
           ...(browser ? { browser } : {}),
+          // Only override if the user explicitly enabled it via CLI
+          ...(options.isolate ? { isolate: true } : {}),
           // If the user has not specified an environment, use a smart default.
           ...(!testConfig?.environment
             ? { environment: await findTestEnvironment(projectResolver) }

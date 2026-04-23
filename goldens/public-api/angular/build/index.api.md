@@ -233,6 +233,7 @@ export type UnitTestBuilderOptions = {
     filter?: string;
     headless?: boolean;
     include?: string[];
+    isolate?: boolean;
     listTests?: boolean;
     outputFile?: string;
     progress?: boolean;
