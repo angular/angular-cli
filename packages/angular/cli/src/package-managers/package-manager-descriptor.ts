@@ -87,6 +87,9 @@ export interface PackageManagerDescriptor {
   /** The command to list all installed dependencies. */
   readonly listDependenciesCommand: readonly string[];
 
+  /** The command to get the current package name. */
+  readonly getPackageNameCommand?: readonly string[];
+
   /** The command to fetch the registry manifest of a package. */
   readonly getManifestCommand: readonly string[];
 
@@ -99,7 +102,11 @@ export interface PackageManagerDescriptor {
   /** A collection of functions to parse the output of specific commands. */
   readonly outputParsers: {
     /** A function to parse the output of `listDependenciesCommand`. */
-    listDependencies: (stdout: string, logger?: Logger) => Map<string, InstalledPackage>;
+    listDependencies: (
+      stdout: string,
+      logger?: Logger,
+      options?: { workspacePackageName?: string },
+    ) => Map<string, InstalledPackage>;
 
     /** A function to parse the output of `getManifestCommand` for a specific version. */
     getRegistryManifest: (stdout: string, logger?: Logger) => PackageManifest | null;
@@ -158,6 +165,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json=true', '--all=true'],
+    getPackageNameCommand: ['pkg', 'get', 'name'],
     getManifestCommand: ['view', '--json'],
     viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
@@ -237,6 +245,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getPackageNameCommand: ['pkg', 'get', 'name'],
     getManifestCommand: ['view', '--json'],
     viewCommandFieldArgFormatter: (fields) => [...fields],
     outputParsers: {
