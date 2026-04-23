@@ -81,6 +81,7 @@ interface NpmListDependency {
 export function parseNpmLikeDependencies(
   stdout: string,
   logger?: Logger,
+  options?: { workspacePackageName?: string },
 ): Map<string, InstalledPackage> {
   logger?.debug(`Parsing npm-like dependency list...`);
   logStdout(stdout, logger);
@@ -108,13 +109,56 @@ export function parseNpmLikeDependencies(
     return dependencies;
   }
 
+  const workspacePackageName = options?.workspacePackageName;
+
+  if (workspacePackageName) {
+    for (const dependencyMap of dependencyMaps) {
+      const info = dependencyMap[workspacePackageName];
+      if (info && typeof info === 'object') {
+        const nestedMaps = [
+          info.dependencies,
+          info.devDependencies,
+          info.unsavedDependencies,
+        ].filter((d) => !!d) as Record<string, NpmListDependency>[];
+
+        for (const nestedMap of nestedMaps) {
+          for (const [name, nestedInfo] of Object.entries(nestedMap)) {
+            if (nestedInfo && typeof nestedInfo === 'object' && nestedInfo.version) {
+              dependencies.set(name, {
+                name,
+                version: nestedInfo.version,
+                path: nestedInfo.path,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Extract top-level dependencies (root), without overwriting subproject dependencies
   for (const dependencyMap of dependencyMaps) {
-    for (const [name, info] of Object.entries(dependencyMap as Record<string, NpmListDependency>)) {
-      dependencies.set(name, {
-        name,
-        version: info.version,
-        path: info.path,
-      });
+    for (const [name, info] of Object.entries(
+      dependencyMap as Record<string, NpmListDependency & { resolved?: string }>,
+    )) {
+      if (!info || typeof info !== 'object') {
+        continue;
+      }
+
+      // Exclude local monorepo workspace packages (which originate from a local file/dir
+      // and contain nested dependency maps in the output of `npm list --depth=0`),
+      // while preserving third-party packages installed from local paths.
+      const isWorkspacePackage =
+        info.resolved?.startsWith('file:') &&
+        (!!info.dependencies || !!info.devDependencies || !!info.unsavedDependencies);
+
+      if (info.version && !dependencies.has(name) && !isWorkspacePackage) {
+        dependencies.set(name, {
+          name,
+          version: info.version,
+          path: info.path,
+        });
+      }
     }
   }
 
