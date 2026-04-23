@@ -145,8 +145,9 @@ export class PackageManager {
 
     const args = this.descriptor.listDependenciesCommand;
 
+    const workspacePackageName = await this.getCurrentPackageName();
     const dependencies = await this.#fetchAndParse(args, (stdout, logger) =>
-      this.descriptor.outputParsers.listDependencies(stdout, logger),
+      this.descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
     );
 
     return (this.#dependencyCache = dependencies ?? new Map());
@@ -359,6 +360,31 @@ export class PackageManager {
     await this.#run(args, options);
 
     this.#dependencyCache = null;
+  }
+
+  /**
+   * Gets the name of the package in the current project.
+   */
+  async getCurrentPackageName(): Promise<string | undefined> {
+    if (this.descriptor.getPackageNameCommand) {
+      try {
+        const { stdout } = await this.#run(this.descriptor.getPackageNameCommand);
+        if (stdout) {
+          return JSON.parse(stdout);
+        }
+      } catch {
+        // Fall back to reading file if command fails
+      }
+    }
+
+    try {
+      const content = await this.host.readFile(join(this.cwd, 'package.json'));
+      const pkgJson = JSON.parse(content);
+
+      return pkgJson.name;
+    } catch {
+      return undefined;
+    }
   }
 
   /**
