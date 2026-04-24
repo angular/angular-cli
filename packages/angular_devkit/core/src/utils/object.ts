@@ -30,11 +30,18 @@ export function deepCopy<T>(value: T): T {
 
     const copy = Object.create(Object.getPrototypeOf(valueCasted));
     valueCasted[copySymbol] = copy;
+
     for (const key of Object.getOwnPropertyNames(valueCasted)) {
+      // 🛡️ SECURITY CHECK FIRST: Block prototype pollution keys
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue;
+      }
+      
+      // Now it is safe to copy
       copy[key] = deepCopy(valueCasted[key]);
     }
+    
     delete valueCasted[copySymbol];
-
     return copy;
   } else {
     return value;
