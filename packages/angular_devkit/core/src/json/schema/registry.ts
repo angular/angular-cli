@@ -13,7 +13,7 @@ import * as https from 'node:https';
 import * as Url from 'node:url';
 import { Observable, from, isObservable, lastValueFrom } from 'rxjs';
 import { BaseException } from '../../exception';
-import { PartiallyOrderedSet, deepCopy } from '../../utils';
+import { PartiallyOrderedSet } from '../../utils';
 import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../utils';
 import {
   JsonPointer,
@@ -257,7 +257,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       }
     }
 
-    const schemaCopy = deepCopy(validate.schema as JsonObject);
+    const schemaCopy = structuredClone(validate.schema as JsonObject);
     visitJsonSchema(schemaCopy, visitor);
 
     return schemaCopy;

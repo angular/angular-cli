@@ -8,6 +8,9 @@
 
 const copySymbol = Symbol();
 
+/**
+ * @deprecated Use `structuredClone` instead.
+ */
 export function deepCopy<T>(value: T): T {
   if (Array.isArray(value)) {
     return value.map((o) => deepCopy(o)) as unknown as T;
