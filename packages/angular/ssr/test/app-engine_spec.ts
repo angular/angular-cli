@@ -95,7 +95,7 @@ describe('AngularAppEngine', () => {
         basePath: '/',
       });
 
-      appEngine = new AngularAppEngine();
+      appEngine = new AngularAppEngine({ trustProxyHeaders: true });
     });
 
     describe('handle', () => {
@@ -151,6 +151,21 @@ describe('AngularAppEngine', () => {
         expect(response?.status).toBe(302);
         expect(response?.headers.get('Location')).toBe('/it');
         expect(response?.headers.get('Vary')).toBe('Accept-Language');
+      });
+
+      it('should completely ignore proxy headers if not allowed', async () => {
+        const strictEngine = new AngularAppEngine({ trustProxyHeaders: false });
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/app',
+          },
+        });
+
+        // The strictEngine will ignore the prefix
+        const response = await strictEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/it');
       });
 
       it('should return null for requests to file-like resources in a locale', async () => {
@@ -258,7 +273,7 @@ describe('AngularAppEngine', () => {
           supportedLocales: { 'en-US': '' },
         });
 
-        appEngine = new AngularAppEngine();
+        appEngine = new AngularAppEngine({ trustProxyHeaders: true });
       });
 
       beforeEach(() => {
@@ -314,10 +329,12 @@ describe('AngularAppEngine', () => {
         expect(response).not.toBeNull();
         expect(response?.status).toBe(400);
         expect(await response?.text()).toContain(
-          'Header "host" contains characters that are not allowed.',
+          'Header "host" with value "example.com/evil" contains characters that are not allowed.',
         );
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
+          jasmine.stringMatching(
+            'Header "host" with value "example.com/evil" contains characters that are not allowed.',
+          ),
         );
       });
     });
@@ -368,7 +385,9 @@ describe('AngularAppEngine', () => {
         expect(response).not.toBeNull();
         expect(await response?.text()).toContain('<title>CSR page</title>');
         expect(consoleErrorSpy).toHaveBeenCalledWith(
-          jasmine.stringMatching('Header "host" contains characters that are not allowed.'),
+          jasmine.stringMatching(
+            'Header "host" with value "example.com/evil" contains characters that are not allowed.',
+          ),
         );
       });
     });
