@@ -159,7 +159,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo, status, renderMode } = matchedRoute;
+    const { redirectTo, status, renderMode, headers, preload } = matchedRoute;
     if (redirectTo !== undefined) {
       return new Response(null, {
         // Note: The status code is validated during route extraction.
