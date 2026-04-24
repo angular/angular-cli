@@ -2,12 +2,11 @@ import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
 import { installPackage } from '../../utils/packages';
-import { exec } from '../../utils/process';
 
 export default async function () {
   await applyVitestBuilder();
 
-  const artifactCount = 100;
+  const artifactCount = 500;
   // A new project starts with 1 test file (app.spec.ts)
   // Each generated artifact will add one more test file.
   const initialTestCount = 1;
