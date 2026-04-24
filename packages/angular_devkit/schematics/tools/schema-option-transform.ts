@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { deepCopy, schema } from '@angular-devkit/core';
+import { schema } from '@angular-devkit/core';
 import { Observable, from, of as observableOf } from 'rxjs';
 import { first, map, mergeMap } from 'rxjs/operators';
 import { FileSystemSchematicContext, FileSystemSchematicDescription } from './description';
@@ -28,7 +28,7 @@ export function validateOptionsWithSchema(registry: schema.SchemaRegistry) {
     context?: FileSystemSchematicContext,
   ): Observable<T> => {
     // Prevent a schematic from changing the options object by making a copy of it.
-    options = deepCopy(options);
+    options = structuredClone(options);
 
     const withPrompts = context ? context.interactive : true;
 
