@@ -660,7 +660,7 @@ touch src/app/mock-recipes.ts
   id: 1,
   name: 'Spaghetti Carbonara',
   description: 'A classic Italian pasta dish.',
-  imgUrl: '[https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara](https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara)',
+  imgUrl: 'INSERT_IMAGE_URL',
   ingredients: [
   { name: 'Spaghetti', quantity: 200, unit: 'g' },
   { name: 'Guanciale', quantity: 100, unit: 'g' },
@@ -673,7 +673,7 @@ touch src/app/mock-recipes.ts
   id: 2,
   name: 'Caprese Salad',
   description: 'A simple and refreshing Italian salad.',
-  imgUrl: '[https://via.placeholder.com/300x200.png?text=Caprese+Salad](https://via.placeholder.com/300x200.png?text=Caprese+Salad)',
+  imgUrl: 'INSERT_IMAGE_URL',
   ingredients: [
   { name: 'Tomatoes', quantity: 4, unit: 'each' },
   { name: 'Fresh Mozzarella', quantity: 200, unit: 'g' },
@@ -717,7 +717,7 @@ touch src/app/mock-recipes.ts
   id: 1,
   name: 'Spaghetti Carbonara',
   description: 'A classic Italian pasta dish.',
-  imgUrl: '[https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara](https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara)',
+  imgUrl: 'INSERT_IMAGE_URL',
   isFavorite: true,
   ingredients: [
   { name: 'Spaghetti', quantity: 200, unit: 'g' },
@@ -731,7 +731,7 @@ touch src/app/mock-recipes.ts
   id: 2,
   name: 'Caprese Salad',
   description: 'A simple and refreshing Italian salad.',
-  imgUrl: '[https://via.placeholder.com/300x200.png?text=Caprese+Salad](https://via.placeholder.com/300x200.png?text=Caprese+Salad)',
+  imgUrl: 'INSERT_IMAGE_URL',
   isFavorite: false,
   ingredients: [
   { name: 'Tomatoes', quantity: 4, unit: 'each' },
@@ -786,8 +786,7 @@ touch src/app/mock-recipes.ts
       name: 'Spaghetti Carbonara',
       description: 'A classic Italian pasta dish.',
       authorEmail: 'mario@italy.com', // Add this
-      imgUrl:
-        '[https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara](https://via.placeholder.com/300x200.png?text=Spaghetti+Carbonara)',
+      imgUrl: 'INSERT_IMAGE_URL',
       isFavorite: true,
       ingredients: [
         { name: 'Spaghetti', quantity: 200, unit: 'g' },
