@@ -135,7 +135,7 @@
     "undici": "8.1.0",
     "unenv": "^1.10.0",
     "verdaccio": "6.5.2",
-    "verdaccio-auth-memory": "^10.0.0",
+    "verdaccio-auth-memory": "^13.0.0",
     "zone.js": "^0.16.0"
   },
   "dependenciesMeta": {
