@@ -7,6 +7,17 @@
  */
 
 /**
+ * Common X-Forwarded-* headers.
+ */
+const X_FORWARDED_HEADERS: ReadonlySet<string> = new Set([
+  'x-forwarded-for',
+  'x-forwarded-host',
+  'x-forwarded-port',
+  'x-forwarded-proto',
+  'x-forwarded-prefix',
+]);
+
+/**
  * The set of headers that should be validated for host header injection attacks.
  */
 const HOST_HEADERS_TO_VALIDATE: ReadonlyArray<string> = ['host', 'x-forwarded-host'];
@@ -22,7 +33,8 @@ const VALID_PORT_REGEX = /^\d+$/;
 const VALID_PROTO_REGEX = /^https?$/i;
 
 /**
- * Regular expression to validate that the prefix is valid.
+ * Regular expression to validate that the prefix is valid. Validates that the prefix is a valid path prefix and nothing else.
+ * It validates that the prefix starts with a forward slash and contains only letters, numbers, hyphens, underscores and forward slashes.
  */
 const VALID_PREFIX_REGEX = /^\/([a-z0-9_-]+\/)*[a-z0-9_-]*$/i;
 
@@ -85,42 +97,36 @@ export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
  * If no headers need to be removed, the original request is returned without cloning.
  *
  * @param request - The incoming `Request` object to sanitize.
- * @param trustProxyHeaders - A set of allowed proxy headers or a boolean indicating whether all are allowed.
+ * @param trustProxyHeaders - A set of allowed proxy headers.
  * @returns The sanitized request, or the original request if no changes were needed.
  */
 export function sanitizeRequestHeaders(
   request: Request,
-  trustProxyHeaders?: boolean | ReadonlySet<string>,
+  trustProxyHeaders: ReadonlySet<string>,
 ): Request {
-  if (trustProxyHeaders === true) {
-    return request;
-  }
+  let headersDeleted = false;
+  const headers = new Headers();
 
-  const keysToDelete: string[] = [];
-  for (const [key] of request.headers) {
+  for (const [key, value] of request.headers) {
     const lowerKey = key.toLowerCase();
-    if (
-      lowerKey.startsWith('x-forwarded-') &&
-      (!trustProxyHeaders || !trustProxyHeaders.has(lowerKey))
-    ) {
-      keysToDelete.push(key);
+    if (lowerKey.startsWith('x-forwarded-') && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Received "${key}" header but "trustProxyHeaders" was not set up to allow it.\n` +
+          `For more information, see https://angular.dev/best-practices/security#configuring-trusted-proxy-headers`,
+      );
+      headersDeleted = true;
+    } else {
+      headers.set(key, value);
     }
   }
 
-  if (keysToDelete.length === 0) {
-    return request;
-  }
-
-  const clonedReq = new Request(request.clone(), {
-    signal: request.signal,
-  });
-
-  const headers = clonedReq.headers;
-  for (const key of keysToDelete) {
-    headers.delete(key);
-  }
-
-  return clonedReq;
+  return headersDeleted
+    ? new Request(request.clone(), {
+        signal: request.signal,
+        headers,
+      })
+    : request;
 }
 
 /**
@@ -216,4 +222,37 @@ function validateHeaders(
         'only alphanumeric characters, hyphens, and underscores, separated by single slashes.',
     );
   }
+}
+
+/**
+ * Checks if a specific proxy header is allowed.
+ *
+ * @param headerName - The name of the proxy header to check.
+ * @param trustProxyHeaders - A set of allowed proxy headers.
+ * @returns `true` if the header is allowed, `false` otherwise.
+ */
+export function isProxyHeaderAllowed(
+  headerName: string,
+  trustProxyHeaders: ReadonlySet<string>,
+): boolean {
+  return trustProxyHeaders.has(headerName.toLowerCase());
+}
+
+/**
+ * Normalizes the `trustProxyHeaders` option to a consistent representation.
+ * @param trustProxyHeaders The input `trustProxyHeaders` value.
+ * @returns A `Set<string>` of normalized header names.
+ */
+export function normalizeTrustProxyHeaders(
+  trustProxyHeaders: boolean | readonly string[] | undefined,
+): ReadonlySet<string> {
+  if (!trustProxyHeaders) {
+    return new Set();
+  }
+
+  if (trustProxyHeaders === true) {
+    return X_FORWARDED_HEADERS;
+  }
+
+  return new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
 }

@@ -7,8 +7,8 @@
  */
 
 import { IncomingMessage } from 'node:http';
-import { Http2ServerRequest } from 'node:http2';
 import { Socket } from 'node:net';
+import { normalizeTrustProxyHeaders } from '../../src/utils/validation';
 import { createRequestUrl } from '../src/request';
 
 // Helper to create a mock request object for testing.
@@ -26,18 +26,6 @@ function createRequest(details: {
   } as unknown as IncomingMessage;
 }
 
-// Helper to create a mock Http2ServerRequest object for testing.
-function createHttp2Request(details: {
-  headers: Record<string, string | string[] | undefined>;
-  url?: string;
-}): Http2ServerRequest {
-  return {
-    headers: details.headers,
-    socket: new Socket(),
-    url: details.url,
-  } as Http2ServerRequest;
-}
-
 describe('createRequestUrl', () => {
   it('should create a http URL with hostname and port from the host header', () => {
     const url = createRequestUrl(
@@ -45,6 +33,7 @@ describe('createRequestUrl', () => {
         headers: { host: 'localhost:8080' },
         url: '/test',
       }),
+      new Set(),
     );
     expect(url.href).toBe('http://localhost:8080/test');
   });
@@ -56,6 +45,7 @@ describe('createRequestUrl', () => {
         encryptedSocket: true,
         url: '/test',
       }),
+      new Set(),
     );
     expect(url.href).toBe('https://example.com/test');
   });
@@ -67,6 +57,7 @@ describe('createRequestUrl', () => {
         encryptedSocket: true,
         url: '',
       }),
+      new Set(),
     );
     expect(url.href).toBe('https://example.com/');
   });
@@ -78,6 +69,7 @@ describe('createRequestUrl', () => {
         encryptedSocket: true,
         url: '/test?a=1',
       }),
+      new Set(),
     );
     expect(url.href).toBe('https://example.com/test?a=1');
   });
@@ -90,6 +82,7 @@ describe('createRequestUrl', () => {
         url: '/test',
         originalUrl: '/original',
       }),
+      new Set(),
     );
     expect(url.href).toBe('https://example.com/original');
   });
@@ -102,6 +95,7 @@ describe('createRequestUrl', () => {
         url: undefined,
         originalUrl: undefined,
       }),
+      new Set(),
     );
     expect(url.href).toBe('https://example.com/');
   });
@@ -112,6 +106,7 @@ describe('createRequestUrl', () => {
         headers: { host: 'localhost:8080' },
         url: '//example.com/test',
       }),
+      new Set(),
     );
     expect(url.href).toBe('http://localhost:8080//example.com/test');
   });
@@ -123,6 +118,7 @@ describe('createRequestUrl', () => {
         url: '/test',
         originalUrl: '//example.com/original',
       }),
+      new Set(),
     );
     expect(url.href).toBe('http://localhost:8080//example.com/original');
   });
@@ -137,7 +133,7 @@ describe('createRequestUrl', () => {
         },
         url: '/test',
       }),
-      true,
+      normalizeTrustProxyHeaders(true),
     );
     expect(url.href).toBe('https://example.com/test');
   });
@@ -153,7 +149,7 @@ describe('createRequestUrl', () => {
         },
         url: '/test',
       }),
-      true,
+      normalizeTrustProxyHeaders(true),
     );
     expect(url.href).toBe('https://example.com:8443/test');
   });

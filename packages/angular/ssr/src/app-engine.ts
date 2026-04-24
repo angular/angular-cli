@@ -12,7 +12,11 @@ import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
-import { sanitizeRequestHeaders, validateRequest } from './utils/validation';
+import {
+  normalizeTrustProxyHeaders,
+  sanitizeRequestHeaders,
+  validateRequest,
+} from './utils/validation';
 
 /**
  * Options for the Angular server application engine.
@@ -27,9 +31,12 @@ export interface AngularAppEngineOptions {
    * Extends the scope of trusted proxy headers (`X-Forwarded-*`).
    *
    * @remarks
-   * When `trustProxyHeaders` is enabled, headers such as `X-Forwarded-Host` and
-   * `X-Forwarded-Prefix` should ideally be strictly validated at a higher infrastructure
-   * level (e.g., at the reverse proxy or API gateway) before reaching the application.
+   * **This is a security-sensitive option!**
+   *
+   * When `trustProxyHeaders` is enabled, request headers such as `X-Forwarded-Host` and
+   * `X-Forwarded-Prefix` are trusted by the server and used for routing. These
+   * headers must be strictly validated and provided by a trusted client (e.g., at a reverse proxy, load
+   * balancer, or API gateway) and must *not* be provided by untrusted end users.
    *
    * If a `string[]` is provided, only those proxy headers are allowed.
    * If `true`, all proxy headers are allowed.
@@ -97,7 +104,7 @@ export class AngularAppEngine {
   /**
    * The normalized allowed proxy headers.
    */
-  private readonly trustProxyHeaders: ReadonlySet<string> | boolean;
+  private readonly trustProxyHeaders: ReadonlySet<string>;
 
   /**
    * A cache that holds entry points, keyed by their potential locale string.
@@ -110,12 +117,7 @@ export class AngularAppEngine {
    */
   constructor(options?: AngularAppEngineOptions) {
     this.allowedHosts = this.getAllowedHosts(options);
-
-    const trustProxyHeaders = options?.trustProxyHeaders ?? false;
-    this.trustProxyHeaders =
-      typeof trustProxyHeaders === 'boolean'
-        ? trustProxyHeaders
-        : new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
+    this.trustProxyHeaders = normalizeTrustProxyHeaders(options?.trustProxyHeaders);
   }
 
   private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {

@@ -224,7 +224,7 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req);
+      const secured = sanitizeRequestHeaders(req, new Set());
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.has('x-forwarded-host')).toBeFalse();
@@ -255,7 +255,10 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, true);
+      const secured = sanitizeRequestHeaders(
+        req,
+        new Set(['x-forwarded-host', 'x-forwarded-proto']),
+      );
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
@@ -266,7 +269,7 @@ describe('Validation Utils', () => {
       const req = new Request('http://example.com', {
         headers: { 'accept': 'application/json' },
       });
-      const secured = sanitizeRequestHeaders(req);
+      const secured = sanitizeRequestHeaders(req, new Set());
 
       expect(secured).toBe(req);
       expect(secured.headers.get('accept')).toBe('application/json');
