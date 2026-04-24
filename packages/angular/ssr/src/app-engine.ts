@@ -11,7 +11,11 @@ import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { joinUrlParts } from './utils/url';
-import { cloneRequestAndPatchHeaders, validateRequest } from './utils/validation';
+import {
+  normalizeTrustProxyHeaders,
+  sanitizeRequestHeaders,
+  validateRequest,
+} from './utils/validation';
 
 /**
  * Options for the Angular server application engine.
@@ -21,6 +25,22 @@ export interface AngularAppEngineOptions {
    * A set of allowed hostnames for the server application.
    */
   allowedHosts?: readonly string[];
+
+  /**
+   * Extends the scope of trusted proxy headers (`X-Forwarded-*`).
+   *
+   * @remarks
+   * When `trustProxyHeaders` is enabled, headers such as `X-Forwarded-Host` and
+   * `X-Forwarded-Prefix` should ideally be strictly validated at a higher infrastructure
+   * level (e.g., at the reverse proxy or API gateway) before reaching the application.
+   *
+   * If a `string[]` is provided, only those proxy headers are allowed.
+   * If `true`, all proxy headers are allowed.
+   * If `false`, proxy headers are ignored.
+   *
+   * @default undefined
+   */
+  trustProxyHeaders?: boolean | readonly string[];
 }
 
 /**
@@ -52,6 +72,13 @@ export class AngularAppEngine {
   static ɵhooks = /* #__PURE__*/ new Hooks();
 
   /**
+   * A flag to disable the allowed hosts check.
+   *
+   * @private
+   */
+  static ɵdisableAllowedHostsCheck = false;
+
+  /**
    * The manifest for the server application.
    */
   private readonly manifest = getAngularAppEngineManifest();
@@ -69,6 +96,11 @@ export class AngularAppEngine {
   );
 
   /**
+   * The normalized allowed proxy headers.
+   */
+  private readonly trustProxyHeaders: ReadonlySet<string>;
+
+  /**
    * A cache that holds entry points, keyed by their potential locale string.
    */
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
@@ -78,7 +110,23 @@ export class AngularAppEngine {
    * @param options Options for the Angular server application engine.
    */
   constructor(options?: AngularAppEngineOptions) {
-    this.allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+    this.allowedHosts = this.getAllowedHosts(options);
+    this.trustProxyHeaders = normalizeTrustProxyHeaders(options?.trustProxyHeaders);
+  }
+
+  private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
+    const allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+
+    if (allowedHosts.has('*')) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Allowing all hosts via "*" is a security risk. This configuration should only be used when ' +
+          'validation for "Host" and "X-Forwarded-Host" headers is performed in another layer, such as a load balancer or reverse proxy. ' +
+          'For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
+      );
+    }
+
+    return allowedHosts;
   }
 
   /**
@@ -106,23 +154,24 @@ export class AngularAppEngine {
    */
   async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
     const allowedHost = this.allowedHosts;
+    const { request: securedRequest, deoptToCSR } = sanitizeRequestHeaders(
+      request,
+      this.trustProxyHeaders,
+    );
 
     try {
-      validateRequest(request, allowedHost);
+      validateRequest(securedRequest, allowedHost, AngularAppEngine.ɵdisableAllowedHostsCheck);
     } catch (error) {
-      return this.handleValidationError(error as Error, request);
+      return this.handleValidationError(error as Error, securedRequest);
     }
-
-    // Clone request with patched headers to prevent unallowed host header access.
-    const { request: securedRequest, onError: onHeaderValidationError } =
-      cloneRequestAndPatchHeaders(request, allowedHost);
 
     const serverApp = await this.getAngularServerAppForRequest(securedRequest);
     if (serverApp) {
-      return Promise.race([
-        onHeaderValidationError.then((error) => this.handleValidationError(error, securedRequest)),
-        serverApp.handle(securedRequest, requestContext),
-      ]);
+      if (deoptToCSR) {
+        return serverApp.serveClientSidePage();
+      }
+
+      return serverApp.handle(securedRequest, requestContext);
     }
 
     if (this.supportedLocales.length > 1) {
