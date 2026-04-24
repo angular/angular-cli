@@ -171,7 +171,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
   /**
    * Add a transformation step before the validation of any Json.
    * @param {JsonVisitor} visitor The visitor to transform every value.
-   * @param {JsonVisitor[]} deps A list of other visitors to run before.
+   * @param {JsonVisitor[]} deps [Deprecated] A list of other visitors to run before. Add transforms in the desired execution order instead.
    */
   addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
     this._pre.add(visitor, deps);
@@ -182,7 +182,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * after the POST, so if transformations are not compatible with the Schema it will not result
    * in an error.
    * @param {JsonVisitor} visitor The visitor to transform every value.
-   * @param {JsonVisitor[]} deps A list of other visitors to run before.
+   * @param {JsonVisitor[]} deps [Deprecated] A list of other visitors to run before. Add transforms in the desired execution order instead.
    */
   addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
     this._post.add(visitor, deps);
