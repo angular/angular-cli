@@ -19,6 +19,9 @@ export class CircularDependencyFoundException extends BaseException {
   }
 }
 
+/**
+ * @deprecated Use standard arrays and ensure correct insertion order instead.
+ */
 export class PartiallyOrderedSet<T> {
   private _items = new Map<T, Set<T>>();
 

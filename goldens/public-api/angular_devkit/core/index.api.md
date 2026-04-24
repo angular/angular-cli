@@ -553,7 +553,7 @@ function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
 // @public (undocumented)
 function parseJsonPointer(pointer: JsonPointer): string[];
 
-// @public (undocumented)
+// @public
 export class PartiallyOrderedSet<T> {
     // (undocumented)
     [Symbol.iterator](): IterableIterator<T, undefined, unknown>;
