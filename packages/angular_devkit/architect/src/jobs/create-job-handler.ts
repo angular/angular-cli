@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BaseException, JsonValue, isPromise, logging } from '@angular-devkit/core';
+import { BaseException, JsonValue, logging } from '@angular-devkit/core';
 import {
   Observable,
   Observer,
@@ -26,6 +26,11 @@ import {
   JobOutboundMessage,
   JobOutboundMessageKind,
 } from './api';
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function isPromise(obj: any): obj is Promise<any> {
+  return !!obj && typeof obj.then === 'function';
+}
 
 export class ChannelAlreadyExistException extends BaseException {
   constructor(name: string) {

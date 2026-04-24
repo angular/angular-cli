@@ -10,6 +10,8 @@
 
 /**
  * Determine if the argument is shaped like a Promise
+ *
+ * @deprecated Use `typeof obj?.then === 'function'` instead.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function isPromise(obj: any): obj is Promise<any> {
