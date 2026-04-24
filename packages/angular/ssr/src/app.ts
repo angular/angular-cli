@@ -175,8 +175,7 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo, status, renderMode, headers } = matchedRoute;
-
+    const { redirectTo, status, renderMode, headers, preload } = matchedRoute;
     if (redirectTo !== undefined) {
       return createRedirectResponse(
         joinUrlParts(

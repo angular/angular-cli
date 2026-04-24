@@ -55,7 +55,7 @@ export interface CommonEngineRenderOptions {
 export function createNodeRequestHandler<T extends NodeRequestHandlerFunction>(handler: T): T;
 
 // @public
-export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage | Http2ServerRequest): Request;
+export function createWebRequestFromNodeRequest(nodeRequest: IncomingMessage | Http2ServerRequest, trustProxyHeaders?: boolean | readonly string[]): Request;
 
 // @public
 export function isMainModule(url: string): boolean;
