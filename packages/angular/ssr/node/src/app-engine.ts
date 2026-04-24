@@ -29,6 +29,7 @@ export interface AngularNodeAppEngineOptions extends AngularAppEngineOptions {}
  */
 export class AngularNodeAppEngine {
   private readonly angularAppEngine: AngularAppEngine;
+  private readonly trustProxyHeaders?: boolean | readonly string[];
 
   /**
    * Creates a new instance of the Angular Node.js server application engine.
@@ -39,6 +40,7 @@ export class AngularNodeAppEngine {
       ...options,
       allowedHosts: [...getAllowedHostsFromEnv(), ...(options?.allowedHosts ?? [])],
     });
+    this.trustProxyHeaders = options?.trustProxyHeaders;
 
     attachNodeGlobalErrorHandlers();
   }
@@ -76,7 +78,9 @@ export class AngularNodeAppEngine {
     requestContext?: unknown,
   ): Promise<Response | null> {
     const webRequest =
-      request instanceof Request ? request : createWebRequestFromNodeRequest(request);
+      request instanceof Request
+        ? request
+        : createWebRequestFromNodeRequest(request, this.trustProxyHeaders);
 
     return this.angularAppEngine.handle(webRequest, requestContext);
   }

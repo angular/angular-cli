@@ -22,6 +22,7 @@ export class AngularAppEngine {
 // @public
 export interface AngularAppEngineOptions {
     allowedHosts?: readonly string[];
+    trustProxyHeaders?: boolean | readonly string[];
 }
 
 // @public
