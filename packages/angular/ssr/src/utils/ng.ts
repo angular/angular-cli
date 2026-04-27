@@ -126,8 +126,8 @@ export async function renderAngular(
         envInjector.get(REQUEST, null, { optional: true })?.headers.get('X-Forwarded-Prefix');
 
       const { pathname, search, hash } = envInjector.get(PlatformLocation);
-      const finalUrl = constructDecodedUrl({ pathname, search, hash }, requestPrefix);
-      const urlToRenderString = constructDecodedUrl(urlToRender, requestPrefix);
+      const finalUrl = constructSerializedUrl(router, { pathname, search, hash }, requestPrefix);
+      const urlToRenderString = constructSerializedUrl(router, urlToRender, requestPrefix);
 
       if (urlToRenderString !== finalUrl) {
         redirectTo = [pathname, search, hash].join('');
@@ -190,22 +190,27 @@ function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
 }
 
 /**
- * Constructs a decoded URL string from its components, ensuring consistency for comparison.
+ * Constructs a normalized and serialized URL string from its components.
  *
- * This function takes a URL-like object (containing `pathname`, `search`, and `hash`),
- * strips the trailing slash from the pathname, joins the components, and then decodes
- * the entire string. This normalization is crucial for accurately comparing URLs
- * that might differ only in encoding or trailing slashes.
+ * This function uses the provided `Router` instance to parse and serialize the URL,
+ * ensuring that the resulting string is consistent with the router's configuration.
+ * It also handles the optional `prefix` parameter to ensure proper URL construction.
  *
+ * @param router - The `Router` instance to use for parsing and serializing the URL.
  * @param url - An object containing the URL components:
  *   - `pathname`: The path of the URL.
  *   - `search`: The query string of the URL (including '?').
  *   - `hash`: The hash fragment of the URL (including '#').
  * @param prefix - An optional prefix (e.g., `APP_BASE_HREF`) to prepend to the pathname
  * if it is not already present.
- * @returns The constructed and decoded URL string.
+ * @returns The normalized and serialized URL string.
+ *
+ * @note
+ * We use the Angular `Router` to construct the URL, so that the URL is consistent with the router's configuration.
+ * This is important for the URL to be correctly parsed and serialized by the router as it might have different encodings.
  */
-function constructDecodedUrl(
+function constructSerializedUrl(
+  router: Router,
   url: { pathname: string; search: string; hash: string },
   prefix?: string | null,
 ): string {
@@ -219,5 +224,7 @@ function constructDecodedUrl(
 
   urlParts.push(search, hash);
 
-  return decodeURIComponent(urlParts.join(''));
+  const urlTree = router.parseUrl(urlParts.join(''));
+
+  return router.serializeUrl(urlTree);
 }
