@@ -345,11 +345,23 @@ describe('AngularServerApp', () => {
         expect(response?.status).toBe(302);
       });
 
-      it('should work with encoded characters', async () => {
-        const request = new Request('http://localhost/home?email=xyz%40xyz.com');
-        const response = await app.handle(request);
-        expect(response?.status).toBe(200);
-        expect(await response?.text()).toContain('Home works');
+      it('should work with complex and encoded URLs', async () => {
+        const urls = [
+          'http://localhost/home?email=xyz%40xyz.com',
+          'http://localhost/home?empty',
+          'http://localhost/home?scope=email+profile',
+          'http://localhost/home?bbb=1&aaa=2&bbb=3',
+          'http://localhost//home',
+        ];
+
+        for (const url of urls) {
+          const request = new Request(url);
+          const response = await app.handle(request);
+          expect(response?.status).withContext(`url: ${url}`).toBe(200);
+          expect(await response?.text())
+            .withContext(`url: ${url}`)
+            .toContain('Home works');
+        }
       });
 
       it('should work with decoded characters', async () => {
