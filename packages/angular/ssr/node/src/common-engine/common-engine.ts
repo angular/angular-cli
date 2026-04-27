@@ -72,10 +72,7 @@ export class CommonEngine {
   private readonly allowedHosts: ReadonlySet<string>;
 
   constructor(private options?: CommonEngineOptions) {
-    this.allowedHosts = new Set([
-      ...getAllowedHostsFromEnv(),
-      ...(this.options?.allowedHosts ?? []),
-    ]);
+    this.allowedHosts = new Set(getAllowedHostsFromEnv() ?? this.options?.allowedHosts ?? []);
 
     attachNodeGlobalErrorHandlers();
   }
