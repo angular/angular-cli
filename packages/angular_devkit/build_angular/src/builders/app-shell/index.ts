@@ -82,10 +82,11 @@ async function _renderUniversal(
         localeDirectory,
       );
 
+      const route = options.route;
       let html: string = await renderWorker.run({
         serverBundlePath,
         document: indexHtml,
-        url: options.route,
+        url: route?.[0] === '/' ? route : '/' + route,
       });
 
       // Overwrite the client index file.
