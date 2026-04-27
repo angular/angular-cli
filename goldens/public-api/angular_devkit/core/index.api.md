@@ -197,7 +197,7 @@ function dasherize(str: string): string;
 // @public
 function decamelize(str: string): string;
 
-// @public
+// @public @deprecated (undocumented)
 export function deepCopy<T>(value: T): T;
 
 // @public (undocumented)
@@ -333,7 +333,7 @@ export function isJsonObject(value: JsonValue): value is JsonObject;
 // @public (undocumented)
 function isJsonSchema(value: unknown): value is JsonSchema;
 
-// @public
+// @public @deprecated
 export function isPromise(obj: any): obj is Promise<any>;
 
 // @public
@@ -553,7 +553,7 @@ function oneLine(strings: TemplateStringsArray, ...values: any[]): string;
 // @public (undocumented)
 function parseJsonPointer(pointer: JsonPointer): string[];
 
-// @public
+// @public @deprecated (undocumented)
 export class PartiallyOrderedSet<T> {
     // (undocumented)
     [Symbol.iterator](): IterableIterator<T, undefined, unknown>;
