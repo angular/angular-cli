@@ -10,7 +10,7 @@ import { AngularAppEngine } from '@angular/ssr';
 import type { IncomingMessage } from 'node:http';
 import type { Http2ServerRequest } from 'node:http2';
 import { AngularAppEngineOptions } from '../../src/app-engine';
-import { getAllowedHostsFromEnv } from './environment-options';
+import { getAllowedHostsFromEnv, getTrustProxyHeadersFromEnv } from './environment-options';
 import { attachNodeGlobalErrorHandlers } from './errors';
 import { createWebRequestFromNodeRequest } from './request';
 
@@ -36,11 +36,14 @@ export class AngularNodeAppEngine {
    * @param options Options for the Angular Node.js server application engine.
    */
   constructor(options?: AngularNodeAppEngineOptions) {
-    this.angularAppEngine = new AngularAppEngine({
+    const appEngineOptions: AngularAppEngineOptions = {
       ...options,
-      allowedHosts: [...getAllowedHostsFromEnv(), ...(options?.allowedHosts ?? [])],
-    });
-    this.trustProxyHeaders = options?.trustProxyHeaders;
+      allowedHosts: getAllowedHostsFromEnv() ?? options?.allowedHosts,
+      trustProxyHeaders: getTrustProxyHeadersFromEnv() ?? options?.trustProxyHeaders,
+    };
+
+    this.angularAppEngine = new AngularAppEngine(appEngineOptions);
+    this.trustProxyHeaders = appEngineOptions.trustProxyHeaders;
 
     attachNodeGlobalErrorHandlers();
   }
