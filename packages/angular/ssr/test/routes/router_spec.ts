@@ -127,5 +127,15 @@ describe('ServerRouter', () => {
         renderMode: RenderMode.Server,
       });
     });
+
+    it('should handle encoded params', () => {
+      const encodedUserMetadata = router.match(
+        new URL('http://localhost/user/Bob%20%2F%20Roberts'),
+      );
+      expect(encodedUserMetadata).toEqual({
+        route: '/user/*',
+        renderMode: RenderMode.Server,
+      });
+    });
   });
 });
