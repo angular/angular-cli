@@ -591,6 +591,7 @@ export default class AddCommandModule
           join(context.collectionName, 'package.json'),
         );
 
+        await this.refreshInstalledPackageInfo(context, resolvedCollectionPath, false);
         context.collectionName = dirname(resolvedCollectionPath);
       } else {
         await packageManager.add(
@@ -603,6 +604,8 @@ export default class AddCommandModule
             registry,
           },
         );
+
+        await this.refreshInstalledPackageInfo(context);
       }
     } catch (e) {
       if (e instanceof PackageManagerError) {
@@ -613,6 +616,34 @@ export default class AddCommandModule
       }
 
       throw e;
+    }
+  }
+
+  private async refreshInstalledPackageInfo(
+    context: AddCommandTaskContext,
+    installedPackagePath?: string,
+    updateCollectionName = true,
+  ): Promise<void> {
+    installedPackagePath ??= this.resolvePackageJson(context.collectionName ?? '');
+    if (!installedPackagePath) {
+      return;
+    }
+
+    try {
+      const installedManifest = JSON.parse(
+        await fs.readFile(installedPackagePath, 'utf-8'),
+      ) as PackageManifest;
+
+      context.hasSchematics = !!installedManifest.schematics;
+      if (updateCollectionName) {
+        context.collectionName = installedManifest.name;
+      }
+      context.homepage = installedManifest.homepage ?? context.homepage;
+    } catch (e) {
+      assertIsError(e);
+      this.context.logger.debug(
+        `Unable to read installed package information from '${installedPackagePath}': ${e.message}`,
+      );
     }
   }
 
