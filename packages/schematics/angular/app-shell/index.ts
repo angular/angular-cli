@@ -15,7 +15,7 @@ import {
   schematic,
 } from '@angular-devkit/schematics';
 import { dirname, join } from 'node:path/posix';
-import ts from '../third_party/typescript';
+import ts from 'typescript';
 import {
   findNode,
   findNodes,

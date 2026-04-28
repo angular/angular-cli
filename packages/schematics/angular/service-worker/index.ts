@@ -20,7 +20,7 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
-import ts from '../third_party/typescript';
+import ts from 'typescript';
 import { addDependency, addRootProvider, writeWorkspace } from '../utility';
 import { addSymbolToNgModuleMetadata, insertImport } from '../utility/ast-utils';
 import { applyToUpdateRecorder } from '../utility/change';

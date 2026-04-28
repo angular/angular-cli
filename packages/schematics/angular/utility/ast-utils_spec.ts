@@ -7,7 +7,7 @@
  */
 
 import { HostTree } from '@angular-devkit/schematics';
-import * as ts from '../third_party/typescript';
+import ts from 'typescript';
 import { Change, InsertChange } from '../utility/change';
 import {
   addDeclarationToModule,

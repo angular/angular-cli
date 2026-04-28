@@ -7,7 +7,7 @@
  */
 
 import { SchematicsException, Tree } from '@angular-devkit/schematics';
-import ts from '../../third_party/typescript';
+import ts from 'typescript';
 import { getDecoratorMetadata, getMetadataField } from '../ast-utils';
 import { findBootstrapModuleCall, getAppModulePath } from '../ng-ast-utils';
 import { findBootstrapApplicationCall, getSourceFile } from './util';

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { TodoCategory } from './todo-notes';
 
 export class RefactorReporter {

@@ -13,7 +13,7 @@
  * operations that use the `done` callback.
  */
 
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { createPropertyAccess } from '../utils/ast-helpers';
 import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';

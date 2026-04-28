@@ -22,8 +22,8 @@ import {
   url,
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
+import ts from 'typescript';
 import { Schema as ComponentOptions } from '../component/schema';
-import * as ts from '../third_party/typescript';
 import { addImportToModule, addRouteDeclarationToModule } from '../utility/ast-utils';
 import { InsertChange } from '../utility/change';
 import {

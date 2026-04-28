@@ -14,7 +14,7 @@
  * `toHaveBeenCalledOnceWith` and `arrayWithExactContents`.
  */
 
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import {
   addVitestValueImport,
   createExpectCallExpression,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 
 export function addVitestValueImport(imports: Set<string>, importName: string): void {
   imports.add(importName);

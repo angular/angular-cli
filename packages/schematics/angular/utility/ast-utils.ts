@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as ts from '../third_party/typescript';
+import ts from 'typescript';
 import { Change, InsertChange, NoopChange } from './change';
 import { getEOL } from './eol';
 
