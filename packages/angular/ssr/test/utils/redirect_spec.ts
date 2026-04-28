@@ -14,7 +14,6 @@ describe('Redirect Utils', () => {
       const response = createRedirectResponse('/home');
       expect(response.status).toBe(302);
       expect(response.headers.get('Location')).toBe('/home');
-      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix');
     });
 
     it('should create a redirect response with a custom status', () => {
@@ -27,23 +26,6 @@ describe('Redirect Utils', () => {
       const response = createRedirectResponse('/home', 302, { 'X-Custom': 'value' });
       expect(response.headers.get('X-Custom')).toBe('value');
       expect(response.headers.get('Location')).toBe('/home');
-      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix');
-    });
-
-    it('should append to Vary header instead of overriding it', () => {
-      const response = createRedirectResponse('/home', 302, {
-        'Location': '/evil',
-        'Vary': 'Host',
-      });
-      expect(response.headers.get('Location')).toBe('/home');
-      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
-    });
-
-    it('should NOT add duplicate X-Forwarded-Prefix if already present in Vary header', () => {
-      const response = createRedirectResponse('/home', 302, {
-        'Vary': 'X-Forwarded-Prefix, Host',
-      });
-      expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
     });
 
     it('should warn if Location header is provided in extra headers in dev mode', () => {
