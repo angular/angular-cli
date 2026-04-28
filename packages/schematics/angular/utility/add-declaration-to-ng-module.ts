@@ -7,7 +7,7 @@
  */
 
 import { Rule, Tree, strings } from '@angular-devkit/schematics';
-import * as ts from '../third_party/typescript';
+import ts from 'typescript';
 import { addDeclarationToModule, addSymbolToNgModuleMetadata } from './ast-utils';
 import { InsertChange } from './change';
 import { buildRelativePath } from './find-module';

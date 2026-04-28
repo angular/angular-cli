@@ -13,7 +13,7 @@
  * necessary `vitest` imports are added to the file.
  */
 
-import ts from '../../../third_party/typescript';
+import ts from 'typescript';
 import { addVitestTypeImport } from '../utils/ast-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 

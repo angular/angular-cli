@@ -7,7 +7,7 @@
  */
 
 import { Rule, SchematicsException, Tree, chain } from '@angular-devkit/schematics';
-import ts from '../../third_party/typescript';
+import ts from 'typescript';
 import { addSymbolToNgModuleMetadata, insertAfterLastOccurrence } from '../ast-utils';
 import { InsertChange } from '../change';
 import { getAppModulePath, isStandaloneApp } from '../ng-ast-utils';

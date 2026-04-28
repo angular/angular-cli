@@ -107,17 +107,8 @@ ts_project(
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/jsonc-parser",
+        ":node_modules/typescript",
         "//:node_modules/@types/node",
-        "//packages/schematics/angular/third_party/typescript",
-    ],
-)
-
-jasmine_test(
-    name = "no_typescript_runtime_dep_test",
-    data = [
-        "no_typescript_runtime_dep_spec.js",
-        ":angular",
-        "//:node_modules/@types/jasmine",
     ],
 )
 
@@ -139,10 +130,10 @@ ts_project(
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
         ":node_modules/jsonc-parser",
+        ":node_modules/typescript",
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
         "//:node_modules/prettier",
-        "//packages/schematics/angular/third_party/typescript",
     ],
 )
 
@@ -173,6 +164,5 @@ npm_package(
         ":README.md",
         ":angular",
         ":license",
-        "//packages/schematics/angular/third_party/typescript",
     ],
 )

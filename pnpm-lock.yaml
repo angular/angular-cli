@@ -327,7 +327,7 @@ importers:
         version: 29.0.2
       ng-packagr:
         specifier: 22.0.0-next.3
-        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.2))(tslib@2.8.1)(typescript@6.0.2)
+        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -430,7 +430,7 @@ importers:
         version: 4.6.4
       ng-packagr:
         specifier: 22.0.0-next.3
-        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.2))(tslib@2.8.1)(typescript@6.0.2)
+        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.10
         version: 8.5.10
@@ -675,7 +675,7 @@ importers:
         version: 8.5.10
       postcss-loader:
         specifier: 8.2.1
-        version: 8.2.1(postcss@8.5.10)(typescript@6.0.2)(webpack@5.106.2(esbuild@0.28.0))
+        version: 8.2.1(postcss@8.5.10)(typescript@6.0.3)(webpack@5.106.2(esbuild@0.28.0))
       resolve-url-loader:
         specifier: 5.0.0
         version: 5.0.0
@@ -730,7 +730,7 @@ importers:
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       ng-packagr:
         specifier: 22.0.0-next.3
-        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.2))(tslib@2.8.1)(typescript@6.0.2)
+        version: 22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       undici:
         specifier: 8.1.0
         version: 8.1.0
@@ -845,6 +845,9 @@ importers:
       jsonc-parser:
         specifier: 3.3.1
         version: 3.3.1
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   tests:
     devDependencies:
@@ -8045,6 +8048,11 @@ packages:
     engines: {node: '>=14.17'}
     hasBin: true
 
+  typescript@6.0.3:
+    resolution: {integrity: sha512-y2TvuxSZPDyQakkFRPZHKFm+KKVqIisdg9/CZwm9ftvKXLP8NRWj38/ODjNbr43SsoXqNuAisEf1GdCxqWcdBw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
   ua-parser-js@0.7.41:
     resolution: {integrity: sha512-O3oYyCMPYgNNHuO7Jjk3uacJWZF8loBgwrfd/5LE/HyZ3lUIOdniQ7DNXJcIgZbwioZxk0fLfI4EVnetdiX5jg==}
     hasBin: true
@@ -8698,6 +8706,22 @@ snapshots:
       yargs: 18.0.0
     optionalDependencies:
       typescript: 6.0.2
+    transitivePeerDependencies:
+      - supports-color
+
+  '@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3)':
+    dependencies:
+      '@angular/compiler': 22.0.0-next.8
+      '@babel/core': 7.29.0
+      '@jridgewell/sourcemap-codec': 1.5.5
+      chokidar: 5.0.0
+      convert-source-map: 1.9.0
+      reflect-metadata: 0.2.2
+      semver: 7.7.4
+      tslib: 2.8.1
+      yargs: 18.0.0
+    optionalDependencies:
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -12878,6 +12902,15 @@ snapshots:
     optionalDependencies:
       typescript: 6.0.2
 
+  cosmiconfig@9.0.1(typescript@6.0.3):
+    dependencies:
+      env-paths: 2.2.1
+      import-fresh: 3.3.1
+      js-yaml: 4.1.1
+      parse-json: 5.2.0
+    optionalDependencies:
+      typescript: 6.0.3
+
   cross-fetch@4.1.0(encoding@0.1.13):
     dependencies:
       node-fetch: 2.7.0(encoding@0.1.13)
@@ -15123,10 +15156,10 @@ snapshots:
 
   netmask@2.1.1: {}
 
-  ng-packagr@22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.2))(tslib@2.8.1)(typescript@6.0.2):
+  ng-packagr@22.0.0-next.3(@angular/compiler-cli@22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@angular/compiler-cli': 22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.2)
+      '@angular/compiler-cli': 22.0.0-next.8(@angular/compiler@22.0.0-next.8)(typescript@6.0.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.60.2)
       '@rollup/wasm-node': 4.60.2
       ajv: 8.18.0
@@ -15142,12 +15175,12 @@ snapshots:
       ora: 9.3.0
       piscina: 5.1.4
       postcss: 8.5.10
-      rollup-plugin-dts: 6.4.1(rollup@4.60.2)(typescript@6.0.2)
+      rollup-plugin-dts: 6.4.1(rollup@4.60.2)(typescript@6.0.3)
       rxjs: 7.8.2
       sass: 1.99.0
       tinyglobby: 0.2.16
       tslib: 2.8.1
-      typescript: 6.0.2
+      typescript: 6.0.3
     optionalDependencies:
       rollup: 4.60.2
 
@@ -15598,9 +15631,9 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-loader@8.2.1(postcss@8.5.10)(typescript@6.0.2)(webpack@5.106.2(esbuild@0.28.0)):
+  postcss-loader@8.2.1(postcss@8.5.10)(typescript@6.0.3)(webpack@5.106.2(esbuild@0.28.0)):
     dependencies:
-      cosmiconfig: 9.0.1(typescript@6.0.2)
+      cosmiconfig: 9.0.1(typescript@6.0.3)
       jiti: 2.6.1
       postcss: 8.5.10
       semver: 7.7.4
@@ -16018,6 +16051,17 @@ snapshots:
       magic-string: 0.30.21
       rollup: 4.60.2
       typescript: 6.0.2
+    optionalDependencies:
+      '@babel/code-frame': 7.29.0
+
+  rollup-plugin-dts@6.4.1(rollup@4.60.2)(typescript@6.0.3):
+    dependencies:
+      '@jridgewell/remapping': 2.3.5
+      '@jridgewell/sourcemap-codec': 1.5.5
+      convert-source-map: 2.0.0
+      magic-string: 0.30.21
+      rollup: 4.60.2
+      typescript: 6.0.3
     optionalDependencies:
       '@babel/code-frame': 7.29.0
 
@@ -16860,6 +16904,8 @@ snapshots:
   typed-query-selector@2.12.1: {}
 
   typescript@6.0.2: {}
+
+  typescript@6.0.3: {}
 
   ua-parser-js@0.7.41: {}
 
