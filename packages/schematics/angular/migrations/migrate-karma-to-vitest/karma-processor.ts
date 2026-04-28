@@ -8,9 +8,9 @@
 
 import type { json } from '@angular-devkit/core';
 import { SchematicContext, Tree } from '@angular-devkit/schematics';
-import { KarmaConfigAnalysis, analyzeKarmaConfig } from '../karma/karma-config-analyzer';
-import { compareKarmaConfigToDefault, hasDifferences } from '../karma/karma-config-comparer';
 import { SUPPORTED_COVERAGE_REPORTERS, SUPPORTED_REPORTERS } from './constants';
+import { KarmaConfigAnalysis, analyzeKarmaConfig } from './karma-config-analyzer';
+import { compareKarmaConfigToDefault, hasDifferences } from './karma-config-comparer';
 
 function extractReporters(
   analysis: KarmaConfigAnalysis,
