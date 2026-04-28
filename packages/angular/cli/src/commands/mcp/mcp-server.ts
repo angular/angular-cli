@@ -21,7 +21,6 @@ import { DEVSERVER_STOP_TOOL } from './tools/devserver/devserver-stop';
 import { DEVSERVER_WAIT_FOR_BUILD_TOOL } from './tools/devserver/devserver-wait-for-build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { E2E_TOOL } from './tools/e2e';
-import { FIND_EXAMPLE_TOOL } from './tools/examples/index';
 import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
@@ -41,7 +40,6 @@ const STABLE_TOOLS = [
   AI_TUTOR_TOOL,
   BEST_PRACTICES_TOOL,
   DOC_SEARCH_TOOL,
-  FIND_EXAMPLE_TOOL,
   LIST_PROJECTS_TOOL,
   ZONELESS_MIGRATION_TOOL,
 ] as const;
@@ -107,7 +105,6 @@ equivalent actions.
 
 * **3. Answer User Questions:**
     - For conceptual questions ("what is..."), use \`search_documentation\`.
-    - For code examples ("show me how to..."), use \`find_examples\`.
 </Core Workflows & Tool Guide>
 
 <Key Concepts>
@@ -163,9 +160,6 @@ export function assembleToolDeclarations(
   }
 
   const enabledExperimentalTools = new Set(options.experimentalTools);
-  if (process.env['NG_MCP_CODE_EXAMPLES'] === '1') {
-    enabledExperimentalTools.add('find_examples');
-  }
   for (const [toolGroupName, toolGroup] of Object.entries(EXPERIMENTAL_TOOL_GROUPS)) {
     if (enabledExperimentalTools.delete(toolGroupName)) {
       for (const tool of toolGroup) {
