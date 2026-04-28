@@ -4,7 +4,7 @@
     "add-istanbul-instrumenter": {
       "version": "22.0.0",
       "factory": "./add-istanbul-instrumenter/migration",
-      "description": "Add istanbul-lib-instrument to devDependencies if Karma unit testing is used."
+      "description": "Add 'istanbul-lib-instrument' to 'devDependencies' if Karma unit testing is used."
     },
     "use-application-builder": {
       "version": "22.0.0",
@@ -19,6 +19,11 @@
       "factory": "./migrate-karma-to-vitest/migration",
       "description": "Migrate projects using legacy Karma unit-test builder to the new unit-test builder with Vitest.",
       "optional": true
+    },
+    "trust-proxy-headers": {
+      "version": "22.0.0",
+      "factory": "./trust-proxy-headers/migration",
+      "description": "Add 'trustProxyHeaders' configuration to 'AngularNodeAppEngine' or 'AngularAppEngine'. For more information see: https://angular.dev/best-practices/security#configuring-trusted-proxy-headers"
     },
     "update-workspace-config": {
       "version": "22.0.0",
