@@ -170,7 +170,7 @@
     "parse5-html-rewriting-stream": "7.0.0",
     "picomatch": "4.0.4",
     "piscina": "4.8.0",
-    "postcss": "8.5.2",
+    "postcss": "8.5.12",
     "postcss-loader": "8.1.1",
     "prettier": "^3.0.0",
     "protractor": "~7.0.0",
