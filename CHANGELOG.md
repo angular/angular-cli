@@ -27,6 +27,24 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
+<a name="20.3.25"></a>
+
+# 20.3.25 (2026-04-29)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [5e01ef40e](https://github.com/angular/angular-cli/commit/5e01ef40eb87deda79d18654fc696b64d18bf889) | fix  | upgrade postcss to 8.5.12 |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [6686848d9](https://github.com/angular/angular-cli/commit/6686848d946ca157f9b92b84db377e912266395e) | fix  | introduce trustProxyHeaders option to safely validate and sanitize proxy headers |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0-next.6"></a>
 
 # 22.0.0-next.6 (2026-04-22)
