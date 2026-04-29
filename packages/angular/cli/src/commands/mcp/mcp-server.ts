@@ -7,11 +7,13 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { join } from 'node:path';
+import { RootsListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
+import { join, normalize } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
 import type { Devserver } from './devserver';
-import { LocalWorkspaceHost } from './host';
+import { LocalWorkspaceHost, createRootRestrictedHost } from './host';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
@@ -123,6 +125,40 @@ equivalent actions.
     logger,
   });
 
+  const restrictedHost = createRootRestrictedHost(LocalWorkspaceHost);
+
+  server.server.oninitialized = () => {
+    void (async () => {
+      try {
+        const clientCapabilities = server.server.getClientCapabilities();
+        if (clientCapabilities?.roots) {
+          const { roots } = await server.server.listRoots();
+          const searchRoots = roots?.map((r) => normalize(fileURLToPath(r.uri))) ?? [];
+          restrictedHost.setRoots(searchRoots);
+
+          if (clientCapabilities.roots.listChanged) {
+            server.server.setNotificationHandler(RootsListChangedNotificationSchema, async () => {
+              try {
+                const { roots: updatedRoots } = await server.server.listRoots();
+                const updatedSearchRoots =
+                  updatedRoots?.map((r) => normalize(fileURLToPath(r.uri))) ?? [];
+                restrictedHost.setRoots(updatedSearchRoots);
+              } catch (e) {
+                logger.warn(
+                  `Failed to update roots on notification: ${e instanceof Error ? e.message : e}`,
+                );
+              }
+            });
+          }
+        }
+      } catch (e) {
+        logger.warn(
+          `Failed to initialize roots on connection: ${e instanceof Error ? e.message : e}`,
+        );
+      }
+    })();
+  };
+
   await registerTools(
     server,
     {
@@ -130,7 +166,7 @@ equivalent actions.
       logger,
       exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
       devservers: new Map<string, Devserver>(),
-      host: LocalWorkspaceHost,
+      host: restrictedHost,
     },
     toolDeclarations,
   );

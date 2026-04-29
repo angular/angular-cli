@@ -18,8 +18,8 @@ export class MockHost implements Host {
   existsSync = jasmine.createSpy('existsSync');
   readFile = jasmine.createSpy('readFile').and.resolveTo('');
   glob = jasmine.createSpy('glob').and.returnValue((async function* () {})());
-  resolveModule = jasmine.createSpy('resolveRequest').and.returnValue('/dev/null');
   spawn = jasmine.createSpy('spawn');
   getAvailablePort = jasmine.createSpy('getAvailablePort');
   isPortAvailable = jasmine.createSpy('isPortAvailable').and.resolveTo(true);
+  setRoots = jasmine.createSpy('setRoots');
 }
