@@ -21,7 +21,6 @@ import { DEVSERVER_STOP_TOOL } from './tools/devserver/devserver-stop';
 import { DEVSERVER_WAIT_FOR_BUILD_TOOL } from './tools/devserver/devserver-wait-for-build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
 import { E2E_TOOL } from './tools/e2e';
-import { MODERNIZE_TOOL } from './tools/modernize';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
 import { TEST_TOOL } from './tools/test';
@@ -48,13 +47,7 @@ const STABLE_TOOLS = [
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [
-  BUILD_TOOL,
-  E2E_TOOL,
-  MODERNIZE_TOOL,
-  TEST_TOOL,
-  ...DEVSERVER_TOOLS,
-] as const;
+export const EXPERIMENTAL_TOOLS = [BUILD_TOOL, E2E_TOOL, TEST_TOOL, ...DEVSERVER_TOOLS] as const;
 
 /**
  * Experimental tools that are grouped together under a single name.
@@ -105,6 +98,12 @@ equivalent actions.
 
 * **3. Answer User Questions:**
     - For conceptual questions ("what is..."), use \`search_documentation\`.
+
+* **4. Discover Schematics for Modernization:** Since this server does not provide a
+  specific tool for listing available schematics, you can use a shell command (if
+  available) with \`ng generate <package-name>: --help\` to discover what migrations
+  are available in a package (e.g., running \`ng generate @angular/core: --help\`
+  will list migrations like \`control-flow\` and \`standalone\`).
 </Core Workflows & Tool Guide>
 
 <Key Concepts>

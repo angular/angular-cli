@@ -44,8 +44,8 @@ most important action to take in the migration journey.
 * **Iterative Process:** The migration process is iterative. You must call this tool repeatedly,
   applying the suggested fix after each call, until the tool indicates that no more actions are
   needed.
-* **Relationship to \`modernize\`:** This tool is the specialized starting point for the zoneless/OnPush
-  migration. For other migrations (like signal inputs), you should use the \`modernize\` tool first,
+* **Relationship to other migrations:** This tool is the specialized starting point for the zoneless/OnPush
+  migration. For other migrations (like signal inputs), you should run the corresponding schematics first,
   as the zoneless migration may depend on them as prerequisites.
 * **Input:** The tool can operate on either a single file or an entire directory. Provide the
   absolute path.
