@@ -7,7 +7,10 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { AngularWorkspace } from '../../utilities/config';
 import { LocalWorkspaceHost } from './host';
 import { addProjectToWorkspace, createMockContext, createMockHost } from './testing/test-utils';
@@ -101,11 +104,24 @@ describe('MCP Workspace Utils', () => {
   describe('resolveWorkspaceAndProject', () => {
     let mockHost: ReturnType<typeof createMockHost>;
     let mockWorkspace: AngularWorkspace;
+    let mockServer: NonNullable<Parameters<typeof resolveWorkspaceAndProject>[0]['server']>;
+    let tempDir: string;
+    let allowedRoot: string;
+    let allowedWorkspace: string;
+    let outsideWorkspace: string;
     const cwd = './';
 
     beforeEach(() => {
       mockHost = createMockHost();
       spyOn(process, 'cwd').and.returnValue(cwd);
+      tempDir = mkdtempSync(join(tmpdir(), 'mcp-workspace-utils-'));
+      allowedRoot = join(tempDir, 'allowed-root');
+      allowedWorkspace = join(allowedRoot, 'workspace');
+      outsideWorkspace = join(tempDir, 'outside-workspace');
+      mkdirSync(allowedWorkspace, { recursive: true });
+      mkdirSync(outsideWorkspace, { recursive: true });
+      writeFileSync(join(allowedWorkspace, 'angular.json'), '{}');
+      writeFileSync(join(outsideWorkspace, 'angular.json'), '{}');
 
       // Setup default mocks
       mockHost.existsSync.and.callFake((p) => {
@@ -118,6 +134,18 @@ describe('MCP Workspace Utils', () => {
           return true;
         }
         if (p === '/my/workspace/angular.json') {
+          return true;
+        }
+        if (p === allowedWorkspace) {
+          return true;
+        }
+        if (p === join(allowedWorkspace, 'angular.json')) {
+          return true;
+        }
+        if (p === outsideWorkspace) {
+          return true;
+        }
+        if (p === join(outsideWorkspace, 'angular.json')) {
           return true;
         }
 
@@ -139,6 +167,21 @@ describe('MCP Workspace Utils', () => {
       } as unknown as AngularWorkspace;
 
       spyOn(AngularWorkspace, 'load').and.resolveTo(mockWorkspace);
+
+      mockServer = {
+        server: {
+          getClientCapabilities: jasmine.createSpy('getClientCapabilities').and.returnValue({
+            roots: { listChanged: false },
+          }),
+          listRoots: jasmine.createSpy('listRoots').and.resolveTo({
+            roots: [{ uri: pathToFileURL(allowedRoot).href, name: 'allowed-root' }],
+          }),
+        },
+      } as unknown as NonNullable<Parameters<typeof resolveWorkspaceAndProject>[0]['server']>;
+    });
+
+    afterEach(() => {
+      rmSync(tempDir, { recursive: true, force: true });
     });
 
     it('should resolve workspace from CWD if not provided and mcpWorkspace is absent', async () => {
@@ -177,6 +220,27 @@ describe('MCP Workspace Utils', () => {
       });
       expect(result.workspacePath).toBe('/my/workspace');
       expect(AngularWorkspace.load).toHaveBeenCalledWith('/my/workspace/angular.json');
+    });
+
+    it('should allow provided workspace within allowed MCP roots', async () => {
+      const result = await resolveWorkspaceAndProject({
+        host: mockHost,
+        server: mockServer,
+        workspacePathInput: allowedWorkspace,
+      });
+      expect(result.workspacePath).toBe(allowedWorkspace);
+      expect(AngularWorkspace.load).toHaveBeenCalledWith(join(allowedWorkspace, 'angular.json'));
+      expect(mockServer.server.listRoots).toHaveBeenCalled();
+    });
+
+    it('should reject provided workspace outside allowed MCP roots', async () => {
+      await expectAsync(
+        resolveWorkspaceAndProject({
+          host: mockHost,
+          server: mockServer,
+          workspacePathInput: outsideWorkspace,
+        }),
+      ).toBeRejectedWithError(/Workspace path is outside the allowed MCP roots/);
     });
 
     it('should throw if provided workspace does not exist', async () => {

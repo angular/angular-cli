@@ -45,6 +45,7 @@ function localhostAddress(port: number) {
 export async function startDevserver(input: DevserverStartToolInput, context: McpToolContext) {
   const { workspacePath, projectName } = await resolveWorkspaceAndProject({
     host: context.host,
+    server: context.server,
     workspacePathInput: input.workspace,
     projectNameInput: input.project,
     mcpWorkspace: context.workspace,

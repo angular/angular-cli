@@ -38,6 +38,7 @@ export type BuildToolOutput = z.infer<typeof buildToolOutputSchema>;
 export async function runBuild(input: BuildToolInput, context: McpToolContext) {
   const { workspacePath, projectName } = await resolveWorkspaceAndProject({
     host: context.host,
+    server: context.server,
     workspacePathInput: input.workspace,
     projectNameInput: input.project,
     mcpWorkspace: context.workspace,

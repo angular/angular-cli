@@ -29,6 +29,7 @@ export type DevserverStopToolOutput = z.infer<typeof devserverStopToolOutputSche
 export async function stopDevserver(input: DevserverStopToolInput, context: McpToolContext) {
   const { workspacePath, projectName } = await resolveWorkspaceAndProject({
     host: context.host,
+    server: context.server,
     workspacePathInput: input.workspace,
     projectNameInput: input.project,
     mcpWorkspace: context.workspace,

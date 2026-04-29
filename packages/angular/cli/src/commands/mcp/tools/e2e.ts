@@ -32,6 +32,7 @@ export type E2eToolOutput = z.infer<typeof e2eToolOutputSchema>;
 export async function runE2e(input: E2eToolInput, host: Host, context: McpToolContext) {
   const { workspacePath, workspace, projectName } = await resolveWorkspaceAndProject({
     host,
+    server: context.server,
     workspacePathInput: input.workspace,
     projectNameInput: input.project,
     mcpWorkspace: context.workspace,
