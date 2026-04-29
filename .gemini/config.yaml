@@ -8,4 +8,6 @@ code_review:
     summary: false
     code_review: true
     include_drafts: false
-ignore_patterns: []
+ignore_patterns:
+  - pnpm-lock.yaml
+  - CHANGELOG.md
