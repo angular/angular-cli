@@ -1,3 +1,32 @@
+<a name="21.2.9"></a>
+
+# 21.2.9 (2026-04-29)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [233deef01](https://github.com/angular/angular-cli/commit/233deef01288c6aa39a048d6bd66a1f09595dc15) | fix  | fix broken img ref in ai-tutor                        |
+| [7cea9885c](https://github.com/angular/angular-cli/commit/7cea9885c64a747b391b74e6434cdf005c843766) | fix  | introduce initial package manager workspace awareness |
+| [5b1a5b743](https://github.com/angular/angular-cli/commit/5b1a5b7434323eb383df1f53c389fe9dc948a785) | fix  | remove standalone true ref in ai tutor                |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [e7abeb5c7](https://github.com/angular/angular-cli/commit/e7abeb5c74024daf125070c9b4f7f8d2426bab66) | fix  | add missing imports for focus and skip APIs in refactor-jasmine-vitest |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [94023f62c](https://github.com/angular/angular-cli/commit/94023f62c5b51a669ff3187cc062057f82c79c52) | fix  | introduce trustProxyHeaders option to safely validate and sanitize proxy headers |
+| [5ffe5c309](https://github.com/angular/angular-cli/commit/5ffe5c309a92e7fd42f1059171924c5942f35c36) | fix  | add support for configuring trusted proxy headers via environment variable       |
+| [930ada9b7](https://github.com/angular/angular-cli/commit/930ada9b73c5172d57830ce42a5a336ae9483a54) | fix  | decode route segments when building and matching route tree                      |
+| [0dc8a440c](https://github.com/angular/angular-cli/commit/0dc8a440ca9e4242edb69ba5a8147fef1dddc4f0) | fix  | use router to normalize URLs for comparison                                      |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.8"></a>
 
 # 21.2.8 (2026-04-22)
