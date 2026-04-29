@@ -7,7 +7,9 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
-import { dirname, join } from 'node:path';
+import { realpathSync } from 'node:fs';
+import { dirname, isAbsolute, join, normalize, relative } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { AngularWorkspace } from '../../utilities/config';
 import { type Host, LocalWorkspaceHost } from './host';
 import { McpToolContext } from './tools/tool-registry';
@@ -80,6 +82,44 @@ export function getDefaultProjectName(workspace: AngularWorkspace | undefined): 
   return undefined;
 }
 
+function isWithinAllowedRoot(root: string, targetPath: string): boolean {
+  const rel = relative(root, targetPath);
+
+  return !rel.startsWith('..') && !isAbsolute(rel);
+}
+
+async function getAllowedWorkspaceRoots(server: McpToolContext['server']): Promise<string[]> {
+  let roots: string[];
+  const clientCapabilities = server.server.getClientCapabilities();
+
+  if (clientCapabilities?.roots) {
+    const { roots: clientRoots } = await server.server.listRoots();
+    roots = clientRoots?.map((root) => fileURLToPath(root.uri)) ?? [];
+  } else {
+    roots = [process.cwd()];
+  }
+
+  return roots
+    .map((root) => {
+      try {
+        return realpathSync(root);
+      } catch {
+        return null;
+      }
+    })
+    .filter((root): root is string => root !== null);
+}
+
+async function isAllowedWorkspacePath(
+  server: McpToolContext['server'],
+  workspacePath: string,
+): Promise<boolean> {
+  const allowedRoots = await getAllowedWorkspaceRoots(server);
+  const resolvedWorkspacePath = realpathSync(workspacePath);
+
+  return allowedRoots.some((root) => isWithinAllowedRoot(root, resolvedWorkspacePath));
+}
+
 /**
  * Resolves workspace and project for tools to operate on.
  *
@@ -89,11 +129,13 @@ export function getDefaultProjectName(workspace: AngularWorkspace | undefined): 
  */
 export async function resolveWorkspaceAndProject({
   host,
+  server,
   workspacePathInput,
   projectNameInput,
   mcpWorkspace,
 }: {
   host: Host;
+  server?: McpToolContext['server'];
   workspacePathInput?: string;
   projectNameInput?: string;
   mcpWorkspace?: AngularWorkspace;
@@ -118,6 +160,15 @@ export async function resolveWorkspaceAndProject({
           "You can use 'list_projects' to find available workspaces.",
       );
     }
+    if (server) {
+      if (!(await isAllowedWorkspacePath(server, workspacePathInput))) {
+        throw new Error(
+          `Workspace path is outside the allowed MCP roots: ${workspacePathInput}. ` +
+            "You can use 'list_projects' to find available workspaces.",
+        );
+      }
+    }
+
     workspacePath = workspacePathInput;
     const configPath = join(workspacePath, 'angular.json');
     try {
@@ -141,6 +192,14 @@ export async function resolveWorkspaceAndProject({
           "You can use 'list_projects' to find available workspaces.",
       );
     }
+
+    if (server && !(await isAllowedWorkspacePath(server, found))) {
+      throw new Error(
+        `The current directory resolves to a workspace outside the allowed MCP roots: ${found}. ` +
+          "You can use 'list_projects' to find available workspaces.",
+      );
+    }
+
     workspacePath = found;
     const configPath = join(workspacePath, 'angular.json');
     try {
