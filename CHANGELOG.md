@@ -1,3 +1,40 @@
+<a name="22.0.0-next.7"></a>
+
+# 22.0.0-next.7 (2026-04-29)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [0572df064](https://github.com/angular/angular-cli/commit/0572df06457a46276cf229c7c50ccb59167a75d8) | fix  | fix broken img ref in ai-tutor                        |
+| [d6121b5e8](https://github.com/angular/angular-cli/commit/d6121b5e87796b61dd0e2157a5ce4e8f3d33e915) | fix  | introduce initial package manager workspace awareness |
+| [48eab1fc0](https://github.com/angular/angular-cli/commit/48eab1fc0bd83c6f87a015252283579ebbd7d0fb) | fix  | remove standalone true ref in ai tutor                |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------- |
+| [b47dfbac4](https://github.com/angular/angular-cli/commit/b47dfbac431b7f22f769dbe3eec491811fa46aca) | fix  | add missing imports for focus and skip APIs in refactor-jasmine-vitest |
+| [dc1238e5a](https://github.com/angular/angular-cli/commit/dc1238e5a4c9ab5902735e3d74bc7c5cc57553bd) | fix  | add trusted-proxy-headers migration                                    |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [e9aa7967b](https://github.com/angular/angular-cli/commit/e9aa7967ba391e429ec1c04473efb4a2d38a62bf) | feat | add isolate option to unit-test builder    |
+| [73233dc5f](https://github.com/angular/angular-cli/commit/73233dc5f41b570f5ac095b255a46de6cbfb54b7) | feat | support Istanbul coverage in Vitest runner |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [126b19b9c](https://github.com/angular/angular-cli/commit/126b19b9c74422211619aad0e523ef5f7e8eeabb) | fix  | add support for configuring trusted proxy headers via environment variable |
+| [53b9623b7](https://github.com/angular/angular-cli/commit/53b9623b7b4ee2266332f57e71896361dac21db8) | fix  | decode route segments when building and matching route tree                |
+| [5adc92541](https://github.com/angular/angular-cli/commit/5adc92541433be23fc2246db5a199cf5c0dc9e67) | fix  | enforce explicit opt-in for proxy headers                                  |
+| [c34c569b0](https://github.com/angular/angular-cli/commit/c34c569b076c8b9d82bf18a094a29cb68fd8a63d) | fix  | use router to normalize URLs for comparison                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.9"></a>
 
 # 21.2.9 (2026-04-29)
