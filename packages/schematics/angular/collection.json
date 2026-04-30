@@ -64,6 +64,11 @@
       "description": "Create an interceptor.",
       "schema": "./interceptor/schema.json"
     },
+    "injectable": {
+      "factory": "./injectable",
+      "description": "Create an Angular injectable.",
+      "schema": "./injectable/schema.json"
+    },
     "interface": {
       "aliases": ["i"],
       "factory": "./interface",
