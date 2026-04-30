@@ -6,8 +6,25 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { getSystemPath } from '@angular-devkit/core';
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { buildApplication } from '../../index';
-import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder, expectNoLog } from '../setup';
+import {
+  APPLICATION_BUILDER_INFO,
+  BASE_OPTIONS,
+  describeBuilder,
+  expectNoLog,
+  host,
+  lazyModuleFiles,
+  lazyModuleFnImport,
+} from '../setup';
+
+/** Resolve a path inside the harness workspace synchronously. */
+function workspacePath(...segments: string[]): string {
+  return join(getSystemPath(host.root()), ...segments);
+}
 
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Option: "subresourceIntegrity"', () => {
@@ -64,6 +81,64 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .expectFile('dist/browser/index.html')
         .content.toMatch(/integrity="\w+-[A-Za-z0-9/+=]+"/);
       expectNoLog(logs, /subresource-integrity/);
+    });
+
+    it(`emits an importmap with integrity for lazy chunks when 'true'`, async () => {
+      await harness.writeFiles(lazyModuleFiles);
+      await harness.writeFiles(lazyModuleFnImport);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        subresourceIntegrity: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+
+      const indexHtml = harness.readFile('dist/browser/index.html');
+      const match = indexHtml.match(/<script type="importmap">([^<]+)<\/script>/);
+      expect(match).withContext('importmap script tag missing').not.toBeNull();
+
+      const importmap = JSON.parse(match![1]) as { integrity: Record<string, string> };
+      expect(importmap.integrity).toBeDefined();
+
+      // Discover every emitted JS chunk on disk (esbuild hashes filenames).
+      const distDir = workspacePath('dist/browser');
+      const jsFiles = readdirSync(distDir).filter((f) => f.endsWith('.js'));
+      // Lazy routing should produce at least one chunk in addition to the
+      // entry-point bundles.
+      expect(jsFiles.length).toBeGreaterThan(1);
+
+      // Every emitted JS chunk must appear in the importmap with a hash that
+      // matches the actual on-disk bytes.
+      for (const file of jsFiles) {
+        const key = `/${file}`;
+        const expectedSri = `sha384-${createHash('sha384')
+          .update(readFileSync(join(distDir, file)))
+          .digest('base64')}`;
+        expect(importmap.integrity[key])
+          .withContext(`integrity entry for ${key}`)
+          .toBe(expectedSri);
+      }
+    });
+
+    it(`places the importmap before any module script tag`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        subresourceIntegrity: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBe(true);
+
+      const indexHtml = harness.readFile('dist/browser/index.html');
+      const importmapIdx = indexHtml.indexOf('<script type="importmap">');
+      const moduleScriptIdx = indexHtml.indexOf('<script src=');
+      expect(importmapIdx).toBeGreaterThanOrEqual(0);
+      expect(moduleScriptIdx).toBeGreaterThanOrEqual(0);
+      expect(importmapIdx)
+        .withContext('importmap must precede the first module script tag')
+        .toBeLessThan(moduleScriptIdx);
     });
   });
 });
