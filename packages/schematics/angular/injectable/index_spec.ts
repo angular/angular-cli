@@ -9,14 +9,14 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as ServiceOptions } from './schema';
+import { Schema as InjectableOptions } from './schema';
 
-describe('Service Schematic', () => {
+describe('Injectable Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
     '@schematics/angular',
     require.resolve('../collection.json'),
   );
-  const defaultOptions: ServiceOptions = {
+  const defaultOptions: InjectableOptions = {
     name: 'foo',
     flat: false,
     project: 'bar',
@@ -36,34 +36,41 @@ describe('Service Schematic', () => {
     skipPackageJson: false,
   };
   let appTree: UnitTestTree;
-
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
   });
 
-  it('should create a service', async () => {
+  it('should create an injectable', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.spec.ts');
     expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
   });
 
-  it('should use @Service decorator', async () => {
+  it('should use @Injectable decorator', async () => {
     const options = { ...defaultOptions };
 
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
-    expect(content).toMatch(/@Service\(\)/);
-    expect(content).toMatch(/import \{ Service \} from '@angular\/core'/);
+    expect(content).toMatch(/@Injectable\(/);
+    expect(content).toMatch(/import \{ Injectable \} from '@angular\/core'/);
+  });
+
+  it('injectable should be tree-shakeable', async () => {
+    const options = { ...defaultOptions };
+
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    expect(content).toMatch(/providedIn: 'root',/);
   });
 
   it('should respect the skipTests flag', async () => {
     const options = { ...defaultOptions, skipTests: true };
 
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const files = tree.files;
     expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
     expect(files).not.toContain('/projects/bar/src/app/foo/foo.spec.ts');
@@ -73,13 +80,13 @@ describe('Service Schematic', () => {
     const config = JSON.parse(appTree.readContent('/angular.json'));
     config.projects.bar.sourceRoot = 'projects/bar/custom';
     appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
-    appTree = await schematicRunner.runSchematic('service', defaultOptions, appTree);
+    appTree = await schematicRunner.runSchematic('injectable', defaultOptions, appTree);
     expect(appTree.files).toContain('/projects/bar/custom/app/foo/foo.ts');
   });
 
   it('should respect the type option', async () => {
     const options = { ...defaultOptions, type: 'Service' };
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(content).toContain('export class FooService');
@@ -88,7 +95,7 @@ describe('Service Schematic', () => {
 
   it('should allow empty string in the type option', async () => {
     const options = { ...defaultOptions, type: '' };
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.spec.ts');
     expect(content).toContain('export class Foo');
@@ -97,7 +104,7 @@ describe('Service Schematic', () => {
 
   it('should not add type to class name when addTypeToClassName is false', async () => {
     const options = { ...defaultOptions, type: 'Service', addTypeToClassName: false };
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(content).toContain('export class Foo {');
@@ -108,7 +115,7 @@ describe('Service Schematic', () => {
 
   it('should add type to class name when addTypeToClassName is true', async () => {
     const options = { ...defaultOptions, type: 'Service', addTypeToClassName: true };
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(content).toContain('export class FooService {');
@@ -117,7 +124,7 @@ describe('Service Schematic', () => {
 
   it('should add type to class name by default', async () => {
     const options = { ...defaultOptions, type: 'Service', addTypeToClassName: undefined };
-    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const tree = await schematicRunner.runSchematic('injectable', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.service.ts');
     const testContent = tree.readContent('/projects/bar/src/app/foo/foo.service.spec.ts');
     expect(content).toContain('export class FooService {');

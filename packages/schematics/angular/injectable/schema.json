@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularInjectable",
+  "title": "Angular Injectable Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Creates a new injectable in your project. Injectables are used to encapsulate reusable logic, such as data access, API calls, or utility functions. This schematic simplifies the process of generating a new injectable with the necessary files and boilerplate code.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new injectable. This will be used to create the injectable class and spec files (e.g., `my-injectable.service.ts` and `my-injectable.service.spec.ts`).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the injectable?"
+    },
+    "path": {
+      "type": "string",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path where the injectable files should be created, relative to the workspace root. If not provided, the injectable will be created in the project's `src/app` directory.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the injectable should be added. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Creates files at the top level of the project or the given path. If set to false, a new folder with the injectable's name will be created to contain the files."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Skip the generation of a unit test file `spec.ts` for the injectable.",
+      "default": false
+    },
+    "type": {
+      "type": "string",
+      "description": "Append a custom type to the injectable's filename. For example, if you set the type to `service`, the file will be named `my-injectable.service.ts`."
+    },
+    "addTypeToClassName": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true, the 'type' option will be appended to the generated class name. When false, only the file name will include the type."
+    }
+  },
+  "required": ["name", "project"]
+}
