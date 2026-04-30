@@ -647,7 +647,8 @@ export class PackageManager {
     // Writing an empty package.json file beforehand prevents this.
     await this.host.writeFile(join(workingDirectory, 'package.json'), '{}');
 
-    // Copy configuration files if the package manager requires it (e.g., bun).
+    // Copy configuration files from the project to the temp directory so that
+    // registry settings and other package manager config are respected.
     if (this.descriptor.copyConfigFromProject) {
       for (const configFile of this.descriptor.configFiles) {
         try {
