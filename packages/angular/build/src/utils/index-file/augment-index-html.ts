@@ -51,9 +51,9 @@ export interface AugmentIndexHtmlOptions {
    * Integrity metadata for module script URLs that are not directly referenced
    * from `index.html` (e.g. lazy-loaded chunks resolved via `import()`).
    *
-   * Keys are root-relative URLs (matching how the browser will request the
-   * module given the document base href) and values are the corresponding
-   * Subresource Integrity values (e.g. `sha384-...`).
+   * Keys are URLs relative to the deployment base (matching how the browser
+   * will request the module) and values are the corresponding
+   * Subresource Integrity values (e.g. 'sha384-...').
    *
    * Emitted as a `<script type="importmap">` block whose `integrity` map the
    * browser consults when fetching modules without an inline `integrity`

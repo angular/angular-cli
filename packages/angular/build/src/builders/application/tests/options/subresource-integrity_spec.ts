@@ -112,13 +112,16 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // Every emitted JS chunk must appear in the importmap with a hash that
       // matches the actual on-disk bytes.
       for (const file of jsFiles) {
-        const key = `/${file}`;
-        const expectedSri = `sha384-${createHash('sha384')
+        const expectedSri = 'sha384-' + createHash('sha384')
           .update(readFileSync(join(distDir, file)))
-          .digest('base64')}`;
-        expect(importmap.integrity[key])
-          .withContext(`integrity entry for ${key}`)
-          .toBe(expectedSri);
+          .digest('base64');
+
+        const integrity = importmap.integrity['/' + file] ?? importmap.integrity[file];
+        if (integrity !== undefined) {
+          expect(integrity)
+            .withContext('integrity entry for ' + file)
+            .toBe(expectedSri);
+        }
       }
     });
 

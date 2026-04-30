@@ -88,11 +88,11 @@ export async function generateIndexHtml(
   if (subresourceIntegrity) {
     const integrity = new Map<string, string>();
     for (const file of browserOutputFiles) {
-      if (!file.path.endsWith('.js')) {
+      if (!file.path.endsWith('.js') || initialFiles.has(file.path)) {
         continue;
       }
       const hash = createHash('sha384').update(file.contents).digest('base64');
-      integrity.set(`/${file.path}`, `sha384-${hash}`);
+      integrity.set(file.path, 'sha384-' + hash);
     }
     chunksIntegrity = integrity;
   }
