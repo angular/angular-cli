@@ -230,7 +230,7 @@ export class BuilderHarness<T> {
       getOptions: async (project, target, configuration) => {
         this.validateProjectName(project);
         if (target === this.targetName) {
-          return (this.options.get(configuration ?? null) ?? {}) as json.JsonObject;
+          return this.options.get(configuration ?? null) ?? {};
         } else if (configuration !== undefined) {
           // Harness builder targets currently do not support configurations
           return {};

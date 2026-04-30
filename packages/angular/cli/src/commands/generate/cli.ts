@@ -92,11 +92,7 @@ export default class GenerateCommandModule
           this.handler({
             ...options,
             schematic: `${collectionName}:${schematicName}`,
-          } as ArgumentsCamelCase<
-            SchematicsCommandArgs & {
-              schematic: string;
-            }
-          >),
+          }),
       });
     }
 

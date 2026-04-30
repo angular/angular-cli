@@ -151,37 +151,25 @@ export class CordHost extends SimpleMemoryHost {
 
   records(): CordHostRecord[] {
     return [
-      ...[...this._filesToDelete.values()].map(
-        (path) =>
-          ({
-            kind: 'delete',
-            path,
-          }) as CordHostRecord,
-      ),
-      ...[...this._filesToRename.entries()].map(
-        ([from, to]) =>
-          ({
-            kind: 'rename',
-            from,
-            to,
-          }) as CordHostRecord,
-      ),
-      ...[...this._filesToCreate.values()].map(
-        (path) =>
-          ({
-            kind: 'create',
-            path,
-            content: this._read(path),
-          }) as CordHostRecord,
-      ),
-      ...[...this._filesToOverwrite.values()].map(
-        (path) =>
-          ({
-            kind: 'overwrite',
-            path,
-            content: this._read(path),
-          }) as CordHostRecord,
-      ),
+      ...[...this._filesToDelete.values()].map((path) => ({
+        kind: 'delete',
+        path,
+      })),
+      ...[...this._filesToRename.entries()].map(([from, to]) => ({
+        kind: 'rename',
+        from,
+        to,
+      })),
+      ...[...this._filesToCreate.values()].map((path) => ({
+        kind: 'create',
+        path,
+        content: this._read(path),
+      })),
+      ...[...this._filesToOverwrite.values()].map((path) => ({
+        kind: 'overwrite',
+        path,
+        content: this._read(path),
+      })),
     ];
   }
 

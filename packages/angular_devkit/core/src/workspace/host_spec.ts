@@ -46,7 +46,7 @@ describe('createWorkspaceHost', () => {
 
   it('supports writeFile', async () => {
     await workspaceHost.writeFile('newfile', 'baz');
-    expect(testHost.files.sort() as string[]).toEqual(['/abc.txt', '/foo/bar.json', '/newfile']);
+    expect(testHost.files.sort()).toEqual(['/abc.txt', '/foo/bar.json', '/newfile']);
 
     expect(testHost.$read('newfile')).toBe('baz');
   });

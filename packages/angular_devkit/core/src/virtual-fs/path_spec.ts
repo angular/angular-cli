@@ -97,7 +97,7 @@ describe('path', () => {
       it(`(${input}) == "${result}"`, () => {
         const normalizedInput = normalize(input);
 
-        expect(split(normalizedInput)).toEqual(result as PathFragment[]);
+        expect(split(normalizedInput)).toEqual(result);
       });
     }
   });

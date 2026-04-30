@@ -82,7 +82,7 @@ export function execute(
       }
 
       // Close the stream once the Karma server returns.
-      karmaServer = new karma.Server(karmaConfig as Config, (exitCode) => {
+      karmaServer = new karma.Server(karmaConfig, (exitCode) => {
         controller.enqueue({ success: exitCode === 0 });
         controller.close();
       });

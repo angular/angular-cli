@@ -107,7 +107,7 @@ describe('ScopedTree', () => {
     expect(scoped.getDir('/level-2')).not.toBeNull();
 
     const dir = scoped.getDir('level-2');
-    expect(dir.path as string).toBe('/level-2');
+    expect(dir.path).toBe('/level-2');
     expect(dir.parent).not.toBeNull();
     const files: string[] = [];
     dir.visit((path) => files.push(path));
@@ -156,7 +156,7 @@ describe('ScopedTree', () => {
 
   it('supports root', () => {
     expect(scoped.root).not.toBeNull();
-    expect(scoped.root.path as string).toBe('/');
+    expect(scoped.root.path).toBe('/');
     expect(scoped.root.parent).toBeNull();
   });
 });

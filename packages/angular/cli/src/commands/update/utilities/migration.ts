@@ -100,13 +100,7 @@ export async function executeMigration(
   logger.info(colors.cyan(`** Executing '${migrationName}' of package '${packageName}' **\n`));
   const schematic = workflow.engine.createSchematic(name, collection);
 
-  return executePackageMigrations(
-    workflow,
-    logger,
-    [schematic.description as MigrationSchematicDescription],
-    packageName,
-    commit,
-  );
+  return executePackageMigrations(workflow, logger, [schematic.description], packageName, commit);
 }
 
 /**

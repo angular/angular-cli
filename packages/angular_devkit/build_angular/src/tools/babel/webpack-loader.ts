@@ -201,7 +201,7 @@ export default custom<ApplicationPresetOptions>(() => {
                     break;
                 }
               },
-            } as ApplicationPresetOptions,
+            },
           ],
         ],
       };

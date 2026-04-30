@@ -24,6 +24,6 @@ export class NullLogger extends Logger {
       warn() {},
       error() {},
       fatal() {},
-    } as LoggerApi;
+    };
   }
 }

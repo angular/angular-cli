@@ -19,6 +19,6 @@ describe('TestHost', () => {
     };
 
     const host = new test.TestHost(files);
-    expect(host.files.sort() as string[]).toEqual(Object.keys(files).sort());
+    expect(host.files.sort()).toEqual(Object.keys(files).sort());
   });
 });

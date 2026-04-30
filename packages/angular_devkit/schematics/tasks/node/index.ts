@@ -25,7 +25,7 @@ export class BuiltinTaskExecutor {
   static readonly RepositoryInitializer: TaskExecutorFactory<RepositoryInitializerTaskFactoryOptions> =
     {
       name: RepositoryInitializerName,
-      create: async (options) => RepositoryInitializerExecutor(options) as TaskExecutor<{}>,
+      create: async (options) => RepositoryInitializerExecutor(options),
     };
   static readonly RunSchematic: TaskExecutorFactory<{}> = {
     name: RunSchematicName,

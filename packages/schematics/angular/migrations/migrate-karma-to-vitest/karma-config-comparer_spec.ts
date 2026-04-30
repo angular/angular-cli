@@ -13,6 +13,7 @@ import {
   generateDefaultKarmaConfig,
 } from './karma-config-comparer';
 
+// eslint-disable @typescript-eslint/no-unnecessary-type-assertion
 describe('Karma Config Comparer', () => {
   describe('compareKarmaConfigs', () => {
     it('should find no differences for identical configs', () => {
@@ -50,7 +51,7 @@ describe('Karma Config Comparer', () => {
 
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(1);
-      expect(diff.added.get('propB') as unknown).toBe('valueB');
+      expect(diff.added.get('propB')).toBe('valueB');
       expect(diff.removed.size).toBe(0);
       expect(diff.modified.size).toBe(0);
     });
@@ -73,7 +74,7 @@ describe('Karma Config Comparer', () => {
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(0);
       expect(diff.removed.size).toBe(1);
-      expect(diff.removed.get('propB') as unknown).toBe('valueB');
+      expect(diff.removed.get('propB')).toBe('valueB');
       expect(diff.modified.size).toBe(0);
     });
 
@@ -94,8 +95,8 @@ describe('Karma Config Comparer', () => {
       expect(diff.removed.size).toBe(0);
       expect(diff.modified.size).toBe(1);
       const modifiedProp = diff.modified.get('propA');
-      expect(modifiedProp?.projectValue as unknown).toBe('newValue');
-      expect(modifiedProp?.defaultValue as unknown).toBe('oldValue');
+      expect(modifiedProp?.projectValue).toBe('newValue');
+      expect(modifiedProp?.defaultValue).toBe('oldValue');
     });
 
     it('should handle a mix of added, removed, and modified properties', () => {
@@ -120,13 +121,13 @@ describe('Karma Config Comparer', () => {
 
       expect(diff.isReliable).toBe(true);
       expect(diff.added.size).toBe(1);
-      expect(diff.added.get('propC') as unknown).toBe('valueC');
+      expect(diff.added.get('propC')).toBe('valueC');
       expect(diff.removed.size).toBe(1);
-      expect(diff.removed.get('propD') as unknown).toBe('valueD');
+      expect(diff.removed.get('propD')).toBe('valueD');
       expect(diff.modified.size).toBe(1);
       const modifiedPropB = diff.modified.get('propB');
-      expect(modifiedPropB?.projectValue as unknown).toBe('newValueB');
-      expect(modifiedPropB?.defaultValue as unknown).toBe('oldValueB');
+      expect(modifiedPropB?.projectValue).toBe('newValueB');
+      expect(modifiedPropB?.defaultValue).toBe('oldValueB');
     });
 
     it('should detect a modified require call', () => {
@@ -190,14 +191,8 @@ describe('Karma Config Comparer', () => {
         projectValue: { dir: RequireInfo };
         defaultValue: { dir: RequireInfo };
       };
-      expect(modified?.projectValue.dir.arguments as string[]).toEqual([
-        '__dirname',
-        'project-path',
-      ]);
-      expect(modified?.defaultValue.dir.arguments as string[]).toEqual([
-        '__dirname',
-        'default-path',
-      ]);
+      expect(modified?.projectValue.dir.arguments).toEqual(['__dirname', 'project-path']);
+      expect(modified?.defaultValue.dir.arguments).toEqual(['__dirname', 'default-path']);
     });
 
     it('should detect an added require call', () => {
@@ -279,11 +274,11 @@ describe('Karma Config Comparer', () => {
       expect(diff.removed.size).toBe(0);
       expect(diff.modified.size).toBe(2);
       const restartOnFileChange = diff.modified.get('restartOnFileChange');
-      expect(restartOnFileChange?.projectValue as boolean).toBe(false);
-      expect(restartOnFileChange?.defaultValue as boolean).toBe(true);
+      expect(restartOnFileChange?.projectValue).toBe(false);
+      expect(restartOnFileChange?.defaultValue).toBe(true);
       const reporters = diff.modified.get('reporters');
-      expect(reporters?.projectValue as string[]).toEqual(['dots']);
-      expect(reporters?.defaultValue as string[]).toEqual(['progress', 'kjhtml']);
+      expect(reporters?.projectValue).toEqual(['dots']);
+      expect(reporters?.defaultValue).toEqual(['progress', 'kjhtml']);
     });
 
     it('should return an unreliable diff if the project config has unsupported values', async () => {

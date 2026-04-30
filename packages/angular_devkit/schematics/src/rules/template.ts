@@ -180,7 +180,7 @@ export function template<T extends object>(options: T): Rule {
     // Force cast to PathTemplateData. We need the type for the actual pathTemplate() call,
     // but in this case we cannot do anything as contentTemplate are more permissive.
     // Since values are coerced to strings in PathTemplates it will be fine in the end.
-    pathTemplate(options as {} as PathTemplateData),
+    pathTemplate(options as {}),
   ]);
 }
 
@@ -191,7 +191,7 @@ export function applyTemplates<T extends object>(options: T): Rule {
       composeFileOperators([
         applyContentTemplate(options),
         // See above for this weird cast.
-        applyPathTemplate(options as {} as PathTemplateData),
+        applyPathTemplate(options as {}),
         (entry) => {
           return {
             content: entry.content,

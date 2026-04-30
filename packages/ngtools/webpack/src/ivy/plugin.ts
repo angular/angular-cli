@@ -731,7 +731,7 @@ export class AngularWebpackPlugin {
 
     const historyData: FileEmitHistoryItem = {
       length: content.length,
-      hash: this.webpackCreateHash('xxhash64').update(content).digest() as Uint8Array,
+      hash: this.webpackCreateHash('xxhash64').update(content).digest(),
     };
 
     if (this.webpackCache) {

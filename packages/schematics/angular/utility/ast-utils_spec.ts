@@ -257,7 +257,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        elements as unknown as ts.Node[],
+        elements,
         `, 'bar'`,
         filePath,
         elements.pos,
@@ -275,7 +275,7 @@ describe('ast utils', () => {
       const elements = (arrayNode.pop() as ts.ArrayLiteralExpression).elements;
 
       const change = insertAfterLastOccurrence(
-        elements as unknown as ts.Node[],
+        elements,
         `'bar'`,
         filePath,
         elements.pos,

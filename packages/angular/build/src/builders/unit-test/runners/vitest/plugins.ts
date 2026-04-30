@@ -117,8 +117,8 @@ function getBrowsersToCheck(
 ): string[] {
   const browsersToCheck: string[] = [];
 
-  const cliBrowser = browser as CustomBrowserConfigOptions | undefined;
-  const userBrowser = testConfigBrowser as CustomBrowserConfigOptions | undefined;
+  const cliBrowser = browser;
+  const userBrowser = testConfigBrowser;
 
   // 1. CLI options override the Vitest configuration completely.
   if (cliBrowser) {

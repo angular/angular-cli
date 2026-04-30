@@ -216,6 +216,6 @@ describe('FilterHostTree', () => {
     });
     const tree = new HostTree(fs);
     const subDirs = tree.getDir('/dir1').subdirs;
-    expect(subDirs as string[]).toEqual(['dir2', 'dir3']);
+    expect(subDirs).toEqual(['dir2', 'dir3']);
   });
 });

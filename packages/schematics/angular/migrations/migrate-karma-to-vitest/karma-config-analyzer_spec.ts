@@ -48,15 +48,12 @@ describe('Karma Config Analyzer', () => {
 
     const { settings, hasUnsupportedValues } = analyzeKarmaConfig(karmaConf);
 
-    expect(settings.get('basePath') as unknown).toBe('');
-    expect(settings.get('frameworks') as unknown).toEqual([
-      'jasmine',
-      '@angular-devkit/build-angular',
-    ]);
-    expect(settings.get('port') as unknown).toBe(9876);
-    expect(settings.get('autoWatch') as boolean).toBe(true);
-    expect(settings.get('singleRun') as boolean).toBe(false);
-    expect(settings.get('reporters') as unknown).toEqual(['progress', 'kjhtml']);
+    expect(settings.get('basePath')).toBe('');
+    expect(settings.get('frameworks')).toEqual(['jasmine', '@angular-devkit/build-angular']);
+    expect(settings.get('port')).toBe(9876);
+    expect(settings.get('autoWatch')).toBe(true);
+    expect(settings.get('singleRun')).toBe(false);
+    expect(settings.get('reporters')).toEqual(['progress', 'kjhtml']);
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const plugins = settings.get('plugins') as any[];
@@ -71,9 +68,9 @@ describe('Karma Config Analyzer', () => {
     expect(dirInfo.module).toBe('path');
     expect(dirInfo.export).toBe('join');
     expect(dirInfo.isCall).toBe(true);
-    expect(dirInfo.arguments as unknown).toEqual(['__dirname', './coverage/test-project']);
+    expect(dirInfo.arguments).toEqual(['__dirname', './coverage/test-project']);
 
-    expect(settings.get('logLevel') as unknown).toBe('config.LOG_INFO');
+    expect(settings.get('logLevel')).toBe('config.LOG_INFO');
     expect(hasUnsupportedValues).toBe(false);
   });
 
@@ -181,7 +178,7 @@ describe('Karma Config Analyzer', () => {
     expect(dirInfo.module).toBe('path');
     expect(dirInfo.export).toBe('join');
     expect(dirInfo.isCall).toBe(true);
-    expect(dirInfo.arguments as unknown).toEqual(['__dirname', undefined]); // myPath is a variable
+    expect(dirInfo.arguments).toEqual(['__dirname', undefined]); // myPath is a variable
     expect(hasUnsupportedValues).toBe(true);
   });
 
@@ -190,22 +187,19 @@ describe('Karma Config Analyzer', () => {
     const { settings, hasUnsupportedValues } = analyzeKarmaConfig(defaultConfig);
 
     expect(hasUnsupportedValues).toBe(false);
-    expect(settings.get('basePath') as unknown).toBe('');
-    expect(settings.get('frameworks') as unknown).toEqual([
-      'jasmine',
-      '@angular-devkit/build-angular',
-    ]);
-    expect(settings.get('plugins') as unknown).toEqual([
+    expect(settings.get('basePath')).toBe('');
+    expect(settings.get('frameworks')).toEqual(['jasmine', '@angular-devkit/build-angular']);
+    expect(settings.get('plugins')).toEqual([
       { module: 'karma-jasmine' },
       { module: 'karma-chrome-launcher' },
       { module: 'karma-jasmine-html-reporter' },
       { module: 'karma-coverage' },
       { module: '@angular-devkit/build-angular/plugins/karma' },
     ]);
-    expect(settings.get('client') as unknown).toEqual({
+    expect(settings.get('client')).toEqual({
       jasmine: {},
     });
-    expect(settings.get('jasmineHtmlReporter') as unknown).toEqual({
+    expect(settings.get('jasmineHtmlReporter')).toEqual({
       suppressAll: true,
     });
     const coverageReporter = settings.get('coverageReporter') as {
@@ -216,15 +210,12 @@ describe('Karma Config Analyzer', () => {
     expect(coverageReporter.dir.module).toBe('path');
     expect(coverageReporter.dir.export).toBe('join');
     expect(coverageReporter.dir.isCall).toBe(true);
-    expect(coverageReporter.dir.arguments as unknown).toEqual([
-      '__dirname',
-      '../coverage/test-project',
-    ]);
+    expect(coverageReporter.dir.arguments).toEqual(['__dirname', '../coverage/test-project']);
     expect(coverageReporter.subdir).toBe('.');
     expect(coverageReporter.reporters).toEqual([{ type: 'html' }, { type: 'text-summary' }]);
-    expect(settings.get('reporters') as unknown).toEqual(['progress', 'kjhtml']);
-    expect(settings.get('browsers') as unknown).toEqual(['Chrome']);
-    expect(settings.get('restartOnFileChange') as unknown).toBe(true);
+    expect(settings.get('reporters')).toEqual(['progress', 'kjhtml']);
+    expect(settings.get('browsers')).toEqual(['Chrome']);
+    expect(settings.get('restartOnFileChange')).toBe(true);
   });
 
   it('should correctly parse require with property access and a call', () => {
@@ -274,7 +265,7 @@ describe('Karma Config Analyzer', () => {
     `;
     const { settings, hasUnsupportedValues } = analyzeKarmaConfig(karmaConf);
 
-    expect(settings.get('port') as unknown).toBe(9876);
+    expect(settings.get('port')).toBe(9876);
     expect(settings.has('basePath')).toBe(false);
     expect(hasUnsupportedValues).toBe(true);
   });

@@ -229,7 +229,7 @@ async function renderPages(
       assetFiles: assetFilesForWorker,
       outputMode,
       hasSsrEntry: !!outputFilesForWorker['server.mjs'],
-    } as RenderWorkerData,
+    },
     execArgv: workerExecArgv,
     env: {
       ...process.env,

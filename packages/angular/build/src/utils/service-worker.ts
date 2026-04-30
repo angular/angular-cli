@@ -219,7 +219,7 @@ export async function augmentAppWithServiceWorkerCore(
   baseHref: string,
 ): Promise<{ manifest: string; assetFiles: { source: string; destination: string }[] }> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { Generator } = (await import('@angular/service-worker/config' as any)) as typeof import(
+  const { Generator } = (await import('@angular/service-worker/config')) as typeof import(
     '@angular/service-worker/config',
     { with: { 'resolution-mode': 'import' } }
   );

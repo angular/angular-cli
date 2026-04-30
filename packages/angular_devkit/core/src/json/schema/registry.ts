@@ -460,7 +460,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
           items = schema.items;
         }
 
-        const propertyTypes = getTypesOfSchema(parentSchema as JsonObject);
+        const propertyTypes = getTypesOfSchema(parentSchema);
         if (!type) {
           if (propertyTypes.size === 1 && propertyTypes.has('boolean')) {
             type = 'confirmation';

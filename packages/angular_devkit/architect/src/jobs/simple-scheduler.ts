@@ -120,8 +120,7 @@ export class SimpleScheduler<
   MinimumArgumentT extends JsonValue = JsonValue,
   MinimumInputT extends JsonValue = JsonValue,
   MinimumOutputT extends JsonValue = JsonValue,
-> implements Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT>
-{
+> implements Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT> {
   private _internalJobDescriptionMap = new Map<JobName, JobHandlerWithExtra>();
   private _queue: (() => void)[] = [];
   private _pauseCounter = 0;
@@ -343,7 +342,7 @@ export class SimpleScheduler<
               description: handler.jobDescription,
             });
           } else {
-            return EMPTY as Observable<JobOutboundMessage<O>>;
+            return EMPTY;
           }
         }),
       ),
@@ -422,7 +421,7 @@ export class SimpleScheduler<
               output: output.data as O,
             } as JobOutboundMessageOutput<O>;
           }),
-        ) as Observable<JobOutboundMessage<O>>;
+        );
       }),
       _jobShare(),
     );

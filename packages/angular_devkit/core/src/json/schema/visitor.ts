@@ -76,7 +76,7 @@ function _visitJsonRecursive<ContextT>(
     }
   }
 
-  const value = visitor(json, ptr, schema as JsonObject, root);
+  const value = visitor(json, ptr, schema, root);
 
   return (isObservable(value) ? value : observableOf(value)).pipe(
     concatMap((value) => {

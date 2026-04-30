@@ -221,7 +221,7 @@ export function createBuilder<OptT = json.JsonObject, OutT extends BuilderOutput
         subscriptions.push(
           result
             .pipe(
-              defaultIfEmpty({ success: false } as unknown),
+              defaultIfEmpty({ success: false }),
               tap(() => {
                 progress({ state: BuilderProgressState.Running, current: total }, context);
                 progress({ state: BuilderProgressState.Stopped }, context);

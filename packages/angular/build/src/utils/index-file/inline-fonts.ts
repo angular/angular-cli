@@ -203,7 +203,7 @@ export class InlineFontsProcessor {
       // See: https://nodejs.org/en/learn/http/enterprise-network-configuration
       // See: https://nodejs.org/docs/latest/api/https.html
 
-      const { HttpsProxyAgent } = (await import('https-proxy-agent' as string)) as typeof import(
+      const { HttpsProxyAgent } = (await import('https-proxy-agent')) as typeof import(
         'https-proxy-agent',
         { with: { 'resolution-mode': 'import' } }
       );

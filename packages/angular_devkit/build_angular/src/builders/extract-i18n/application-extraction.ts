@@ -32,10 +32,10 @@ export async function extractMessages(
   // Setup the build options for the application based on the buildTarget option
   let buildOptions;
   if (builderName === '@angular-devkit/build-angular:application') {
-    buildOptions = (await context.validateOptions(
+    buildOptions = await context.validateOptions(
       await context.getTargetOptions(options.buildTarget),
       builderName,
-    )) as unknown as ApplicationBuilderOptions;
+    );
   } else {
     buildOptions = convertBrowserOptions(
       (await context.validateOptions(

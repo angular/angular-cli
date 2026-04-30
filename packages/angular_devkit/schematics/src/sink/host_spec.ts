@@ -34,7 +34,7 @@ describe('FileSystemSink', () => {
     const sink = new HostSink(outputHost);
     await sink.commit(tree).toPromise();
     const tmpFiles = outputHost.files.sort();
-    expect(tmpFiles as string[]).toEqual(files);
+    expect(tmpFiles).toEqual(files);
     expect(outputHost.sync.read(normalize('/test')).toString()).toBe('testing testing 1 2');
   });
 

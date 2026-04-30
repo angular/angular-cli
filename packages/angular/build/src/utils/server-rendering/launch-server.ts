@@ -20,9 +20,8 @@ export const DEFAULT_URL = new URL('http://ng-localhost/');
  */
 export async function launchServer(): Promise<URL> {
   const { reqHandler } = await loadEsmModuleFromMemory('./server.mjs');
-  const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } = (await import(
-    '@angular/ssr/node' as string
-  )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
+  const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
+    await import('@angular/ssr/node');
 
   if (!isSsrNodeRequestHandler(reqHandler) && !isSsrRequestHandler(reqHandler)) {
     return DEFAULT_URL;

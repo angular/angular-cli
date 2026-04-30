@@ -27,12 +27,9 @@ describe('lazyRoutesTransformer', () => {
       getSourceFile: () => undefined,
       useCaseSensitiveFileNames: () => true,
       resolveModuleNames: (moduleNames, containingFile) =>
-        moduleNames.map(
-          (name) =>
-            ({
-              resolvedFileName: `/project/src/${name}.ts`,
-            }) as ts.ResolvedModule,
-        ),
+        moduleNames.map((name) => ({
+          resolvedFileName: `/project/src/${name}.ts`,
+        })),
     };
   });
 

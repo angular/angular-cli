@@ -39,7 +39,7 @@ describe('Serve Tools', () => {
     mockContext = mock.context;
 
     // Customize host spies
-    mockHost.spawn.and.returnValue(mockProcess as unknown as ChildProcess);
+    mockHost.spawn.and.returnValue(mockProcess);
     mockHost.getAvailablePort.and.callFake(() => Promise.resolve(portCounter++));
 
     // Setup default project
@@ -125,7 +125,7 @@ describe('Serve Tools', () => {
 
     // Start server for project 2, returning a new mock process.
     const process2 = new MockChildProcess();
-    mockHost.spawn.and.returnValue(process2 as unknown as ChildProcess);
+    mockHost.spawn.and.returnValue(process2);
     const startResult2 = await startDevserver({ project: 'app-two' }, mockContext);
     expect(startResult2.structuredContent.message).toBe(
       `Development server for project 'app-two' started and watching for workspace changes.`,

@@ -147,19 +147,19 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
     if (content) {
       end = _positionFor(sourceText, offset + content.length);
       offset += content.length;
-      children.push({ kind: 'content', content, start, end } as TemplateAstContent);
+      children.push({ kind: 'content', content, start, end });
       start = end;
     }
     if (escape) {
       end = _positionFor(sourceText, offset + escape.length + 5);
       offset += escape.length + 5;
-      children.push({ kind: 'escape', expression: escape, start, end } as TemplateAstEscape);
+      children.push({ kind: 'escape', expression: escape, start, end });
       start = end;
     }
     if (comment) {
       end = _positionFor(sourceText, offset + comment.length + 5);
       offset += comment.length + 5;
-      children.push({ kind: 'comment', text: comment, start, end } as TemplateAstComment);
+      children.push({ kind: 'comment', text: comment, start, end });
       start = end;
     }
     if (interpolate) {
@@ -170,13 +170,13 @@ export function templateParser(sourceText: string, fileName: string): TemplateAs
         expression: interpolate,
         start,
         end,
-      } as TemplateAstInterpolate);
+      });
       start = end;
     }
     if (evaluate) {
       end = _positionFor(sourceText, offset + evaluate.length + 5);
       offset += evaluate.length + 5;
-      children.push({ kind: 'evaluate', expression: evaluate, start, end } as TemplateAstEvaluate);
+      children.push({ kind: 'evaluate', expression: evaluate, start, end });
       start = end;
     }
   }

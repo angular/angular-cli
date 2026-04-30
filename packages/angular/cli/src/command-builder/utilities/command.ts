@@ -57,7 +57,7 @@ export function addCommandModuleToYargs<U extends CommandModuleConstructor>(
         );
       }
 
-      return cmd.builder(argv) as Argv;
+      return cmd.builder(argv);
     },
     handler: (args) => cmd.handler(args),
   });

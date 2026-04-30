@@ -71,7 +71,7 @@ async function getRoutes(
         outputPath,
         serverBundlePath,
         zonePackage,
-      } as RoutesExtractorWorkerData,
+      },
       recordTiming: false,
     });
 
@@ -133,7 +133,7 @@ async function _scheduleBuilds(
 
     const success =
       browserResult.success && serverResult.success && browserResult.baseOutputPath !== undefined;
-    const error = browserResult.error || (serverResult.error as string);
+    const error = browserResult.error || serverResult.error;
 
     return { success, error, browserResult, serverResult };
   } catch (e) {

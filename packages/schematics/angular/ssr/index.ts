@@ -207,7 +207,7 @@ function updateApplicationBuilderWorkspaceConfigRule(
     buildTarget.options = {
       ...buildTarget.options,
       security: {
-        ...((buildTarget.options?.security as JsonObject | undefined) ?? {}),
+        ...(buildTarget.options?.security ?? {}),
         allowedHosts: [],
       },
       outputPath,

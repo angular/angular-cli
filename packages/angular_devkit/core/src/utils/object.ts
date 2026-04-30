@@ -24,7 +24,7 @@ export function deepCopy<T>(value: T): T {
 
     if (valueCasted[copySymbol]) {
       // This is a circular dependency. Just return the cloned value.
-      return valueCasted[copySymbol] as T;
+      return valueCasted[copySymbol];
     }
 
     if (valueCasted['toJSON']) {

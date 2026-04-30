@@ -129,7 +129,7 @@ export default async function ({ asset, options }: OptimizeRequest) {
     }
 
     if (terserResult.map) {
-      partialSourcemaps.unshift(terserResult.map as SourceMapInput);
+      partialSourcemaps.unshift(terserResult.map);
     }
 
     if (asset.map) {

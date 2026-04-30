@@ -36,9 +36,8 @@ export function createAngularSsrInternalMiddleware(
       // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
       // which must be processed by the runtime linker, even if they are not used.
       await import('@angular/compiler');
-      const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } = (await import(
-        '@angular/ssr/node' as string
-      )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
+      const { writeResponseToNodeResponse, createWebRequestFromNodeRequest } =
+        await import('@angular/ssr/node');
 
       const { ɵgetOrCreateAngularServerApp } = (await server.ssrLoadModule('/main.server.mjs')) as {
         ɵgetOrCreateAngularServerApp: typeof getOrCreateAngularServerApp;
@@ -86,9 +85,8 @@ export async function createAngularSsrExternalMiddleware(
   // which must be processed by the runtime linker, even if they are not used.
   await import('@angular/compiler');
 
-  const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } = (await import(
-    '@angular/ssr/node' as string
-  )) as typeof import('@angular/ssr/node', { with: { 'resolution-mode': 'import' } });
+  const { createWebRequestFromNodeRequest, writeResponseToNodeResponse } =
+    await import('@angular/ssr/node');
 
   // Disable host check if allowed hosts is true meaning allow all hosts.
   const { allowedHosts } = server.config.server;

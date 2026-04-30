@@ -267,7 +267,7 @@ function parseProject(
       },
     });
 
-  return Object.assign(project, base) as ProjectDefinition;
+  return Object.assign(project, base);
 }
 
 function parseTargetsObject(

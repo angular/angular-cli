@@ -309,7 +309,7 @@ describe('FileSystemEngineHost', () => {
       return lastValueFrom(new HostSink(host).commit(tree));
     });
 
-    expect(host.files as string[]).toEqual(['/extra-schematic']);
+    expect(host.files).toEqual(['/extra-schematic']);
     expect(host.sync.read(normalize('/extra-schematic')).toString()).toEqual('extra-collection');
   });
 

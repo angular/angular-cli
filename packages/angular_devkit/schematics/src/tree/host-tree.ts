@@ -436,7 +436,7 @@ export class HostTree implements Tree {
             kind: 'c',
             path: record.path,
             content: Buffer.from(record.content),
-          } as CreateFileAction;
+          };
           break;
         case 'overwrite':
           yield {
@@ -445,7 +445,7 @@ export class HostTree implements Tree {
             kind: 'o',
             path: record.path,
             content: Buffer.from(record.content),
-          } as OverwriteFileAction;
+          };
           break;
         case 'rename':
           yield {
@@ -454,7 +454,7 @@ export class HostTree implements Tree {
             kind: 'r',
             path: record.from,
             to: record.to,
-          } as RenameFileAction;
+          };
           break;
         case 'delete':
           yield {
@@ -462,7 +462,7 @@ export class HostTree implements Tree {
             parent: 0,
             kind: 'd',
             path: record.path,
-          } as DeleteFileAction;
+          };
           break;
       }
     }
@@ -493,7 +493,7 @@ export class FilterHostTree extends HostTree {
   constructor(tree: HostTree, filter: FilePredicate<boolean> = () => true) {
     const newBackend = new virtualFs.SimpleMemoryHost();
     // cast to allow access
-    const originalBackend = (tree as FilterHostTree)._backend;
+    const originalBackend = tree._backend;
 
     // Walk the original backend and add files that match the filter to the new backend
     const pendingPaths: Path[] = ['/' as Path];

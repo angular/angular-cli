@@ -13,7 +13,7 @@ describe('Hooks', () => {
   const url = new URL('http://example.com/');
 
   beforeEach(() => {
-    hooks = new Hooks() as Hooks & { run: Function };
+    hooks = new Hooks();
   });
 
   describe('on', () => {
