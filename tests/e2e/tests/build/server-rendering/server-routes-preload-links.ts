@@ -132,7 +132,7 @@ export default async function () {
 
   const res = await fetch(`http://localhost:${defaultServerPort}/`);
   const text = await res.text();
-  const homeMatch = /<link rel="modulepreload" href="(home-[a-zA-Z0-9]{8}\.js)">/;
+  const homeMatch = /<link rel="modulepreload" href="(home-[a-zA-Z0-9_]{8}\.js)">/;
   assert.match(text, homeMatch, `Response for '/': ${homeMatch} was not matched in content.`);
 
   const link = text.match(homeMatch)?.[1];
@@ -148,36 +148,36 @@ const RESPONSE_EXPECTS: Record<
   }
 > = {
   '/': {
-    matches: [/<link rel="modulepreload" href="(home-[a-zA-Z0-9]{8}\.js)">/],
+    matches: [/<link rel="modulepreload" href="(home-[a-zA-Z0-9_]{8}\.js)">/],
     notMatches: [/ssg\-component/, /ssr/, /csr/, /cross-dep-/],
   },
   '/ssg': {
     matches: [
-      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg-component-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9_]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-component-[a-zA-Z0-9_]{8}\.js)">/,
     ],
     notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg-two/, /cross-dep-/],
   },
   '/ssg/one': {
     matches: [
-      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg-one-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9_]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-one-[a-zA-Z0-9_]{8}\.js)">/,
     ],
     notMatches: [/home/, /ssr/, /csr/, /ssg-two/, /ssg\-component/, /cross-dep-/],
   },
   '/ssg/two': {
     matches: [
-      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9]{8}\.js)">/,
-      /<link rel="modulepreload" href="(ssg-two-[a-zA-Z0-9]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg\.routes-[a-zA-Z0-9_]{8}\.js)">/,
+      /<link rel="modulepreload" href="(ssg-two-[a-zA-Z0-9_]{8}\.js)">/,
     ],
     notMatches: [/home/, /ssr/, /csr/, /ssg-one/, /ssg\-component/, /cross-dep-/],
   },
   '/ssr': {
-    matches: [/<link rel="modulepreload" href="(ssr-[a-zA-Z0-9]{8}\.js)">/],
+    matches: [/<link rel="modulepreload" href="(ssr-[a-zA-Z0-9_]{8}\.js)">/],
     notMatches: [/home/, /ssg\-component/, /csr/],
   },
   '/csr': {
-    matches: [/<link rel="modulepreload" href="(csr-[a-zA-Z0-9]{8}\.js)">/],
+    matches: [/<link rel="modulepreload" href="(csr-[a-zA-Z0-9_]{8}\.js)">/],
     notMatches: [/home/, /ssg\-component/, /ssr/, /cross-dep-/],
   },
 };
