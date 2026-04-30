@@ -43,7 +43,7 @@
   "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular/compiler-cli": "22.0.0-next.10",
-    "typescript": "6.0.2"
+    "typescript": "6.0.3"
   },
   "devDependencies": {
     "@angular/animations": "22.0.0-next.10",
