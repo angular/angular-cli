@@ -27,6 +27,7 @@
     "typescript": "~6.0.2",
     "vitest": "^4.0.8",
     "@vitest/coverage-v8": "^4.0.8",
+    "@vitest/coverage-istanbul": "^4.0.8",
     "@vitest/browser-playwright": "^4.0.8",
     "@vitest/browser-webdriverio": "^4.0.8",
     "@vitest/browser-preview": "^4.0.8",

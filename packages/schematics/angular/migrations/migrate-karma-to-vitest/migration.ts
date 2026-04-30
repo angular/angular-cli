@@ -27,8 +27,9 @@ async function processTestTargetOptions(
   customBuildOptions: Record<string, Record<string, json.JsonValue | undefined>>,
   needDevkitPlugin: boolean,
   manualMigrationFiles: string[],
-): Promise<boolean> {
+): Promise<{ needsCoverage: boolean; needsIstanbul: boolean }> {
   let needsCoverage = false;
+  let needsIstanbul = false;
   for (const [configName, options] of allTargetOptions(testTarget, false)) {
     const configKey = configName || '';
     if (!customBuildOptions[configKey]) {
@@ -81,6 +82,20 @@ async function processTestTargetOptions(
 
     const updatedBrowsers = options['browsers'];
     if (Array.isArray(updatedBrowsers) && updatedBrowsers.length > 0) {
+      const hasNonChromium = updatedBrowsers.some((b) => {
+        if (typeof b !== 'string') {
+          return false;
+        }
+
+        const normalized = b.toLowerCase();
+
+        return !['chrome', 'chromium', 'edge'].some((name) => normalized.includes(name));
+      });
+
+      if (hasNonChromium) {
+        needsIstanbul = true;
+      }
+
       context.logger.info(
         `Project "${projectName}" has browsers configured for tests. ` +
           `To run tests in a browser with Vitest, you will need to install either ` +
@@ -118,7 +133,7 @@ async function processTestTargetOptions(
     delete options['main'];
   }
 
-  return needsCoverage;
+  return { needsCoverage, needsIstanbul };
 }
 
 function updateTsConfigTypes(
@@ -154,9 +169,49 @@ function updateTsConfigTypes(
   }
 }
 
+function logSummary(
+  context: SchematicContext,
+  migratedProjects: string[],
+  skippedNonApplications: string[],
+  skippedMissingAppBuilder: string[],
+  manualMigrationFiles: string[],
+): void {
+  context.logger.info('\n--- Karma to Vitest Migration Summary ---');
+  context.logger.info(`Projects migrated: ${migratedProjects.length}`);
+  if (migratedProjects.length > 0) {
+    context.logger.info(`  - ${migratedProjects.join(', ')}`);
+  }
+  context.logger.info(`Projects skipped (non-applications): ${skippedNonApplications.length}`);
+  if (skippedNonApplications.length > 0) {
+    context.logger.info(`  - ${skippedNonApplications.join(', ')}`);
+  }
+  context.logger.info(
+    `Projects skipped (missing application builder): ${skippedMissingAppBuilder.length}`,
+  );
+  if (skippedMissingAppBuilder.length > 0) {
+    context.logger.info(`  - ${skippedMissingAppBuilder.join(', ')}`);
+  }
+
+  const uniqueManualFiles = [...new Set(manualMigrationFiles)];
+  if (uniqueManualFiles.length > 0) {
+    context.logger.warn(`\nThe following Karma configuration files require manual migration:`);
+    for (const file of uniqueManualFiles) {
+      context.logger.warn(`  - ${file}`);
+    }
+  }
+  if (migratedProjects.length > 0) {
+    context.logger.info(
+      `\nNote: To refactor your test files from Jasmine to Vitest, consider running the following command:` +
+        `\n  ng g @schematics/angular:refactor-jasmine-vitest <project_name>`,
+    );
+  }
+  context.logger.info('-----------------------------------------\n');
+}
+
 function updateProjects(tree: Tree, context: SchematicContext): Rule {
   return updateWorkspace(async (workspace) => {
     let needsCoverage = false;
+    let needsIstanbul = false;
     const removableKarmaConfigs = new Map<string, KarmaConfigProcessingResult>();
     const migratedProjects: string[] = [];
     const tsConfigsToUpdate = new Set<string>();
@@ -223,7 +278,7 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
       // Store custom build options to move to a new build configuration if needed
       const customBuildOptions: Record<string, Record<string, json.JsonValue | undefined>> = {};
 
-      const projectNeedsCoverage = await processTestTargetOptions(
+      const projectCoverageInfo = await processTestTargetOptions(
         testTarget,
         projectName,
         context,
@@ -234,8 +289,11 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
         manualMigrationFiles,
       );
 
-      if (projectNeedsCoverage) {
+      if (projectCoverageInfo.needsCoverage) {
         needsCoverage = true;
+        if (projectCoverageInfo.needsIstanbul) {
+          needsIstanbul = true;
+        }
       }
 
       // If we have custom build options, create testing configurations
@@ -297,36 +355,13 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
     updateTsConfigTypes(tree, tsConfigsToUpdate, context);
 
     // Log summary
-    context.logger.info('\n--- Karma to Vitest Migration Summary ---');
-    context.logger.info(`Projects migrated: ${migratedProjects.length}`);
-    if (migratedProjects.length > 0) {
-      context.logger.info(`  - ${migratedProjects.join(', ')}`);
-    }
-    context.logger.info(`Projects skipped (non-applications): ${skippedNonApplications.length}`);
-    if (skippedNonApplications.length > 0) {
-      context.logger.info(`  - ${skippedNonApplications.join(', ')}`);
-    }
-    context.logger.info(
-      `Projects skipped (missing application builder): ${skippedMissingAppBuilder.length}`,
+    logSummary(
+      context,
+      migratedProjects,
+      skippedNonApplications,
+      skippedMissingAppBuilder,
+      manualMigrationFiles,
     );
-    if (skippedMissingAppBuilder.length > 0) {
-      context.logger.info(`  - ${skippedMissingAppBuilder.join(', ')}`);
-    }
-
-    const uniqueManualFiles = [...new Set(manualMigrationFiles)];
-    if (uniqueManualFiles.length > 0) {
-      context.logger.warn(`\nThe following Karma configuration files require manual migration:`);
-      for (const file of uniqueManualFiles) {
-        context.logger.warn(`  - ${file}`);
-      }
-    }
-    if (migratedProjects.length > 0) {
-      context.logger.info(
-        `\nNote: To refactor your test files from Jasmine to Vitest, consider running the following command:` +
-          `\n  ng g @schematics/angular:refactor-jasmine-vitest <project_name>`,
-      );
-    }
-    context.logger.info('-----------------------------------------\n');
 
     if (migratedProjects.length > 0) {
       const rules = [
@@ -343,6 +378,19 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
             existing: ExistingBehavior.Skip,
           }),
         );
+
+        if (needsIstanbul) {
+          rules.push(
+            addDependency(
+              '@vitest/coverage-istanbul',
+              latestVersions['@vitest/coverage-istanbul'],
+              {
+                type: DependencyType.Dev,
+                existing: ExistingBehavior.Skip,
+              },
+            ),
+          );
+        }
       }
 
       return chain(rules);
