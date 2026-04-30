@@ -41,7 +41,7 @@ export function createWatcher(options?: {
   followSymlinks?: boolean;
 }): BuildWatcher {
   const watcher = new WatchPack({
-    poll: options?.polling ? options?.interval ?? true : false,
+    poll: options?.polling ? (options?.interval ?? true) : false,
     ignored: options?.ignored,
     followSymlinks: options?.followSymlinks,
     aggregateTimeout: 250,

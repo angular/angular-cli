@@ -43,9 +43,8 @@ export class JitCompilation extends AngularCompilation {
     referencedFiles: readonly string[];
   }> {
     // Dynamically load the Angular compiler CLI package
-    const { constructorParametersDownlevelTransform } = await import(
-      '@angular/compiler-cli/private/tooling'
-    );
+    const { constructorParametersDownlevelTransform } =
+      await import('@angular/compiler-cli/private/tooling');
 
     // Load the compiler configuration and transform as needed
     const {

@@ -49,6 +49,13 @@ export interface IndexHtmlGeneratorOptions {
   imageDomains?: string[];
   generateDedicatedSSRContent?: boolean;
   autoCsp?: AutoCspOptions;
+
+  /**
+   * Integrity metadata for module URLs not directly referenced in the index
+   * (typically lazy-loaded chunks). Forwarded to {@link augmentIndexHtml} so
+   * a `<script type="importmap">` integrity block can be emitted.
+   */
+  chunksIntegrity?: ReadonlyMap<string, string>;
 }
 
 export type IndexHtmlTransform = (content: string) => Promise<string>;
@@ -168,7 +175,14 @@ export class IndexHtmlGenerator {
 }
 
 function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
-  const { deployUrl, crossOrigin, sri = false, entrypoints, imageDomains } = generator.options;
+  const {
+    deployUrl,
+    crossOrigin,
+    sri = false,
+    entrypoints,
+    imageDomains,
+    chunksIntegrity,
+  } = generator.options;
 
   return async (html, options) => {
     const { lang, baseHref, outputPath = '', files, hints } = options;
@@ -185,6 +199,7 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
       imageDomains,
       files,
       hints,
+      chunksIntegrity,
     });
   };
 }

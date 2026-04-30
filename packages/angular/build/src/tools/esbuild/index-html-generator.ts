@@ -7,6 +7,7 @@
  */
 
 import assert from 'node:assert';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
@@ -80,6 +81,22 @@ export async function generateIndexHtml(
     throw new Error(`Output file does not exist: ${relativefilePath}`);
   };
 
+  // When SRI is enabled, build an integrity map for every browser JavaScript
+  // chunk so an `<script type="importmap">` block can carry integrity metadata
+  // for modules loaded via dynamic `import()`.
+  let chunksIntegrity: ReadonlyMap<string, string> | undefined;
+  if (subresourceIntegrity) {
+    const integrity = new Map<string, string>();
+    for (const file of browserOutputFiles) {
+      if (!file.path.endsWith('.js') || initialFiles.has(file.path)) {
+        continue;
+      }
+      const hash = createHash('sha384').update(file.contents).digest('base64');
+      integrity.set(file.path, 'sha384-' + hash);
+    }
+    chunksIntegrity = integrity;
+  }
+
   // Create an index HTML generator that reads from the in-memory output files
   const indexHtmlGenerator = new IndexHtmlGenerator({
     indexPath: indexHtmlOptions.input,
@@ -95,6 +112,7 @@ export async function generateIndexHtml(
       buildOptions.appShellOptions
     ),
     autoCsp: buildOptions.security.autoCsp,
+    chunksIntegrity,
   });
 
   indexHtmlGenerator.readAsset = readAsset;
