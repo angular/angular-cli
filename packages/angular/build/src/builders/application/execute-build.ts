@@ -21,6 +21,7 @@ import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
 import {
   calculateEstimatedTransferSizes,
+  isZonelessApp,
   logBuildStats,
   transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
@@ -36,6 +37,10 @@ import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundling';
+
+/** The esbuild error text prefix used to detect top-level await errors. */
+const TOP_LEVEL_AWAIT_ERROR_TEXT =
+  'Top-level await is not available in the configured target environment';
 
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
@@ -146,6 +151,24 @@ export async function executeBuild(
 
   // Return if the bundling has errors
   if (bundlingResult.errors) {
+    // If Zone.js is used, augment top-level await errors with a more helpful message.
+    // esbuild's default error mentions "target environment" with browser versions, but
+    // the actual reason is that async/await is downleveled for Zone.js compatibility.
+    if (!isZonelessApp(options.polyfills)) {
+      for (const error of bundlingResult.errors) {
+        if (error.text?.startsWith(TOP_LEVEL_AWAIT_ERROR_TEXT)) {
+          error.notes ??= [];
+          error.notes.push({
+            text:
+              'Top-level await is not supported in applications that use Zone.js. ' +
+              'Consider removing Zone.js or moving this code into an async function. \n' +
+              'For more information about zoneless Angular applications, visit: https://angular.dev/guide/zoneless',
+            location: null,
+          });
+        }
+      }
+    }
+
     executionResult.addErrors(bundlingResult.errors);
 
     return executionResult;
