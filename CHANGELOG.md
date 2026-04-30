@@ -1,3 +1,27 @@
+<a name="19.2.25"></a>
+
+# 19.2.25 (2026-04-30)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [49ae0ad2d](https://github.com/angular/angular-cli/commit/49ae0ad2d452ab7d7510297919125fe00081fa49) | fix  | upgrade postcss to 8.5.12 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------- |
+| [2d53feca5](https://github.com/angular/angular-cli/commit/2d53feca58730def7e2fb79f9cabfd1c32b9351d) | fix  | update esbuild to `0.28.0` |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [02ce8bf26](https://github.com/angular/angular-cli/commit/02ce8bf2695e71c1684e231151b4ab5ccba94869) | fix  | introduce trustProxyHeaders option to safely validate and sanitize proxy headers |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0-next.7"></a>
 
 # 22.0.0-next.7 (2026-04-29)
@@ -3087,6 +3111,7 @@
 - Protractor is no longer supported.
 
   Protractor was marked end-of-life in August 2023 (see https://protractortest.org/). Projects still relying on Protractor should consider migrating to another E2E testing framework, several support solid migration paths from Protractor.
+
   - https://angular.dev/tools/cli/end-to-end
   - https://blog.angular.dev/the-state-of-end-to-end-testing-with-angular-d175f751cb9c
 
@@ -6721,6 +6746,7 @@ Alan Agius, Charles Lyding and Doug Parker
 ### @angular/cli
 
 - Several changes to the `ng analytics` command syntax.
+
   - `ng analytics project <setting>` has been replaced with `ng analytics <setting>`
   - `ng analytics <setting>` has been replaced with `ng analytics <setting> --global`
 
@@ -6750,6 +6776,7 @@ Alan Agius, Charles Lyding and Doug Parker
 - `browser` and `karma` builders `script` and `styles` options input files extensions are now validated.
 
   Valid extensions for `scripts` are:
+
   - `.js`
   - `.cjs`
   - `.mjs`
@@ -6758,6 +6785,7 @@ Alan Agius, Charles Lyding and Doug Parker
   - `.mjsx`
 
   Valid extensions for `styles` are:
+
   - `.css`
   - `.less`
   - `.sass`
