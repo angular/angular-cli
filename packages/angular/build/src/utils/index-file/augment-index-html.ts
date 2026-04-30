@@ -46,6 +46,21 @@ export interface AugmentIndexHtmlOptions {
   lang?: string;
   hints?: { url: string; mode: string; as?: string }[];
   imageDomains?: string[];
+
+  /**
+   * Integrity metadata for module script URLs that are not directly referenced
+   * from `index.html` (e.g. lazy-loaded chunks resolved via `import()`).
+   *
+   * Keys are URLs relative to the deployment base (matching how the browser
+   * will request the module) and values are the corresponding
+   * Subresource Integrity values (e.g. 'sha384-...').
+   *
+   * Emitted as a `<script type="importmap">` block whose `integrity` map the
+   * browser consults when fetching modules without an inline `integrity`
+   * attribute. See:
+   * https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/script/type/importmap#integrity_metadata_map
+   */
+  chunksIntegrity?: ReadonlyMap<string, string>;
 }
 
 export interface FileInfo {
@@ -64,8 +79,18 @@ export interface FileInfo {
 export async function augmentIndexHtml(
   params: AugmentIndexHtmlOptions,
 ): Promise<{ content: string; warnings: string[]; errors: string[] }> {
-  const { loadOutputFile, files, entrypoints, sri, deployUrl, lang, baseHref, html, imageDomains } =
-    params;
+  const {
+    loadOutputFile,
+    files,
+    entrypoints,
+    sri,
+    deployUrl,
+    lang,
+    baseHref,
+    html,
+    imageDomains,
+    chunksIntegrity,
+  } = params;
 
   const warnings: string[] = [];
   const errors: string[] = [];
@@ -128,8 +153,27 @@ export async function augmentIndexHtml(
     scriptTags.push(`<script ${attrs.join(' ')}></script>`);
   }
 
+  let subResourceIntegrityTag: string | undefined;
   let headerLinkTags: string[] = [];
   let bodyLinkTags: string[] = [];
+
+  // Emit an integrity-only import map so the browser can validate lazy chunks
+  // resolved via dynamic `import()` (which otherwise carry no SRI metadata).
+  // The block is placed first inside `<head>` so it precedes any module
+  // script, as required by the import-map spec.
+  if (sri && chunksIntegrity?.size) {
+    const integrity: Record<string, string> = {};
+    // Stable iteration order for reproducible builds.
+    const sortedEntries = [...chunksIntegrity.entries()].sort(([keyA], [keyB]) =>
+      keyA.localeCompare(keyB),
+    );
+    for (const [url, integrityHash] of sortedEntries) {
+      integrity[generateUrl(url, deployUrl)] = integrityHash;
+    }
+    const importMapJson = JSON.stringify({ integrity }).replace(/</g, '\\u003c');
+    subResourceIntegrityTag = `<script type="importmap">${importMapJson}</script>`;
+  }
+
   for (const src of stylesheets) {
     const attrs = [`rel="stylesheet"`, `href="${generateUrl(src, deployUrl)}"`];
 
@@ -212,6 +256,9 @@ export async function augmentIndexHtml(
           if (!baseTagExists && isString(baseHref)) {
             rewriter.emitStartTag(tag);
             rewriter.emitRaw(`<base href="${baseHref}">`);
+            if (subResourceIntegrityTag) {
+              rewriter.emitRaw(subResourceIntegrityTag);
+            }
 
             return;
           }
@@ -220,6 +267,9 @@ export async function augmentIndexHtml(
           // Adjust base href if specified
           if (isString(baseHref)) {
             updateAttribute(tag, 'href', baseHref);
+          }
+          if (subResourceIntegrityTag) {
+            rewriter.emitRaw(subResourceIntegrityTag);
           }
           break;
         case 'link':
