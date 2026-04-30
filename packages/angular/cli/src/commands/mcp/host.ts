@@ -15,11 +15,11 @@
 
 import { existsSync as nodeExistsSync } from 'fs';
 import { ChildProcess, spawn } from 'node:child_process';
-import { Stats } from 'node:fs';
+import { Stats, realpathSync } from 'node:fs';
 import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 
 /**
  * An error thrown when a command fails to execute.
@@ -72,14 +72,6 @@ export interface Host {
   ): AsyncIterable<{ name: string; parentPath: string; isFile(): boolean }>;
 
   /**
-   * Resolves a module request from a given path.
-   * @param request The module request to resolve.
-   * @param from The path from which to resolve the request.
-   * @returns The resolved module path.
-   */
-  resolveModule(request: string, from: string): string;
-
-  /**
    * Spawns a child process and returns a promise that resolves with the process's
    * output or rejects with a structured error.
    * @param command The command to run.
@@ -124,6 +116,11 @@ export interface Host {
    * Checks whether a TCP port is available on the system.
    */
   isPortAvailable(port: number): Promise<boolean>;
+
+  /**
+   * Sets the allowed roots for this host.
+   */
+  setRoots(roots: string[]): void;
 }
 
 function resolveCommand(
@@ -171,10 +168,6 @@ export const LocalWorkspaceHost: Host = {
     options: { cwd: string },
   ): AsyncIterable<{ name: string; parentPath: string; isFile(): boolean }> {
     return nodeGlob(pattern, { ...options, withFileTypes: true });
-  },
-
-  resolveModule(request: string, from: string): string {
-    return createRequire(from).resolve(request);
   },
 
   runCommand: async (
@@ -287,4 +280,113 @@ export const LocalWorkspaceHost: Host = {
       });
     });
   },
+
+  setRoots(roots: string[]) {
+    // LocalWorkspaceHost does not enforce roots, so this is a no-op.
+  },
 };
+
+export function createRootRestrictedHost(
+  baseHost: Host,
+  initialRoots: string[] = [process.cwd()],
+): Host {
+  let roots = initialRoots;
+
+  function checkPath(path: string) {
+    const resolvedPath = resolve(path);
+    let realPath: string;
+    try {
+      realPath = realpathSync(resolvedPath);
+    } catch (e) {
+      if ((e as Error & { code?: string }).code === 'ENOENT') {
+        // Path does not exist. Find the first existing ancestor.
+        let current = resolvedPath;
+        while (current) {
+          try {
+            realPath = realpathSync(current);
+            break;
+          } catch (err) {
+            if ((err as Error & { code?: string }).code !== 'ENOENT') {
+              throw err;
+            }
+            const parent = dirname(current);
+            if (parent === current) {
+              // Reached filesystem root
+              throw err;
+            }
+            current = parent;
+          }
+        }
+      } else {
+        throw e;
+      }
+    }
+
+    const isAllowed = roots.some((root) => {
+      const rel = relative(root, realPath);
+
+      return !rel.startsWith('..') && !isAbsolute(rel);
+    });
+
+    if (!isAllowed) {
+      throw new Error(`Access denied: path '${path}' is outside allowed roots.`);
+    }
+  }
+
+  return {
+    ...baseHost,
+    setRoots(newRoots: string[]) {
+      roots = newRoots;
+    },
+    stat(path: string) {
+      checkPath(path);
+
+      return baseHost.stat(path);
+    },
+    existsSync(path: string) {
+      checkPath(path);
+
+      return baseHost.existsSync(path);
+    },
+    readFile(path: string, encoding: 'utf-8') {
+      checkPath(path);
+
+      return baseHost.readFile(path, encoding);
+    },
+    glob(pattern: string, options: { cwd: string }) {
+      if (pattern.includes('..')) {
+        throw new Error(
+          `Access denied: glob pattern '${pattern}' contains path traversal sequences.`,
+        );
+      }
+
+      checkPath(options.cwd);
+
+      const firstWildcardIndex = pattern.search(/[*?[{]/);
+      const basePath = firstWildcardIndex >= 0 ? pattern.substring(0, firstWildcardIndex) : pattern;
+
+      const targetDir = resolve(options.cwd, basePath);
+      checkPath(targetDir);
+
+      return baseHost.glob(pattern, options);
+    },
+    runCommand(command: string, args: readonly string[], options: { cwd?: string } = {}) {
+      const effectiveCwd = options.cwd ?? process.cwd();
+      checkPath(effectiveCwd);
+      if (command.includes('/') || command.includes('\\')) {
+        checkPath(resolve(effectiveCwd, command));
+      }
+
+      return baseHost.runCommand(command, args, options);
+    },
+    spawn(command: string, args: readonly string[], options: { cwd?: string } = {}) {
+      const effectiveCwd = options.cwd ?? process.cwd();
+      checkPath(effectiveCwd);
+      if (command.includes('/') || command.includes('\\')) {
+        checkPath(resolve(effectiveCwd, command));
+      }
+
+      return baseHost.spawn(command, args, options);
+    },
+  };
+}
