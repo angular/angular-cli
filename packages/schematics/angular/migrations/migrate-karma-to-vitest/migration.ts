@@ -14,14 +14,14 @@ import { latestVersions } from '../../utility/latest-versions';
 import { TargetDefinition, allTargetOptions, updateWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
 import { BUILD_OPTIONS_KEYS } from './constants';
-import { processKarmaConfig } from './karma-processor';
+import { KarmaConfigProcessingResult, processKarmaConfig } from './karma-processor';
 
 async function processTestTargetOptions(
   testTarget: TargetDefinition,
   projectName: string,
   context: SchematicContext,
   tree: Tree,
-  removableKarmaConfigs: Map<string, boolean>,
+  removableKarmaConfigs: Map<string, KarmaConfigProcessingResult>,
   customBuildOptions: Record<string, Record<string, json.JsonValue | undefined>>,
   needDevkitPlugin: boolean,
   manualMigrationFiles: string[],
@@ -122,7 +122,7 @@ async function processTestTargetOptions(
 function updateProjects(tree: Tree, context: SchematicContext): Rule {
   return updateWorkspace(async (workspace) => {
     let needsCoverage = false;
-    const removableKarmaConfigs = new Map<string, boolean>();
+    const removableKarmaConfigs = new Map<string, KarmaConfigProcessingResult>();
     const migratedProjects: string[] = [];
     const skippedNonApplications: string[] = [];
     const skippedMissingAppBuilder: string[] = [];
@@ -233,6 +233,13 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
       testTarget.options['runner'] = 'vitest';
 
       migratedProjects.push(projectName);
+    }
+
+    // Perform cleanup of removable karma config files
+    for (const [configPath, result] of removableKarmaConfigs) {
+      if (result.isRemovable && tree.exists(configPath)) {
+        tree.delete(configPath);
+      }
     }
 
     // Log summary

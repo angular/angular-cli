@@ -322,6 +322,7 @@ module.exports = function (config) {
     const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
     expect(newTree.exists('karma.conf.js')).toBeFalse();
   });
+
   it('should shift main compilation entry file directly into setupFiles array', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.test.options.main = 'src/test.ts';
@@ -333,6 +334,7 @@ module.exports = function (config) {
     expect(newProjects.app.targets.test.options.setupFiles).toEqual(['src/test.ts']);
     expect(newProjects.app.targets.test.options.main).toBeUndefined();
   });
+
   it('should generate unique testing configuration name preventing collision overwrites', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.build.configurations = {
@@ -350,6 +352,7 @@ module.exports = function (config) {
     ]);
     expect(newProjects.app.targets.test.options.buildTarget).toBe(':build:testing-2');
   });
+
   it('should inject @vitest/coverage-v8 whenever coverage presence is detected', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.test.options.codeCoverage = true;
@@ -359,5 +362,62 @@ module.exports = function (config) {
     const { devDependencies } = newTree.readJson('/package.json') as any;
 
     expect(devDependencies['@vitest/coverage-v8']).toBe(latestVersions['@vitest/coverage-v8']);
+  });
+
+  it('should successfully extract settings across multiple projects sharing the same removable karma config', async () => {
+    const { projects } = tree.readJson('/angular.json') as any;
+    projects.app.targets.test.builder = '@angular-devkit/build-angular:karma';
+
+    // Add a second project sharing the exact same configuration
+    projects.app2 = {
+      ...JSON.parse(JSON.stringify(projects.app)),
+      root: 'app2',
+    };
+
+    tree.overwrite('/angular.json', JSON.stringify({ version: 1, projects }));
+
+    const DEFAULT_KARMA_CONFIG = `
+module.exports = function (config) {
+  config.set({
+    basePath: '',
+    frameworks: ['jasmine', '@angular-devkit/build-angular'],
+    plugins: [
+      require('karma-jasmine'),
+      require('karma-chrome-launcher'),
+      require('karma-jasmine-html-reporter'),
+      require('karma-coverage'),
+      require('@angular-devkit/build-angular/plugins/karma')
+    ],
+    client: {
+      jasmine: {},
+    },
+    jasmineHtmlReporter: {
+      suppressAll: true
+    },
+    coverageReporter: {
+      dir: require('path').join(__dirname, './coverage/app'),
+      subdir: '.',
+      reporters: [
+        { type: 'html' },
+        { type: 'text-summary' }
+      ]
+    },
+    reporters: ['progress', 'kjhtml'],
+    browsers: ['Chrome'],
+    restartOnFileChange: true
+  });
+};
+`;
+    tree.create('karma.conf.js', DEFAULT_KARMA_CONFIG);
+
+    const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    const { projects: newProjects } = newTree.readJson('/angular.json') as any;
+
+    // Assert BOTH projects got the extraction logic mapped correctly
+    expect(newProjects.app.targets.test.options.reporters).toEqual(['default']);
+    expect(newProjects.app2.targets.test.options.reporters).toEqual(['default']);
+
+    // Assert that the deletion deferred successfully until BOTH extracted the data
+    expect(newTree.exists('karma.conf.js')).toBeFalse();
   });
 });

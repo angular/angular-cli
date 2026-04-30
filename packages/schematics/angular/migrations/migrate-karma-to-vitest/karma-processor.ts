@@ -119,42 +119,47 @@ function extractCoverageSettings(
   }
 }
 
+export interface KarmaConfigProcessingResult {
+  analysis: KarmaConfigAnalysis;
+  isRemovable: boolean;
+}
+
 export async function processKarmaConfig(
   karmaConfig: string,
   options: Record<string, json.JsonValue | undefined>,
   projectName: string,
   context: SchematicContext,
   tree: Tree,
-  removableKarmaConfigs: Map<string, boolean>,
+  cache: Map<string, KarmaConfigProcessingResult>,
   needDevkitPlugin: boolean,
   manualMigrationFiles: string[],
 ): Promise<void> {
-  if (tree.exists(karmaConfig)) {
+  let cachedResult = cache.get(karmaConfig);
+
+  if (!cachedResult && tree.exists(karmaConfig)) {
     const content = tree.readText(karmaConfig);
     const analysis = analyzeKarmaConfig(content);
 
-    extractReporters(analysis, options, projectName, context);
-    extractCoverageSettings(analysis, options, projectName, context);
-
-    let isRemovable = removableKarmaConfigs.get(karmaConfig);
-    if (isRemovable === undefined) {
-      if (analysis.hasUnsupportedValues) {
-        isRemovable = false;
-      } else {
-        const diff = await compareKarmaConfigToDefault(
-          analysis,
-          projectName,
-          karmaConfig,
-          needDevkitPlugin,
-        );
-        isRemovable = !hasDifferences(diff) && diff.isReliable;
-      }
-      removableKarmaConfigs.set(karmaConfig, isRemovable);
+    let isRemovable = false;
+    if (!analysis.hasUnsupportedValues) {
+      const diff = await compareKarmaConfigToDefault(
+        analysis,
+        projectName,
+        karmaConfig,
+        needDevkitPlugin,
+      );
+      isRemovable = !hasDifferences(diff) && diff.isReliable;
     }
 
-    if (isRemovable) {
-      tree.delete(karmaConfig);
-    } else {
+    cachedResult = { analysis, isRemovable };
+    cache.set(karmaConfig, cachedResult);
+  }
+
+  if (cachedResult) {
+    extractReporters(cachedResult.analysis, options, projectName, context);
+    extractCoverageSettings(cachedResult.analysis, options, projectName, context);
+
+    if (!cachedResult.isRemovable) {
       context.logger.warn(
         `Project "${projectName}" uses a custom Karma configuration file "${karmaConfig}". ` +
           `Tests have been migrated to use Vitest, but you may need to manually migrate custom settings ` +
@@ -164,5 +169,6 @@ export async function processKarmaConfig(
       manualMigrationFiles.push(karmaConfig);
     }
   }
+
   delete options['karmaConfig'];
 }
