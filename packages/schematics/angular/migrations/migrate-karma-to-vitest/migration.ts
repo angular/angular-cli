@@ -8,8 +8,10 @@
 
 import type { json } from '@angular-devkit/core';
 import { Rule, SchematicContext, Tree, chain } from '@angular-devkit/schematics';
+import { join } from 'node:path/posix';
 import { isDeepStrictEqual } from 'util';
 import { DependencyType, ExistingBehavior, addDependency } from '../../utility/dependency';
+import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';
 import { TargetDefinition, allTargetOptions, updateWorkspace } from '../../utility/workspace';
 import { Builders } from '../../utility/workspace-models';
@@ -119,11 +121,45 @@ async function processTestTargetOptions(
   return needsCoverage;
 }
 
+function updateTsConfigTypes(
+  tree: Tree,
+  tsConfigsToUpdate: Set<string>,
+  context: SchematicContext,
+): void {
+  for (const tsConfigPath of tsConfigsToUpdate) {
+    if (tree.exists(tsConfigPath)) {
+      try {
+        const json = new JSONFile(tree, tsConfigPath);
+        const typesPath = ['compilerOptions', 'types'];
+        const existingTypes = (json.get(typesPath) as string[] | undefined) ?? [];
+        const newTypes = existingTypes.filter((t) => t !== 'jasmine');
+
+        if (!newTypes.includes('vitest/globals')) {
+          newTypes.push('vitest/globals');
+        }
+
+        if (
+          newTypes.length !== existingTypes.length ||
+          newTypes.some((t, i) => t !== existingTypes[i])
+        ) {
+          json.modify(typesPath, newTypes);
+        }
+      } catch (err) {
+        context.logger.warn(
+          `Failed to automatically update types in "${tsConfigPath}". ` +
+            `Please manually remove "jasmine" and add "vitest/globals" to compilerOptions.types.`,
+        );
+      }
+    }
+  }
+}
+
 function updateProjects(tree: Tree, context: SchematicContext): Rule {
   return updateWorkspace(async (workspace) => {
     let needsCoverage = false;
     const removableKarmaConfigs = new Map<string, KarmaConfigProcessingResult>();
     const migratedProjects: string[] = [];
+    const tsConfigsToUpdate = new Set<string>();
     const skippedNonApplications: string[] = [];
     const skippedMissingAppBuilder: string[] = [];
     const manualMigrationFiles: string[] = [];
@@ -168,6 +204,21 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
       if (!isKarma) {
         continue;
       }
+
+      // Collect tsConfig paths to perform globals updates
+      const baseTsConfig = testTarget.options?.['tsConfig'];
+      if (typeof baseTsConfig === 'string') {
+        tsConfigsToUpdate.add(baseTsConfig);
+      }
+      if (testTarget.configurations) {
+        for (const config of Object.values(testTarget.configurations)) {
+          if (typeof config?.['tsConfig'] === 'string') {
+            tsConfigsToUpdate.add(config['tsConfig']);
+          }
+        }
+      }
+      // Always include fallback to the default tsconfig.spec.json path
+      tsConfigsToUpdate.add(join(project.root, 'tsconfig.spec.json'));
 
       // Store custom build options to move to a new build configuration if needed
       const customBuildOptions: Record<string, Record<string, json.JsonValue | undefined>> = {};
@@ -241,6 +292,9 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
         tree.delete(configPath);
       }
     }
+
+    // Update TSConfig files to use Vitest types instead of Jasmine
+    updateTsConfigTypes(tree, tsConfigsToUpdate, context);
 
     // Log summary
     context.logger.info('\n--- Karma to Vitest Migration Summary ---');

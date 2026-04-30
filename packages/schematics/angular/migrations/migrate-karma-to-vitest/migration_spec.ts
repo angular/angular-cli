@@ -420,4 +420,26 @@ module.exports = function (config) {
     // Assert that the deletion deferred successfully until BOTH extracted the data
     expect(newTree.exists('karma.conf.js')).toBeFalse();
   });
+
+  it('should automatically transition types in referenced tsconfigs from jasmine to vitest/globals', async () => {
+    // Create a virtual tsconfig that mimics existing state
+    tree.create(
+      'tsconfig.spec.json',
+      JSON.stringify({
+        compilerOptions: {
+          outDir: './out-tsc/spec',
+          types: ['jasmine', 'node'],
+        },
+        files: ['src/test.ts'],
+        include: ['src/**/*.spec.ts', 'src/**/*.d.ts'],
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    const tsConfigJson = JSON.parse(newTree.readText('tsconfig.spec.json'));
+
+    expect(tsConfigJson.compilerOptions.types).toContain('vitest/globals');
+    expect(tsConfigJson.compilerOptions.types).not.toContain('jasmine');
+    expect(tsConfigJson.compilerOptions.types).toContain('node');
+  });
 });
