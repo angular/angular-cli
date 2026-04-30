@@ -80,7 +80,8 @@ export function analyzeKarmaConfig(content: string): KarmaConfigAnalysis {
   function extractValue(node: ts.Expression): KarmaConfigValue {
     switch (node.kind) {
       case ts.SyntaxKind.StringLiteral:
-        return (node as ts.StringLiteral).text;
+      case ts.SyntaxKind.NoSubstitutionTemplateLiteral:
+        return (node as ts.StringLiteral | ts.NoSubstitutionTemplateLiteral).text;
       case ts.SyntaxKind.NumericLiteral:
         return Number((node as ts.NumericLiteral).text);
       case ts.SyntaxKind.TrueKeyword:

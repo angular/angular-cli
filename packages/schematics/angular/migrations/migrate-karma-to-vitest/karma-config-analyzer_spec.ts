@@ -293,4 +293,33 @@ describe('Karma Config Analyzer', () => {
     expect(settings.size).toBe(0);
     expect(hasUnsupportedValues).toBe(true);
   });
+
+  it('should parse plain template literal strings without substitution', () => {
+    const karmaConf = `
+      module.exports = function (config) {
+        config.set({
+          basePath: \`some/path\`,
+        });
+      };
+    `;
+    const { settings, hasUnsupportedValues } = analyzeKarmaConfig(karmaConf);
+
+    expect(settings.get('basePath') as unknown).toBe('some/path');
+    expect(hasUnsupportedValues).toBe(false);
+  });
+
+  it('should flag template literals with substitution as unsupported', () => {
+    const karmaConf = `
+      const relativePath = './coverage';
+      module.exports = function (config) {
+        config.set({
+          basePath: \`\${relativePath}/test\`,
+        });
+      };
+    `;
+    const { settings, hasUnsupportedValues } = analyzeKarmaConfig(karmaConf);
+
+    expect(settings.get('basePath')).toBeUndefined();
+    expect(hasUnsupportedValues).toBe(true);
+  });
 });
