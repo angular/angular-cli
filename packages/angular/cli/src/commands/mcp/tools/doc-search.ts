@@ -14,10 +14,31 @@ import { at, iv, k1 } from '../constants';
 import { type McpToolContext, declareTool } from './tool-registry';
 
 const ALGOLIA_APP_ID = 'L1XWT2UJ7F';
-// https://www.algolia.com/doc/guides/security/api-keys/#search-only-api-key
-// This is a search only, rate limited key. It is sent within the URL of the query request.
-// This is not the actual key.
+// Default Algolia API key used when NG_DOCS_SEARCH_API_KEY is not set.
+// Operators (e.g. self-hosted documentation, internal CI, rotation testing)
+// can override this by setting NG_DOCS_SEARCH_API_KEY in the environment.
 const ALGOLIA_API_E = '34738e8ae1a45e58bbce7b0f9810633d8b727b44a6479cf5e14b6a337148bd50';
+
+/**
+ * Resolves the Algolia API key to use for documentation search. If the
+ * `NG_DOCS_SEARCH_API_KEY` environment variable is set to a non-empty value
+ * it is used verbatim; otherwise the bundled default is used.
+ *
+ * Exported for testing.
+ */
+export function resolveAlgoliaApiKey(): string {
+  const override = process.env['NG_DOCS_SEARCH_API_KEY'];
+  if (typeof override === 'string' && override !== '') {
+    return override;
+  }
+  const dcip = createDecipheriv(
+    'aes-256-gcm',
+    (k1 + ALGOLIA_APP_ID).padEnd(32, '^'),
+    iv,
+  ).setAuthTag(Buffer.from(at, 'base64'));
+
+  return dcip.update(ALGOLIA_API_E, 'hex', 'utf-8') + dcip.final('utf-8');
+}
 
 /**
  * The minimum major version of Angular for which a version-specific documentation index is known to exist.
@@ -129,16 +150,8 @@ function createDocSearchHandler({ logger }: McpToolContext) {
 
   return async ({ query, includeTopContent, version }: DocSearchInput) => {
     if (!client) {
-      const dcip = createDecipheriv(
-        'aes-256-gcm',
-        (k1 + ALGOLIA_APP_ID).padEnd(32, '^'),
-        iv,
-      ).setAuthTag(Buffer.from(at, 'base64'));
       const { searchClient } = await import('algoliasearch');
-      client = searchClient(
-        ALGOLIA_APP_ID,
-        dcip.update(ALGOLIA_API_E, 'hex', 'utf-8') + dcip.final('utf-8'),
-      );
+      client = searchClient(ALGOLIA_APP_ID, resolveAlgoliaApiKey());
     }
 
     let finalSearchedVersion = Math.max(
