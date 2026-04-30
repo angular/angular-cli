@@ -103,7 +103,9 @@
           "type": "string",
           "description": "Activate the inspector on host and port in the format of `[[host:]port]`. See the security warning in https://nodejs.org/docs/latest-v22.x/api/cli.html#warning-binding-inspector-to-a-public-ipport-combination-is-insecure regarding the host parameter usage."
         },
-        { "type": "boolean" }
+        {
+          "type": "boolean"
+        }
       ]
     },
     "forceEsbuild": {
@@ -114,22 +116,34 @@
     "prebundle": {
       "description": "Enable and control the Vite-based development server's prebundling capabilities. To enable prebundling, the Angular CLI cache must also be enabled. This option has no effect when using the 'browser' or other Webpack-based builders.",
       "oneOf": [
-        { "type": "boolean" },
+        {
+          "type": "boolean"
+        },
         {
           "type": "object",
           "properties": {
             "exclude": {
               "description": "List of package imports that should not be prebundled by the development server. The packages will be bundled into the application code itself.",
               "type": "array",
-              "items": { "type": "string" }
+              "items": {
+                "type": "string"
+              }
             }
           },
           "additionalProperties": false,
-          "required": ["exclude"]
+          "required": [
+            "exclude"
+          ]
         }
       ]
+    },
+    "middlewareConfig": {
+      "type": "string",
+      "description": "Middleware configuration file."
     }
   },
   "additionalProperties": false,
-  "required": ["buildTarget"]
+  "required": [
+    "buildTarget"
+  ]
 }
