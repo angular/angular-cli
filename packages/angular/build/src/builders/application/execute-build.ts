@@ -21,6 +21,7 @@ import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
 import {
   calculateEstimatedTransferSizes,
+  filterMetafile,
   logBuildStats,
   transformSupportedBrowsersToTargets,
 } from '../../tools/esbuild/utils';
@@ -230,7 +231,7 @@ export async function executeBuild(
     executionResult.setExternalMetadata(implicitBrowser, implicitServer, [...explicitExternal]);
   }
 
-  const { metafile, initialFiles, outputFiles } = bundlingResult;
+  const { metafile, browserMetafile, serverMetafile, initialFiles, outputFiles } = bundlingResult;
 
   executionResult.outputFiles.push(...outputFiles);
 
@@ -322,13 +323,34 @@ export async function executeBuild(
     BuildOutputFileType.Root,
   );
 
-  // Write metafile if stats option is enabled
+  // Write metafiles if stats option is enabled, split by browser/server and initial/non-initial
   if (options.stats) {
+    const filterInitialFiles = (outputPath: string) => initialFiles.has(outputPath);
+    const filterNonInitialFiles = (outputPath: string) => !initialFiles.has(outputPath);
+
     executionResult.addOutputFile(
-      'stats.json',
-      JSON.stringify(metafile, null, 2),
+      'browser-stats.json',
+      JSON.stringify(filterMetafile(browserMetafile, filterNonInitialFiles), null, 2),
       BuildOutputFileType.Root,
     );
+    executionResult.addOutputFile(
+      'browser-initial-stats.json',
+      JSON.stringify(filterMetafile(browserMetafile, filterInitialFiles), null, 2),
+      BuildOutputFileType.Root,
+    );
+
+    if (serverMetafile) {
+      executionResult.addOutputFile(
+        'server-stats.json',
+        JSON.stringify(filterMetafile(serverMetafile, filterNonInitialFiles), null, 2),
+        BuildOutputFileType.Root,
+      );
+      executionResult.addOutputFile(
+        'server-initial-stats.json',
+        JSON.stringify(filterMetafile(serverMetafile, filterInitialFiles), null, 2),
+        BuildOutputFileType.Root,
+      );
+    }
   }
 
   if (!jsonLogs && !options.quiet) {

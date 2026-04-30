@@ -278,6 +278,7 @@ export class ComponentStylesheetBundler {
       contents,
       outputFiles,
       metafile,
+      browserMetafile: metafile,
       referencedFiles,
       externalImports: result.externalImports,
       initialFiles: new Map(),

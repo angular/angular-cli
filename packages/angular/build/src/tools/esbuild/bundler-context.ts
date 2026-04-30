@@ -29,6 +29,8 @@ export type BundleContextResult =
       errors: undefined;
       warnings: Message[];
       metafile: Metafile;
+      browserMetafile: Metafile;
+      serverMetafile?: Metafile;
       outputFiles: BuildOutputFile[];
       initialFiles: Map<string, InitialFileRecord>;
       externalImports: {
@@ -128,6 +130,8 @@ export class BundlerContext {
     let errors: Message[] | undefined;
     const warnings: Message[] = [];
     const metafile: Metafile = { inputs: {}, outputs: {} };
+    const browserMetafile: Metafile = { inputs: {}, outputs: {} };
+    let serverMetafile: Metafile | undefined;
     const initialFiles = new Map<string, InitialFileRecord>();
     const externalImportsBrowser = new Set<string>();
     const externalImportsServer = new Set<string>();
@@ -146,6 +150,17 @@ export class BundlerContext {
       if (result.metafile) {
         Object.assign(metafile.inputs, result.metafile.inputs);
         Object.assign(metafile.outputs, result.metafile.outputs);
+      }
+
+      // Keep browser and server metafiles isolated for separate stats output
+      if (result.browserMetafile) {
+        Object.assign(browserMetafile.inputs, result.browserMetafile.inputs);
+        Object.assign(browserMetafile.outputs, result.browserMetafile.outputs);
+      }
+      if (result.serverMetafile) {
+        serverMetafile ??= { inputs: {}, outputs: {} };
+        Object.assign(serverMetafile.inputs, result.serverMetafile.inputs);
+        Object.assign(serverMetafile.outputs, result.serverMetafile.outputs);
       }
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
@@ -170,6 +185,8 @@ export class BundlerContext {
       errors,
       warnings,
       metafile,
+      browserMetafile,
+      serverMetafile,
       initialFiles,
       outputFiles,
       externalImports: {
@@ -414,6 +431,8 @@ export class BundlerContext {
         [isPlatformServer ? 'server' : 'browser']: externalImports,
       },
       externalConfiguration,
+      browserMetafile: isPlatformServer ? { inputs: {}, outputs: {} } : result.metafile,
+      serverMetafile: isPlatformServer ? result.metafile : undefined,
       errors: undefined,
     };
   }

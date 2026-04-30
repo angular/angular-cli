@@ -29,6 +29,36 @@ import {
   PrerenderedRoutesRecord,
 } from './bundler-execution-result';
 
+/**
+ * Filters a metafile to only include outputs matching a predicate,
+ * along with the inputs those outputs directly reference.
+ */
+export function filterMetafile(
+  metafile: Metafile,
+  predicate: (outputPath: string) => boolean,
+): Metafile {
+  const filteredOutputs: Metafile['outputs'] = {};
+  const referencedInputs = new Set<string>();
+
+  for (const [path, output] of Object.entries(metafile.outputs)) {
+    if (predicate(path)) {
+      filteredOutputs[path] = output;
+      for (const inputPath of Object.keys(output.inputs)) {
+        referencedInputs.add(inputPath);
+      }
+    }
+  }
+
+  const filteredInputs: Metafile['inputs'] = {};
+  for (const [inputPath, input] of Object.entries(metafile.inputs)) {
+    if (referencedInputs.has(inputPath)) {
+      filteredInputs[inputPath] = input;
+    }
+  }
+
+  return { inputs: filteredInputs, outputs: filteredOutputs };
+}
+
 export function logBuildStats(
   metafile: Metafile,
   outputFiles: BuildOutputFile[],
