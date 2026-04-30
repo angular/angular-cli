@@ -2,6 +2,6 @@
   "devDependencies": {
     "@types/tar-stream": "3.1.4",
     "@angular-devkit/schematics": "workspace:*",
-    "tar-stream": "3.1.8"
+    "tar-stream": "3.2.0"
   }
 }
