@@ -3,15 +3,15 @@ import { RouterModule } from '@angular/router';<% } %>
 import { App } from './app<%= suffix %>';
 
 describe('App', () => {
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({<% if (routing) { %>
+  beforeEach(() => {
+    TestBed.configureTestingModule({<% if (routing) { %>
       imports: [
         RouterModule.forRoot([])
       ],<% } %>
       declarations: [
         App
       ],
-    }).compileComponents();
+    });
   });
 
   it('should create the app', () => {
