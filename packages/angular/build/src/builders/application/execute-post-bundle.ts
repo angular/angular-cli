@@ -30,6 +30,7 @@ import {
 } from '../../utils/server-rendering/models';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
+import { injectDebugIds } from './inject-debug-ids';
 import { INDEX_HTML_CSR, INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
 import { OutputMode } from './schema';
 
@@ -78,6 +79,14 @@ export async function executePostBundleSteps(
     workspaceRoot,
     partialSSRBuild,
   } = options;
+
+  // Embed ECMA-426 Debug IDs into JS/source-map pairs before any consumer reads the bytes (in
+  // particular `generateIndexHtml` below, which computes SRI hashes from the on-disk content).
+  // Doing this here also covers the i18n path, where this function is invoked once per locale
+  // with locale-specific output files. Files without a source map sibling are skipped.
+  if (sourcemapOptions.scripts) {
+    injectDebugIds(outputFiles);
+  }
 
   // Index HTML content without CSS inlining to be used for server rendering (AppShell, SSG and SSR).
   // NOTE: Critical CSS inlining is deliberately omitted here, as it will be handled during server rendering.
