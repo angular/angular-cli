@@ -51,13 +51,13 @@
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
     "istanbul-lib-instrument": "6.0.3",
-    "jsdom": "29.0.2",
+    "jsdom": "29.1.1",
     "less": "4.6.4",
     "ng-packagr": "22.0.0-next.3",
-    "postcss": "8.5.10",
-    "rolldown": "1.0.0-rc.16",
+    "postcss": "8.5.13",
+    "rolldown": "1.0.0-rc.18",
     "rxjs": "7.8.2",
-    "vitest": "4.1.4"
+    "vitest": "4.1.5"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",

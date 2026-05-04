@@ -30,7 +30,7 @@
     "@modelcontextprotocol/sdk": "1.29.0",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "@yarnpkg/lockfile": "1.1.0",
-    "algoliasearch": "5.50.2",
+    "algoliasearch": "5.52.0",
     "ini": "6.0.0",
     "jsonc-parser": "3.3.1",
     "listr2": "10.2.1",
@@ -39,7 +39,7 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "semver": "7.7.4",
     "yargs": "18.0.0",
-    "zod": "4.3.6"
+    "zod": "4.4.2"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
