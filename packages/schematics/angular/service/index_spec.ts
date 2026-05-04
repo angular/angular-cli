@@ -36,6 +36,7 @@ describe('Service Schematic', () => {
     skipPackageJson: false,
   };
   let appTree: UnitTestTree;
+
   beforeEach(async () => {
     appTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
     appTree = await schematicRunner.runSchematic('application', appOptions, appTree);
@@ -50,12 +51,23 @@ describe('Service Schematic', () => {
     expect(files).toContain('/projects/bar/src/app/foo/foo.ts');
   });
 
-  it('service should be tree-shakeable', async () => {
+  it('should use @Service decorator', async () => {
     const options = { ...defaultOptions };
 
     const tree = await schematicRunner.runSchematic('service', options, appTree);
     const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    expect(content).toMatch(/@Service\(\)/);
+    expect(content).toMatch(/import \{ Service \} from '@angular\/core'/);
+  });
+
+  it('should use @Injectable decorator when injectable flag is true', async () => {
+    const options = { ...defaultOptions, injectable: true };
+
+    const tree = await schematicRunner.runSchematic('service', options, appTree);
+    const content = tree.readContent('/projects/bar/src/app/foo/foo.ts');
+    expect(content).toMatch(/@Injectable\(/);
     expect(content).toMatch(/providedIn: 'root',/);
+    expect(content).toMatch(/import \{ Injectable \} from '@angular\/core'/);
   });
 
   it('should respect the skipTests flag', async () => {
