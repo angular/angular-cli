@@ -213,6 +213,7 @@ export default [
       '@typescript-eslint/prefer-promise-reject-errors': 'off',
       '@typescript-eslint/only-throw-error': 'off',
       '@typescript-eslint/no-unsafe-function-type': 'off',
+      '@typescript-eslint/no-unnecessary-type-assertion': 'off',
     },
   },
   {
