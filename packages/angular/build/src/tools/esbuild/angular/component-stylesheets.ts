@@ -9,12 +9,8 @@
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import {
-  BuildOutputFile,
-  BuildOutputFileType,
-  BundleContextResult,
-  BundlerContext,
-} from '../bundler-context';
+import { BundleContextResult, BundlerContext } from '../bundler-context';
+import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
 import { MemoryCache } from '../cache';
 import {
   BundleStylesheetOptions,

@@ -9,7 +9,7 @@
 import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { ResultFile } from '../builders/application/results';
-import { BuildOutputFileType } from '../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../tools/esbuild/bundler-files';
 import { emitFilesToDisk } from '../tools/esbuild/utils';
 
 /**

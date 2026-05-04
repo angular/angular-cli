@@ -17,17 +17,14 @@ import { coerce } from 'semver';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { OutputMode } from '../../builders/application/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
-import {
-  SERVER_APP_ENGINE_MANIFEST_FILENAME,
-  SERVER_APP_MANIFEST_FILENAME,
-} from '../../utils/server-rendering/manifest';
+
 import { BundleStats, generateEsbuildBuildStatsTable } from '../../utils/stats-table';
-import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
 import {
   BuildOutputAsset,
   ExecutionResult,
   PrerenderedRoutesRecord,
 } from './bundler-execution-result';
+import { type BuildOutputFile, BuildOutputFileType, type InitialFileRecord } from './bundler-files';
 
 /**
  * Filters a metafile to only include outputs matching a predicate,
@@ -263,111 +260,6 @@ export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
   }
 }
 
-export function createOutputFile(
-  path: string,
-  data: string | Uint8Array,
-  type: BuildOutputFileType,
-): BuildOutputFile {
-  if (typeof data === 'string') {
-    let cachedContents: Uint8Array | null = null;
-    let cachedText: string | null = data;
-    let cachedHash: string | null = null;
-
-    return {
-      path,
-      type,
-      get contents(): Uint8Array {
-        cachedContents ??= new TextEncoder().encode(data);
-
-        return cachedContents;
-      },
-      set contents(value: Uint8Array) {
-        cachedContents = value;
-        cachedText = null;
-      },
-      get text(): string {
-        cachedText ??= new TextDecoder('utf-8').decode(this.contents);
-
-        return cachedText;
-      },
-      get size(): number {
-        return this.contents.byteLength;
-      },
-      get hash(): string {
-        cachedHash ??= createHash('sha256')
-          .update(cachedText ?? this.contents)
-          .digest('hex');
-
-        return cachedHash;
-      },
-      clone(): BuildOutputFile {
-        return createOutputFile(this.path, cachedText ?? this.contents, this.type);
-      },
-    };
-  } else {
-    let cachedContents = data;
-    let cachedText: string | null = null;
-    let cachedHash: string | null = null;
-
-    return {
-      get contents(): Uint8Array {
-        return cachedContents;
-      },
-      set contents(value: Uint8Array) {
-        cachedContents = value;
-        cachedText = null;
-      },
-      path,
-      type,
-      get size(): number {
-        return this.contents.byteLength;
-      },
-      get text(): string {
-        cachedText ??= new TextDecoder('utf-8').decode(this.contents);
-
-        return cachedText;
-      },
-      get hash(): string {
-        cachedHash ??= createHash('sha256').update(this.contents).digest('hex');
-
-        return cachedHash;
-      },
-      clone(): BuildOutputFile {
-        return createOutputFile(this.path, this.contents, this.type);
-      },
-    };
-  }
-}
-
-export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile {
-  let { contents: cachedContents } = file;
-  let cachedText: string | null = null;
-
-  return {
-    get contents(): Uint8Array {
-      return cachedContents;
-    },
-    set contents(value: Uint8Array) {
-      cachedContents = value;
-      cachedText = null;
-    },
-    hash: file.hash,
-    path: file.path,
-    type,
-    get size(): number {
-      return this.contents.byteLength;
-    },
-    get text(): string {
-      cachedText ??= new TextDecoder('utf-8').decode(this.contents);
-
-      return cachedText;
-    },
-    clone(): BuildOutputFile {
-      return convertOutputFile(this, this.type);
-    },
-  };
-}
-
 /**
  * Transform browserlists result to esbuild target.
  * @see https://esbuild.github.io/api/#target
@@ -516,17 +408,3 @@ export function getEntryPointName(entryPoint: string): string {
     .replace(/\.[cm]?[jt]s$/, '')
     .replace(/[\\/.]/g, '-');
 }
-
-/**
- * A set of server-generated dependencies that are treated as external.
- *
- * These dependencies are marked as external because they are produced by a
- * separate bundling process and are not included in the primary bundle. This
- * ensures that these generated files are resolved from an external source rather
- * than being part of the main bundle.
- */
-export const SERVER_GENERATED_EXTERNALS = new Set([
-  './polyfills.server.mjs',
-  './' + SERVER_APP_MANIFEST_FILENAME,
-  './' + SERVER_APP_ENGINE_MANIFEST_FILENAME,
-]);

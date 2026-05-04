@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 
 export enum ResultKind {
   Failure,

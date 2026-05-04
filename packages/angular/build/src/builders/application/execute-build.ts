@@ -10,12 +10,9 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { createAngularCompilation } from '../../tools/angular/compilation';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
-import {
-  BuildOutputFileType,
-  BundleContextResult,
-  BundlerContext,
-} from '../../tools/esbuild/bundler-context';
+import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';

@@ -12,8 +12,8 @@ import type { Config, Filesystem } from '@angular/service-worker/config' with {
 import * as crypto from 'node:crypto';
 import { existsSync, promises as fsPromises } from 'node:fs';
 import * as path from 'node:path';
-import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-context';
 import { BuildOutputAsset } from '../tools/esbuild/bundler-execution-result';
+import { BuildOutputFile, BuildOutputFileType } from '../tools/esbuild/bundler-files';
 import { assertIsError } from './error';
 import { toPosixPath } from './path';
 

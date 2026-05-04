@@ -9,11 +9,11 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Metafile } from 'esbuild';
 import { join } from 'node:path';
-import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-context';
 import {
   ExecutionResult,
   PrerenderedRoutesRecord,
 } from '../../tools/esbuild/bundler-execution-result';
+import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-files';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';

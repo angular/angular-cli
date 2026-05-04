@@ -17,6 +17,7 @@ import { toPosixPath } from '../../utils/path';
 import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
   SERVER_APP_MANIFEST_FILENAME,
+  SERVER_GENERATED_EXTERNALS,
 } from '../../utils/server-rendering/manifest';
 import { AngularCompilation, NoopCompilation } from '../angular/compilation';
 import { createCompilerPlugin } from './angular/compiler-plugin';
@@ -32,7 +33,7 @@ import { createLoaderImportAttributePlugin } from './loader-import-attribute-plu
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createServerBundleMetadata } from './server-bundle-metadata-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
-import { SERVER_GENERATED_EXTERNALS, getFeatureSupport, isZonelessApp } from './utils';
+import { getFeatureSupport, isZonelessApp } from './utils';
 import { createVirtualModulePlugin } from './virtual-module-plugin';
 import { createWasmPlugin } from './wasm-plugin';
 

@@ -20,13 +20,13 @@
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
 import { type Plugin, rollup } from 'rollup';
+import { BundleContextResult } from '../../tools/esbuild/bundler-context';
 import {
-  BuildOutputFile,
+  type BuildOutputFile,
   BuildOutputFileType,
-  BundleContextResult,
-  InitialFileRecord,
-} from '../../tools/esbuild/bundler-context';
-import { createOutputFile } from '../../tools/esbuild/utils';
+  type InitialFileRecord,
+  createOutputFile,
+} from '../../tools/esbuild/bundler-files';
 import { useRolldownChunks } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 import { toPosixPath } from '../../utils/path';

@@ -10,9 +10,8 @@ import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { extname, join } from 'node:path';
 import { WorkerPool } from '../../utils/worker-pool';
-import { BuildOutputFile, BuildOutputFileType } from './bundler-context';
+import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import type { LmdbCacheStore } from './lmdb-cache-store';
-import { createOutputFile } from './utils';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.

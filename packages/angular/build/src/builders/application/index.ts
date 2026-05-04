@@ -10,7 +10,7 @@ import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-
 import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';

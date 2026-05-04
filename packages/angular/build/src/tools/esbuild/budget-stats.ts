@@ -8,11 +8,7 @@
 
 import type { Metafile } from 'esbuild';
 import type { BudgetStats } from '../../utils/bundle-calculator';
-import {
-  type BuildOutputFile,
-  BuildOutputFileType,
-  type InitialFileRecord,
-} from './bundler-context';
+import { type BuildOutputFile, BuildOutputFileType, type InitialFileRecord } from './bundler-files';
 import { getChunkNameFromMetafile } from './utils';
 
 /**

@@ -10,7 +10,7 @@ import assert from 'node:assert';
 import path from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
-import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-context';
+import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-files';
 
 /**
  * The maximum number of module preload link elements that should be added for

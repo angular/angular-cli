@@ -11,8 +11,8 @@ import { normalize } from 'node:path';
 import type { ChangedFiles } from '../../tools/esbuild/watcher';
 import type { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import type { SourceFileCache } from './angular/source-file-cache';
-import type { BuildOutputFile, BuildOutputFileType, BundlerContext } from './bundler-context';
-import { createOutputFile } from './utils';
+import type { BundlerContext } from './bundler-context';
+import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 
 export interface BuildOutputAsset {
   source: string;

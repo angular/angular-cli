@@ -8,7 +8,7 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import { createRequire } from 'node:module';
-import { BuildOutputFileType } from '../../tools/esbuild/bundler-context';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { findTests, getTestEntrypoints } from './find-tests';
 import type { NormalizedKarmaBuilderOptions } from './options';

@@ -9,8 +9,8 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
+import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { ChangedFiles } from '../../tools/esbuild/watcher';

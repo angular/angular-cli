@@ -20,8 +20,14 @@ import {
 import assert from 'node:assert';
 import { builtinModules } from 'node:module';
 import { basename, extname, join, relative } from 'node:path';
+import { SERVER_GENERATED_EXTERNALS } from '../../utils/server-rendering/manifest';
+import {
+  type BuildOutputFile,
+  BuildOutputFileType,
+  type InitialFileRecord,
+  convertOutputFile,
+} from './bundler-files';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
-import { SERVER_GENERATED_EXTERNALS, convertOutputFile } from './utils';
 
 export type BundleContextResult =
   | { errors: Message[]; warnings: Message[] }
@@ -39,29 +45,6 @@ export type BundleContextResult =
       };
       externalConfiguration?: string[];
     };
-
-export interface InitialFileRecord {
-  entrypoint: boolean;
-  name?: string;
-  type: 'script' | 'style';
-  external?: boolean;
-  serverFile: boolean;
-  depth: number;
-}
-
-export enum BuildOutputFileType {
-  Browser,
-  Media,
-  ServerApplication,
-  ServerRoot,
-  Root,
-}
-
-export interface BuildOutputFile extends OutputFile {
-  type: BuildOutputFileType;
-  readonly size: number;
-  clone: () => BuildOutputFile;
-}
 
 export type BundlerOptionsFactory<T extends BuildOptions = BuildOptions> = (
   loadCache: LoadResultCache | undefined,

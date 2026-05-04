@@ -8,7 +8,7 @@ import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
 import type { ConfigOptions } from 'karma';
 import type http from 'node:http';
-import { OutputFile } from 'esbuild';
+import type { OutputFile } from 'esbuild';
 import type { Plugin as Plugin_2 } from 'esbuild';
 
 // @public (undocumented)

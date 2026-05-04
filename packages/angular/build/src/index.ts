@@ -8,7 +8,7 @@
 
 export { buildApplication, type ApplicationBuilderOptions } from './builders/application';
 export type { ApplicationBuilderExtensions } from './builders/application/options';
-export { type BuildOutputFile, BuildOutputFileType } from './tools/esbuild/bundler-context';
+export { type BuildOutputFile, BuildOutputFileType } from './tools/esbuild/bundler-files';
 export type { BuildOutputAsset } from './tools/esbuild/bundler-execution-result';
 
 export {

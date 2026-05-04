@@ -9,16 +9,16 @@
 import type { Metafile } from 'esbuild';
 import assert from 'node:assert';
 import {
-  BuildOutputFile,
-  BuildOutputFileType,
-  InitialFileRecord,
-} from '../../tools/esbuild/bundler-context';
-import {
-  BuildOutputAsset,
-  PrerenderedRoutesRecord,
+  type BuildOutputAsset,
+  type PrerenderedRoutesRecord,
 } from '../../tools/esbuild/bundler-execution-result';
+import {
+  type BuildOutputFile,
+  BuildOutputFileType,
+  type InitialFileRecord,
+  createOutputFile,
+} from '../../tools/esbuild/bundler-files';
 import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
-import { createOutputFile } from '../../tools/esbuild/utils';
 import { maxWorkers } from '../../utils/environment-options';
 import {
   SERVER_APP_MANIFEST_FILENAME,
