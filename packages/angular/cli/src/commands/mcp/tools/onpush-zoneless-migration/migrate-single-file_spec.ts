@@ -9,6 +9,7 @@
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
 import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
 import ts from 'typescript';
+import { createMockHost } from '../../testing/test-utils';
 import { migrateSingleFile } from './migrate-single-file';
 
 const fakeExtras = {
@@ -17,11 +18,13 @@ const fakeExtras = {
 } as unknown as RequestHandlerExtra<ServerRequest, ServerNotification>;
 
 describe('migrateSingleFile', () => {
+  const mockHost = createMockHost();
+
   it('should identify test files by extension', async () => {
     const fileName = 'test.spec.ts';
     const sourceFile = ts.createSourceFile(fileName, '', ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result?.content[0].text).toContain(
       'The test file `test.spec.ts` is not yet configured for zoneless change detection.' +
@@ -34,7 +37,7 @@ describe('migrateSingleFile', () => {
     const content = `import { TestBed } from '@angular/core/testing';`;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result?.content[0].text).toContain(
       'The test file `test.ts` is not yet configured for zoneless change detection.' +
@@ -59,7 +62,7 @@ describe('migrateSingleFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result?.content[0].text).toContain(
       'The component uses NgZone APIs that are incompatible with zoneless applications',
@@ -80,7 +83,7 @@ describe('migrateSingleFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result).toBeNull();
   });
@@ -99,7 +102,7 @@ describe('migrateSingleFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result).toBeNull();
   });
@@ -117,7 +120,7 @@ describe('migrateSingleFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result?.content[0].text).toContain(
       'The component does not currently use a change detection strategy, which means it may rely on Zone.js',
@@ -134,7 +137,7 @@ describe('migrateSingleFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result).toBeNull();
   });
@@ -144,7 +147,7 @@ describe('migrateSingleFile', () => {
     const content = ``;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateSingleFile(sourceFile, fakeExtras);
+    const result = await migrateSingleFile(sourceFile, mockHost, fakeExtras);
 
     expect(result).toBeNull();
   });
