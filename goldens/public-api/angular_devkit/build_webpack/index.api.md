@@ -40,14 +40,14 @@ export interface EmittedFiles {
     name?: string;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export function runWebpack(config: webpack.Configuration, context: BuilderContext, options?: {
     logging?: WebpackLoggingCallback;
     webpackFactory?: WebpackFactory;
     shouldProvideStats?: boolean;
 }): Observable<BuildResult>;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export function runWebpackDevServer(config: webpack.Configuration, context: BuilderContext, options?: {
     shouldProvideStats?: boolean;
     devServerConfig?: WebpackDevServer.Configuration;
