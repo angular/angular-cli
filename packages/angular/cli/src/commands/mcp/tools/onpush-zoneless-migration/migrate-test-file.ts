@@ -6,19 +6,21 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { existsSync, readFileSync } from 'node:fs';
-import { glob } from 'node:fs/promises';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import type { SourceFile } from 'typescript';
+import { type Host } from '../../host';
 import { findAngularJsonDir } from '../../workspace-utils';
 import { createFixResponseForZoneTests, createProvideZonelessForTestsSetupPrompt } from './prompts';
 import { loadTypescript } from './ts-utils';
 import { MigrationResponse } from './types';
 
-export async function migrateTestFile(sourceFile: SourceFile): Promise<MigrationResponse | null> {
+export async function migrateTestFile(
+  sourceFile: SourceFile,
+  host: Host,
+): Promise<MigrationResponse | null> {
   const ts = await loadTypescript();
   // Check if tests use zoneless either by default through `initTestEnvironment` or by explicitly calling `provideZonelessChangeDetection`.
-  let testsUseZonelessChangeDetection = await searchForGlobalZoneless(sourceFile.fileName);
+  let testsUseZonelessChangeDetection = await searchForGlobalZoneless(sourceFile.fileName, host);
   if (!testsUseZonelessChangeDetection) {
     ts.forEachChild(sourceFile, function visit(node) {
       if (
@@ -42,8 +44,8 @@ export async function migrateTestFile(sourceFile: SourceFile): Promise<Migration
   return createFixResponseForZoneTests(sourceFile);
 }
 
-export async function searchForGlobalZoneless(startPath: string): Promise<boolean> {
-  const angularJsonDir = findAngularJsonDir(startPath);
+export async function searchForGlobalZoneless(startPath: string, host: Host): Promise<boolean> {
+  const angularJsonDir = findAngularJsonDir(startPath, host);
   if (!angularJsonDir) {
     // Cannot determine project root, fallback to original behavior or assume false.
     // For now, let's assume no global setup if angular.json is not found.
@@ -51,9 +53,10 @@ export async function searchForGlobalZoneless(startPath: string): Promise<boolea
   }
 
   try {
-    const files = glob(`${angularJsonDir}/**/*.ts`);
+    const files = host.glob('**/*.ts', { cwd: angularJsonDir });
     for await (const file of files) {
-      const content = readFileSync(file, 'utf-8');
+      const fullPath = join(file.parentPath, file.name);
+      const content = await host.readFile(fullPath, 'utf-8');
       if (
         content.includes('initTestEnvironment') &&
         content.includes('provideZonelessChangeDetection')

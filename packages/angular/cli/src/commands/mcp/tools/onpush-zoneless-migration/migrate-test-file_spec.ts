@@ -7,14 +7,16 @@
  */
 
 import ts from 'typescript';
+import { createMockHost } from '../../testing/test-utils';
 import { migrateTestFile } from './migrate-test-file';
 
 describe('migrateTestFile', () => {
+  const mockHost = createMockHost();
   it('should return setup prompt when zoneless is not detected', async () => {
     const fileName = 'test.spec.ts';
     const sourceFile = ts.createSourceFile(fileName, '', ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateTestFile(sourceFile);
+    const result = await migrateTestFile(sourceFile, mockHost);
 
     expect(result?.content[0].text).toContain(
       'The test file `test.spec.ts` is not yet configured for zoneless change detection.',
@@ -33,7 +35,7 @@ describe('migrateTestFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateTestFile(sourceFile);
+    const result = await migrateTestFile(sourceFile, mockHost);
 
     expect(result).toBeNull();
   });
@@ -60,7 +62,7 @@ describe('migrateTestFile', () => {
     `;
     const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ESNext, true);
 
-    const result = await migrateTestFile(sourceFile);
+    const result = await migrateTestFile(sourceFile, mockHost);
 
     expect(result?.content[0].text).toContain(
       'You must refactor these tests to work in a zoneless environment and remove the `provideZoneChangeDetection` calls.',
