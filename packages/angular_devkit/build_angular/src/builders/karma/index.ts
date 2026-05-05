@@ -39,6 +39,11 @@ export async function* execute(
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
   } = {},
 ): AsyncIterable<BuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:karma" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:karma" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   // Check Angular version.
   assertCompatibleAngularVersion(context.workspaceRoot);
 

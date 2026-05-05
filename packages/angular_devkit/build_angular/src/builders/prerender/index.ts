@@ -278,6 +278,11 @@ export async function execute(
   options: PrerenderBuilderOptions,
   context: BuilderContext,
 ): Promise<PrerenderBuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:prerender" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   const browserTarget = targetFromTargetString(options.browserTarget);
   const browserOptions = (await context.getTargetOptions(
     browserTarget,

@@ -63,6 +63,11 @@ export function execute(
   options: SSRDevServerBuilderOptions,
   context: BuilderContext,
 ): Observable<SSRDevServerBuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:ssr-dev-server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:ssr-dev-server" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   let browserSync: typeof import('browser-sync');
   try {
     browserSync = createRequire(context.workspaceRoot + '/')('browser-sync');

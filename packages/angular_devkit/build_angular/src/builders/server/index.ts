@@ -66,6 +66,11 @@ export function execute(
 ): Observable<ServerBuilderOutput> {
   const root = context.workspaceRoot;
 
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   // Check Angular version.
   assertCompatibleAngularVersion(root);
 
