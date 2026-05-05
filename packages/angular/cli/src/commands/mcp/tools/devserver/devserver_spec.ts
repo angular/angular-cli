@@ -39,7 +39,7 @@ describe('Serve Tools', () => {
     mockContext = mock.context;
 
     // Customize host spies
-    mockHost.spawn.and.returnValue(mockProcess as unknown as ChildProcess);
+    mockHost.startNgProcess.and.returnValue(mockProcess as unknown as ChildProcess);
     mockHost.getAvailablePort.and.callFake(() => Promise.resolve(portCounter++));
 
     // Setup default project
@@ -52,7 +52,7 @@ describe('Serve Tools', () => {
     expect(startResult.structuredContent.message).toBe(
       `Development server for project 'my-app' started and watching for workspace changes.`,
     );
-    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'my-app', '--port=12345'], {
+    expect(mockHost.startNgProcess).toHaveBeenCalledWith(['serve', 'my-app', '--port=12345'], {
       stdio: 'pipe',
       cwd: '/test',
     });
@@ -69,7 +69,7 @@ describe('Serve Tools', () => {
     expect(startResult.structuredContent.message).toBe(
       `Development server for project 'my-app' started and watching for workspace changes.`,
     );
-    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'my-app', '--port=54321'], {
+    expect(mockHost.startNgProcess).toHaveBeenCalledWith(['serve', 'my-app', '--port=54321'], {
       stdio: 'pipe',
       cwd: '/test',
     });
@@ -125,17 +125,17 @@ describe('Serve Tools', () => {
 
     // Start server for project 2, returning a new mock process.
     const process2 = new MockChildProcess();
-    mockHost.spawn.and.returnValue(process2 as unknown as ChildProcess);
+    mockHost.startNgProcess.and.returnValue(process2 as unknown as ChildProcess);
     const startResult2 = await startDevserver({ project: 'app-two' }, mockContext);
     expect(startResult2.structuredContent.message).toBe(
       `Development server for project 'app-two' started and watching for workspace changes.`,
     );
 
-    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'app-one', '--port=12345'], {
+    expect(mockHost.startNgProcess).toHaveBeenCalledWith(['serve', 'app-one', '--port=12345'], {
       stdio: 'pipe',
       cwd: '/test',
     });
-    expect(mockHost.spawn).toHaveBeenCalledWith('ng', ['serve', 'app-two', '--port=12346'], {
+    expect(mockHost.startNgProcess).toHaveBeenCalledWith(['serve', 'app-two', '--port=12346'], {
       stdio: 'pipe',
       cwd: '/test',
     });

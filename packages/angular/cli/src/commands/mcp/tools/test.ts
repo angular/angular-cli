@@ -65,7 +65,7 @@ export async function runTest(input: TestToolInput, context: McpToolContext) {
   let logs: string[];
 
   try {
-    logs = (await context.host.runCommand('ng', args, { cwd: workspacePath })).logs;
+    logs = (await context.host.executeNgCommand(args, { cwd: workspacePath })).logs;
   } catch (e) {
     status = 'failure';
     logs = getCommandErrorLogs(e);

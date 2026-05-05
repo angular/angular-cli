@@ -62,7 +62,7 @@ export async function runE2e(input: E2eToolInput, host: Host, context: McpToolCo
   let logs: string[];
 
   try {
-    logs = (await host.runCommand('ng', args, { cwd: workspacePath })).logs;
+    logs = (await host.executeNgCommand(args, { cwd: workspacePath })).logs;
   } catch (e) {
     status = 'failure';
     logs = getCommandErrorLogs(e);

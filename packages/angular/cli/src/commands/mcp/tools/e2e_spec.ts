@@ -33,14 +33,14 @@ describe('E2E Tool', () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
 
     await runE2e({}, mockHost, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith('ng', ['e2e', 'my-app'], { cwd: '/test' });
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(['e2e', 'my-app'], { cwd: '/test' });
   });
 
   it('should construct the command correctly with a specified project', async () => {
     addProjectToWorkspace(mockProjects, 'my-app', { e2e: { builder: 'mock-builder' } });
 
     await runE2e({ project: 'my-app' }, mockHost, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith('ng', ['e2e', 'my-app'], { cwd: '/test' });
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(['e2e', 'my-app'], { cwd: '/test' });
   });
 
   it('should error if project does not have e2e target', async () => {
@@ -50,7 +50,7 @@ describe('E2E Tool', () => {
 
     expect(structuredContent.status).toBe('failure');
     expect(structuredContent.logs?.[0]).toContain("No e2e target is defined for project 'my-app'");
-    expect(mockHost.runCommand).not.toHaveBeenCalled();
+    expect(mockHost.executeNgCommand).not.toHaveBeenCalled();
   });
 
   it('should error if no project was specified and the default project does not have e2e target', async () => {
@@ -61,32 +61,32 @@ describe('E2E Tool', () => {
 
     expect(structuredContent.status).toBe('failure');
     expect(structuredContent.logs?.[0]).toContain("No e2e target is defined for project 'my-app'");
-    expect(mockHost.runCommand).not.toHaveBeenCalled();
+    expect(mockHost.executeNgCommand).not.toHaveBeenCalled();
   });
 
   it('should handle a successful e2e run with a specified project', async () => {
     addProjectToWorkspace(mockProjects, 'my-app', { e2e: { builder: 'mock-builder' } });
     const e2eLogs = ['E2E passed for my-app'];
-    mockHost.runCommand.and.resolveTo({ logs: e2eLogs });
+    mockHost.executeNgCommand.and.resolveTo({ logs: e2eLogs });
 
     const { structuredContent } = await runE2e({ project: 'my-app' }, mockHost, mockContext);
 
     expect(structuredContent.status).toBe('success');
     expect(structuredContent.logs).toEqual(e2eLogs);
-    expect(mockHost.runCommand).toHaveBeenCalledWith('ng', ['e2e', 'my-app'], { cwd: '/test' });
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(['e2e', 'my-app'], { cwd: '/test' });
   });
 
   it('should handle a successful e2e run with the default project', async () => {
     mockContext.workspace.extensions['defaultProject'] = 'default-app';
     addProjectToWorkspace(mockProjects, 'default-app', { e2e: { builder: 'mock-builder' } });
     const e2eLogs = ['E2E passed for default-app'];
-    mockHost.runCommand.and.resolveTo({ logs: e2eLogs });
+    mockHost.executeNgCommand.and.resolveTo({ logs: e2eLogs });
 
     const { structuredContent } = await runE2e({}, mockHost, mockContext);
 
     expect(structuredContent.status).toBe('success');
     expect(structuredContent.logs).toEqual(e2eLogs);
-    expect(mockHost.runCommand).toHaveBeenCalledWith('ng', ['e2e', 'default-app'], {
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(['e2e', 'default-app'], {
       cwd: '/test',
     });
   });
@@ -94,7 +94,7 @@ describe('E2E Tool', () => {
   it('should handle a failed e2e run', async () => {
     addProjectToWorkspace(mockProjects, 'my-app', { e2e: { builder: 'mock-builder' } });
     const e2eLogs = ['E2E failed'];
-    mockHost.runCommand.and.rejectWith(new CommandError('Failed', e2eLogs, 1));
+    mockHost.executeNgCommand.and.rejectWith(new CommandError('Failed', e2eLogs, 1));
 
     const { structuredContent } = await runE2e({ project: 'my-app' }, mockHost, mockContext);
 
