@@ -39,8 +39,16 @@ import { createAotTransformers, createJitTransformers, mergeTransformers } from 
  */
 const DIAGNOSTICS_AFFECTED_THRESHOLD = 1;
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation.
+ * Deprecated since v22.
+ */
 export const imageDomains: Set<string> = new Set();
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation.
+ * Deprecated since v22.
+ */
 export interface AngularWebpackPluginOptions {
   tsconfig: string;
   compilerOptions?: CompilerOptions;
@@ -71,6 +79,10 @@ interface FileEmitHistoryItem {
   hash: Uint8Array;
 }
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation.
+ * Deprecated since v22.
+ */
 export class AngularWebpackPlugin {
   private readonly pluginOptions: AngularWebpackPluginOptions;
   private compilerCliModule?: typeof import('@angular/compiler-cli');

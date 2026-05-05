@@ -16,6 +16,10 @@ type SourceMap = NonNullable<
 
 const JS_FILE_REGEXP = /\.[cm]?js$/;
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation.
+ * Deprecated since v22.
+ */
 export function angularWebpackLoader(
   this: LoaderContext<unknown>,
   content: string,

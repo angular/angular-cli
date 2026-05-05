@@ -9,4 +9,8 @@
 export { angularWebpackLoader as default } from './loader';
 export { type AngularWebpackPluginOptions, AngularWebpackPlugin, imageDomains } from './plugin';
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation.
+ * Deprecated since v22.
+ */
 export const AngularWebpackLoaderPath: string = __filename;
