@@ -22,6 +22,11 @@ export function execute(
   options: NgPackagrBuilderOptions,
   context: BuilderContext,
 ): Observable<BuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:ng-packagr" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:ng-packagr" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   return from(
     (async () => {
       // Purge old build disk cache.

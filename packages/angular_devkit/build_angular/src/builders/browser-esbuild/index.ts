@@ -30,6 +30,11 @@ export async function* buildEsbuildBrowser(
   },
   plugins?: Plugin[],
 ): AsyncIterable<BuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:browser-esbuild" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:application" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   // Warn about any unsupported options
   if (userOptions['vendorChunk']) {
     context.logger.warn(

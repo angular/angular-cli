@@ -57,6 +57,11 @@ export function execute(
     return EMPTY;
   }
 
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:dev-server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:dev-server" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
   return defer(() => initialize(options, projectName, context, extensions?.builderSelector)).pipe(
     switchMap(({ builderName, normalizedOptions }) => {
       // Use vite-based development server for esbuild-based builds
