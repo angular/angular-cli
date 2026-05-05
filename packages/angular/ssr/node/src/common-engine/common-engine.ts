@@ -24,6 +24,10 @@ import {
 
 const SSG_MARKER_REGEXP = /ng-server-context=["']\w*\|?ssg\|?\w*["']/;
 
+/**
+ * @deprecated Use `AngularNodeAppEngine` or `AngularAppEngine` instead.
+ * Deprecated since v22.
+ */
 export interface CommonEngineOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
@@ -38,6 +42,10 @@ export interface CommonEngineOptions {
   allowedHosts?: readonly string[];
 }
 
+/**
+ * @deprecated Use `AngularNodeAppEngine` or `AngularAppEngine` instead.
+ * Deprecated since v22.
+ */
 export interface CommonEngineRenderOptions {
   /** A method that when invoked returns a promise that returns an `ApplicationRef` instance once resolved or an NgModule. */
   bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
@@ -63,8 +71,10 @@ export interface CommonEngineRenderOptions {
 
 /**
  * A common engine to use to server render an application.
+ *
+ * @deprecated Use `AngularNodeAppEngine` or `AngularAppEngine` instead.
+ * Deprecated since v22.
  */
-
 export class CommonEngine {
   private readonly templateCache = new Map<string, string>();
   private readonly inlineCriticalCssProcessor = new CommonEngineInlineCriticalCssProcessor();
