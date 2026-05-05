@@ -107,13 +107,30 @@ function _transformFakeAsyncCall(
     `Transformed \`fakeAsync\` to \`vi.useFakeTimers\`.`,
   );
 
+  let statements = callbackBody.statements;
+
+  // Append `vi.runOnlyPendingTimersAsync()` as the last statement of `beforeEach` to mimic flush behavior.
+  if (
+    ts.isCallExpression(node.parent) &&
+    ts.isIdentifier(node.parent.expression) &&
+    node.parent.expression.text === 'beforeEach' &&
+    !_isFakeAsyncFlushDisabled(node)
+  ) {
+    statements = ts.factory.createNodeArray([
+      ...statements,
+      ts.factory.createExpressionStatement(
+        ts.factory.createAwaitExpression(createViCallExpression(ctx, 'runOnlyPendingTimersAsync')),
+      ),
+    ]);
+  }
+
   return ts.factory.createArrowFunction(
     [ts.factory.createModifier(ts.SyntaxKind.AsyncKeyword)],
     fakeAsyncCallback.typeParameters,
     fakeAsyncCallback.parameters,
     undefined,
     ts.factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
-    ts.factory.createBlock(callbackBody.statements),
+    ts.factory.createBlock(statements),
   );
 }
 
@@ -175,6 +192,25 @@ function _createFakeTimersHookStatements(ctx: RefactorContext): ts.Statement[] {
       ]),
     ),
   ];
+}
+
+/**
+ * Detects if the `flush` option is set to false in the `fakeAsync` call expression.
+ * e.g. `fakeAsync(() => { ... }, { flush: false })`
+ */
+function _isFakeAsyncFlushDisabled(fakeAsyncCallExpression: ts.CallExpression): boolean {
+  const options = fakeAsyncCallExpression.arguments[1];
+
+  return (
+    options &&
+    ts.isObjectLiteralExpression(options) &&
+    options.properties.some(
+      (property) =>
+        ts.isPropertyAssignment(property) &&
+        property.name.getText() === 'flush' &&
+        property.initializer.getText() === 'false',
+    )
+  );
 }
 
 interface CurrentOutermostDescribeContext {
