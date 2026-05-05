@@ -240,11 +240,49 @@ describe('Validation Utils', () => {
 
     it('should allow accessing other headers without validation', () => {
       const req = new Request('http://example.com', {
-        headers: { 'accept': 'application/json' },
+        headers: { 'accept': 'text/html, application/json' },
       });
       const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
 
-      expect(secured.headers.get('accept')).toBe('application/json');
+      expect(secured.headers.get('accept')).toBe('text/html, application/json');
+    });
+
+    it('should return the validated host header token when accessed via get()', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          host: 'example.com,@127.0.0.1:8765',
+          'x-forwarded-host': 'sub.valid.com,@127.0.0.1:8765',
+        },
+      });
+      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.get('x-forwarded-host')).toBe('sub.valid.com');
+    });
+
+    it('should return validated host header tokens when iterating headers', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          accept: 'text/html, application/json',
+          host: 'example.com,@127.0.0.1:8765',
+          'x-forwarded-host': 'sub.valid.com,@127.0.0.1:8765',
+        },
+      });
+      const { request: secured } = cloneRequestAndPatchHeaders(req, allowedHosts);
+
+      expect([...secured.headers.entries()]).toContain(['host', 'example.com']);
+      expect([...secured.headers.entries()]).toContain(['x-forwarded-host', 'sub.valid.com']);
+      expect([...secured.headers.values()]).toContain('example.com');
+      expect([...secured.headers.values()]).toContain('sub.valid.com');
+      expect([...secured.headers]).toContain(['host', 'example.com']);
+      expect([...secured.headers]).toContain(['x-forwarded-host', 'sub.valid.com']);
+
+      const forEachValues = new Map<string, string>();
+      secured.headers.forEach((value, key) => forEachValues.set(key, value));
+
+      expect(forEachValues.get('accept')).toBe('text/html, application/json');
+      expect(forEachValues.get('host')).toBe('example.com');
+      expect(forEachValues.get('x-forwarded-host')).toBe('sub.valid.com');
     });
 
     it('should validate headers when iterating with entries()', async () => {

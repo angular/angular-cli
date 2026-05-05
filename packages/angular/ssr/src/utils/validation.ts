@@ -98,8 +98,16 @@ export function cloneRequestAndPatchHeaders(
   });
 
   const headers = clonedReq.headers;
-
   const originalGet = headers.get;
+
+  for (const name of HOST_HEADERS_TO_VALIDATE) {
+    const value = originalGet.call(headers, name);
+    const normalizedValue = getFirstHeaderValue(value);
+    if (normalizedValue !== undefined && normalizedValue !== value) {
+      headers.set(name, normalizedValue);
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
   (headers.get as typeof originalGet) = function (name) {
     const value = originalGet.call(headers, name);
