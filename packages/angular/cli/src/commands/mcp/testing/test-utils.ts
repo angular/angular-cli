@@ -20,10 +20,12 @@ import { MockHost } from './mock-host';
  */
 export function createMockHost(): MockHost {
   return {
-    runCommand: jasmine.createSpy<Host['runCommand']>('runCommand').and.resolveTo({ logs: [] }),
+    executeNgCommand: jasmine
+      .createSpy<Host['executeNgCommand']>('executeNgCommand')
+      .and.resolveTo({ logs: [] }),
     stat: jasmine.createSpy<Host['stat']>('stat'),
     existsSync: jasmine.createSpy<Host['existsSync']>('existsSync'),
-    spawn: jasmine.createSpy<Host['spawn']>('spawn'),
+    startNgProcess: jasmine.createSpy<Host['startNgProcess']>('startNgProcess'),
     getAvailablePort: jasmine
       .createSpy<Host['getAvailablePort']>('getAvailablePort')
       .and.resolveTo(0),

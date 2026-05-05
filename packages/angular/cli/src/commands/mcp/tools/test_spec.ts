@@ -29,8 +29,7 @@ describe('Test Tool', () => {
   it('should construct the command correctly with defaults', async () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runTest({}, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['test', 'my-app', '--browsers', 'ChromeHeadless', '--watch', 'false'],
       { cwd: '/test' },
     );
@@ -39,8 +38,7 @@ describe('Test Tool', () => {
   it('should construct the command correctly with a specified project', async () => {
     addProjectToWorkspace(mockContext.workspace.projects, 'my-lib');
     await runTest({ project: 'my-lib' }, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['test', 'my-lib', '--browsers', 'ChromeHeadless', '--watch', 'false'],
       { cwd: '/test' },
     );
@@ -49,8 +47,7 @@ describe('Test Tool', () => {
   it('should construct the command correctly with filter', async () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runTest({ filter: 'AppComponent' }, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       [
         'test',
         'my-app',
@@ -67,14 +64,13 @@ describe('Test Tool', () => {
 
   it('should handle a successful test run and capture logs', async () => {
     const testLogs = ['Executed 10 of 10 SUCCESS', 'Total: 10 success'];
-    mockHost.runCommand.and.resolveTo({
+    mockHost.executeNgCommand.and.resolveTo({
       logs: testLogs,
     });
 
     const { structuredContent } = await runTest({ project: 'my-app' }, mockContext);
 
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['test', 'my-app', '--browsers', 'ChromeHeadless', '--watch', 'false'],
       { cwd: '/test' },
     );
@@ -86,7 +82,7 @@ describe('Test Tool', () => {
     addProjectToWorkspace(mockContext.workspace.projects, 'my-failed-app');
     const testLogs = ['Executed 10 of 10 FAILED', 'Error: Some test failed'];
     const error = new CommandError('Test failed', testLogs, 1);
-    mockHost.runCommand.and.rejectWith(error);
+    mockHost.executeNgCommand.and.rejectWith(error);
 
     const { structuredContent } = await runTest({ project: 'my-failed-app' }, mockContext);
 
@@ -106,8 +102,7 @@ describe('Test Tool', () => {
 
     await runTest({ project: 'my-vitest-app' }, mockContext);
 
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['test', 'my-vitest-app', '--headless', 'true', '--watch', 'false'],
       { cwd: '/test' },
     );
@@ -123,8 +118,7 @@ describe('Test Tool', () => {
 
     await runTest({ project: 'my-default-vitest-app' }, mockContext);
 
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['test', 'my-default-vitest-app', '--headless', 'true', '--watch', 'false'],
       { cwd: '/test' },
     );
