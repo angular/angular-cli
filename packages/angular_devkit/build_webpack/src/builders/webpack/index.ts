@@ -29,6 +29,10 @@ export type BuildResult = BuilderOutput & {
   outputPath: string;
 };
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation. Use `@angular/build` APIs instead.
+ * Deprecated since v22.
+ */
 export function runWebpack(
   config: webpack.Configuration,
   context: BuilderContext,
@@ -125,6 +129,11 @@ export function runWebpack(
 
 const builder: Builder<WebpackBuilderSchema> = createBuilder<WebpackBuilderSchema>(
   (options, context) => {
+    context.logger.warn(
+      'The "@angular-devkit/build-webpack:webpack" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+        'Use "@angular/build" instead.',
+    );
+
     const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
     return from(getWebpackConfig(configPath)).pipe(

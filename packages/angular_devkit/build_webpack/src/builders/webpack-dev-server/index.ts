@@ -24,6 +24,10 @@ export type DevServerBuildOutput = BuildResult & {
   address: string;
 };
 
+/**
+ * @deprecated Part of Angular's Webpack support deprecation. Use `@angular/build` APIs instead.
+ * Deprecated since v22.
+ */
 export function runWebpackDevServer(
   config: webpack.Configuration,
   context: BuilderContext,
@@ -136,6 +140,11 @@ const builder: Builder<WebpackDevServerBuilderSchema> = createBuilder<
   WebpackDevServerBuilderSchema,
   DevServerBuildOutput
 >((options, context) => {
+  context.logger.warn(
+    'The "@angular-devkit/build-webpack:webpack-dev-server" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build" instead.',
+  );
+
   const configPath = pathResolve(context.workspaceRoot, options.webpackConfig);
 
   return from(getWebpackConfig(configPath)).pipe(
