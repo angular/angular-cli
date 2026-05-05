@@ -119,14 +119,14 @@ function _transformFakeAsyncCall(
 
 function _createFakeTimersHookStatements(ctx: RefactorContext): ts.Statement[] {
   return [
-    // > beforeAll(() => {
+    // > beforeEach(() => {
     // >   vi.useFakeTimers({
     // >     advanceTimeDelta: 1,
     // >     shouldAdvanceTime: true
     // >   });
     // > });
     ts.factory.createExpressionStatement(
-      ts.factory.createCallExpression(ts.factory.createIdentifier('beforeAll'), undefined, [
+      ts.factory.createCallExpression(ts.factory.createIdentifier('beforeEach'), undefined, [
         ts.factory.createArrowFunction(
           undefined,
           undefined,
@@ -156,11 +156,11 @@ function _createFakeTimersHookStatements(ctx: RefactorContext): ts.Statement[] {
       ]),
     ),
 
-    // > afterAll(() => {
+    // > afterEach(() => {
     // >   vi.useRealTimers();
     // > });
     ts.factory.createExpressionStatement(
-      ts.factory.createCallExpression(ts.factory.createIdentifier('afterAll'), undefined, [
+      ts.factory.createCallExpression(ts.factory.createIdentifier('afterEach'), undefined, [
         ts.factory.createArrowFunction(
           undefined,
           undefined,
