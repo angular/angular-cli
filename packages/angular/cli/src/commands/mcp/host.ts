@@ -58,7 +58,7 @@ export interface Host {
    * @param encoding The encoding to use.
    * @returns A promise that resolves to the file content.
    */
-  readFile(path: string, encoding: 'utf-8'): Promise<string>;
+  readFile(path: string, encoding: BufferEncoding): Promise<string>;
 
   /**
    * Finds files matching a glob pattern.
@@ -348,7 +348,7 @@ export function createRootRestrictedHost(
 
       return baseHost.existsSync(path);
     },
-    readFile(path: string, encoding: 'utf-8') {
+    readFile(path: string, encoding: BufferEncoding) {
       checkPath(path);
 
       return baseHost.readFile(path, encoding);
