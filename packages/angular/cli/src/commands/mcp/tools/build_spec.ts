@@ -29,8 +29,7 @@ describe('Build Tool', () => {
   it('should construct the command correctly with default configuration', async () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runBuild({}, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['build', 'my-app', '-c', 'development'],
       { cwd: '/test' },
     );
@@ -39,8 +38,7 @@ describe('Build Tool', () => {
   it('should construct the command correctly with a specified project', async () => {
     addProjectToWorkspace(mockContext.workspace.projects, 'another-app');
     await runBuild({ project: 'another-app' }, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['build', 'another-app', '-c', 'development'],
       { cwd: '/test' },
     );
@@ -49,7 +47,7 @@ describe('Build Tool', () => {
   it('should construct the command correctly for a custom configuration', async () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runBuild({ configuration: 'myconfig' }, mockContext);
-    expect(mockHost.runCommand).toHaveBeenCalledWith('ng', ['build', 'my-app', '-c', 'myconfig'], {
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(['build', 'my-app', '-c', 'myconfig'], {
       cwd: '/test',
     });
   });
@@ -61,14 +59,13 @@ describe('Build Tool', () => {
       'some warning',
       'Output location: dist/my-app',
     ];
-    mockHost.runCommand.and.resolveTo({
+    mockHost.executeNgCommand.and.resolveTo({
       logs: buildLogs,
     });
 
     const { structuredContent } = await runBuild({ project: 'my-app' }, mockContext);
 
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['build', 'my-app', '-c', 'development'],
       { cwd: '/test' },
     );
@@ -81,15 +78,14 @@ describe('Build Tool', () => {
     addProjectToWorkspace(mockContext.workspace.projects, 'my-failed-app');
     const buildLogs = ['Some output before the crash.', 'Error: Something went wrong!'];
     const error = new CommandError('Build failed', buildLogs, 1);
-    mockHost.runCommand.and.rejectWith(error);
+    mockHost.executeNgCommand.and.rejectWith(error);
 
     const { structuredContent } = await runBuild(
       { project: 'my-failed-app', configuration: 'production' },
       mockContext,
     );
 
-    expect(mockHost.runCommand).toHaveBeenCalledWith(
-      'ng',
+    expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
       ['build', 'my-failed-app', '-c', 'production'],
       { cwd: '/test' },
     );
@@ -100,7 +96,7 @@ describe('Build Tool', () => {
 
   it('should handle builds where the output path is not found in logs', async () => {
     const buildLogs = ["Some logs that don't match any output path."];
-    mockHost.runCommand.and.resolveTo({ logs: buildLogs });
+    mockHost.executeNgCommand.and.resolveTo({ logs: buildLogs });
 
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     const { structuredContent } = await runBuild({}, mockContext);

@@ -76,13 +76,11 @@ export interface Host {
   /**
    * Spawns a child process and returns a promise that resolves with the process's
    * output or rejects with a structured error.
-   * @param command The command to run.
    * @param args The arguments to pass to the command.
    * @param options Options for the child process.
    * @returns A promise that resolves with the standard output and standard error of the command.
    */
-  runCommand(
-    command: string,
+  executeNgCommand(
     args: readonly string[],
     options?: {
       timeout?: number;
@@ -94,13 +92,11 @@ export interface Host {
 
   /**
    * Spawns a long-running child process and returns the `ChildProcess` object.
-   * @param command The command to run.
    * @param args The arguments to pass to the command.
    * @param options Options for the child process.
    * @returns The spawned `ChildProcess` instance.
    */
-  spawn(
-    command: string,
+  startNgProcess(
     args: readonly string[],
     options?: {
       stdio?: 'pipe' | 'ignore';
@@ -125,13 +121,13 @@ export interface Host {
   setRoots(roots: string[]): void;
 }
 
-function resolveCommand(
-  command: string,
+function resolveNgCommand(
   args: readonly string[],
   cwd?: string,
 ): { command: string; args: readonly string[] } {
-  if (command !== 'ng' || !cwd) {
-    return { command, args };
+  const defaultCommand = { command: 'ng', args };
+  if (!cwd) {
+    return defaultCommand;
   }
 
   try {
@@ -152,7 +148,7 @@ function resolveCommand(
     // Failed to resolve the CLI binary, fall back to assuming `ng` is on PATH.
   }
 
-  return { command, args };
+  return defaultCommand;
 }
 
 /**
@@ -172,8 +168,7 @@ export const LocalWorkspaceHost: Host = {
     return nodeGlob(pattern, { ...options, withFileTypes: true });
   },
 
-  runCommand: async (
-    command: string,
+  executeNgCommand: async (
     args: readonly string[],
     options: {
       timeout?: number;
@@ -182,7 +177,7 @@ export const LocalWorkspaceHost: Host = {
       env?: Record<string, string>;
     } = {},
   ): Promise<{ logs: string[] }> => {
-    const resolved = resolveCommand(command, args, options.cwd);
+    const resolved = resolveNgCommand(args, options.cwd);
     const signal = options.timeout ? AbortSignal.timeout(options.timeout) : undefined;
 
     return new Promise((resolve, reject) => {
@@ -223,8 +218,7 @@ export const LocalWorkspaceHost: Host = {
     });
   },
 
-  spawn(
-    command: string,
+  startNgProcess(
     args: readonly string[],
     options: {
       stdio?: 'pipe' | 'ignore';
@@ -232,7 +226,7 @@ export const LocalWorkspaceHost: Host = {
       env?: Record<string, string>;
     } = {},
   ): ChildProcess {
-    const resolved = resolveCommand(command, args, options.cwd);
+    const resolved = resolveNgCommand(args, options.cwd);
 
     return spawn(resolved.command, resolved.args, {
       shell: false,
@@ -372,23 +366,20 @@ export function createRootRestrictedHost(
 
       return baseHost.glob(pattern, options);
     },
-    runCommand(command: string, args: readonly string[], options: { cwd?: string } = {}) {
-      const effectiveCwd = options.cwd ?? process.cwd();
+    executeNgCommand(
+      args: readonly string[],
+      options: Parameters<Host['executeNgCommand']>[1] = {},
+    ) {
+      const effectiveCwd = options?.cwd ?? process.cwd();
       checkPath(effectiveCwd);
-      if (command.includes('/') || command.includes('\\')) {
-        checkPath(resolve(effectiveCwd, command));
-      }
 
-      return baseHost.runCommand(command, args, options);
+      return baseHost.executeNgCommand(args, options);
     },
-    spawn(command: string, args: readonly string[], options: { cwd?: string } = {}) {
-      const effectiveCwd = options.cwd ?? process.cwd();
+    startNgProcess(args: readonly string[], options: Parameters<Host['startNgProcess']>[1] = {}) {
+      const effectiveCwd = options?.cwd ?? process.cwd();
       checkPath(effectiveCwd);
-      if (command.includes('/') || command.includes('\\')) {
-        checkPath(resolve(effectiveCwd, command));
-      }
 
-      return baseHost.spawn(command, args, options);
+      return baseHost.startNgProcess(args, options);
     },
   };
 }
