@@ -8,7 +8,25 @@ import { releasePackages } from '../scripts/packages.mts';
  */
 export const release = {
   representativeNpmPackage: '@angular/cli',
-  npmPackages: releasePackages.map(({ name, experimental }) => ({ name, experimental })),
+  npmPackages: releasePackages.map(({ name, experimental }) => {
+    if (
+      name === '@angular-devkit/build-angular' ||
+      name === '@angular-devkit/build-webpack' ||
+      name === '@ngtools/webpack'
+    ) {
+      return {
+        name,
+        experimental,
+        deprecated: {
+          version: '>=22.0.0-next.0',
+          message:
+            'Angular\'s Webpack support is deprecated. Use the esbuild and Vite-based "@angular/build" package instead.',
+        },
+      };
+    }
+
+    return { name, experimental };
+  }),
   buildPackages: async () => {
     // The `performNpmReleaseBuild` function is loaded at runtime to avoid loading additional
     // files and dependencies unless a build is required.
