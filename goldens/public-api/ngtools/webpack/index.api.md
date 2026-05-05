@@ -8,14 +8,14 @@ import type { Compiler } from 'webpack';
 import type { CompilerOptions } from '@angular/compiler-cli';
 import type { LoaderContext } from 'webpack';
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 function angularWebpackLoader(this: LoaderContext<unknown>, content: string, map: string): void;
 export default angularWebpackLoader;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const AngularWebpackLoaderPath: string;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export class AngularWebpackPlugin {
     constructor(options?: Partial<AngularWebpackPluginOptions>);
     // (undocumented)
@@ -24,7 +24,7 @@ export class AngularWebpackPlugin {
     get options(): AngularWebpackPluginOptions;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface AngularWebpackPluginOptions {
     // (undocumented)
     compilerOptions?: CompilerOptions;
@@ -48,7 +48,7 @@ export interface AngularWebpackPluginOptions {
     tsconfig: string;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export const imageDomains: Set<string>;
 
 // (No @packageDocumentation comment for this package)

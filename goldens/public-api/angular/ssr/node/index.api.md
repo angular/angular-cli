@@ -23,13 +23,13 @@ export class AngularNodeAppEngine {
 export interface AngularNodeAppEngineOptions extends AngularAppEngineOptions {
 }
 
-// @public
+// @public @deprecated
 export class CommonEngine {
     constructor(options?: CommonEngineOptions | undefined);
     render(opts: CommonEngineRenderOptions): Promise<string>;
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface CommonEngineOptions {
     allowedHosts?: readonly string[];
     bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
@@ -37,7 +37,7 @@ export interface CommonEngineOptions {
     providers?: StaticProvider[];
 }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 export interface CommonEngineRenderOptions {
     bootstrap?: Type<{}> | ((context: BootstrapContext) => Promise<ApplicationRef>);
     // (undocumented)
