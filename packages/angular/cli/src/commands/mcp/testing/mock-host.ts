@@ -13,12 +13,12 @@ import type { Host } from '../host';
  * This class allows spying on host methods and controlling their return values.
  */
 export class MockHost implements Host {
-  runCommand = jasmine.createSpy('runCommand').and.resolveTo({ logs: [] });
+  executeNgCommand = jasmine.createSpy('executeNgCommand').and.resolveTo({ logs: [] });
   stat = jasmine.createSpy('stat');
   existsSync = jasmine.createSpy('existsSync');
   readFile = jasmine.createSpy('readFile').and.resolveTo('');
   glob = jasmine.createSpy('glob').and.returnValue((async function* () {})());
-  spawn = jasmine.createSpy('spawn');
+  startNgProcess = jasmine.createSpy('startNgProcess');
   getAvailablePort = jasmine.createSpy('getAvailablePort');
   isPortAvailable = jasmine.createSpy('isPortAvailable').and.resolveTo(true);
   setRoots = jasmine.createSpy('setRoots');
