@@ -9,6 +9,7 @@
 import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
 import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
 import type { SourceFile } from 'typescript';
+import type { Host } from '../../host';
 import { analyzeForUnsupportedZoneUses } from './analyze-for-unsupported-zone-uses';
 import { migrateTestFile } from './migrate-test-file';
 import { generateZonelessMigrationInstructionsForComponent } from './prompts';
@@ -20,12 +21,13 @@ const supportedStrategies: ReadonlySet<string> = new Set(['OnPush', 'Default', '
 
 export async function migrateSingleFile(
   sourceFile: SourceFile,
+  host: Host,
   extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
 ): Promise<MigrationResponse | null> {
   const testBedSpecifier = await getImportSpecifier(sourceFile, '@angular/core/testing', 'TestBed');
   const isTestFile = sourceFile.fileName.endsWith('.spec.ts') || !!testBedSpecifier;
   if (isTestFile) {
-    return migrateTestFile(sourceFile);
+    return migrateTestFile(sourceFile, host);
   }
 
   const unsupportedZoneUseResponse = await analyzeForUnsupportedZoneUses(sourceFile);

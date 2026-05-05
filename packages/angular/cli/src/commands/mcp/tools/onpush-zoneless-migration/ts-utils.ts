@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFileSync } from 'node:fs';
 import type ts from 'typescript';
+import type { Host } from '../../host';
 
 let typescriptModule: typeof ts;
 
@@ -116,8 +116,8 @@ export function findImportSpecifier(
 }
 
 /** Creates a TypeScript source file from a file path. */
-export async function createSourceFile(file: string) {
-  const content = readFileSync(file, 'utf8');
+export async function createSourceFile(file: string, host: Host) {
+  const content = await host.readFile(file, 'utf8');
 
   const ts = await loadTypescript();
 
