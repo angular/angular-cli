@@ -23,10 +23,10 @@ describe('transformFakeAsyncTest', () => {
         `,
       expected: `
           describe('My fakeAsync suite', () => {
-            beforeAll(() => {
+            beforeEach(() => {
               vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
             });
-            afterAll(() => {
+            afterEach(() => {
               vi.useRealTimers();
             });
             it('works', async () => {
@@ -49,10 +49,10 @@ describe('transformFakeAsyncTest', () => {
         `,
       expected: `
           describe('My fakeAsync suite', () => {
-            beforeAll(() => {
+            beforeEach(() => {
               vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
             });
-            afterAll(() => {
+            afterEach(() => {
               vi.useRealTimers();
             });
             it('works', async (strangeArg: Strange = myStrangeDefault) => {
@@ -91,10 +91,10 @@ describe('transformFakeAsyncTest', () => {
           });
 
           describe('My outer fakeAsync suite', () => {
-            beforeAll(() => {
+            beforeEach(() => {
               vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
             });
-            afterAll(() => {
+            afterEach(() => {
               vi.useRealTimers();
             });
 
@@ -137,10 +137,10 @@ describe('transformFakeAsyncTest', () => {
           });
 
           describe.skip('My outer fakeAsync suite', () => {
-            beforeAll(() => {
+            beforeEach(() => {
               vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
             });
-            afterAll(() => {
+            afterEach(() => {
               vi.useRealTimers();
             });
 
@@ -178,10 +178,10 @@ describe('transformFakeAsyncTest', () => {
         `,
       expected: `
           describe('My fakeAsync suite', () => {
-            beforeAll(() => {
+            beforeEach(() => {
               vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
             });
-            afterAll(() => {
+            afterEach(() => {
               vi.useRealTimers();
             });
             beforeAll(async () => {

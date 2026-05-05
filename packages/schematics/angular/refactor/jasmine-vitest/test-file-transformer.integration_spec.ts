@@ -576,10 +576,10 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
     `;
     const vitestCode = `
       describe('My fakeAsync suite', () => {
-        beforeAll(() => {
+        beforeEach(() => {
           vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
         });
-        afterAll(() => {
+        afterEach(() => {
           vi.useRealTimers();
         });
         it('works', async () => {

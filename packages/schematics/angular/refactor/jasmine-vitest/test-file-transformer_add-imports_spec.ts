@@ -162,13 +162,13 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
         });
       `;
     const expected = `
-        import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
+        import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
         describe('My fakeAsync suite', () => {
-          beforeAll(() => {
+          beforeEach(() => {
             vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
           });
-          afterAll(() => {
+          afterEach(() => {
             vi.useRealTimers();
           });
           it('works', async () => {
