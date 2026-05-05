@@ -23,7 +23,7 @@ import {
  */
 export interface AngularAppEngineOptions {
   /**
-   * A set of allowed hostnames for the server application.
+   * A set of allowed hosts for the server application.
    */
   allowedHosts?: readonly string[];
 
@@ -90,7 +90,7 @@ export class AngularAppEngine {
   private readonly manifest = getAngularAppEngineManifest();
 
   /**
-   * A set of allowed hostnames for the server application.
+   * A set of allowed hosts for the server application.
    */
   private readonly allowedHosts: ReadonlySet<string>;
 

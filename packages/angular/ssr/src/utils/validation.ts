@@ -62,7 +62,7 @@ export function getFirstHeaderValue(
  * Validates a request.
  *
  * @param request - The incoming `Request` object to validate.
- * @param allowedHosts - A set of allowed hostnames.
+ * @param allowedHosts - A set of allowed hosts.
  * @param disableHostCheck - Whether to disable the host check.
  * @throws Error if any of the validated headers contain invalid values.
  */
@@ -71,24 +71,24 @@ export function validateRequest(
   allowedHosts: ReadonlySet<string>,
   disableHostCheck: boolean,
 ): void {
-  validateHeaders(request, allowedHosts, disableHostCheck);
+  const url = new URL(request.url);
+  validateHeaders(request, allowedHosts, disableHostCheck, url.protocol);
 
   if (!disableHostCheck) {
-    validateUrl(new URL(request.url), allowedHosts);
+    validateUrl(url, allowedHosts);
   }
 }
 
 /**
- * Validates that the hostname of a given URL is allowed.
+ * Validates that the host of a given URL is allowed.
  *
  * @param url - The URL object to validate.
- * @param allowedHosts - A set of allowed hostnames.
- * @throws Error if the hostname is not in the allowlist.
+ * @param allowedHosts - A set of allowed hosts.
+ * @throws Error if the host is not in the allowlist.
  */
 export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
-  const { hostname } = url;
-  if (!isHostAllowed(hostname, allowedHosts)) {
-    throw new Error(`URL with hostname "${hostname}" is not allowed.`);
+  if (!isHostAllowed(url, allowedHosts)) {
+    throw new Error(`URL with host "${url.host}" is not allowed.`);
   }
 }
 
@@ -134,49 +134,46 @@ export function sanitizeRequestHeaders(
  *
  * @param headerName - The name of the header to validate (e.g., 'host', 'x-forwarded-host').
  * @param headerValue - The value of the header to validate.
- * @param allowedHosts - A set of allowed hostnames.
+ * @param allowedHosts - A set of allowed hosts.
  * @throws Error if the header value is invalid or the hostname is not in the allowlist.
  */
 function verifyHostAllowed(
   headerName: string,
   headerValue: string,
   allowedHosts: ReadonlySet<string>,
+  protocol: string,
 ): void {
-  const url = `http://${headerValue}`;
+  const url = `${protocol}//${headerValue}`;
   if (!URL.canParse(url)) {
     throw new Error(`Header "${headerName}" contains an invalid value and cannot be parsed.`);
   }
 
-  const { hostname, pathname, search, hash, username, password } = new URL(url);
+  const parsedUrl = new URL(url);
+  const { pathname, search, hash, username, password } = parsedUrl;
   if (pathname !== '/' || search || hash || username || password) {
     throw new Error(
       `Header "${headerName}" with value "${headerValue}" contains characters that are not allowed.`,
     );
   }
 
-  if (!isHostAllowed(hostname, allowedHosts)) {
+  if (!isHostAllowed(parsedUrl, allowedHosts)) {
     throw new Error(`Header "${headerName}" with value "${headerValue}" is not allowed.`);
   }
 }
 
 /**
- * Checks if the hostname is allowed.
- * @param hostname - The hostname to check.
- * @param allowedHosts - A set of allowed hostnames.
- * @returns `true` if the hostname is allowed, `false` otherwise.
+ * Checks if the host is allowed.
+ * @param url - The URL to check.
+ * @param allowedHosts - A set of allowed hosts.
+ * @returns `true` if the host is allowed, `false` otherwise.
  */
-function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boolean {
-  if (allowedHosts.has('*') || allowedHosts.has(hostname)) {
+function isHostAllowed(url: URL, allowedHosts: ReadonlySet<string>): boolean {
+  if (allowedHosts.has('*') || allowedHosts.has(url.host)) {
     return true;
   }
 
   for (const allowedHost of allowedHosts) {
-    if (!allowedHost.startsWith('*.')) {
-      continue;
-    }
-
-    const domain = allowedHost.slice(1);
-    if (hostname.endsWith(domain)) {
+    if (isAllowedHostMatch(url, allowedHost)) {
       return true;
     }
   }
@@ -184,11 +181,33 @@ function isHostAllowed(hostname: string, allowedHosts: ReadonlySet<string>): boo
   return false;
 }
 
+function isAllowedHostMatch(url: URL, allowedHost: string): boolean {
+  const wildcard = allowedHost.startsWith('*.');
+  const comparableAllowedHost = wildcard ? `placeholder${allowedHost.slice(1)}` : allowedHost;
+  const allowedUrl = `${url.protocol}//${comparableAllowedHost}`;
+
+  if (!URL.canParse(allowedUrl)) {
+    return false;
+  }
+
+  const parsedAllowedUrl = new URL(allowedUrl);
+  if (url.port !== parsedAllowedUrl.port) {
+    return false;
+  }
+
+  if (wildcard) {
+    const domain = parsedAllowedUrl.hostname.slice('placeholder'.length);
+    return url.hostname.endsWith(domain);
+  }
+
+  return url.hostname === parsedAllowedUrl.hostname;
+}
+
 /**
  * Validates the headers of an incoming request.
  *
  * @param request - The incoming `Request` object containing the headers to validate.
- * @param allowedHosts - A set of allowed hostnames.
+ * @param allowedHosts - A set of allowed hosts.
  * @param disableHostCheck - Whether to disable the host check.
  * @throws Error if any of the validated headers contain invalid values.
  */
@@ -196,12 +215,13 @@ function validateHeaders(
   request: Request,
   allowedHosts: ReadonlySet<string>,
   disableHostCheck: boolean,
+  protocol: string,
 ): void {
   const headers = request.headers;
   for (const headerName of HOST_HEADERS_TO_VALIDATE) {
     const headerValue = getFirstHeaderValue(headers.get(headerName));
     if (headerValue && !disableHostCheck) {
-      verifyHostAllowed(headerName, headerValue, allowedHosts);
+      verifyHostAllowed(headerName, headerValue, allowedHosts, protocol);
     }
   }
 

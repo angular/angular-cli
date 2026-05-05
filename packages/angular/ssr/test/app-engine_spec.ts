@@ -351,9 +351,9 @@ describe('AngularAppEngine', () => {
       const response = await appEngine.handle(request);
       expect(response).not.toBeNull();
       expect(response?.status).toBe(400);
-      expect(await response?.text()).toContain('URL with hostname "evil.com" is not allowed.');
+      expect(await response?.text()).toContain('URL with host "evil.com" is not allowed.');
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        jasmine.stringMatching('URL with hostname "evil.com" is not allowed.'),
+        jasmine.stringMatching('URL with host "evil.com" is not allowed.'),
       );
     });
 

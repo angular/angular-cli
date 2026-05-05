@@ -50,7 +50,7 @@ describe('Validation Utils', () => {
 
     it('should throw for disallowed hostname', () => {
       expect(() => validateUrl(new URL('http://evil.com'), allowedHosts)).toThrowError(
-        /URL with hostname "evil.com" is not allowed/,
+        /URL with host "evil.com" is not allowed/,
       );
     });
 
@@ -61,7 +61,7 @@ describe('Validation Utils', () => {
     it('should not match base domain for wildcard (*.google.com vs google.com)', () => {
       // Logic: hostname.endsWith('.google.com') -> 'google.com'.endsWith('.google.com') is false
       expect(() => validateUrl(new URL('http://google.com'), allowedHosts)).toThrowError(
-        /URL with hostname "google.com" is not allowed/,
+        /URL with host "google.com" is not allowed/,
       );
     });
 
@@ -70,6 +70,33 @@ describe('Validation Utils', () => {
       expect(() => validateUrl(new URL('http://example.com'), allowedHosts)).not.toThrow();
       expect(() => validateUrl(new URL('http://google.com'), allowedHosts)).not.toThrow();
       expect(() => validateUrl(new URL('http://evil.com'), allowedHosts)).not.toThrow();
+    });
+
+    it('should reject arbitrary ports on an allowed hostname', () => {
+      expect(() => validateUrl(new URL('http://example.com:8080'), allowedHosts)).toThrowError(
+        /URL with host "example.com:8080" is not allowed/,
+      );
+    });
+
+    it('should pass for default ports on an allowed hostname', () => {
+      expect(() => validateUrl(new URL('http://example.com:80'), allowedHosts)).not.toThrow();
+      expect(() => validateUrl(new URL('https://example.com:443'), allowedHosts)).not.toThrow();
+    });
+
+    it('should pass for explicitly allowed hostname and port', () => {
+      const allowedHosts = new Set(['example.com:8080']);
+      expect(() => validateUrl(new URL('http://example.com:8080'), allowedHosts)).not.toThrow();
+      expect(() => validateUrl(new URL('http://example.com:9090'), allowedHosts)).toThrowError(
+        /URL with host "example.com:9090" is not allowed/,
+      );
+    });
+
+    it('should pass for explicitly allowed wildcard hostname and port', () => {
+      const allowedHosts = new Set(['*.google.com:8443']);
+      expect(() => validateUrl(new URL('https://foo.google.com:8443'), allowedHosts)).not.toThrow();
+      expect(() => validateUrl(new URL('https://foo.google.com:9443'), allowedHosts)).toThrowError(
+        /URL with host "foo.google.com:9443" is not allowed/,
+      );
     });
   });
 
@@ -97,8 +124,35 @@ describe('Validation Utils', () => {
       const req = new Request('http://evil.com');
 
       expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
-        /URL with hostname "evil.com" is not allowed/,
+        /URL with host "evil.com" is not allowed/,
       );
+    });
+
+    it('should throw if URL port is not explicitly allowed', () => {
+      const req = new Request('http://example.com:8080');
+
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        /URL with host "example.com:8080" is not allowed/,
+      );
+    });
+
+    it('should throw if x-forwarded-host uses an arbitrary port on an allowed hostname', () => {
+      const req = new Request('http://example.com:8080', {
+        headers: { 'x-forwarded-host': 'example.com:8080' },
+      });
+
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        'Header "x-forwarded-host" with value "example.com:8080" is not allowed.',
+      );
+    });
+
+    it('should pass if x-forwarded-host uses an explicitly allowed port', () => {
+      const allowedHosts = new Set(['example.com:8080']);
+      const req = new Request('http://example.com:8080', {
+        headers: { 'x-forwarded-host': 'example.com:8080' },
+      });
+
+      expect(() => validateRequest(req, allowedHosts, false)).not.toThrow();
     });
 
     it('should throw if x-forwarded-port is invalid', () => {

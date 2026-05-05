@@ -75,7 +75,7 @@ export interface AngularAppEngineManifest {
   readonly supportedLocales: Readonly<Record<string, string>>;
 
   /**
-   * A readonly array of allowed hostnames.
+   * A readonly array of allowed hosts.
    */
   readonly allowedHosts: Readonly<string[]>;
 }
