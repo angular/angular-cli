@@ -1,3 +1,15 @@
+<a name="21.2.10"></a>
+
+# 21.2.10 (2026-05-06)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [bb8611913](https://github.com/angular/angular-cli/commit/bb861191328fc2d25bd5ee99b0c8edc5e49d3a7d) | fix  | restrict MCP workspace access to allowed client roots during resolution |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.9"></a>
 
 # 21.2.9 (2026-04-29)
