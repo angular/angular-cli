@@ -15,7 +15,6 @@
     "strict": true,
     "target": "es2023",
     "lib": ["es2023"],
-    "rootDir": ".",
     "rootDirs": [".", "./dist-schema/bin/"],
     "paths": {
       "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
