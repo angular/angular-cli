@@ -45,13 +45,13 @@ if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completi
 // These would then crash with a hard to diagnose error message.
 const [major] = process.versions.node.split('.', 1).map((part) => Number(part));
 
-if (major % 2 === 1) {
+if (major === 23 || major === 25) {
   // Allow new odd numbered releases with a warning.
   console.warn(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'Odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
+      'Prior to version 27, odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
       ' For more information, please see https://nodejs.org/en/about/previous-releases/.',
   );
 
