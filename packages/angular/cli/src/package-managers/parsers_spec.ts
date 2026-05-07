@@ -136,6 +136,14 @@ describe('parsers', () => {
       expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.1.0' });
     });
 
+    it('should return the highest version manifest from an unsorted array', () => {
+      const stdout = JSON.stringify([
+        { name: 'foo', version: '1.1.0' },
+        { name: 'foo', version: '1.0.0' },
+      ]);
+      expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.1.0' });
+    });
+
     it('should return null for empty stdout', () => {
       expect(parseNpmLikeManifest('')).toBeNull();
     });

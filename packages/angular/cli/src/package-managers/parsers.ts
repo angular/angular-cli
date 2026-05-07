@@ -16,6 +16,7 @@ import { ErrorInfo } from './error';
 import { Logger } from './logger';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
+import { compare } from 'semver';
 
 const MAX_LOG_LENGTH = 1024;
 
@@ -234,7 +235,26 @@ export function parseNpmLikeManifest(stdout: string, logger?: Logger): PackageMa
 
   const result = JSON.parse(stdout);
 
-  return Array.isArray(result) ? result[result.length - 1] : result;
+  // npm view returns an array of manifests if the query matches multiple versions
+  // (e.g. when using a version range). We find the highest version to ensure
+  // we get the latest relevant manifest, even if the output is not sorted.
+  if (Array.isArray(result)) {
+    let maxManifest: PackageManifest | null = null;
+
+    for (const manifest of result) {
+      if (!manifest || typeof manifest.version !== 'string') {
+        continue;
+      }
+
+      if (!maxManifest || compare(manifest.version, maxManifest.version) > 0) {
+        maxManifest = manifest;
+      }
+    }
+
+    return maxManifest;
+  }
+
+  return result;
 }
 
 /**
