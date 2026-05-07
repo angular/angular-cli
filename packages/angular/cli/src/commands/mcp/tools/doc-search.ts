@@ -28,7 +28,9 @@ const ALGOLIA_API_E = '34738e8ae1a45e58bbce7b0f9810633d8b727b44a6479cf5e14b6a337
  */
 export function resolveAlgoliaApiKey(): string {
   const override = process.env['NG_DOCS_SEARCH_API_KEY'];
-  if (typeof override === 'string' && override !== '') {
+  if (typeof override === 'string' && override.trim() !== '') {
+    return override.trim();
+  }
     return override;
   }
   const dcip = createDecipheriv(
