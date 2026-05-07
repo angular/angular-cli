@@ -13,6 +13,7 @@ import {
   parseNpmLikeManifest,
   parseYarnClassicDependencies,
   parseYarnClassicError,
+  parseYarnClassicManifest,
   parseYarnModernDependencies,
 } from './parsers';
 
@@ -144,8 +145,69 @@ describe('parsers', () => {
       expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.1.0' });
     });
 
+    it('should skip invalid manifests in an array', () => {
+      const stdout = JSON.stringify([
+        { name: 'foo', version: '1.0.0' },
+        { name: 'foo' }, // Missing version
+        { version: '1.2.0' }, // Missing name
+        null,
+        'invalid',
+      ]);
+      expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.0.0' });
+    });
+
+    it('should return null if no valid manifests found in the array', () => {
+      const stdout = JSON.stringify([{ name: 'foo' }, { version: '1.2.0' }]);
+      expect(parseNpmLikeManifest(stdout)).toBeNull();
+    });
+
+    it('should return null for invalid single object', () => {
+      const stdout = JSON.stringify({ name: 'foo' }); // Missing version
+      expect(parseNpmLikeManifest(stdout)).toBeNull();
+    });
+
+    it('should skip manifests with invalid semver versions in an array', () => {
+      const stdout = JSON.stringify([
+        { name: 'foo', version: '1.0.0' },
+        { name: 'foo', version: 'invalid-version' },
+        { name: 'foo', version: '1.0' },
+      ]);
+      expect(parseNpmLikeManifest(stdout)).toEqual({ name: 'foo', version: '1.0.0' });
+    });
+
+    it('should return null for single object with invalid semver version', () => {
+      const stdout = JSON.stringify({ name: 'foo', version: 'invalid-version' });
+      expect(parseNpmLikeManifest(stdout)).toBeNull();
+    });
+
     it('should return null for empty stdout', () => {
       expect(parseNpmLikeManifest('')).toBeNull();
+    });
+  });
+
+  describe('parseYarnClassicManifest', () => {
+    it('should parse a valid manifest', () => {
+      const stdout = JSON.stringify({
+        type: 'inspect',
+        data: { name: 'foo', version: '1.0.0' },
+      });
+      expect(parseYarnClassicManifest(stdout)).toEqual({ name: 'foo', version: '1.0.0' });
+    });
+
+    it('should return null for invalid manifest', () => {
+      const stdout = JSON.stringify({
+        type: 'inspect',
+        data: { name: 'foo' },
+      });
+      expect(parseYarnClassicManifest(stdout)).toBeNull();
+    });
+
+    it('should return null if no inspect type found', () => {
+      const stdout = JSON.stringify({
+        type: 'other',
+        data: { name: 'foo', version: '1.0.0' },
+      });
+      expect(parseYarnClassicManifest(stdout)).toBeNull();
     });
   });
 
