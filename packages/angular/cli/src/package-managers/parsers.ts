@@ -12,11 +12,11 @@
  * into their own file improves modularity and allows for focused testing.
  */
 
+import { compare, valid } from 'semver';
 import { ErrorInfo } from './error';
 import { Logger } from './logger';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
-import { compare } from 'semver';
 
 const MAX_LOG_LENGTH = 1024;
 
@@ -217,6 +217,18 @@ export function parseYarnClassicDependencies(
   return dependencies;
 }
 
+function isValidManifest(obj: unknown): obj is PackageManifest {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const record = obj as Record<string, unknown>;
+  const name = record.name;
+  const version = record.version;
+
+  return typeof name === 'string' && typeof version === 'string' && valid(version) !== null;
+}
+
 /**
  * Parses the output of `npm view` or a compatible command to get a package manifest.
  * @param stdout The standard output of the command.
@@ -242,7 +254,10 @@ export function parseNpmLikeManifest(stdout: string, logger?: Logger): PackageMa
     let maxManifest: PackageManifest | null = null;
 
     for (const manifest of result) {
-      if (!manifest || typeof manifest.version !== 'string') {
+      if (!isValidManifest(manifest)) {
+        logger?.debug(
+          '  Skipping invalid manifest in array (missing name, version, or invalid SemVer).',
+        );
         continue;
       }
 
@@ -251,7 +266,19 @@ export function parseNpmLikeManifest(stdout: string, logger?: Logger): PackageMa
       }
     }
 
+    if (!maxManifest) {
+      logger?.debug('  No valid manifests found in the array.');
+    }
+
     return maxManifest;
+  }
+
+  if (!isValidManifest(result)) {
+    logger?.debug(
+      '  Parsed JSON is not a valid manifest (missing name, version, or invalid SemVer).',
+    );
+
+    return null;
   }
 
   return result;
@@ -327,6 +354,14 @@ export function parseYarnClassicManifest(stdout: string, logger?: Logger): Packa
     Object.keys(manifest['ng-add']).length === 0
   ) {
     manifest['ng-add'].save ??= false;
+  }
+
+  if (!isValidManifest(manifest)) {
+    logger?.debug(
+      '  Parsed JSON is not a valid manifest (missing name, version, or invalid SemVer).',
+    );
+
+    return null;
   }
 
   return manifest;
