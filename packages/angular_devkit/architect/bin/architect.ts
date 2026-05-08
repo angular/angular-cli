@@ -8,7 +8,7 @@
  */
 
 import { JsonValue, json, logging, schema, strings, tags, workspaces } from '@angular-devkit/core';
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { existsSync } from 'node:fs';
 import * as path from 'node:path';
 import { parseArgs, styleText } from 'node:util';
@@ -217,12 +217,35 @@ async function main(args: string[]): Promise<number> {
   const { positionals, cliOptions, builderOptions } = parseOptions(args);
 
   /** Create the DevKit Logger used through the CLI. */
-  const logger = createConsoleLogger(!!cliOptions['verbose'], process.stdout, process.stderr, {
+  const logger = new logging.IndentLogger('architect');
+  const colorLevels: Record<string, (message: string) => string> = {
     info: (s) => s,
     debug: (s) => s,
-    warn: (s) => styleText(['yellow', 'bold'], s),
-    error: (s) => styleText(['red', 'bold'], s),
-    fatal: (s) => styleText(['red', 'bold'], s),
+    warn: (s) => styleText(['yellow', 'bold'], s, { stream: process.stderr }),
+    error: (s) => styleText(['red', 'bold'], s, { stream: process.stderr }),
+    fatal: (s) => styleText(['red', 'bold'], s, { stream: process.stderr }),
+  };
+
+  logger.subscribe((entry) => {
+    if (entry.level === 'debug' && !cliOptions['verbose']) {
+      return;
+    }
+
+    const color = colorLevels[entry.level];
+    const message = color ? color(entry.message) : entry.message;
+
+    switch (entry.level) {
+      case 'warn':
+      case 'fatal':
+      case 'error':
+        // eslint-disable-next-line no-console
+        console.error(message);
+        break;
+      default:
+        // eslint-disable-next-line no-console
+        console.log(message);
+        break;
+    }
   });
 
   // Check the target.
