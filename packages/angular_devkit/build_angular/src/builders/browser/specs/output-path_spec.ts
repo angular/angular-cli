@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { getSystemPath, join, virtualFs } from '@angular-devkit/core';
+import { getSystemPath, join } from '@angular-devkit/core';
 import * as fs from 'node:fs';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
@@ -24,7 +24,7 @@ describe('Browser Builder output path', () => {
   it('deletes output path content', async () => {
     // Write a file to the output path to later verify it was deleted.
     await host
-      .write(join(host.root(), 'dist/file.txt'), virtualFs.stringToFileBuffer('file'))
+      .write(join(host.root(), 'dist/file.txt'), new TextEncoder().encode('file').buffer)
       .toPromise();
 
     // Delete an app file to force a failed compilation.
@@ -42,7 +42,7 @@ describe('Browser Builder output path', () => {
     // Write a file to the output path to later verify it was deleted.
     host.writeMultipleFiles({
       'src-link/a.txt': '',
-      'dist/file.txt': virtualFs.stringToFileBuffer('file'),
+      'dist/file.txt': new TextEncoder().encode('file').buffer,
     });
 
     const distLinked = join(host.root(), 'dist', 'linked');

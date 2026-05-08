@@ -21,14 +21,17 @@ export interface WorkspaceHost {
 }
 
 export function createWorkspaceHost(host: virtualFs.Host): WorkspaceHost {
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+
   const workspaceHost: WorkspaceHost = {
     async readFile(path: string): Promise<string> {
       const data = await lastValueFrom(host.read(normalize(path)));
 
-      return virtualFs.fileBufferToString(data);
+      return decoder.decode(data);
     },
     async writeFile(path: string, data: string): Promise<void> {
-      return lastValueFrom(host.write(normalize(path), virtualFs.stringToFileBuffer(data)));
+      return lastValueFrom(host.write(normalize(path), encoder.encode(data).buffer));
     },
     async isDirectory(path: string): Promise<boolean> {
       try {

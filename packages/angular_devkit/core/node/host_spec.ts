@@ -33,15 +33,15 @@ describe('NodeJsAsyncHost', () => {
   it('should get correct result for exists', async () => {
     const filePath = normalize('not-found');
     expect(await host.exists(filePath).toPromise()).toBeFalse();
-    await host.write(filePath, virtualFs.stringToFileBuffer('content')).toPromise();
+    await host.write(filePath, new TextEncoder().encode('content').buffer).toPromise();
     expect(await host.exists(filePath).toPromise()).toBeTrue();
   });
 
   linuxOnlyIt(
     'can watch',
     async () => {
-      const content = virtualFs.stringToFileBuffer('hello world');
-      const content2 = virtualFs.stringToFileBuffer('hello world 2');
+      const content = new TextEncoder().encode('hello world').buffer;
+      const content2 = new TextEncoder().encode('hello world 2').buffer;
       const allEvents: virtualFs.HostWatchEvent[] = [];
 
       fs.mkdirSync(root + '/sub1');
@@ -85,8 +85,8 @@ describe('NodeJsSyncHost', () => {
   linuxOnlyIt(
     'can watch',
     async () => {
-      const content = virtualFs.stringToFileBuffer('hello world');
-      const content2 = virtualFs.stringToFileBuffer('hello world 2');
+      const content = new TextEncoder().encode('hello world').buffer;
+      const content2 = new TextEncoder().encode('hello world 2').buffer;
       const allEvents: virtualFs.HostWatchEvent[] = [];
 
       fs.mkdirSync(root + '/sub1');
@@ -122,7 +122,7 @@ describe('NodeJsSyncHost', () => {
       host.rename(normalize('/rename/a.txt'), normalize('/rename/b/c/d/a.txt'));
       if (fs.existsSync(root + '/rename/b/c/d/a.txt')) {
         const resContent = host.read(normalize('/rename/b/c/d/a.txt'));
-        const content = virtualFs.fileBufferToString(resContent);
+        const content = new TextDecoder().decode(resContent);
         expect(content).toEqual('hello world');
       }
     },

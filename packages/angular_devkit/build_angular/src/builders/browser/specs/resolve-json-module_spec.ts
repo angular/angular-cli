@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, virtualFs } from '@angular-devkit/core';
+import { join } from '@angular-devkit/core';
 import { take, tap } from 'rxjs';
 import { createArchitect, host, outputPath } from '../../../testing/test-utils';
 
@@ -40,7 +40,7 @@ describe('Browser Builder resolve json module', () => {
     await run.output
       .pipe(
         tap(() => {
-          const content = virtualFs.fileBufferToString(
+          const content = new TextDecoder().decode(
             host.scopedSync().read(join(outputPath, 'main.js')),
           );
 

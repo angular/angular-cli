@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, logging, virtualFs } from '@angular-devkit/core';
+import { join, logging } from '@angular-devkit/core';
 import { debounceTime, lastValueFrom, map, switchMap, takeWhile, tap, timer } from 'rxjs';
 import { browserBuild, createArchitect, host, outputPath } from '../../../testing/test-utils';
 
@@ -90,14 +90,14 @@ describe('Browser Builder Web Worker support', () => {
     await browserBuild(architect, host, target, overrides, { logger });
 
     // Worker bundle contains worker code.
-    const workerContent = virtualFs.fileBufferToString(
+    const workerContent = new TextDecoder().decode(
       host.scopedSync().read(join(outputPath, 'src_app_app_worker_ts.js')),
     );
     expect(workerContent).toContain('hello from worker');
     expect(workerContent).toContain('bar');
 
     // Main bundle references worker.
-    const mainContent = virtualFs.fileBufferToString(
+    const mainContent = new TextDecoder().decode(
       host.scopedSync().read(join(outputPath, 'main.js')),
     );
     expect(mainContent).toContain('src_app_app_worker_ts');
@@ -119,7 +119,7 @@ describe('Browser Builder Web Worker support', () => {
       /src_app_app_worker_ts\.[0-9a-f]{16}\.js/,
     ) as string;
     expect(workerBundle).toBeTruthy('workerBundle should exist');
-    const workerContent = virtualFs.fileBufferToString(
+    const workerContent = new TextDecoder().decode(
       host.scopedSync().read(join(outputPath, workerBundle)),
     );
     expect(workerContent).toContain('hello from worker');
@@ -129,7 +129,7 @@ describe('Browser Builder Web Worker support', () => {
     // Main bundle should reference hashed worker bundle.
     const mainBundle = host.fileMatchExists(outputPath, /main\.[0-9a-f]{16}\.js/) as string;
     expect(mainBundle).toBeTruthy('mainBundle should exist');
-    const mainContent = virtualFs.fileBufferToString(
+    const mainContent = new TextDecoder().decode(
       host.scopedSync().read(join(outputPath, mainBundle)),
     );
     expect(mainContent).toContain('src_app_app_worker_ts');
@@ -159,7 +159,7 @@ describe('Browser Builder Web Worker support', () => {
           switch (phase) {
             case 1:
               // Original worker content should be there.
-              workerContent = virtualFs.fileBufferToString(host.scopedSync().read(workerPath));
+              workerContent = new TextDecoder().decode(host.scopedSync().read(workerPath));
               expect(workerContent).toContain('bar');
               // Change content of worker dependency.
               host.writeMultipleFiles({ 'src/app/dep.ts': `export const foo = 'baz';` });
@@ -167,7 +167,7 @@ describe('Browser Builder Web Worker support', () => {
               break;
 
             case 2:
-              workerContent = virtualFs.fileBufferToString(host.scopedSync().read(workerPath));
+              workerContent = new TextDecoder().decode(host.scopedSync().read(workerPath));
               // Worker content should have changed.
               expect(workerContent).toContain('baz');
               phase = 3;

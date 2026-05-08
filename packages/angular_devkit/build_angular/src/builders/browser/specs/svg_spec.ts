@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { createArchitect, host, outputPath } from '../../../testing/test-utils';
 
 describe('Browser Builder allow svg', () => {
@@ -53,9 +53,7 @@ describe('Browser Builder allow svg', () => {
     expect(exists).toBe(true, '"main.js" should exist');
 
     if (exists) {
-      const content = virtualFs.fileBufferToString(
-        host.scopedSync().read(join(outputPath, 'main.js')),
-      );
+      const content = new TextDecoder().decode(host.scopedSync().read(join(outputPath, 'main.js')));
 
       // Verify that the svg contents are present in the main bundle,
       // e.g. as template instructions.

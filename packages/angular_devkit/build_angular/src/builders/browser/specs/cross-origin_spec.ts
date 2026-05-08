@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { BrowserBuilderOutput } from '../index';
@@ -37,9 +37,7 @@ describe('Browser Builder crossOrigin', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css" crossorigin="use-credentials"></head>` +
         `<body><app-root></app-root>` +
@@ -57,9 +55,7 @@ describe('Browser Builder crossOrigin', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/">` +
         `<link rel="stylesheet" href="styles.css" crossorigin="anonymous"></head>` +
@@ -78,9 +74,7 @@ describe('Browser Builder crossOrigin', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/">` +
         `<link rel="stylesheet" href="styles.css"></head>` +
@@ -105,9 +99,7 @@ describe('Browser Builder crossOrigin', () => {
     expect(output.success).toBe(true);
 
     const fileName = join(normalize(output.outputs[0].path), 'runtime.js');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toContain('script.crossOrigin = "use-credentials"');
     await run.stop();
   });

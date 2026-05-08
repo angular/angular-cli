@@ -6,13 +6,18 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { TextDecoder, TextEncoder } from 'node:util';
 import { FileBuffer } from './interface';
 
+/**
+ * @deprecated Use `new TextEncoder().encode(str).buffer` instead.
+ */
 export function stringToFileBuffer(str: string): FileBuffer {
   return new TextEncoder().encode(str).buffer;
 }
 
+/**
+ * @deprecated Use `new TextDecoder().decode(fileBuffer)` instead.
+ */
 export function fileBufferToString(fileBuffer: FileBuffer): string {
   if (fileBuffer.toString.length === 1) {
     return (fileBuffer.toString as (enc: string) => string)('utf-8');

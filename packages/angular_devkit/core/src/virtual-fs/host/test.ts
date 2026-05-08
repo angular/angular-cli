@@ -8,7 +8,6 @@
 
 import { Observable } from 'rxjs';
 import { Path, PathFragment, join, normalize } from '../path';
-import { fileBufferToString, stringToFileBuffer } from './buffer';
 import { FileBuffer, HostWatchEvent, HostWatchOptions, Stats } from './interface';
 import { SimpleMemoryHost, SimpleMemoryHostStats } from './memory';
 import { SyncDelegateHost } from './sync';
@@ -41,7 +40,7 @@ export class TestHost extends SimpleMemoryHost {
     super();
 
     for (const filePath of Object.getOwnPropertyNames(map)) {
-      this._write(normalize(filePath), stringToFileBuffer(map[filePath]));
+      this._write(normalize(filePath), new TextEncoder().encode(map[filePath]).buffer);
     }
   }
 
@@ -138,11 +137,11 @@ export class TestHost extends SimpleMemoryHost {
   }
 
   $write(path: string, content: string): void {
-    return super._write(normalize(path), stringToFileBuffer(content));
+    return super._write(normalize(path), new TextEncoder().encode(content).buffer);
   }
 
   $read(path: string): string {
-    return fileBufferToString(super._read(normalize(path)));
+    return new TextDecoder().decode(super._read(normalize(path)));
   }
 
   $list(path: string): PathFragment[] {

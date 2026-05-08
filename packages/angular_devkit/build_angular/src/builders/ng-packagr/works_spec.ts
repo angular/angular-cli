@@ -9,14 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestProjectHost, TestingArchitectHost } from '@angular-devkit/architect/testing';
-import {
-  getSystemPath,
-  join,
-  normalize,
-  schema,
-  virtualFs,
-  workspaces,
-} from '@angular-devkit/core';
+import { getSystemPath, join, normalize, schema, workspaces } from '@angular-devkit/core';
 import { debounceTime, map, take, tap } from 'rxjs';
 
 describe('NgPackagr Builder', () => {
@@ -67,7 +60,7 @@ describe('NgPackagr Builder', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(normalize('./dist/lib/fesm2022/lib.mjs'))).toBe(true);
-    const content = virtualFs.fileBufferToString(
+    const content = new TextDecoder().decode(
       host.scopedSync().read(normalize('./dist/lib/fesm2022/lib.mjs')),
     );
     expect(content).toContain('lib works');
@@ -101,7 +94,7 @@ describe('NgPackagr Builder', () => {
         debounceTime(1000),
         map(() => {
           const fileName = './dist/lib/fesm2022/lib.mjs';
-          const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+          const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
 
           return content;
         }),

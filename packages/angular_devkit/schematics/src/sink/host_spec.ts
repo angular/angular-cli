@@ -108,7 +108,7 @@ describe('FileSystemSink', () => {
       const sink = new HostSink(host);
       await sink.commit(tree).toPromise();
       expect(host.sync.read(normalize('/file0')).toString()).toBe('hello');
-      expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('world');
+      expect(new TextDecoder().decode(host.sync.read(normalize('/file1')))).toBe('world');
     });
 
     it('can rename then modify the same file', async () => {
@@ -125,7 +125,7 @@ describe('FileSystemSink', () => {
 
       const sink = new HostSink(host);
       await sink.commit(tree).toPromise();
-      expect(virtualFs.fileBufferToString(host.sync.read(normalize('/file1')))).toBe('hello');
+      expect(new TextDecoder().decode(host.sync.read(normalize('/file1')))).toBe('hello');
     });
   });
 });

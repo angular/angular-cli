@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, tags, virtualFs, workspaces } from '@angular-devkit/core';
+import { join, normalize, tags, workspaces } from '@angular-devkit/core';
 import { lastValueFrom } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { BrowserBuilderOutput } from '../index';
@@ -34,9 +34,7 @@ describe('Browser Builder index HTML processing', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head>` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
@@ -59,9 +57,7 @@ describe('Browser Builder index HTML processing', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head>` +
         `<body><app-root></app-root>` +
@@ -84,9 +80,7 @@ describe('Browser Builder index HTML processing', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><title>&iacute;</title><base href="/"><link rel="stylesheet" href="styles.css"></head> ` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
@@ -108,9 +102,7 @@ describe('Browser Builder index HTML processing', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
     const fileName = join(normalize(output.outputs[0].path), 'index.html');
-    const content = virtualFs.fileBufferToString(
-      await lastValueFrom(host.read(normalize(fileName))),
-    );
+    const content = new TextDecoder().decode(await lastValueFrom(host.read(normalize(fileName))));
     expect(content).toBe(
       `<html><head><base href="/"><%= csrf_meta_tags %><link rel="stylesheet" href="styles.css"></head> ` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
@@ -159,7 +151,7 @@ describe('Browser Builder index HTML processing', () => {
 
     const outputIndexPath = join(host.root(), 'dist', 'index.html');
     const content = await lastValueFrom(host.read(normalize(outputIndexPath)));
-    expect(virtualFs.fileBufferToString(content)).toBe(
+    expect(new TextDecoder().decode(content)).toBe(
       `<html><head><base href="/"><%= csrf_meta_tags %><link rel="stylesheet" href="styles.css"></head> ` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
         `<script src="polyfills.js" type="module"></script>` +
@@ -206,7 +198,7 @@ describe('Browser Builder index HTML processing', () => {
 
     const outputIndexPath = join(host.root(), 'dist', 'main.html');
     const content = await lastValueFrom(host.read(normalize(outputIndexPath)));
-    expect(virtualFs.fileBufferToString(content)).toBe(
+    expect(new TextDecoder().decode(content)).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head> ` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
         `<script src="polyfills.js" type="module"></script>` +
@@ -253,7 +245,7 @@ describe('Browser Builder index HTML processing', () => {
 
     const outputIndexPath = join(host.root(), 'dist', 'extra', 'main.html');
     const content = await lastValueFrom(host.read(normalize(outputIndexPath)));
-    expect(virtualFs.fileBufferToString(content)).toBe(
+    expect(new TextDecoder().decode(content)).toBe(
       `<html><head><base href="/"><link rel="stylesheet" href="styles.css"></head> ` +
         `<body><app-root></app-root><script src="runtime.js" type="module"></script>` +
         `<script src="polyfills.js" type="module"></script>` +

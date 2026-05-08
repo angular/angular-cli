@@ -7,14 +7,13 @@
  */
 
 import { normalize } from '..';
-import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
 import { PatternMatchingHost } from './pattern';
 
 describe('PatternMatchingHost', () => {
   it('works for NativeScript', () => {
-    const content = stringToFileBuffer('hello world');
-    const content2 = stringToFileBuffer('hello world 2');
+    const content = new TextEncoder().encode('hello world').buffer;
+    const content2 = new TextEncoder().encode('hello world 2').buffer;
 
     const host = new SimpleMemoryHost();
     host.write(normalize('/some/file.tns.ts'), content).subscribe();
