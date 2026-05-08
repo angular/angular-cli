@@ -6,32 +6,24 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { PassThrough } from 'node:stream';
+import { stripVTControlCharacters } from 'node:util';
 import { main } from '../bin/schematics';
 
-// We only care about the write method in these mocks of NodeJS.WriteStream.
-class MockWriteStream {
-  lines: string[] = [];
-  write(str: string) {
-    // Strip color control characters.
-    this.lines.push(str.replace(/[^\x20-\x7F]\[\d+m/g, ''));
-
-    return true;
-  }
-}
-
 describe('schematics-cli binary', () => {
-  let stdout: MockWriteStream, stderr: MockWriteStream;
+  let stdout: PassThrough, stderr: PassThrough;
 
   beforeEach(() => {
-    stdout = new MockWriteStream();
-    stderr = new MockWriteStream();
+    stdout = new PassThrough();
+    stderr = new PassThrough();
   });
 
   it('list-schematics works', async () => {
     const args = ['--list-schematics'];
     const res = await main({ args, stdout, stderr });
-    expect(stdout.lines).toMatch(/blank/);
-    expect(stdout.lines).toMatch(/schematic/);
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).toMatch(/blank/);
+    expect(output).toMatch(/schematic/);
     expect(res).toEqual(0);
   });
 
@@ -45,30 +37,33 @@ describe('schematics-cli binary', () => {
   it('dry-run works', async () => {
     const args = ['blank', 'foo', '--dry-run'];
     const res = await main({ args, stdout, stderr });
-    expect(stdout.lines).toMatch(/CREATE foo\/README.md/);
-    expect(stdout.lines).toMatch(/CREATE foo\/.gitignore/);
-    expect(stdout.lines).toMatch(/CREATE foo\/src\/foo\/index.ts/);
-    expect(stdout.lines).toMatch(/CREATE foo\/src\/foo\/index_spec.ts/);
-    expect(stdout.lines).toMatch(/Dry run enabled./);
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).toMatch(/CREATE foo\/README.md/);
+    expect(output).toMatch(/CREATE foo\/.gitignore/);
+    expect(output).toMatch(/CREATE foo\/src\/foo\/index.ts/);
+    expect(output).toMatch(/CREATE foo\/src\/foo\/index_spec.ts/);
+    expect(output).toMatch(/Dry run enabled./);
     expect(res).toEqual(0);
   });
 
   it('dry-run is default when debug mode', async () => {
     const args = ['blank', 'foo', '--debug'];
     const res = await main({ args, stdout, stderr });
-    expect(stdout.lines).toMatch(/Debug mode enabled./);
-    expect(stdout.lines).toMatch(/CREATE foo\/README.md/);
-    expect(stdout.lines).toMatch(/CREATE foo\/.gitignore/);
-    expect(stdout.lines).toMatch(/CREATE foo\/src\/foo\/index.ts/);
-    expect(stdout.lines).toMatch(/CREATE foo\/src\/foo\/index_spec.ts/);
-    expect(stdout.lines).toMatch(/Dry run enabled by default in debug mode./);
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).toMatch(/Debug mode enabled./);
+    expect(output).toMatch(/CREATE foo\/README.md/);
+    expect(output).toMatch(/CREATE foo\/.gitignore/);
+    expect(output).toMatch(/CREATE foo\/src\/foo\/index.ts/);
+    expect(output).toMatch(/CREATE foo\/src\/foo\/index_spec.ts/);
+    expect(output).toMatch(/Dry run enabled by default in debug mode./);
     expect(res).toEqual(0);
   });
 
   it('error when no name is provided', async () => {
     const args = ['blank'];
     const res = await main({ args, stdout, stderr });
-    expect(stderr.lines).toMatch(/Error: name option is required/);
+    const output = stripVTControlCharacters(stderr.read()?.toString() || '');
+    expect(output).toMatch(/Error: name option is required/);
     expect(res).toEqual(1);
   });
 });
