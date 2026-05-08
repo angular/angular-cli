@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { normalize } from '@angular-devkit/core';
 import { createArchitect, host } from '../../testing/test-utils';
 
 describe('AppShell Builder', () => {
@@ -133,7 +133,7 @@ describe('AppShell Builder', () => {
     expect(output.success).toBe(true);
 
     const fileName = 'dist/index.html';
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
     expect(content).toMatch('Welcome to app');
   });
 
@@ -147,7 +147,7 @@ describe('AppShell Builder', () => {
 
     expect(output.success).toBe(true);
     const fileName = 'dist/index.html';
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
     expect(content).toContain('app-shell works!');
   });
 
@@ -164,7 +164,7 @@ describe('AppShell Builder', () => {
 
     expect(output.success).toBe(true);
     const fileName = 'dist/index.html';
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
 
     expect(content).toContain('app-shell works!');
     expect(content).toContain('p{color:#000}');
@@ -187,7 +187,7 @@ describe('AppShell Builder', () => {
 
     expect(output.success).toBe(true);
     const fileName = 'dist/index.html';
-    const content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+    const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
 
     expect(content).toContain('app-shell works!');
     expect(content).toContain('<style nonce="{% nonce %}">p{color:#000}</style>');

@@ -243,7 +243,7 @@ type FileBuffer = ArrayBuffer;
 // @public (undocumented)
 type FileBufferLike = ArrayBufferLike;
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 function fileBufferToString(fileBuffer: FileBuffer): string;
 
 // @public (undocumented)
@@ -1012,7 +1012,7 @@ declare namespace strings {
 }
 export { strings }
 
-// @public (undocumented)
+// @public @deprecated (undocumented)
 function stringToFileBuffer(str: string): FileBuffer;
 
 // @public (undocumented)

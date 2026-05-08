@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { createArchitect, host } from '../../testing/test-utils';
 
 describe('Prerender Builder', () => {
@@ -94,7 +94,7 @@ describe('Prerender Builder', () => {
 
     expect(output.success).toBe(true);
 
-    const content = virtualFs.fileBufferToString(
+    const content = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/foo/index.html')),
     );
 
@@ -109,17 +109,17 @@ describe('Prerender Builder', () => {
 
     expect(output.success).toBe(true);
 
-    let content = virtualFs.fileBufferToString(
+    let content = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/foo/index.html')),
     );
     expect(content).toContain('foo works!');
 
-    content = virtualFs.fileBufferToString(
+    content = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/index.original.html')),
     );
     expect(content).not.toContain('<router-outlet');
 
-    content = virtualFs.fileBufferToString(host.scopedSync().read(normalize('dist/index.html')));
+    content = new TextDecoder().decode(host.scopedSync().read(normalize('dist/index.html')));
 
     expect(content).toContain('<router-outlet');
   });
@@ -128,7 +128,7 @@ describe('Prerender Builder', () => {
     await host
       .write(
         join(host.root(), 'routes-file.txt'),
-        virtualFs.stringToFileBuffer(['/foo', '/'].join('\n')),
+        new TextEncoder().encode(['/foo', '/'].join('\n')).buffer,
       )
       .toPromise();
     const run = await architect.scheduleTarget(target, {
@@ -140,10 +140,10 @@ describe('Prerender Builder', () => {
 
     expect(output.success).toBe(true);
 
-    const fooContent = virtualFs.fileBufferToString(
+    const fooContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/foo/index.html')),
     );
-    const appContent = virtualFs.fileBufferToString(
+    const appContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/index.html')),
     );
 
@@ -173,10 +173,10 @@ describe('Prerender Builder', () => {
     });
 
     const output = await run.result;
-    const fooContent = virtualFs.fileBufferToString(
+    const fooContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/foo/index.html')),
     );
-    const appContent = virtualFs.fileBufferToString(
+    const appContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/index.html')),
     );
 
@@ -214,7 +214,7 @@ describe('Prerender Builder', () => {
 
     expect(output.success).toBe(true);
 
-    const content = virtualFs.fileBufferToString(
+    const content = new TextDecoder().decode(
       host.scopedSync().read(normalize('dist/foo/index.html')),
     );
 

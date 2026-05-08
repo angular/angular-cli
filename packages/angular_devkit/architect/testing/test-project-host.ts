@@ -117,7 +117,7 @@ export class TestProjectHost extends NodeJsSyncHost {
     Object.keys(files).forEach((fileName) => {
       let content = files[fileName];
       if (typeof content == 'string') {
-        content = virtualFs.stringToFileBuffer(content);
+        content = new TextEncoder().encode(content).buffer;
       } else if (content instanceof Buffer) {
         content = content.buffer.slice(content.byteOffset, content.byteOffset + content.byteLength);
       }
@@ -127,16 +127,16 @@ export class TestProjectHost extends NodeJsSyncHost {
   }
 
   replaceInFile(path: string, match: RegExp | string, replacement: string): void {
-    const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
+    const content = new TextDecoder().decode(this.scopedSync().read(normalize(path)));
     this.scopedSync().write(
       normalize(path),
-      virtualFs.stringToFileBuffer(content.replace(match, replacement)),
+      new TextEncoder().encode(content.replace(match, replacement)).buffer,
     );
   }
 
   appendToFile(path: string, str: string): void {
-    const content = virtualFs.fileBufferToString(this.scopedSync().read(normalize(path)));
-    this.scopedSync().write(normalize(path), virtualFs.stringToFileBuffer(content.concat(str)));
+    const content = new TextDecoder().decode(this.scopedSync().read(normalize(path)));
+    this.scopedSync().write(normalize(path), new TextEncoder().encode(content.concat(str)).buffer);
   }
 
   fileMatchExists(dir: string, regex: RegExp): PathFragment | undefined {

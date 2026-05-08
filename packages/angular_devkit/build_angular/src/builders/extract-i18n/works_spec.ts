@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
+import { join, logging, normalize } from '@angular-devkit/core';
 import { createArchitect, extractI18nTargetSpec, host } from '../../testing/test-utils';
 
 describe('Extract i18n Target', () => {
@@ -34,7 +34,7 @@ describe('Extract i18n Target', () => {
     expect(exists).toBe(true);
 
     if (exists) {
-      const content = virtualFs.fileBufferToString(host.scopedSync().read(extractionFile));
+      const content = new TextDecoder().decode(host.scopedSync().read(extractionFile));
       expect(content).toContain('i18n test');
     }
   });
@@ -85,9 +85,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
-      /i18n test/,
-    );
+    expect(new TextDecoder().decode(host.scopedSync().read(extractionFile))).toMatch(/i18n test/);
   });
 
   it('supports output path', async () => {
@@ -104,9 +102,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
-      /i18n test/,
-    );
+    expect(new TextDecoder().decode(host.scopedSync().read(extractionFile))).toMatch(/i18n test/);
   });
 
   it('supports i18n format', async () => {
@@ -121,9 +117,7 @@ describe('Extract i18n Target', () => {
     await run.stop();
 
     expect(host.scopedSync().exists(extractionFile)).toBe(true);
-    expect(virtualFs.fileBufferToString(host.scopedSync().read(extractionFile))).toMatch(
-      /i18n test/,
-    );
+    expect(new TextDecoder().decode(host.scopedSync().read(extractionFile))).toMatch(/i18n test/);
   });
 
   it('issues warnings for duplicate message identifiers', async () => {

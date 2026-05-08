@@ -8,7 +8,7 @@
 
 import { Architect, BuilderRun } from '@angular-devkit/architect';
 import { EmittedFiles } from '@angular-devkit/build-webpack';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { normalize } from '@angular-devkit/core';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { DevServerBuilderOutput } from '../index';
 
@@ -73,7 +73,7 @@ describe('Dev Server Builder', () => {
 
   it('uses source locale when not localizing', async () => {
     const config = host.scopedSync().read(normalize('angular.json'));
-    const jsonConfig = JSON.parse(virtualFs.fileBufferToString(config));
+    const jsonConfig = JSON.parse(new TextDecoder().decode(config));
     const applicationProject = jsonConfig.projects.app;
 
     applicationProject.i18n = { sourceLocale: 'fr' };

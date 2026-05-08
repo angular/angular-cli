@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, normalize, virtualFs } from '@angular-devkit/core';
+import { join, normalize } from '@angular-devkit/core';
 import { debounceTime, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 
@@ -86,7 +86,7 @@ describe('Browser Builder service worker', () => {
 
     expect(host.scopedSync().exists(normalize('dist/ngsw.json'))).toBeTrue();
     const ngswJson = JSON.parse(
-      virtualFs.fileBufferToString(host.scopedSync().read(normalize('dist/ngsw.json'))),
+      new TextDecoder().decode(host.scopedSync().read(normalize('dist/ngsw.json'))),
     );
     // Verify index and assets are there.
     expect(ngswJson).toEqual(
@@ -154,7 +154,7 @@ describe('Browser Builder service worker', () => {
           const ngswJsonPath = normalize('dist/ngsw.json');
           expect(host.scopedSync().exists(ngswJsonPath)).toBeTrue();
           const ngswJson = JSON.parse(
-            virtualFs.fileBufferToString(host.scopedSync().read(ngswJsonPath)),
+            new TextDecoder().decode(host.scopedSync().read(ngswJsonPath)),
           );
 
           const hashTableEntries = Object.keys(ngswJson.hashTable);
@@ -203,7 +203,7 @@ describe('Browser Builder service worker', () => {
 
     expect(host.scopedSync().exists(normalize('dist/ngsw.json'))).toBeTrue();
     const ngswJson = JSON.parse(
-      virtualFs.fileBufferToString(host.scopedSync().read(normalize('dist/ngsw.json'))),
+      new TextDecoder().decode(host.scopedSync().read(normalize('dist/ngsw.json'))),
     );
     // Verify index and assets include the base href.
     expect(ngswJson).toEqual(

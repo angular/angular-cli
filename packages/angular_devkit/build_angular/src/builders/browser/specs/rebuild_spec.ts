@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { join, logging, normalize, virtualFs } from '@angular-devkit/core';
+import { join, logging, normalize } from '@angular-devkit/core';
 import { debounceTime, take, takeWhile, tap, timeout } from 'rxjs';
 import {
   createArchitect,
@@ -104,9 +104,7 @@ describe('Browser Builder rebuilds', () => {
                   /\$\$_E2E_GOLDEN_VALUE_3/.source,
               );
               const fileName = './dist/main.js';
-              const content = virtualFs.fileBufferToString(
-                host.scopedSync().read(normalize(fileName)),
-              );
+              const content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
 
               if (re.test(content)) {
                 phase = 4;
@@ -311,7 +309,7 @@ describe('Browser Builder rebuilds', () => {
   });
 
   it('rebuilds after errors in JIT', async () => {
-    const origContent = virtualFs.fileBufferToString(
+    const origContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('src/app/app.component.ts')),
     );
     host.appendToFile('./src/app/app.component.ts', `]]]]`);
@@ -348,7 +346,7 @@ describe('Browser Builder rebuilds', () => {
 
   it('rebuilds after errors in AOT', async () => {
     // Save the original contents of `./src/app/app.component.ts`.
-    const origContent = virtualFs.fileBufferToString(
+    const origContent = new TextDecoder().decode(
       host.scopedSync().read(normalize('src/app/app.component.ts')),
     );
     // Add a major static analysis error on a non-main file to the initial build.
@@ -495,7 +493,7 @@ describe('Browser Builder rebuilds', () => {
             case 4:
               // Check if html changes are added to factories.
               expect(buildEvent.success).toBe(true);
-              content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+              content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
               expect(content).toContain('HTML_REBUILD_STRING');
               // Change the component css.
               host.appendToFile('src/app/app.component.css', 'CSS_REBUILD_STRING {color: #f00;}');
@@ -504,7 +502,7 @@ describe('Browser Builder rebuilds', () => {
             case 5:
               // Check if css changes are added to factories.
               expect(buildEvent.success).toBe(true);
-              content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+              content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
               expect(content).toContain('CSS_REBUILD_STRING');
               // Change the component css import.
               host.appendToFile(
@@ -516,7 +514,7 @@ describe('Browser Builder rebuilds', () => {
             case 6:
               // Check if css import changes are added to factories.
               expect(buildEvent.success).toBe(true);
-              content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+              content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
               expect(content).toContain('CSS_DEP_REBUILD_STRING');
               // Change the component itself.
               host.replaceInFile(
@@ -529,7 +527,7 @@ describe('Browser Builder rebuilds', () => {
             case 7:
               // Check if component changes are added to factories.
               expect(buildEvent.success).toBe(true);
-              content = virtualFs.fileBufferToString(host.scopedSync().read(normalize(fileName)));
+              content = new TextDecoder().decode(host.scopedSync().read(normalize(fileName)));
               expect(content).toContain('FACTORY_REBUILD_STRING');
               break;
           }
@@ -593,7 +591,7 @@ describe('Browser Builder rebuilds', () => {
       .pipe(
         debounceTime(rebuildDebounceTime),
         tap(() => {
-          const content = virtualFs.fileBufferToString(
+          const content = new TextDecoder().decode(
             host.scopedSync().read(join(outputPath, 'main.js')),
           );
 
@@ -626,7 +624,7 @@ describe('Browser Builder rebuilds', () => {
         timeout(BUILD_TIMEOUT),
         debounceTime(rebuildDebounceTime),
         tap(() => {
-          const content = virtualFs.fileBufferToString(
+          const content = new TextDecoder().decode(
             host.scopedSync().read(join(outputPath, 'main.js')),
           );
 

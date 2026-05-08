@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { normalize, virtualFs } from '@angular-devkit/core';
+import { normalize } from '@angular-devkit/core';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
 describe('Browser Builder tsconfig paths', () => {
@@ -24,14 +24,14 @@ describe('Browser Builder tsconfig paths', () => {
     host.replaceInFile('src/app/app.module.ts', './app.component', '@root/app/app.component');
 
     const tsconfigPath = normalize('tsconfig.json');
-    const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
+    const tsconfig = JSON.parse(new TextDecoder().decode(host.scopedSync().read(tsconfigPath)));
     tsconfig.compilerOptions ??= {};
     tsconfig.compilerOptions.paths = {
       '@root/*': ['./src/*'],
     };
     host
       .scopedSync()
-      .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
+      .write(tsconfigPath, new TextEncoder().encode(JSON.stringify(tsconfig, null, 2)).buffer);
 
     await browserBuild(architect, host, target);
   });
@@ -43,7 +43,7 @@ describe('Browser Builder tsconfig paths', () => {
       'src/app/shared/index.ts': `export * from './meaning'`,
     });
     const tsconfigPath = normalize('tsconfig.json');
-    const tsconfig = JSON.parse(virtualFs.fileBufferToString(host.scopedSync().read(tsconfigPath)));
+    const tsconfig = JSON.parse(new TextDecoder().decode(host.scopedSync().read(tsconfigPath)));
     tsconfig.compilerOptions ??= {};
     tsconfig.compilerOptions.paths = {
       '@shared': ['./src/app/shared'],
@@ -52,7 +52,7 @@ describe('Browser Builder tsconfig paths', () => {
     };
     host
       .scopedSync()
-      .write(tsconfigPath, virtualFs.stringToFileBuffer(JSON.stringify(tsconfig, null, 2)));
+      .write(tsconfigPath, new TextEncoder().encode(JSON.stringify(tsconfig, null, 2)).buffer);
 
     host.appendToFile(
       'src/app/app.component.ts',

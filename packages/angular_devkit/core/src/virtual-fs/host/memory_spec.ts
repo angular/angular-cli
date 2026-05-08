@@ -8,7 +8,6 @@
 
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { fragment, normalize } from '../path';
-import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
 import { SyncDelegateHost } from './sync';
 
@@ -16,7 +15,7 @@ describe('SimpleMemoryHost', () => {
   it('can watch', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    host.write(normalize('/sub/file1'), stringToFileBuffer(''));
+    host.write(normalize('/sub/file1'), new TextEncoder().encode('').buffer);
 
     let recursiveCalled = 0;
     let noRecursiveCalled = 0;
@@ -28,14 +27,14 @@ describe('SimpleMemoryHost', () => {
     host.watch(normalize('/sub/file2'))!.subscribe(() => noRecursiveFileCalled++);
     host.watch(normalize('/sub/file3'))!.subscribe(() => diffFile++);
 
-    host.write(normalize('/sub/file2'), stringToFileBuffer(''));
+    host.write(normalize('/sub/file2'), new TextEncoder().encode('').buffer);
 
     expect(recursiveCalled).toBe(1);
     expect(noRecursiveCalled).toBe(0);
     expect(noRecursiveFileCalled).toBe(1);
     expect(diffFile).toBe(0);
 
-    host.write(normalize('/sub/file3'), stringToFileBuffer(''));
+    host.write(normalize('/sub/file3'), new TextEncoder().encode('').buffer);
 
     expect(recursiveCalled).toBe(2);
     expect(noRecursiveCalled).toBe(0);
@@ -46,7 +45,7 @@ describe('SimpleMemoryHost', () => {
   it('can read', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     host.write(normalize('/hello'), buffer);
     expect(host.read(normalize('/hello'))).toBe(buffer);
@@ -55,7 +54,7 @@ describe('SimpleMemoryHost', () => {
   it('can delete', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     expect(host.exists(normalize('/sub/file1'))).toBe(false);
     host.write(normalize('/sub/file1'), buffer);
@@ -67,7 +66,7 @@ describe('SimpleMemoryHost', () => {
   it('can delete directory', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     expect(host.exists(normalize('/sub/file1'))).toBe(false);
     host.write(normalize('/sub/file1'), buffer);
@@ -83,7 +82,7 @@ describe('SimpleMemoryHost', () => {
   it('can rename', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     expect(host.exists(normalize('/sub/file1'))).toBe(false);
     host.write(normalize('/sub/file1'), buffer);
@@ -97,7 +96,7 @@ describe('SimpleMemoryHost', () => {
   it('can list', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     host.write(normalize('/sub/file1'), buffer);
     host.write(normalize('/sub/file2'), buffer);
@@ -116,7 +115,7 @@ describe('SimpleMemoryHost', () => {
   it('supports isFile / isDirectory', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
+    const buffer = new TextEncoder().encode('hello').buffer;
 
     host.write(normalize('/sub/file1'), buffer);
     host.write(normalize('/sub/file2'), buffer);
@@ -135,8 +134,8 @@ describe('SimpleMemoryHost', () => {
   it('makes every path absolute', () => {
     const host = new SyncDelegateHost(new SimpleMemoryHost());
 
-    const buffer = stringToFileBuffer('hello');
-    const buffer2 = stringToFileBuffer('hello 2');
+    const buffer = new TextEncoder().encode('hello').buffer;
+    const buffer2 = new TextEncoder().encode('hello 2').buffer;
 
     host.write(normalize('file1'), buffer);
     host.write(normalize('/sub/file2'), buffer);

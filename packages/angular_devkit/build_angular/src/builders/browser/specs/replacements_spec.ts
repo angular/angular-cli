@@ -7,7 +7,7 @@
  */
 
 import { Architect } from '@angular-devkit/architect';
-import { logging, normalize, virtualFs } from '@angular-devkit/core';
+import { logging, normalize } from '@angular-devkit/core';
 import { delay, filter, map, of, race, take, takeUntil, takeWhile, tap, timeout } from 'rxjs';
 import { browserBuild, createArchitect, host } from '../../../testing/test-utils';
 
@@ -116,7 +116,7 @@ describe('Browser Builder file replacements', () => {
           expect(result.success).toBe(true, 'build should succeed');
 
           const fileName = normalize('dist/main.js');
-          const content = virtualFs.fileBufferToString(host.scopedSync().read(fileName));
+          const content = new TextDecoder().decode(host.scopedSync().read(fileName));
           const has42 = /meaning\s*=\s*42/.test(content);
           buildCount++;
           switch (phase) {

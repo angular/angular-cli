@@ -8,7 +8,7 @@
 
 import { Architect } from '@angular-devkit/architect';
 
-import { join, normalize, relative, virtualFs } from '@angular-devkit/core';
+import { join, normalize, relative } from '@angular-devkit/core';
 import { Observable, lastValueFrom, take, tap } from 'rxjs';
 import { createArchitect, host } from '../../../testing/test-utils';
 import { BrowserBuilderOutput } from '../index';
@@ -39,7 +39,7 @@ describe('Browser Builder allow js', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
-    const content = virtualFs.fileBufferToString(
+    const content = new TextDecoder().decode(
       await lastValueFrom(host.read(join(normalize(output.outputs[0].path), 'main.js'))),
     );
 
@@ -66,7 +66,7 @@ describe('Browser Builder allow js', () => {
     const output = await run.result;
     expect(output.success).toBe(true);
 
-    const content = virtualFs.fileBufferToString(
+    const content = new TextDecoder().decode(
       await lastValueFrom(host.read(join(normalize(output.outputs[0].path), 'main.js'))),
     );
 
@@ -96,7 +96,7 @@ describe('Browser Builder allow js', () => {
       run.output.pipe(
         tap((output) => {
           const path = relative(host.root(), join(normalize(output.outputs[0].path), 'main.js'));
-          const content = virtualFs.fileBufferToString(host.scopedSync().read(path));
+          const content = new TextDecoder().decode(host.scopedSync().read(path));
 
           switch (buildCount) {
             case 1:

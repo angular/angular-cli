@@ -8,12 +8,11 @@
 
 import { normalize } from '..';
 import { AliasHost } from './alias';
-import { stringToFileBuffer } from './buffer';
 import { SimpleMemoryHost } from './memory';
 
 describe('AliasHost', () => {
   it('works as in the example', () => {
-    const content = stringToFileBuffer('hello world');
+    const content = new TextEncoder().encode('hello world').buffer;
 
     const host = new SimpleMemoryHost();
     host.write(normalize('/some/file'), content).subscribe();
@@ -33,8 +32,8 @@ describe('AliasHost', () => {
   });
 
   it('works as in the example (2)', () => {
-    const content = stringToFileBuffer('hello world');
-    const content2 = stringToFileBuffer('hello world 2');
+    const content = new TextEncoder().encode('hello world').buffer;
+    const content2 = new TextEncoder().encode('hello world 2').buffer;
 
     const host = new SimpleMemoryHost();
     host.write(normalize('/some/folder/file'), content).subscribe();
