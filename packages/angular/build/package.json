@@ -36,12 +36,12 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.4",
     "piscina": "5.1.4",
-    "rollup": "4.60.2",
+    "rollup": "4.60.3",
     "sass": "1.99.0",
     "semver": "7.7.4",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.16",
-    "vite": "7.3.2",
+    "vite": "7.3.3",
     "watchpack": "2.5.1"
   },
   "optionalDependencies": {
@@ -54,8 +54,8 @@
     "jsdom": "29.1.1",
     "less": "4.6.4",
     "ng-packagr": "22.0.0-next.3",
-    "postcss": "8.5.13",
-    "rolldown": "1.0.0-rc.18",
+    "postcss": "8.5.14",
+    "rolldown": "1.0.0",
     "rxjs": "7.8.2",
     "vitest": "4.1.5"
   },
