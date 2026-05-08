@@ -8,7 +8,6 @@
  */
 
 import { JsonValue, logging, schema } from '@angular-devkit/core';
-import { ProcessOutput, createConsoleLogger } from '@angular-devkit/core/node';
 import { UnsuccessfulWorkflowExecution, strings } from '@angular-devkit/schematics';
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { existsSync } from 'node:fs';
@@ -50,8 +49,8 @@ function removeLeadingSlash(value: string): string {
 
 export interface MainOptions {
   args: string[];
-  stdout?: ProcessOutput;
-  stderr?: ProcessOutput;
+  stdout?: NodeJS.WritableStream;
+  stderr?: NodeJS.WritableStream;
 }
 
 function _listSchematics(workflow: NodeWorkflow, collectionName: string, logger: logging.Logger) {
@@ -217,6 +216,37 @@ function getPackageManagerName() {
   return 'npm';
 }
 
+function createLogger(
+  verbose: boolean,
+  stdout: NodeJS.WritableStream,
+  stderr: NodeJS.WritableStream,
+): logging.Logger {
+  const logger = new logging.IndentLogger('schematics');
+  const colorLevels: Record<string, (message: string, stream: NodeJS.WritableStream) => string> = {
+    info: (s) => s,
+    debug: (s) => s,
+    warn: (s, stream) => styleText(['bold', 'yellow'], s, { stream }),
+    error: (s, stream) => styleText(['bold', 'red'], s, { stream }),
+    fatal: (s, stream) => styleText(['bold', 'red'], s, { stream }),
+  };
+
+  logger.subscribe((entry) => {
+    if (entry.level === 'debug' && !verbose) {
+      return;
+    }
+
+    const output =
+      entry.level === 'warn' || entry.level === 'fatal' || entry.level === 'error'
+        ? stderr
+        : stdout;
+    const color = colorLevels[entry.level];
+    const message = color ? color(entry.message, output) : entry.message;
+    output.write(message + '\n');
+  });
+
+  return logger;
+}
+
 export async function main({
   args,
   stdout = process.stdout,
@@ -224,14 +254,7 @@ export async function main({
 }: MainOptions): Promise<0 | 1> {
   const { cliOptions, schematicOptions, _ } = parseOptions(args);
 
-  /** Create the DevKit Logger used through the CLI. */
-  const logger = createConsoleLogger(!!cliOptions.verbose, stdout, stderr, {
-    info: (s) => s,
-    debug: (s) => s,
-    warn: (s) => styleText(['bold', 'yellow'], s),
-    error: (s) => styleText(['bold', 'red'], s),
-    fatal: (s) => styleText(['bold', 'red'], s),
-  });
+  const logger = createLogger(!!cliOptions.verbose, stdout, stderr);
 
   if (cliOptions.help) {
     logger.info(getUsage());
