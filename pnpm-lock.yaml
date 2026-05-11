@@ -1012,7 +1012,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda}
+    resolution: {gitHosted: true, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda}
     version: 0.0.0-ba993c8a28db88485a5474bf9cc387dffd3eabd9
     hasBin: true
 
