@@ -23,16 +23,12 @@ export default async function () {
     ...process.env,
     NG_BUILD_OPTIMIZE_CHUNKS: 'true',
   });
-  const files1Opt = await readdir('dist/test-project/browser');
-  const jsFiles1Opt = files1Opt.filter((f) => f.endsWith('.js'));
 
   // Build with forced off
   await execWithEnv('ng', ['build', '--output-hashing=none'], {
     ...process.env,
     NG_BUILD_OPTIMIZE_CHUNKS: 'false',
   });
-  const files1Unopt = await readdir('dist/test-project/browser');
-  const jsFiles1Unopt = files1Unopt.filter((f) => f.endsWith('.js'));
 
   // We just verify it runs without error.
   // With 1 chunk it might not be able to optimize further, so counts might be equal.
