@@ -74,9 +74,14 @@ const MODULE_PRELOAD_MAX = 10;
 const CATCH_ALL_REGEXP = /\/(\*\*)$/;
 
 /**
- * Regular expression to match segments preceded by a colon in a string.
+ * Regular expression to match a segment preceded by a colon in a string.
  */
-const URL_PARAMETER_REGEXP = /(?<!\\):([^/]+)/g;
+const URL_PARAMETER_REGEXP = /(?<!\\):([^/]+)/;
+
+/**
+ * Regular expression to match all segments preceded by a colon in a string.
+ */
+const URL_PARAMETER_GLOBAL_REGEXP = new RegExp(URL_PARAMETER_REGEXP, 'g');
 
 /**
  * Additional metadata for a server configuration route tree.
@@ -464,7 +469,7 @@ async function* handleSSGRoute(
       for (const params of parameters) {
         const replacer = handlePrerenderParamsReplacement(params, currentRoutePath);
         const routeWithResolvedParams = currentRoutePath
-          .replace(URL_PARAMETER_REGEXP, replacer)
+          .replace(URL_PARAMETER_GLOBAL_REGEXP, replacer)
           .replace(CATCH_ALL_REGEXP, replacer);
 
         yield {
