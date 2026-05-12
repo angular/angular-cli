@@ -15,6 +15,8 @@ export interface ProcessOutput {
 
 /**
  * A Logger that sends information to STDOUT and STDERR.
+ *
+ * @deprecated Use a custom logger implementation instead.
  */
 export function createConsoleLogger(
   verbose = false,
