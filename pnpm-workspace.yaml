@@ -24,3 +24,35 @@ minimumReleaseAgeExclude:
   - '@ngtools/webpack'
   - '@schematics/*'
   - 'ng-packagr'
+overrides:
+  '@angular/build': workspace:*
+packageExtensions:
+  grpc-gcp:
+    peerDependencies:
+      protobufjs: '*'
+  vitest:
+    peerDependencies:
+      '@vitest/coverage-v8': '*'
+
+engineStrict: true
+# Disabling pnpm [hoisting](https://pnpm.io/settings#hoist) by setting `hoist:false` is recommended on
+# projects using rules_js so that pnpm outside of Bazel lays out a node_modules tree similar to what
+# rules_js lays out under Bazel (without a hidden node_modules/.pnpm/node_modules)
+hoist: false
+
+# Avoid pnpm auto-installing peer dependencies. We want to be explicit about our versions used
+# for peer dependencies, avoiding potential mismatches. In addition, it ensures we can continue
+# to rely on peer dependency placeholders substituted via Bazel.
+autoInstallPeers: false
+allowBuilds:
+  '@firebase/util': false
+  '@google/genai': false
+  '@parcel/watcher': false
+  bufferutil: false
+  esbuild: false
+  lmdb: false
+  msgpackr-extract: false
+  protobufjs: false
+  puppeteer: false
+  utf-8-validate: false
+  webdriver-manager: true
