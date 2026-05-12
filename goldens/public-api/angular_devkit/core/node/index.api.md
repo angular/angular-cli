@@ -11,7 +11,7 @@ import { Stats as Stats_2 } from 'node:fs';
 import { Subject } from 'rxjs';
 import { Subscription } from 'rxjs';
 
-// @public
+// @public @deprecated
 export function createConsoleLogger(verbose?: boolean, stdout?: ProcessOutput, stderr?: ProcessOutput, colors?: Partial<Record<logging.LogLevel, (s: string) => string>>): logging.Logger;
 
 // @public
