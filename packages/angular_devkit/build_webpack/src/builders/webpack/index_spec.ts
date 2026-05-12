@@ -10,9 +10,8 @@ import { Architect } from '@angular-devkit/architect';
 import { WorkspaceNodeModulesArchitectHost } from '@angular-devkit/architect/node';
 import { TestingArchitectHost } from '@angular-devkit/architect/testing';
 import { join, normalize, schema, workspaces } from '@angular-devkit/core';
-import { NodeJsSyncHost, createConsoleLogger } from '@angular-devkit/core/node';
+import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import * as path from 'node:path';
-import { BuildResult } from './index';
 
 describe('Webpack Builder basic test', () => {
   let testArchitectHost: TestingArchitectHost;
@@ -99,11 +98,7 @@ describe('Webpack Builder basic test', () => {
     });
 
     it('works', async () => {
-      const run = await architect.scheduleTarget(
-        { project: 'app', target: 'build-webpack' },
-        {},
-        { logger: createConsoleLogger() },
-      );
+      const run = await architect.scheduleTarget({ project: 'app', target: 'build-webpack' });
       const output = await run.result;
 
       expect(output.success).toBe(true);
