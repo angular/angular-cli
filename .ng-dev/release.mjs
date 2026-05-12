@@ -18,7 +18,7 @@ export const release = {
         name,
         experimental,
         deprecated: {
-          version: '>=22.0.0-next.0',
+          version: '>=22.0.0-rc.0',
           message:
             'Angular\'s Webpack support is deprecated. Use the esbuild and Vite-based "@angular/build" package instead.',
         },

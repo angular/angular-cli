@@ -11,16 +11,6 @@
     "angular-cli",
     "Angular CLI"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/angular/angular-cli.git"
-  },
-  "author": "Angular Authors",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/angular/angular-cli/issues"
-  },
-  "homepage": "https://github.com/angular/angular-cli",
   "dependencies": {
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",

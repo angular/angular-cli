@@ -4,22 +4,12 @@
   "description": "Webpack plugin that AoT compiles your Angular components and modules.",
   "main": "./src/index.js",
   "typings": "src/index.d.ts",
-  "license": "MIT",
   "keywords": [
     "angular",
     "webpack",
     "plugin",
     "aot"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/angular/angular-cli.git"
-  },
-  "author": "angular",
-  "bugs": {
-    "url": "https://github.com/angular/angular-cli/issues"
-  },
-  "homepage": "https://github.com/angular/angular-cli/tree/main/packages/ngtools/webpack",
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
     "typescript": ">=6.0 <6.1",

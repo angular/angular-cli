@@ -3,8 +3,6 @@
   "version": "0.0.0-PLACEHOLDER",
   "description": "Angular server side rendering utilities",
   "type": "module",
-  "license": "MIT",
-  "homepage": "https://github.com/angular/angular-cli",
   "keywords": [
     "angular",
     "ssr",
@@ -39,9 +37,5 @@
     "beasties": "0.4.2"
   },
   "sideEffects": false,
-  "schematics": "./schematics/collection.json",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/angular/angular-cli.git"
-  }
+  "schematics": "./schematics/collection.json"
 }
