@@ -29,7 +29,7 @@
     "copy-webpack-plugin": "14.0.0",
     "css-loader": "7.1.4",
     "esbuild-wasm": "0.28.0",
-    "http-proxy-middleware": "3.0.5",
+    "http-proxy-middleware": "4.0.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsonc-parser": "3.3.1",
     "karma-source-map-support": "1.4.0",
