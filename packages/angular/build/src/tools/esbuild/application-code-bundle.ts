@@ -67,7 +67,7 @@ export function createBrowserCodeBundleOptions(
       entryNames: outputNames.bundles,
       entryPoints,
       target,
-      supported: getFeatureSupport(target, zoneless),
+      supported: getFeatureSupport(zoneless),
     };
 
     buildOptions.plugins ??= [];
@@ -278,7 +278,7 @@ export function createServerMainCodeBundleOptions(
         js: `import './polyfills.server.mjs';`,
       },
       entryPoints,
-      supported: getFeatureSupport(target, zoneless),
+      supported: getFeatureSupport(zoneless),
     };
 
     buildOptions.plugins ??= [];
@@ -423,7 +423,7 @@ export function createSsrEntryCodeBundleOptions(
       entryPoints: {
         'server': ssrEntryNamespace,
       },
-      supported: getFeatureSupport(target, true),
+      supported: getFeatureSupport(true),
     };
 
     buildOptions.plugins ??= [];
