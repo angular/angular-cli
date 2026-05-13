@@ -7,15 +7,9 @@
  */
 
 /**
- * Common X-Forwarded-* headers.
+ * Internal sentinel string representing a wildcard rule to trust all proxy headers.
  */
-const X_FORWARDED_HEADERS: ReadonlySet<string> = new Set([
-  'x-forwarded-for',
-  'x-forwarded-host',
-  'x-forwarded-port',
-  'x-forwarded-proto',
-  'x-forwarded-prefix',
-]);
+const TRUST_ALL_PROXY_HEADERS = '*';
 
 /**
  * The set of headers that should be validated for host header injection attacks.
@@ -235,7 +229,10 @@ export function isProxyHeaderAllowed(
   headerName: string,
   trustProxyHeaders: ReadonlySet<string>,
 ): boolean {
-  return trustProxyHeaders.has(headerName.toLowerCase());
+  return (
+    trustProxyHeaders.has(TRUST_ALL_PROXY_HEADERS) ||
+    trustProxyHeaders.has(headerName.toLowerCase())
+  );
 }
 
 /**
@@ -251,8 +248,15 @@ export function normalizeTrustProxyHeaders(
   }
 
   if (trustProxyHeaders === true) {
-    return X_FORWARDED_HEADERS;
+    return new Set([TRUST_ALL_PROXY_HEADERS]);
   }
 
-  return new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
+  const normalizedTrustedProxyHeaders = new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
+  if (normalizedTrustedProxyHeaders.has(TRUST_ALL_PROXY_HEADERS)) {
+    throw new Error(
+      `"${TRUST_ALL_PROXY_HEADERS}" is not allowed as a value for the "trustProxyHeaders" option.`,
+    );
+  }
+
+  return normalizedTrustedProxyHeaders;
 }

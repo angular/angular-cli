@@ -8,6 +8,7 @@
 
 import {
   getFirstHeaderValue,
+  normalizeTrustProxyHeaders,
   sanitizeRequestHeaders,
   validateRequest,
   validateUrl,
@@ -34,6 +35,35 @@ describe('Validation Utils', () => {
 
     it('should return empty string for empty string input', () => {
       expect(getFirstHeaderValue('')).toBe('');
+    });
+  });
+
+  describe('normalizeTrustProxyHeaders', () => {
+    it('should return an empty set when input is undefined', () => {
+      expect(normalizeTrustProxyHeaders(undefined)).toEqual(new Set());
+    });
+
+    it('should return an empty set when input is false', () => {
+      expect(normalizeTrustProxyHeaders(false)).toEqual(new Set());
+    });
+
+    it('should return a set containing "*" when input is true', () => {
+      expect(normalizeTrustProxyHeaders(true)).toEqual(new Set(['*']));
+    });
+
+    it('should return a set of lowercased header names when input is an array of strings', () => {
+      expect(normalizeTrustProxyHeaders(['X-Forwarded-Host', 'X-Forwarded-Proto'])).toEqual(
+        new Set(['x-forwarded-host', 'x-forwarded-proto']),
+      );
+    });
+
+    it('should throw an error if input array contains "*"', () => {
+      expect(() => normalizeTrustProxyHeaders(['*'])).toThrowError(
+        '"*" is not allowed as a value for the "trustProxyHeaders" option.',
+      );
+      expect(() => normalizeTrustProxyHeaders(['X-Forwarded-Host', '*'])).toThrowError(
+        '"*" is not allowed as a value for the "trustProxyHeaders" option.',
+      );
     });
   });
 
@@ -224,15 +254,29 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, new Set());
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.has('x-forwarded-host')).toBeFalse();
       expect(secured.headers.has('x-forwarded-proto')).toBeFalse();
     });
 
-    it('should retain allowed proxy headers when explicitly provided', () => {
-      const trustProxyHeaders = new Set(['x-forwarded-host']);
+    it('should scrub unallowed proxy headers when trustProxyHeaders is false', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'evil.com',
+          'x-forwarded-proto': 'https',
+        },
+      });
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(false));
+
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.has('x-forwarded-host')).toBeFalse();
+      expect(secured.headers.has('x-forwarded-proto')).toBeFalse();
+    });
+
+    it('should only retain allowed proxy headers when explicitly provided', () => {
       const req = new Request('http://example.com', {
         headers: {
           'host': 'example.com',
@@ -240,7 +284,7 @@ describe('Validation Utils', () => {
           'x-forwarded-proto': 'https',
         },
       });
-      const secured = sanitizeRequestHeaders(req, trustProxyHeaders);
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(['x-forwarded-host']));
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
@@ -253,23 +297,22 @@ describe('Validation Utils', () => {
           'host': 'example.com',
           'x-forwarded-host': 'proxy.com',
           'x-forwarded-proto': 'https',
+          'x-forwarded-email': 'user@example.com',
         },
       });
-      const secured = sanitizeRequestHeaders(
-        req,
-        new Set(['x-forwarded-host', 'x-forwarded-proto']),
-      );
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(true));
 
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('x-forwarded-host')).toBe('proxy.com');
       expect(secured.headers.get('x-forwarded-proto')).toBe('https');
+      expect(secured.headers.get('x-forwarded-email')).toBe('user@example.com');
     });
 
     it('should not clone the request if no proxy headers need to be removed', () => {
       const req = new Request('http://example.com', {
         headers: { 'accept': 'application/json' },
       });
-      const secured = sanitizeRequestHeaders(req, new Set());
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(false));
 
       expect(secured).toBe(req);
       expect(secured.headers.get('accept')).toBe('application/json');
