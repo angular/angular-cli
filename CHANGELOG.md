@@ -1,3 +1,15 @@
+<a name="20.3.26"></a>
+
+# 20.3.26 (2026-05-13)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [7cc1871ee](https://github.com/angular/angular-cli/commit/7cc1871ee50d123853ddf6bd89857b354d647462) | fix  | allow all hosts in common engine rendering options to prevent validation errors |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.25"></a>
 
 # 20.3.25 (2026-04-29)
