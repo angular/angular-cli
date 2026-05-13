@@ -50,8 +50,8 @@ importers:
         specifier: 22.0.0-next.8
         version: 22.0.0-next.8(93ce75c341587667f5d7d40f3eefe13f)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#f084e2e88e71cdca8098489e6104ffcdbd9a8eda
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2c36222db3f44751284cc93b3806dbe1baee583a
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))
       '@angular/platform-browser':
         specifier: 22.0.0-next.12
         version: 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
@@ -333,7 +333,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
+        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
 
   packages/angular/build:
     dependencies:
@@ -442,7 +442,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
+        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
     optionalDependencies:
       lmdb:
         specifier: 3.5.4
@@ -1011,9 +1011,9 @@ packages:
       '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda':
-    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda}
-    version: 0.0.0-ba993c8a28db88485a5474bf9cc387dffd3eabd9
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a':
+    resolution: {tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a}
+    version: 0.0.0-6ef1cf3158022456bf1f7031de79b7e44fe479b2
     hasBin: true
 
   '@angular/platform-browser@22.0.0-next.12':
@@ -8287,7 +8287,6 @@ packages:
       '@vitest/ui': 4.1.5
       happy-dom: '*'
       jsdom: '*'
-      vite: ^6.0.0 || ^7.0.0 || ^8.0.0
     peerDependenciesMeta:
       '@edge-runtime/vm':
         optional: true
@@ -8453,6 +8452,11 @@ packages:
   which@6.0.1:
     resolution: {integrity: sha512-oGLe46MIrCRqX7ytPUf66EAYvdeMIZYn3WaocqqKZAxrBpkqHfL/qvTyJ/bTk5+AqHCjXmrv3CEWgy368zhRUg==}
     engines: {node: ^20.17.0 || >=22.9.0}
+    hasBin: true
+
+  which@7.0.0:
+    resolution: {integrity: sha512-RancgH2dmbLdHl6LRhEqvklWMgl/Hdnun0Y90KhBOLkMefg8Qa7/Zel8Sm+8HEcP6DEjzsWzpkuBQEZok58isA==}
+    engines: {node: ^22.22.2 || ^24.15.0 || >=26.0.0}
     hasBin: true
 
   why-is-node-running@2.3.0:
@@ -8799,7 +8803,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f084e2e88e71cdca8098489e6104ffcdbd9a8eda(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 2.7.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.4.0)
@@ -8851,7 +8855,7 @@ snapshots:
       typed-graphqlify: 3.1.6
       typescript: 6.0.3
       utf-8-validate: 6.0.6
-      which: 6.0.1
+      which: 7.0.0
       yaml: 2.8.4
       yargs: 18.0.0
       zod: 4.4.2
@@ -12038,7 +12042,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
+      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -17168,7 +17172,7 @@ snapshots:
       tsx: 4.21.0
       yaml: 2.9.0
 
-  vitest@4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jsdom@29.1.1)(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)):
+  vitest@4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.1.5
       '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
@@ -17196,7 +17200,17 @@ snapshots:
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
       jsdom: 29.1.1
     transitivePeerDependencies:
+      - jiti
+      - less
+      - lightningcss
       - msw
+      - sass
+      - sass-embedded
+      - stylus
+      - sugarss
+      - terser
+      - tsx
+      - yaml
 
   void-elements@2.0.1: {}
 
@@ -17508,6 +17522,10 @@ snapshots:
       isexe: 2.0.0
 
   which@6.0.1:
+    dependencies:
+      isexe: 4.0.0
+
+  which@7.0.0:
     dependencies:
       isexe: 4.0.0
 
