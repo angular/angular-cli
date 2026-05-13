@@ -1,3 +1,22 @@
+<a name="21.2.11"></a>
+
+# 21.2.11 (2026-05-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [bbd63b7a5](https://github.com/angular/angular-cli/commit/bbd63b7a5a1049bc56b9ddf6edf6563a1f2d9ace) | fix  | robustly parse npm manifest from array |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [eafe1a719](https://github.com/angular/angular-cli/commit/eafe1a719fd3fecd5263e0a8371200b4b1ff4bb9) | fix  | allow all hosts in common engine rendering options to prevent validation errors |
+| [7a116a80d](https://github.com/angular/angular-cli/commit/7a116a80d7e6db341fd003737285d1a9db10ba6c) | fix  | remove stateful flag from URL_PARAMETER_REGEXP                                  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.26"></a>
 
 # 20.3.26 (2026-05-13)
