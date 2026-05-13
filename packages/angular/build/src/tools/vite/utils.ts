@@ -100,7 +100,7 @@ export function getDepOptimizationConfig({
     esbuildOptions: {
       // Set esbuild supported targets.
       target,
-      supported: getFeatureSupport(target, zoneless),
+      supported: getFeatureSupport(zoneless),
       plugins,
       loader,
       define: {
