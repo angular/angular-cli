@@ -38,6 +38,35 @@ describe('Validation Utils', () => {
     });
   });
 
+  describe('normalizeTrustProxyHeaders', () => {
+    it('should return an empty set when input is undefined', () => {
+      expect(normalizeTrustProxyHeaders(undefined)).toEqual(new Set());
+    });
+
+    it('should return an empty set when input is false', () => {
+      expect(normalizeTrustProxyHeaders(false)).toEqual(new Set());
+    });
+
+    it('should return a set containing "*" when input is true', () => {
+      expect(normalizeTrustProxyHeaders(true)).toEqual(new Set(['*']));
+    });
+
+    it('should return a set of lowercased header names when input is an array of strings', () => {
+      expect(normalizeTrustProxyHeaders(['X-Forwarded-Host', 'X-Forwarded-Proto'])).toEqual(
+        new Set(['x-forwarded-host', 'x-forwarded-proto']),
+      );
+    });
+
+    it('should throw an error if input array contains "*"', () => {
+      expect(() => normalizeTrustProxyHeaders(['*'])).toThrowError(
+        '"*" is not allowed as a value for the "trustProxyHeaders" option.',
+      );
+      expect(() => normalizeTrustProxyHeaders(['X-Forwarded-Host', '*'])).toThrowError(
+        '"*" is not allowed as a value for the "trustProxyHeaders" option.',
+      );
+    });
+  });
+
   describe('validateUrl', () => {
     const allowedHosts = new Set(['example.com', '*.google.com']);
 
