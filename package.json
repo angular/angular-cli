@@ -108,7 +108,7 @@
     "fast-glob": "3.3.3",
     "globals": "17.6.0",
     "http-proxy": "^1.18.1",
-    "http-proxy-middleware": "3.0.5",
+    "http-proxy-middleware": "4.0.0",
     "husky": "9.1.7",
     "jasmine": "~6.2.0",
     "jasmine-core": "~6.2.0",
