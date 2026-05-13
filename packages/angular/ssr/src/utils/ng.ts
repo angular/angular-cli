@@ -40,8 +40,7 @@ export type AngularBootstrap =
 /**
  * Renders an Angular application or module to an HTML string.
  *
- * This function determines whether the provided `bootstrap` value is an Angular module
- * or a bootstrap function and invokes the appropriate rendering method (`renderModule` or `renderApplication`).
+ * This function supports both Angular modules and bootstrap functions for application initialization.
  *
  * @param html - The initial HTML document content.
  * @param bootstrap - An Angular module type or a function returning a promise that resolves to an `ApplicationRef`.
