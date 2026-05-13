@@ -1,3 +1,80 @@
+<a name="22.0.0-rc.0"></a>
+
+# 22.0.0-rc.0 (2026-05-13)
+
+## Deprecations
+
+### @angular-devkit/build-angular
+
+- Webpack builders in build-angular are deprecated. Use @angular/build builders instead.
+
+### @angular-devkit/build-webpack
+
+- Webpack builders in build-webpack are deprecated. Use @angular/build builders instead.
+
+### @angular/ssr
+
+- CommonEngine APIs are deprecated in favor of AngularNodeAppEngine or AngularAppEngine.
+
+### @ngtools/webpack
+
+- @ngtools/webpack loader and plugin are deprecated. Use @angular/build instead.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [b2f7a038b](https://github.com/angular/angular-cli/commit/b2f7a038b4a321e4e1b0b340cd09425f948c77ad) | feat | conditionally install istanbul coverage provider for Vitest migration |
+| [d227e6985](https://github.com/angular/angular-cli/commit/d227e6985ef5540e0eea2571577ee2b9be0d3c64) | feat | migrate fake async to Vitest fake timers                              |
+| [d2aa9ede5](https://github.com/angular/angular-cli/commit/d2aa9ede55a3e16b61ce6ae60dba6c8ea8954358) | feat | migrate fakeAsync's flush behavior when used in beforeEach            |
+| [c9f408153](https://github.com/angular/angular-cli/commit/c9f4081533f6f114846b88a152a9d5dc7363d680) | feat | set up fake timers in beforeEach instead of beforeAll                 |
+| [8d0805dd1](https://github.com/angular/angular-cli/commit/8d0805dd1750cb16af620811dc01b40e46ad030e) | feat | update TSConfig globals during karma to vitest migration              |
+| [aed407db8](https://github.com/angular/angular-cli/commit/aed407db8be6bc7591fb82f10c79586cbd072a8a) | fix  | defer karma config deletion in Karma to Vitest migration              |
+| [7fb59eaa6](https://github.com/angular/angular-cli/commit/7fb59eaa65a8d7e880b6f44d715b2aeaff9301ca) | fix  | use service decorator in ng generate                                  |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [58c0978f6](https://github.com/angular/angular-cli/commit/58c0978f658ee5fa7232abd8e2eb7f146e4eb6bb) | feat | add support for Node.js 26.0.0                                            |
+| [ff88f491d](https://github.com/angular/angular-cli/commit/ff88f491da38493d6e06f3e4ac080d171c630ccd) | fix  | restrict MCP workspace access to allowed client roots during resolution   |
+| [a5e1e48db](https://github.com/angular/angular-cli/commit/a5e1e48db759e9ffcaa89f04504f5f93a1afdda4) | fix  | update odd-numbered Node.js version warning condition for future releases |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type     | Description                |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------- |
+| [b7940dbcb](https://github.com/angular/angular-cli/commit/b7940dbcb40291be4de5b31e8a8001165459a7d4) | refactor | deprecate Webpack builders |
+
+### @angular-devkit/build-webpack
+
+| Commit                                                                                              | Type     | Description                                       |
+| --------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------- |
+| [3d5daa45e](https://github.com/angular/angular-cli/commit/3d5daa45e3ade025c1bc0df35d2766563ccf7c03) | refactor | deprecate webpack and webpack-dev-server builders |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [58c7c7a9d](https://github.com/angular/angular-cli/commit/58c7c7a9d80fc6af5cf8b82a6d87f1d3cf3808c6) | feat | subresource integrity validation for dynamically loaded modules |
+| [edfa782d5](https://github.com/angular/angular-cli/commit/edfa782d52fd971aebead8b96b6ca470a3f5123e) | fix  | use dynamic TestComponentRenderer for Vitest                    |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type     | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | -------- | ----------------------------------------------------------------- |
+| [ea95e1a87](https://github.com/angular/angular-cli/commit/ea95e1a87ebfb5b452a6b6ffa7838ca1fe094100) | fix      | remove stateful flag from URL_PARAMETER_REGEXP                    |
+| [f85343925](https://github.com/angular/angular-cli/commit/f8534392552f4896ee9449939cdc705010331e3d) | fix      | support all X-Forwarded-\* headers when trustProxyHeaders is true |
+| [50b16a65b](https://github.com/angular/angular-cli/commit/50b16a65b1be1f9c2ec11d578240a8884518d517) | refactor | deprecate CommonEngine APIs                                       |
+
+### @ngtools/webpack
+
+| Commit                                                                                              | Type     | Description                                  |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------- |
+| [547ca515b](https://github.com/angular/angular-cli/commit/547ca515b707c283489a3f088d86fc84807d830d) | refactor | deprecate @ngtools/webpack loader and plugin |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.10"></a>
 
 # 21.2.10 (2026-05-06)
