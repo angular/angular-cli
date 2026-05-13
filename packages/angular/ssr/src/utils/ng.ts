@@ -77,11 +77,13 @@ export function renderAngular(
         url: urlToRender,
         document: html,
         extraProviders: providers,
+        allowedHosts: ['*'],
       })
     : renderApplication(bootstrap, {
         url: urlToRender,
         document: html,
         platformProviders: providers,
+        allowedHosts: ['*'],
       });
 }
 
