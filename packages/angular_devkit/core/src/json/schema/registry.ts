@@ -224,7 +224,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * See: https://json-schema.org/draft/2019-09/json-schema-core.html#rfc.appendix.B.2
    *
    * @param schema The schema or URI to flatten.
-   * @returns An Observable of the flattened schema object.
+   * @return A Promise that resolves to the flattened schema object.
    * @private since 11.2 without replacement.
    */
   async ɵflatten(schema: JsonObject): Promise<JsonObject> {
