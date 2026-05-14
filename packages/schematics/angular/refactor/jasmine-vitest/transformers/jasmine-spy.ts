@@ -505,6 +505,53 @@ function transformThisFor(
   );
 }
 
+function transformAllCallsArgs(
+  node: ts.Node,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
+): ts.Node {
+  if (
+    !ts.isPropertyAccessExpression(node) ||
+    !ts.isIdentifier(node.name) ||
+    node.name.text !== 'args'
+  ) {
+    return node;
+  }
+
+  const elementAccess = node.expression;
+  if (!ts.isElementAccessExpression(elementAccess)) {
+    return node;
+  }
+
+  const allCall = elementAccess.expression;
+  if (!ts.isCallExpression(allCall) || !ts.isPropertyAccessExpression(allCall.expression)) {
+    return node;
+  }
+
+  const allPae = allCall.expression;
+  if (!ts.isIdentifier(allPae.name) || allPae.name.text !== 'all') {
+    return node;
+  }
+
+  if (!ts.isPropertyAccessExpression(allPae.expression)) {
+    return node;
+  }
+
+  const spyIdentifier = getSpyIdentifierFromCalls(allPae.expression);
+  if (!spyIdentifier) {
+    return node;
+  }
+
+  reporter.reportTransformation(
+    sourceFile,
+    node,
+    'Transformed `spy.calls.all()[i].args` to `vi.mocked(spy).mock.calls[i]`.',
+  );
+  const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
+  const callsProperty = createPropertyAccess(mockProperty, 'calls');
+
+  return ts.factory.createElementAccessExpression(callsProperty, elementAccess.argumentExpression);
+}
+
 export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const mostRecentArgsTransformed = transformMostRecentArgs(node, refactorCtx);
   if (mostRecentArgsTransformed !== node) {
@@ -514,6 +561,11 @@ export function transformSpyCallInspection(node: ts.Node, refactorCtx: RefactorC
   const thisForTransformed = transformThisFor(node, refactorCtx);
   if (thisForTransformed !== node) {
     return thisForTransformed;
+  }
+
+  const allCallsArgsTransformed = transformAllCallsArgs(node, refactorCtx);
+  if (allCallsArgsTransformed !== node) {
+    return allCallsArgsTransformed;
   }
 
   if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {

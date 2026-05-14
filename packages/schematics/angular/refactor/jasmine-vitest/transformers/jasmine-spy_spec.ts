@@ -271,6 +271,11 @@ describe('transformSpyCallInspection', () => {
       expected: `const allCalls = vi.mocked(mySpy).mock.calls;`,
     },
     {
+      description: 'should transform spy.calls.all()[i].args',
+      input: `expect(mySpy.calls.all()[2].args[0]).toBeInstanceOf(RemoveShareUrlAction);`,
+      expected: `expect(vi.mocked(mySpy).mock.calls[2][0]).toBeInstanceOf(RemoveShareUrlAction);`,
+    },
+    {
       description: 'should transform spy.calls.mostRecent().args',
       input: `const recentArgs = mySpy.calls.mostRecent().args;`,
       expected: `const recentArgs = vi.mocked(mySpy).mock.lastCall;`,
