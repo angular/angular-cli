@@ -13,12 +13,10 @@ import {
   BuildResult,
   Message,
   Metafile,
-  OutputFile,
   build,
   context,
 } from 'esbuild';
 import assert from 'node:assert';
-import { builtinModules } from 'node:module';
 import { basename, extname, join, relative } from 'node:path';
 import { SERVER_GENERATED_EXTERNALS } from '../../utils/server-rendering/manifest';
 import {
@@ -472,12 +470,9 @@ function isInternalBundlerFile(file: string) {
     return true;
   }
 
-  const DISABLED_BUILTIN = '(disabled):';
-
-  // Disabled node builtins such as "/some/path/(disabled):fs"
-  const disabledIndex = file.indexOf(DISABLED_BUILTIN);
-  if (disabledIndex >= 0) {
-    return builtinModules.includes(file.slice(disabledIndex + DISABLED_BUILTIN.length));
+  // Any (disabled): path is a virtual esbuild entry that doesn't exist on disk
+  if (file.includes('(disabled):')) {
+    return true;
   }
 
   return false;
