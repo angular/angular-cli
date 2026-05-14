@@ -16,6 +16,7 @@ import {
   OutputFile,
   build,
   context,
+  stop,
 } from 'esbuild';
 import assert from 'node:assert';
 import { builtinModules } from 'node:module';
@@ -55,6 +56,10 @@ export type BundlerOptionsFactory<T extends BuildOptions = BuildOptions> = (
  */
 function isEsBuildFailure(value: unknown): value is BuildFailure {
   return !!value && typeof value === 'object' && 'errors' in value && 'warnings' in value;
+}
+
+export function shutdownEsbuild(): Promise<void> {
+  return stop();
 }
 
 export class BundlerContext {

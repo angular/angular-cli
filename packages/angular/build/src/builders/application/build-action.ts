@@ -9,6 +9,7 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
+import { shutdownEsbuild } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
@@ -89,9 +90,10 @@ export async function* runEsBuildBuildAction(
     // Log all diagnostic (error/warning/logs) messages
     await logMessages(logger, result, colors, jsonLogs);
   } finally {
-    // Ensure Sass workers are shutdown if not watching
+    // Ensure workers are shutdown if not watching
     if (!watch) {
       shutdownSassWorkerPool();
+      await shutdownEsbuild();
     }
   }
 
@@ -219,6 +221,7 @@ export async function* runEsBuildBuildAction(
     await Promise.allSettled([watcher.close(), result.dispose()]);
 
     shutdownSassWorkerPool();
+    await shutdownEsbuild();
   }
 }
 
