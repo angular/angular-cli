@@ -88,6 +88,9 @@ const listProjectsOutputSchema = {
               'The default style language for the project (e.g., "scss"). ' +
                 'This determines the file extension for new component styles.',
             ),
+          targets: z
+            .array(z.string())
+            .describe('Available project targets (e.g., ["build", "test", "lint", "e2e"]).'),
         }),
       ),
     }),
@@ -131,6 +134,7 @@ their types, and their locations.
 * Getting the \`selectorPrefix\` for a project before generating a new component to ensure it follows conventions.
 * Identifying the major version of the Angular framework for each workspace, which is crucial for monorepos.
 * Determining a project's primary function by inspecting its builder (e.g., '@angular-devkit/build-angular:browser' for an application).
+* Identifying available architect targets (e.g., \`lint\`, \`e2e\`, \`serve\`, \`deploy\`) before attempting execution.
 </Use Cases>
 <Operational Notes>
 * **Working Directory:** Shell commands for a project (like \`ng generate\`) **MUST**
@@ -471,6 +475,7 @@ async function loadAndParseWorkspace(
       const fullSourceRoot = join(workspaceRoot, sourceRoot);
       const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
       const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
+      const targets = Array.from(project.targets.keys());
 
       projects.push({
         name,
@@ -481,6 +486,7 @@ async function loadAndParseWorkspace(
         selectorPrefix: project.extensions['prefix'] as string,
         unitTestFramework,
         styleLanguage,
+        targets,
       });
     }
 
