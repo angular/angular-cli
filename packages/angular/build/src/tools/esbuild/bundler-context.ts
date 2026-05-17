@@ -33,6 +33,8 @@ export type BundleContextResult =
       errors: undefined;
       warnings: Message[];
       metafile: Metafile;
+      browserMetafile: Metafile;
+      serverMetafile: Metafile;
       outputFiles: BuildOutputFile[];
       initialFiles: Map<string, InitialFileRecord>;
       externalImports: {
@@ -112,6 +114,8 @@ export class BundlerContext {
     let errors: Message[] | undefined;
     const warnings: Message[] = [];
     const metafile: Metafile = { inputs: {}, outputs: {} };
+    const browserMetafile: Metafile = { inputs: {}, outputs: {} };
+    const serverMetafile: Metafile = { inputs: {}, outputs: {} };
     const initialFiles = new Map<string, InitialFileRecord>();
     const externalImportsBrowser = new Set<string>();
     const externalImportsServer = new Set<string>();
@@ -126,11 +130,16 @@ export class BundlerContext {
         continue;
       }
 
-      // Combine metafiles used for the stats option as well as bundle budgets and console output
+      // Combine metafiles used for the bundle budgets and console output
       if (result.metafile) {
         Object.assign(metafile.inputs, result.metafile.inputs);
         Object.assign(metafile.outputs, result.metafile.outputs);
       }
+
+      Object.assign(browserMetafile.inputs, result.browserMetafile.inputs);
+      Object.assign(browserMetafile.outputs, result.browserMetafile.outputs);
+      Object.assign(serverMetafile.inputs, result.serverMetafile.inputs);
+      Object.assign(serverMetafile.outputs, result.serverMetafile.outputs);
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
 
@@ -154,6 +163,8 @@ export class BundlerContext {
       errors,
       warnings,
       metafile,
+      browserMetafile,
+      serverMetafile,
       initialFiles,
       outputFiles,
       externalImports: {
@@ -416,6 +427,8 @@ export class BundlerContext {
       ...result,
       outputFiles,
       initialFiles,
+      browserMetafile: isPlatformServer ? { inputs: {}, outputs: {} } : result.metafile,
+      serverMetafile: isPlatformServer ? result.metafile : { inputs: {}, outputs: {} },
       externalImports: {
         [isPlatformServer ? 'server' : 'browser']: externalImports,
       },
