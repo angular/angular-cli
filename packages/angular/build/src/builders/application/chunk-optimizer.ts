@@ -413,5 +413,25 @@ export async function optimizeChunks(
     }
   }
 
+  // Rebuild browserMetafile from the updated combined metafile and output files.
+  // Chunk optimization only affects browser chunks, so serverMetafile is unchanged.
+  const browserOutputPaths = new Set(
+    original.outputFiles.filter((f) => f.type === BuildOutputFileType.Browser).map((f) => f.path),
+  );
+  const newBrowserMetafile: Metafile = { inputs: {}, outputs: {} };
+  for (const [path, output] of Object.entries(original.metafile.outputs)) {
+    if (!browserOutputPaths.has(path)) {
+      continue;
+    }
+    newBrowserMetafile.outputs[path] = output;
+    for (const inputPath of Object.keys(output.inputs)) {
+      const input = original.metafile.inputs[inputPath];
+      if (input) {
+        newBrowserMetafile.inputs[inputPath] ??= input;
+      }
+    }
+  }
+  original.browserMetafile = newBrowserMetafile;
+
   return original;
 }
