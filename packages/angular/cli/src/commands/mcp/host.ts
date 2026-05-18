@@ -20,6 +20,8 @@ import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promis
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { createInterface } from 'node:readline';
+import { stripVTControlCharacters } from 'node:util';
 
 /**
  * An error thrown when a command fails to execute.
@@ -196,8 +198,8 @@ export const LocalWorkspaceHost: Host = {
       });
 
       const logs: string[] = [];
-      childProcess.stdout?.on('data', (data) => logs.push(data.toString()));
-      childProcess.stderr?.on('data', (data) => logs.push(data.toString()));
+      processStreamLines(childProcess.stdout, (line) => logs.push(line));
+      processStreamLines(childProcess.stderr, (line) => logs.push(line));
 
       childProcess.on('close', (code) => {
         if (code === 0) {
@@ -389,4 +391,26 @@ export function createRootRestrictedHost(
       return baseHost.spawn(command, args, options);
     },
   };
+}
+
+/**
+ * Binds a readline interface to the given stream to process each line.
+ * Sanitizes lines by removing VT/ANSI control characters, trimming trailing whitespace,
+ * and preserving leading indentation.
+ */
+export function processStreamLines(
+  stream: NodeJS.ReadableStream | undefined | null,
+  lineCallback: (line: string) => void,
+): void {
+  if (!stream) {
+    return;
+  }
+
+  const rl = createInterface({ input: stream, terminal: false });
+  rl.on('line', (line) => {
+    const cleanLine = stripVTControlCharacters(line).trimEnd();
+    if (cleanLine.length > 0) {
+      lineCallback(cleanLine);
+    }
+  });
 }

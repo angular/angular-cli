@@ -7,7 +7,7 @@
  */
 
 import type { ChildProcess } from 'child_process';
-import type { Host } from './host';
+import { type Host, processStreamLines } from './host';
 
 // Log messages that we want to catch to identify the build status.
 
@@ -122,13 +122,10 @@ export class LocalDevserver implements Devserver {
       stdio: 'pipe',
       cwd: this.workspacePath,
     });
-    this.devserverProcess.stdout?.on('data', (data) => {
-      this.addLog(data.toString());
-    });
-    this.devserverProcess.stderr?.on('data', (data) => {
-      this.addLog(data.toString());
-    });
-    this.devserverProcess.stderr?.on('close', () => {
+    processStreamLines(this.devserverProcess.stdout, (line) => this.addLog(line));
+    processStreamLines(this.devserverProcess.stderr, (line) => this.addLog(line));
+
+    this.devserverProcess.on('close', () => {
       this.stop();
     });
     this.buildInProgress = true;
