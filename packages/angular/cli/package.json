@@ -15,7 +15,7 @@
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
-    "@inquirer/prompts": "8.4.2",
+    "@inquirer/prompts": "8.4.3",
     "@listr2/prompt-adapter-inquirer": "4.2.3",
     "@modelcontextprotocol/sdk": "1.29.0",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
@@ -27,7 +27,7 @@
     "npm-package-arg": "13.0.2",
     "pacote": "21.5.0",
     "parse5-html-rewriting-stream": "8.0.1",
-    "semver": "7.7.4",
+    "semver": "7.8.0",
     "yargs": "18.0.0",
     "zod": "4.4.3"
   },
