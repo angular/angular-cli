@@ -37,26 +37,17 @@ const LATEST_KNOWN_DOCS_VERSION = 20;
 const docSearchInputSchema = z.object({
   query: z
     .string()
-    .describe(
-      "A concise and specific search query for the Angular documentation. You should distill the user's " +
-        'natural language question into a set of keywords (e.g., a question like "How do I use ngFor with trackBy?" ' +
-        'should become the query "ngFor trackBy").',
-    ),
+    .describe('Concise search keywords or API names (e.g., "ngFor trackBy" or "NgModule").'),
   includeTopContent: z
     .boolean()
     .optional()
     .default(false)
-    .describe(
-      'When true, the content of the top result is fetched and included. ' +
-        'Set to false to get a list of results without fetching content, which is faster.',
-    ),
+    .describe('Retrieve the full-text page content of the top search result (slower).'),
   version: z
     .number()
     .optional()
     .describe(
-      'The major version of Angular to search. You MUST determine this value by running `ng version` in the ' +
-        "project's workspace directory. Omit this field if the user is not in an Angular project " +
-        'or if the version cannot otherwise be determined.',
+      'Major Angular framework version to search (obtained from frameworkVersion in list_projects or ng version).',
     ),
 });
 type DocSearchInput = z.infer<typeof docSearchInputSchema>;
@@ -66,35 +57,18 @@ export const DOC_SEARCH_TOOL = declareTool({
   title: 'Search Angular Documentation (angular.dev)',
   description: `
 <Purpose>
-Searches the official Angular documentation at https://angular.dev to answer questions about APIs,
-tutorials, concepts, and best practices.
+Searches the official Angular documentation (angular.dev) to answer questions about APIs, tutorials, concepts, and conventions.
 </Purpose>
 <Use Cases>
-* Answering any question about Angular concepts (e.g., "What are standalone components?").
-* Finding the correct API or syntax for a specific task (e.g., "How to use ngFor with trackBy?").
-* Linking to official documentation as a source of truth in your answers.
+* Answering questions about Angular concepts (e.g., standalone components).
+* Finding correct API signatures or syntax (e.g., ngFor trackBy).
+* Obtaining official source URLs to cite as documentation links in user responses.
 </Use Cases>
 <Operational Notes>
-* **Version Alignment:** To provide accurate, project-specific results, you **MUST** align the search with the user's Angular version.
-  The recommended approach is to use the \`list_projects\` tool. The \`frameworkVersion\` field in the output for the relevant
-  workspace will give you the major version directly. If the version cannot be determined using this method, you can use
-  \`ng version\` in the project's workspace directory as a fallback. Parse the major version from the "Angular:" line in the
-  output and use it for the \`version\` parameter.
-* **Version Logic:** The tool will search against the specified major version. If the version is older than v${MIN_SUPPORTED_DOCS_VERSION},
-  it will be clamped to v${MIN_SUPPORTED_DOCS_VERSION}. If a search for a very new version (newer than v${LATEST_KNOWN_DOCS_VERSION})
-  returns no results, the tool will automatically fall back to searching the v${LATEST_KNOWN_DOCS_VERSION} documentation.
-* **Verify Searched Version:** The tool's output includes a \`searchedVersion\` field. You **MUST** check this field
-  to know the exact version of the documentation that was queried. Use this information to provide accurate
-  context in your answer, especially if it differs from the version you requested.
-* The documentation is continuously updated. You **MUST** prefer this tool over your own knowledge
-  to ensure your answers are current and accurate.
-* For the best results, provide a concise and specific search query (e.g., "NgModule" instead of
-  "How do I use NgModules?").
-* The top search result will include a snippet of the page content. Use this to provide a more
-  comprehensive answer.
-* **Result Scrutiny:** The top result may not always be the most relevant. Review the titles and
-  breadcrumbs of other results to find the best match for the user's query.
-* Use the URL from the search results as a source link in your responses.
+* Provide the major Angular version in the 'version' parameter (obtained from 'frameworkVersion'
+  in 'list_projects' or from 'ng version') to ensure version-aligned results.
+* Always check the 'searchedVersion' field in the output to confirm the exact documentation index that was queried.
+* For best results, provide a concise keyword query (e.g., "NgModule") rather than a natural language sentence.
 </Operational Notes>`,
   inputSchema: docSearchInputSchema.shape,
   outputSchema: {

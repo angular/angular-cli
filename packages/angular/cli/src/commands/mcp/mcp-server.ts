@@ -83,36 +83,33 @@ export async function createMcpServer(
       },
       instructions: `
 <General Purpose>
-This server provides a safe, programmatic interface to the Angular CLI for an AI assistant.
-Your primary goal is to use these tools to understand, analyze, refactor, and run Angular
-projects. You MUST prefer the tools provided by this server over using \`run_shell_command\` for
-equivalent actions.
+This server provides a safe, programmatic interface to the Angular CLI. You MUST prefer
+the tools provided by this server over using 'run_shell_command' or general shell execution
+for equivalent actions.
 </General Purpose>
 
 <Core Workflows & Tool Guide>
-* **1. Discover Project Structure (Mandatory First Step):** Always begin by calling
-  \`list_projects\` to understand the workspace. The \`path\` property for a workspace
-  is a required input for other tools.
+* **1. Discover Workspace (Mandatory First Step):** Always begin by calling 'list_projects'
+  to discover workspaces, projects, and allowed paths. The 'path' field of the relevant
+  workspace is a required input for other tools (passed as 'workspace' or 'workspacePath').
 
-* **2. Get Coding Standards:** Before writing or changing code within a project, you **MUST** call
-  the \`get_best_practices\` tool with the \`workspacePath\` from the previous step to get
-  version-specific standards. For general knowledge, you can call the tool without this path.
+* **2. Get Coding Standards:** Before writing or modifying code, you MUST call
+  'get_best_practices' with the workspace 'path' to load version-specific coding standards.
 
-* **3. Answer User Questions:**
-    - For conceptual questions ("what is..."), use \`search_documentation\`.
+* **3. Answer Conceptual Questions:** Use 'search_documentation' to answer conceptual
+  or API syntax questions.
 
-* **4. Discover Schematics for Modernization:** Since this server does not provide a
-  specific tool for listing available schematics, you can use a shell command (if
-  available) with \`ng generate <package-name>: --help\` to discover what migrations
-  are available in a package (e.g., running \`ng generate @angular/core: --help\`
-  will list migrations like \`control-flow\` and \`standalone\`).
+* **4. Discover Schematics:** To discover available package migrations, use a shell command
+  (if available) with 'ng generate <package-name>: --help' (e.g., 'ng generate @angular/core: --help').
 </Core Workflows & Tool Guide>
 
 <Key Concepts>
-* **Workspace vs. Project:** A 'workspace' contains an \`angular.json\` file and defines 'projects'
-  (applications or libraries). A monorepo can have multiple workspaces.
-* **Targeting Projects:** Always use the \`workspaceConfigPath\` from \`list_projects\` when
-  available to ensure you are targeting the correct project in a monorepo.
+* **Workspace vs. Project:** A 'workspace' contains an 'angular.json' file and defines
+  'projects' (applications or libraries). A monorepo can contain multiple workspaces.
+
+* **Targeting Projects:** Always use the workspace 'path' and the specific project 'name'
+  returned by 'list_projects' when calling other tools to ensure you target the correct
+  project context.
 </Key Concepts>
 `,
     },

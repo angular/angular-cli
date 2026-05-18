@@ -25,30 +25,19 @@ export const ZONELESS_MIGRATION_TOOL = declareTool({
   title: 'Plan migration to OnPush and/or zoneless',
   description: `
 <Purpose>
-Analyzes Angular code and provides a step-by-step, iterative plan to migrate it to \`OnPush\`
-change detection, a prerequisite for a zoneless application. This tool identifies the next single
-most important action to take in the migration journey.
+Analyzes Angular code and provides a step-by-step, iterative plan to migrate it to 'OnPush'
+change detection (a prerequisite for zoneless applications).
 </Purpose>
 <Use Cases>
-* **Step-by-Step Migration:** Running the tool repeatedly to get the next instruction for a full
-  migration to \`OnPush\`.
-* **Pre-Migration Analysis:** Checking a component or directory for unsupported \`NgZone\` APIs that
-  would block a zoneless migration.
-* **Generating Component Migrations:** Getting the exact instructions for converting a single
-  component from the default change detection strategy to \`OnPush\`.
+* Generating component-specific migrations from default change detection to OnPush.
+* Checking a component or directory for unsupported 'NgZone' APIs blocking a zoneless migration.
+* Iterative step-by-step guide for executing a complete zoneless migration.
 </Use Cases>
 <Operational Notes>
-* **Execution Model:** This tool **DOES NOT** modify code. It **PROVIDES INSTRUCTIONS** for a
-  single action at a time. You **MUST** apply the changes it suggests, and then run the tool
-  again to get the next step.
-* **Iterative Process:** The migration process is iterative. You must call this tool repeatedly,
-  applying the suggested fix after each call, until the tool indicates that no more actions are
-  needed.
-* **Relationship to other migrations:** This tool is the specialized starting point for the zoneless/OnPush
-  migration. For other migrations (like signal inputs), you should run the corresponding schematics first,
-  as the zoneless migration may depend on them as prerequisites.
-* **Input:** The tool can operate on either a single file or an entire directory. Provide the
-  absolute path.
+* This tool is strictly read-only and does NOT modify code. It outputs EXACTLY ONE actionable step at a time.
+* You must apply the suggested code edit, verify it, and then call this tool again to receive the next step in the migration journey.
+* Run modernization schematics (e.g., Signal Inputs migrations) as prerequisites before starting this migration.
+* Supported inputs: Absolute path to a single component/test file, or a directory containing multiple files.
 </Operational Notes>`,
   isReadOnly: true,
   isLocalOnly: true,
@@ -56,8 +45,7 @@ most important action to take in the migration journey.
     fileOrDirPath: z
       .string()
       .describe(
-        'The absolute path of the directory or file with the component(s), directive(s), or service(s) to migrate.' +
-          ' The contents are read with fs.readFileSync.',
+        'Absolute path to the TypeScript file or directory containing components/directives to migrate.',
       ),
   },
   factory:
