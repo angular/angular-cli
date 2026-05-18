@@ -122,29 +122,20 @@ export const LIST_PROJECTS_TOOL = declareTool({
   title: 'List Angular Projects',
   description: `
 <Purpose>
-Provides a comprehensive overview of all Angular workspaces and projects within the repository.
-It is essential to use this tool as a first step before performing any project-specific actions to understand the available projects,
-their types, and their locations.
+Provides a comprehensive overview of all Angular workspaces, projects, and configured targets within the repository.
+Always use this tool as a mandatory first step before performing any project-specific actions
+to understand the available projects and locations.
 </Purpose>
 <Use Cases>
-* Finding the correct project name to use in other commands (e.g., \`ng generate component my-comp --project=my-app\`).
-* Identifying the \`root\` and \`sourceRoot\` of a project to read, analyze, or modify its files.
-* Determining a project's unit test framework (\`unitTestFramework\`) before writing or modifying tests.
-* Identifying the project's style language (\`styleLanguage\`) to use the correct file extension (e.g., \`.scss\`).
-* Getting the \`selectorPrefix\` for a project before generating a new component to ensure it follows conventions.
-* Identifying the major version of the Angular framework for each workspace, which is crucial for monorepos.
-* Determining a project's primary function by inspecting its builder (e.g., '@angular-devkit/build-angular:browser' for an application).
-* Identifying available architect targets (e.g., \`lint\`, \`e2e\`, \`serve\`, \`deploy\`) before attempting execution.
+* Discovering project names, locations, builders, selector prefixes, and style languages before generating or building components.
+* Determining a project's unit test framework (Jasmine, Jest, or Vitest) before writing or modifying tests.
+* Identifying available execution targets (e.g., lint, e2e, serve, deploy) before attempting execution.
+* Disambiguating multiple workspaces in monorepos.
 </Use Cases>
 <Operational Notes>
-* **Working Directory:** Shell commands for a project (like \`ng generate\`) **MUST**
-  be executed from the parent directory of the \`path\` field for the relevant workspace.
-* **Unit Testing:** The \`unitTestFramework\` field tells you which testing API to use (e.g., Jasmine, Jest).
-  If the value is 'unknown', you **MUST** inspect the project's configuration files
-  (e.g., \`karma.conf.js\`, \`jest.config.js\`, or the 'test' target in \`angular.json\`) to determine the
-  framework before generating tests.
-* **Disambiguation:** A monorepo may contain multiple workspaces (e.g., for different applications or even in output directories).
-  Use the \`path\` of each workspace to understand its context and choose the correct project.
+* Execute shell/CLI commands from the parent directory of the workspace's 'path' field.
+* If 'unitTestFramework' is 'unknown', inspect local config files (e.g., jest.config.js, karma.conf.js)
+  or the 'test' target in 'angular.json' to determine the framework before creating tests.
 </Operational Notes>`,
   outputSchema: listProjectsOutputSchema,
   isReadOnly: true,
