@@ -27,10 +27,8 @@ const bestPracticesInputSchema = z.object({
     .string()
     .optional()
     .describe(
-      'The absolute path to the `angular.json` file for the workspace. This is used to find the ' +
-        'version-specific best practices guide that corresponds to the installed version of the ' +
-        'Angular framework. You **MUST** get this path from the `list_projects` tool. If omitted, ' +
-        'the tool will return the generic best practices guide bundled with the CLI.',
+      'Absolute path to the angular.json workspace directory (obtained via list_projects). ' +
+        'If omitted, returns the generic best practices guide.',
     ),
 });
 
@@ -42,23 +40,17 @@ export const BEST_PRACTICES_TOOL = declareTool({
   description: `
 <Purpose>
 Retrieves the official Angular Best Practices Guide. This guide contains the essential rules and conventions
-that **MUST** be followed for any task involving the creation, analysis, or modification of Angular code.
+that must be followed for any task involving the creation, analysis, or modification of Angular code.
 </Purpose>
 <Use Cases>
-* As a mandatory first step before writing or modifying any Angular code to ensure adherence to modern standards.
-* To learn about key concepts like standalone components, typed forms, and modern control flow syntax (@if, @for, @switch).
-* To verify that existing code aligns with current Angular conventions before making changes.
+* Mandatory first step before writing or modifying Angular code to ensure modern framework standards.
+* Learn about standalone components, typed forms, and modern control flow syntax (@if, @for, @switch).
+* Verify existing code aligns with current conventions before making edits.
 </Use Cases>
 <Operational Notes>
-* **Project-Specific Use (Recommended):** For tasks inside a user's project, you **MUST** provide the
-  \`workspacePath\` argument to get the guide that matches the project's Angular version. Get this
-  path from \`list_projects\`.
-* **General Use:** If no project context is available (e.g., for general questions or learning),
-  you can call the tool without the \`workspacePath\` argument. It will return the latest
-  generic best practices guide.
-* The content of this guide is non-negotiable and reflects the official, up-to-date standards for Angular development.
-* You **MUST** internalize and apply the principles from this guide in all subsequent Angular-related tasks.
-* Failure to adhere to these best practices will result in suboptimal and outdated code.
+* Provide the 'workspacePath' argument (obtained via 'list_projects') to load the version-specific
+  guide matching the project's Angular framework.
+* Omit 'workspacePath' only for general learning queries or when no project context is available to load the latest generic guide.
 </Operational Notes>`,
   inputSchema: bestPracticesInputSchema.shape,
   isReadOnly: true,
