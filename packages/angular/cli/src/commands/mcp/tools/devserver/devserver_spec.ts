@@ -18,9 +18,14 @@ import { startDevserver } from './devserver-start';
 import { stopDevserver } from './devserver-stop';
 import { WATCH_DELAY, waitForDevserverBuild } from './devserver-wait-for-build';
 
+class MockStream extends EventEmitter {
+  resume = jasmine.createSpy('resume').and.returnValue(this);
+  pause = jasmine.createSpy('pause').and.returnValue(this);
+}
+
 class MockChildProcess extends EventEmitter {
-  stdout = new EventEmitter();
-  stderr = new EventEmitter();
+  stdout = new MockStream();
+  stderr = new MockStream();
   kill = jasmine.createSpy('kill');
 }
 
@@ -95,10 +100,10 @@ describe('Serve Tools', () => {
     const waitPromise = waitForDevserverBuild({ timeout: 10 }, mockContext);
 
     // Simulate build logs.
-    mockProcess.stdout.emit('data', '... building ...');
-    mockProcess.stdout.emit('data', '✔ Changes detected. Rebuilding...');
-    mockProcess.stdout.emit('data', '... more logs ...');
-    mockProcess.stdout.emit('data', 'Application bundle generation complete.');
+    mockProcess.stdout.emit('data', '... building ...\n');
+    mockProcess.stdout.emit('data', '✔ Changes detected. Rebuilding...\n');
+    mockProcess.stdout.emit('data', '... more logs ...\n');
+    mockProcess.stdout.emit('data', 'Application bundle generation complete.\n');
 
     const waitResult = await waitPromise;
     expect(waitResult.structuredContent.status).toBe('success');
@@ -161,7 +166,7 @@ describe('Serve Tools', () => {
     await startDevserver({ project: 'crash-app' }, mockContext);
 
     // Simulate a crash with exit code 1
-    mockProcess.stdout.emit('data', 'Fatal error.');
+    mockProcess.stdout.emit('data', 'Fatal error.\n');
     mockProcess.emit('close', 1);
 
     const stopResult = await stopDevserver({ project: 'crash-app' }, mockContext);
@@ -185,7 +190,7 @@ describe('Serve Tools', () => {
       await startDevserver({}, mockContext);
 
       // Immediately simulate a build starting so isBuilding() is true.
-      mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...');
+      mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...\n');
 
       const waitPromise = waitForDevserverBuild({ timeout: 5 * WATCH_DELAY }, mockContext);
 
@@ -199,7 +204,7 @@ describe('Serve Tools', () => {
       jasmine.clock().tick(WATCH_DELAY + 1);
 
       // Now finish the build.
-      mockProcess.stdout.emit('data', 'Application bundle generation complete.');
+      mockProcess.stdout.emit('data', 'Application bundle generation complete.\n');
 
       // Tick past another debounce to exit the loop.
       jasmine.clock().tick(WATCH_DELAY + 1);
