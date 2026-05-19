@@ -14,8 +14,8 @@ importers:
   .:
     dependencies:
       '@angular/compiler-cli':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3)
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -26,44 +26,44 @@ importers:
         built: true
     devDependencies:
       '@angular/animations':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       '@angular/cdk':
-        specifier: 22.0.0-next.8
-        version: 22.0.0-next.8(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@angular/common':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
       '@angular/compiler':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0
       '@angular/core':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       '@angular/forms':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@angular/localize':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(@angular/compiler@22.0.0-next.12)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(@angular/compiler@22.0.0-rc.0)
       '@angular/material':
-        specifier: 22.0.0-next.8
-        version: 22.0.0-next.8(93ce75c341587667f5d7d40f3eefe13f)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(b11ecddb61371acc147801b64fc28dc6)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#2c36222db3f44751284cc93b3806dbe1baee583a
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#98b21a0cb6ef6d068a99a9346e89812e3ec9d2b1
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/98b21a0cb6ef6d068a99a9346e89812e3ec9d2b1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))
       '@angular/platform-browser':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       '@angular/platform-server':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-next.12)(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-rc.0)(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@angular/router':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@angular/service-worker':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
       '@babel/core':
         specifier: 7.29.0
         version: 7.29.0
@@ -326,14 +326,14 @@ importers:
         specifier: 29.1.1
         version: 29.1.1
       ng-packagr:
-        specifier: 22.0.0-next.4
-        version: 22.0.0-next.4(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
 
   packages/angular/build:
     dependencies:
@@ -354,10 +354,10 @@ importers:
         version: 7.24.7
       '@inquirer/confirm':
         specifier: 6.0.12
-        version: 6.0.12(@types/node@24.12.2)
+        version: 6.0.12(@types/node@24.12.4)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.3.0
-        version: 2.3.0(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
+        version: 2.3.0(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0))
       beasties:
         specifier: 0.4.2
         version: 0.4.2
@@ -408,7 +408,7 @@ importers:
         version: 0.2.16
       vite:
         specifier: 7.3.2
-        version: 7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+        version: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
       watchpack:
         specifier: 2.5.1
         version: 2.5.1
@@ -429,8 +429,8 @@ importers:
         specifier: 4.6.4
         version: 4.6.4
       ng-packagr:
-        specifier: 22.0.0-next.4
-        version: 22.0.0-next.4(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.14
         version: 8.5.14
@@ -442,7 +442,7 @@ importers:
         version: 7.8.2
       vitest:
         specifier: 4.1.5
-        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+        version: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
     optionalDependencies:
       lmdb:
         specifier: 3.5.4
@@ -461,10 +461,10 @@ importers:
         version: link:../../angular_devkit/schematics
       '@inquirer/prompts':
         specifier: 8.4.2
-        version: 8.4.2(@types/node@24.12.2)
+        version: 8.4.2(@types/node@24.12.4)
       '@listr2/prompt-adapter-inquirer':
         specifier: 4.2.3
-        version: 4.2.3(@inquirer/prompts@8.4.2(@types/node@24.12.2))(@types/node@24.12.2)(listr2@10.2.1)
+        version: 4.2.3(@inquirer/prompts@8.4.2(@types/node@24.12.4))(@types/node@24.12.4)(listr2@10.2.1)
       '@modelcontextprotocol/sdk':
         specifier: 1.29.0
         version: 1.29.0(zod@4.4.2)
@@ -527,23 +527,23 @@ importers:
         specifier: workspace:*
         version: link:../../angular_devkit/schematics
       '@angular/common':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
       '@angular/compiler':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0
       '@angular/core':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       '@angular/platform-browser':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       '@angular/platform-server':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-next.12)(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-rc.0)(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@angular/router':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
       '@schematics/angular':
         specifier: workspace:*
         version: link:../../schematics/angular
@@ -729,8 +729,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 22.0.0-next.4
-        version: 22.0.0-next.4(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       undici:
         specifier: 8.2.0
         version: 8.2.0
@@ -814,7 +814,7 @@ importers:
         version: link:../schematics
       '@inquirer/prompts':
         specifier: 8.4.2
-        version: 8.4.2(@types/node@24.12.2)
+        version: 8.4.2(@types/node@24.12.4)
 
   packages/ngtools/webpack:
     devDependencies:
@@ -822,11 +822,11 @@ importers:
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../angular_devkit/core
       '@angular/compiler':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0
       '@angular/compiler-cli':
-        specifier: 22.0.0-next.12
-        version: 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3)
+        specifier: 22.0.0-rc.0
+        version: 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3)
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -935,47 +935,47 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@angular/animations@22.0.0-next.12':
-    resolution: {integrity: sha512-lhn6S0rlXIMccNzyCbA/1OyMzRBzVVVD/7G0hyk8MOGPyueNrla0lciabkyv9OxVVVmeQm2Fnpkx9xmCz0BP4Q==}
+  '@angular/animations@22.0.0-rc.0':
+    resolution: {integrity: sha512-2voJV4M6uGsV9jYFfIb/2N3ZHc7WFtB2KKnsdr7U4/b6NZJRPofeO7/06+6hL1bK72K4I/N+Z6o2fqmeAzitRg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/core': 22.0.0-next.12
+      '@angular/core': 22.0.0-rc.0
 
-  '@angular/cdk@22.0.0-next.8':
-    resolution: {integrity: sha512-6H/A2ExBPz1KpxqrB2C3U2c9Dcsvq9Xgttpv2ap73h8EVyWqilxmt6lsCl8JefcovEMjnL40srHnvPJnI+Ri1g==}
+  '@angular/cdk@22.0.0-rc.0':
+    resolution: {integrity: sha512-YDFXp7UF0sU8yhKUL3TQyxAZydAZheqULroCo19t88Pku3pl4VEy+bLAsaP6CgI3s04aohm/N/P2QG7QlNKfCw==}
     peerDependencies:
       '@angular/common': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       '@angular/core': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/common@22.0.0-next.12':
-    resolution: {integrity: sha512-PG7r+XfHJAyI9qnHBubcSJxNDURavGxq0Qe/F+TRaCsGzmQ/ojIe3phZyea/HXr72dDVvPrdFNeBIrNCN0D3Rg==}
+  '@angular/common@22.0.0-rc.0':
+    resolution: {integrity: sha512-CXANdqoAdkzBi5yqABUMbGW7RP8oOASBYA3CzvRLQbu1Cq0hMmkexaJtjmOTMl2kDyEkNK0vE+8mVAVdt8Cw0w==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/core': 22.0.0-next.12
+      '@angular/core': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/compiler-cli@22.0.0-next.12':
-    resolution: {integrity: sha512-vrVv0hKbXZmBau4UoqfEUBJ+cVA3M4WcJj0Tn1fyNcou6jLBw3fH4MuNBafpQWGR0oDWv01lK3chVP8XkLUeYg==}
+  '@angular/compiler-cli@22.0.0-rc.0':
+    resolution: {integrity: sha512-swhOCT+bwWKJSqNobGOhTw6uxBVOhRF0SN9DpvUYCDVjG/q7eDEKMRAUJ5sg+Iez7w9BOLUfSz2cCXhr7zgpVw==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler': 22.0.0-next.12
+      '@angular/compiler': 22.0.0-rc.0
       typescript: '>=6.0 <6.1'
     peerDependenciesMeta:
       typescript:
         optional: true
 
-  '@angular/compiler@22.0.0-next.12':
-    resolution: {integrity: sha512-/q3Zj9+bkKAE+Myoy6LEey52mX5p2rbnnNqzKFsJ45yni/c12NlDJ1M0BnU+FzI84rQmVPDrq3jkeIyTpDI2eA==}
+  '@angular/compiler@22.0.0-rc.0':
+    resolution: {integrity: sha512-eaOfLUJDBr6mtvuUKKS25TWbhnwhAKIml+tonkIEZtBpp2wfbuM3MIRZAntSbAJQaKHJj4oI82mBTKFuJo022Q==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
 
-  '@angular/core@22.0.0-next.12':
-    resolution: {integrity: sha512-daGYyqLzfVMUQ+LvQjItyxVFyGnzvxffiyOcTX0t21ZPp+WxR4gC/q6PMzVUD1Jf25iS6TrBo3nD/ep6GbiD0A==}
+  '@angular/core@22.0.0-rc.0':
+    resolution: {integrity: sha512-+P2hVciCEH3MuXTXIuFiGpvcCivgCXB3agCakWHQ7rMiEmRB2oILTSKH5rRPlwPyoETPwfPeVn7tiAAaOuuGFg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/compiler': 22.0.0-next.12
+      '@angular/compiler': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
       zone.js: ~0.15.0 || ~0.16.0
     peerDependenciesMeta:
@@ -984,74 +984,74 @@ packages:
       zone.js:
         optional: true
 
-  '@angular/forms@22.0.0-next.12':
-    resolution: {integrity: sha512-DTUVS29tbm/g5P8atU/818IeIgsToPjZa/SMHfHY1VySxbJ9zpiXtWonTIANlZm1dla3ohrJ3G43PedW48nc7w==}
+  '@angular/forms@22.0.0-rc.0':
+    resolution: {integrity: sha512-FIXEVK+tvL8lHIsbUHa1Lot9obpJme0pmh2k9//dTKoPgiODJ8Hg4CIKwMllk4RsSukQwvZzjghvvkQ8vUXnyw==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/common': 22.0.0-next.12
-      '@angular/core': 22.0.0-next.12
-      '@angular/platform-browser': 22.0.0-next.12
+      '@angular/common': 22.0.0-rc.0
+      '@angular/core': 22.0.0-rc.0
+      '@angular/platform-browser': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/localize@22.0.0-next.12':
-    resolution: {integrity: sha512-KHRG2FpCYiy5pntfBvnl11ULzoS5t8nUPVJcfd7oe7RQfd+HyA/Sk56WPafE4Izu6hB8yCCQT4hq3yIgSKV5rg==}
+  '@angular/localize@22.0.0-rc.0':
+    resolution: {integrity: sha512-4h3SnRR4qNbvGOzQCnQVJZI0+Q3szpzobWnHjdgkiIZpab1hTFRmL02joXdLdv+I/Nw8MkFpZIkDv+BjCKwqDw==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler': 22.0.0-next.12
-      '@angular/compiler-cli': 22.0.0-next.12
+      '@angular/compiler': 22.0.0-rc.0
+      '@angular/compiler-cli': 22.0.0-rc.0
 
-  '@angular/material@22.0.0-next.8':
-    resolution: {integrity: sha512-sQUXI2gzVv8DCryapqzYTgJNrCAh+p9ugEkUtUVORvVTyBG95pqYZ5SU9UZFkqoSR/FHGDlbD7Fry/Jyuvrm0g==}
+  '@angular/material@22.0.0-rc.0':
+    resolution: {integrity: sha512-YDmmc83WdjTLAu+avL7bSbzvhsiWj7zq/hWYTwauvlkn8bR4j7eGG16yzV2mDAPsX1MgyK7Z0bl616tzhDo14w==}
     peerDependencies:
-      '@angular/cdk': 22.0.0-next.8
+      '@angular/cdk': 22.0.0-rc.0
       '@angular/common': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       '@angular/core': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       '@angular/forms': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a}
-    version: 0.0.0-6ef1cf3158022456bf1f7031de79b7e44fe479b2
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/98b21a0cb6ef6d068a99a9346e89812e3ec9d2b1':
+    resolution: {gitHosted: true, integrity: sha512-AwkT8gIA2duICq9kqxtH7i9nvh4LaJRd8/V1uExEFlTx1LLijdF9Z8hm8WZuJ+idk0MAIQcxwZMp8MeY00y8Xw==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/98b21a0cb6ef6d068a99a9346e89812e3ec9d2b1}
+    version: 0.0.0-49e2dadc4b17b0ff10a76329065c9b7e1fff3e91
     hasBin: true
 
-  '@angular/platform-browser@22.0.0-next.12':
-    resolution: {integrity: sha512-qdCfNO25c52RGx7pRD1cdBs+Qee+WULO7zHjZ2FV4x/hj8gpGk41FuMsp2TdZAsxEqdGl7udO6e6addfpmDVlw==}
+  '@angular/platform-browser@22.0.0-rc.0':
+    resolution: {integrity: sha512-eYFmQKQzd3lhvJj1Str7zwR42WDa3NvFHMnj4wKkd6v+3Y8QQ3SBCASe3Xidoyt3HOV37rB9NPy6Ogbirovipg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/animations': 22.0.0-next.12
-      '@angular/common': 22.0.0-next.12
-      '@angular/core': 22.0.0-next.12
+      '@angular/animations': 22.0.0-rc.0
+      '@angular/common': 22.0.0-rc.0
+      '@angular/core': 22.0.0-rc.0
     peerDependenciesMeta:
       '@angular/animations':
         optional: true
 
-  '@angular/platform-server@22.0.0-next.12':
-    resolution: {integrity: sha512-jRcJzqiz31alb/hWTunoo424clEpue9ygYF76adMOPE0zTVVNAFDs9Gvo4NfJbWMmXxoI2i0ibB2dtE9kE2+hQ==}
+  '@angular/platform-server@22.0.0-rc.0':
+    resolution: {integrity: sha512-KNgYHtOUl9yB48mdOzK7or2bVP3iEIvpW+rGzQlq70gHfUjR77w0SJWo566wXSFTsnYlt0cA+SyZ070KJwGcPg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/common': 22.0.0-next.12
-      '@angular/compiler': 22.0.0-next.12
-      '@angular/core': 22.0.0-next.12
-      '@angular/platform-browser': 22.0.0-next.12
+      '@angular/common': 22.0.0-rc.0
+      '@angular/compiler': 22.0.0-rc.0
+      '@angular/core': 22.0.0-rc.0
+      '@angular/platform-browser': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/router@22.0.0-next.12':
-    resolution: {integrity: sha512-x8+P6lcJyukJcTgu6vTgGB5RLCZvNXfHTjlukPr8jMoOyMxFPjHV33g+87pmVBjDKRK5pyRnXTqkanQwnwbguA==}
+  '@angular/router@22.0.0-rc.0':
+    resolution: {integrity: sha512-c0uySQaPja15uRtQN88RlEHrejxgKm25Qj5hjMhob332CQ4/SjHFCmn+VpTx6eCSlCG1Awki/xG/sbcJeK1Usg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     peerDependencies:
-      '@angular/common': 22.0.0-next.12
-      '@angular/core': 22.0.0-next.12
-      '@angular/platform-browser': 22.0.0-next.12
+      '@angular/common': 22.0.0-rc.0
+      '@angular/core': 22.0.0-rc.0
+      '@angular/platform-browser': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/service-worker@22.0.0-next.12':
-    resolution: {integrity: sha512-MbzZrbcgh1fPfS0a7ntVKidwHAU/VcfU/fMWn9P/6uOnrVjwRA/U7mN8c6Az6Qqj/8Dl/Wz49sLBV+B6vwggrA==}
+  '@angular/service-worker@22.0.0-rc.0':
+    resolution: {integrity: sha512-LDXbqAFgJCYUAkBnjtbYFR/c7FMzd3XIrJ4XLSv6DzDNJdgYyRJfWBBHBut+GhFfX15GZ368K5n6+LIlS/ks8g==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/core': 22.0.0-next.12
+      '@angular/core': 22.0.0-rc.0
       rxjs: ^6.5.3 || ^7.4.0
 
   '@asamuzakjp/css-color@5.1.11':
@@ -2042,72 +2042,72 @@ packages:
       '@noble/hashes':
         optional: true
 
-  '@firebase/ai@2.11.1':
-    resolution: {integrity: sha512-WGTF81W3WBKJY+c7xqTzO15OGAkCAs8cpADqflAI0skhTZjIkhF0qyf55rq4Ctt6jKygkv99rPfMrjAHTgXaVQ==}
+  '@firebase/ai@2.12.0':
+    resolution: {integrity: sha512-b+OL4vdyiSLZL/7dLd67V55CjKJvU9MpNmwnday7eA6GG2+J4iwUEsEHgw0/jKY3A41FfkF0SrnYFvtKbQZ65A==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
       '@firebase/app-types': 0.x
 
-  '@firebase/analytics-compat@0.2.27':
-    resolution: {integrity: sha512-ZObpYpAxL6JfgH7GnvlDD0sbzGZ0o4nijV8skatV9ZX49hJtCYbFqaEcPYptT94rgX1KUoKEderC7/fa7hybtw==}
+  '@firebase/analytics-compat@0.2.28':
+    resolution: {integrity: sha512-lIAlqUUbBu93FJMlQfslryQtBwwzdzvp23ePC6FNgymXk6Ook5v4Uvc0vdutvoIeqmyA3LfP0ZeRFK8+11kOOQ==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/analytics-types@0.8.3':
-    resolution: {integrity: sha512-VrIp/d8iq2g501qO46uGz3hjbDb8xzYMrbu8Tp0ovzIzrvJZ2fvmj649gTjge/b7cCCcjT0H37g1gVtlNhnkbg==}
+  '@firebase/analytics-types@0.8.4':
+    resolution: {integrity: sha512-zQ+XTgkwH6CY/eUSHJRP7e4LxM30RCxlCmob5sy2axs25GE3Ny0XdgpDscMTHHQIGqWkxPXad4w2Mw9sCgT8zQ==}
 
-  '@firebase/analytics@0.10.21':
-    resolution: {integrity: sha512-j2y2q65BlgLGB5Pwjhv/Jopw2X/TBTzvAtI5z/DSp56U4wBj7LfhBfzbdCtFPges+Wz0g55GdoawXibOH5jGng==}
+  '@firebase/analytics@0.10.22':
+    resolution: {integrity: sha512-8BSaq/QRGU1+xyi8L2PTLTJU7MH9aMA72RQdIxrbhWFauOZY9OXo8f2YDN/972xA8d588tlnNVEQ2Mo69pT9Ow==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/app-check-compat@0.4.2':
-    resolution: {integrity: sha512-M91NhxqbSkI0ChkJWy69blC+rPr6HEgaeRllddSaU1pQ/7IiegeCQM9pPDIgvWnwnBSzKhUHpe6ro/jhJ+cvzw==}
+  '@firebase/app-check-compat@0.4.3':
+    resolution: {integrity: sha512-L3AKIRTJxT9b7cDUH3OyV8gWTnmW3vYkwdzRsukWt4kbPBTct12xalnyvHDkm1lKkr+cQq/4uzBx1bOWsQ2ciw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/app-check-interop-types@0.3.3':
-    resolution: {integrity: sha512-gAlxfPLT2j8bTI/qfe3ahl2I2YcBQ8cFIBdhAQA4I2f3TndcO+22YizyGYuttLHPQEpWkhmpFW60VCFEPg4g5A==}
+  '@firebase/app-check-interop-types@0.3.4':
+    resolution: {integrity: sha512-zz3i6e13B8BfWiLy8MABtTh8aGIACgKbf9UVnyHcWs+yQzJXgQcl8A46b0zfaiJHdQ+niF0ouAfcpuf+3LMPQg==}
 
-  '@firebase/app-check-types@0.5.3':
-    resolution: {integrity: sha512-hyl5rKSj0QmwPdsAxrI5x1otDlByQ7bvNvVt8G/XPO2CSwE++rmSVf3VEhaeOR4J8ZFaF0Z0NDSmLejPweZ3ng==}
+  '@firebase/app-check-types@0.5.4':
+    resolution: {integrity: sha512-xV7JsIyzVr15aA7f3Pi0rB9gdBuVubs89FGA8VkRYA4g0l78poADgdfrScgf7NndSg9mm7cR7PJyY0+t22KaGw==}
 
-  '@firebase/app-check@0.11.2':
-    resolution: {integrity: sha512-jcXQVMHAQ5AEKzVD5C7s5fmAYeFOuN6lAJeNTgZK2B9aLnofWaJt8u1A8Idm8gpsBBYSaY3cVyeH5SWMOVPBLQ==}
+  '@firebase/app-check@0.11.3':
+    resolution: {integrity: sha512-aJ4DfubWfTO8/2vhEhIAizOoOmiycESTU32e+OUgbWcS/G3PA4Vxlr/9zaiN2wfUG2AptQ7DTvj00tyuFZP5Bg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/app-compat@0.5.11':
-    resolution: {integrity: sha512-KaACDjXkK5VLpI01vEs592R7/8s5DjFdIXfKoR385ly1SmK3Tu+jMHCIB4MsiY5jsez6v7VlEX/3rJ90dVkHyA==}
+  '@firebase/app-compat@0.5.12':
+    resolution: {integrity: sha512-Pe513OBerK/CIBxz4/za9atd5MsZtd6DzHz4cmqkvkrcDWhQChAoHBpZ3McuZNuSP8YZiKwfX/J1frR07l15/w==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/app-types@0.9.4':
-    resolution: {integrity: sha512-crX9TA5SVYZwLPG7/R16IsH8FLlgkPXjJUVhsVpHVDSqJiq3D/NuFTM5ctxGTExXAOeIn//69tQw47CPerM8MQ==}
+  '@firebase/app-types@0.9.5':
+    resolution: {integrity: sha512-YevqTjvo7Iujsa9Dwowmd6dSoElhzmD63ZSrq6bzjvQ6POjYgNjOFHLmNIgJs48eNO093NCERibuFnxbfOvU7A==}
 
-  '@firebase/app@0.14.11':
-    resolution: {integrity: sha512-yxADFW35LYkP8oSGobGsYIrI42I+GPCvKTNHx4meT9Yq3C950IVz1eANoBk822I9tbKv1wyv9P4Bv1G5TpucFw==}
+  '@firebase/app@0.14.12':
+    resolution: {integrity: sha512-FT+HoNp1NdaZ/N26hCwV3WbxS1m6gTn3p2QRBQ3KH7YqyCQqJx0iT7126RgVk68/Rq+9DeL/zCFnHZ0C4u1nLQ==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/auth-compat@0.6.5':
-    resolution: {integrity: sha512-IfVsafZ3QiXbsydXTP/XMI0wVYbJLI1rkb8Qqf03/h5FnL+upbbPOb+6Yj3RpcX+Y1iP5Uh18lxTHlXfbiyAow==}
+  '@firebase/auth-compat@0.6.6':
+    resolution: {integrity: sha512-KDJ/GAf/rt7galOpn3DRb2buFfGkZCsHTryKjXDG0eeRnok4+2B4nnkMOMdjRnPkElmcJv2Ao0vEA6kp5m98PQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/auth-interop-types@0.2.4':
-    resolution: {integrity: sha512-JPgcXKCuO+CWqGDnigBtvo09HeBs5u/Ktc2GaFj2m01hLarbxthLNm7Fk8iOP1aqAtXV+fnnGj7U28xmk7IwVA==}
+  '@firebase/auth-interop-types@0.2.5':
+    resolution: {integrity: sha512-1Li/YuBDBAXcKv7BzY4U28gontUmAaw53sYiqbaVOMCFb2lFKK/c3CGMUWqtwe7+TXrl3poWnTCL5umYBg85Eg==}
 
-  '@firebase/auth-types@0.13.0':
-    resolution: {integrity: sha512-S/PuIjni0AQRLF+l9ck0YpsMOdE8GO2KU6ubmBB7P+7TJUCQDa3R1dlgYm9UzGbbePMZsp0xzB93f2b/CgxMOg==}
+  '@firebase/auth-types@0.13.1':
+    resolution: {integrity: sha512-0c1Mnid0uMDfGJHeUS4zfvBa4/CedJXotGy/n/NZJnBjwiJawt0ZYU+wH2VAVLiRCEfG2ncCkAX3yd1/2nrB7g==}
     peerDependencies:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/auth@1.13.0':
-    resolution: {integrity: sha512-mKkSLNym3UbnnZ06dAmtqzp5EpPGCANGCZDJbkoR135aoUdKG6Aizwcnp29RzsQpwH0nmy5nay17Sfbsh9oY8A==}
+  '@firebase/auth@1.13.1':
+    resolution: {integrity: sha512-/1nkKY/MicI+I9WWcx6R4NKs77AaW9NQ0IwsFdUBomWrW0/cXEmopfM2dtLm2oI1qG6z6vom3CXZDHJIJXoMuw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
@@ -2116,141 +2116,141 @@ packages:
       '@react-native-async-storage/async-storage':
         optional: true
 
-  '@firebase/component@0.7.2':
-    resolution: {integrity: sha512-iyVDGc6Vjx7Rm0cAdccLH/NG6fADsgJak/XW9IA2lPf8AjIlsemOpFGKczYyPHxm4rnKdR8z6sK4+KEC7NwmEg==}
+  '@firebase/component@0.7.3':
+    resolution: {integrity: sha512-wFofIaa2879ogD/WvkjYXJxRmfnL0scen6ORgaC3na1FNOR9ASIUANQdhqQcmWu/h77/pVHY7ch5flewa5Bcew==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/data-connect@0.6.0':
-    resolution: {integrity: sha512-OiugPRcdlhqXF97oR9CjVObILmsWU0dFUS0gXNYEe4bDfpW8pZmQ5GqhIPPtLWbT/0W2lMJJD7VILFMk+xuHPg==}
+  '@firebase/data-connect@0.7.0':
+    resolution: {integrity: sha512-ar9sNOJh5poQCSMSVlnVE8eo8+usTD1POWDCv65omkKUvnFMcdXaQ7J/e7WGKqJzcEMgiezSX/TZiKHZkItMbQ==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/database-compat@2.1.3':
-    resolution: {integrity: sha512-GMyfWjD8mehjg/QpNkY/tl9G/MoeugPeg91n9D0atggxbWuKF/2KhVPHZDH+XmoP0EKYqMWYTtKxBsaBaNKLYQ==}
+  '@firebase/database-compat@2.1.4':
+    resolution: {integrity: sha512-3pK35F1MAgmqFJQlf2nhQl44vtAXQO1uaCaQOEUI9kCRtLFqi7N+QRKR7lFZPg+xIZIyubgxQaxY69YgfZRZWg==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/database-types@1.0.19':
-    resolution: {integrity: sha512-FqewjUZmV9LqFfuEnmgdcUpiOUz7qwLXxnm/H8BcMFEzQXtd1yyUDm8ex5VRad2nuTE+ahOuCjUAM/cyDncO+g==}
+  '@firebase/database-types@1.0.20':
+    resolution: {integrity: sha512-kegbOk/w8iU64pr0q6k2ItyNGjnQBMHFhwS7ohdWI4W+pc0/zhhdGXTdFj6X1oxItRjPoYOsSQmERgBkn/ihxw==}
 
-  '@firebase/database@1.1.2':
-    resolution: {integrity: sha512-lP96CMjMPy/+d1d9qaaHjHHdzdwvEOuyyLq9ehX89e2XMKwS1jHNzYBO+42bdSumuj5ukPbmnFtViZu8YOMT+w==}
+  '@firebase/database@1.1.3':
+    resolution: {integrity: sha512-XwWCa+E4TvNGpGwXrycLRNfdogADwFcvuhyow6wDWma9W54roaQIhe+4PM0KiLsIftBdSCGI7OKCXrdSRHbIhw==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/firestore-compat@0.4.8':
-    resolution: {integrity: sha512-WK9NJRpnosGD2nuyjdr7K+Ht7AxRYJlTF62myI4rRA7ibJOosbecvjacR5oirJ7s1BgNS6qzcBw7n4fD3a5w1w==}
+  '@firebase/firestore-compat@0.4.9':
+    resolution: {integrity: sha512-NPtBuFr79BbIQJXFWhW4xFC6rBksK8/ewqCTYbbAYfZBDDx0/iHTUj4WpKi5D4d0Pn2Md/3T/e5V9379G5N/Zg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/firestore-types@3.0.3':
-    resolution: {integrity: sha512-hD2jGdiWRxB/eZWF89xcK9gF8wvENDJkzpVFb4aGkzfEaKxVRD1kjz1t1Wj8VZEp2LCB53Yx1zD8mrhQu87R6Q==}
+  '@firebase/firestore-types@3.0.4':
+    resolution: {integrity: sha512-jGn+JSS4X9zZsrfu7Yw66v5YRdOLD1oyQh4USR0xWl4CUqV/DA6bNIXRPpxH/cUl3iVTNiP6MN7g+EL42A4qfA==}
     peerDependencies:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/firestore@4.14.0':
-    resolution: {integrity: sha512-bZc6YOjRkMBVA16527tgzi6iN9n//xRB3Mmx/R+Gr6UAP/+xrIKOejQIcn1hh+tCzNT8jO0jI+kWox5J4tB/qQ==}
+  '@firebase/firestore@4.14.1':
+    resolution: {integrity: sha512-PouS0NJZ3NYOZE/tPDvXa8VUeJ10Ll//7jIdFvMYdhQkd/P3O7nlqhyoTmY0h8Xa9hxg+H0j6gxUytJcoZ9YOg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/functions-compat@0.4.3':
-    resolution: {integrity: sha512-BxkEwWgx1of0tKaao/r2VR6WBLk/RAiyztatiONPrPE8gkitFkOnOCxf8i9cUyA5hX5RGt5H30uNn25Q6QNEmQ==}
+  '@firebase/functions-compat@0.4.4':
+    resolution: {integrity: sha512-Be+MwhseVf/eFAZwGrFJGok6S7cmsLrAPK8MgyM8LjM0MewTsx2n01WOOca9jio1UsCZOJ0aVyQobnINcdNuIQ==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/functions-types@0.6.3':
-    resolution: {integrity: sha512-EZoDKQLUHFKNx6VLipQwrSMh01A1SaL3Wg6Hpi//x6/fJ6Ee4hrAeswK99I5Ht8roiniKHw4iO0B1Oxj5I4plg==}
+  '@firebase/functions-types@0.6.4':
+    resolution: {integrity: sha512-zV6kgqtduR4rUAdC/ilS7kmb93XD7bEZoJDlVBZqlOw2uGGGCNBQBuleww2rr0Ulr3L9o2TDjumEt68/l1f9DQ==}
 
-  '@firebase/functions@0.13.3':
-    resolution: {integrity: sha512-csO7ckK3SSs+NUZW1nms9EK7ckHe/1QOjiP8uAkCYa7ND18s44vjE9g3KxEeIUpyEPqZaX1EhJuFyZjHigAcYw==}
+  '@firebase/functions@0.13.4':
+    resolution: {integrity: sha512-oB5rpm2Emxn2+IS1gRelAeT/5tSZMwM/KhqC5LnJsmTNnS1ZDhD7ZMZNgCI8vchTW6PbaXIwEnpUryGuIQsNbg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/installations-compat@0.2.21':
-    resolution: {integrity: sha512-zahIUkaVKbR8zmTeBHkdfaVl6JGWlhVoSjF7CVH33nFqD3SlPEpEEegn2GNT5iAfsVdtlCyJJ9GW4YKjq+RJKQ==}
+  '@firebase/installations-compat@0.2.22':
+    resolution: {integrity: sha512-C/zpAuTP5S9OgKSPvXRupw3hoY/JZSlA1wFjD/Sb7LIQE0FNbcMdO8Y4KXVEkjVzma/DDDDIAzxEXqKMAzc88w==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/installations-types@0.5.3':
-    resolution: {integrity: sha512-2FJI7gkLqIE0iYsNQ1P751lO3hER+Umykel+TkLwHj6plzWVxqvfclPUZhcKFVQObqloEBTmpi2Ozn7EkCABAA==}
+  '@firebase/installations-types@0.5.4':
+    resolution: {integrity: sha512-U2eFapdHwjb43Vx9o+Pmj4dFfvcHEK1IirEFLqMtWrTHvmdrS3gBpBD1kmJk/9HjsOtoHZxJ2Paoe79e+L1ZPg==}
     peerDependencies:
       '@firebase/app-types': 0.x
 
-  '@firebase/installations@0.6.21':
-    resolution: {integrity: sha512-xGFGTeICJZ5vhrmmDukeczIcFULFXybojML2+QSDFoKj5A7zbGN7KzFGSKNhDkIxpjzsYG9IleJyUebuAcmqWA==}
+  '@firebase/installations@0.6.22':
+    resolution: {integrity: sha512-ef6nn3GGQTdReCfotRMG77PJZu8CqEbiK5pEoBnM0gTu/Z9v0i/az2p3HABsa/1beQmmyh1OsOjf7P5+pgwdZw==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/logger@0.5.0':
-    resolution: {integrity: sha512-cGskaAvkrnh42b3BA3doDWeBmuHFO/Mx5A83rbRDYakPjO9bJtRL3dX7javzc2Rr/JHZf4HlterTW2lUkfeN4g==}
+  '@firebase/logger@0.5.1':
+    resolution: {integrity: sha512-vZKLsqE1ABOy8OjQiE7cUTFn4gvaqlk88yp8N94Pk/sDpq61YqZGqmVFZTvOyflTwuYFcWirBdYGoJgbDaXKYQ==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/messaging-compat@0.2.25':
-    resolution: {integrity: sha512-eoOQqGLtRlseTdiemTN44LlHZpltK5gnhq8XVUuLgtIOG+odtDzrz2UoTpcJWSzaJQVxNLb/x9f39tHdDM4N4w==}
+  '@firebase/messaging-compat@0.2.26':
+    resolution: {integrity: sha512-fn0XvWOfK4tsDLSipwJUW9Cp6ahWA6z+iJHxZ0pHp9MzMSUNQx85yuxZAuI7gkGXfqs7+DqEDHyyS7jDGswrmQ==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/messaging-interop-types@0.2.3':
-    resolution: {integrity: sha512-xfzFaJpzcmtDjycpDeCUj0Ge10ATFi/VHVIvEEjDNc3hodVBQADZ7BWQU7CuFpjSHE+eLuBI13z5F/9xOoGX8Q==}
+  '@firebase/messaging-interop-types@0.2.4':
+    resolution: {integrity: sha512-wrzITQq+xw5LtygX7O0fu43/k9ABQ4x5H9/sR5m1SbNnhIRI5xd3+raSNJaJkYC4BUhM9A4ZNSnyR2sjhxnb2Q==}
 
-  '@firebase/messaging@0.12.25':
-    resolution: {integrity: sha512-7RhDwoDHlOK1/ou0/LeubxmjcngsTjDdrY/ssg2vwAVpUuVAhQzQvuCAOYxcX5wNC1zCgQ54AP1vdngBwbCmOQ==}
+  '@firebase/messaging@0.12.26':
+    resolution: {integrity: sha512-lHVTO9uLofymHVWkYeUtMddIPcmJvSzVbHRB88W6XKfxbcKF+p3QrfqKhDxremSB4NQjUla1Gwn7d9umSMmt/w==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/performance-compat@0.2.24':
-    resolution: {integrity: sha512-YRlejH8wLt7ThWao+HXoKUHUrZKGYq+otxkPS+8nuE5PeN1cBXX7NAJl9ueuUkBwMIrnKdnDqL/voHXxDAAt3g==}
+  '@firebase/performance-compat@0.2.25':
+    resolution: {integrity: sha512-q6NjTXpIPoFuUmCmMN/maCdTgzT6aExs9xZo+PxfVLj6uLVGvpyAD6XWjmcrb7jChsFBYbq7E5dyNDF7Zhy9kA==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/performance-types@0.2.3':
-    resolution: {integrity: sha512-IgkyTz6QZVPAq8GSkLYJvwSLr3LS9+V6vNPQr0x4YozZJiLF5jYixj0amDtATf1X0EtYHqoPO48a9ija8GocxQ==}
+  '@firebase/performance-types@0.2.4':
+    resolution: {integrity: sha512-kJSEk7b0uhpcPRyL4SQ/GPujLqk52XNKcXlnsKDbWGAb9vugcLvOU3u6zfEdwd+d8hWJb5S5ZizV1JFFI0nkKg==}
 
-  '@firebase/performance@0.7.11':
-    resolution: {integrity: sha512-V3uAhrz7IYJuji+OgT3qYTGKxpek/TViXti9OSsUJ4AexZ3jQjYH5Yrn7JvBxk8MGiSLsC872hh+BxQiPZsm7g==}
+  '@firebase/performance@0.7.12':
+    resolution: {integrity: sha512-fe7nV8teUU3OBHlMUZ9Lw4gLhCW2k4m5Uc3pfWGV+fl8uwJQBGp9Q3lqsJ+HSrFu3Q2pJyLAgrClPGSKyDeYgQ==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/remote-config-compat@0.2.23':
-    resolution: {integrity: sha512-4+KqRRHEUUmKT6tFmnpWATOsaFfmSuBs1jXH8JzVtMLEYqq/WS9IDM92OdefFDSrAA2xGd0WN004z8mKeIIscw==}
+  '@firebase/remote-config-compat@0.2.24':
+    resolution: {integrity: sha512-EWZTt6fJ7YmPHodQNsSxAIDZY2x8P5kRPvXAc5CmzzBm+NyPFhODbfDsNllDXDL8jlzp50bVWjDY+BXepZS9Mg==}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/remote-config-types@0.5.0':
-    resolution: {integrity: sha512-vI3bqLoF14L/GchtgayMiFpZJF+Ao3uR8WCde0XpYNkSokDpAKca2DxvcfeZv7lZUqkUwQPL2wD83d3vQ4vvrg==}
+  '@firebase/remote-config-types@0.5.1':
+    resolution: {integrity: sha512-cX/1LT6KQwkXzck2eSzeKnuvXZCyr8qaPpDcikoJs7jmI+oBOXixpDLeDtWj1U6GNMkIoXrEDNoyT2Ypcyp5/A==}
 
-  '@firebase/remote-config@0.8.2':
-    resolution: {integrity: sha512-5EXqOThV4upjK9D38d/qOSVwOqRhemlaOFk9vCkMNNALeIlwr+4pLjtLNo4qoY8etQmU/1q4aIATE9N8PFqg0g==}
+  '@firebase/remote-config@0.8.3':
+    resolution: {integrity: sha512-ggGKAaLy9YNOvpFoQZgm5p5SiFw3ZFtwti08dojnBQmQicpThTxvG5xZMSpCTYMj2o3gM/yK9CVd2w+kZub8YA==}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/storage-compat@0.4.2':
-    resolution: {integrity: sha512-R+aB38wxCH5zjIO/xu9KznI7fgiPuZAG98uVm1NcidHyyupGgIDLKigGmRGBZMnxibe/m2oxNKoZpfEbUX2aQQ==}
+  '@firebase/storage-compat@0.4.3':
+    resolution: {integrity: sha512-gruVqjtUGX8tEoeNbaWXZm0Zfcfcb7fvmDmBxV8yPAbWvExRnZYLO2+qw9idxNE7BvPXt5csyjSYHy//dAizxw==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app-compat': 0.x
 
-  '@firebase/storage-types@0.8.3':
-    resolution: {integrity: sha512-+Muk7g9uwngTpd8xn9OdF/D48uiQ7I1Fae7ULsWPuKoCH3HU7bfFPhxtJYzyhjdniowhuDpQcfPmuNRAqZEfvg==}
+  '@firebase/storage-types@0.8.4':
+    resolution: {integrity: sha512-BT7cwxJOx8SWwlQfrlC+bD/Sk3Cw+1odCi8UZNFNWTVZoPsBnA5W+mqtZzVnvsdJpXCFGSGQ7R7vOR6dtM/BRA==}
     peerDependencies:
       '@firebase/app-types': 0.x
       '@firebase/util': 1.x
 
-  '@firebase/storage@0.14.2':
-    resolution: {integrity: sha512-o/culaTeJ8GRpKXRJov21rux/n9dRaSOWLebyatFP2sqEdCxQPjVA1H9Z2fzYwQxMIU0JVmC7SPPmU11v7L6vQ==}
+  '@firebase/storage@0.14.3':
+    resolution: {integrity: sha512-YX4/YL6P6/fufSSeGnVhjWddcIXbFq2cWIhMKFTZo1E/Rtcl2mJj/BYUQTwJfcE1Tl8un1FOya4L05jcSLN/Eg==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@firebase/app': 0.x
 
-  '@firebase/util@1.15.0':
-    resolution: {integrity: sha512-AmWf3cHAOMbrCPG4xdPKQaj5iHnyYfyLKZxwz+Xf55bqKbpAmcYifB4jQinT2W9XhDRHISOoPyBOariJpCG6FA==}
+  '@firebase/util@1.15.1':
+    resolution: {integrity: sha512-LUdM4Wg7YM9Pq/49nGYySJA0CSQEKnGffFzWV8+6gXN7mGxn+FL1IqvFbuZUtAQcfZgHYDwCE1wwlK7rB7gl2g==}
     engines: {node: '>=20.0.0'}
 
-  '@firebase/webchannel-wrapper@1.0.5':
-    resolution: {integrity: sha512-+uGNN7rkfn41HLO0vekTFhTxk61eKa8mTpRGLO0QSqlQdKvIoGAvLp3ppdVIWbTGYJWM6Kp0iN+PjMIOcnVqTw==}
+  '@firebase/webchannel-wrapper@1.0.6':
+    resolution: {integrity: sha512-Vr/Mqu79dMwGRAyGbJ4uN4+BtXB3/mRTdzetD1daWNeG8QaWuzhhbG77GltO5c0yYmYls8i250iX73624GJd7Q==}
 
   '@gar/promise-retry@1.0.3':
     resolution: {integrity: sha512-GmzA9ckNokPypTg10pgpeHNQe7ph+iIKKmhKu3Ob9ANkswreCx7R3cKmY781K8QK3AqVL3xVh9A42JvIAbkkSA==}
@@ -2365,6 +2365,15 @@ packages:
       '@types/node':
         optional: true
 
+  '@inquirer/confirm@6.0.13':
+    resolution: {integrity: sha512-wkGPC7yJ5WJk1DJ5SX7fzk+gfj4BM8cf5dDDi71B/551xHrdsZVRJOC0WyikXd0pEsb/9cLniuE4atbsMqmFkw==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
   '@inquirer/core@11.1.10':
     resolution: {integrity: sha512-a4Q5BXHQAHa9eO202sTaFCHFYVB3x5fauDuThEAdZ9gfn76pSxiKU7wWcEH0N1O0XmQvNfQNU6QXpiRxmYQx+A==}
     engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
@@ -2434,6 +2443,15 @@ packages:
 
   '@inquirer/prompts@8.4.2':
     resolution: {integrity: sha512-XJmn/wY4AX56l1BRU+ZjDrFtg9+2uBEi4JvJQj82kwJDQKiPgSn4CEsbfGGygS4Gw6rkL4W18oATjfVfaqub2Q==}
+    engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
+    peerDependencies:
+      '@types/node': '>=18'
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+
+  '@inquirer/prompts@8.4.3':
+    resolution: {integrity: sha512-ai5LseTw9HhegupIgmo4cn7RpnCGznjjXu4OI+7jMR8vu7T1ZCCNMzFFAovUCjL1fl0cceksIN1++yQE59SmZw==}
     engines: {node: '>=23.5.0 || ^22.13.0 || ^21.7.0 || ^20.12.0'}
     peerDependencies:
       '@types/node': '>=18'
@@ -3682,8 +3700,8 @@ packages:
   '@types/node@22.19.19':
     resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
 
-  '@types/node@24.12.2':
-    resolution: {integrity: sha512-A1sre26ke7HDIuY/M23nd9gfB+nrmhtYyMINbjI1zHJxYteKR6qSMX56FsmjMcDb3SMcjJg5BiRRgOCC/yBD0g==}
+  '@types/node@24.12.4':
+    resolution: {integrity: sha512-GUUEShf+PBCGW2KaXwcIt3Yk+e3pkKwWKb9GSyM9WQVE+ep2jzmHdGsHzu4wgcZy5fN9FBdVzjpBQsYlpfpgLA==}
 
   '@types/npm-package-arg@6.1.4':
     resolution: {integrity: sha512-vDgdbMy2QXHnAruzlv68pUtXCjmqUk3WrBAsRboRovsOmxbfn/WiYCjmecyKjGztnMps5dWp4Uq2prp+Ilo17Q==}
@@ -5397,8 +5415,8 @@ packages:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
 
-  firebase@12.12.1:
-    resolution: {integrity: sha512-ee7xA+bTJLfjB9BP/8FQr3EkxmpAAGc1lNc5QkWgTDpUw24HYXFPm7FEWRdLtGnygxIdYpFmepSc5VjkI6NHhw==}
+  firebase@12.13.0:
+    resolution: {integrity: sha512-iutR8ejvAqk6qUClnsPz3U3VIjTWp243AX4cD3iifak5t56to1J29xUIQgSDDzaAqKvhshZerzSahwMQj2TlvA==}
 
   flat-cache@4.0.1:
     resolution: {integrity: sha512-f7ccFPK3SXFHpx15UIGyRJ/FJQctuKZ0zVuN3frBo4HnK3cay9VEW0R6yPYFHC0AgqhukPzKjq22t5DmAyqGyw==}
@@ -5411,8 +5429,8 @@ packages:
   flatted@3.4.2:
     resolution: {integrity: sha512-PjDse7RzhcPkIJwy5t7KPWQSZ9cAbzQXcafsetQoD7sOJRQlGikNbx7yZp2OotDnJyrDcbyRq3Ttb18iYOqkxA==}
 
-  folder-hash@4.1.2:
-    resolution: {integrity: sha512-rjdiHw3ShVonhMZZXvD/I28boUkbJFT/RBsg5MbQQd8e61PhevIwFwmL218/AscBEsW/blH4BC4A+kFeIqHVfw==}
+  folder-hash@4.1.3:
+    resolution: {integrity: sha512-94fj+fXj1XHT8zGumUy/VlyFARc/yrslKJ2+vjrP/U6ftTdL7u68+gQhvSBjz9wrwTuty6BpZ7JsbEK5OU9RNw==}
     engines: {node: '>=10.10.0'}
     hasBin: true
 
@@ -5538,9 +5556,6 @@ packages:
   get-symbol-description@1.1.0:
     resolution: {integrity: sha512-w9UMqWwJxHNOvoNzSJ2oPF5wvYcvP7jUvYzhp67yEhTi17ZDBBC1z9pTdGuzjD+EFIqLSYRweZjqfiPzQ06Ebg==}
     engines: {node: '>= 0.4'}
-
-  get-tsconfig@4.14.0:
-    resolution: {integrity: sha512-yTb+8DXzDREzgvYmh6s9vHsSVCHeC0G3PI5bEXNBHtmshPnO+S5O7qgLEOn0I5QvMy6kpZN8K1NKGyilLb93wA==}
 
   get-uri@6.0.5:
     resolution: {integrity: sha512-b1O07XYq8eRuVzBNgJLstU6FYc1tS6wnMtF1I1D9lE8LxZSOGZ7LhxN54yPP6mGw5f2CkXY2BQUL9Fx41qvcIg==}
@@ -6660,8 +6675,8 @@ packages:
     resolution: {integrity: sha512-eonl3sLUha+S1GzTPxychyhnUzKyeQkZ7jLjKrBagJgPla13F+uQ71HgpFefyHgqrjEbCPkDArxYsjY8/+gLKA==}
     engines: {node: '>= 0.4.0'}
 
-  ng-packagr@22.0.0-next.4:
-    resolution: {integrity: sha512-rZorWpYgRUHJ6DVgHb+Ele+spOTH/lQu6u0HA3HL4N8a+vIipEIZ/JUPXNfAhcGd0yhj7jhuokD7akIjiL3zzg==}
+  ng-packagr@22.0.0-rc.0:
+    resolution: {integrity: sha512-5R/axgfRB500l2fhFMVdjqZB2FhEgxHIKIauSsFBFTeJ3XbODKsQZiVya2P8/LTXEQRit1tOkvjYYB9iwlrPZg==}
     engines: {node: ^22.22.0 || ^24.13.1 || >=26.0.0}
     hasBin: true
     peerDependencies:
@@ -6673,8 +6688,8 @@ packages:
       tailwindcss:
         optional: true
 
-  nock@14.0.14:
-    resolution: {integrity: sha512-PKk7tex0O3RRXUZC5XDKJ9yM3rYRPS13myduT85VIIYDBnib42Fpxoe6KxRSzqB4iL2NDxkcJ2yiskZ18hGLEQ==}
+  nock@14.0.15:
+    resolution: {integrity: sha512-S0a47C9pLvcYx/Ugf0H30BVBEcUgMMBDk9VJIDlJ8XGrfH2QDUD4Tgdp45qDIiHttokBG+IbsOtsvIjGR/j3bg==}
     engines: {node: '>=18.20.0 <20 || >=20.12.1'}
 
   node-addon-api@6.1.0:
@@ -7330,9 +7345,6 @@ packages:
     resolution: {integrity: sha512-pb/MYmXstAkysRFx8piNI1tGFNQIFA3vkE3Gq4EuA1dF6gHp/+vgZqsCGJapvy8N3Q+4o7FwvquPJcnZ7RYy4g==}
     engines: {node: '>=4'}
 
-  resolve-pkg-maps@1.0.0:
-    resolution: {integrity: sha512-seS2Tj26TBVOC2NIc2rOe2y2ZO7efxITtLZcGSOnHHNOQ7CkiUBfw0Iw2ck6xkIhPwLhKNLS8BO+hEpngQlqzw==}
-
   resolve-url-loader@5.0.0:
     resolution: {integrity: sha512-uZtduh8/8srhBoMx//5bwqjQ+rfYOUq8zC9NrMUGtjBiGTtFJM42s58/36+hTqeqINcnYe08Nj3LkK9lW4N8Xg==}
     engines: {node: '>=12'}
@@ -7515,6 +7527,11 @@ packages:
 
   semver@7.7.4:
     resolution: {integrity: sha512-vFKC2IEtQnVhpT78h1Yp8wzwrf8CM+MzKMHGJZfBtzhZNycRFnXsHk6E5TxIkkMsgNS7mdX3AGB7x2QM2di4lA==}
+    engines: {node: '>=10'}
+    hasBin: true
+
+  semver@7.8.0:
+    resolution: {integrity: sha512-AcM7dV/5ul4EekoQ29Agm5vri8JNqRyj39o0qpX6vDF2GZrtutZl5RwgD1XnZjiTAfncsJhMI48QQH3sN87YNA==}
     engines: {node: '>=10'}
     hasBin: true
 
@@ -8025,8 +8042,8 @@ packages:
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
-  tsx@4.21.0:
-    resolution: {integrity: sha512-5C1sg4USs1lfG0GFb2RLXsdpXqBSEhAaA/0kPL01wxzpMqLILNxIxIOKiILz+cdg/pLnOUxFYOR5yhHU666wbw==}
+  tsx@4.22.1:
+    resolution: {integrity: sha512-TvncJykhxAzFCk0VQZKBTClall4Pm7qXDSodb6uxi8QFa8X8mT6ABjxxsQ2opDRYxG7AzcRWXaFtruz5HJKuWg==}
     engines: {node: '>=18.0.0'}
     hasBin: true
 
@@ -8558,11 +8575,6 @@ packages:
     resolution: {integrity: sha512-YgvUTfwqyc7UXVMrB+SImsVYSmTS8X/tSrtdNZMImM+n7+QTriRXyXim0mBrTXNeqzVF0KWGgHPeiyViFFrNDw==}
     engines: {node: '>=18'}
 
-  yaml@2.8.4:
-    resolution: {integrity: sha512-ml/JPOj9fOQK8RNnWojA67GbZ0ApXAUlN2UQclwv2eVgTgn7O9gg9o7paZWKMp4g0H3nTLtS9LVzhkpOFIKzog==}
-    engines: {node: '>= 14.6'}
-    hasBin: true
-
   yaml@2.9.0:
     resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
     engines: {node: '>= 14.6'}
@@ -8724,29 +8736,29 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))':
+  '@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))':
     dependencies:
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       tslib: 2.8.1
 
-  '@angular/cdk@22.0.0-next.8(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
+  '@angular/cdk@22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
-      '@angular/platform-browser': 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/platform-browser': 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       parse5: 8.0.1
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)':
+  '@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)':
     dependencies:
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3)':
+  '@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3)':
     dependencies:
-      '@angular/compiler': 22.0.0-next.12
+      '@angular/compiler': 22.0.0-rc.0
       '@babel/core': 7.29.0
       '@jridgewell/sourcemap-codec': 1.5.5
       chokidar: 5.0.0
@@ -8760,32 +8772,32 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/compiler@22.0.0-next.12':
+  '@angular/compiler@22.0.0-rc.0':
     dependencies:
       tslib: 2.8.1
 
-  '@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)':
+  '@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)':
     dependencies:
       rxjs: 7.8.2
       tslib: 2.8.1
     optionalDependencies:
-      '@angular/compiler': 22.0.0-next.12
+      '@angular/compiler': 22.0.0-rc.0
       zone.js: 0.16.2
 
-  '@angular/forms@22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
+  '@angular/forms@22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
-      '@angular/platform-browser': 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/platform-browser': 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       '@standard-schema/spec': 1.1.0
       rxjs: 7.8.2
       tslib: 2.8.1
       zod: 4.4.2
 
-  '@angular/localize@22.0.0-next.12(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(@angular/compiler@22.0.0-next.12)':
+  '@angular/localize@22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(@angular/compiler@22.0.0-rc.0)':
     dependencies:
-      '@angular/compiler': 22.0.0-next.12
-      '@angular/compiler-cli': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3)
+      '@angular/compiler': 22.0.0-rc.0
+      '@angular/compiler-cli': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3)
       '@babel/core': 7.29.0
       '@types/babel__core': 7.20.5
       tinyglobby: 0.2.16
@@ -8793,24 +8805,24 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@angular/material@22.0.0-next.8(93ce75c341587667f5d7d40f3eefe13f)':
+  '@angular/material@22.0.0-rc.0(b11ecddb61371acc147801b64fc28dc6)':
     dependencies:
-      '@angular/cdk': 22.0.0-next.8(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
-      '@angular/forms': 22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
-      '@angular/platform-browser': 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/cdk': 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/forms': 22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)
+      '@angular/platform-browser': 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/2c36222db3f44751284cc93b3806dbe1baee583a(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/98b21a0cb6ef6d068a99a9346e89812e3ec9d2b1(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 2.7.0(conventional-commits-filter@5.0.0)(conventional-commits-parser@6.4.0)
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
       '@google/genai': 1.52.0(@modelcontextprotocol/sdk@1.29.0(zod@4.4.2))(bufferutil@4.1.0)(supports-color@10.2.2)(utf-8-validate@6.0.6)
-      '@inquirer/prompts': 8.4.2(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/prompts': 8.4.3(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
       '@octokit/auth-app': 8.2.0
       '@octokit/core': 7.0.6
       '@octokit/graphql': 9.0.3
@@ -8827,7 +8839,7 @@ snapshots:
       '@types/events': 3.0.3
       '@types/folder-hash': 4.0.4
       '@types/jasmine': 6.0.0
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
       '@types/semver': 7.7.1
       '@types/which': 3.0.4
       '@types/yargs': 17.0.35
@@ -8840,58 +8852,58 @@ snapshots:
       ejs: 5.0.2
       encoding: 0.1.13
       fast-glob: 3.3.3
-      firebase: 12.12.1
-      folder-hash: 4.1.2(supports-color@10.2.2)
+      firebase: 12.13.0
+      folder-hash: 4.1.3(supports-color@10.2.2)
       jasmine: 6.2.0
       jasmine-core: 6.2.0
       jasmine-reporters: 2.5.2
       jsonc-parser: 3.3.1
       minimatch: 10.2.5
       multimatch: 8.0.0
-      nock: 14.0.14
-      semver: 7.7.4
+      nock: 14.0.15
+      semver: 7.8.0
       supports-color: 10.2.2
-      tsx: 4.21.0
+      tsx: 4.22.1
       typed-graphqlify: 3.1.6
       typescript: 6.0.3
       utf-8-validate: 6.0.6
       which: 7.0.0
-      yaml: 2.8.4
+      yaml: 2.9.0
       yargs: 18.0.0
       zod: 4.4.2
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - '@react-native-async-storage/async-storage'
 
-  '@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))':
+  '@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))':
     dependencies:
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       tslib: 2.8.1
     optionalDependencies:
-      '@angular/animations': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/animations': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
 
-  '@angular/platform-server@22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-next.12)(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
+  '@angular/platform-server@22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/compiler@22.0.0-rc.0)(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/compiler': 22.0.0-next.12
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
-      '@angular/platform-browser': 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/compiler': 22.0.0-rc.0
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/platform-browser': 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       rxjs: 7.8.2
       tslib: 2.8.1
       xhr2: 0.2.1
 
-  '@angular/router@22.0.0-next.12(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
+  '@angular/router@22.0.0-rc.0(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(@angular/platform-browser@22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(rxjs@7.8.2)':
     dependencies:
-      '@angular/common': 22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
-      '@angular/platform-browser': 22.0.0-next.12(@angular/animations@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))
+      '@angular/common': 22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/platform-browser': 22.0.0-rc.0(@angular/animations@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/service-worker@22.0.0-next.12(@angular/core@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)':
+  '@angular/service-worker@22.0.0-rc.0(@angular/core@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2)':
     dependencies:
-      '@angular/core': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(rxjs@7.8.2)(zone.js@0.16.2)
+      '@angular/core': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.2)
       rxjs: 7.8.2
       tslib: 2.8.1
 
@@ -9892,325 +9904,325 @@ snapshots:
 
   '@exodus/bytes@1.15.0': {}
 
-  '@firebase/ai@2.11.1(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)':
+  '@firebase/ai@2.12.0(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/app-check-interop-types': 0.3.3
-      '@firebase/app-types': 0.9.4
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/app-check-interop-types': 0.3.4
+      '@firebase/app-types': 0.9.5
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/analytics-compat@0.2.27(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
+  '@firebase/analytics-compat@0.2.28(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/analytics': 0.10.21(@firebase/app@0.14.11)
-      '@firebase/analytics-types': 0.8.3
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/util': 1.15.0
-      tslib: 2.8.1
-    transitivePeerDependencies:
-      - '@firebase/app'
-
-  '@firebase/analytics-types@0.8.3': {}
-
-  '@firebase/analytics@0.10.21(@firebase/app@0.14.11)':
-    dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
-      tslib: 2.8.1
-
-  '@firebase/app-check-compat@0.4.2(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
-    dependencies:
-      '@firebase/app-check': 0.11.2(@firebase/app@0.14.11)
-      '@firebase/app-check-types': 0.5.3
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/analytics': 0.10.22(@firebase/app@0.14.12)
+      '@firebase/analytics-types': 0.8.4
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
-  '@firebase/app-check-interop-types@0.3.3': {}
+  '@firebase/analytics-types@0.8.4': {}
 
-  '@firebase/app-check-types@0.5.3': {}
-
-  '@firebase/app-check@0.11.2(@firebase/app@0.14.11)':
+  '@firebase/analytics@0.10.22(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/app-compat@0.5.11':
+  '@firebase/app-check-compat@0.4.3(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app-check': 0.11.3(@firebase/app@0.14.12)
+      '@firebase/app-check-types': 0.5.4
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
+      tslib: 2.8.1
+    transitivePeerDependencies:
+      - '@firebase/app'
+
+  '@firebase/app-check-interop-types@0.3.4': {}
+
+  '@firebase/app-check-types@0.5.4': {}
+
+  '@firebase/app-check@0.11.3(@firebase/app@0.14.12)':
+    dependencies:
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/app-types@0.9.4':
+  '@firebase/app-compat@0.5.12':
     dependencies:
-      '@firebase/logger': 0.5.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
+      tslib: 2.8.1
 
-  '@firebase/app@0.14.11':
+  '@firebase/app-types@0.9.5':
     dependencies:
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/logger': 0.5.1
+
+  '@firebase/app@0.14.12':
+    dependencies:
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       idb: 7.1.1
       tslib: 2.8.1
 
-  '@firebase/auth-compat@0.6.5(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)':
+  '@firebase/auth-compat@0.6.6(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/auth': 1.13.0(@firebase/app@0.14.11)
-      '@firebase/auth-types': 0.13.0(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)
-      '@firebase/component': 0.7.2
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/auth': 1.13.1(@firebase/app@0.14.12)
+      '@firebase/auth-types': 0.13.1(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)
+      '@firebase/component': 0.7.3
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
       - '@react-native-async-storage/async-storage'
 
-  '@firebase/auth-interop-types@0.2.4': {}
+  '@firebase/auth-interop-types@0.2.5': {}
 
-  '@firebase/auth-types@0.13.0(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)':
+  '@firebase/auth-types@0.13.1(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)':
     dependencies:
-      '@firebase/app-types': 0.9.4
-      '@firebase/util': 1.15.0
+      '@firebase/app-types': 0.9.5
+      '@firebase/util': 1.15.1
 
-  '@firebase/auth@1.13.0(@firebase/app@0.14.11)':
+  '@firebase/auth@1.13.1(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/component@0.7.2':
+  '@firebase/component@0.7.3':
     dependencies:
-      '@firebase/util': 1.15.0
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/data-connect@0.6.0(@firebase/app@0.14.11)':
+  '@firebase/data-connect@0.7.0(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/auth-interop-types': 0.2.4
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/auth-interop-types': 0.2.5
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/database-compat@2.1.3':
+  '@firebase/database-compat@2.1.4':
     dependencies:
-      '@firebase/component': 0.7.2
-      '@firebase/database': 1.1.2
-      '@firebase/database-types': 1.0.19
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/component': 0.7.3
+      '@firebase/database': 1.1.3
+      '@firebase/database-types': 1.0.20
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/database-types@1.0.19':
+  '@firebase/database-types@1.0.20':
     dependencies:
-      '@firebase/app-types': 0.9.4
-      '@firebase/util': 1.15.0
+      '@firebase/app-types': 0.9.5
+      '@firebase/util': 1.15.1
 
-  '@firebase/database@1.1.2':
+  '@firebase/database@1.1.3':
     dependencies:
-      '@firebase/app-check-interop-types': 0.3.3
-      '@firebase/auth-interop-types': 0.2.4
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app-check-interop-types': 0.3.4
+      '@firebase/auth-interop-types': 0.2.5
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       faye-websocket: 0.11.4
       tslib: 2.8.1
 
-  '@firebase/firestore-compat@0.4.8(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)':
+  '@firebase/firestore-compat@0.4.9(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/firestore': 4.14.0(@firebase/app@0.14.11)
-      '@firebase/firestore-types': 3.0.3(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/firestore': 4.14.1(@firebase/app@0.14.12)
+      '@firebase/firestore-types': 3.0.4(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
 
-  '@firebase/firestore-types@3.0.3(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)':
+  '@firebase/firestore-types@3.0.4(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)':
     dependencies:
-      '@firebase/app-types': 0.9.4
-      '@firebase/util': 1.15.0
+      '@firebase/app-types': 0.9.5
+      '@firebase/util': 1.15.1
 
-  '@firebase/firestore@4.14.0(@firebase/app@0.14.11)':
+  '@firebase/firestore@4.14.1(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
-      '@firebase/webchannel-wrapper': 1.0.5
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
+      '@firebase/webchannel-wrapper': 1.0.6
       '@grpc/grpc-js': 1.9.15
       '@grpc/proto-loader': 0.7.15
       tslib: 2.8.1
 
-  '@firebase/functions-compat@0.4.3(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
+  '@firebase/functions-compat@0.4.4(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/functions': 0.13.3(@firebase/app@0.14.11)
-      '@firebase/functions-types': 0.6.3
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/functions': 0.13.4(@firebase/app@0.14.12)
+      '@firebase/functions-types': 0.6.4
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
-  '@firebase/functions-types@0.6.3': {}
+  '@firebase/functions-types@0.6.4': {}
 
-  '@firebase/functions@0.13.3(@firebase/app@0.14.11)':
+  '@firebase/functions@0.13.4(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/app-check-interop-types': 0.3.3
-      '@firebase/auth-interop-types': 0.2.4
-      '@firebase/component': 0.7.2
-      '@firebase/messaging-interop-types': 0.2.3
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/app-check-interop-types': 0.3.4
+      '@firebase/auth-interop-types': 0.2.5
+      '@firebase/component': 0.7.3
+      '@firebase/messaging-interop-types': 0.2.4
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/installations-compat@0.2.21(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)':
+  '@firebase/installations-compat@0.2.22(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/installations-types': 0.5.3(@firebase/app-types@0.9.4)
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/installations-types': 0.5.4(@firebase/app-types@0.9.5)
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
 
-  '@firebase/installations-types@0.5.3(@firebase/app-types@0.9.4)':
+  '@firebase/installations-types@0.5.4(@firebase/app-types@0.9.5)':
     dependencies:
-      '@firebase/app-types': 0.9.4
+      '@firebase/app-types': 0.9.5
 
-  '@firebase/installations@0.6.21(@firebase/app@0.14.11)':
+  '@firebase/installations@0.6.22(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/util': 1.15.1
       idb: 7.1.1
       tslib: 2.8.1
 
-  '@firebase/logger@0.5.0':
+  '@firebase/logger@0.5.1':
     dependencies:
       tslib: 2.8.1
 
-  '@firebase/messaging-compat@0.2.25(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
+  '@firebase/messaging-compat@0.2.26(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/messaging': 0.12.25(@firebase/app@0.14.11)
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/messaging': 0.12.26(@firebase/app@0.14.12)
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
-  '@firebase/messaging-interop-types@0.2.3': {}
+  '@firebase/messaging-interop-types@0.2.4': {}
 
-  '@firebase/messaging@0.12.25(@firebase/app@0.14.11)':
+  '@firebase/messaging@0.12.26(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/messaging-interop-types': 0.2.3
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/messaging-interop-types': 0.2.4
+      '@firebase/util': 1.15.1
       idb: 7.1.1
       tslib: 2.8.1
 
-  '@firebase/performance-compat@0.2.24(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
+  '@firebase/performance-compat@0.2.25(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/performance': 0.7.11(@firebase/app@0.14.11)
-      '@firebase/performance-types': 0.2.3
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/performance': 0.7.12(@firebase/app@0.14.12)
+      '@firebase/performance-types': 0.2.4
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
-  '@firebase/performance-types@0.2.3': {}
+  '@firebase/performance-types@0.2.4': {}
 
-  '@firebase/performance@0.7.11(@firebase/app@0.14.11)':
+  '@firebase/performance@0.7.12(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
       web-vitals: 4.2.4
 
-  '@firebase/remote-config-compat@0.2.23(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)':
+  '@firebase/remote-config-compat@0.2.24(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/logger': 0.5.0
-      '@firebase/remote-config': 0.8.2(@firebase/app@0.14.11)
-      '@firebase/remote-config-types': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/logger': 0.5.1
+      '@firebase/remote-config': 0.8.3(@firebase/app@0.14.12)
+      '@firebase/remote-config-types': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
 
-  '@firebase/remote-config-types@0.5.0': {}
+  '@firebase/remote-config-types@0.5.1': {}
 
-  '@firebase/remote-config@0.8.2(@firebase/app@0.14.11)':
+  '@firebase/remote-config@0.8.3(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/logger': 0.5.0
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/logger': 0.5.1
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/storage-compat@0.4.2(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)':
+  '@firebase/storage-compat@0.4.3(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app-compat': 0.5.11
-      '@firebase/component': 0.7.2
-      '@firebase/storage': 0.14.2(@firebase/app@0.14.11)
-      '@firebase/storage-types': 0.8.3(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)
-      '@firebase/util': 1.15.0
+      '@firebase/app-compat': 0.5.12
+      '@firebase/component': 0.7.3
+      '@firebase/storage': 0.14.3(@firebase/app@0.14.12)
+      '@firebase/storage-types': 0.8.4(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
     transitivePeerDependencies:
       - '@firebase/app'
       - '@firebase/app-types'
 
-  '@firebase/storage-types@0.8.3(@firebase/app-types@0.9.4)(@firebase/util@1.15.0)':
+  '@firebase/storage-types@0.8.4(@firebase/app-types@0.9.5)(@firebase/util@1.15.1)':
     dependencies:
-      '@firebase/app-types': 0.9.4
-      '@firebase/util': 1.15.0
+      '@firebase/app-types': 0.9.5
+      '@firebase/util': 1.15.1
 
-  '@firebase/storage@0.14.2(@firebase/app@0.14.11)':
+  '@firebase/storage@0.14.3(@firebase/app@0.14.12)':
     dependencies:
-      '@firebase/app': 0.14.11
-      '@firebase/component': 0.7.2
-      '@firebase/util': 1.15.0
+      '@firebase/app': 0.14.12
+      '@firebase/component': 0.7.3
+      '@firebase/util': 1.15.1
       tslib: 2.8.1
 
-  '@firebase/util@1.15.0':
+  '@firebase/util@1.15.1':
     dependencies:
       tslib: 2.8.1
 
-  '@firebase/webchannel-wrapper@1.0.5': {}
+  '@firebase/webchannel-wrapper@1.0.6': {}
 
   '@gar/promise-retry@1.0.3': {}
 
@@ -10337,122 +10349,144 @@ snapshots:
 
   '@inquirer/ansi@2.0.5': {}
 
-  '@inquirer/checkbox@5.1.5(@types/node@24.12.2)':
+  '@inquirer/checkbox@5.1.5(@types/node@24.12.4)':
     dependencies:
       '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
       '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/confirm@6.0.12(@types/node@24.12.2)':
+  '@inquirer/confirm@6.0.12(@types/node@24.12.4)':
     dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/core@11.1.10(@types/node@24.12.2)':
+  '@inquirer/confirm@6.0.13(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
+    optionalDependencies:
+      '@types/node': 24.12.4
+
+  '@inquirer/core@11.1.10(@types/node@24.12.4)':
     dependencies:
       '@inquirer/ansi': 2.0.5
       '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
       cli-width: 4.1.0
       fast-wrap-ansi: 0.2.0
       mute-stream: 3.0.0
       signal-exit: 4.1.0
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/editor@5.1.2(@types/node@24.12.2)':
+  '@inquirer/editor@5.1.2(@types/node@24.12.4)':
     dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/external-editor': 3.0.0(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/external-editor': 3.0.0(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/expand@5.0.14(@types/node@24.12.2)':
+  '@inquirer/expand@5.0.14(@types/node@24.12.4)':
     dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/external-editor@3.0.0(@types/node@24.12.2)':
+  '@inquirer/external-editor@3.0.0(@types/node@24.12.4)':
     dependencies:
       chardet: 2.1.1
       iconv-lite: 0.7.2
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
   '@inquirer/figures@2.0.5': {}
 
-  '@inquirer/input@5.0.13(@types/node@24.12.2)':
+  '@inquirer/input@5.0.13(@types/node@24.12.4)':
     dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/number@4.0.13(@types/node@24.12.2)':
+  '@inquirer/number@4.0.13(@types/node@24.12.4)':
     dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/password@5.0.13(@types/node@24.12.2)':
-    dependencies:
-      '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
-    optionalDependencies:
-      '@types/node': 24.12.2
-
-  '@inquirer/prompts@8.4.2(@types/node@24.12.2)':
-    dependencies:
-      '@inquirer/checkbox': 5.1.5(@types/node@24.12.2)
-      '@inquirer/confirm': 6.0.12(@types/node@24.12.2)
-      '@inquirer/editor': 5.1.2(@types/node@24.12.2)
-      '@inquirer/expand': 5.0.14(@types/node@24.12.2)
-      '@inquirer/input': 5.0.13(@types/node@24.12.2)
-      '@inquirer/number': 4.0.13(@types/node@24.12.2)
-      '@inquirer/password': 5.0.13(@types/node@24.12.2)
-      '@inquirer/rawlist': 5.2.9(@types/node@24.12.2)
-      '@inquirer/search': 4.1.9(@types/node@24.12.2)
-      '@inquirer/select': 5.1.5(@types/node@24.12.2)
-    optionalDependencies:
-      '@types/node': 24.12.2
-
-  '@inquirer/rawlist@5.2.9(@types/node@24.12.2)':
-    dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
-    optionalDependencies:
-      '@types/node': 24.12.2
-
-  '@inquirer/search@4.1.9(@types/node@24.12.2)':
-    dependencies:
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
-    optionalDependencies:
-      '@types/node': 24.12.2
-
-  '@inquirer/select@5.1.5(@types/node@24.12.2)':
+  '@inquirer/password@5.0.13(@types/node@24.12.4)':
     dependencies:
       '@inquirer/ansi': 2.0.5
-      '@inquirer/core': 11.1.10(@types/node@24.12.2)
-      '@inquirer/figures': 2.0.5
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
 
-  '@inquirer/type@4.0.5(@types/node@24.12.2)':
+  '@inquirer/prompts@8.4.2(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/checkbox': 5.1.5(@types/node@24.12.4)
+      '@inquirer/confirm': 6.0.12(@types/node@24.12.4)
+      '@inquirer/editor': 5.1.2(@types/node@24.12.4)
+      '@inquirer/expand': 5.0.14(@types/node@24.12.4)
+      '@inquirer/input': 5.0.13(@types/node@24.12.4)
+      '@inquirer/number': 4.0.13(@types/node@24.12.4)
+      '@inquirer/password': 5.0.13(@types/node@24.12.4)
+      '@inquirer/rawlist': 5.2.9(@types/node@24.12.4)
+      '@inquirer/search': 4.1.9(@types/node@24.12.4)
+      '@inquirer/select': 5.1.5(@types/node@24.12.4)
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
+
+  '@inquirer/prompts@8.4.3(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/checkbox': 5.1.5(@types/node@24.12.4)
+      '@inquirer/confirm': 6.0.13(@types/node@24.12.4)
+      '@inquirer/editor': 5.1.2(@types/node@24.12.4)
+      '@inquirer/expand': 5.0.14(@types/node@24.12.4)
+      '@inquirer/input': 5.0.13(@types/node@24.12.4)
+      '@inquirer/number': 4.0.13(@types/node@24.12.4)
+      '@inquirer/password': 5.0.13(@types/node@24.12.4)
+      '@inquirer/rawlist': 5.2.9(@types/node@24.12.4)
+      '@inquirer/search': 4.1.9(@types/node@24.12.4)
+      '@inquirer/select': 5.1.5(@types/node@24.12.4)
+    optionalDependencies:
+      '@types/node': 24.12.4
+
+  '@inquirer/rawlist@5.2.9(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
+    optionalDependencies:
+      '@types/node': 24.12.4
+
+  '@inquirer/search@4.1.9(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/figures': 2.0.5
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
+    optionalDependencies:
+      '@types/node': 24.12.4
+
+  '@inquirer/select@5.1.5(@types/node@24.12.4)':
+    dependencies:
+      '@inquirer/ansi': 2.0.5
+      '@inquirer/core': 11.1.10(@types/node@24.12.4)
+      '@inquirer/figures': 2.0.5
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
+    optionalDependencies:
+      '@types/node': 24.12.4
+
+  '@inquirer/type@4.0.5(@types/node@24.12.4)':
+    optionalDependencies:
+      '@types/node': 24.12.4
 
   '@isaacs/cliui@8.0.2':
     dependencies:
@@ -10626,10 +10660,10 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@4.2.3(@inquirer/prompts@8.4.2(@types/node@24.12.2))(@types/node@24.12.2)(listr2@10.2.1)':
+  '@listr2/prompt-adapter-inquirer@4.2.3(@inquirer/prompts@8.4.2(@types/node@24.12.4))(@types/node@24.12.4)(listr2@10.2.1)':
     dependencies:
-      '@inquirer/prompts': 8.4.2(@types/node@24.12.2)
-      '@inquirer/type': 4.0.5(@types/node@24.12.2)
+      '@inquirer/prompts': 8.4.2(@types/node@24.12.4)
+      '@inquirer/type': 4.0.5(@types/node@24.12.4)
       listr2: 10.2.1
     transitivePeerDependencies:
       - '@types/node'
@@ -11639,7 +11673,7 @@ snapshots:
     dependencies:
       undici-types: 6.21.0
 
-  '@types/node@24.12.2':
+  '@types/node@24.12.4':
     dependencies:
       undici-types: 7.16.0
 
@@ -12026,9 +12060,9 @@ snapshots:
       lodash: 4.18.1
       minimatch: 7.4.9
 
-  '@vitejs/plugin-basic-ssl@2.3.0(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))':
+  '@vitejs/plugin-basic-ssl@2.3.0(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0))':
     dependencies:
-      vite: 7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+      vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
 
   '@vitest/coverage-v8@4.1.5(vitest@4.1.5)':
     dependencies:
@@ -12042,7 +12076,7 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+      vitest: 4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
 
   '@vitest/expect@4.1.5':
     dependencies:
@@ -12053,13 +12087,13 @@ snapshots:
       chai: 6.2.2
       tinyrainbow: 3.1.0
 
-  '@vitest/mocker@4.1.5(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))':
+  '@vitest/mocker@4.1.5(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 4.1.5
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+      vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
 
   '@vitest/pretty-format@4.1.5':
     dependencies:
@@ -13853,36 +13887,36 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  firebase@12.12.1:
+  firebase@12.13.0:
     dependencies:
-      '@firebase/ai': 2.11.1(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)
-      '@firebase/analytics': 0.10.21(@firebase/app@0.14.11)
-      '@firebase/analytics-compat': 0.2.27(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/app': 0.14.11
-      '@firebase/app-check': 0.11.2(@firebase/app@0.14.11)
-      '@firebase/app-check-compat': 0.4.2(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/app-compat': 0.5.11
-      '@firebase/app-types': 0.9.4
-      '@firebase/auth': 1.13.0(@firebase/app@0.14.11)
-      '@firebase/auth-compat': 0.6.5(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)
-      '@firebase/data-connect': 0.6.0(@firebase/app@0.14.11)
-      '@firebase/database': 1.1.2
-      '@firebase/database-compat': 2.1.3
-      '@firebase/firestore': 4.14.0(@firebase/app@0.14.11)
-      '@firebase/firestore-compat': 0.4.8(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)
-      '@firebase/functions': 0.13.3(@firebase/app@0.14.11)
-      '@firebase/functions-compat': 0.4.3(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/installations': 0.6.21(@firebase/app@0.14.11)
-      '@firebase/installations-compat': 0.2.21(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)
-      '@firebase/messaging': 0.12.25(@firebase/app@0.14.11)
-      '@firebase/messaging-compat': 0.2.25(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/performance': 0.7.11(@firebase/app@0.14.11)
-      '@firebase/performance-compat': 0.2.24(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/remote-config': 0.8.2(@firebase/app@0.14.11)
-      '@firebase/remote-config-compat': 0.2.23(@firebase/app-compat@0.5.11)(@firebase/app@0.14.11)
-      '@firebase/storage': 0.14.2(@firebase/app@0.14.11)
-      '@firebase/storage-compat': 0.4.2(@firebase/app-compat@0.5.11)(@firebase/app-types@0.9.4)(@firebase/app@0.14.11)
-      '@firebase/util': 1.15.0
+      '@firebase/ai': 2.12.0(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)
+      '@firebase/analytics': 0.10.22(@firebase/app@0.14.12)
+      '@firebase/analytics-compat': 0.2.28(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/app': 0.14.12
+      '@firebase/app-check': 0.11.3(@firebase/app@0.14.12)
+      '@firebase/app-check-compat': 0.4.3(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/app-compat': 0.5.12
+      '@firebase/app-types': 0.9.5
+      '@firebase/auth': 1.13.1(@firebase/app@0.14.12)
+      '@firebase/auth-compat': 0.6.6(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)
+      '@firebase/data-connect': 0.7.0(@firebase/app@0.14.12)
+      '@firebase/database': 1.1.3
+      '@firebase/database-compat': 2.1.4
+      '@firebase/firestore': 4.14.1(@firebase/app@0.14.12)
+      '@firebase/firestore-compat': 0.4.9(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)
+      '@firebase/functions': 0.13.4(@firebase/app@0.14.12)
+      '@firebase/functions-compat': 0.4.4(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/installations': 0.6.22(@firebase/app@0.14.12)
+      '@firebase/installations-compat': 0.2.22(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)
+      '@firebase/messaging': 0.12.26(@firebase/app@0.14.12)
+      '@firebase/messaging-compat': 0.2.26(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/performance': 0.7.12(@firebase/app@0.14.12)
+      '@firebase/performance-compat': 0.2.25(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/remote-config': 0.8.3(@firebase/app@0.14.12)
+      '@firebase/remote-config-compat': 0.2.24(@firebase/app-compat@0.5.12)(@firebase/app@0.14.12)
+      '@firebase/storage': 0.14.3(@firebase/app@0.14.12)
+      '@firebase/storage-compat': 0.4.3(@firebase/app-compat@0.5.12)(@firebase/app-types@0.9.5)(@firebase/app@0.14.12)
+      '@firebase/util': 1.15.1
     transitivePeerDependencies:
       - '@react-native-async-storage/async-storage'
 
@@ -13895,7 +13929,7 @@ snapshots:
 
   flatted@3.4.2: {}
 
-  folder-hash@4.1.2(supports-color@10.2.2):
+  folder-hash@4.1.3(supports-color@10.2.2):
     dependencies:
       debug: 4.4.0(supports-color@10.2.2)
       minimatch: 7.4.9
@@ -14028,10 +14062,6 @@ snapshots:
       call-bound: 1.0.4
       es-errors: 1.3.0
       get-intrinsic: 1.3.0
-
-  get-tsconfig@4.14.0:
-    dependencies:
-      resolve-pkg-maps: 1.0.0
 
   get-uri@6.0.5:
     dependencies:
@@ -15235,10 +15265,10 @@ snapshots:
 
   netmask@2.1.1: {}
 
-  ng-packagr@22.0.0-next.4(@angular/compiler-cli@22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3):
+  ng-packagr@22.0.0-rc.0(@angular/compiler-cli@22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@angular/compiler-cli': 22.0.0-next.12(@angular/compiler@22.0.0-next.12)(typescript@6.0.3)
+      '@angular/compiler-cli': 22.0.0-rc.0(@angular/compiler@22.0.0-rc.0)(typescript@6.0.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.60.2)
       '@rollup/wasm-node': 4.60.2
       ajv: 8.20.0
@@ -15263,7 +15293,7 @@ snapshots:
     optionalDependencies:
       rollup: 4.60.2
 
-  nock@14.0.14:
+  nock@14.0.15:
     dependencies:
       '@mswjs/interceptors': 0.41.9
       json-stringify-safe: 5.0.1
@@ -16035,8 +16065,6 @@ snapshots:
 
   resolve-from@4.0.0: {}
 
-  resolve-pkg-maps@1.0.0: {}
-
   resolve-url-loader@5.0.0:
     dependencies:
       adjust-sourcemap-loader: 4.0.0
@@ -16268,6 +16296,8 @@ snapshots:
   semver@7.7.2: {}
 
   semver@7.7.4: {}
+
+  semver@7.8.0: {}
 
   send@0.19.2:
     dependencies:
@@ -16903,10 +16933,9 @@ snapshots:
 
   tslib@2.8.1: {}
 
-  tsx@4.21.0:
+  tsx@4.22.1:
     dependencies:
-      esbuild: 0.27.7
-      get-tsconfig: 4.14.0
+      esbuild: 0.28.0
     optionalDependencies:
       fsevents: 2.3.3
 
@@ -17154,7 +17183,7 @@ snapshots:
       core-util-is: 1.0.2
       extsprintf: 1.3.0
 
-  vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0):
+  vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0):
     dependencies:
       esbuild: 0.27.7
       fdir: 6.5.0(picomatch@4.0.4)
@@ -17163,19 +17192,19 @@ snapshots:
       rollup: 4.60.2
       tinyglobby: 0.2.16
     optionalDependencies:
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
       fsevents: 2.3.3
       jiti: 2.7.0
       less: 4.6.4
       sass: 1.99.0
       terser: 5.46.2
-      tsx: 4.21.0
+      tsx: 4.22.1
       yaml: 2.9.0
 
-  vitest@4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.2)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0):
+  vitest@4.1.5(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.5)(jiti@2.7.0)(jsdom@29.1.1)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0):
     dependencies:
       '@vitest/expect': 4.1.5
-      '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0))
+      '@vitest/mocker': 4.1.5(vite@7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0))
       '@vitest/pretty-format': 4.1.5
       '@vitest/runner': 4.1.5
       '@vitest/snapshot': 4.1.5
@@ -17192,11 +17221,11 @@ snapshots:
       tinyexec: 1.1.2
       tinyglobby: 0.2.16
       tinyrainbow: 3.1.0
-      vite: 7.3.2(@types/node@24.12.2)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.21.0)(yaml@2.9.0)
+      vite: 7.3.2(@types/node@24.12.4)(jiti@2.7.0)(less@4.6.4)(sass@1.99.0)(terser@5.46.2)(tsx@4.22.1)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
-      '@types/node': 24.12.2
+      '@types/node': 24.12.4
       '@vitest/coverage-v8': 4.1.5(vitest@4.1.5)
       jsdom: 29.1.1
     transitivePeerDependencies:
@@ -17602,8 +17631,6 @@ snapshots:
   yallist@4.0.0: {}
 
   yallist@5.0.0: {}
-
-  yaml@2.8.4: {}
 
   yaml@2.9.0: {}
 
