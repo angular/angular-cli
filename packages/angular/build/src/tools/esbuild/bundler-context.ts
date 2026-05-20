@@ -13,6 +13,7 @@ import {
   BuildResult,
   Message,
   Metafile,
+  OutputFile,
   build,
   context,
 } from 'esbuild';
