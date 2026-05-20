@@ -94,7 +94,7 @@ You can find more info about debugging [tests with Bazel in the docs.](https://g
 - Provide additional `e2e_runner` options using `--test_arg`: `--test_arg="--package-manager=yarn"`
 
 When running the debug commands, Node will stop and wait for a debugger to attach.
-You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also, see [IDE Specific Usage](#ide-specific-usage) for a
+You can attach your IDE to the debugger to stop on breakpoints and step through the code. Also, see [IDE-specific usage](#ide-specific-usage) for a
 simpler debug story.
 
 ## IDE Specific Usage
