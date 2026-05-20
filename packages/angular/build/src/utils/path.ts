@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { posix } from 'node:path';
+import { normalize, posix, resolve } from 'node:path';
 import { platform } from 'node:process';
 
 const WINDOWS_PATH_SEPERATOR_REGEXP = /\\/g;
@@ -34,4 +34,18 @@ const WINDOWS_PATH_SEPERATOR_REGEXP = /\\/g;
  */
 export function toPosixPath(path: string): string {
   return platform === 'win32' ? path.replace(WINDOWS_PATH_SEPERATOR_REGEXP, posix.sep) : path;
+}
+
+/**
+ * Determines if a path is a subdirectory or file within a parent directory.
+ *
+ * @param parent - The parent directory path.
+ * @param child - The child path to check.
+ * @returns `true` if the child path is within the parent directory, `false` otherwise.
+ */
+export function isSubDirectory(parent: string, child: string): boolean {
+  const normalizedParent = normalize(parent);
+  const resolvedChild = resolve(parent, child);
+
+  return resolvedChild.startsWith(normalizedParent);
 }

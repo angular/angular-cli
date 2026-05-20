@@ -10,6 +10,7 @@ import assert from 'node:assert';
 import { statSync } from 'node:fs';
 import * as path from 'node:path';
 import { AssetPattern, AssetPatternClass } from '../builders/application/schema';
+import { isSubDirectory } from './path';
 
 export function normalizeAssetPatterns(
   assetPatterns: AssetPattern[],
@@ -70,6 +71,10 @@ export function normalizeAssetPatterns(
 
       assetPattern = { glob, input, output };
     } else {
+      if (!isSubDirectory(workspaceRoot, assetPattern.input)) {
+        throw new Error(`The ${assetPattern.input} asset path must be within the workspace root.`);
+      }
+
       assetPattern.output = path.join('.', assetPattern.output ?? '');
     }
 

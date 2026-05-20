@@ -8,6 +8,7 @@
 
 import path from 'node:path';
 import { glob } from 'tinyglobby';
+import { isSubDirectory } from './path';
 
 export async function resolveAssets(
   entries: {
@@ -25,7 +26,12 @@ export async function resolveAssets(
   const outputFiles: { source: string; destination: string }[] = [];
 
   for (const entry of entries) {
+    if (!isSubDirectory(root, entry.input)) {
+      throw new Error(`The ${entry.input} asset path must be within the workspace root.`);
+    }
+
     const cwd = path.resolve(root, entry.input);
+
     const files = await glob(entry.glob, {
       cwd,
       dot: true,
