@@ -9,7 +9,7 @@ $ npm link
 ```
 
 This will link the binaries included in this repository, which includes the `devkit-admin` binary. This document
-describes each scripts available.
+describes each available script.
 
 ## build
 
