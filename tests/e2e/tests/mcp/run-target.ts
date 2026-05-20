@@ -1,3 +1,4 @@
+import { getGlobalVariable } from '../../utils/env';
 import { exec, ProcessOutput, silentNpm } from '../../utils/process';
 import assert from 'node:assert/strict';
 
@@ -53,8 +54,31 @@ export default async function () {
       'target=build',
     );
     assert.match(stdoutCall, /"status":\s*"success"/);
+    // Webpack-based browser builder does not print output paths to stdout logs.
+    // Only esbuild-based application builders output 'Output location: ...' and support outputPath extraction.
+    const esbuild = getGlobalVariable('argv')['esbuild'];
+    if (esbuild) {
+      assert.match(stdoutCall, /"outputPath":\s*"dist\/.+"/);
+    } else {
+      assert.doesNotMatch(stdoutCall, /"outputPath"/);
+    }
+
+    // 4. Call run_target with test target (only for esbuild/Vite test runner, as webpack-based Karma fails on this bazel CI headless runner)
+    if (esbuild) {
+      const { stdout: stdoutTestCall } = await runInspector(
+        '-E',
+        'run_target',
+        '--method',
+        'tools/call',
+        '--tool-name',
+        'run_target',
+        '--tool-arg',
+        'target=test',
+      );
+      assert.match(stdoutTestCall, /"status":\s*"success"/);
+    }
   } finally {
-    // 4. Clean up global installation
+    // 5. Clean up global installation
     await silentNpm('uninstall', '-g', MCP_INSPECTOR_PACKAGE_NAME);
   }
 }

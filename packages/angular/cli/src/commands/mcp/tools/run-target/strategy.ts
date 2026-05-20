@@ -11,7 +11,7 @@ import type { RunTargetOutput, StrategyExecutionContext } from './types';
 
 export interface TargetStrategy {
   /** Whether this strategy is responsible for handling the given target/builder */
-  canHandle(target: string, builder?: string): boolean;
+  canHandle(targetName: string, builder?: string): boolean;
 
   /** Executes the target using this strategy */
   execute(input: StrategyExecutionContext, context: McpToolContext): Promise<RunTargetOutput>;

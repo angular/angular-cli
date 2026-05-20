@@ -49,7 +49,12 @@ export type RunTargetOutput = z.infer<typeof runTargetOutputSchema>;
 export interface StrategyExecutionContext {
   workspacePath: string;
   projectName: string;
-  target: string;
+  targetName: string;
+  targetDefinition?: {
+    builder: string;
+    options?: Record<string, unknown>;
+    configurations?: Record<string, Record<string, unknown> | undefined>;
+  };
   configuration?: string;
   options?: Record<string, OptionValue>;
 }
