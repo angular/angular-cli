@@ -1,3 +1,15 @@
+<a name="21.2.12"></a>
+
+# 21.2.12 (2026-05-20)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [cbad57579](https://github.com/angular/angular-cli/commit/cbad57579adb5de7887985afbb2bf1f40adf3cb2) | fix  | ignore virtual esbuild paths with (disabled): |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0-rc.0"></a>
 
 # 22.0.0-rc.0 (2026-05-13)
@@ -74,6 +86,7 @@
 | [547ca515b](https://github.com/angular/angular-cli/commit/547ca515b707c283489a3f088d86fc84807d830d) | refactor | deprecate @ngtools/webpack loader and plugin |
 
 <!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.11"></a>
 
 # 21.2.11 (2026-05-13)
