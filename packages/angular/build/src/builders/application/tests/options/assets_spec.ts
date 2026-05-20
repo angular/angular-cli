@@ -367,7 +367,29 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
         const { error } = await harness.executeOnce({ outputLogsOnException: false });
 
-        expect(error?.message).toMatch('asset path must be within the workspace root');
+        expect(error?.message).toContain('asset path must be within the workspace root');
+      });
+
+      it('fails if asset input option is outside workspace root (relative)', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: '../outside', output: '.' }],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toContain('asset path must be within the workspace root');
+      });
+
+      it('fails if asset input option is outside workspace root (absolute)', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: '/tmp/outside-workspace', output: '.' }],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toContain('asset path must be within the workspace root');
       });
 
       it('fails if output option is not within project output path', async () => {
