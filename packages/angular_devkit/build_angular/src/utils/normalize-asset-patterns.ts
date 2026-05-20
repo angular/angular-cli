@@ -43,7 +43,7 @@ export function normalizeAssetPatterns(
       }
 
       let glob: string, input: string;
-      let isDirectory = false;
+      let isDirectory: boolean;
 
       try {
         isDirectory = statSync(resolvedAssetPath).isDirectory();
@@ -68,6 +68,11 @@ export function normalizeAssetPatterns(
 
       assetPattern = { glob, input, output };
     } else {
+      const resolvedInput = path.resolve(workspaceRoot, assetPattern.input);
+      if (!resolvedInput.startsWith(workspaceRoot)) {
+        throw new Error(`The ${assetPattern.input} asset path must be within the workspace root.`);
+      }
+
       assetPattern.output = path.join('.', assetPattern.output ?? '');
     }
 
