@@ -359,6 +359,28 @@ describeBuilder(buildWebpackBrowser, BROWSER_BUILDER_INFO, (harness) => {
         harness.expectFile('dist/subdirectory/test.svg').content.toBe('<svg></svg>');
       });
 
+      it('fails if asset input option is outside workspace root (relative)', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: '../outside', output: '.' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.error).toMatch('asset path must be within the workspace root');
+      });
+
+      it('fails if asset input option is outside workspace root (absolute)', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: '/tmp/outside-workspace', output: '.' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.error).toMatch('asset path must be within the workspace root');
+      });
+
       it('fails if output option is not within project output path', async () => {
         await harness.writeFile('test.svg', '<svg></svg>');
 
