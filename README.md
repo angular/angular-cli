@@ -40,7 +40,7 @@
 
 ## Documentation
 
-Get started with Angular CLI, learn the fundamentals and explore advanced topics on our documentation website.
+Get started with Angular CLI, learn the fundamentals, and explore advanced topics on our documentation website.
 
 - [Getting started][quickstart]
 - [CLI][cli]
