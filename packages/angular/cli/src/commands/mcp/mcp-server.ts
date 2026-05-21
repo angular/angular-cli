@@ -17,16 +17,13 @@ import { LocalWorkspaceHost, createRootRestrictedHost } from './host';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
-import { BUILD_TOOL } from './tools/build';
 import { DEVSERVER_START_TOOL } from './tools/devserver/devserver-start';
 import { DEVSERVER_STOP_TOOL } from './tools/devserver/devserver-stop';
 import { DEVSERVER_WAIT_FOR_BUILD_TOOL } from './tools/devserver/devserver-wait-for-build';
 import { DOC_SEARCH_TOOL } from './tools/doc-search';
-import { E2E_TOOL } from './tools/e2e';
 import { ZONELESS_MIGRATION_TOOL } from './tools/onpush-zoneless-migration/zoneless-migration';
 import { LIST_PROJECTS_TOOL } from './tools/projects';
 import { RUN_TARGET_TOOL } from './tools/run-target/run-target';
-import { TEST_TOOL } from './tools/test';
 import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry';
 
 /**
@@ -50,13 +47,7 @@ const STABLE_TOOLS = [
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS = [
-  BUILD_TOOL,
-  E2E_TOOL,
-  TEST_TOOL,
-  RUN_TARGET_TOOL,
-  ...DEVSERVER_TOOLS,
-] as const;
+export const EXPERIMENTAL_TOOLS = [RUN_TARGET_TOOL, ...DEVSERVER_TOOLS] as const;
 
 /**
  * Experimental tools that are grouped together under a single name.
