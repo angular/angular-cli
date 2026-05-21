@@ -57,7 +57,7 @@ if (major === 23 || major === 25) {
 
   require('./bootstrap');
 } else if (!nodeUtils.isNodeVersionSupported()) {
-  // Error and exit if less than 22.22 or 24.15.0
+  // Error and exit if less than the supported versions.
   console.error(
     'Node.js version ' +
       process.version +
