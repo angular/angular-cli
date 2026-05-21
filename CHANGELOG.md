@@ -1,3 +1,22 @@
+<a name="22.0.0-rc.1"></a>
+
+# 22.0.0-rc.1 (2026-05-21)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [a7ac8e5f0](https://github.com/angular/angular-cli/commit/a7ac8e5f0a268994a8fcfebbf56f76e994b6207d) | fix  | support spy call arguments migration in refactor-jasmine-vitest |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [327cc2414](https://github.com/angular/angular-cli/commit/327cc24144ab7e0e36ff3d6e9a67585588f2f69f) | fix  | assert that asset input paths are within workspace root |
+| [93d352798](https://github.com/angular/angular-cli/commit/93d3527985f8aa1950f62ab42a88c0a74ae0b051) | fix  | ignore virtual esbuild paths with (disabled):           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.12"></a>
 
 # 21.2.12 (2026-05-20)
