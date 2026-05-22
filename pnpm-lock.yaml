@@ -647,8 +647,8 @@ importers:
         specifier: 4.6.4
         version: 4.6.4
       less-loader:
-        specifier: 12.3.2
-        version: 12.3.2(less@4.6.4)(webpack@5.106.2(esbuild@0.28.0)(postcss@8.5.14))
+        specifier: 13.0.0
+        version: 13.0.0(less@4.6.4)(webpack@5.106.2(esbuild@0.28.0)(postcss@8.5.14))
       license-webpack-plugin:
         specifier: 4.0.2
         version: 4.0.2(webpack@5.106.2(esbuild@0.28.0)(postcss@8.5.14))
@@ -6233,9 +6233,9 @@ packages:
   launch-editor@2.13.2:
     resolution: {integrity: sha512-4VVDnbOpLXy/s8rdRCSXb+zfMeFR0WlJWpET1iA9CQdlZDfwyLjUuGQzXU4VeOoey6AicSAluWan7Etga6Kcmg==}
 
-  less-loader@12.3.2:
-    resolution: {integrity: sha512-uLV5c702ff2jBvO7qewpkLRzkh/I9QW07ur2NKkv8TVTrtX2lrKjEbEU/LLXAn7cgpCIBbkfyUm4qYXCQs5/+w==}
-    engines: {node: '>= 18.12.0'}
+  less-loader@13.0.0:
+    resolution: {integrity: sha512-TIa8d6znKH634Mg+7OU3jevZT6KeOhh0amW+YeMPD0GM9buUn5Y7HvtyCR5pUDdLaFfqLA8AX5PTSIHMNSexEA==}
+    engines: {node: '>= 22.11.0'}
     peerDependencies:
       '@rspack/core': 0.x || ^1.0.0 || ^2.0.0-0
       less: ^3.5.0 || ^4.0.0
@@ -14734,8 +14734,9 @@ snapshots:
       picocolors: 1.1.1
       shell-quote: 1.8.3
 
-  less-loader@12.3.2(less@4.6.4)(webpack@5.106.2(esbuild@0.28.0)(postcss@8.5.14)):
+  less-loader@13.0.0(less@4.6.4)(webpack@5.106.2(esbuild@0.28.0)(postcss@8.5.14)):
     dependencies:
+      '@types/less': 3.0.8
       less: 4.6.4
     optionalDependencies:
       webpack: 5.106.2(esbuild@0.28.0)(postcss@8.5.14)
