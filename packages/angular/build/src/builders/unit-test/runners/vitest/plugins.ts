@@ -55,6 +55,7 @@ interface VitestConfigPluginOptions {
   optimizeDepsInclude: string[];
   watch: boolean;
   isolate: boolean;
+  customConditions: string[] | undefined;
 }
 
 async function findTestEnvironment(
@@ -156,6 +157,7 @@ export async function createVitestConfigPlugin(
     setupFiles,
     projectPlugins,
     projectSourceRoot,
+    customConditions,
   } = options;
 
   const { mergeConfig } = await import('vitest/config');
@@ -257,7 +259,13 @@ export async function createVitestConfigPlugin(
         },
         resolve: {
           mainFields: ['es2020', 'module', 'main'],
-          conditions: ['es2015', 'es2020', 'module', ...(browser ? ['browser'] : [])],
+          conditions: [
+            'es2015',
+            'es2020',
+            'module',
+            ...(browser ? ['browser'] : []),
+            ...(customConditions ?? []),
+          ],
         },
       };
 

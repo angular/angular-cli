@@ -327,6 +327,22 @@ export async function* execute(
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
       quiet: normalizedOptions.quiet,
       ...(normalizedOptions.tsConfig ? { tsConfig: normalizedOptions.tsConfig } : {}),
+      // The `@angular/build:ng-packagr` builder has no `conditions` option, so
+      // its synthesized application options never carry custom resolve
+      // conditions. The application builder forwards `conditions` into
+      // esbuild, and the Angular compiler plugin reuses esbuild's conditions
+      // for the in-plugin TypeScript program; leaving `conditions` unset
+      // therefore makes both esbuild and TypeScript resolve with default
+      // conditions only, diverging from `ng build` via
+      // `@angular/build:ng-packagr` which honors
+      // `compilerOptions.customConditions` natively. Backfill from the test
+      // tsconfig's `compilerOptions.customConditions` to realign all
+      // resolvers. The `@angular/build:application` buildTarget already
+      // exposes `conditions`; only fill in when it wasn't explicitly set.
+      ...((buildTargetOptions as { conditions?: string[] }).conditions === undefined &&
+      normalizedOptions.customConditions
+        ? { conditions: normalizedOptions.customConditions }
+        : {}),
     } satisfies ApplicationBuilderInternalOptions;
 
     const dumpDirectory = normalizedOptions.dumpVirtualFiles
