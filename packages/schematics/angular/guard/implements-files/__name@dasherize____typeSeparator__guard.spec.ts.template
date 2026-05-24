@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { <%= classify(name) %>Guard } from './<%= dasherize(name) %><%= typeSeparator %>guard';
 
 describe('<%= classify(name) %>Guard', () => {
