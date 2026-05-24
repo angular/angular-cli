@@ -1,4 +1,4 @@
-<% if(displayBlock){ if(style != 'sass') { %>:host {
+<% if (displayBlock) { if (style != 'sass') { %>:host {
   display: block;
 }
 <% } else { %>\:host
