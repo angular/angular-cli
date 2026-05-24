@@ -4,5 +4,4 @@ import { <%= injectable ? 'Injectable' : 'Service' %> } from '@angular/core';
   providedIn: 'root',
 })<% } else { %>@Service()<% } %>
 export class <%= classifiedName %> {
-  
 }
