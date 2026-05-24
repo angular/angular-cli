@@ -1,5 +1,4 @@
 import { TestBed } from '@angular/core/testing';
-
 import { <%= classifiedName %> } from './<%= dasherize(name) %><%= type ? '.' + dasherize(type) : '' %>';
 
 describe('<%= classifiedName %>', () => {
