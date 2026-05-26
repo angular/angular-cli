@@ -3,6 +3,7 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ts_json_schema.bzl", "ts_json_schema")
@@ -45,16 +46,10 @@ copy_to_bin(
     srcs = glob(["**/schema.json"]),
 )
 
-genrule(
+copy_file(
     name = "angular_best_practices",
-    srcs = [
-        "//:node_modules/@angular/core/dir",
-    ],
-    outs = ["ai-config/files/__rulesName__.template"],
-    cmd = """
-        echo -e "<% if (frontmatter) { %><%= frontmatter %>\\n<% } %>" > $@
-        cat "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" >> $@
-    """,
+    src = "//:node_modules/@angular/core/resources/best-practices.md",
+    out = "ai-config/files/__bestPracticesName__.template",
 )
 
 RUNTIME_ASSETS = [

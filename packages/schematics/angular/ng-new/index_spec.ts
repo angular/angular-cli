@@ -104,13 +104,15 @@ describe('Ng New Schematic', () => {
     expect(cli.packageManager).toBe('npm');
   });
 
-  it('should add ai config file when aiConfig is set', async () => {
-    const options = { ...defaultOptions, aiConfig: ['gemini', 'claude'] };
+  it('should add AI config file when aiConfig is set', async () => {
+    const options = { ...defaultOptions, aiConfig: ['gemini-cli', 'claude-code'] };
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
     const files = tree.files;
+    expect(files).toContain('/bar/AGENTS.md');
+    expect(files).toContain('/bar/.mcp.json');
     expect(files).toContain('/bar/.gemini/GEMINI.md');
-    expect(files).toContain('/bar/.claude/CLAUDE.md');
+    expect(files).toContain('/bar/.gemini/settings.json');
   });
 
   it('should create a tailwind project when style is tailwind', async () => {
