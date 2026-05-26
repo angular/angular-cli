@@ -30,7 +30,11 @@ import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
-import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
+import {
+  VALID_REDIRECT_RESPONSE_CODES,
+  isValidRedirectResponseCode,
+  validateUrlForStaticEmission,
+} from '../utils/redirect';
 import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
@@ -522,6 +526,16 @@ function handlePrerenderParamsReplacement(
           `returned a non-string value for parameter '${parameterName}'. ` +
           `Please make sure the 'getPrerenderParams' function returns values for all parameters ` +
           'specified in this route.',
+      );
+    }
+
+    const invalidValueReason = validateUrlForStaticEmission(value);
+    if (invalidValueReason) {
+      throw new Error(
+        `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
+          `returned an unsafe value for parameter '${parameterName}': ${invalidValueReason} ` +
+          `Such values would be embedded verbatim in generated URLs and static HTML, ` +
+          `which can lead to HTML injection. Percent-encode the value or sanitize the source.`,
       );
     }
 

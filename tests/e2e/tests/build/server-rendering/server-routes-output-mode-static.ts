@@ -49,6 +49,14 @@ export default async function () {
       redirectTo: 'ssg'
     },
     {
+      path: 'ssg-redirect-external',
+      component: Ssg,
+    },
+    {
+      path: 'ssg-redirect-unsafe-url',
+      component: Ssg,
+    },
+    {
       path: 'ssg-redirect-via-guard',
       canActivate: [() => {
         return inject(Router).createUrlTree(['ssg'], { queryParams: { foo: 'bar' }})
@@ -73,6 +81,11 @@ export default async function () {
   import { RenderMode, ServerRoute } from '@angular/ssr';
 
   export const serverRoutes: ServerRoute[] = [
+    {
+      path: 'ssg-redirect-external',
+      renderMode: RenderMode.Prerender,
+      headers: { Location: 'https://example.com/docs?from=ssg&next=/ssg' },
+    },
     {
       path: 'ssg/:id',
       renderMode: RenderMode.Prerender,
@@ -108,20 +121,91 @@ export default async function () {
   await replaceInFile('src/app/app.routes.server.ts', 'RenderMode.Server', 'RenderMode.Prerender');
   await noSilentNg('build', '--output-mode=static');
 
-  const expects: Record<string, RegExp | string> = {
+  const expects: Record<string, RegExp | string | (RegExp | string)[]> = {
     'index.html': /ng-server-context="ssg".+home works!/,
     'ssg/index.html': /ng-server-context="ssg".+ssg works!/,
     'ssg/one/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
     'ssg/two/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
     // When static redirects are generated as meta tags.
     'ssg-redirect/index.html': '<meta http-equiv="refresh" content="0; url=/ssg">',
+    'ssg-redirect-external/index.html': [
+      '<meta http-equiv="refresh" content="0; url=https://example.com/docs?from=ssg&amp;next=/ssg">',
+      '<a href="https://example.com/docs?from=ssg&amp;next=/ssg">https://example.com/docs?from=ssg&amp;next=/ssg</a>',
+    ],
     'ssg-redirect-via-guard/index.html':
       '<meta http-equiv="refresh" content="0; url=/ssg?foo=bar">',
   };
 
-  for (const [filePath, fileMatch] of Object.entries(expects)) {
-    await expectFileToMatch(join('dist/test-project/browser', filePath), fileMatch);
+  for (const [filePath, fileMatches] of Object.entries(expects)) {
+    for (const fileMatch of Array.isArray(fileMatches) ? fileMatches : [fileMatches]) {
+      await expectFileToMatch(join('dist/test-project/browser', filePath), fileMatch);
+    }
   }
+
+  await replaceInFile(
+    'src/app/app.routes.ts',
+    `redirectTo: 'ssg'`,
+    `redirectTo: '/ssg"><script>alert(1)</script>&q=x'`,
+  );
+
+  const { message: unsafeRedirectToErrorMessage } = await expectToFail(() =>
+    noSilentNg('build', '--output-mode=static'),
+  );
+  assert.match(unsafeRedirectToErrorMessage, /Invalid 'redirectTo' for route 'ssg-redirect'/);
+  assert.match(
+    unsafeRedirectToErrorMessage,
+    /contains characters that are not allowed in a statically emitted URL/,
+  );
+
+  await replaceInFile(
+    'src/app/app.routes.ts',
+    `redirectTo: '/ssg"><script>alert(1)</script>&q=x'`,
+    `redirectTo: 'ssg'`,
+  );
+
+  await replaceInFile(
+    'src/app/app.routes.server.ts',
+    `{
+      path: '**',
+      renderMode: RenderMode.Prerender,
+    },`,
+    `{
+      path: 'ssg-redirect-unsafe-url',
+      renderMode: RenderMode.Prerender,
+      headers: { Location: 'javascript:alert(1)' },
+    },
+    {
+      path: '**',
+      renderMode: RenderMode.Prerender,
+    },`,
+  );
+
+  const { message: unsafeProtocolErrorMessage } = await expectToFail(() =>
+    noSilentNg('build', '--output-mode=static'),
+  );
+  assert.match(
+    unsafeProtocolErrorMessage,
+    /Invalid 'headers\.Location' for route 'ssg-redirect-unsafe-url'/,
+  );
+  assert.match(unsafeProtocolErrorMessage, /the protocol 'javascript:' is not allowed/);
+
+  await replaceInFile(
+    'src/app/app.routes.server.ts',
+    `headers: { Location: 'javascript:alert(1)' },`,
+    `headers: { Location: '/\\\\evil.com' },`,
+  );
+
+  const { message: backslashRedirectErrorMessage } = await expectToFail(() =>
+    noSilentNg('build', '--output-mode=static'),
+  );
+  assert.match(
+    backslashRedirectErrorMessage,
+    /Invalid 'headers\.Location' for route 'ssg-redirect-unsafe-url'/,
+  );
+  assert.match(
+    backslashRedirectErrorMessage,
+    /contains characters that are not allowed in a statically emitted URL/,
+  );
 
   // Check that server directory does not exist
   assert(
