@@ -15,6 +15,7 @@ exports_files([
     "tsconfig-build-ng.json",
     "tsconfig-build.json",
     "package.json",
+    "node_modules/@angular/core/resources/best-practices.md",
 ])
 
 npm_link_all_packages()

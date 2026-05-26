@@ -4,14 +4,14 @@
   "title": "Angular AI Config File Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates AI configuration files for Angular projects. This schematic creates configuration files that help AI tools follow Angular best practices, improving the quality of AI-generated code and suggestions.",
+  "description": "Generates AI configuration files for Angular projects. This schematic creates AGENTS.md file and Angular MCP server configuration, improving the quality of AI-generated code and suggestions.",
   "properties": {
     "tool": {
       "type": "array",
       "uniqueItems": true,
       "default": ["none"],
       "x-prompt": {
-        "message": "Which AI tools do you want to configure with Angular best practices? https://angular.dev/ai/develop-with-ai",
+        "message": "Which AI tools should Angular integrate with? https://angular.dev/ai/develop-with-ai",
         "type": "list",
         "items": [
           {
@@ -19,39 +19,31 @@
             "label": "None"
           },
           {
-            "value": "agents",
-            "label": "Agents.md      [ https://agents.md/                                               ]"
-          },
-          {
-            "value": "claude",
-            "label": "Claude         [ https://docs.anthropic.com/en/docs/claude-code/memory            ]"
+            "value": "claude-code",
+            "label": "Claude Code   [ `AGENTS.md` + Angular MCP server config ]"
           },
           {
             "value": "cursor",
-            "label": "Cursor         [ https://docs.cursor.com/en/context/rules                         ]"
+            "label": "Cursor        [ `AGENTS.md` + Angular MCP server config ]"
           },
           {
-            "value": "gemini",
-            "label": "Gemini         [ https://ai.google.dev/gemini-api/docs                            ]"
+            "value": "gemini-cli",
+            "label": "Gemini CLI    [ `GEMINI.md` + Angular MCP server config ]"
           },
           {
-            "value": "copilot",
-            "label": "GitHub Copilot [ https://code.visualstudio.com/docs/copilot/copilot-customization ]"
+            "value": "open-ai-codex",
+            "label": "Open AI Codex [ `AGENTS.md` + Angular MCP server config ]"
           },
           {
-            "value": "jetbrains",
-            "label": "JetBrains AI   [ https://www.jetbrains.com/help/junie/customize-guidelines.html   ]"
-          },
-          {
-            "value": "windsurf",
-            "label": "Windsurf       [ https://docs.windsurf.com/windsurf/cascade/memories#rules        ]"
+            "value": "vscode",
+            "label": "VSCode        [ `AGENTS.md` + Angular MCP server config ]"
           }
         ]
       },
-      "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
+      "description": "Specifies which AI tools to generate configuration files (AGENTS.md, MCP server config) for.",
       "items": {
         "type": "string",
-        "enum": ["none", "gemini", "copilot", "claude", "cursor", "jetbrains", "windsurf", "agents"]
+        "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]
       }
     }
   }
