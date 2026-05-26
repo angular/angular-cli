@@ -60,10 +60,7 @@ export async function getDevServerConfig(
     devServer: {
       host,
       port,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        ...headers,
-      },
+      headers,
       historyApiFallback: !!index && {
         index: posix.join(servePath, getIndexOutputFile(index)),
         disableDotRule: true,
