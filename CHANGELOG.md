@@ -1,3 +1,21 @@
+<a name="21.2.13"></a>
+
+# 21.2.13 (2026-05-27)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [3c6d26a31](https://github.com/angular/angular-cli/commit/3c6d26a316cd6aea455c19b249dc6852d84a698e) | fix  | remove unconditional CORS wildcard from webpack dev-server |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [2b3e95517](https://github.com/angular/angular-cli/commit/2b3e95517358f8ef3482d5319d970f4774e45ad0) | fix  | assert that asset input paths are within workspace root |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.12"></a>
 
 # 21.2.12 (2026-05-20)
