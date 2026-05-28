@@ -109,7 +109,7 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
         });
 
         it('should handle user click', () => {
-          vi.spyOn(window, 'alert');
+          vi.spyOn(window, 'alert').mockReturnValue(undefined);
           const button = fixture.nativeElement.querySelector('button');
           button.click();
           fixture.detectChanges();

@@ -11,9 +11,10 @@ import { expectTransformation } from '../test-helpers';
 describe('Jasmine to Vitest Transformer - transformSpies', () => {
   const testCases = [
     {
-      description: 'should transform spyOn(object, "method") to vi.spyOn(object, "method")',
+      description:
+        'should transform spyOn(object, "method") to vi.spyOn(object, "method").mockReturnValue(undefined)',
       input: `spyOn(service, 'myMethod');`,
-      expected: `vi.spyOn(service, 'myMethod');`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`,
     },
     {
       description: 'should transform .and.returnValue(...) to .mockReturnValue(...)',
@@ -58,9 +59,10 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy');`,
     },
     {
-      description: 'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop")',
+      description:
+        'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop").mockReturnValue(undefined)',
       input: `spyOnProperty(service, 'myProp');`,
-      expected: `vi.spyOn(service, 'myProp');`,
+      expected: `vi.spyOn(service, 'myProp').mockReturnValue(undefined);`,
     },
     {
       description: 'should transform .and.stub() to .mockImplementation(() => {})',
@@ -116,6 +118,36 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       input: `spyOn(service, 'myMethod').and.unknownStrategy();`,
       expected: `// TODO: vitest-migration: Unsupported spy strategy ".and.unknownStrategy()" found. Please migrate this manually. See: https://vitest.dev/api/mocked.html#mock
 vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
+    },
+    {
+      description: 'should correctly identify chained spies with element access (bracket notation)',
+      input: `spyOn(service, 'myMethod')['and'].returnValue(42);`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue(42);`,
+    },
+    {
+      description: 'should correctly identify chained spies with non-null assertion',
+      input: `(spyOn(service, 'myMethod')!).and.returnValue(42);`,
+      expected: `(vi.spyOn(service, 'myMethod')!).mockReturnValue(42);`,
+    },
+    {
+      description: 'should correctly identify chained spies with type assertion',
+      input: `(<any>spyOn(service, 'myMethod')).and.returnValue(42);`,
+      expected: `(<any>vi.spyOn(service, 'myMethod')).mockReturnValue(42);`,
+    },
+    {
+      description: 'should correctly identify chained spies with satisfies expression',
+      input: `(spyOn(service, 'myMethod') satisfies any).and.returnValue(42);`,
+      expected: `(vi.spyOn(service, 'myMethod') satisfies any).mockReturnValue(42);`,
+    },
+    {
+      description: 'should handle and.returnValue() without arguments defensively',
+      input: `spyOn(service, 'myMethod').and.returnValue();`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue();`,
+    },
+    {
+      description: 'should handle and.throwError() without arguments defensively',
+      input: `spyOn(service, 'myMethod').and.throwError();`,
+      expected: `vi.spyOn(service, 'myMethod').mockImplementation(() => { throw new Error() });`,
     },
   ];
 
