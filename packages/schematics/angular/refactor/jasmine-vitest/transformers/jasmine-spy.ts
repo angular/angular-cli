@@ -34,19 +34,7 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
     ts.isIdentifier(node.expression) &&
     (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')
   ) {
-    addVitestValueImport(pendingVitestValueImports, 'vi');
-    reporter.reportTransformation(
-      sourceFile,
-      node,
-      `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`,
-    );
-
-    return ts.factory.updateCallExpression(
-      node,
-      createPropertyAccess('vi', 'spyOn'),
-      node.typeArguments,
-      node.arguments,
-    );
+    return transformSpyExpression(node, refactorCtx);
   }
 
   if (ts.isPropertyAccessExpression(node.expression)) {
@@ -93,8 +81,8 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
             );
             const returnValues = node.arguments;
             if (returnValues.length === 0) {
-              // No values, so it's a no-op. Just transform the spyOn call.
-              return transformSpies(spyCall, refactorCtx);
+              // No values, preserve Jasmine's stub-by-default behavior.
+              return transformSpyExpression(spyCall, refactorCtx, true);
             }
             // spy.and.returnValues(a, b) -> spy.mockReturnValueOnce(a).mockReturnValueOnce(b)
             let chainedCall: ts.Expression = spyCall;
@@ -119,7 +107,8 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
               'Removed redundant `.and.callThrough()` call.',
             );
 
-            return transformSpies(spyCall, refactorCtx); // .and.callThrough() is redundant, just transform spyOn.
+            // .and.callThrough() is redundant, just transform spyOn.
+            return transformSpyExpression(spyCall, refactorCtx, false);
           case 'stub': {
             reporter.reportTransformation(
               sourceFile,
@@ -214,6 +203,67 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
     addTodoComment(node, category);
 
     return node;
+  }
+
+  return node;
+}
+
+function transformSpyExpression(
+  node: ts.Expression,
+  refactorCtx: RefactorContext,
+  forceStubBehavior?: boolean,
+): ts.Expression {
+  const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
+
+  if (
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')
+  ) {
+    const spyFnName = node.expression.text;
+    addVitestValueImport(pendingVitestValueImports, 'vi');
+
+    const viSpyOnCall = ts.factory.updateCallExpression(
+      node,
+      createPropertyAccess('vi', 'spyOn'),
+      node.typeArguments,
+      node.arguments,
+    );
+
+    const shouldStub = forceStubBehavior ?? shouldStubBareSpyOn(node);
+
+    if (shouldStub) {
+      reporter.reportTransformation(
+        sourceFile,
+        node,
+        `Transformed \`${spyFnName}\` to \`vi.spyOn(...).mockReturnValue(undefined)\` ` +
+          `to preserve Jasmine's stub-by-default behavior.`,
+      );
+
+      return ts.factory.createCallExpression(
+        createPropertyAccess(viSpyOnCall, 'mockReturnValue'),
+        undefined,
+        [ts.factory.createIdentifier('undefined')],
+      );
+    }
+
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      `Transformed \`${spyFnName}\` to \`vi.spyOn\`.`,
+    );
+
+    return viSpyOnCall;
+  }
+
+  // Variable reference (e.g. `spy` from `spy.and.returnValues()`).
+  // There is no spyOn call to transform — only stub-wrapping is relevant here.
+  if (forceStubBehavior) {
+    return ts.factory.createCallExpression(
+      createPropertyAccess(node, 'mockReturnValue'),
+      undefined,
+      [ts.factory.createIdentifier('undefined')],
+    );
   }
 
   return node;
@@ -393,6 +443,32 @@ export function transformSpyReset(
   }
 
   return node;
+}
+
+function shouldStubBareSpyOn(node: ts.CallExpression): boolean {
+  if (
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === 'spyOnProperty' &&
+    node.arguments.length >= 3
+  ) {
+    const accessType = node.arguments[2];
+    if (ts.isStringLiteralLike(accessType) && accessType.text === 'set') {
+      return false;
+    }
+  }
+
+  const parent = node.parent;
+  if (
+    parent &&
+    ts.isPropertyAccessExpression(parent) &&
+    parent.expression === node &&
+    ts.isIdentifier(parent.name) &&
+    parent.name.text === 'and'
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 function getSpyIdentifierFromCalls(node: ts.PropertyAccessExpression): ts.Expression | undefined {

@@ -11,9 +11,10 @@ import { expectTransformation } from '../test-helpers';
 describe('Jasmine to Vitest Transformer - transformSpies', () => {
   const testCases = [
     {
-      description: 'should transform spyOn(object, "method") to vi.spyOn(object, "method")',
+      description:
+        'should transform bare spyOn to vi.spyOn(...).mockReturnValue(undefined) to preserve Jasmine stub-by-default semantics',
       input: `spyOn(service, 'myMethod');`,
-      expected: `vi.spyOn(service, 'myMethod');`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`,
     },
     {
       description: 'should transform .and.returnValue(...) to .mockReturnValue(...)',
@@ -58,9 +59,10 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy');`,
     },
     {
-      description: 'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop")',
+      description:
+        'should transform bare spyOnProperty to vi.spyOn(...).mockReturnValue(undefined) to preserve Jasmine stub-by-default semantics',
       input: `spyOnProperty(service, 'myProp');`,
-      expected: `vi.spyOn(service, 'myProp');`,
+      expected: `vi.spyOn(service, 'myProp').mockReturnValue(undefined);`,
     },
     {
       description: 'should transform .and.stub() to .mockImplementation(() => {})',
@@ -80,9 +82,11 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `const mySpy = vi.fn().mockName('mySpy').mockReturnValue(true);`,
     },
     {
-      description: 'should handle .and.returnValues() with no arguments',
+      description:
+        'should transform .and.returnValues() with no args to vi.spyOn(...).mockReturnValue(undefined) ' +
+        'because Jasmine reverts to stub-by-default',
       input: `spyOn(service, 'myMethod').and.returnValues();`,
-      expected: `vi.spyOn(service, 'myMethod');`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`,
     },
     {
       description:
@@ -116,6 +120,46 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       input: `spyOn(service, 'myMethod').and.unknownStrategy();`,
       expected: `// TODO: vitest-migration: Unsupported spy strategy ".and.unknownStrategy()" found. Please migrate this manually. See: https://vitest.dev/api/mocked.html#mock
 vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
+    },
+    {
+      description: 'should preserve stub-by-default semantics for spyOn assigned to a variable',
+      input: `const spy = spyOn(service, 'myMethod');`,
+      expected: `const spy = vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`,
+    },
+    {
+      description:
+        'should wrap spyOnProperty with explicit "get" access type to preserve stub-by-default semantics',
+      input: `spyOnProperty(service, 'myProp', 'get');`,
+      expected: `vi.spyOn(service, 'myProp', 'get').mockReturnValue(undefined);`,
+    },
+    {
+      description:
+        'should NOT wrap spyOnProperty with "set" access type because setter semantics already match',
+      input: `spyOnProperty(service, 'myProp', 'set');`,
+      expected: `vi.spyOn(service, 'myProp', 'set');`,
+    },
+    {
+      description:
+        'should wrap spyOn used as an expression argument to preserve stub-by-default semantics',
+      input: `expect(spyOn(service, 'myMethod')).toBeDefined();`,
+      expected: `expect(vi.spyOn(service, 'myMethod').mockReturnValue(undefined)).toBeDefined();`,
+    },
+    {
+      description:
+        'should wrap a spy variable with .and.returnValues() with no args to preserve stub-by-default semantics',
+      input: `spy.and.returnValues();`,
+      expected: `spy.mockReturnValue(undefined);`,
+    },
+    {
+      description: 'should remove .and.callThrough() on a spy variable',
+      input: `spy.and.callThrough();`,
+      expected: `spy;`,
+    },
+    {
+      description:
+        'should preserve stub-by-default on spyOn with .calls.reset() chained (not an .and accessor)',
+      input: `spyOn(service, 'myMethod').calls.reset();`,
+      expected: `vi.spyOn(service, 'myMethod').mockReturnValue(undefined).mockClear();`,
     },
   ];
 

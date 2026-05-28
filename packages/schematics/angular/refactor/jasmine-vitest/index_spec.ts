@@ -59,7 +59,7 @@ describe('Jasmine to Vitest Schematic', () => {
     );
 
     const newContent = tree.readContent(specFilePath);
-    expect(newContent).toContain(`vi.spyOn(service, 'myMethod');`);
+    expect(newContent).toContain(`vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`);
   });
 
   it('should only transform files matching the fileSuffix option', async () => {
@@ -94,7 +94,7 @@ describe('Jasmine to Vitest Schematic', () => {
     expect(unchangedContent).not.toContain(`vi.spyOn(window, 'alert');`);
 
     const changedContent = tree.readContent(testFilePath);
-    expect(changedContent).toContain(`vi.spyOn(window, 'confirm');`);
+    expect(changedContent).toContain(`vi.spyOn(window, 'confirm').mockReturnValue(undefined);`);
   });
 
   it('should print verbose logs when the verbose option is true', async () => {
@@ -120,7 +120,11 @@ describe('Jasmine to Vitest Schematic', () => {
 
     expect(logs).toContain('Detailed Transformation Log:');
     expect(logs).toContain(`Processing: /${specFilePath}`);
-    expect(logs.some((log) => log.includes('Transformed `spyOn` to `vi.spyOn`'))).toBe(true);
+    expect(
+      logs.some((log) =>
+        log.includes('Transformed `spyOn` to `vi.spyOn(...).mockReturnValue(undefined)`'),
+      ),
+    ).toBe(true);
   });
 
   describe('with `include` option', () => {
@@ -144,7 +148,7 @@ describe('Jasmine to Vitest Schematic', () => {
       );
 
       const changedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
-      expect(changedContent).toContain(`vi.spyOn(window, 'confirm');`);
+      expect(changedContent).toContain(`vi.spyOn(window, 'confirm').mockReturnValue(undefined);`);
 
       const unchangedContent = tree.readContent('projects/bar/src/app/app.spec.ts');
       expect(unchangedContent).toContain(`spyOn(window, 'alert');`);
@@ -158,7 +162,7 @@ describe('Jasmine to Vitest Schematic', () => {
       );
 
       const changedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
-      expect(changedContent).toContain(`vi.spyOn(window, 'confirm');`);
+      expect(changedContent).toContain(`vi.spyOn(window, 'confirm').mockReturnValue(undefined);`);
 
       const unchangedContent = tree.readContent('projects/bar/src/app/app.spec.ts');
       expect(unchangedContent).toContain(`spyOn(window, 'alert');`);
@@ -177,10 +181,12 @@ describe('Jasmine to Vitest Schematic', () => {
       );
 
       const changedAppContent = tree.readContent('projects/bar/src/app/app.spec.ts');
-      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert');`);
+      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert').mockReturnValue(undefined);`);
 
       const changedNestedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
-      expect(changedNestedContent).toContain(`vi.spyOn(window, 'confirm');`);
+      expect(changedNestedContent).toContain(
+        `vi.spyOn(window, 'confirm').mockReturnValue(undefined);`,
+      );
 
       const unchangedContent = tree.readContent('projects/bar/src/other/other.spec.ts');
       expect(unchangedContent).toContain(`spyOn(window, 'close');`);
@@ -194,10 +200,12 @@ describe('Jasmine to Vitest Schematic', () => {
       );
 
       const changedAppContent = tree.readContent('projects/bar/src/app/app.spec.ts');
-      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert');`);
+      expect(changedAppContent).toContain(`vi.spyOn(window, 'alert').mockReturnValue(undefined);`);
 
       const changedNestedContent = tree.readContent('projects/bar/src/app/nested/nested.spec.ts');
-      expect(changedNestedContent).toContain(`vi.spyOn(window, 'confirm');`);
+      expect(changedNestedContent).toContain(
+        `vi.spyOn(window, 'confirm').mockReturnValue(undefined);`,
+      );
     });
 
     it('should throw if the include path does not exist', async () => {

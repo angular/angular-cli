@@ -13,7 +13,7 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
     const input = `spyOn(foo, 'bar');`;
     const expected = `
         import { vi } from 'vitest';
-        vi.spyOn(foo, 'bar');
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
       `;
     await expectTransformation(input, expected, true);
   });
@@ -27,7 +27,7 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
         import { type Mock, vi } from 'vitest';
 
         let mySpy: Mock;
-        vi.spyOn(foo, 'bar');
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
       `;
     await expectTransformation(input, expected, true);
   });
@@ -41,7 +41,7 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
         import type { Mock } from 'vitest';
 
         let mySpy: Mock;
-        vi.spyOn(foo, 'bar');
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
       `;
     await expectTransformation(input, expected, false);
   });
