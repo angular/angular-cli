@@ -42,6 +42,9 @@ export enum PrerenderFallback {
 export function provideServerRendering(...features: ServerRenderingFeature<ServerRenderingFeatureKind>[]): EnvironmentProviders;
 
 // @public
+export function provideServerRendering(options: ServerRenderingOptions, ...features: ServerRenderingFeature<ServerRenderingFeatureKind>[]): EnvironmentProviders;
+
+// @public
 export enum RenderMode {
     Client = 1,
     Prerender = 2,
@@ -50,6 +53,11 @@ export enum RenderMode {
 
 // @public
 export type RequestHandlerFunction = (request: Request) => Promise<Response | null> | null | Response;
+
+// @public
+export interface ServerRenderingOptions {
+    maxResponseBodySize: number;
+}
 
 // @public
 export type ServerRoute = ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
