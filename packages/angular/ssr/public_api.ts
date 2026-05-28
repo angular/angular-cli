@@ -23,6 +23,7 @@ export {
   type ServerRoutePrerenderWithParams,
   type ServerRouteServer,
   type ServerRouteCommon,
+  type ServerRenderingOptions,
 } from './src/routes/route-config';
 
 export { IS_DISCOVERING_ROUTES } from './src/routes/ng-routes';

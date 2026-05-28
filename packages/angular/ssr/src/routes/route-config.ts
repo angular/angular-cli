@@ -342,6 +342,17 @@ export function withAppShell(
 }
 
 /**
+ * Options for configuring server-side rendering.
+ */
+export interface ServerRenderingOptions {
+  /**
+   * The maximum allowed response body size when using the Fetch API.
+   * @default 1MB
+   */
+  maxResponseBodySize: number;
+}
+
+/**
  * Configures server-side rendering for an Angular application.
  *
  * This function sets up the necessary providers for server-side rendering, including
@@ -379,10 +390,71 @@ export function withAppShell(
  */
 export function provideServerRendering(
   ...features: ServerRenderingFeature<ServerRenderingFeatureKind>[]
+): EnvironmentProviders;
+
+/**
+ * Configures server-side rendering for an Angular application with additional options.
+ *
+ * This function sets up the necessary providers for server-side rendering, including
+ * support for server routes and app shell. It combines features configured using
+ * `withRoutes` and `withAppShell` to provide a comprehensive server-side rendering setup.
+ *
+ * @param options - Configuration options for server-side rendering.
+ * @param features - Optional features to configure additional server rendering behaviors.
+ * @returns An `EnvironmentProviders` instance with the server-side rendering configuration.
+ *
+ * @example
+ * Basic example of how you can enable server-side rendering with options in your application
+ * when using the `bootstrapApplication` function:
+ *
+ * ```ts
+ * import { bootstrapApplication, BootstrapContext } from '@angular/platform-browser';
+ * import { provideServerRendering, withRoutes, withAppShell } from '@angular/ssr';
+ * import { AppComponent } from './app/app.component';
+ * import { SERVER_ROUTES } from './app/app.server.routes';
+ * import { AppShellComponent } from './app/app-shell.component';
+ *
+ * const bootstrap = (context: BootstrapContext) =>
+ *     bootstrapApplication(AppComponent, {
+ *       providers: [
+ *         provideServerRendering(
+ *           { maxResponseBodySize: 1024 * 1024 }, // 1MB limit
+ *           withRoutes(SERVER_ROUTES),
+ *           withAppShell(AppShellComponent),
+ *         ),
+ *       ],
+ *     }, context);
+ *
+ * export default bootstrap;
+ * ```
+ * @see {@link withRoutes} configures server-side routing
+ * @see {@link withAppShell} configures the application shell
+ */
+export function provideServerRendering(
+  options: ServerRenderingOptions,
+  ...features: ServerRenderingFeature<ServerRenderingFeatureKind>[]
+): EnvironmentProviders;
+export function provideServerRendering(
+  ...args:
+    | ServerRenderingFeature<ServerRenderingFeatureKind>[]
+    | [ServerRenderingOptions, ...ServerRenderingFeature<ServerRenderingFeatureKind>[]]
 ): EnvironmentProviders {
+  let options: ServerRenderingOptions | undefined;
+  let features: ServerRenderingFeature<ServerRenderingFeatureKind>[];
+  if (hasOptions(args)) {
+    const [first, ...rest] = args;
+    options = first;
+    features = rest;
+  } else {
+    features = args;
+  }
+
+  const providers: (Provider | EnvironmentProviders)[] = [
+    provideServerRenderingPlatformServer(options),
+  ];
+
   let hasAppShell = false;
   let hasServerRoutes = false;
-  const providers: (Provider | EnvironmentProviders)[] = [provideServerRenderingPlatformServer()];
 
   for (const { ɵkind, ɵproviders } of features) {
     hasAppShell ||= ɵkind === ServerRenderingFeatureKind.AppShell;
@@ -398,4 +470,17 @@ export function provideServerRendering(
   }
 
   return makeEnvironmentProviders(providers);
+}
+
+/**
+ * Checks if the first element of args is a `ServerRenderingOptions` object.
+ */
+function hasOptions(
+  args:
+    | ServerRenderingFeature<ServerRenderingFeatureKind>[]
+    | [ServerRenderingOptions, ...ServerRenderingFeature<ServerRenderingFeatureKind>[]],
+): args is [ServerRenderingOptions, ...ServerRenderingFeature<ServerRenderingFeatureKind>[]] {
+  const value = args[0];
+
+  return !!value && typeof value === 'object' && !('ɵkind' in value);
 }
