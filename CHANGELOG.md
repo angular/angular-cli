@@ -1,3 +1,15 @@
+<a name="22.0.0-rc.2"></a>
+
+# 22.0.0-rc.2 (2026-05-27)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [c0f7bd833](https://github.com/angular/angular-cli/commit/c0f7bd83379c0715bceeffae0e3c6d37d15bf327) | fix  | remove unconditional CORS wildcard from webpack dev-server |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.13"></a>
 
 # 21.2.13 (2026-05-27)
