@@ -24,6 +24,37 @@ import { addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 import { createViCallExpression } from '../utils/refactor-helpers';
 
+function isChainedWithAnd(node: ts.Node): boolean {
+  let parent = node.parent;
+  while (parent) {
+    if (ts.isPropertyAccessExpression(parent)) {
+      if (ts.isIdentifier(parent.name) && parent.name.text === 'and') {
+        return true;
+      }
+    } else if (ts.isElementAccessExpression(parent)) {
+      if (
+        ts.isStringLiteralLike(parent.argumentExpression) &&
+        parent.argumentExpression.text === 'and'
+      ) {
+        return true;
+      }
+    } else if (
+      ts.isParenthesizedExpression(parent) ||
+      ts.isAsExpression(parent) ||
+      ts.isNonNullExpression(parent) ||
+      ts.isTypeAssertionExpression(parent) ||
+      ts.isSatisfiesExpression(parent)
+    ) {
+      parent = parent.parent;
+      continue;
+    }
+    break;
+  }
+
+  return false;
+}
+
+/* eslint-disable max-lines-per-function */
 export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
   if (!ts.isCallExpression(node)) {
@@ -35,29 +66,58 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
     (node.expression.text === 'spyOn' || node.expression.text === 'spyOnProperty')
   ) {
     addVitestValueImport(pendingVitestValueImports, 'vi');
-    reporter.reportTransformation(
-      sourceFile,
-      node,
-      `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`,
-    );
 
-    return ts.factory.updateCallExpression(
+    const viSpyOnCall = ts.factory.updateCallExpression(
       node,
       createPropertyAccess('vi', 'spyOn'),
       node.typeArguments,
       node.arguments,
+    );
+
+    if (isChainedWithAnd(node)) {
+      reporter.reportTransformation(
+        sourceFile,
+        node,
+        `Transformed \`${node.expression.text}\` to \`vi.spyOn\`.`,
+      );
+
+      return viSpyOnCall;
+    }
+
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      `Transformed \`${node.expression.text}\` to \`vi.spyOn\`, ` +
+        `appending \`.mockReturnValue(undefined)\` to preserve stub-by-default semantics.`,
+    );
+
+    return ts.factory.createCallExpression(
+      createPropertyAccess(viSpyOnCall, 'mockReturnValue'),
+      undefined,
+      [ts.factory.createIdentifier('undefined')],
     );
   }
 
   if (ts.isPropertyAccessExpression(node.expression)) {
     const pae = node.expression;
 
+    let spyCall: ts.Expression | undefined;
+
     if (
       ts.isPropertyAccessExpression(pae.expression) &&
       ts.isIdentifier(pae.expression.name) &&
       pae.expression.name.text === 'and'
     ) {
-      const spyCall = pae.expression.expression;
+      spyCall = pae.expression.expression;
+    } else if (
+      ts.isElementAccessExpression(pae.expression) &&
+      ts.isStringLiteralLike(pae.expression.argumentExpression) &&
+      pae.expression.argumentExpression.text === 'and'
+    ) {
+      spyCall = pae.expression.expression;
+    }
+
+    if (spyCall) {
       let newMethodName: string | undefined;
       let args = node.arguments;
 
@@ -66,7 +126,8 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
         switch (strategyName) {
           case 'returnValue':
             {
-              const result = getPromiseResolveRejectMethod(args[0]);
+              const firstArg = args[0];
+              const result = firstArg ? getPromiseResolveRejectMethod(firstArg) : null;
               if (result) {
                 const methodMapping = {
                   'resolve': 'mockResolvedValue',
@@ -146,12 +207,12 @@ export function transformSpies(node: ts.Node, refactorCtx: RefactorContext): ts.
             );
             const errorArg = node.arguments[0];
             const throwStatement = ts.factory.createThrowStatement(
-              ts.isNewExpression(errorArg)
+              errorArg && ts.isNewExpression(errorArg)
                 ? errorArg
                 : ts.factory.createNewExpression(
                     ts.factory.createIdentifier('Error'),
                     undefined,
-                    node.arguments,
+                    errorArg ? [errorArg] : [],
                   ),
             );
             const arrowFunction = ts.factory.createArrowFunction(
