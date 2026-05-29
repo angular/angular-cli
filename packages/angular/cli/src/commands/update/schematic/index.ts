@@ -882,14 +882,16 @@ export default function (options: UpdateSchema): Rule {
     let lastPackagesSize;
     do {
       lastPackagesSize = packages.size;
-      npmPackageJsonMap.forEach((npmPackageJson) => {
-        _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
-      });
-    } while (packages.size > lastPackagesSize);
 
-    // This is done in seperate loop to ensure that package groups are added before peer dependencies.
-    do {
-      lastPackagesSize = packages.size;
+      let lastGroupSize;
+      do {
+        lastGroupSize = packages.size;
+        npmPackageJsonMap.forEach((npmPackageJson) => {
+          _addPackageGroup(tree, packages, npmDeps, npmPackageJson, logger);
+        });
+      } while (packages.size > lastGroupSize);
+
+      // This is done in seperate loop to ensure that package groups are added before peer dependencies.
       npmPackageJsonMap.forEach((npmPackageJson) => {
         _addPeerDependencies(tree, packages, npmDeps, npmPackageJson, npmPackageJsonMap, logger);
       });
