@@ -534,14 +534,14 @@ export class PackageManager {
 
         // We only need to resolve the version locally when:
         // 1. The package manager requires it (e.g. yarn-classic), OR
-        // 2. A `minReleaseAge` cooldown is configured. In that case, even for
-        //    `range`/`tag` specifiers we must filter out versions newer than
-        //    the cutoff; otherwise the package manager would refuse to install
-        //    the version we picked.
+        // 2. A `minReleaseAge` cooldown is configured AND the spec is a `tag`
+        //    or `range`. For an explicit version we skip the extra metadata
+        //    lookup; if the version is too new the package manager itself
+        //    will reject the install with a clearer error than we could give.
         const needsLocalResolution =
           (this.descriptor.requiresManifestVersionLookup &&
             (type === 'tag' || type === 'range' || !fetchSpec)) ||
-          minReleaseAgeMs > 0;
+          (minReleaseAgeMs > 0 && (type === 'tag' || type === 'range'));
 
         if (needsLocalResolution) {
           const metadata = await this.getRegistryMetadata(name, options);
@@ -613,15 +613,19 @@ export class PackageManager {
    * release age cooldown.
    *
    * Behavior summary:
-   * - `version`: returns the requested version, or `null` when it is too new.
-   *   The caller asked for an exact version, so we don't second-guess them.
    * - `tag`: resolves the tag, then returns it directly when it is old enough.
    *   When it is too new, falls back to the newest version that satisfies the
    *   cooldown, so commands like `ng update` and `ng add` can still proceed.
    * - `range`: returns the newest version in the range that is old enough.
    *
+   * Note: this is not called for explicit `version` specifiers when a
+   * cooldown is configured (the manifest endpoint is used directly and the
+   * package manager enforces the cooldown at install time).
+   *
    * @param metadata The package metadata returned by the registry.
-   * @param type The specifier type (`tag`, `range`, or `version`).
+   * @param type The specifier type (`tag` or `range`). `version` is only
+   *   passed when `requiresManifestVersionLookup` is set, in which case the
+   *   cooldown is `0` and we just echo the version back.
    * @param spec The tag, range, or version requested by the caller.
    * @param minReleaseAgeMs The cooldown in milliseconds. `0` disables filtering.
    * @returns A concrete version string, or `null` when no version qualifies.
@@ -664,10 +668,15 @@ export class PackageManager {
       return Number.isNaN(publishedMs) ? true : publishedMs <= cutoff;
     };
 
+    // Pass `includePrerelease` so prereleases are eligible. This matters when
+    // the resolved tag points at a prerelease (e.g. `next`); otherwise the
+    // fallback would silently downgrade to a stable release.
+    const semverOptions = { includePrerelease: true };
+
     if (type === 'range') {
       const eligible = metadata.versions.filter(isOldEnough);
 
-      return maxSatisfying(eligible, spec) ?? null;
+      return maxSatisfying(eligible, spec, semverOptions) ?? null;
     }
 
     if (isOldEnough(spec)) {
@@ -679,10 +688,11 @@ export class PackageManager {
       // that satisfies the cooldown so the command can still complete.
       const eligible = metadata.versions.filter(isOldEnough);
 
-      return maxSatisfying(eligible, '*') ?? null;
+      return maxSatisfying(eligible, '*', semverOptions) ?? null;
     }
 
-    // Exact version requested but it's too new: signal "no installable version".
+    // Should not be reachable: callers no longer pass an explicit `version`
+    // with a cooldown configured. Returning `null` is the safe default.
     return null;
   }
 

@@ -77,6 +77,18 @@ describe('getMinReleaseAgeMs', () => {
     ).toBe(2 * MS_PER_DAY);
   });
 
+  it('treats a `.git` file as a repo root (git submodules and worktrees)', async () => {
+    const host = new MockHost();
+    // In a submodule or worktree `.git` is a regular file containing a
+    // `gitdir:` pointer, not a directory. The walk must still stop here.
+    host.setFile('/repo/.git', 'gitdir: /elsewhere/.git/modules/repo\n');
+    host.setFile('/repo/.npmrc', 'min-release-age=4\n');
+
+    expect(await getMinReleaseAgeMs(host, '/repo', SUPPORTED_PACKAGE_MANAGERS.npm)).toBe(
+      4 * MS_PER_DAY,
+    );
+  });
+
   it('returns 0 for non-positive or non-numeric values', async () => {
     const host = new MockHost();
     host.setDirectory('/project/.git');

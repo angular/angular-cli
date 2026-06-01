@@ -188,7 +188,7 @@ describe('PackageManager', () => {
       expect(manifest?.version).toBe('21.3.0');
     });
 
-    it('returns null when an explicit version is younger than the cooldown', async () => {
+    it('does not fetch metadata for an explicit version even when a cooldown is configured', async () => {
       spyOn(host, 'readFile').and.callFake((path: string) => {
         if (path === '/tmp/.npmrc') {
           return Promise.resolve('min-release-age=7\n');
@@ -196,12 +196,19 @@ describe('PackageManager', () => {
 
         return Promise.reject(new Error('not found'));
       });
-      mockMetadataResponse();
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '21.4.0' }),
+        stderr: '',
+      });
 
       const pm = new PackageManager(host, '/tmp', descriptor);
       const manifest = await pm.getManifest('foo@21.4.0');
 
-      expect(manifest).toBeNull();
+      // Hit `getRegistryManifest` directly. The package manager enforces the
+      // cooldown at install time; the CLI should not second-guess an explicit
+      // version, since that would block legitimate use cases like pinning.
+      expect(manifest?.version).toBe('21.4.0');
+      expect(runCommandSpy).toHaveBeenCalledTimes(1);
     });
 
     it('does not call `getRegistryMetadata` when no cooldown is configured', async () => {
@@ -217,6 +224,51 @@ describe('PackageManager', () => {
       expect(manifest?.version).toBe('21.4.0');
       // A single call: directly to `getRegistryManifest`. No metadata lookup.
       expect(runCommandSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps prereleases eligible when falling back from a prerelease tag', async () => {
+      spyOn(host, 'readFile').and.callFake((path: string) => {
+        if (path === '/tmp/.npmrc') {
+          return Promise.resolve('min-release-age=7\n');
+        }
+
+        return Promise.reject(new Error('not found'));
+      });
+
+      const metadata = {
+        name: 'foo',
+        'dist-tags': { next: '22.0.0-next.5', latest: '21.3.0' },
+        versions: ['21.3.0', '22.0.0-next.4', '22.0.0-next.5'],
+        time: {
+          // Stable older release.
+          '21.3.0': new Date(now - 30 * MS_PER_DAY).toISOString(),
+          // Older prerelease, eligible.
+          '22.0.0-next.4': new Date(now - 15 * MS_PER_DAY).toISOString(),
+          // Newest prerelease, blocked by the cooldown.
+          '22.0.0-next.5': new Date(now - 1 * MS_PER_DAY).toISOString(),
+        },
+      };
+
+      runCommandSpy.and.callFake((_binary: string, args: readonly string[]) => {
+        const versionedSpec = args.find((a) => /^foo@\S+/.test(a));
+        if (!versionedSpec) {
+          return Promise.resolve({ stdout: JSON.stringify(metadata), stderr: '' });
+        }
+
+        const requestedVersion = /^foo@(\S+)/.exec(versionedSpec)?.[1] ?? '';
+
+        return Promise.resolve({
+          stdout: JSON.stringify({ name: 'foo', version: requestedVersion }),
+          stderr: '',
+        });
+      });
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      const manifest = await pm.getManifest('foo@next');
+
+      // Should pick the older prerelease, not silently downgrade to a stable
+      // version that the user never asked for.
+      expect(manifest?.version).toBe('22.0.0-next.4');
     });
   });
 });

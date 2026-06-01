@@ -67,10 +67,12 @@ async function readNpmrcChain(
     directoriesToVisit.push(currentDir);
 
     // Stop walking when we reach a git repository root, mirroring `discovery.ts`.
+    // `.git` may be a directory (regular repo), a file (submodules and
+    // worktrees use a `gitdir:` pointer file), or absent. We just need to
+    // know whether it exists; `host.stat` rejects when it doesn't.
     try {
-      if ((await host.stat(join(currentDir, '.git'))).isDirectory()) {
-        break;
-      }
+      await host.stat(join(currentDir, '.git'));
+      break;
     } catch {
       // No `.git` here; continue searching upwards.
     }
