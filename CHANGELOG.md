@@ -1,3 +1,33 @@
+<a name="22.0.0-rc.3"></a>
+
+# 22.0.0-rc.3 (2026-06-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [f05343a42](https://github.com/angular/angular-cli/commit/f05343a429b5445fb07aa6031b6fad02affe2ec1) | fix  | expand package groups for newly added peer dependencies in update schematic |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [4fbc60891](https://github.com/angular/angular-cli/commit/4fbc6089174142623fbd28cc68cede181074fab5) | fix  | preserve Jasmine stub-by-default semantics for bare spies |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [418abd825](https://github.com/angular/angular-cli/commit/418abd8258d98f1371d561af92e4c0f018c860fa) | fix  | prevent esbuild service child process leakage |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [8471ba634](https://github.com/angular/angular-cli/commit/8471ba63433d87ba3e59af622ed9cfa89b732cd9) | fix  | support server-side rendering configuration options |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0-rc.2"></a>
 
 # 22.0.0-rc.2 (2026-05-27)
