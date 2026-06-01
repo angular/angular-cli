@@ -245,6 +245,22 @@ export default class AddCommandModule
       const result = await tasks.run(taskContext);
       assert(result.collectionName, 'Collection name should always be available');
 
+      let shouldCleanUp = false;
+      if (!result.hasSchematics && !options.dryRun) {
+        const packageJsonPath = this.resolvePackageJson(result.collectionName);
+        if (packageJsonPath && existsSync(packageJsonPath)) {
+          try {
+            const localManifest = JSON.parse(await fs.readFile(packageJsonPath, 'utf-8'));
+            if (localManifest.schematics) {
+              result.hasSchematics = true;
+              if (localManifest['ng-add']?.save === false) {
+                shouldCleanUp = true;
+              }
+            }
+          } catch {}
+        }
+      }
+
       // Check if the installed package has actual add actions and not just schematic support
       if (result.hasSchematics && !options.dryRun) {
         const workflow = this.getOrCreateWorkflowForBuilder(result.collectionName);
@@ -299,7 +315,16 @@ export default class AddCommandModule
         return;
       }
 
-      return this.executeSchematic({ ...options, collection: result.collectionName });
+      const schematicExitCode = await this.executeSchematic({
+        ...options,
+        collection: result.collectionName,
+      });
+
+      if (shouldCleanUp) {
+        await this.cleanUpTemporaryDependency(result.collectionName);
+      }
+
+      return schematicExitCode;
     } catch (e) {
       if (e instanceof CommandError) {
         logger.error(e.message);
@@ -557,6 +582,36 @@ export default class AddCommandModule
 
     if (!shouldProceed) {
       throw new CommandError('Command aborted');
+    }
+  }
+
+  private async cleanUpTemporaryDependency(packageName: string): Promise<void> {
+    try {
+      this.context.logger.info(`Cleaning up temporary dependency '${packageName}'...`);
+
+      // 1. Remove from root package.json
+      const projectManifest = await this.getProjectManifest();
+      if (projectManifest) {
+        if (projectManifest.dependencies) {
+          delete projectManifest.dependencies[packageName];
+        }
+        if (projectManifest.devDependencies) {
+          delete projectManifest.devDependencies[packageName];
+        }
+
+        await fs.writeFile(
+          join(this.context.root, 'package.json'),
+          JSON.stringify(projectManifest, null, 2) + '\n',
+        );
+      }
+
+      // 2. Silent install pass to prune files from node_modules and update the lockfile
+      await this.context.packageManager.install({ ignoreScripts: true });
+    } catch (error) {
+      this.context.logger.warn(
+        `Failed to clean up temporary dependency '${packageName}': ` +
+          `${error instanceof Error ? error.message : error}`,
+      );
     }
   }
 
