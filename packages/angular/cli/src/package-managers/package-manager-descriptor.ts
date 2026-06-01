@@ -120,6 +120,27 @@ export interface PackageManagerDescriptor {
 
   /** A function that checks if a structured error represents a "package not found" error. */
   readonly isNotFound: (error: ErrorInfo) => boolean;
+
+  /**
+   * Describes how to read the user-configured "minimum release age" (also
+   * known as the install cooldown) for this package manager.
+   *
+   * When set, the CLI uses this configuration to filter out versions that
+   * are too new during automatic version selection (e.g. `ng update`,
+   * `ng add`). This prevents the CLI from picking a version that the
+   * underlying package manager would subsequently refuse to install.
+   *
+   * Set to `undefined` for package managers whose configuration is not yet
+   * supported here. The cooldown filter then becomes a no-op for those
+   * package managers, which preserves the existing behavior.
+   */
+  readonly minReleaseAge?: {
+    /** The setting name to read from `.npmrc`. */
+    readonly key: string;
+
+    /** The unit the setting value is expressed in. */
+    readonly unit: 'days' | 'minutes';
+  };
 }
 
 /** A type that represents the name of a supported package manager. */
@@ -175,6 +196,8 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getError: parseNpmLikeError,
     },
     isNotFound: isKnownNotFound,
+    // npm 11.10+ honors `min-release-age` (in days) from `.npmrc`.
+    minReleaseAge: { key: 'min-release-age', unit: 'days' },
   },
   yarn: {
     binary: 'yarn',
@@ -228,6 +251,8 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getError: parseYarnClassicError,
     },
     isNotFound: isKnownNotFound,
+    // Yarn classic has no native cooldown but reads `.npmrc`, so honor `min-release-age`.
+    minReleaseAge: { key: 'min-release-age', unit: 'days' },
   },
   pnpm: {
     binary: 'pnpm',
@@ -255,6 +280,9 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getError: parseNpmLikeError,
     },
     isNotFound: isKnownNotFound,
+    // pnpm 10.x reads `minimum-release-age` from `.npmrc` (in minutes).
+    // pnpm 11+ uses `minimumReleaseAge` in `pnpm-workspace.yaml`, which is not handled here.
+    minReleaseAge: { key: 'minimum-release-age', unit: 'minutes' },
   },
   bun: {
     binary: 'bun',

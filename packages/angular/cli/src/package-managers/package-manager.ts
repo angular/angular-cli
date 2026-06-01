@@ -18,6 +18,7 @@ import { maxSatisfying, valid } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
+import { getMinReleaseAgeMs } from './min-release-age';
 import { PackageManagerDescriptor } from './package-manager-descriptor';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
@@ -93,6 +94,7 @@ export class PackageManager {
   readonly #initializationError?: Error;
   #dependencyCache: Map<string, InstalledPackage> | null = null;
   #version: string | undefined;
+  #minReleaseAgeMs: number | undefined;
 
   /**
    * Creates a new `PackageManager` instance.
@@ -528,20 +530,27 @@ export class PackageManager {
 
         // `fetchSpec` is the version, range, or tag.
         let versionSpec = fetchSpec ?? 'latest';
-        if (this.descriptor.requiresManifestVersionLookup) {
-          if (type === 'tag' || !fetchSpec) {
-            const metadata = await this.getRegistryMetadata(name, options);
-            if (!metadata) {
-              return null;
-            }
-            versionSpec = metadata['dist-tags'][versionSpec];
-          } else if (type === 'range') {
-            const metadata = await this.getRegistryMetadata(name, options);
-            if (!metadata) {
-              return null;
-            }
-            versionSpec = maxSatisfying(metadata.versions, fetchSpec) ?? '';
+        const minReleaseAgeMs = await this.#getMinReleaseAgeMs();
+
+        // We only need to resolve the version locally when:
+        // 1. The package manager requires it (e.g. yarn-classic), OR
+        // 2. A `minReleaseAge` cooldown is configured. In that case, even for
+        //    `range`/`tag` specifiers we must filter out versions newer than
+        //    the cutoff; otherwise the package manager would refuse to install
+        //    the version we picked.
+        const needsLocalResolution =
+          (this.descriptor.requiresManifestVersionLookup &&
+            (type === 'tag' || type === 'range' || !fetchSpec)) ||
+          minReleaseAgeMs > 0;
+
+        if (needsLocalResolution) {
+          const metadata = await this.getRegistryMetadata(name, options);
+          if (!metadata) {
+            return null;
           }
+
+          versionSpec = this.#selectVersion(metadata, type, versionSpec, minReleaseAgeMs) ?? '';
+
           if (!versionSpec) {
             return null;
           }
@@ -596,6 +605,106 @@ export class PackageManager {
       default:
         throw new Error(`Unsupported package specifier type: ${type}`);
     }
+  }
+
+  /**
+   * Resolves a `tag` or `range` specifier to a concrete version, optionally
+   * excluding versions that are too new to satisfy the configured minimum
+   * release age cooldown.
+   *
+   * Behavior summary:
+   * - `version`: returns the requested version, or `null` when it is too new.
+   *   The caller asked for an exact version, so we don't second-guess them.
+   * - `tag`: resolves the tag, then returns it directly when it is old enough.
+   *   When it is too new, falls back to the newest version that satisfies the
+   *   cooldown, so commands like `ng update` and `ng add` can still proceed.
+   * - `range`: returns the newest version in the range that is old enough.
+   *
+   * @param metadata The package metadata returned by the registry.
+   * @param type The specifier type (`tag`, `range`, or `version`).
+   * @param spec The tag, range, or version requested by the caller.
+   * @param minReleaseAgeMs The cooldown in milliseconds. `0` disables filtering.
+   * @returns A concrete version string, or `null` when no version qualifies.
+   */
+  #selectVersion(
+    metadata: PackageMetadata,
+    type: 'tag' | 'range' | 'version',
+    spec: string,
+    minReleaseAgeMs: number,
+  ): string | null {
+    let resolvedFromTag = false;
+
+    // Resolve tags up front (e.g. `latest` -> `21.4.0`).
+    if (type === 'tag' || !spec) {
+      const resolved = metadata['dist-tags']?.[spec || 'latest'];
+      if (!resolved) {
+        return null;
+      }
+      spec = resolved;
+      resolvedFromTag = true;
+      type = 'version';
+    }
+
+    if (minReleaseAgeMs <= 0) {
+      // No cooldown: keep the original behavior.
+      return type === 'range' ? (maxSatisfying(metadata.versions, spec) ?? null) : spec;
+    }
+
+    const cutoff = Date.now() - minReleaseAgeMs;
+    const time = metadata.time;
+    const isOldEnough = (version: string): boolean => {
+      const publishedAt = time?.[version];
+      if (!publishedAt) {
+        // If the registry didn't provide a timestamp, err on the side of allowing
+        // the version. The package manager itself remains the ultimate gate.
+        return true;
+      }
+      const publishedMs = Date.parse(publishedAt);
+
+      return Number.isNaN(publishedMs) ? true : publishedMs <= cutoff;
+    };
+
+    if (type === 'range') {
+      const eligible = metadata.versions.filter(isOldEnough);
+
+      return maxSatisfying(eligible, spec) ?? null;
+    }
+
+    if (isOldEnough(spec)) {
+      return spec;
+    }
+
+    if (resolvedFromTag) {
+      // The tag pointed at a too-new version. Fall back to the newest version
+      // that satisfies the cooldown so the command can still complete.
+      const eligible = metadata.versions.filter(isOldEnough);
+
+      return maxSatisfying(eligible, '*') ?? null;
+    }
+
+    // Exact version requested but it's too new: signal "no installable version".
+    return null;
+  }
+
+  /**
+   * Lazily reads the configured minimum release age (in milliseconds) for
+   * the active package manager.
+   */
+  async #getMinReleaseAgeMs(): Promise<number> {
+    if (this.#minReleaseAgeMs === undefined) {
+      try {
+        this.#minReleaseAgeMs = await getMinReleaseAgeMs(
+          this.host,
+          this.cwd,
+          this.descriptor,
+          this.options.logger,
+        );
+      } catch {
+        this.#minReleaseAgeMs = 0;
+      }
+    }
+
+    return this.#minReleaseAgeMs;
   }
 
   private async getTemporaryDirectory(): Promise<string | undefined> {
