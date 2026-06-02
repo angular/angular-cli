@@ -140,8 +140,12 @@ export function updateExternalMetadata(
   }
 
   const { implicitBrowser, implicitServer, explicit } = result.detail['externalMetadata'];
-  const implicitServerFiltered = implicitServer.filter((m) => !isBuiltin(m) && !isAbsoluteUrl(m));
-  const implicitBrowserFiltered = implicitBrowser.filter((m) => !isAbsoluteUrl(m));
+  const implicitServerFiltered = implicitServer.filter(
+    (m) => !isBuiltin(m) && !isAbsoluteUrl(m) && !m.endsWith('.json'),
+  );
+  const implicitBrowserFiltered = implicitBrowser.filter(
+    (m) => !isAbsoluteUrl(m) && !m.endsWith('.json'),
+  );
   const explicitBrowserFiltered = explicitPackagesOnly
     ? explicit.filter((m) => !isAbsoluteUrl(m))
     : explicit;
