@@ -1,3 +1,15 @@
+<a name="20.3.27"></a>
+
+# 20.3.27 (2026-06-02)
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [07c6c96ba](https://github.com/angular/angular-cli/commit/07c6c96baf2901f44322beb70b77c32dc0824e45) | fix  | add support for configuring trusted proxy headers via environment variable |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.26"></a>
 
 # 20.3.26 (2026-05-13)
