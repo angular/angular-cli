@@ -16,6 +16,7 @@ import npa from 'npm-package-arg';
 import semver, { Range, compare, intersects, prerelease, satisfies, valid } from 'semver';
 import { Argv } from 'yargs';
 import {
+  CommandModuleError,
   CommandModuleImplementation,
   Options,
   OtherOptions,
@@ -130,6 +131,17 @@ export default class AddCommandModule
           'Ensure package name is correct prior to using this option.',
         type: 'boolean',
         default: false,
+      })
+      .check(({ registry }) => {
+        if (registry === undefined) {
+          return true;
+        }
+
+        if (typeof registry === 'string' && URL.canParse(registry)) {
+          return true;
+        }
+
+        throw new CommandModuleError('Option --registry must be a valid URL.');
       })
       // Prior to downloading we don't know the full schema and therefore we cannot be strict on the options.
       // Possibly in the future update the logic to use the following syntax:
