@@ -86,6 +86,115 @@ describe('PackageManager', () => {
     });
   });
 
+  describe('acquireTempPackage', () => {
+    it('should copy and sanitize pnpm-workspace.yaml when package manager is pnpm and workspace file exists', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', pnpmDescriptor);
+
+      const createTempDirectorySpy = spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const mockWorkspaceContent = [
+        'packages:',
+        '  - .',
+        '  - packages/*',
+        'minimumReleaseAge: 1440',
+        'minimumReleaseAgeExclude:',
+        "  - '@angular/*'",
+        'overrides:',
+        "  '@angular/build': workspace:*",
+        'packageExtensions:',
+        '  vitest:',
+        '    peerDependencies:',
+        "      '@vitest/coverage-v8': '*'",
+      ].join('\n');
+      const readFileSpy = spyOn(testHost, 'readFile').and.resolveTo(mockWorkspaceContent);
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      const { workingDirectory } = await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(workingDirectory).toBe('/tmp/project/node_modules/angular-cli-tmp-packages-abc');
+      expect(createTempDirectorySpy).toHaveBeenCalledWith('/tmp/project/node_modules');
+      expect(readFileSpy).toHaveBeenCalledWith('/tmp/project/pnpm-workspace.yaml');
+
+      const expectedSanitizedContent = [
+        'packages:',
+        "  - '.'",
+        'minimumReleaseAge: 1440',
+        'minimumReleaseAgeExclude:',
+        "  - '@angular/*'",
+        'packageExtensions:',
+        '  vitest:',
+        '    peerDependencies:',
+        "      '@vitest/coverage-v8': '*'",
+      ].join('\n');
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/pnpm-workspace.yaml',
+        expectedSanitizedContent,
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        '{}',
+      );
+    });
+
+    it('should write empty pnpm-workspace.yaml as fallback when package manager is pnpm and workspace file does not exist', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', pnpmDescriptor);
+
+      const createTempDirectorySpy = spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const readFileSpy = spyOn(testHost, 'readFile').and.throwError(
+        new Error('ENOENT: no such file or directory'),
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      const { workingDirectory } = await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(workingDirectory).toBe('/tmp/project/node_modules/angular-cli-tmp-packages-abc');
+      expect(createTempDirectorySpy).toHaveBeenCalledWith('/tmp/project/node_modules');
+      expect(readFileSpy).toHaveBeenCalledWith('/tmp/project/pnpm-workspace.yaml');
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        '{}',
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/pnpm-workspace.yaml',
+        "packages:\n  - '.'\n",
+      );
+    });
+
+    it('should NOT write pnpm-workspace.yaml when package manager is npm', async () => {
+      const npmDescriptor = SUPPORTED_PACKAGE_MANAGERS['npm'];
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', npmDescriptor);
+
+      const createTempDirectorySpy = spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      const { workingDirectory } = await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(workingDirectory).toBe('/tmp/project/node_modules/angular-cli-tmp-packages-abc');
+      expect(createTempDirectorySpy).toHaveBeenCalledWith('/tmp/project/node_modules');
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        '{}',
+      );
+      expect(writeFileSpy).not.toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/pnpm-workspace.yaml',
+        '',
+      );
+    });
+  });
+
   describe('initializationError', () => {
     it('should throw initializationError when running commands', async () => {
       const error = new Error('Not installed');
