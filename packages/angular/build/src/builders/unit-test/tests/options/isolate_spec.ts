@@ -54,5 +54,59 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should override isolate from the Vitest config file when set to false', async () => {
+      harness.writeFile(
+        'vitest-base.config.ts',
+        `
+          import { defineConfig } from 'vitest/config';
+
+          export default defineConfig({
+            test: {
+              fileParallelism: false,
+              isolate: true,
+              setupFiles: ['./src/setup.ts'],
+            },
+          });
+        `,
+      );
+
+      harness.writeFile(
+        'src/setup.ts',
+        `
+          const global = globalThis as typeof globalThis & { setupCount?: number };
+          global.setupCount = (global.setupCount ?? 0) + 1;
+        `,
+      );
+
+      harness.writeFile(
+        'src/app/first.spec.ts',
+        `
+          it('runs first', () => {
+            expect(true).toBe(true);
+          });
+        `,
+      );
+
+      harness.writeFile(
+        'src/app/second.spec.ts',
+        `
+          it('shares the test environment with the first spec file', () => {
+            const global = globalThis as typeof globalThis & { setupCount?: number };
+            expect(global.setupCount).toBeGreaterThan(1);
+          });
+        `,
+      );
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runner: 'vitest' as any,
+        runnerConfig: true,
+        isolate: false,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });
