@@ -1,3 +1,21 @@
+<a name="21.2.14"></a>
+
+# 21.2.14 (2026-06-03)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
+| [aed448748](https://github.com/angular/angular-cli/commit/aed448748451b6b87c20e7bd9b3b1f822067f681) | fix  | expand package groups for newly added peer dependencies in update schematic |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
+| [d46c082fb](https://github.com/angular/angular-cli/commit/d46c082fb994138327eb36882373f63daeec8bc1) | fix  | prevent esbuild service child process leakage |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.13"></a>
 
 # 21.2.13 (2026-05-27)
