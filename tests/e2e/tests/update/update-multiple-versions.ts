@@ -7,7 +7,7 @@ import { expectToFail } from '../../utils/utils';
 export default async function () {
   let restoreRegistry: (() => Promise<void>) | undefined;
   try {
-    restoreRegistry = await createProjectFromAsset('19.0-project', true);
+    restoreRegistry = await createProjectFromAsset('20.0-project', true);
     await setRegistry(true);
 
     const extraArgs = ['--force'];
