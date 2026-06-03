@@ -126,7 +126,7 @@ export async function normalizeOptions(
     watch,
     debug: options.debug ?? false,
     ui: process.env['CI'] ? false : ui,
-    isolate: isolate ?? false,
+    isolate,
     quiet: options.quiet ?? (process.env['CI'] ? false : true),
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
     setupFiles: options.setupFiles
