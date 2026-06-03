@@ -51,27 +51,36 @@ export class MockHost implements Host {
     } as Stats);
   }
 
-  runCommand(): Promise<{ stdout: string; stderr: string }> {
+  runCommand(
+    command: string,
+    args: readonly string[],
+    options?: {
+      timeout?: number;
+      stdio?: 'pipe' | 'ignore';
+      cwd?: string;
+      env?: Record<string, string>;
+    },
+  ): Promise<{ stdout: string; stderr: string }> {
     throw new Error('Method not implemented.');
   }
 
-  createTempDirectory(): Promise<string> {
+  createTempDirectory(baseDir?: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  deleteDirectory(): Promise<void> {
+  deleteDirectory(path: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  writeFile(): Promise<void> {
+  writeFile(path: string, content: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 
-  readFile(): Promise<string> {
+  readFile(path: string): Promise<string> {
     throw new Error('Method not implemented.');
   }
 
-  copyFile(): Promise<void> {
+  copyFile(src: string, dest: string): Promise<void> {
     throw new Error('Method not implemented.');
   }
 }
