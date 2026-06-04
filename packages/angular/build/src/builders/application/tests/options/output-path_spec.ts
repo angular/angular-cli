@@ -260,6 +260,28 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           }),
         );
       });
+
+      it('should error when browser directory escapes the output path base', async () => {
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          polyfills: [],
+          outputPath: {
+            base: 'dist',
+            browser: '..',
+          },
+          ssr: false,
+        });
+
+        const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+        expect(result?.success).toBeFalse();
+        expect(logs).toContain(
+          jasmine.objectContaining({
+            message: jasmine.stringMatching(
+              `The output file path .* is outside of the configured output path`,
+            ),
+          }),
+        );
+      });
     });
   });
 });

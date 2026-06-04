@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { normalize, posix, resolve } from 'node:path';
+import { isAbsolute, posix, relative, resolve } from 'node:path';
 import { platform } from 'node:process';
 
 const WINDOWS_PATH_SEPERATOR_REGEXP = /\\/g;
@@ -44,8 +44,9 @@ export function toPosixPath(path: string): string {
  * @returns `true` if the child path is within the parent directory, `false` otherwise.
  */
 export function isSubDirectory(parent: string, child: string): boolean {
-  const normalizedParent = normalize(parent);
+  const resolvedParent = resolve(parent);
   const resolvedChild = resolve(parent, child);
+  const relativePath = toPosixPath(relative(resolvedParent, resolvedChild));
 
-  return resolvedChild.startsWith(normalizedParent);
+  return relativePath !== '..' && !relativePath.startsWith('../') && !isAbsolute(relativePath);
 }
