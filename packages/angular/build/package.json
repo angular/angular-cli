@@ -23,7 +23,7 @@
     "@babel/core": "7.29.7",
     "@babel/helper-annotate-as-pure": "7.29.7",
     "@babel/helper-split-export-declaration": "7.24.7",
-    "@inquirer/confirm": "6.1.0",
+    "@inquirer/confirm": "6.1.1",
     "@vitejs/plugin-basic-ssl": "2.3.0",
     "beasties": "0.4.2",
     "browserslist": "^4.26.0",
@@ -36,16 +36,16 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.4",
     "piscina": "5.1.4",
-    "rollup": "4.60.4",
+    "rollup": "4.61.0",
     "sass": "1.100.0",
     "semver": "7.8.1",
     "source-map-support": "0.5.21",
-    "tinyglobby": "0.2.16",
-    "vite": "7.3.3",
+    "tinyglobby": "0.2.17",
+    "vite": "7.3.5",
     "watchpack": "2.5.1"
   },
   "optionalDependencies": {
-    "lmdb": "3.5.4"
+    "lmdb": "3.5.5"
   },
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
@@ -55,9 +55,9 @@
     "less": "4.6.4",
     "ng-packagr": "22.0.0-rc.0",
     "postcss": "8.5.15",
-    "rolldown": "1.0.2",
+    "rolldown": "1.0.3",
     "rxjs": "7.8.2",
-    "vitest": "4.1.7"
+    "vitest": "4.1.8"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
