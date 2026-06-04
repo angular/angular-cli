@@ -15,6 +15,7 @@ import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/ut
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { bazelEsbuildPluginPath, useJSONBuildLogs } from '../../utils/environment-options';
+import { isSubDirectory } from '../../utils/path';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import { runEsBuildBuildAction } from './build-action';
@@ -197,45 +198,57 @@ export async function* buildApplication(
 
     // Writes the output files to disk and ensures the containing directories are present
     const directoryExists = new Set<string>();
-    await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
-      if (
-        outputOptions.ignoreServer &&
-        (file.type === BuildOutputFileType.ServerApplication ||
-          file.type === BuildOutputFileType.ServerRoot)
-      ) {
-        return;
-      }
+    try {
+      await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
+        if (
+          outputOptions.ignoreServer &&
+          (file.type === BuildOutputFileType.ServerApplication ||
+            file.type === BuildOutputFileType.ServerRoot)
+        ) {
+          return;
+        }
 
-      const fullFilePath = generateFullPath(filePath, file.type, outputOptions);
+        const fullFilePath = generateFullPath(filePath, file.type, outputOptions);
 
-      // Ensure output subdirectories exist
-      const fileBasePath = path.dirname(fullFilePath);
-      if (fileBasePath && !directoryExists.has(fileBasePath)) {
-        await fs.mkdir(fileBasePath, { recursive: true });
-        directoryExists.add(fileBasePath);
-      }
+        // Ensure output subdirectories exist
+        const fileBasePath = path.dirname(fullFilePath);
+        if (fileBasePath && !directoryExists.has(fileBasePath)) {
+          await fs.mkdir(fileBasePath, { recursive: true });
+          directoryExists.add(fileBasePath);
+        }
 
-      if (file.origin === 'memory') {
-        // Write file contents
-        await fs.writeFile(fullFilePath, file.contents);
-      } else {
-        // Copy file contents
-        await fs.cp(file.inputPath, fullFilePath, {
-          mode: fs.constants.COPYFILE_FICLONE,
-          preserveTimestamps: true,
-        });
-      }
-    });
+        if (file.origin === 'memory') {
+          // Write file contents
+          await fs.writeFile(fullFilePath, file.contents);
+        } else {
+          // Copy file contents
+          await fs.cp(file.inputPath, fullFilePath, {
+            mode: fs.constants.COPYFILE_FICLONE,
+            preserveTimestamps: true,
+          });
+        }
+      });
+    } catch (error) {
+      context.logger.error(error instanceof Error ? error.message : String(error));
+      yield { success: false };
+      continue;
+    }
 
     // Delete any removed files if incremental
     if (result.kind === ResultKind.Incremental && result.removed?.length) {
-      await Promise.all(
-        result.removed.map((file) => {
-          const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
+      try {
+        await Promise.all(
+          result.removed.map((file) => {
+            const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
 
-          return fs.rm(fullFilePath, { force: true, maxRetries: 3 });
-        }),
-      );
+            return fs.rm(fullFilePath, { force: true, maxRetries: 3 });
+          }),
+        );
+      } catch (error) {
+        context.logger.error(error instanceof Error ? error.message : String(error));
+        yield { success: false };
+        continue;
+      }
     }
 
     yield { success: true };
@@ -267,6 +280,12 @@ function generateFullPath(
   }
   // NOTE: 'base' is a fully resolved path at this point
   const fullFilePath = path.join(outputOptions.base, typeDirectory, filePath);
+
+  if (!isSubDirectory(outputOptions.base, fullFilePath)) {
+    throw new Error(
+      `The output file path "${fullFilePath}" is outside of the configured output path "${outputOptions.base}".`,
+    );
+  }
 
   return fullFilePath;
 }
