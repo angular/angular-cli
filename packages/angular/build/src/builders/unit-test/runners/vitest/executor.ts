@@ -379,6 +379,7 @@ export class VitestExecutor implements TestExecutor {
           include,
           watch,
           isolate: this.options.isolate,
+          customConditions: this.options.customConditions,
         }),
       ],
     };

@@ -9,6 +9,7 @@
 import { type BuilderContext, targetFromTargetString } from '@angular-devkit/architect';
 import { constants, promises as fs } from 'node:fs';
 import path from 'node:path';
+import ts from 'typescript';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { isTTY } from '../../utils/tty';
@@ -24,6 +25,29 @@ async function exists(path: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/**
+ * Reads the `compilerOptions.customConditions` from a tsconfig file, honoring
+ * the `extends` chain. Returns `undefined` when no conditions are declared.
+ */
+function readCustomConditionsFromTsConfig(tsConfigPath: string): string[] | undefined {
+  const { config, error } = ts.readConfigFile(tsConfigPath, (p) => ts.sys.readFile(p));
+  if (error || !config) {
+    return undefined;
+  }
+
+  const parsed = ts.parseJsonConfigFileContent(
+    config,
+    ts.sys,
+    path.dirname(tsConfigPath),
+    /* existingOptions */ undefined,
+    tsConfigPath,
+  );
+
+  const conditions = parsed.options.customConditions;
+
+  return Array.isArray(conditions) && conditions.length > 0 ? [...conditions] : undefined;
 }
 
 function normalizeReporterOption(
@@ -89,6 +113,20 @@ export async function normalizeOptions(
     watch = true;
   }
 
+  // Resolve custom package resolution conditions from the test tsconfig so
+  // library tests get parity with `ng build` via `@angular/build:ng-packagr`,
+  // which honors `compilerOptions.customConditions` natively. The unit-test
+  // builder synthesizes an application-builder build whose `conditions` then
+  // feed esbuild's `build.initialOptions.conditions`; the Angular compiler
+  // plugin assigns those esbuild conditions onto `compilerOptions.customConditions`
+  // for the in-plugin TypeScript program. Forwarding the tsconfig values here
+  // therefore aligns esbuild, the in-plugin TS program, and Vitest's resolver
+  // on the same condition set. The `extends` chain is followed by the
+  // TypeScript config parser.
+  const customConditions = tsConfig
+    ? readCustomConditionsFromTsConfig(path.join(workspaceRoot, tsConfig))
+    : undefined;
+
   return {
     // Project/workspace information
     workspaceRoot,
@@ -140,6 +178,7 @@ export async function normalizeOptions(
           ? true
           : path.resolve(workspaceRoot, runnerConfig)
         : runnerConfig,
+    customConditions,
   };
 }
 
