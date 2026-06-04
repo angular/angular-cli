@@ -142,7 +142,7 @@ export function analyzeKarmaConfig(content: string): KarmaConfigAnalysis {
       case ts.SyntaxKind.ArrayLiteralExpression:
         return (node as ts.ArrayLiteralExpression).elements.map(extractValue);
       case ts.SyntaxKind.ObjectLiteralExpression: {
-        const obj: { [key: string]: KarmaConfigValue } = {};
+        const obj: { [key: string]: KarmaConfigValue } = Object.create(null);
         for (const prop of (node as ts.ObjectLiteralExpression).properties) {
           if (isSupportedPropertyAssignment(prop)) {
             // Recursively extract values for nested objects.

@@ -32,6 +32,7 @@ async function processTestTargetOptions(
   let needsIstanbul = false;
   for (const [configName, options] of allTargetOptions(testTarget, false)) {
     const configKey = configName || '';
+
     if (!customBuildOptions[configKey]) {
       // Match Karma behavior where AOT was disabled by default
       customBuildOptions[configKey] = {
@@ -276,7 +277,10 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
       tsConfigsToUpdate.add(join(project.root, 'tsconfig.spec.json'));
 
       // Store custom build options to move to a new build configuration if needed
-      const customBuildOptions: Record<string, Record<string, json.JsonValue | undefined>> = {};
+      const customBuildOptions: Record<
+        string,
+        Record<string, json.JsonValue | undefined>
+      > = Object.create(null);
 
       const projectCoverageInfo = await processTestTargetOptions(
         testTarget,
