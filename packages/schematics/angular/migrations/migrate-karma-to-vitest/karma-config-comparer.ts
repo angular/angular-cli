@@ -46,11 +46,10 @@ export async function generateDefaultKarmaConfig(
 
   // TODO: Replace this with the actual schematic templating logic.
   template = template
-    .replace(
-      /<%= relativePathToWorkspaceRoot %>/g,
+    .replace(/<%= relativePathToWorkspaceRoot %>/g, () =>
       path.normalize(relativePathToWorkspaceRoot).replace(/\\/g, '/'),
     )
-    .replace(/<%= folderName %>/g, projectName);
+    .replace(/<%= folderName %>/g, () => projectName);
 
   const devkitPluginRegex = /<% if \(needDevkitPlugin\) { %>(.*?)<% } %>/gs;
   const replacement = needDevkitPlugin ? '$1' : '';
