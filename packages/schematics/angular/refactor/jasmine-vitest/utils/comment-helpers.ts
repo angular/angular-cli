@@ -70,3 +70,23 @@ export function addTodoComment(
     true,
   );
 }
+
+/**
+ * Safely comments out the full text of a node line-by-line and attaches
+ * it to a target node. This prevents multi-line statements from breaking
+ * syntax when converted to single-line comments.
+ * @param targetNode The node to which the comments will be added.
+ * @param nodeToComment The original node whose text will be commented out.
+ */
+export function addCommentedNodeText(targetNode: ts.Node, nodeToComment: ts.Node): void {
+  const originalText = nodeToComment.getFullText().trim();
+  const lines = originalText.split('\n');
+  for (const line of lines) {
+    ts.addSyntheticLeadingComment(
+      targetNode,
+      ts.SyntaxKind.SingleLineCommentTrivia,
+      ` ${line.trim()}`,
+      true,
+    );
+  }
+}
