@@ -15,7 +15,7 @@
 
 import ts from 'typescript';
 import { createPropertyAccess } from '../utils/ast-helpers';
-import { addTodoComment } from '../utils/comment-helpers';
+import { addCommentedNodeText, addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 
 const FOCUSED_SKIPPED_RENAMES = new Map<string, { newBase: string; newName: string }>([
@@ -77,7 +77,6 @@ export function transformPending(
     ) {
       hasPending = true;
       const replacement = ts.factory.createEmptyStatement();
-      const originalText = bodyNode.getFullText().trim();
 
       reporter.reportTransformation(
         sourceFile,
@@ -87,12 +86,7 @@ export function transformPending(
       const category = 'pending';
       reporter.recordTodo(category, sourceFile, bodyNode);
       addTodoComment(replacement, category);
-      ts.addSyntheticLeadingComment(
-        replacement,
-        ts.SyntaxKind.SingleLineCommentTrivia,
-        ` ${originalText}`,
-        true,
-      );
+      addCommentedNodeText(replacement, bodyNode);
 
       return replacement;
     }

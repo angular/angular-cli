@@ -21,7 +21,7 @@ import {
   createPropertyAccess,
 } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
-import { addTodoComment } from '../utils/comment-helpers';
+import { addCommentedNodeText, addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 
 const SUGAR_MATCHER_CHANGES = new Map<string, { newName: string; newArgs?: ts.Expression[] }>([
@@ -607,18 +607,12 @@ export function transformExpectNothing(
 
   // The statement is `expect().nothing()`, which can be removed.
   const replacement = ts.factory.createEmptyStatement();
-  const originalText = node.getFullText().trim();
 
   reporter.reportTransformation(sourceFile, node, 'Removed `expect().nothing()` statement.');
   const category = 'expect-nothing';
   reporter.recordTodo(category, sourceFile, node);
   addTodoComment(replacement, category);
-  ts.addSyntheticLeadingComment(
-    replacement,
-    ts.SyntaxKind.SingleLineCommentTrivia,
-    ` ${originalText}`,
-    true,
-  );
+  addCommentedNodeText(replacement, node);
 
   return replacement;
 }
