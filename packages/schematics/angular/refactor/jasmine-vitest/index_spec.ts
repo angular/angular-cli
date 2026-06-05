@@ -238,4 +238,46 @@ describe('Jasmine to Vitest Schematic', () => {
     expect(logs).toContain('- 1 TODO(s) added for manual review:');
     expect(logs).toContain('  - 1x spyOnAllFunctions');
   });
+
+  it('should not transform toHaveClass when browserMode is true', async () => {
+    const specFilePath = 'projects/bar/src/app/app.spec.ts';
+    const content = `
+      describe('AppComponent', () => {
+        it('should check class', () => {
+          expect(element).toHaveClass('active');
+        });
+      });
+    `;
+    appTree.overwrite(specFilePath, content);
+
+    const tree = await schematicRunner.runSchematic(
+      'refactor-jasmine-vitest',
+      { project: 'bar', browserMode: true },
+      appTree,
+    );
+
+    const result = tree.readContent(specFilePath);
+    expect(result).toContain("expect(element).toHaveClass('active');");
+  });
+
+  it('should transform toHaveClass when browserMode is false', async () => {
+    const specFilePath = 'projects/bar/src/app/app.spec.ts';
+    const content = `
+      describe('AppComponent', () => {
+        it('should check class', () => {
+          expect(element).toHaveClass('active');
+        });
+      });
+    `;
+    appTree.overwrite(specFilePath, content);
+
+    const tree = await schematicRunner.runSchematic(
+      'refactor-jasmine-vitest',
+      { project: 'bar', browserMode: false },
+      appTree,
+    );
+
+    const result = tree.readContent(specFilePath);
+    expect(result).toContain("expect(element.classList.contains('active')).toBe(true);");
+  });
 });
