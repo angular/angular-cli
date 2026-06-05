@@ -58,6 +58,10 @@
       "type": "string",
       "default": "npm",
       "enum": ["npm", "yarn", "pnpm", "bun"]
+    },
+    "workspaceRoot": {
+      "description": "The path to the workspace root directory.",
+      "type": "string"
     }
   },
   "required": []
