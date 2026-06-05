@@ -16,7 +16,7 @@
 import ts from 'typescript';
 import { addVitestValueImport } from '../utils/ast-helpers';
 import { getJasmineMethodName, isJasmineCallExpression } from '../utils/ast-validation';
-import { addTodoComment } from '../utils/comment-helpers';
+import { addCommentedNodeText, addTodoComment } from '../utils/comment-helpers';
 import { RefactorContext } from '../utils/refactor-context';
 import { createViCallExpression } from '../utils/refactor-helpers';
 import { TodoCategory } from '../utils/todo-notes';
@@ -143,7 +143,6 @@ export function transformJasmineMembers(node: ts.Node, refactorCtx: RefactorCont
         case 'MAX_PRETTY_PRINT_DEPTH':
         case 'MAX_PRETTY_PRINT_CHARS': {
           const replacement = ts.factory.createEmptyStatement();
-          const originalText = node.getFullText().trim();
 
           reporter.reportTransformation(
             sourceFile,
@@ -153,12 +152,7 @@ export function transformJasmineMembers(node: ts.Node, refactorCtx: RefactorCont
           const category = 'unsupported-jasmine-member';
           reporter.recordTodo(category, sourceFile, node);
           addTodoComment(replacement, category, { name: memberName });
-          ts.addSyntheticLeadingComment(
-            replacement,
-            ts.SyntaxKind.SingleLineCommentTrivia,
-            ` ${originalText}`,
-            true,
-          );
+          addCommentedNodeText(replacement, node);
 
           return replacement;
         }

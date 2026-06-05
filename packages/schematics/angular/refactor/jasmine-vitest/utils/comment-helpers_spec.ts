@@ -7,7 +7,7 @@
  */
 
 import ts from 'typescript';
-import { addTodoComment } from './comment-helpers';
+import { addCommentedNodeText, addTodoComment } from './comment-helpers';
 
 describe('addTodoComment', () => {
   function createTestHarness(sourceText: string) {
@@ -64,5 +64,20 @@ describe('addTodoComment', () => {
 
     expect(result.trim().startsWith('// TODO')).toBe(true);
     expect(result).toContain('const mySpy = jasmine.createSpy()');
+  });
+
+  describe('addCommentedNodeText', () => {
+    it('should comment out a multiline node line-by-line', () => {
+      const sourceText = `expect()\n  .nothing();`;
+      const sourceFile = ts.createSourceFile('test.ts', sourceText, ts.ScriptTarget.Latest, true);
+      const statement = sourceFile.statements[0];
+      const replacement = ts.factory.createEmptyStatement();
+      const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
+
+      addCommentedNodeText(replacement, statement);
+
+      const result = printer.printNode(ts.EmitHint.Unspecified, replacement, sourceFile);
+      expect(result).toContain('// expect()\n// .nothing();');
+    });
   });
 });
