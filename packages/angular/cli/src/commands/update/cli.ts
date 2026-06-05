@@ -256,6 +256,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           verbose: options.verbose,
           packageManager: packageManager.name,
           packages: [],
+          workspaceRoot: this.context.root,
         },
       );
 
@@ -519,6 +520,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         next: options.next,
         packageManager: this.context.packageManager.name,
         packages: packagesToUpdate,
+        workspaceRoot: this.context.root,
       },
     );
 
