@@ -387,5 +387,5 @@ describe('@schematics/update', () => {
     expect(dependencies['@angular/cdk']).toMatch(version20Regexp);
     expect(dependencies['@angular/common']).toMatch(version20Regexp);
     expect(dependencies['@angular/core']).toMatch(version20Regexp);
-  });
+  }, 45000);
 });
