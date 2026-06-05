@@ -121,7 +121,7 @@ export default function (options: Schema): Rule {
       const content = tree.readText(file);
       const newContent = transformJasmineToVitest(file, content, reporter, {
         addImports: !!options.addImports,
-        browserMode: !!options.browerMode,
+        browserMode: !!options.browserMode,
         fakeAsync: !!options.fakeAsync,
       });
 
