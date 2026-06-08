@@ -1,9 +1,0 @@
-{
-  "schematics": {
-    "update": {
-      "factory": "./index",
-      "schema": "./schema.json",
-      "description": "Update one or multiple packages to versions, updating peer dependencies along the way."
-    }
-  }
-}

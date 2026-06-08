@@ -29,7 +29,6 @@ RUNTIME_ASSETS = glob(
     include = [
         "bin/**/*",
         "src/**/*.md",
-        "src/**/*.json",
     ],
     exclude = [
         "lib/config/workspace-schema.json",
@@ -53,7 +52,6 @@ ts_project(
     ) + [
         # These files are generated from the JSON schema
         "//packages/angular/cli:lib/config/workspace-schema.ts",
-        "//packages/angular/cli:src/commands/update/schematic/schema.ts",
     ],
     data = RUNTIME_ASSETS,
     deps = [
@@ -103,11 +101,6 @@ ts_json_schema(
     name = "cli_schema",
     src = "lib/config/workspace-schema.json",
     data = CLI_SCHEMA_DATA,
-)
-
-ts_json_schema(
-    name = "update_schematic_schema",
-    src = "src/commands/update/schematic/schema.json",
 )
 
 ts_project(
