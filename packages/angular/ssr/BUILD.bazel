@@ -1,0 +1,101 @@
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("@rules_pkg//:pkg.bzl", "pkg_tar")
+load("//tools:defaults.bzl", "ng_package", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+ts_project(
+    name = "ssr",
+    srcs = glob(
+        include = [
+            "*.ts",
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "**/*_spec.ts",
+        ],
+    ),
+    args = [
+        "--lib",
+        "dom.iterable,dom,es2022",
+    ],
+    data = [
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
+    ],
+    source_map = True,
+    tsconfig = "//:build-tsconfig-esm",
+    deps = [
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@angular/router",
+        "//:node_modules/tslib",
+        "//packages/angular/ssr/third_party/beasties:beasties_dts",
+    ],
+)
+
+ng_package(
+    name = "npm_package",
+    srcs = [
+        ":package.json",
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
+    ],
+    externals = [
+        "@angular/ssr",
+        "@angular/ssr/node",
+        "../../third_party/beasties",
+    ],
+    extra_substitutions = {
+        # Needed for ssr.d.ts file
+        "\\./third_party/beasties": "../third_party/beasties",
+        # Needed for the FESM file.
+        "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
+    },
+    nested_packages = [
+        "//packages/angular/ssr/schematics:pkg",
+        # Included directly as the generated types reference the types file in this location.
+        "//packages/angular/ssr/third_party/beasties:beasties_dts",
+    ],
+    package = "@angular/ssr",
+    readme_md = ":README.md",
+    rollup_runtime_deps = [
+        "//:node_modules/@babel/core",
+        "//:node_modules/@rollup/plugin-commonjs",
+        "//:node_modules/@rollup/plugin-node-resolve",
+        "//:node_modules/magic-string",
+        "//:node_modules/rollup-plugin-dts",
+        "//:node_modules/rollup-plugin-sourcemaps2",
+    ],
+    tags = ["release-package"],
+    deps = [
+        ":ssr",
+        "//packages/angular/ssr/node",
+    ],
+)
+
+pkg_tar(
+    name = "npm_package_archive",
+    srcs = [":npm_package"],
+    extension = "tgz",
+    # should not be built unless it is a dependency of another rule
+    tags = ["manual"],
+)
+
+alias(
+    name = "pkg",
+    actual = ":npm_package",
+)
+
+api_golden_test_npm_package(
+    name = "ssr_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "goldens/public-api/angular/ssr",
+    npm_package = "packages/angular/ssr/npm_package",
+)

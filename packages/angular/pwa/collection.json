@@ -1,0 +1,16 @@
+{
+  "schematics": {
+    "ng-add": {
+      "factory": "./pwa",
+      "description": "Update an application with PWA defaults.",
+      "schema": "./pwa/schema.json",
+      "private": true,
+      "hidden": true
+    },
+    "pwa": {
+      "factory": "./pwa",
+      "description": "Update an application with PWA defaults.",
+      "schema": "./pwa/schema.json"
+    }
+  }
+}

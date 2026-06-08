@@ -1,0 +1,32 @@
+{
+  "name": "@angular-devkit/build-webpack",
+  "version": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+  "description": "Webpack Builder for Architect",
+  "experimental": true,
+  "main": "src/index.js",
+  "typings": "src/index.d.ts",
+  "builders": "builders.json",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./package.json": "./package.json",
+    "./*": "./*.js",
+    "./*.js": "./*.js"
+  },
+  "dependencies": {
+    "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "rxjs": "7.8.2"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
+    "@ngtools/webpack": "workspace:0.0.0-PLACEHOLDER",
+    "webpack": "5.107.2",
+    "webpack-dev-server": "5.2.4"
+  },
+  "peerDependencies": {
+    "webpack": "^5.30.0",
+    "webpack-dev-server": "^5.0.2"
+  }
+}

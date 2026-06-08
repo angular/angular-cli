@@ -1,0 +1,52 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "node",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "testing/**/*.ts",
+            "**/*_spec.ts",
+        ],
+    ),
+    deps = [
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node_modules/chokidar",
+        "//packages/angular_devkit/core:node_modules/rxjs",
+    ],
+)
+
+ts_project(
+    name = "node_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+        ],
+        exclude = [
+            "testing/**/*.ts",
+        ],
+    ),
+    deps = [
+        ":node",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/core",
+        "//packages/angular_devkit/core:node_modules/rxjs",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":node_test_lib"],
+)

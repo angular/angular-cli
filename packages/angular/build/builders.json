@@ -1,0 +1,34 @@
+{
+  "builders": {
+    "application": {
+      "implementation": "./src/builders/application/index",
+      "schema": "./src/builders/application/schema.json",
+      "description": "Build an application."
+    },
+    "dev-server": {
+      "implementation": "./src/builders/dev-server/index",
+      "schema": "./src/builders/dev-server/schema.json",
+      "description": "Execute a development server for an application."
+    },
+    "extract-i18n": {
+      "implementation": "./src/builders/extract-i18n/index",
+      "schema": "./src/builders/extract-i18n/schema.json",
+      "description": "Extract i18n messages from an application."
+    },
+    "karma": {
+      "implementation": "./src/builders/karma",
+      "schema": "./src/builders/karma/schema.json",
+      "description": "Run Karma unit tests."
+    },
+    "ng-packagr": {
+      "implementation": "./src/builders/ng-packagr/index",
+      "schema": "./src/builders/ng-packagr/schema.json",
+      "description": "Build a library with ng-packagr."
+    },
+    "unit-test": {
+      "implementation": "./src/builders/unit-test",
+      "schema": "./src/builders/unit-test/schema.json",
+      "description": "[EXPERIMENTAL] Run application unit tests."
+    }
+  }
+}

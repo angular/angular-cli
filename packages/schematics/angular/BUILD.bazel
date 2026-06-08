@@ -1,0 +1,163 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@bazel_skylib//rules:copy_file.bzl", "copy_file")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "copy_to_bin", "jasmine_test", "npm_package", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+# Create a list of Tuple("path/file.json", "path_file") to be used as rules
+ALL_SCHEMA_TARGETS = [
+    (
+        x,
+        x.replace("/", "_").replace("-", "_").replace(".json", ""),
+    )
+    for x in glob(
+        include = [
+            "*/schema.json",
+            "refactor/*/schema.json",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    )
+]
+
+# Create all the targets.
+[
+    ts_json_schema(
+        name = name,
+        src = src,
+    )
+    for (src, name) in ALL_SCHEMA_TARGETS
+]
+
+copy_to_bin(
+    name = "schemas",
+    srcs = glob(["**/schema.json"]),
+)
+
+copy_file(
+    name = "angular_best_practices",
+    src = "//:node_modules/@angular/core/resources/best-practices.md",
+    out = "ai-config/files/__bestPracticesName__.template",
+)
+
+RUNTIME_ASSETS = [
+    "collection.json",
+    "migrations/migration-collection.json",
+    "package.json",
+    "utility/latest-versions/package.json",
+    ":angular_best_practices",
+] + glob(
+    include = [
+        "*/schema.json",
+        "*/files/**/*",
+        "*/implements-files/**/*",
+        "*/type-files/**/*",
+        "*/functional-files/**/*",
+        "*/class-files/**/*",
+        "refactor/*/schema.json",
+    ],
+    exclude = [
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        "node_modules/**",
+    ],
+)
+
+ts_project(
+    name = "angular",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            "refactor/jasmine-vitest/test-helpers.ts",
+            # Also exclude templated files.
+            "*/files/**/*.ts",
+            "*/other-files/**/*.ts",
+            "*/implements-files/**/*",
+            "*/type-files/**/*",
+            "*/functional-files/**/*",
+            "*/class-files/**/*",
+            # Exclude test helpers.
+            "utility/test/**/*.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        "//packages/schematics/angular:" + src.replace(".json", ".ts")
+        for (src, _) in ALL_SCHEMA_TARGETS
+    ],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/jsonc-parser",
+        ":node_modules/typescript",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_project(
+    name = "angular_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+            "utility/test/**/*.ts",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + ["refactor/jasmine-vitest/test-helpers.ts"],
+    deps = [
+        ":angular",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/jsonc-parser",
+        ":node_modules/typescript",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//:node_modules/prettier",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":angular_test_lib"],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/angular_devkit/core:package.json",
+    ],
+    stamp_files = [
+        "config/index.js",
+        "utility/latest-versions.js",
+    ],
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":angular",
+        ":license",
+    ],
+)

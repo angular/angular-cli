@@ -1,0 +1,33 @@
+storage: ./storage
+auth:
+  auth-memory:
+    users:
+      testing:
+        name: testing
+        password: s3cret
+listen: localhost:${HTTPS_PORT}
+uplinks:
+  local:
+    url: http://localhost:${HTTP_PORT}
+    cache: false
+    maxage: 20m
+    max_fails: 32
+    timeout: 60s
+    agent_options:
+      keepAlive: true
+      maxSockets: 32
+      maxFreeSockets: 8
+
+packages:
+  '**':
+    access: $authenticated
+    proxy: local
+
+log:
+  type: stdout
+  format: pretty
+  level: warn
+
+# https://github.com/verdaccio/verdaccio/issues/301
+server:
+  keepAliveTimeout: 0

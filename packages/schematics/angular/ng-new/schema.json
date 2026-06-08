@@ -1,0 +1,169 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularNgNew",
+  "title": "Angular Ng New Options Schema",
+  "type": "object",
+  "description": "Creates a new Angular workspace and an initial project. This schematic sets up the foundation for your Angular development, generating the workspace configuration files and an optional starter application. You can customize various aspects of the workspace and the initial project, such as routing, styling, and testing.",
+  "additionalProperties": false,
+  "properties": {
+    "directory": {
+      "type": "string",
+      "description": "The directory where the new workspace and project should be created. If not specified, the workspace will be created in the current directory."
+    },
+    "name": {
+      "description": "The name for the new workspace and the initial project. This name will be used for the root directory and various identifiers throughout the project.",
+      "type": "string",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the new workspace and initial project?"
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
+    },
+    "skipGit": {
+      "description": "Do not initialize a Git repository in the new workspace. By default, a Git repository is initialized to help you track changes to your project.",
+      "type": "boolean",
+      "default": false,
+      "alias": "g"
+    },
+    "commit": {
+      "description": "Configure the initial Git commit for the new repository.",
+      "oneOf": [
+        { "type": "boolean" },
+        {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "email": {
+              "type": "string",
+              "format": "email"
+            },
+            "message": {
+              "type": "string"
+            }
+          },
+          "required": ["name", "email"]
+        }
+      ],
+      "default": true
+    },
+    "newProjectRoot": {
+      "description": "The path where new projects will be created within the workspace, relative to the workspace root. By default, new projects are created in the `projects` directory.",
+      "type": "string",
+      "default": "projects"
+    },
+    "inlineStyle": {
+      "description": "Include the styles for the initial application's root component directly within the `app.ts` file. By default, a separate stylesheet file (e.g., `app.css`) is created.",
+      "type": "boolean",
+      "alias": "s",
+      "x-user-analytics": "ep.ng_inline_style"
+    },
+    "inlineTemplate": {
+      "description": "Include the HTML template for the initial application's root component directly within the `app.ts` file. By default, a separate template file (e.g., `app.html`) is created.",
+      "type": "boolean",
+      "alias": "t",
+      "x-user-analytics": "ep.ng_inline_template"
+    },
+    "viewEncapsulation": {
+      "description": "Sets the view encapsulation mode for components in the initial project. This determines how component styles are scoped and applied. Options include: `Emulated` (default, styles are scoped to the component), `None` (styles are global), and `ShadowDom` (styles are encapsulated using Shadow DOM).",
+      "enum": ["Emulated", "None", "ShadowDom"],
+      "type": "string"
+    },
+    "version": {
+      "type": "string",
+      "description": "The version of the Angular CLI to use.",
+      "visible": false,
+      "$default": {
+        "$source": "ng-cli-version"
+      }
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Enable routing in the initial application project. This sets up the necessary files and modules for managing navigation between different views in your application.",
+      "x-user-analytics": "ep.ng_routing"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The prefix to apply to generated selectors for the initial project. For example, if the prefix is `my-app` and you generate a component named `my-component`, the selector will be `my-app-my-component`.",
+      "minLength": 1,
+      "default": "app",
+      "alias": "p"
+    },
+    "style": {
+      "description": "The type of stylesheet files to be created for components in the initial project.",
+      "type": "string",
+      "enum": ["css", "scss", "sass", "less", "tailwind"],
+      "x-user-analytics": "ep.ng_style"
+    },
+    "skipTests": {
+      "description": "Skip the generation of unit test files `spec.ts`.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "testRunner": {
+      "description": "The unit testing runner to use.",
+      "type": "string",
+      "enum": ["vitest", "karma"],
+      "default": "vitest"
+    },
+    "createApplication": {
+      "description": "Create a new initial application project in the new workspace. When false, creates an empty workspace with no initial application. You can then use the `ng generate application` command to create applications in the `projects` directory.",
+      "type": "boolean",
+      "default": true
+    },
+    "minimal": {
+      "description": "Generate a minimal Angular workspace without any testing frameworks. This is intended for learning purposes and simple experimentation, not for production applications.",
+      "type": "boolean",
+      "default": false
+    },
+    "strict": {
+      "description": "Enable stricter type checking and stricter bundle budgets settings. This setting helps improve maintainability and catch bugs ahead of time. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
+      "type": "boolean",
+      "default": true
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "bun"]
+    },
+    "standalone": {
+      "description": "Creates an application based upon the standalone API, without NgModules.",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": "ep.ng_standalone"
+    },
+    "ssr": {
+      "description": "Configure the initial application for Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering).",
+      "type": "boolean",
+      "x-user-analytics": "ep.ng_ssr"
+    },
+    "zoneless": {
+      "description": "Create an initial application that does not utilize `zone.js`.",
+      "type": "boolean"
+    },
+    "aiConfig": {
+      "type": "array",
+      "uniqueItems": true,
+      "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
+      "items": {
+        "type": "string",
+        "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]
+      }
+    },
+    "fileNameStyleGuide": {
+      "type": "string",
+      "enum": ["2016", "2025"],
+      "default": "2025",
+      "description": "The file naming convention to use for generated files. The '2025' style guide (default) uses a concise format (e.g., `app.ts` for the root component), while the '2016' style guide includes the type in the file name (e.g., `app.component.ts`). For more information, see the Angular Style Guide (https://angular.dev/style-guide)."
+    }
+  },
+  "required": ["name", "version"]
+}

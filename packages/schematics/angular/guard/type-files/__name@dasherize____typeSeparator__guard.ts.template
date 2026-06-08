@@ -1,0 +1,9 @@
+import { <%= guardType %> } from '@angular/router';
+
+export const <%= camelize(name) %>Guard: <%= guardType %><% if (guardType === 'CanDeactivateFn') { %><unknown><% } %> = <%
+  if (guardType === 'CanMatchFn') { %>(route, segments)<% }
+  %><% if (guardType === 'CanActivateFn') { %>(route, state)<% }
+  %><% if (guardType === 'CanActivateChildFn') { %>(childRoute, state)<% }
+  %><% if (guardType === 'CanDeactivateFn') { %>(component, currentRoute, currentState, nextState)<% } %> => {
+  return true;
+};

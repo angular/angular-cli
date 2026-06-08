@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularServerApp",
+  "title": "Angular Server App Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Sets up server-side rendering (SSR) for your Angular application. SSR allows your app to be rendered on the server, improving initial load performance and SEO. This schematic configures your project for SSR and generates the necessary files.",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to enable server-side rendering for.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["project"]
+}

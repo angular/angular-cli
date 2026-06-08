@@ -1,0 +1,47 @@
+{
+  "name": "@angular/cli",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "CLI tool for Angular",
+  "main": "lib/cli/index.js",
+  "bin": {
+    "ng": "bin/ng.js"
+  },
+  "keywords": [
+    "angular",
+    "angular-cli",
+    "Angular CLI"
+  ],
+  "dependencies": {
+    "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
+    "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
+    "@inquirer/prompts": "8.5.2",
+    "@listr2/prompt-adapter-inquirer": "4.2.4",
+    "@modelcontextprotocol/sdk": "1.29.0",
+    "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
+    "@yarnpkg/lockfile": "1.1.0",
+    "algoliasearch": "5.53.0",
+    "ini": "7.0.0",
+    "jsonc-parser": "3.3.1",
+    "listr2": "10.2.1",
+    "npm-package-arg": "14.0.0",
+    "pacote": "21.5.0",
+    "parse5-html-rewriting-stream": "8.0.1",
+    "semver": "7.8.1",
+    "yargs": "18.0.0",
+    "zod": "4.4.3"
+  },
+  "ng-update": {
+    "migrations": "@schematics/angular/migrations/migration-collection.json",
+    "packageGroup": {
+      "@angular/cli": "0.0.0-PLACEHOLDER",
+      "@angular/build": "0.0.0-PLACEHOLDER",
+      "@angular/ssr": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/architect": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+      "@angular-devkit/build-angular": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/build-webpack": "0.0.0-EXPERIMENTAL-PLACEHOLDER",
+      "@angular-devkit/core": "0.0.0-PLACEHOLDER",
+      "@angular-devkit/schematics": "0.0.0-PLACEHOLDER"
+    }
+  }
+}

@@ -1,0 +1,102 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+# Create a list of Tuple("path/file.json", "path_file") to be used as rules
+ALL_SCHEMA_TARGETS = [
+    (
+        x,
+        x.replace("/", "_").replace("-", "_").replace(".json", ""),
+    )
+    for x in glob(
+        include = ["*/schema.json"],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    )
+]
+
+# Create all the targets.
+[
+    ts_json_schema(
+        name = name,
+        src = src,
+    )
+    for (src, name) in ALL_SCHEMA_TARGETS
+]
+
+filegroup(
+    name = "schematics_assets",
+    srcs = glob(
+        [
+            "**/*.json",
+        ],
+    ),
+)
+
+ts_project(
+    name = "schematics",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        "//packages/angular/ssr/schematics:" + src.replace(".json", ".ts")
+        for (src, _) in ALL_SCHEMA_TARGETS
+    ],
+    deps = [
+        "//packages/angular/ssr:node_modules/@angular-devkit/schematics",
+        "//packages/angular/ssr:node_modules/@schematics/angular",
+    ],
+)
+
+ts_project(
+    name = "ssr_schematics_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    deps = [
+        ":schematics",
+        "//:node_modules/@types/node",
+        "//packages/angular/ssr:node_modules/@angular-devkit/schematics",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [
+        ":schematics_assets",
+        ":ssr_schematics_test_lib",
+    ],
+)
+
+# This target is used as nested_package in the main @angular/ssr package as a dep.
+js_library(
+    name = "pkg",
+    srcs = [
+        "package.json",
+        ":schematics",
+        ":schematics_assets",
+    ],
+    visibility = ["//packages/angular/ssr:__pkg__"],
+)

@@ -1,0 +1,11 @@
+{
+  "name": "@angular-devkit-tests/update-migrations-external",
+  "version": "1.6.0",
+  "description": "Tests",
+  "ng-update": {
+    "migrations": "@angular-devkit-tests/update-migrations/migrations.json"
+  },
+  "dependencies": {
+    "@angular-devkit-tests/update-migrations": "1.6.0"
+  }
+}

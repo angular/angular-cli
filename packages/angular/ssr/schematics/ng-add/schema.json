@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularNgAddSSR",
+  "title": "Angular SSR Options Schema",
+  "type": "object",
+  "description": "Adds Server-Side Rendering (SSR) capabilities to an existing Angular application. SSR allows your app to be rendered on the server, leading to faster initial load times and improved SEO. This schematic modifies your project to enable SSR, sets up the necessary configurations, and installs the required dependencies.",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project you want to enable SSR for. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": ["project"],
+  "additionalProperties": false
+}

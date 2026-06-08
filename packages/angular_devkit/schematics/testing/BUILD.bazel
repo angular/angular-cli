@@ -1,0 +1,24 @@
+load("//tools:defaults.bzl", "ts_project")
+
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "testing",
+    srcs = glob(
+        include = ["**/*.ts"],
+    ),
+    data = ["package.json"],
+    deps = [
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:node_modules/rxjs",
+        "//packages/angular_devkit/schematics/tasks/node",
+        "//packages/angular_devkit/schematics/tools",
+    ],
+)

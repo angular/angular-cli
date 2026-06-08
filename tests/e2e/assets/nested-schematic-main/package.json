@@ -1,0 +1,5 @@
+{
+  "name": "nested-main",
+  "version": "0.0.1",
+  "schematics": "./collection.json"
+}

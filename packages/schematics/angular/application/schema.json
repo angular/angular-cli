@@ -1,0 +1,144 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularApp",
+  "title": "Angular Application Options Schema",
+  "type": "object",
+  "description": "Generates a new Angular application within your workspace. This schematic sets up the foundational structure of your project, including the root component, module, and configuration files. You can customize various aspects of the application, such as routing, styling, and testing.",
+  "additionalProperties": false,
+  "properties": {
+    "projectRoot": {
+      "description": "The directory where the new application's files will be created, relative to the workspace root. If not specified, the application will be created in a subfolder within the `projects` directory, using the application's name.",
+      "type": "string"
+    },
+    "name": {
+      "description": "The name for the new application. This name will be used for the project directory and various identifiers throughout the application's code.",
+      "type": "string",
+      "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the application?"
+    },
+    "inlineStyle": {
+      "description": "Include the styles for the root component directly within the `app.ts` file. Only CSS styles can be included inline. By default, a separate stylesheet file (e.g., `app.css`) is created.",
+      "type": "boolean",
+      "alias": "s",
+      "x-user-analytics": "ep.ng_inline_style"
+    },
+    "inlineTemplate": {
+      "description": "Include the HTML template for the root component directly within the `app.ts` file. By default, a separate template file (e.g., `app.html`) is created.",
+      "type": "boolean",
+      "alias": "t",
+      "x-user-analytics": "ep.ng_inline_template"
+    },
+    "viewEncapsulation": {
+      "description": "Sets the view encapsulation mode for the application's components. This determines how component styles are scoped and applied.",
+      "enum": ["Emulated", "None", "ShadowDom"],
+      "type": "string"
+    },
+    "routing": {
+      "type": "boolean",
+      "description": "Generate an application with routing already configured. This sets up the necessary files and modules for managing navigation between different views in your application.",
+      "default": true,
+      "x-user-analytics": "ep.ng_routing"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "A prefix to be added to the selectors of components generated within this application. For example, if the prefix is `my-app` and you generate a component named `my-component`, the selector will be `my-app-my-component`.",
+      "default": "app",
+      "alias": "p"
+    },
+    "style": {
+      "description": "The type of stylesheet files to be created for components in the application.",
+      "type": "string",
+      "default": "css",
+      "enum": ["css", "scss", "sass", "less", "tailwind"],
+      "x-prompt": {
+        "message": "Which stylesheet system would you like to use?",
+        "type": "list",
+        "items": [
+          {
+            "value": "css",
+            "label": "CSS             [ https://developer.mozilla.org/docs/Web/CSS                     ]"
+          },
+          {
+            "value": "tailwind",
+            "label": "Tailwind CSS    [ https://tailwindcss.com                                        ]"
+          },
+          {
+            "value": "scss",
+            "label": "Sass (SCSS)     [ https://sass-lang.com/documentation/syntax#scss                ]"
+          },
+          {
+            "value": "sass",
+            "label": "Sass (Indented) [ https://sass-lang.com/documentation/syntax#the-indented-syntax ]"
+          },
+          {
+            "value": "less",
+            "label": "Less            [ http://lesscss.org                                             ]"
+          }
+        ]
+      },
+      "x-user-analytics": "ep.ng_style"
+    },
+    "skipTests": {
+      "description": "Skip the generation of a unit test files `spec.ts`.",
+      "type": "boolean",
+      "default": false,
+      "alias": "S"
+    },
+    "testRunner": {
+      "description": "The unit testing runner to use.",
+      "type": "string",
+      "enum": ["vitest", "karma"],
+      "default": "vitest"
+    },
+    "skipPackageJson": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not add dependencies to the `package.json` file."
+    },
+    "minimal": {
+      "description": "Generate a minimal project without any testing frameworks. This is intended for learning purposes and simple experimentation, not for production applications.",
+      "type": "boolean",
+      "default": false
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
+    },
+    "strict": {
+      "description": "Enable stricter bundle budget settings for the application. This helps to keep your application's bundle size small and improve performance. For more information, see https://angular.dev/tools/cli/template-typecheck#strict-mode",
+      "type": "boolean",
+      "default": true
+    },
+    "standalone": {
+      "description": "Create an application that utilizes the standalone API, eliminating the need for NgModules. This can simplify the structure of your application.",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": "ep.ng_standalone"
+    },
+    "ssr": {
+      "description": "Configure the application for Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering).",
+      "x-prompt": "Do you want to enable Server-Side Rendering (SSR) and Static Site Generation (SSG/Prerendering)?",
+      "type": "boolean",
+      "default": false,
+      "x-user-analytics": "ep.ng_ssr"
+    },
+    "zoneless": {
+      "description": "Generate an application that does not use `zone.js`.",
+      "type": "boolean",
+      "default": true
+    },
+    "fileNameStyleGuide": {
+      "type": "string",
+      "enum": ["2016", "2025"],
+      "default": "2025",
+      "description": "The file naming convention to use for generated files. The '2025' style guide (default) uses a concise format (e.g., `app.ts` for the root component), while the '2016' style guide includes the type in the file name (e.g., `app.component.ts`). For more information, see the Angular Style Guide (https://angular.dev/style-guide)."
+    }
+  },
+  "required": ["name"]
+}

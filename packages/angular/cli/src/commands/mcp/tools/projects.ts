@@ -1,0 +1,652 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { realpathSync } from 'node:fs';
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { dirname, extname, isAbsolute, join, normalize, posix, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import semver from 'semver';
+import { z } from 'zod';
+import { AngularWorkspace } from '../../../utilities/config';
+import { assertIsError } from '../../../utilities/error';
+import { type McpToolContext, declareTool } from './tool-registry';
+
+// Single source of truth for what constitutes a valid style language.
+const styleLanguageSchema = z.enum(['css', 'scss', 'sass', 'less']);
+type StyleLanguage = z.infer<typeof styleLanguageSchema>;
+const VALID_STYLE_LANGUAGES = styleLanguageSchema.options;
+
+// Explicitly ordered for the file system search heuristic.
+const STYLE_LANGUAGE_SEARCH_ORDER: ReadonlyArray<StyleLanguage> = ['scss', 'sass', 'less', 'css'];
+
+function isStyleLanguage(value: unknown): value is StyleLanguage {
+  return (
+    typeof value === 'string' && (VALID_STYLE_LANGUAGES as ReadonlyArray<string>).includes(value)
+  );
+}
+
+function getStyleLanguageFromExtension(extension: string): StyleLanguage | undefined {
+  const style = extension.toLowerCase().substring(1); // remove leading '.'
+
+  return isStyleLanguage(style) ? style : undefined;
+}
+
+const listProjectsOutputSchema = {
+  workspaces: z.array(
+    z.object({
+      path: z.string().describe('The path to the `angular.json` file for this workspace.'),
+      frameworkVersion: z
+        .string()
+        .optional()
+        .describe(
+          'The major version of the Angular framework (`@angular/core`) in this workspace, if found.',
+        ),
+      projects: z.array(
+        z.object({
+          name: z
+            .string()
+            .describe('The name of the project, as defined in the `angular.json` file.'),
+          type: z
+            .enum(['application', 'library'])
+            .optional()
+            .describe(`The type of the project, either 'application' or 'library'.`),
+          builder: z
+            .string()
+            .optional()
+            .describe('The primary builder for the project, typically from the "build" target.'),
+          root: z
+            .string()
+            .describe('The root directory of the project, relative to the workspace root.'),
+          sourceRoot: z
+            .string()
+            .describe(
+              `The root directory of the project's source files, relative to the workspace root.`,
+            ),
+          selectorPrefix: z
+            .string()
+            .optional()
+            .describe(
+              'The prefix to use for component selectors.' +
+                ` For example, a prefix of 'app' would result in selectors like '<app-my-component>'.`,
+            ),
+          unitTestFramework: z
+            .enum(['jasmine', 'jest', 'vitest', 'unknown'])
+            .optional()
+            .describe(
+              'The unit test framework used by the project, such as Jasmine, Jest, or Vitest. ' +
+                'This field is critical for generating correct and idiomatic unit tests. ' +
+                'When writing or modifying tests, you MUST use the APIs corresponding to this framework.',
+            ),
+          styleLanguage: styleLanguageSchema
+            .optional()
+            .describe(
+              'The default style language for the project (e.g., "scss"). ' +
+                'This determines the file extension for new component styles.',
+            ),
+          targets: z
+            .array(z.string())
+            .describe('Available project targets (e.g., ["build", "test", "lint", "e2e"]).'),
+        }),
+      ),
+    }),
+  ),
+  parsingErrors: z
+    .array(
+      z.object({
+        filePath: z.string().describe('The path to the file that could not be parsed.'),
+        message: z.string().describe('The error message detailing why parsing failed.'),
+      }),
+    )
+    .default([])
+    .describe('A list of files that looked like workspaces but failed to parse.'),
+  versioningErrors: z
+    .array(
+      z.object({
+        filePath: z
+          .string()
+          .describe('The path to the workspace `angular.json` for which versioning failed.'),
+        message: z.string().describe('The error message detailing why versioning failed.'),
+      }),
+    )
+    .default([])
+    .describe('A list of workspaces for which the framework version could not be determined.'),
+};
+
+export const LIST_PROJECTS_TOOL = declareTool({
+  name: 'list_projects',
+  title: 'List Angular Projects',
+  description: `
+<Purpose>
+Provides a comprehensive overview of all Angular workspaces, projects, and configured targets within the repository.
+Always use this tool as a mandatory first step before performing any project-specific actions
+to understand the available projects and locations.
+</Purpose>
+<Use Cases>
+* Discovering project names, locations, builders, selector prefixes, and style languages before generating or building components.
+* Determining a project's unit test framework (Jasmine, Jest, or Vitest) before writing or modifying tests.
+* Identifying available execution targets (e.g., lint, e2e, serve, deploy) before attempting execution.
+* Disambiguating multiple workspaces in monorepos.
+</Use Cases>
+<Operational Notes>
+* Execute shell/CLI commands from the parent directory of the workspace's 'path' field.
+* If 'unitTestFramework' is 'unknown', inspect local config files (e.g., jest.config.js, karma.conf.js)
+  or the 'test' target in 'angular.json' to determine the framework before creating tests.
+</Operational Notes>`,
+  outputSchema: listProjectsOutputSchema,
+  isReadOnly: true,
+  isLocalOnly: true,
+  factory: createListProjectsHandler,
+});
+
+const EXCLUDED_DIRS = new Set(['node_modules', 'dist', 'out', 'coverage']);
+const IGNORED_FILE_SYSTEM_ERRORS = new Set(['EACCES', 'EPERM', 'ENOENT', 'EBUSY', 'EBADF']);
+
+function isIgnorableFileError(error: Error & { code?: string }): boolean {
+  return !!error.code && IGNORED_FILE_SYSTEM_ERRORS.has(error.code);
+}
+
+/**
+ * Iteratively finds all 'angular.json' files with controlled concurrency and directory exclusions.
+ * This non-recursive implementation is suitable for very large directory trees,
+ * prevents file descriptor exhaustion (`EMFILE` errors), and handles symbolic link loops.
+ * @param rootDir The directory to start the search from.
+ * @param allowedRealRoots A list of allowed real root directories (resolved paths) to restrict symbolic link traversal.
+ * @returns An async generator that yields the full path of each found 'angular.json' file.
+ */
+async function* findAngularJsonFiles(
+  rootDir: string,
+  allowedRealRoots: ReadonlyArray<string>,
+): AsyncGenerator<string> {
+  const CONCURRENCY_LIMIT = 50;
+  const queue: string[] = [rootDir];
+  const seenInodes = new Set<number>();
+
+  try {
+    const rootStats = await stat(rootDir);
+    seenInodes.add(rootStats.ino);
+  } catch (error) {
+    assertIsError(error);
+    if (isIgnorableFileError(error)) {
+      return; // Cannot access root, so there's nothing to do.
+    }
+    throw error;
+  }
+
+  while (queue.length > 0) {
+    const batch = queue.splice(0, CONCURRENCY_LIMIT);
+    const foundFilesInBatch: string[] = [];
+
+    const promises = batch.map(async (dir) => {
+      try {
+        const entries = await readdir(dir, { withFileTypes: true });
+        const subdirectories: string[] = [];
+        for (const entry of entries) {
+          const fullPath = join(dir, entry.name);
+          if (entry.isDirectory() || entry.isSymbolicLink()) {
+            // Exclude dot-directories, build/cache directories, and node_modules
+            if (entry.name.startsWith('.') || EXCLUDED_DIRS.has(entry.name)) {
+              continue;
+            }
+
+            let entryStats;
+            try {
+              entryStats = await stat(fullPath);
+              if (seenInodes.has(entryStats.ino)) {
+                continue; // Already visited this directory (symlink loop), skip.
+              }
+              // Only process actual directories or symlinks to directories.
+              if (!entryStats.isDirectory()) {
+                continue;
+              }
+            } catch {
+              // Ignore errors from stat (e.g., broken symlinks)
+              continue;
+            }
+
+            if (entry.isSymbolicLink()) {
+              try {
+                const targetPath = realpathSync(fullPath);
+                // Ensure the link target is within one of the allowed roots.
+                const isAllowed = allowedRealRoots.some((root) => {
+                  const rel = relative(root, targetPath);
+
+                  return !rel.startsWith('..') && !isAbsolute(rel);
+                });
+
+                if (!isAllowed) {
+                  continue;
+                }
+              } catch {
+                // Ignore broken links.
+                continue;
+              }
+            }
+
+            seenInodes.add(entryStats.ino);
+            subdirectories.push(fullPath);
+          } else if (entry.name === 'angular.json') {
+            foundFilesInBatch.push(fullPath);
+          }
+        }
+
+        return subdirectories;
+      } catch (error) {
+        assertIsError(error);
+        if (isIgnorableFileError(error)) {
+          return []; // Silently ignore permission errors.
+        }
+        throw error;
+      }
+    });
+
+    const nestedSubdirs = await Promise.all(promises);
+    queue.push(...nestedSubdirs.flat());
+
+    yield* foundFilesInBatch;
+  }
+}
+
+/**
+ * Searches upwards from a starting directory to find the version of '@angular/core'.
+ * It caches results to avoid redundant lookups.
+ * @param startDir The directory to start the search from.
+ * @param cache A map to store cached results.
+ * @param searchRoot The directory at which to stop the search.
+ * @returns The major version of '@angular/core' as a string, otherwise undefined.
+ */
+async function findAngularCoreVersion(
+  startDir: string,
+  cache: Map<string, string | undefined>,
+  searchRoot: string,
+): Promise<string | undefined> {
+  let currentDir = startDir;
+  const dirsToCache: string[] = [];
+
+  while (currentDir) {
+    dirsToCache.push(currentDir);
+    if (cache.has(currentDir)) {
+      const cachedResult = cache.get(currentDir);
+      // Populate cache for all intermediate directories.
+      for (const dir of dirsToCache) {
+        cache.set(dir, cachedResult);
+      }
+
+      return cachedResult;
+    }
+
+    const pkgPath = join(currentDir, 'package.json');
+    try {
+      const pkgContent = await readFile(pkgPath, 'utf-8');
+      const pkg = JSON.parse(pkgContent);
+      const versionSpecifier =
+        pkg.dependencies?.['@angular/core'] ?? pkg.devDependencies?.['@angular/core'];
+
+      if (versionSpecifier) {
+        const minVersion = semver.minVersion(versionSpecifier);
+        const result = minVersion ? String(minVersion.major) : undefined;
+        for (const dir of dirsToCache) {
+          cache.set(dir, result);
+        }
+
+        return result;
+      }
+    } catch (error) {
+      assertIsError(error);
+      if (error.code !== 'ENOENT') {
+        // Ignore missing package.json files, but rethrow other errors.
+        throw error;
+      }
+    }
+
+    // Stop if we are at the search root or the filesystem root.
+    if (currentDir === searchRoot) {
+      break;
+    }
+    const parentDir = dirname(currentDir);
+    if (parentDir === currentDir) {
+      break; // Reached the filesystem root.
+    }
+    currentDir = parentDir;
+  }
+
+  // Cache the failure for all traversed directories.
+  for (const dir of dirsToCache) {
+    cache.set(dir, undefined);
+  }
+
+  return undefined;
+}
+
+// Helper types inferred from the Zod schema for structured data processing.
+type WorkspaceData = z.infer<typeof listProjectsOutputSchema.workspaces>[number];
+type ParsingError = z.infer<typeof listProjectsOutputSchema.parsingErrors>[number];
+type VersioningError = z.infer<typeof listProjectsOutputSchema.versioningErrors>[number];
+
+/**
+ * Determines the unit test framework for a project based on its 'test' target configuration.
+ * It handles both the modern `@angular/build:unit-test` builder with its `runner` option
+ * and older builders where the framework is inferred from the builder name.
+ * @param testTarget The 'test' target definition from the workspace configuration.
+ * @returns The name of the unit test framework ('jasmine', 'jest', 'vitest'), 'unknown' if
+ * the framework can't be determined from a known builder, or `undefined` if there is no test target.
+ */
+function getUnitTestFramework(
+  testTarget: import('@angular-devkit/core').workspaces.TargetDefinition | undefined,
+): 'jasmine' | 'jest' | 'vitest' | 'unknown' | undefined {
+  if (!testTarget) {
+    return undefined;
+  }
+
+  // For the new unit-test builder, the runner option directly informs the framework.
+  if (testTarget.builder === '@angular/build:unit-test') {
+    const runner = testTarget.options?.['runner'] as 'karma' | 'vitest' | undefined;
+    if (runner === 'karma') {
+      return 'jasmine'; // Karma is a runner, but the framework is Jasmine.
+    } else {
+      return runner; // For 'vitest', the runner and framework are the same.
+    }
+  }
+
+  // Fallback for older builders where the framework is inferred from the builder name.
+  if (testTarget.builder) {
+    const testBuilder = testTarget.builder;
+    if (
+      testBuilder.includes('karma') ||
+      testBuilder === '@angular-devkit/build-angular:web-test-runner'
+    ) {
+      return 'jasmine';
+    } else if (testBuilder.includes('jest')) {
+      return 'jest';
+    } else if (testBuilder.includes('vitest')) {
+      return 'vitest';
+    } else {
+      return 'unknown';
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Determines the style language for a project using a prioritized heuristic.
+ * It checks project-specific schematics, then workspace-level schematics,
+ * and finally infers from the build target's inlineStyleLanguage option.
+ * @param project The project definition from the workspace configuration.
+ * @param workspace The loaded Angular workspace.
+ * @returns The determined style language ('css', 'scss', 'sass', 'less').
+ */
+async function getProjectStyleLanguage(
+  project: import('@angular-devkit/core').workspaces.ProjectDefinition,
+  workspace: AngularWorkspace,
+  fullSourceRoot: string,
+): Promise<StyleLanguage> {
+  const projectSchematics = project.extensions.schematics as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+  const workspaceSchematics = workspace.extensions.schematics as
+    | Record<string, Record<string, unknown>>
+    | undefined;
+
+  // 1. Check for a project-specific schematic setting.
+  let style = projectSchematics?.['@schematics/angular:component']?.['style'];
+  if (isStyleLanguage(style)) {
+    return style;
+  }
+
+  // 2. Check for a workspace-level schematic setting.
+  style = workspaceSchematics?.['@schematics/angular:component']?.['style'];
+  if (isStyleLanguage(style)) {
+    return style;
+  }
+
+  const buildTarget = project.targets.get('build');
+  if (buildTarget?.options) {
+    // 3. Infer from the build target's inlineStyleLanguage option.
+    style = buildTarget.options['inlineStyleLanguage'];
+    if (isStyleLanguage(style)) {
+      return style;
+    }
+
+    // 4. Infer from the 'styles' array (explicit).
+    const styles = buildTarget.options['styles'] as string[] | undefined;
+    if (Array.isArray(styles)) {
+      for (const stylePath of styles) {
+        const style = getStyleLanguageFromExtension(extname(stylePath));
+        if (style) {
+          return style;
+        }
+      }
+    }
+  }
+
+  // 5. Infer from implicit default styles file (future-proofing).
+  for (const ext of STYLE_LANGUAGE_SEARCH_ORDER) {
+    try {
+      await stat(join(fullSourceRoot, `styles.${ext}`));
+
+      return ext;
+    } catch {
+      // Silently ignore all errors (e.g., file not found, permissions).
+      // If we can't read the file, we can't use it for detection.
+    }
+  }
+
+  // 6. Fallback to 'css'.
+  return 'css';
+}
+
+/**
+ * Loads, parses, and transforms a single angular.json file into the tool's output format.
+ * It checks a set of seen paths to avoid processing the same workspace multiple times.
+ * @param configFile The path to the angular.json file.
+ * @param seenPaths A Set of absolute paths that have already been processed.
+ * @returns A promise resolving to the workspace data or a parsing error.
+ */
+async function loadAndParseWorkspace(
+  configFile: string,
+  seenPaths: Set<string>,
+): Promise<{ workspace: WorkspaceData | null; error: ParsingError | null }> {
+  try {
+    const resolvedPath = resolve(configFile);
+    if (seenPaths.has(resolvedPath)) {
+      return { workspace: null, error: null }; // Already processed, skip.
+    }
+    seenPaths.add(resolvedPath);
+
+    const ws = await AngularWorkspace.load(configFile);
+    const projects = [];
+    const workspaceRoot = dirname(configFile);
+    for (const [name, project] of ws.projects.entries()) {
+      const sourceRoot = project.sourceRoot ?? posix.join(project.root, 'src');
+      const fullSourceRoot = join(workspaceRoot, sourceRoot);
+      const unitTestFramework = getUnitTestFramework(project.targets.get('test'));
+      const styleLanguage = await getProjectStyleLanguage(project, ws, fullSourceRoot);
+      const targets = Array.from(project.targets.keys());
+
+      projects.push({
+        name,
+        type: project.extensions['projectType'] as 'application' | 'library' | undefined,
+        builder: project.targets.get('build')?.builder,
+        root: project.root,
+        sourceRoot,
+        selectorPrefix: project.extensions['prefix'] as string,
+        unitTestFramework,
+        styleLanguage,
+        targets,
+      });
+    }
+
+    return { workspace: { path: configFile, projects }, error: null };
+  } catch (error) {
+    let message;
+    if (error instanceof Error) {
+      message = error.message;
+    } else {
+      message = 'An unknown error occurred while parsing the file.';
+    }
+
+    return { workspace: null, error: { filePath: configFile, message } };
+  }
+}
+
+/**
+ * Processes a single `angular.json` file to extract workspace and framework version information.
+ * @param configFile The path to the `angular.json` file.
+ * @param searchRoot The directory at which to stop the upward search for `package.json`.
+ * @param seenPaths A Set of absolute paths that have already been processed to avoid duplicates.
+ * @param versionCache A Map to cache framework version lookups for performance.
+ * @returns A promise resolving to an object containing the processed data and any errors.
+ */
+async function processConfigFile(
+  configFile: string,
+  searchRoot: string,
+  seenPaths: Set<string>,
+  versionCache: Map<string, string | undefined>,
+): Promise<{
+  workspace?: WorkspaceData;
+  parsingError?: ParsingError;
+  versioningError?: VersioningError;
+}> {
+  const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
+  if (error) {
+    return { parsingError: error };
+  }
+
+  if (!workspace) {
+    return {}; // Skipped as it was already seen.
+  }
+
+  try {
+    const workspaceDir = dirname(configFile);
+    workspace.frameworkVersion = await findAngularCoreVersion(
+      workspaceDir,
+      versionCache,
+      searchRoot,
+    );
+
+    return { workspace };
+  } catch (e) {
+    return {
+      workspace,
+      versioningError: {
+        filePath: workspace.path,
+        message: e instanceof Error ? e.message : 'An unknown error occurred.',
+      },
+    };
+  }
+}
+
+/**
+ * Deduplicates overlapping search roots (e.g., if one is a child of another).
+ * Sorting by length ensures parent directories are processed before children.
+ * @param roots A list of normalized absolute paths used as search roots.
+ * @returns A deduplicated list of search roots.
+ */
+function deduplicateSearchRoots(roots: string[]): string[] {
+  const sortedRoots = [...roots].sort((a, b) => a.length - b.length);
+  const deduplicated: string[] = [];
+
+  for (const root of sortedRoots) {
+    const isSubdirectory = deduplicated.some((existing) => {
+      const rel = relative(existing, root);
+
+      return rel === '' || (!rel.startsWith('..') && !isAbsolute(rel));
+    });
+
+    if (!isSubdirectory) {
+      deduplicated.push(root);
+    }
+  }
+
+  return deduplicated;
+}
+
+async function createListProjectsHandler({ server }: McpToolContext) {
+  return async () => {
+    const workspaces: WorkspaceData[] = [];
+    const parsingErrors: ParsingError[] = [];
+    const versioningErrors: z.infer<typeof listProjectsOutputSchema.versioningErrors> = [];
+    const seenPaths = new Set<string>();
+    const versionCache = new Map<string, string | undefined>();
+
+    let searchRoots: string[];
+    const clientCapabilities = server.server.getClientCapabilities();
+    if (clientCapabilities?.roots) {
+      const { roots } = await server.server.listRoots();
+      searchRoots = roots?.map((r) => normalize(fileURLToPath(r.uri))) ?? [];
+    } else {
+      // Fallback to the current working directory if client does not support roots
+      searchRoots = [process.cwd()];
+    }
+
+    searchRoots = deduplicateSearchRoots(searchRoots);
+
+    // Pre-resolve allowed roots to handle their own symlinks or normalizations.
+    // We ignore failures here; if a root is broken, we simply won't match against it.
+    const realAllowedRoots = searchRoots
+      .map((r) => {
+        try {
+          return realpathSync(r);
+        } catch {
+          return null;
+        }
+      })
+      .filter((r): r is string => r !== null);
+
+    for (const root of searchRoots) {
+      for await (const configFile of findAngularJsonFiles(root, realAllowedRoots)) {
+        const { workspace, parsingError, versioningError } = await processConfigFile(
+          configFile,
+          root,
+          seenPaths,
+          versionCache,
+        );
+
+        if (workspace) {
+          workspaces.push(workspace);
+        }
+        if (parsingError) {
+          parsingErrors.push(parsingError);
+        }
+        if (versioningError) {
+          versioningErrors.push(versioningError);
+        }
+      }
+    }
+
+    if (workspaces.length === 0 && parsingErrors.length === 0) {
+      return {
+        content: [
+          {
+            type: 'text' as const,
+            text:
+              'No Angular workspace found.' +
+              ' An `angular.json` file, which marks the root of a workspace,' +
+              ' could not be located in the current directory or any of its parent directories.',
+          },
+        ],
+        structuredContent: { workspaces: [] },
+      };
+    }
+
+    let text = `Found ${workspaces.length} workspace(s).\n${JSON.stringify({ workspaces })}`;
+    if (parsingErrors.length > 0) {
+      text += `\n\nWarning: The following ${parsingErrors.length} file(s) could not be parsed and were skipped:\n`;
+      text += parsingErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
+    }
+    if (versioningErrors.length > 0) {
+      text += `\n\nWarning: The framework version for the following ${versioningErrors.length} workspace(s) could not be determined:\n`;
+      text += versioningErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
+    }
+
+    return {
+      content: [{ type: 'text' as const, text }],
+      structuredContent: { workspaces, parsingErrors, versioningErrors },
+    };
+  };
+}

@@ -1,0 +1,92 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+ts_project(
+    name = "webpack",
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "src/**/*_spec.ts",
+        ],
+    ) + [
+        "index.ts",
+    ],
+    data = [
+        "package.json",
+    ],
+    deps = [
+        ":node_modules/webpack",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@types/node",
+        "//:node_modules/typescript",
+    ],
+)
+
+ts_project(
+    name = "webpack_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+        ],
+    ),
+    deps = [
+        ":node_modules/@angular-devkit/core",
+        ":webpack",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/typescript",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    size = "medium",
+    data = [
+        ":webpack_test_lib",
+        # Needed at runtime for runtime TS compilations performed by tests.
+        ":node_modules/webpack",
+        "//:node_modules/tslib",
+    ],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    tags = ["release-package"],
+    deps = [
+        ":README.md",
+        ":license",
+        ":webpack",
+    ],
+)
+
+api_golden_test_npm_package(
+    name = "ngtools_webpack_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "goldens/public-api/ngtools/webpack",
+    npm_package = "packages/ngtools/webpack/npm_package",
+)

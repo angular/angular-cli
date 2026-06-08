@@ -1,0 +1,285 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { schema } from '@angular-devkit/core';
+import { readFileSync } from 'node:fs';
+import { join, posix, relative } from 'node:path';
+import type { ArgumentsCamelCase, Argv, CommandModule as YargsCommandModule } from 'yargs';
+import { Parser as yargsParser } from 'yargs/helpers';
+import { getAnalyticsUserId } from '../analytics/analytics';
+import { AnalyticsCollector } from '../analytics/analytics-collector';
+import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
+import { considerSettingUpAutocompletion } from '../utilities/completion';
+import { AngularWorkspace } from '../utilities/config';
+import { memoize } from '../utilities/memoize';
+import { CommandContext, CommandScope, Options, OtherOptions } from './definitions';
+import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
+
+export { CommandScope };
+export type { CommandContext, Options, OtherOptions };
+
+export interface CommandModuleImplementation<T extends {} = {}> extends Omit<
+  YargsCommandModule<{}, T>,
+  'builder' | 'handler'
+> {
+  /** Scope in which the command can be executed in. */
+  scope: CommandScope;
+
+  /** Path used to load the long description for the command in JSON help text. */
+  longDescriptionPath?: string;
+
+  /** Object declaring the options the command accepts, or a function accepting and returning a yargs instance. */
+  builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
+
+  /** A function which will be passed the parsed argv. */
+  run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
+}
+
+export interface FullDescribe {
+  describe?: string;
+  longDescription?: string;
+  longDescriptionRelativePath?: string;
+}
+
+export abstract class CommandModule<T extends {} = {}> implements CommandModuleImplementation<T> {
+  abstract readonly command: string;
+  abstract readonly describe: string | false;
+  abstract readonly longDescriptionPath?: string;
+  protected readonly shouldReportAnalytics: boolean = true;
+  readonly scope: CommandScope = CommandScope.Both;
+
+  private readonly optionsWithAnalytics = new Map<
+    string,
+    EventCustomDimension | EventCustomMetric
+  >();
+
+  constructor(protected readonly context: CommandContext) {}
+
+  /**
+   * Description object which contains the long command descroption.
+   * This is used to generate JSON help wich is used in AIO.
+   *
+   * `false` will result in a hidden command.
+   */
+  public get fullDescribe(): FullDescribe | false {
+    return this.describe === false
+      ? false
+      : {
+          describe: this.describe,
+          ...(this.longDescriptionPath
+            ? {
+                longDescriptionRelativePath: relative(
+                  join(__dirname, '../../../../'),
+                  this.longDescriptionPath,
+                ).replace(/\\/g, posix.sep),
+                longDescription: readFileSync(this.longDescriptionPath, 'utf8').replace(
+                  /\r\n/g,
+                  '\n',
+                ),
+              }
+            : {}),
+        };
+  }
+
+  protected get commandName(): string {
+    return this.command.split(' ', 1)[0];
+  }
+
+  abstract builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
+  abstract run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
+
+  async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
+    const { _, $0, ...options } = args;
+
+    // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
+    const camelCasedOptions: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(options)) {
+      camelCasedOptions[yargsParser.camelCase(key)] = value;
+    }
+
+    // Set up autocompletion if appropriate.
+    const autocompletionExitCode = await considerSettingUpAutocompletion(
+      this.commandName,
+      this.context.logger,
+    );
+    if (autocompletionExitCode !== undefined) {
+      process.exitCode = autocompletionExitCode;
+
+      return;
+    }
+
+    // Gather and report analytics.
+    const analytics = await this.getAnalytics();
+    const stopPeriodicFlushes = analytics && analytics.periodFlush();
+
+    let exitCode: number | void | undefined;
+    try {
+      if (analytics) {
+        this.reportCommandRunAnalytics(analytics);
+        this.reportWorkspaceInfoAnalytics(analytics);
+      }
+
+      exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
+    } catch (e) {
+      if (e instanceof schema.SchemaValidationException) {
+        this.context.logger.fatal(`Error: ${e.message}`);
+        exitCode = 1;
+      } else {
+        throw e;
+      }
+    } finally {
+      await stopPeriodicFlushes?.();
+
+      if (typeof exitCode === 'number' && exitCode > 0) {
+        process.exitCode = exitCode;
+      }
+    }
+  }
+
+  @memoize
+  protected async getAnalytics(): Promise<AnalyticsCollector | undefined> {
+    if (!this.shouldReportAnalytics) {
+      return undefined;
+    }
+
+    const userId = await getAnalyticsUserId(
+      this.context,
+      // Don't prompt on `ng update`, 'ng version' or `ng analytics`.
+      ['version', 'update', 'analytics'].includes(this.commandName),
+    );
+
+    if (!userId) {
+      return undefined;
+    }
+
+    let version: string | undefined;
+    try {
+      version = await this.context.packageManager.getVersion();
+    } catch {
+      // Ignore errors if the package manager is not available.
+    }
+
+    return new AnalyticsCollector(this.context.logger, userId, {
+      name: this.context.packageManager.name,
+      version,
+    });
+  }
+
+  /**
+   * Adds schema options to a command also this keeps track of options that are required for analytics.
+   * **Note:** This method should be called from the command bundler method.
+   */
+  protected addSchemaOptionsToCommand<T>(localYargs: Argv<T>, options: Option[]): Argv<T> {
+    const optionsWithAnalytics = addSchemaOptionsToCommand(
+      localYargs,
+      options,
+      // This should only be done when `--help` is used otherwise default will override options set in angular.json.
+      /* includeDefaultValues= */ this.context.args.options.help,
+    );
+
+    // Record option of analytics.
+    for (const [name, userAnalytics] of optionsWithAnalytics) {
+      this.optionsWithAnalytics.set(name, userAnalytics);
+    }
+
+    return localYargs;
+  }
+
+  protected getWorkspaceOrThrow(): AngularWorkspace {
+    const { workspace } = this.context;
+    if (!workspace) {
+      throw new CommandModuleError('A workspace is required for this command.');
+    }
+
+    return workspace;
+  }
+
+  /**
+   * Flush on an interval (if the event loop is waiting).
+   *
+   * @returns a method that when called will terminate the periodic
+   * flush and call flush one last time.
+   */
+  protected getAnalyticsParameters(
+    options: (Options<T> & OtherOptions) | OtherOptions,
+  ): Partial<Record<EventCustomDimension | EventCustomMetric, string | boolean | number>> {
+    const parameters: Partial<
+      Record<EventCustomDimension | EventCustomMetric, string | boolean | number>
+    > = {};
+
+    const validEventCustomDimensionAndMetrics = new Set([
+      ...Object.values(EventCustomDimension),
+      ...Object.values(EventCustomMetric),
+    ]);
+
+    for (const [name, ua] of this.optionsWithAnalytics) {
+      if (!validEventCustomDimensionAndMetrics.has(ua)) {
+        continue;
+      }
+
+      const value = options[name];
+      if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+        parameters[ua] = value;
+      } else if (Array.isArray(value)) {
+        // GA doesn't allow array as values.
+        parameters[ua] = value.sort().join(', ');
+      }
+    }
+
+    return parameters;
+  }
+
+  private reportCommandRunAnalytics(analytics: AnalyticsCollector): void {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const internalMethods = (this.context.yargsInstance as any).getInternalMethods();
+    // $0 generate component [name] -> generate_component
+    // $0 add <collection> -> add
+    const fullCommand = (internalMethods.getUsageInstance().getUsage()[0][0] as string)
+      .split(' ')
+      .filter((x) => {
+        const code = x.charCodeAt(0);
+
+        return code >= 97 && code <= 122;
+      })
+      .join('_');
+
+    analytics.reportCommandRunEvent(fullCommand);
+  }
+
+  private reportWorkspaceInfoAnalytics(analytics: AnalyticsCollector): void {
+    const { workspace } = this.context;
+    if (!workspace) {
+      return;
+    }
+
+    let applicationProjectsCount = 0;
+    let librariesProjectsCount = 0;
+    for (const project of workspace.projects.values()) {
+      switch (project.extensions['projectType']) {
+        case 'application':
+          applicationProjectsCount++;
+          break;
+        case 'library':
+          librariesProjectsCount++;
+          break;
+      }
+    }
+
+    analytics.reportWorkspaceInfoEvent({
+      [EventCustomMetric.AllProjectsCount]: librariesProjectsCount + applicationProjectsCount,
+      [EventCustomMetric.ApplicationProjectsCount]: applicationProjectsCount,
+      [EventCustomMetric.LibraryProjectsCount]: librariesProjectsCount,
+    });
+  }
+}
+
+/**
+ * Creates an known command module error.
+ * This is used so during executation we can filter between known validation error and real non handled errors.
+ */
+export class CommandModuleError extends Error {}

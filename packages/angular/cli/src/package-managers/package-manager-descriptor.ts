@@ -1,0 +1,295 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+/**
+ * @fileoverview This file defines the data structures and configuration for
+ * supported package managers. It is the single source of truth for all
+ * package-manager-specific commands, flags, and output parsing.
+ */
+
+import { ErrorInfo } from './error';
+import { Logger } from './logger';
+import { PackageManifest, PackageMetadata } from './package-metadata';
+import { InstalledPackage } from './package-tree';
+import {
+  parseBunDependencies,
+  parseNpmLikeDependencies,
+  parseNpmLikeError,
+  parseNpmLikeManifest,
+  parseNpmLikeMetadata,
+  parseYarnClassicDependencies,
+  parseYarnClassicError,
+  parseYarnClassicManifest,
+  parseYarnClassicMetadata,
+  parseYarnModernDependencies,
+} from './parsers';
+
+/**
+ * An interface that describes the commands and properties of a package manager.
+ */
+export interface PackageManagerDescriptor {
+  /** The binary executable for the package manager. */
+  readonly binary: string;
+
+  /** The lockfile names used by the package manager. */
+  readonly lockfiles: readonly string[];
+
+  /** The command to add a package. */
+  readonly addCommand: string;
+
+  /** The command to install all dependencies. */
+  readonly installCommand: readonly string[];
+
+  /** The flag to force a clean installation. */
+  readonly forceFlag: string;
+
+  /** The flag to save a package with an exact version. */
+  readonly saveExactFlag: string;
+
+  /** The flag to save a package with a tilde version range. */
+  readonly saveTildeFlag: string;
+
+  /** The flag to save a package as a dev dependency. */
+  readonly saveDevFlag: string;
+
+  /** The flag to prevent the lockfile from being updated. */
+  readonly noLockfileFlag: string;
+
+  /** The flag to prevent lifecycle scripts from being executed. */
+  readonly ignoreScriptsFlag: string;
+
+  /** The flag to ignore peer dependency warnings/errors. */
+  readonly ignorePeerDependenciesFlag?: string;
+
+  /** The configuration files used by the package manager. */
+  readonly configFiles: readonly string[];
+
+  /**
+   * Whether to copy configuration files from the project root to the temporary directory.
+   * This is necessary for package managers that do not inherit configuration from parent directories (e.g., bun).
+   */
+  readonly copyConfigFromProject?: boolean;
+
+  /** A function that returns the arguments and environment variables to use a custom registry. */
+  readonly getRegistryOptions?: (registry: string) => {
+    args?: string[];
+    env?: Record<string, string>;
+  };
+
+  /** The command to get the package manager's version. */
+  readonly versionCommand: readonly string[];
+
+  /** The command to list all installed dependencies. */
+  readonly listDependenciesCommand: readonly string[];
+
+  /** The command to get the current package name. */
+  readonly getPackageNameCommand?: readonly string[];
+
+  /** The command to fetch the registry manifest of a package. */
+  readonly getManifestCommand: readonly string[];
+
+  /** Whether a specific version lookup is needed prior to fetching a registry manifest. */
+  readonly requiresManifestVersionLookup?: boolean;
+
+  /** A function that formats the arguments for field-filtered registry views. */
+  readonly viewCommandFieldArgFormatter?: (fields: readonly string[]) => string[];
+
+  /** A collection of functions to parse the output of specific commands. */
+  readonly outputParsers: {
+    /** A function to parse the output of `listDependenciesCommand`. */
+    listDependencies: (
+      stdout: string,
+      logger?: Logger,
+      options?: { workspacePackageName?: string },
+    ) => Map<string, InstalledPackage>;
+
+    /** A function to parse the output of `getManifestCommand` for a specific version. */
+    getRegistryManifest: (stdout: string, logger?: Logger) => PackageManifest | null;
+
+    /** A function to parse the output of `getManifestCommand` for the full package metadata. */
+    getRegistryMetadata: (stdout: string, logger?: Logger) => PackageMetadata | null;
+
+    /** A function to parse the output when a command fails. */
+    getError?: (output: string, logger?: Logger) => ErrorInfo | null;
+  };
+
+  /** A function that checks if a structured error represents a "package not found" error. */
+  readonly isNotFound: (error: ErrorInfo) => boolean;
+}
+
+/** A type that represents the name of a supported package manager. */
+export type PackageManagerName = keyof typeof SUPPORTED_PACKAGE_MANAGERS;
+
+/** A set of error codes that are known to indicate a "package not found" error. */
+const NOT_FOUND_ERROR_CODES = new Set(['E404']);
+
+/**
+ * A shared function to check if a structured error represents a "package not found" error.
+ * @param error The structured error to check.
+ * @returns True if the error code is a known "not found" code, false otherwise.
+ */
+function isKnownNotFound(error: ErrorInfo): boolean {
+  return NOT_FOUND_ERROR_CODES.has(error.code);
+}
+
+/**
+ * A map of supported package managers to their descriptors.
+ * This is the single source of truth for all package-manager-specific
+ * configuration and behavior.
+ *
+ * Each descriptor is intentionally explicit and self-contained. This approach
+ * avoids inheritance or fallback logic between package managers, ensuring that
+ * the behavior for each one is clear, predictable, and easy to modify in
+ * isolation. For example, `yarn-classic` does not inherit any properties from
+ * the `yarn` descriptor; it is a complete and independent definition.
+ */
+export const SUPPORTED_PACKAGE_MANAGERS = {
+  npm: {
+    binary: 'npm',
+    lockfiles: ['package-lock.json', 'npm-shrinkwrap.json'],
+    addCommand: 'install',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--save-exact',
+    saveTildeFlag: '--save-tilde',
+    saveDevFlag: '--save-dev',
+    noLockfileFlag: '--no-package-lock',
+    ignoreScriptsFlag: '--ignore-scripts',
+    ignorePeerDependenciesFlag: '--force',
+    configFiles: ['.npmrc'],
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['list', '--depth=0', '--json=true', '--all=true'],
+    getPackageNameCommand: ['pkg', 'get', 'name'],
+    getManifestCommand: ['view', '--json'],
+    viewCommandFieldArgFormatter: (fields) => [...fields],
+    outputParsers: {
+      listDependencies: parseNpmLikeDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+    },
+    isNotFound: isKnownNotFound,
+  },
+  yarn: {
+    binary: 'yarn',
+    lockfiles: ['yarn.lock'],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--exact',
+    saveTildeFlag: '--tilde',
+    saveDevFlag: '--dev',
+    noLockfileFlag: '',
+    ignoreScriptsFlag: '--mode=skip-build',
+    configFiles: ['.yarnrc.yml', '.yarnrc.yaml'],
+    getRegistryOptions: (registry: string) => ({ env: { YARN_NPM_REGISTRY_SERVER: registry } }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['info', '--name-only', '--json'],
+    getManifestCommand: ['npm', 'info', '--json'],
+    viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
+    outputParsers: {
+      listDependencies: parseYarnModernDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+    },
+    isNotFound: isKnownNotFound,
+  },
+  'yarn-classic': {
+    binary: 'yarn',
+    // This is intentionally empty. `yarn-classic` is not a discoverable package manager.
+    // The discovery process finds `yarn` via `yarn.lock`, and the factory logic
+    // determines whether it is classic or modern by checking the installed version.
+    lockfiles: [],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--exact',
+    saveTildeFlag: '--tilde',
+    saveDevFlag: '--dev',
+    noLockfileFlag: '--no-lockfile',
+    ignoreScriptsFlag: '--ignore-scripts',
+    configFiles: ['.yarnrc', '.npmrc'],
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getManifestCommand: ['info', '--json', '--verbose'],
+    requiresManifestVersionLookup: true,
+    outputParsers: {
+      listDependencies: parseYarnClassicDependencies,
+      getRegistryManifest: parseYarnClassicManifest,
+      getRegistryMetadata: parseYarnClassicMetadata,
+      getError: parseYarnClassicError,
+    },
+    isNotFound: isKnownNotFound,
+  },
+  pnpm: {
+    binary: 'pnpm',
+    lockfiles: ['pnpm-lock.yaml'],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--save-exact',
+    saveTildeFlag: '--save-tilde',
+    saveDevFlag: '--save-dev',
+    noLockfileFlag: '--no-lockfile',
+    ignoreScriptsFlag: '--ignore-scripts',
+    ignorePeerDependenciesFlag: '--strict-peer-dependencies=false',
+    configFiles: ['.npmrc', 'pnpm-workspace.yaml'],
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getPackageNameCommand: ['pkg', 'get', 'name'],
+    getManifestCommand: ['view', '--json'],
+    viewCommandFieldArgFormatter: (fields) => [...fields],
+    outputParsers: {
+      listDependencies: parseNpmLikeDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+    },
+    isNotFound: isKnownNotFound,
+  },
+  bun: {
+    binary: 'bun',
+    lockfiles: ['bun.lockb', 'bun.lock'],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--exact',
+    saveTildeFlag: '', // Bun does not have a flag for tilde, it defaults to caret.
+    saveDevFlag: '--development',
+    noLockfileFlag: '', // Bun does not have a flag for this.
+    ignoreScriptsFlag: '--ignore-scripts',
+    configFiles: ['bunfig.toml', '.npmrc'],
+    copyConfigFromProject: true,
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['pm', 'ls'],
+    getManifestCommand: ['pm', 'view', '--json'],
+    outputParsers: {
+      listDependencies: parseBunDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+    },
+    isNotFound: isKnownNotFound,
+  },
+} satisfies Record<string, PackageManagerDescriptor>;
+
+/**
+ * The order of precedence for package managers.
+ * This is a best-effort ordering based on estimated Angular community usage and default presence.
+ */
+export const PACKAGE_MANAGER_PRECEDENCE: readonly PackageManagerName[] = [
+  'pnpm',
+  'yarn',
+  'bun',
+  'npm',
+];

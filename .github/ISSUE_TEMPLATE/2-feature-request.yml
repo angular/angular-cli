@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest a feature for Angular CLI
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Oh hi there!
+
+        To expedite issue processing please search open and closed issues before submitting a new one.
+        Existing issues often contain information about workarounds, resolution, or progress updates.
+  - type: dropdown
+    id: command
+    attributes:
+      label: Command
+      description: Can you pin-point the command or commands that are relevant for this feature request?
+      options:
+        - add
+        - build
+        - config
+        - doc
+        - e2e
+        - extract-i18n
+        - generate
+        - help
+        - lint
+        - new
+        - run
+        - serve
+        - test
+        - update
+        - version
+      multiple: true
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: A clear and concise description of the problem or missing capability.
+    validations:
+      required: true
+  - type: textarea
+    id: desired-solution
+    attributes:
+      label: Describe the solution you'd like
+      description: If you have a solution in mind, please describe it.
+    validations:
+      required: false
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Describe alternatives you've considered
+      description: Have you considered any alternative solutions or workarounds?
+    validations:
+      required: false

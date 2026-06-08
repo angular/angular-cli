@@ -1,0 +1,153 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { createRequire } from 'node:module';
+import { CommandContext } from '../../command-builder/definitions';
+import { isNodeVersionSupported } from '../../utilities/node-version';
+import { VERSION } from '../../utilities/version';
+
+/**
+ * A subset of `package.json` fields that are relevant for the version command.
+ */
+interface PartialPackageInfo {
+  name: string;
+  version: string;
+  dependencies?: Record<string, string>;
+  devDependencies?: Record<string, string>;
+}
+
+/**
+ * An object containing version information for a single package.
+ */
+export interface PackageVersionInfo {
+  requested: string;
+  installed: string;
+}
+
+/**
+ * An object containing all the version information that will be displayed by the command.
+ */
+export interface VersionInfo {
+  cli: {
+    version: string;
+  };
+  framework: {
+    version: string | undefined;
+  };
+  system: {
+    node: {
+      version: string;
+      unsupported: boolean;
+    };
+    os: {
+      platform: string;
+      architecture: string;
+    };
+    packageManager: {
+      name: string;
+      version: string | undefined;
+    };
+  };
+  packages: Record<string, PackageVersionInfo>;
+}
+
+/**
+ * A list of regular expression patterns that match package names that should be included in the
+ * version output.
+ */
+const PACKAGE_PATTERNS = [
+  /^@angular\/.*/,
+  /^@angular-devkit\/.*/,
+  /^@ngtools\/.*/,
+  /^@schematics\/.*/,
+  /^rxjs$/,
+  /^typescript$/,
+  /^ng-packagr$/,
+  /^vitest$/,
+  /^webpack$/,
+  /^zone\.js$/,
+];
+
+/**
+ * Gathers all the version information from the environment and workspace.
+ * @returns An object containing all the version information.
+ */
+export async function gatherVersionInfo(context: CommandContext): Promise<VersionInfo> {
+  // Trailing slash is used to allow the path to be treated as a directory
+  const workspaceRequire = createRequire(context.root + '/');
+
+  let workspacePackage: PartialPackageInfo | undefined;
+  try {
+    workspacePackage = workspaceRequire('./package.json');
+  } catch {}
+
+  const allDependencies = {
+    ...workspacePackage?.dependencies,
+    ...workspacePackage?.devDependencies,
+  };
+  const packageNames = new Set(Object.keys(allDependencies));
+
+  const packages: Record<string, PackageVersionInfo> = {};
+  for (const name of packageNames) {
+    if (PACKAGE_PATTERNS.some((p) => p.test(name))) {
+      packages[name] = {
+        requested: allDependencies[name] ?? 'error',
+        installed: getVersion(name, workspaceRequire),
+      };
+    }
+  }
+
+  const angularCoreVersion = packages['@angular/core'];
+
+  return {
+    cli: {
+      version: VERSION.full,
+    },
+    framework: {
+      version: angularCoreVersion?.installed,
+    },
+    system: {
+      node: {
+        version: process.versions.node,
+        unsupported: !isNodeVersionSupported(),
+      },
+      os: {
+        platform: process.platform,
+        architecture: process.arch,
+      },
+      packageManager: {
+        name: context.packageManager.name,
+        version: await context.packageManager.getVersion(),
+      },
+    },
+    packages,
+  };
+}
+
+/**
+ * Gets the version of a package.
+ * @param moduleName The name of the package.
+ * @param workspaceRequire A `require` function for the workspace.
+ * @param localRequire A `require` function for the CLI.
+ * @returns The version of the package, or `<error>` if it could not be found.
+ */
+function getVersion(moduleName: string, workspaceRequire: NodeJS.Require): string {
+  let packageInfo: PartialPackageInfo | undefined;
+
+  // Try to find the package in the workspace
+  try {
+    packageInfo = workspaceRequire(`${moduleName}/package.json`);
+  } catch {}
+
+  // If found, attempt to get the version
+  if (packageInfo) {
+    return packageInfo.version;
+  }
+
+  return '<error>';
+}

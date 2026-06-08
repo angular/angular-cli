@@ -1,0 +1,51 @@
+{
+  "name": "@angular/ssr",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Angular server side rendering utilities",
+  "type": "module",
+  "keywords": [
+    "angular",
+    "ssr",
+    "universal"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/angular/angular-cli.git"
+  },
+  "author": "Angular Authors",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/angular/angular-cli/issues"
+  },
+  "homepage": "https://github.com/angular/angular-cli",
+  "ng-add": {
+    "save": "dependencies"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  },
+  "peerDependencies": {
+    "@angular/common": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/router": "0.0.0-ANGULAR-FW-PEER-DEP"
+  },
+  "peerDependenciesMeta": {
+    "@angular/platform-server": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@angular-devkit/schematics": "workspace:*",
+    "@angular/common": "22.0.0",
+    "@angular/compiler": "22.0.0",
+    "@angular/core": "22.0.0",
+    "@angular/platform-browser": "22.0.0",
+    "@angular/platform-server": "22.0.0",
+    "@angular/router": "22.0.0",
+    "@schematics/angular": "workspace:*",
+    "beasties": "0.4.2"
+  },
+  "sideEffects": false,
+  "schematics": "./schematics/collection.json"
+}

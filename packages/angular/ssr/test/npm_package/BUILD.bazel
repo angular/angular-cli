@@ -1,0 +1,38 @@
+load("@bazel_lib//lib:write_source_files.bzl", "write_source_file")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+ts_project(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    deps = [
+        "//:node_modules/@types/node",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [
+        "unit_test_lib",
+        "//packages/angular/ssr:npm_package",
+    ],
+)
+
+genrule(
+    name = "beasties_license_file",
+    srcs = [
+        "//packages/angular/ssr:npm_package",
+    ],
+    outs = [
+        "THIRD_PARTY_LICENSES.txt",
+    ],
+    cmd = """
+      cp $(location //packages/angular/ssr:npm_package)/third_party/beasties/THIRD_PARTY_LICENSES.txt $(location :THIRD_PARTY_LICENSES.txt)
+    """,
+)
+
+write_source_file(
+    name = "beasties_license",
+    in_file = ":beasties_license_file",
+    out_file = ":THIRD_PARTY_LICENSES.txt.golden",
+)

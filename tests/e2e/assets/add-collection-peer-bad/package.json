@@ -1,0 +1,8 @@
+{
+  "name": "add-collection-peer-bad",
+  "version": "0.0.1",
+  "schematics": "./collection.json",
+  "peerDependencies": {
+    "typescript": "2.x"
+  }
+}

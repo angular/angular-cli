@@ -1,0 +1,28 @@
+load("//tools:defaults.bzl", "ts_project")
+
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "tasks",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "node/**/*.ts",
+            "**/*_spec.ts",
+        ],
+    ),
+    data = ["package.json"],
+    deps = [
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/schematics",
+        "//packages/angular_devkit/schematics:node_modules/@angular-devkit/core",
+        "//packages/angular_devkit/schematics:node_modules/ora",
+        "//packages/angular_devkit/schematics:node_modules/rxjs",
+    ],
+)

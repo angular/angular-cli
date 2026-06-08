@@ -1,0 +1,12 @@
+import { NgModule } from '@angular/core';
+import { provideServerRendering, withRoutes } from '@angular/ssr';
+import { <%= appComponentName %> } from '<%= appComponentPath %>';
+import { <%= appModuleName %> } from '<%= appModulePath %>';
+import { serverRoutes } from './app.routes.server';
+
+@NgModule({
+  imports: [<%= appModuleName %>],
+  providers: [provideServerRendering(withRoutes(serverRoutes))],
+  bootstrap: [<%= appComponentName %>],
+})
+export class AppServerModule {}

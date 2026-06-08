@@ -1,0 +1,25 @@
+{
+  "name": "@ngtools/webpack",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Webpack plugin that AoT compiles your Angular components and modules.",
+  "main": "./src/index.js",
+  "typings": "src/index.d.ts",
+  "keywords": [
+    "angular",
+    "webpack",
+    "plugin",
+    "aot"
+  ],
+  "peerDependencies": {
+    "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "typescript": ">=6.0 <6.1",
+    "webpack": "^5.54.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
+    "@angular/compiler": "22.0.0",
+    "@angular/compiler-cli": "22.0.0",
+    "typescript": "6.0.3",
+    "webpack": "5.107.2"
+  }
+}

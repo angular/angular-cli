@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsSchematicSchema",
+  "title": "Schematic Options Schema",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The package name for the new schematic."
+    },
+    "author": {
+      "type": "string",
+      "description": "Author for the new schematic."
+    },
+    "packageManager": {
+      "description": "The package manager used to install dependencies.",
+      "type": "string",
+      "enum": ["npm", "yarn", "pnpm", "bun"],
+      "default": "npm"
+    }
+  },
+  "required": ["name"]
+}

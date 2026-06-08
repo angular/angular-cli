@@ -1,0 +1,23 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import <% if(!exportDefault) { %>{ <% }%><%= classifiedName %> <% if(!exportDefault) {%>} <% }%>from './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>';
+
+describe('<%= classifiedName %>', () => {
+  let component: <%= classifiedName %>;
+  let fixture: ComponentFixture<<%= classifiedName %>>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      <%= standalone ? 'imports' : 'declarations' %>: [<%= classifiedName %>]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(<%= classifiedName %>);
+    component = fixture.componentInstance;
+    <%= zoneless ? 'await fixture.whenStable();' : 'fixture.detectChanges();' %>
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});

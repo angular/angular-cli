@@ -1,0 +1,30 @@
+import { Injectable } from '@angular/core';
+import { <%= routerImports %> } from '@angular/router';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class <%= classify(name) %>Guard implements <%= implementations %> {
+  <% if (implements.includes('CanActivate')) { %>canActivate(
+    route: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): MaybeAsync<GuardResult> {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanActivateChild')) { %>canActivateChild(
+    childRoute: ActivatedRouteSnapshot,
+    state: RouterStateSnapshot): MaybeAsync<GuardResult> {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanDeactivate')) { %>canDeactivate(
+    component: unknown,
+    currentRoute: ActivatedRouteSnapshot,
+    currentState: RouterStateSnapshot,
+    nextState?: RouterStateSnapshot): MaybeAsync<GuardResult> {
+    return true;
+  }
+  <% } %><% if (implements.includes('CanMatch')) { %>canMatch(
+    route: Route,
+    segments: UrlSegment[]): MaybeAsync<GuardResult> {
+    return true;
+  }<% } %>
+}

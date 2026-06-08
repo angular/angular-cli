@@ -1,0 +1,181 @@
+# Disable NG CLI TTY mode
+build --action_env=NG_FORCE_TTY=false
+
+# Required by `rules_ts`.
+common --@aspect_rules_ts//ts:skipLibCheck=always
+common --@aspect_rules_ts//ts:default_to_tsc_transpiler
+
+# Make TypeScript compilation fast, by keeping a few copies of the compiler
+# running as daemons, and cache SourceFile AST's to reduce parse time.
+build --strategy=TypeScriptCompile=worker
+
+# Enable debugging tests with --config=debug
+test:debug --test_arg=--node_options=--inspect-brk --test_output=streamed --test_strategy=exclusive --test_timeout=9999 --nocache_test_results
+
+# Enable debugging tests with --config=no-sharding
+# The below is useful to while using `fit` and `fdescribe` to avoid sharing and re-runs of failed flaky tests.
+test:no-sharding --flaky_test_attempts=1 --test_sharding_strategy=disabled
+
+# Frozen lockfile
+common --lockfile_mode=error
+
+###############################
+# Filesystem interactions     #
+###############################
+
+# Create symlinks in the project:
+# - dist/bin for outputs
+# - dist/testlogs, dist/genfiles
+# - bazel-out
+# NB: bazel-out should be excluded from the editor configuration.
+# The checked-in /.vscode/settings.json does this for VSCode.
+# Other editors may require manual config to ignore this directory.
+# In the past, we saw a problem where VSCode traversed a massive tree, opening file handles and
+# eventually a surprising failure with auto-discovery of the C++ toolchain in
+# MacOS High Sierra.
+# See https://github.com/bazelbuild/bazel/issues/4603
+build --symlink_prefix=dist/
+
+# Turn off legacy external runfiles
+build --nolegacy_external_runfiles
+
+# Turn on --incompatible_strict_action_env which was on by default
+# in Bazel 0.21.0 but turned off again in 0.22.0. Follow
+# https://github.com/bazelbuild/bazel/issues/7026 for more details.
+# This flag is needed to so that the bazel cache is not invalidated
+# when running bazel via `pnpm bazel`.
+# See https://github.com/angular/angular/issues/27514.
+build --incompatible_strict_action_env
+run --incompatible_strict_action_env
+test --incompatible_strict_action_env
+
+# Enable remote caching of build/action tree
+build --experimental_remote_merkle_tree_cache
+
+# Ensure that tags applied in BUILDs propagate to actions
+common --incompatible_allow_tags_propagation
+
+# Ensure sandboxing is enabled even for exclusive tests
+test --incompatible_exclusive_test_sandboxed
+
+###############################
+# Saucelabs support           #
+# Turn on these settings with #
+#  --config=saucelabs         #
+###############################
+
+# Expose SauceLabs environment to actions
+# These environment variables are needed by
+# web_test_karma to run on Saucelabs
+test:saucelabs --action_env=SAUCE_USERNAME
+test:saucelabs --action_env=SAUCE_ACCESS_KEY
+test:saucelabs --action_env=SAUCE_READY_FILE
+test:saucelabs --action_env=SAUCE_PID_FILE
+test:saucelabs --action_env=SAUCE_TUNNEL_IDENTIFIER
+test:saucelabs --define=KARMA_WEB_TEST_MODE=SL_REQUIRED
+
+###############################
+# Release support             #
+# Turn on these settings with #
+#  --config=release           #
+###############################
+
+# Releases should always be stamped with version control info
+# This command assumes node on the path and is a workaround for
+# https://github.com/bazelbuild/bazel/issues/4802
+build:release --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=release"
+build:release --stamp
+
+build:snapshot --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=snapshot"
+build:snapshot --stamp
+build:snapshot --//:enable_snapshot_repo_deps
+
+build:e2e --workspace_status_command="pnpm -s ng-dev release build-env-stamp --mode=release"
+build:e2e --stamp
+test:e2e --test_timeout=3600 --experimental_ui_max_stdouterr_bytes=2097152
+
+# Retry in the event of flakes
+test:e2e --flaky_test_attempts=2
+
+build:local --//:enable_package_json_tar_deps
+
+###############################
+# Output                      #
+###############################
+
+# A more useful default output mode for bazel query
+# Prints eg. "ng_module rule //foo:bar" rather than just "//foo:bar"
+query --output=label_kind
+
+# By default, failing tests don't print any output, it goes to the log file
+test --test_output=errors
+################################
+# Remote Execution Setup       #
+################################
+
+# Use the Angular team internal GCP instance for remote execution.
+build:remote --remote_instance_name=projects/internal-200822/instances/primary_instance
+build:remote --bes_instance_name=internal-200822
+
+# Starting with Bazel 0.27.0 strategies do not need to be explicitly
+# defined. See https://github.com/bazelbuild/bazel/issues/7480
+build:remote --define=EXECUTOR=remote
+
+# Setup the remote build execution servers.
+build:remote --remote_cache=remotebuildexecution.googleapis.com
+build:remote --remote_executor=remotebuildexecution.googleapis.com
+build:remote --remote_timeout=600
+build:remote --jobs=150
+
+# Setup the toolchain and platform for the remote build execution. The platform
+# is provided by the shared dev-infra package and targets k8 remote containers.
+build:remote --extra_execution_platforms=@devinfra//bazel/remote-execution:platform_with_network
+build:remote --host_platform=@devinfra//bazel/remote-execution:platform_with_network
+build:remote --platforms=@devinfra//bazel/remote-execution:platform_with_network
+
+# Set remote caching settings
+build:remote --remote_accept_cached=true
+build:remote --remote_upload_local_results=false
+
+# Force remote executions to consider the entire run as linux.
+# This is required for OSX cross-platform RBE.
+build:remote --cpu=k8
+build:remote --host_cpu=k8
+
+# Set up authentication mechanism for RBE
+build:remote --google_default_credentials
+
+# Use HTTP remote cache
+build:remote-cache --remote_cache=https://storage.googleapis.com/angular-team-cache
+build:remote-cache --remote_accept_cached=true
+build:remote-cache --remote_upload_local_results=false
+build:remote-cache --google_default_credentials
+
+# Additional flags added when running a "trusted build" with additional access
+build:trusted-build --remote_upload_local_results=true
+
+# Fixes issues with browser archives and files with spaces. Could be
+# removed in Bazel 8 when Bazel runfiles supports spaces.
+build --experimental_inprocess_symlink_creation
+
+####################################################
+# rules_js specific flags
+####################################################
+
+# TODO(josephperrott): investigate if this can be removed eventually.
+# Prevents the npm package extract from occuring or caching on RBE which overwhelms our quota
+build --modify_execution_info=NpmPackageExtract=+no-remote
+
+# Allow the Bazel server to check directory sources for changes. `rules_js` previously
+# heavily relied on this, but still uses directory "inputs" in some cases.
+# See: https://github.com/aspect-build/rules_js/issues/1408.
+startup --host_jvm_args=-DBAZEL_TRACK_SOURCE_DIRECTORIES=1
+
+####################################################
+# User bazel configuration
+# NOTE: This needs to be the *last* entry in the config.
+####################################################
+
+# Load any settings which are specific to the current user. Needs to be *last* statement
+# in this config, as the user configuration should be able to overwrite flags from this file.
+try-import .bazelrc.user

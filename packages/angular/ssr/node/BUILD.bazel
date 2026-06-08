@@ -1,0 +1,25 @@
+load("//tools:defaults.bzl", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "node",
+    srcs = glob(
+        [
+            "*.ts",
+            "src/**/*.ts",
+        ],
+    ),
+    args = [
+        "--types",
+        "node",
+    ],
+    source_map = True,
+    tsconfig = "//:build-tsconfig-esm",
+    deps = [
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-server",
+        "//:node_modules/@types/node",
+        "//packages/angular/ssr",
+    ],
+)

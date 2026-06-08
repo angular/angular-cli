@@ -1,0 +1,42 @@
+name: Native Windows Bazel E2E test
+description: Runs an Angular CLI e2e Bazel test on native Windows
+author: Angular
+
+inputs:
+  test_target_name:
+    description: E2E test target name.
+    required: true
+  e2e_temp_dir:
+    description: 'The temporary directory path for E2E tests.'
+    required: false
+    # Use D:\\ by default as it's much faster
+    # See: https://devblogs.microsoft.com/commandline/share-environment-vars-between-wsl-and-windows
+    default: 'D:\\tmp_dir'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up temp directory
+      shell: bash
+      run: |
+        mkdir ${{ inputs.e2e_temp_dir }}
+
+    - name: Convert symlinks for Windows host
+      shell: pwsh
+      run: |
+        $runfiles_dir = "./dist/bin/tests/${{inputs.test_target_name}}_/${{inputs.test_target_name}}.bat.runfiles"
+
+        # Needed for resolution because Aspect/Bazel looks for repositories at `<workspace>/external`.
+        # TODO(devversion): consult with Aspect on why this is needed.
+        Set-Location -Path "${runfiles_dir}\_main"
+        New-Item -ItemType SymbolicLink -Path "external" -Target ".."
+
+    - name: Run CLI E2E tests
+      shell: bash
+      env:
+        BAZEL_BINDIR: '.'
+        E2E_TEMP: ${{ inputs.e2e_temp_dir }}
+      run: |
+        node ./scripts/windows-testing/parallel-executor.mjs \
+          "./dist/bin/tests/${{ inputs.test_target_name }}_/${{ inputs.test_target_name }}.bat.runfiles" \
+          ${{ inputs.test_target_name }}

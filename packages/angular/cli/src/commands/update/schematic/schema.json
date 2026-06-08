@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsUpdateSchema",
+  "title": "Schematic Options Schema",
+  "type": "object",
+  "properties": {
+    "packages": {
+      "description": "The package or packages to update.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "$default": {
+        "$source": "argv"
+      }
+    },
+    "force": {
+      "description": "When false (the default), reports an error if installed packages are incompatible with the update.",
+      "default": false,
+      "type": "boolean"
+    },
+    "next": {
+      "description": "Update to the latest version, including beta and RCs.",
+      "default": false,
+      "type": "boolean"
+    },
+    "migrateOnly": {
+      "description": "Perform a migration, but do not update the installed version.",
+      "default": false,
+      "type": "boolean"
+    },
+    "from": {
+      "description": "When using `--migrateOnly` for a single package, the version of that package from which to migrate.",
+      "type": "string"
+    },
+    "to": {
+      "description": "When using `--migrateOnly` for a single package, the version of that package to which to migrate.",
+      "type": "string"
+    },
+    "registry": {
+      "description": "The npm registry to use.",
+      "type": "string",
+      "oneOf": [
+        {
+          "format": "uri"
+        },
+        {
+          "format": "hostname"
+        }
+      ]
+    },
+    "verbose": {
+      "description": "Display additional details during the update process.",
+      "type": "boolean"
+    },
+    "packageManager": {
+      "description": "The preferred package manager configuration files to use for registry settings.",
+      "type": "string",
+      "default": "npm",
+      "enum": ["npm", "yarn", "pnpm", "bun"]
+    }
+  },
+  "required": []
+}

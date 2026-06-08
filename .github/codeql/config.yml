@@ -1,0 +1,8 @@
+name: 'Angular CLI CodeQL config'
+
+query-filters:
+  # TODO(josephperrott): reevaluate if these can be reenabled.
+  - exclude:
+      id: js/bad-code-sanitization
+  - exclude:
+      id: js/regex-injection

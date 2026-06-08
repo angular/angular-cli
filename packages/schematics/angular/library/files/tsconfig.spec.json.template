@@ -1,0 +1,15 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
+  "compilerOptions": {
+    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/spec",
+    "types": [
+      "<%= testTypesPackage %>"
+    ]
+  },
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*<% if (standalone) { %>.spec<% } %>.ts"
+  ]
+}

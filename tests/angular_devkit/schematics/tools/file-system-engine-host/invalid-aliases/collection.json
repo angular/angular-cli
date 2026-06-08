@@ -1,0 +1,14 @@
+{
+  "name": "invalid-aliases",
+  "schematics": {
+    "schematic1": {
+      "aliases": ["schematic2"],
+      "description": "1",
+      "factory": "../null-factory"
+    },
+    "schematic2": {
+      "description": "2",
+      "factory": "../null-factory"
+    }
+  }
+}

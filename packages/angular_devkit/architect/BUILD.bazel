@@ -1,0 +1,129 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+npm_link_all_packages()
+
+ts_json_schema(
+    name = "builder_input_schema",
+    src = "src/input-schema.json",
+)
+
+ts_json_schema(
+    name = "builder_output_schema",
+    src = "src/output-schema.json",
+)
+
+ts_json_schema(
+    name = "builder_builders_schema",
+    src = "src/builders-schema.json",
+)
+
+ts_json_schema(
+    name = "progress_schema",
+    src = "src/progress-schema.json",
+)
+
+ts_json_schema(
+    name = "operator_schema",
+    src = "builders/operator-schema.json",
+)
+
+JSON_FILES = glob(
+    include = ["**/*.json"],
+    exclude = [
+        # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+        "node_modules/**",
+    ],
+)
+
+ts_project(
+    name = "architect",
+    srcs = glob(
+        include = [
+            "index.ts",
+            "src/**/*.ts",
+            "builders/*.ts",
+        ],
+        exclude = ["**/*_spec.ts"],
+    ) + [
+        # These files are generated from the JSON schema
+        "//packages/angular_devkit/architect:src/input-schema.ts",
+        "//packages/angular_devkit/architect:src/output-schema.ts",
+        "//packages/angular_devkit/architect:src/builders-schema.ts",
+        "//packages/angular_devkit/architect:src/progress-schema.ts",
+        "//packages/angular_devkit/architect:builders/operator-schema.ts",
+    ],
+    # Ensure tests can execute the output JS, relying on schemas/JSON files.
+    data = JSON_FILES,
+    deps = [
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/rxjs",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_project(
+    name = "architect_test_lib",
+    testonly = True,
+    srcs = glob(["src/**/*_spec.ts"]),
+    deps = [
+        ":architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/rxjs",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/architect/testing",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":architect_test_lib"],
+)
+
+# @external_begin
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/core:package.json",
+    ],
+    tags = ["release-package"],
+    deps = JSON_FILES + [
+        "README.md",
+        ":architect",
+        ":license",
+        "//packages/angular_devkit/architect/bin",
+        "//packages/angular_devkit/architect/bin:cli.js",
+        "//packages/angular_devkit/architect/node",
+        "//packages/angular_devkit/architect/testing",
+    ],
+)
+
+api_golden_test_npm_package(
+    name = "architect_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "goldens/public-api/angular_devkit/architect",
+    npm_package = "packages/angular_devkit/architect/npm_package",
+)
+# @external_end

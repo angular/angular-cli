@@ -1,0 +1,16 @@
+import { TestBed } from '@angular/core/testing';
+
+import { <%= classify(name) %>Interceptor } from './<%= dasherize(name) %><%= typeSeparator %>interceptor';
+
+describe('<%= classify(name) %>Interceptor', () => {
+  beforeEach(() => TestBed.configureTestingModule({
+    providers: [
+      <%= classify(name) %>Interceptor
+      ]
+  }));
+
+  it('should be created', () => {
+    const interceptor: <%= classify(name) %>Interceptor = TestBed.inject(<%= classify(name) %>Interceptor);
+    expect(interceptor).toBeTruthy();
+  });
+});

@@ -1,0 +1,8 @@
+{
+  "name": "lib",
+  "version": "0.0.1",
+  "peerDependencies": {
+    "@angular/common": "^22.0.0-next",
+    "@angular/core": "^22.0.0-next"
+  }
+}

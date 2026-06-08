@@ -1,0 +1,25 @@
+{
+  "$schema": "../architect/src/builders-schema.json",
+  "builders": {
+    "build": {
+      "implementation": "./src/builders/webpack",
+      "schema": "./src/builders/webpack/schema.json",
+      "description": "Build a webpack app."
+    },
+    "webpack": {
+      "implementation": "./src/builders/webpack",
+      "schema": "./src/builders/webpack/schema.json",
+      "description": "Build a webpack app."
+    },
+    "dev-server": {
+      "implementation": "./src/builders/webpack-dev-server",
+      "schema": "./src/builders/webpack-dev-server/schema.json",
+      "description": "Serve a webpack app."
+    },
+    "webpack-dev-server": {
+      "implementation": "./src/builders/webpack-dev-server",
+      "schema": "./src/builders/webpack-dev-server/schema.json",
+      "description": "Serve a webpack app."
+    }
+  }
+}

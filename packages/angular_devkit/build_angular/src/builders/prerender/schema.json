@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title": "Prerender Target",
+  "type": "object",
+  "properties": {
+    "browserTarget": {
+      "type": "string",
+      "description": "Target to build.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "serverTarget": {
+      "type": "string",
+      "description": "Server target to use for prerendering the app.",
+      "pattern": "^[^:\\s]+:[^:\\s]+(:[^\\s]+)?$"
+    },
+    "routesFile": {
+      "type": "string",
+      "description": "The path to a file that contains a list of all routes to prerender, separated by newlines. This option is useful if you want to prerender routes with parameterized URLs."
+    },
+    "routes": {
+      "type": "array",
+      "description": "The routes to render.",
+      "items": {
+        "minItems": 1,
+        "type": "string",
+        "uniqueItems": true
+      },
+      "default": []
+    },
+    "discoverRoutes": {
+      "type": "boolean",
+      "description": "Whether the builder should process the Angular Router configuration to find all unparameterized routes and prerender them.",
+      "default": true
+    }
+  },
+  "required": ["browserTarget", "serverTarget"],
+  "anyOf": [{ "required": ["routes"] }, { "required": ["routesFile"] }],
+  "additionalProperties": false
+}

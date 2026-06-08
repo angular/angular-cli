@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularAIConfig",
+  "title": "Angular AI Config File Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Generates AI configuration files for Angular projects. This schematic creates AGENTS.md file and Angular MCP server configuration, improving the quality of AI-generated code and suggestions.",
+  "properties": {
+    "tool": {
+      "type": "array",
+      "uniqueItems": true,
+      "default": ["none"],
+      "x-prompt": {
+        "message": "Which AI tools should Angular integrate with? https://angular.dev/ai/develop-with-ai",
+        "type": "list",
+        "items": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "claude-code",
+            "label": "Claude Code   [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "cursor",
+            "label": "Cursor        [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "gemini-cli",
+            "label": "Gemini CLI    [ `GEMINI.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "open-ai-codex",
+            "label": "Open AI Codex [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "vscode",
+            "label": "VSCode        [ `AGENTS.md` + Angular MCP server config ]"
+          }
+        ]
+      },
+      "description": "Specifies which AI tools to generate configuration files (AGENTS.md, MCP server config) for.",
+      "items": {
+        "type": "string",
+        "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]
+      }
+    }
+  }
+}

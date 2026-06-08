@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularService",
+  "title": "Angular Service Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Creates a new service in your project. Services are used to encapsulate reusable logic, such as data access, API calls, or utility functions. This schematic simplifies the process of generating a new service with the necessary files and boilerplate code.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new service. This will be used to create the service's class and spec files (e.g., `my-service.service.ts` and `my-service.service.spec.ts`).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the service?"
+    },
+    "path": {
+      "type": "string",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path where the service files should be created, relative to the workspace root. If not provided, the service will be created in the project's `src/app` directory.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the service should be added. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Creates files at the top level of the project or the given path. If set to false, a new folder with the service's name will be created to contain the files."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Skip the generation of a unit test file `spec.ts` for the service.",
+      "default": false
+    },
+    "type": {
+      "type": "string",
+      "description": "Append a custom type to the service's filename. For example, if you set the type to `service`, the file will be named `my-service.service.ts`."
+    },
+    "addTypeToClassName": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true, the 'type' option will be appended to the generated class name. When false, only the file name will include the type."
+    },
+    "injectable": {
+      "type": "boolean",
+      "default": false,
+      "description": "When true, generates an `@Injectable` instead of `@Service`."
+    }
+  },
+  "required": ["name", "project"]
+}

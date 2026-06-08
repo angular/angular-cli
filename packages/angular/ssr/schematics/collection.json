@@ -1,0 +1,9 @@
+{
+  "schematics": {
+    "ng-add": {
+      "description": "Adds Angular SSR to the application without affecting any templates",
+      "factory": "./ng-add/index",
+      "schema": "./ng-add/schema.json"
+    }
+  }
+}

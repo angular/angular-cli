@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "BuilderProgressSchema",
+  "title": "Progress schema for builders.",
+  "type": "object",
+  "allOf": [
+    {
+      "type": "object",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["stopped"]
+            }
+          },
+          "required": ["state"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["waiting"]
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": ["state"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["running"]
+            },
+            "current": {
+              "type": "number",
+              "minimum": 0
+            },
+            "total": {
+              "type": "number",
+              "minimum": 0
+            },
+            "status": {
+              "type": "string"
+            }
+          },
+          "required": ["state"]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "state": {
+              "type": "string",
+              "enum": ["error"]
+            },
+            "error": true
+          },
+          "required": ["state"]
+        }
+      ]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "builder": {
+          "type": "object"
+        },
+        "target": {
+          "type": "object"
+        },
+        "id": {
+          "type": "number"
+        }
+      },
+      "required": ["builder", "id"]
+    }
+  ]
+}

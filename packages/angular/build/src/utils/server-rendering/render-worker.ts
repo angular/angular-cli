@@ -1,0 +1,75 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { workerData } from 'node:worker_threads';
+import type { OutputMode } from '../../builders/application/schema';
+import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
+import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
+import { DEFAULT_URL, launchServer } from './launch-server';
+import { loadEsmModuleFromMemory } from './load-esm-from-memory';
+import { generateRedirectStaticPage } from './utils';
+
+export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
+  assetFiles: Record</** Destination */ string, /** Source */ string>;
+  outputMode: OutputMode | undefined;
+  hasSsrEntry: boolean;
+}
+
+export interface RenderOptions {
+  url: string;
+}
+
+/**
+ * This is passed as workerData when setting up the worker via the `piscina` package.
+ */
+const { outputMode, hasSsrEntry } = workerData as {
+  outputMode: OutputMode | undefined;
+  hasSsrEntry: boolean;
+};
+
+let serverURL = DEFAULT_URL;
+
+/**
+ * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
+ */
+async function renderPage({ url }: RenderOptions): Promise<string | null> {
+  const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } =
+    await loadEsmModuleFromMemory('./main.server.mjs');
+
+  const angularServerApp = getOrCreateAngularServerApp({
+    allowStaticRouteRender: true,
+  });
+
+  const response = await angularServerApp.handle(
+    new Request(new URL(url, serverURL), { signal: AbortSignal.timeout(30_000) }),
+  );
+
+  if (!response) {
+    return null;
+  }
+
+  const location = response.headers.get('Location');
+
+  return location ? generateRedirectStaticPage(location) : response.text();
+}
+
+async function initialize() {
+  // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
+  // which must be processed by the runtime linker, even if they are not used.
+  await import('@angular/compiler');
+
+  if (outputMode !== undefined && hasSsrEntry) {
+    serverURL = await launchServer();
+  }
+
+  patchFetchToLoadInMemoryAssets(serverURL);
+
+  return renderPage;
+}
+
+export default initialize();

@@ -1,0 +1,18 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularEnvironment",
+  "title": "Angular Environments Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Generates and configures environment files for your project. Environment files allow you to define different settings and configurations for various environments, such as development, testing, and production. This schematic helps you create and manage these files, making it easier to customize your application's behavior for each environment.",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the environment files should be created or updated.",
+      "$default": {
+        "$source": "projectName"
+      }
+    }
+  },
+  "required": ["project"]
+}

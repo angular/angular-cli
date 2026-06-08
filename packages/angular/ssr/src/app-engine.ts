@@ -1,0 +1,326 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
+import { Hooks } from './hooks';
+import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
+import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
+import { createRedirectResponse } from './utils/redirect';
+import { joinUrlParts } from './utils/url';
+import {
+  normalizeTrustProxyHeaders,
+  sanitizeRequestHeaders,
+  validateRequest,
+} from './utils/validation';
+
+/**
+ * Options for the Angular server application engine.
+ */
+export interface AngularAppEngineOptions {
+  /**
+   * A set of allowed hostnames for the server application.
+   */
+  allowedHosts?: readonly string[];
+
+  /**
+   * Extends the scope of trusted proxy headers (`X-Forwarded-*`).
+   *
+   * @remarks
+   * **This is a security-sensitive option!**
+   *
+   * When `trustProxyHeaders` is enabled, request headers such as `X-Forwarded-Host` and
+   * `X-Forwarded-Prefix` are trusted by the server and used for routing. These
+   * headers must be strictly validated and provided by a trusted client (e.g., at a reverse proxy, load
+   * balancer, or API gateway) and must *not* be provided by untrusted end users.
+   *
+   * If a `string[]` is provided, only those proxy headers are allowed.
+   * If `true`, all proxy headers are allowed.
+   * If `false` or not provided, proxy headers are ignored.
+   *
+   * @default false
+   */
+  trustProxyHeaders?: boolean | readonly string[];
+}
+
+/**
+ * Angular server application engine.
+ * Manages Angular server applications (including localized ones), handles rendering requests,
+ * and optionally transforms index HTML before rendering.
+ *
+ * @remarks This class should be instantiated once and used as a singleton across the server-side
+ * application to ensure consistent handling of rendering requests and resource management.
+ */
+export class AngularAppEngine {
+  /**
+   * A flag to enable or disable the rendering of prerendered routes.
+   *
+   * Typically used during development to avoid prerendering all routes ahead of time,
+   * allowing them to be rendered on the fly as requested.
+   *
+   * @private
+   */
+  static ɵallowStaticRouteRender = false;
+
+  /**
+   * A flag to enable or disable the allowed hosts check.
+   *
+   * Typically used during development to avoid the allowed hosts check.
+   *
+   * @private
+   */
+  static ɵdisableAllowedHostsCheck = false;
+
+  /**
+   * Hooks for extending or modifying the behavior of the server application.
+   * These hooks are used by the Angular CLI when running the development server and
+   * provide extensibility points for the application lifecycle.
+   *
+   * @private
+   */
+  static ɵhooks: Hooks = /* #__PURE__*/ new Hooks();
+
+  /**
+   * The manifest for the server application.
+   */
+  private readonly manifest = getAngularAppEngineManifest();
+
+  /**
+   * A set of allowed hostnames for the server application.
+   */
+  private readonly allowedHosts: ReadonlySet<string>;
+
+  /**
+   * A map of supported locales from the server application's manifest.
+   */
+  private readonly supportedLocales: ReadonlyArray<string> = Object.keys(
+    this.manifest.supportedLocales,
+  );
+
+  /**
+   * The normalized allowed proxy headers.
+   */
+  private readonly trustProxyHeaders: ReadonlySet<string>;
+
+  /**
+   * A cache that holds entry points, keyed by their potential locale string.
+   */
+  private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
+
+  /**
+   * Creates a new instance of the Angular server application engine.
+   * @param options Options for the Angular server application engine.
+   */
+  constructor(options?: AngularAppEngineOptions) {
+    this.allowedHosts = this.getAllowedHosts(options);
+    this.trustProxyHeaders = normalizeTrustProxyHeaders(options?.trustProxyHeaders);
+  }
+
+  private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
+    const allowedHosts = new Set([...(options?.allowedHosts ?? []), ...this.manifest.allowedHosts]);
+
+    if (allowedHosts.has('*')) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        'Allowing all hosts via "*" is a security risk. This configuration should only be used when ' +
+          'validation for "Host" and "X-Forwarded-Host" headers is performed in another layer, such as a load balancer or reverse proxy. ' +
+          'For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
+      );
+    }
+
+    return allowedHosts;
+  }
+
+  /**
+   * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
+   * or delivering a static file for client-side rendered routes based on the `RenderMode` setting.
+   *
+   * @param request - The HTTP request to handle.
+   * @param requestContext - Optional context for rendering, such as metadata associated with the request.
+   * @returns A promise that resolves to the resulting HTTP response object, or `null` if no matching Angular route is found.
+   *
+   * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
+   * corresponding to `https://www.example.com/page`.
+   *
+   * @remarks
+   * To prevent potential Server-Side Request Forgery (SSRF), this function verifies the hostname
+   * of the `request.url` against a list of authorized hosts.
+   * If the hostname is not recognized a 400 Bad Request is returned.
+   *
+   * Resolution:
+   * Authorize your hostname by configuring `allowedHosts` in `angular.json` in:
+   * `projects.[project-name].architect.build.options.security.allowedHosts`.
+   * Alternatively, you pass it directly through the configuration options of `AngularAppEngine`.
+   *
+   * For more information see: https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf
+   */
+  async handle(request: Request, requestContext?: unknown): Promise<Response | null> {
+    const allowedHost = this.allowedHosts;
+    const securedRequest = sanitizeRequestHeaders(request, this.trustProxyHeaders);
+
+    try {
+      validateRequest(securedRequest, allowedHost, AngularAppEngine.ɵdisableAllowedHostsCheck);
+    } catch (error) {
+      return this.handleValidationError(securedRequest.url, error as Error);
+    }
+
+    const serverApp = await this.getAngularServerAppForRequest(securedRequest);
+    if (serverApp) {
+      return serverApp.handle(securedRequest, requestContext);
+    }
+
+    if (this.supportedLocales.length > 1) {
+      // Redirect to the preferred language if i18n is enabled.
+      return this.redirectBasedOnAcceptLanguage(securedRequest);
+    }
+
+    return null;
+  }
+
+  /**
+   * Handles requests for the base path when i18n is enabled.
+   * Redirects the user to a locale-specific path based on the `Accept-Language` header.
+   *
+   * @param request The incoming request.
+   * @returns A `Response` object with a 302 redirect, or `null` if i18n is not enabled
+   *          or the request is not for the base path.
+   */
+  private redirectBasedOnAcceptLanguage(request: Request): Response | null {
+    const { basePath, supportedLocales } = this.manifest;
+
+    // If the request is not for the base path, it's not our responsibility to handle it.
+    const { pathname } = new URL(request.url);
+    if (pathname !== basePath) {
+      return null;
+    }
+
+    // For requests to the base path (typically '/'), attempt to extract the preferred locale
+    // from the 'Accept-Language' header.
+    const preferredLocale = getPreferredLocale(
+      request.headers.get('Accept-Language') || '*',
+      this.supportedLocales,
+    );
+
+    if (preferredLocale) {
+      const subPath = supportedLocales[preferredLocale];
+      if (subPath !== undefined) {
+        const prefix = request.headers.get('X-Forwarded-Prefix') ?? '';
+
+        return createRedirectResponse(
+          joinUrlParts(prefix, pathname, subPath),
+          302,
+          // Use a 302 redirect as language preference may change.
+          { 'Vary': 'Accept-Language' },
+        );
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Retrieves the Angular server application instance for a given request.
+   *
+   * This method checks if the request URL corresponds to an Angular application entry point.
+   * If so, it initializes or retrieves an instance of the Angular server application for that entry point.
+   * Requests that resemble file requests (except for `/index.html`) are skipped.
+   *
+   * @param request - The incoming HTTP request object.
+   * @returns A promise that resolves to an `AngularServerApp` instance if a valid entry point is found,
+   * or `null` if no entry point matches the request URL.
+   */
+  private async getAngularServerAppForRequest(request: Request): Promise<AngularServerApp | null> {
+    // Skip if the request looks like a file but not `/index.html`.
+    const url = new URL(request.url);
+    const entryPoint = await this.getEntryPointExportsForUrl(url);
+    if (!entryPoint) {
+      return null;
+    }
+
+    // Note: Using `instanceof` is not feasible here because `AngularServerApp` will
+    // be located in separate bundles, making `instanceof` checks unreliable.
+    const ɵgetOrCreateAngularServerApp =
+      entryPoint.ɵgetOrCreateAngularServerApp as typeof getOrCreateAngularServerApp;
+
+    const serverApp = ɵgetOrCreateAngularServerApp({
+      allowStaticRouteRender: AngularAppEngine.ɵallowStaticRouteRender,
+      hooks: AngularAppEngine.ɵhooks,
+    });
+
+    return serverApp;
+  }
+
+  /**
+   * Retrieves the exports for a specific entry point, caching the result.
+   *
+   * @param potentialLocale - The locale string used to find the corresponding entry point.
+   * @returns A promise that resolves to the entry point exports or `undefined` if not found.
+   */
+  private getEntryPointExports(potentialLocale: string): Promise<EntryPointExports> | undefined {
+    const cachedEntryPoint = this.entryPointsCache.get(potentialLocale);
+    if (cachedEntryPoint) {
+      return cachedEntryPoint;
+    }
+
+    const { entryPoints } = this.manifest;
+    const entryPoint = entryPoints[potentialLocale];
+    if (!entryPoint) {
+      return undefined;
+    }
+
+    const entryPointExports = entryPoint();
+    this.entryPointsCache.set(potentialLocale, entryPointExports);
+
+    return entryPointExports;
+  }
+
+  /**
+   * Retrieves the entry point for a given URL by determining the locale and mapping it to
+   * the appropriate application bundle.
+   *
+   * This method determines the appropriate entry point and locale for rendering the application by examining the URL.
+   * If there is only one entry point available, it is returned regardless of the URL.
+   * Otherwise, the method extracts a potential locale identifier from the URL and looks up the corresponding entry point.
+   *
+   * @param url - The URL of the request.
+   * @returns A promise that resolves to the entry point exports or `undefined` if not found.
+   */
+  private getEntryPointExportsForUrl(url: URL): Promise<EntryPointExports> | undefined {
+    const { basePath, supportedLocales } = this.manifest;
+
+    if (this.supportedLocales.length === 1) {
+      return this.getEntryPointExports(supportedLocales[this.supportedLocales[0]]);
+    }
+
+    const potentialLocale = getPotentialLocaleIdFromUrl(url, basePath);
+
+    return this.getEntryPointExports(potentialLocale) ?? this.getEntryPointExports('');
+  }
+
+  /**
+   * Handles validation errors by logging the error and returning an appropriate response.
+   *
+   * @param url - The URL of the request.
+   * @param error - The validation error to handle.
+   * @returns A `Response` object with a 400 status code.
+   */
+  private handleValidationError(url: string, error: Error): Response {
+    const errorMessage = error.message;
+    // eslint-disable-next-line no-console
+    console.error(
+      `ERROR: Bad Request ("${url}").\n` +
+        errorMessage +
+        '\n\nFor more information, see https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf',
+    );
+
+    return new Response(errorMessage, {
+      status: 400,
+      statusText: 'Bad Request',
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+}

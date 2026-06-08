@@ -1,0 +1,97 @@
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+npm_link_all_packages()
+
+RUNTIME_ASSETS = glob(
+    include = ["**/*.json"],
+    # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+    exclude = [
+        "node_modules/**",
+        "src/workspace/json/test/**",
+    ],
+)
+
+ts_project(
+    name = "core",
+    srcs = glob(
+        include = ["src/**/*.ts"],
+        exclude = [
+            "src/**/*_spec.ts",
+        ],
+    ) + ["index.ts"],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/ajv",
+        ":node_modules/ajv-formats",
+        ":node_modules/jsonc-parser",
+        ":node_modules/picomatch",
+        ":node_modules/rxjs",
+        ":node_modules/source-map",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/picomatch",
+    ],
+)
+
+# @external_begin
+
+ts_project(
+    name = "core_test_lib",
+    testonly = True,
+    srcs = glob(["src/**/*_spec.ts"]),
+    data = glob(["src/workspace/json/test/**/*.json"]),
+    deps = [
+        ":core",
+        ":node_modules/rxjs",
+        "//:node_modules/@types/node",
+        "//packages/angular_devkit/core/node",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":core_test_lib"],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":core",
+        ":license",
+        "//packages/angular_devkit/core/node",
+        "//packages/angular_devkit/core/node/testing",
+    ],
+)
+
+api_golden_test_npm_package(
+    name = "core_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "goldens/public-api/angular_devkit/core",
+    npm_package = "packages/angular_devkit/core/npm_package",
+    types = {
+        "//:node_modules/@types/node": "node",
+    },
+)
+# @external_end

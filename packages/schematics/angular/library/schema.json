@@ -1,0 +1,65 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsLibrary",
+  "title": "Library Options Schema",
+  "type": "object",
+  "description": "Creates a new library project in your Angular workspace. Libraries are reusable collections of components, services, and other Angular artifacts that can be shared across multiple applications. This schematic simplifies the process of generating a new library with the necessary files and configurations.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new library. This name will be used for the project directory and various identifiers within the library's code.",
+      "pattern": "^(?:@[a-zA-Z0-9-*~][a-zA-Z0-9-*._~]*/)?[a-zA-Z0-9-~][a-zA-Z0-9-._~]*$",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the library?"
+    },
+    "entryFile": {
+      "type": "string",
+      "format": "path",
+      "description": "The path to the library's public API file, relative to the workspace root. This file defines what parts of the library are accessible to applications that import it.",
+      "default": "public-api"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "A prefix to be added to the selectors of components generated within this library. For example, if the prefix is `my-lib` and you generate a component named `my-component`, the selector will be `my-lib-my-component`.",
+      "default": "lib",
+      "alias": "p"
+    },
+    "skipPackageJson": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not automatically add dependencies to the `package.json` file."
+    },
+    "skipInstall": {
+      "description": "Skip the automatic installation of packages. You will need to manually install the dependencies later.",
+      "type": "boolean",
+      "default": false
+    },
+    "skipTsConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not update the workspace `tsconfig.json` file to add a path mapping for the new library. The path mapping is needed to use the library in an application, but can be disabled here to simplify development."
+    },
+    "projectRoot": {
+      "type": "string",
+      "description": "The root directory for the new library, relative to the workspace root. If not specified, the library will be created in a subfolder within the `projects` directory, using the library's name."
+    },
+    "standalone": {
+      "description": "Create a library that utilizes the standalone API, eliminating the need for NgModules. This can simplify the structure of your library and its usage in applications.",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": "ep.ng_standalone"
+    },
+    "testRunner": {
+      "description": "The unit testing runner to use.",
+      "type": "string",
+      "enum": ["vitest", "karma"],
+      "default": "vitest"
+    }
+  },
+  "required": ["name"]
+}

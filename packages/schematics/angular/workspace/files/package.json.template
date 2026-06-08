@@ -1,0 +1,29 @@
+{
+  "name": "<%= utils.dasherize(name) %>",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development"<% if (!minimal) { %>,
+    "test": "ng test"<% } %>
+  },
+  "private": true,
+  <% if (packageManagerWithVersion) { %>"packageManager": "<%= packageManagerWithVersion %>",<% } %>
+  "dependencies": {
+    "@angular/common": "<%= latestVersions.Angular %>",
+    "@angular/compiler": "<%= latestVersions.Angular %>",
+    "@angular/core": "<%= latestVersions.Angular %>",
+    "@angular/forms": "<%= latestVersions.Angular %>",
+    "@angular/platform-browser": "<%= latestVersions.Angular %>",
+    "@angular/router": "<%= latestVersions.Angular %>",
+    "rxjs": "<%= latestVersions['rxjs'] %>",
+    "tslib": "<%= latestVersions['tslib'] %>"
+  },
+  "devDependencies": {
+    "@angular/cli": "<%= '^' + version %>",
+    "@angular/compiler-cli": "<%= latestVersions.Angular %>",
+    "prettier": "<%= latestVersions['prettier'] %>",
+    "typescript": "<%= latestVersions['typescript'] %>"
+  }
+}

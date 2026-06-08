@@ -1,0 +1,8 @@
+import { <%= injectable ? 'Injectable' : 'Service' %> } from '@angular/core';
+
+<% if (injectable) { %>@Injectable({
+  providedIn: 'root',
+})<% } else { %>@Service()<% } %>
+export class <%= classifiedName %> {
+  
+}

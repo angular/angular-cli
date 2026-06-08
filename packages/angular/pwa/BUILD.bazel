@@ -1,0 +1,82 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+RUNTIME_ASSETS = glob(
+    include = [
+        "pwa/files/**/*",
+    ],
+) + [
+    "package.json",
+    "collection.json",
+    "pwa/schema.json",
+]
+
+ts_project(
+    name = "pwa",
+    srcs = [
+        "pwa/index.ts",
+        "//packages/angular/pwa:pwa/schema.ts",
+    ],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@schematics/angular",
+        ":node_modules/parse5-html-rewriting-stream",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_json_schema(
+    name = "pwa_schema",
+    src = "pwa/schema.json",
+)
+
+ts_project(
+    name = "pwa_test_lib",
+    testonly = True,
+    srcs = glob(["pwa/**/*_spec.ts"]),
+    deps = [
+        ":node_modules/@angular-devkit/schematics",
+        ":pwa",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":pwa_test_lib"],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/schematics/angular:package.json",
+    ],
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":license",
+        ":pwa",
+    ],
+)

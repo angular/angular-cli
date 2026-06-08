@@ -1,0 +1,8 @@
+import { <%= classifiedName %> } from './<%= dasherize(name) %><%= type ? '.' + dasherize(type) : '' %>';
+
+describe('<%= classifiedName %>', () => {
+  it('should create an instance', () => {
+    const directive = new <%= classifiedName %>();
+    expect(directive).toBeTruthy();
+  });
+});

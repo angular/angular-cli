@@ -1,0 +1,95 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularDirective",
+  "title": "Angular Directive Options Schema",
+  "type": "object",
+  "description": "Creates a new directive in your project. Directives are used to extend the behavior or appearance of HTML elements and components. They allow you to manipulate the DOM, add custom attributes, and respond to events. This schematic generates the necessary files and boilerplate code for a new directive.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new directive. This will be used to create the directive's class and spec files (e.g., `my-directive.directive.ts` and `my-directive.directive.spec.ts`).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the directive?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path where the directive files should be created, relative to the workspace root. If not provided, the directive will be created in the current directory.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the directive should be added. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "prefix": {
+      "type": "string",
+      "description": "A prefix to be added to the directive's selector. For example, if the prefix is `app` and the directive name is `highlight`, the selector will be `appHighlight`.",
+      "alias": "p",
+      "oneOf": [
+        {
+          "maxLength": 0
+        },
+        {
+          "minLength": 1,
+          "format": "html-selector"
+        }
+      ]
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Skip the generation of a unit test file `spec.ts` for the new directive.",
+      "default": false
+    },
+    "skipImport": {
+      "type": "boolean",
+      "description": "Do not automatically import the new directive into its closest NgModule.",
+      "default": false
+    },
+    "selector": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "The HTML selector to use for this directive. If not provided, a selector will be generated based on the directive's name (e.g., `appHighlight`)."
+    },
+    "standalone": {
+      "description": "Generate a standalone directive. Standalone directives are self-contained and don't need to be declared in an NgModule. They can be used independently or imported directly into other standalone components or directives.",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": "ep.ng_standalone"
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "Creates the new directive files at the top level of the current project. If set to false, a new folder with the directive's name will be created to contain the files.",
+      "default": true
+    },
+    "module": {
+      "type": "string",
+      "description": "Specify the NgModule where the directive should be declared. If not provided, the CLI will attempt to find the closest NgModule in the directive's path.",
+      "alias": "m"
+    },
+    "export": {
+      "type": "boolean",
+      "default": false,
+      "description": "Automatically export the directive from the specified NgModule, making it accessible to other modules in the application."
+    },
+    "type": {
+      "type": "string",
+      "description": "Append a custom type to the directive's filename. For example, if you set the type to `directive`, the file will be named `example.directive.ts`."
+    },
+    "addTypeToClassName": {
+      "type": "boolean",
+      "default": true,
+      "description": "When true, the 'type' option will be appended to the generated class name. When false, only the file name will include the type."
+    }
+  },
+  "required": ["name", "project"]
+}

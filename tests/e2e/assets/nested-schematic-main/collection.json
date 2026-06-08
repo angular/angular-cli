@@ -1,0 +1,8 @@
+{
+  "schematics": {
+    "test": {
+      "factory": "./index.js",
+      "description": "call an external schematic from nested package collection."
+    }
+  }
+}

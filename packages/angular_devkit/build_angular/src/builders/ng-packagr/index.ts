@@ -1,0 +1,75 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { purgeStaleBuildCache } from '@angular/build/private';
+import { BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
+import type { NgPackagrOptions } from 'ng-packagr';
+import { createRequire } from 'node:module';
+import { join, resolve } from 'node:path';
+import { Observable, catchError, from, map, of, switchMap } from 'rxjs';
+import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { Schema as NgPackagrBuilderOptions } from './schema';
+
+/**
+ * @experimental Direct usage of this function is considered experimental.
+ */
+export function execute(
+  options: NgPackagrBuilderOptions,
+  context: BuilderContext,
+): Observable<BuilderOutput> {
+  context.logger.warn(
+    'The "@angular-devkit/build-angular:ng-packagr" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
+      'Use "@angular/build:ng-packagr" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+  );
+
+  return from(
+    (async () => {
+      // Purge old build disk cache.
+      await purgeStaleBuildCache(context);
+
+      const root = context.workspaceRoot;
+      const workspaceRequire = createRequire(root + '/');
+      const ngPackagePath = workspaceRequire.resolve('ng-packagr');
+      const packager = (await import(ngPackagePath)).ngPackagr();
+
+      packager.forProject(resolve(root, options.project));
+
+      if (options.tsConfig) {
+        packager.withTsConfig(resolve(root, options.tsConfig));
+      }
+
+      const projectName = context.target?.project;
+      if (!projectName) {
+        throw new Error('The builder requires a target.');
+      }
+
+      const metadata = await context.getProjectMetadata(projectName);
+      const { enabled: cacheEnabled, path: cacheDirectory } = normalizeCacheOptions(
+        metadata,
+        context.workspaceRoot,
+      );
+
+      const ngPackagrOptions: NgPackagrOptions = {
+        cacheEnabled,
+        poll: options.poll,
+        cacheDirectory: join(cacheDirectory, 'ng-packagr'),
+      };
+
+      return { packager, ngPackagrOptions };
+    })(),
+  ).pipe(
+    switchMap(({ packager, ngPackagrOptions }) =>
+      options.watch ? packager.watch(ngPackagrOptions) : packager.build(ngPackagrOptions),
+    ),
+    map(() => ({ success: true })),
+    catchError((err) => of({ success: false, error: err.message })),
+  );
+}
+
+export type { NgPackagrBuilderOptions };
+export default createBuilder<Record<string, string> & NgPackagrBuilderOptions>(execute);

@@ -1,0 +1,20 @@
+import { Component, signal } from '@angular/core';<% if(routing) { %>
+import { RouterOutlet } from '@angular/router';<% } %>
+
+@Component({
+  selector: '<%= selector %>',
+  imports: [<% if(routing) { %>RouterOutlet<% } %>],<% if(inlineTemplate) { %>
+  template: `
+    <h1>Hello, {{ title() }}</h1>
+
+    <% if (routing) {
+     %><router-outlet /><%
+    } %>
+  `,<% } else { %>
+  templateUrl: './app<%= suffix %>.html',<% } if(inlineStyle) { %>
+  styles: [],<% } else { %>
+  styleUrl: './app<%= suffix %>.<%= style %>'<% } %>
+})
+export class App {
+  protected readonly title = signal('<%= name %>');
+}

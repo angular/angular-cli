@@ -1,0 +1,44 @@
+<!doctype html>
+<!--
+This is the execution context.
+Loaded within the iframe.
+Reloaded before every execution run.
+-->
+<html>
+  <head>
+    <title></title>
+    <base href="/" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link rel="stylesheet" href="styles.css" crossorigin="anonymous" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+    />
+  </head>
+
+  <body>
+    <!-- The scripts need to be in the body DOM element, as some test running frameworks need the body
+       to have already been created so they can insert their magic into it. For example, if loaded
+       before body, Angular Scenario test framework fails to find the body and crashes and burns in
+       an epic manner. -->
+    <script src="context.js"></script>
+    <script type="text/javascript">
+      // Configure our Karma and set up bindings
+      %CLIENT_CONFIG%
+        window.__karma__.setupContext(window);
+
+      // All served files with the latest timestamps
+      %MAPPINGS%
+    </script>
+    <script src="runtime.js" crossorigin="anonymous"></script>
+    <script src="polyfills.js" crossorigin="anonymous"></script>
+    <!-- Dynamically replaced with <script> tags -->
+    %SCRIPTS%
+    <script src="scripts.js" crossorigin="anonymous" defer></script>
+    <script src="vendor.js" crossorigin="anonymous" type="module"></script>
+    <script src="main.js" crossorigin="anonymous" type="module"></script>
+    <script type="module">
+      window.__karma__.loaded();
+    </script>
+  </body>
+</html>

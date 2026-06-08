@@ -1,0 +1,181 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { expectTransformation } from './test-helpers';
+
+describe('Jasmine to Vitest Transformer - addImports option', () => {
+  it('should add value imports when addImports is true', async () => {
+    const input = `spyOn(foo, 'bar');`;
+    const expected = `
+        import { vi } from 'vitest';
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should generate a single, combined import for value and type imports when addImports is true', async () => {
+    const input = `
+        let mySpy: jasmine.Spy;
+        spyOn(foo, 'bar');
+      `;
+    const expected = `
+        import { type Mock, vi } from 'vitest';
+
+        let mySpy: Mock;
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should only add type imports when addImports is false', async () => {
+    const input = `
+        let mySpy: jasmine.Spy;
+        spyOn(foo, 'bar');
+      `;
+    const expected = `
+        import type { Mock } from 'vitest';
+
+        let mySpy: Mock;
+        vi.spyOn(foo, 'bar').mockReturnValue(undefined);
+      `;
+    await expectTransformation(input, expected, false);
+  });
+
+  it('should not add an import if no Vitest APIs are used, even when addImports is true', async () => {
+    const input = `const a = 1;`;
+    const expected = `const a = 1;`;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should add imports for top-level describe and it when addImports is true', async () => {
+    const input = `
+        describe('My Suite', () => {
+          it('should do something', () => {
+            // test content
+          });
+        });
+      `;
+    const expected = `
+        import { describe, it } from 'vitest';
+
+        describe('My Suite', () => {
+          it('should do something', () => {
+            // test content
+          });
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should add imports for top-level expect when addImports is true', async () => {
+    const input = `expect(true).toBe(true);`;
+    const expected = `
+        import { expect } from 'vitest';
+        expect(true).toBe(true);
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should add imports for beforeEach and afterEach when addImports is true', async () => {
+    const input = `
+        describe('My Suite', () => {
+          beforeEach(() => {});
+          afterEach(() => {});
+        });
+      `;
+    const expected = `
+        import { afterEach, beforeEach, describe } from 'vitest';
+
+        describe('My Suite', () => {
+          beforeEach(() => {});
+          afterEach(() => {});
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should add imports for beforeAll and afterAll when addImports is true', async () => {
+    const input = `
+        describe('My Suite', () => {
+          beforeAll(() => {});
+          afterAll(() => {});
+        });
+      `;
+    const expected = `
+        import { afterAll, beforeAll, describe } from 'vitest';
+
+        describe('My Suite', () => {
+          beforeAll(() => {});
+          afterAll(() => {});
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
+  it('should add imports for transformed global functions with different Vitest names', async () => {
+    await expectTransformation(
+      `
+        fdescribe('My Suite', () => {
+          xit('should skip', () => {});
+        });
+      `,
+      `
+        import { describe, it } from 'vitest';
+
+        describe.only('My Suite', () => {
+          it.skip('should skip', () => {});
+        });
+      `,
+      true,
+    );
+
+    await expectTransformation(
+      `
+        xdescribe('My Suite', () => {
+          fit('should focus', () => {});
+        });
+      `,
+      `
+        import { describe, it } from 'vitest';
+
+        describe.skip('My Suite', () => {
+          it.only('should focus', () => {});
+        });
+      `,
+      true,
+    );
+  });
+
+  it('should add imports for `vi` when addImports is true', async () => {
+    const input = `
+        import { fakeAsync } from '@angular/core/testing';
+
+        describe('My fakeAsync suite', () => {
+          it('works', fakeAsync(() => {
+            expect(1).toBe(1);
+          }));
+        });
+      `;
+    const expected = `
+        import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+        describe('My fakeAsync suite', () => {
+          beforeEach(() => {
+            vi.useFakeTimers({ advanceTimeDelta: 1, shouldAdvanceTime: true });
+          });
+          afterEach(() => {
+            vi.useRealTimers();
+          });
+          it('works', async () => {
+            expect(1).toBe(1);
+          });
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
+});

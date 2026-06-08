@@ -1,0 +1,36 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { TaskConfiguration, TaskConfigurationGenerator } from '../../src';
+import { RepositoryInitializerName, RepositoryInitializerTaskOptions } from './options';
+
+export interface CommitOptions {
+  message?: string;
+  name?: string;
+  email?: string;
+}
+
+export class RepositoryInitializerTask implements TaskConfigurationGenerator<RepositoryInitializerTaskOptions> {
+  constructor(
+    public workingDirectory?: string | undefined,
+    public commitOptions?: CommitOptions | undefined,
+  ) {}
+
+  toConfiguration(): TaskConfiguration<RepositoryInitializerTaskOptions> {
+    return {
+      name: RepositoryInitializerName,
+      options: {
+        commit: !!this.commitOptions,
+        workingDirectory: this.workingDirectory,
+        authorName: this.commitOptions && this.commitOptions.name,
+        authorEmail: this.commitOptions && this.commitOptions.email,
+        message: this.commitOptions && this.commitOptions.message,
+      },
+    };
+  }
+}

@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularInterceptor",
+  "title": "Angular Interceptor Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Creates a new interceptor in your project. Interceptors are used to intercept and modify HTTP requests and responses before they reach their destination. This allows you to perform tasks like adding authentication headers, handling errors, or logging requests. This schematic generates the necessary files and boilerplate code for a new interceptor.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new interceptor. This will be used to create the interceptor's class and spec files (e.g., `my-interceptor.interceptor.ts` and `my-interceptor.interceptor.spec.ts`).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the interceptor?"
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path where the interceptor files should be created, relative to the workspace root. If not provided, the interceptor will be created in the current directory.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the interceptor should be created. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "flat": {
+      "type": "boolean",
+      "default": true,
+      "description": "Creates the new interceptor files at the top level of the current project. If set to false, a new folder with the interceptor's name will be created to contain the files."
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Skip the generation of a unit test file `spec.ts` for the new interceptor.",
+      "default": false
+    },
+    "functional": {
+      "type": "boolean",
+      "description": "Creates the interceptor as a function `HttpInterceptorFn` instead of a class. Functional interceptors can be simpler for basic scenarios.",
+      "default": true
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."],
+      "description": "The separator character to use before the type within the generated file's name. For example, if you set the option to `.`, the file will be named `example.interceptor.ts`."
+    }
+  },
+  "required": ["name", "project"]
+}

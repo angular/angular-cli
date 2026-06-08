@@ -1,0 +1,29 @@
+load("//tools:defaults.bzl", "ts_project")
+
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+package(default_visibility = ["//visibility:public"])
+
+licenses(["notice"])
+
+ts_project(
+    name = "file_system_engine_host_test_lib",
+    srcs = glob(
+        include = [
+            "**/*.ts",
+        ],
+    ),
+    data = glob(
+        include = [
+            "**/collection.json",
+            "**/*.js",
+        ],
+    ),
+    deps = [
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+        "//tests:node_modules/@angular-devkit/schematics",
+    ],
+)

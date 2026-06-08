@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsAngularResolver",
+  "title": "Angular Resolver Options Schema",
+  "type": "object",
+  "additionalProperties": false,
+  "description": "Creates a new resolver in your project. Resolvers are used to pre-fetch data before a route is activated, ensuring that the necessary data is available before the component is displayed. This can improve the user experience by preventing delays and loading states. This schematic generates a new resolver with the specified name and options.",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name for the new resolver. This will be used to create the resolver's class and spec files (e.g., `my-resolver.resolver.ts` and `my-resolver.resolver.spec.ts`).",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the resolver?"
+    },
+    "skipTests": {
+      "type": "boolean",
+      "description": "Skip the generation of a unit test file `spec.ts` for the new resolver.",
+      "default": false
+    },
+    "flat": {
+      "type": "boolean",
+      "description": "Creates the new resolver files at the top level of the current project. If set to false, a new folder with the resolver's name will be created to contain the files.",
+      "default": true
+    },
+    "functional": {
+      "type": "boolean",
+      "description": "Creates the resolver as a function `ResolveFn` instead of a class. Functional resolvers can be simpler for basic scenarios.",
+      "default": true
+    },
+    "path": {
+      "type": "string",
+      "format": "path",
+      "$default": {
+        "$source": "workingDirectory"
+      },
+      "description": "The path where the resolver files should be created, relative to the current workspace. If not provided, the resolver will be created in the current directory.",
+      "visible": false
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the project where the resolver should be created. If not specified, the CLI will determine the project from the current directory.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "typeSeparator": {
+      "type": "string",
+      "default": "-",
+      "enum": ["-", "."],
+      "description": "The separator character to use before the type within the generated file's name. For example, if you set the option to `.`, the file will be named `example.resolver.ts`."
+    }
+  },
+  "required": ["name", "project"]
+}

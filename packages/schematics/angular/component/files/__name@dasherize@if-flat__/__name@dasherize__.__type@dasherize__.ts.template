@@ -1,0 +1,24 @@
+import { <% if(changeDetection !== 'OnPush') { %>ChangeDetectionStrategy, <% }%>Component<% if(!!viewEncapsulation) { %>, ViewEncapsulation<% }%> } from '@angular/core';
+
+@Component({<% if(!skipSelector) {%>
+  selector: '<%= selector %>',<%}%><% if(standalone) {%>
+  imports: [],<%} else { %>
+  standalone: false,<% }%><% if(inlineTemplate) { %>
+  template: `
+    <p>
+      <%= dasherize(name) %> works!
+    </p>
+  `,<% } else { %>
+  templateUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %><%= ngext %>.html',<% } if(inlineStyle) { %>
+  styles: `<% if(displayBlock){ %>
+    :host {
+      display: block;
+    }
+  <% } %>`,<% } else if (style !== 'none') { %>
+  styleUrl: './<%= dasherize(name) %><%= type ? '.' + dasherize(type): '' %>.<%= style %>',<% } %><% if(!!viewEncapsulation) { %>
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %>,<% } if (changeDetection !== 'OnPush') { %>
+  changeDetection: ChangeDetectionStrategy.<%= changeDetection %>,<% } %>
+})
+export <% if(exportDefault) {%>default <%}%>class <%= classifiedName %> {
+
+}

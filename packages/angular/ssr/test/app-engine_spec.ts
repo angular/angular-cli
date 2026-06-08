@@ -1,0 +1,464 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+// The compiler is needed as tests are in JIT.
+/* eslint-disable import/no-unassigned-import */
+import '@angular/compiler';
+/* eslint-enable import/no-unassigned-import */
+
+import { Component, REQUEST, inject } from '@angular/core';
+import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app';
+import { AngularAppEngine } from '../src/app-engine';
+import { setAngularAppEngineManifest } from '../src/manifest';
+import { RenderMode } from '../src/routes/route-config';
+import { setAngularAppTestingManifest } from './testing-utils';
+
+@Component({
+  selector: 'app-home',
+  template: 'Home works',
+})
+class TestHomeComponent {
+  private request = inject(REQUEST);
+  constructor() {
+    // Force header access to trigger validation
+    this.request?.headers.get('host');
+    this.request?.headers.get('x-forwarded-host');
+  }
+}
+
+function createEntryPoint(locale: string) {
+  return async () => {
+    @Component({
+      selector: `app-home-${locale}`,
+      template: `Home works ${locale.toUpperCase()}`,
+    })
+    class HomeComponent {}
+
+    @Component({
+      selector: `app-ssr-${locale}`,
+      template: `SSR works ${locale.toUpperCase()}`,
+    })
+    class SSRComponent {}
+
+    @Component({
+      selector: `app-ssg-${locale}`,
+      template: `SSG works ${locale.toUpperCase()}`,
+    })
+    class SSGComponent {}
+
+    setAngularAppTestingManifest(
+      [
+        { path: 'ssg', component: SSGComponent },
+        { path: 'ssr', component: SSRComponent },
+        { path: '', component: HomeComponent },
+      ],
+      [
+        { path: 'ssg', renderMode: RenderMode.Prerender },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+      '/' + locale,
+      {
+        'ssg/index.html': {
+          size: 25,
+          hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
+          text: async () => `<html>
+            <head>
+              <title>SSG page</title>
+              <base href="/${locale}" />
+            </head>
+            <body>
+              SSG works ${locale.toUpperCase()}
+            </body>
+          </html>
+        `,
+        },
+      },
+      locale,
+    );
+
+    return {
+      ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+      ɵdestroyAngularServerApp: destroyAngularServerApp,
+    };
+  };
+}
+
+describe('AngularAppEngine', () => {
+  let appEngine: AngularAppEngine;
+
+  describe('Localized app', () => {
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        // Note: Although we are testing only one locale, we need to configure two or more
+        // to ensure that we test a different code path.
+        entryPoints: {
+          it: createEntryPoint('it'),
+          en: createEntryPoint('en'),
+        },
+        supportedLocales: { 'it': 'it', 'en': 'en' },
+        basePath: '/',
+      });
+
+      appEngine = new AngularAppEngine({ trustProxyHeaders: true });
+    });
+
+    describe('handle', () => {
+      it('should return null for requests to unknown pages', async () => {
+        const request = new Request('https://example.com/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return null for requests with unknown locales', async () => {
+        const request = new Request('https://example.com/es/ssr');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return a rendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+      });
+
+      it('should correctly render the content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should return a serve prerendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should correctly serve the prerendered content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+      });
+
+      it('should return null for requests to unknown pages in a locale', async () => {
+        const request = new Request('https://example.com/it/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should redirect to the highest priority locale when the URL is "/"', async () => {
+        const request = new Request('https://example.com', {
+          headers: { 'Accept-Language': 'fr-CH, fr;q=0.9, it;q=0.8, en;q=0.7, *;q=0.5' },
+        });
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/it');
+        expect(response?.headers.get('Vary')).toBe('X-Forwarded-Prefix, Accept-Language');
+      });
+
+      it('should include forwarded prefix in locale redirect location when present', async () => {
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/app',
+          },
+        });
+
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/app/it');
+        expect(response?.headers.get('Vary')).toBe('X-Forwarded-Prefix, Accept-Language');
+      });
+
+      it('should completely ignore proxy headers if not allowed', async () => {
+        const strictEngine = new AngularAppEngine({ trustProxyHeaders: false });
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/app',
+          },
+        });
+
+        // The strictEngine will ignore the prefix
+        const response = await strictEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/it');
+      });
+
+      it('should return null for requests to file-like resources in a locale', async () => {
+        const request = new Request('https://example.com/it/logo.png');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+    });
+  });
+
+  describe('Localized app with single locale', () => {
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          it: createEntryPoint('it'),
+        },
+        supportedLocales: { 'it': 'it' },
+        basePath: '/',
+      });
+
+      appEngine = new AngularAppEngine();
+    });
+
+    describe('handle', () => {
+      it('should return null for requests to unknown pages', async () => {
+        const request = new Request('https://example.com/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return a rendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+      });
+
+      it('should correctly render the content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssr/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSR works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should return a serve prerendered page with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
+      });
+
+      it('should correctly serve the prerendered content when the URL ends with "index.html" with correct locale', async () => {
+        const request = new Request('https://example.com/it/ssg/index.html');
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG works IT');
+      });
+
+      it('should return null for requests to unknown pages in a locale', async () => {
+        const request = new Request('https://example.com/it/unknown/page');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return null for requests to file-like resources in a locale', async () => {
+        const request = new Request('https://example.com/it/logo.png');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+    });
+  });
+
+  describe('Non-localized app', () => {
+    beforeAll(() => {
+      @Component({
+        selector: 'app-home',
+        template: `Home works`,
+      })
+      class HomeComponent {}
+
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: HomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
+
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine();
+    });
+
+    it('should return null for requests to file-like resources', async () => {
+      const request = new Request('https://example.com/logo.png');
+      const response = await appEngine.handle(request);
+      expect(response).toBeNull();
+    });
+
+    it('should return null for requests to unknown pages', async () => {
+      const request = new Request('https://example.com/unknown/page');
+      const response = await appEngine.handle(request);
+      expect(response).toBeNull();
+    });
+
+    it('should return a rendered page for known paths', async () => {
+      const request = new Request('https://example.com/home');
+      const response = await appEngine.handle(request);
+      expect(await response?.text()).toContain('Home works');
+    });
+
+    it('should correctly render the content when the URL ends with "index.html"', async () => {
+      const request = new Request('https://example.com/home/index.html');
+      const response = await appEngine.handle(request);
+      expect(await response?.text()).toContain('Home works');
+    });
+  });
+
+  describe('Invalid host headers', () => {
+    let consoleErrorSpy: jasmine.Spy;
+
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: TestHomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
+
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine({ trustProxyHeaders: true });
+    });
+
+    beforeEach(() => {
+      consoleErrorSpy = spyOn(console, 'error');
+    });
+
+    it('should return 400 when disallowed host', async () => {
+      const request = new Request('https://evil.com');
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain('URL with hostname "evil.com" is not allowed.');
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('URL with hostname "evil.com" is not allowed.'),
+      );
+    });
+
+    it('should return 400 when disallowed host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'evil.com' },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" with value "evil.com" is not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "host" with value "evil.com" is not allowed.'),
+      );
+    });
+
+    it('should return 400 when disallowed x-forwarded-host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'x-forwarded-host': 'evil.com' },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "x-forwarded-host" with value "evil.com" is not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Header "x-forwarded-host" with value "evil.com" is not allowed.'),
+      );
+    });
+
+    it('should return 400 when host with path separator', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'example.com/evil' },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).not.toBeNull();
+      expect(response?.status).toBe(400);
+      expect(await response?.text()).toContain(
+        'Header "host" with value "example.com/evil" contains characters that are not allowed.',
+      );
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching(
+          'Header "host" with value "example.com/evil" contains characters that are not allowed.',
+        ),
+      );
+    });
+  });
+
+  describe('Disable host check', () => {
+    let consoleErrorSpy: jasmine.Spy;
+
+    beforeAll(() => {
+      setAngularAppEngineManifest({
+        allowedHosts: ['example.com'],
+        entryPoints: {
+          '': async () => {
+            setAngularAppTestingManifest(
+              [{ path: 'home', component: TestHomeComponent }],
+              [{ path: '**', renderMode: RenderMode.Server }],
+            );
+
+            return {
+              ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp,
+              ɵdestroyAngularServerApp: destroyAngularServerApp,
+            };
+          },
+        },
+        basePath: '/',
+        supportedLocales: { 'en-US': '' },
+      });
+
+      appEngine = new AngularAppEngine();
+
+      AngularAppEngine.ɵdisableAllowedHostsCheck = true;
+    });
+
+    afterAll(() => {
+      AngularAppEngine.ɵdisableAllowedHostsCheck = false;
+    });
+
+    beforeEach(() => {
+      consoleErrorSpy = spyOn(console, 'error');
+    });
+
+    it('should allow requests to disallowed hosts', async () => {
+      const request = new Request('https://evil.com/home');
+      const response = await appEngine.handle(request);
+      expect(response).toBeDefined();
+      expect(response?.status).toBe(200);
+      expect(await response?.text()).toContain('Home works');
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+
+    it('should allow requests with disallowed host header', async () => {
+      const request = new Request('https://example.com/home', {
+        headers: { 'host': 'evil.com' },
+      });
+      const response = await appEngine.handle(request);
+      expect(response).toBeDefined();
+      expect(response?.status).toBe(200);
+      expect(await response?.text()).toContain('Home works');
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+    });
+  });
+});

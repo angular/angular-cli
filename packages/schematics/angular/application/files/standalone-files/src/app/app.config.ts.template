@@ -1,0 +1,12 @@
+import { ApplicationConfig, provideBrowserGlobalErrorListeners<% if(!zoneless) { %>, provideZoneChangeDetection<% } %> } from '@angular/core';<% if (routing) { %>
+import { provideRouter } from '@angular/router';
+
+import { routes } from './app.routes';<% } %>
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideBrowserGlobalErrorListeners(),<% if(!zoneless) { %>
+    provideZoneChangeDetection({ eventCoalescing: true }),<% } %>
+    <% if (routing) {%>provideRouter(routes)<% } %>
+  ]
+};

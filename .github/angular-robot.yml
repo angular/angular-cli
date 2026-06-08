@@ -1,0 +1,92 @@
+# Configuration for angular-robot
+
+# options for the merge plugin
+merge:
+  # the status will be added to your pull requests
+  status:
+    # set to true to disable
+    disabled: true
+    # the name of the status
+    context: 'ci/angular: merge status'
+    # text to show when all checks pass
+    successText: 'All checks passed!'
+    # text to show when some checks are failing
+    failureText: 'The following checks are failing:'
+
+  # comment that will be added to a PR when there is a conflict, leave empty or set to false to disable
+  mergeConflictComment: >-
+    Hi @{{PRAuthor}}! This PR has merge conflicts due to recent upstream merges.
+
+    Please help to unblock it by resolving these conflicts. Thanks!
+
+  # label to monitor
+  mergeLabel: 'action: merge'
+
+  # list of checks that will determine if the merge label can be added
+  checks:
+    # whether the PR shouldn't have a conflict with the base branch
+    noConflict: true
+    # whether the PR should have all reviews completed.
+    requireReviews: true
+    # list of labels that a PR needs to have, checked with a regexp (e.g. "target:" will work for the label "target: major")
+    requiredLabels:
+      - 'target: *'
+
+    # list of labels that a PR shouldn't have, checked after the required labels with a regexp
+    forbiddenLabels:
+      - 'action: cleanup'
+      - 'action: review'
+      - 'PR state: blocked'
+
+    # list of PR statuses that need to be successful
+    # NOTE: Required PR statuses are now exclusively handled via Github configuration
+    requiredStatuses: []
+
+  # the comment that will be added when the merge label is added despite failing checks, leave empty or set to false to disable
+  # {{MERGE_LABEL}} will be replaced by the value of the mergeLabel option
+  # {{PLACEHOLDER}} will be replaced by the list of failing checks
+  mergeRemovedComment: >-
+    I see that you just added the `{{MERGE_LABEL}}` label, but the following
+    checks are still failing:
+
+    {{PLACEHOLDER}}
+
+    **If you want your PR to be merged, it has to pass all the CI checks.**
+
+    If you can't get the PR to a green state due to flakes or broken `main`,
+    please try rebasing to `main` and/or restarting the CI job. If that fails
+    and you believe that the issue is not due to your change, please contact the
+    caretaker and ask for help.
+# options for the triage plugin
+triage:
+  # set to true to disable
+  disabled: true
+  # number of the milestone to apply when the issue has not been triaged yet
+  needsTriageMilestone: 11,
+  # number of the milestone to apply when the issue is triaged
+  defaultMilestone: 12,
+  # arrays of labels that determine if an issue has been triaged by the caretaker
+  l1TriageLabels:
+    - - 'area: *'
+  # arrays of labels that determine if an issue has been fully triaged
+  l2TriageLabels:
+    - - 'type: bug/fix'
+      - 'severity*'
+      - 'freq*'
+      - 'area: *'
+    - - 'type: feature'
+      - 'area: *'
+    - - 'type: refactor'
+      - 'area: *'
+    - - 'type: RFC / Discussion / question'
+      - 'area: *'
+    - - 'type: docs'
+      - 'area: *'
+
+# Size checking
+size:
+  # Size checking for production build is performed via the E2E test `build/prod-build`
+  disabled: true
+  circleCiStatusName: 'ci/circleci: e2e-cli'
+  maxSizeIncrease: 10000
+  comment: false

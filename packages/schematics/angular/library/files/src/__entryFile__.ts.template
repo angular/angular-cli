@@ -1,0 +1,6 @@
+/*
+ * Public API Surface of <%= dasherize(name) %>
+ */
+
+export * from './lib/<%= dasherize(name) %>';<% if (!standalone) { %>
+export * from './lib/<%= dasherize(name) %>-module';<% } %>

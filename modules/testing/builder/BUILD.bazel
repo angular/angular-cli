@@ -1,0 +1,55 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+ts_project(
+    name = "builder",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "src/**/*_spec.ts",
+        ],
+    ),
+    data = [
+        # Needed at runtime by some builder tests relying on SSR being
+        # resolvable in the test project.
+        ":node_modules/@angular/ssr",
+        ":node_modules/browser-sync",
+        ":node_modules/istanbul-lib-instrument",
+        ":node_modules/jsdom",
+        ":node_modules/ng-packagr",
+        ":node_modules/vitest",
+        ":node_modules/@vitest/coverage-v8",
+    ] + glob(["projects/**/*"]),
+    deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/rxjs",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_project(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+        ],
+    ),
+    deps = [
+        ":builder",
+        ":node_modules/@angular-devkit/architect",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":unit_test_lib"],
+)

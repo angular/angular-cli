@@ -1,0 +1,30 @@
+load("@aspect_rules_js//npm:defs.bzl", "npm_link_package")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+ts_project(
+    name = "schematics_cli_test_lib",
+    testonly = True,
+    srcs = glob(["**/*"]),
+    deps = [
+        "//packages/angular_devkit/schematics_cli",
+    ],
+)
+
+# Note: Link the schematics CLI package into node modules for testing. Notably, tests
+# of a package typically don't use the npm package, to e.g. allow for relative
+# imports, but here this is an exception as the package needs to be resolvable at runtime.
+npm_link_package(
+    name = "node_modules/@angular-devkit/schematics-cli",
+    src = "//packages/angular_devkit/schematics_cli:pkg",
+    package = "@angular-devkit/schematics-cli",
+)
+
+jasmine_test(
+    name = "test",
+    data = [
+        ":schematics_cli_test_lib",
+        # The npm package itself is needed for the test at runtime, so we
+        # link it into this folder as `node_modules/@angular-devkit/schematics-cli`.
+        ":node_modules/@angular-devkit/schematics-cli",
+    ],
+)

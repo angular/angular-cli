@@ -1,0 +1,32 @@
+load("//tools:defaults.bzl", "js_binary")
+
+package(default_visibility = ["//visibility:public"])
+
+platform(
+    name = "windows_x64",
+    constraint_values = [
+        "@platforms//os:windows",
+        "@platforms//cpu:x86_64",
+    ],
+)
+
+exports_files([
+    "package_json_release_filter.jq",
+])
+
+js_binary(
+    name = "ng_cli_schema",
+    data = [
+        "ng_cli_schema_generator.js",
+    ],
+    entry_point = "ng_cli_schema_generator.js",
+)
+
+js_binary(
+    name = "quicktype_runner",
+    data = [
+        "quicktype_runner.js",
+        "//:node_modules/quicktype-core",
+    ],
+    entry_point = "quicktype_runner.js",
+)

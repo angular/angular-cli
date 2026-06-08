@@ -1,0 +1,10 @@
+{
+  "name": "extends-basic-string",
+  "extends": "works",
+  "schematics": {
+    "schematic2": {
+      "description": "2",
+      "factory": "../null-factory"
+    }
+  }
+}

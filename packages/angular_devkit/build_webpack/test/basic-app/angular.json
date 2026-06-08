@@ -1,0 +1,29 @@
+{
+  "$schema": "../../../core/src/workspace/workspace-schema.json",
+  "version": 1,
+  "newProjectRoot": "./projects",
+  "cli": {},
+  "schematics": {},
+  "projects": {
+    "app": {
+      "root": "src",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "schematics": {},
+      "targets": {
+        "build": {
+          "builder": "../../:webpack",
+          "options": {
+            "webpackConfig": "webpack.config.cjs"
+          }
+        },
+        "serve": {
+          "builder": "../../:webpack-dev-server",
+          "options": {
+            "webpackConfig": "webpack.config.cjs"
+          }
+        }
+      }
+    }
+  }
+}

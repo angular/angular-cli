@@ -1,0 +1,15 @@
+{
+  "devDependencies": {
+    "@angular-devkit/architect": "workspace:*",
+    "@angular-devkit/build-angular": "workspace:*",
+    "@angular-devkit/core": "workspace:*",
+    "@angular/ssr": "workspace:*",
+    "@vitest/coverage-v8": "4.1.8",
+    "browser-sync": "3.0.4",
+    "istanbul-lib-instrument": "6.0.3",
+    "jsdom": "29.1.1",
+    "ng-packagr": "22.1.0-next.1",
+    "rxjs": "7.8.2",
+    "vitest": "4.1.8"
+  }
+}

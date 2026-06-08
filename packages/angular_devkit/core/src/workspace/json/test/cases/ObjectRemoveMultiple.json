@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "x-foo": {
+    "is": ["good", "great", "awesome"]
+  },
+  "x-bar": 5,
+}

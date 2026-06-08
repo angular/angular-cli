@@ -1,0 +1,47 @@
+load("@aspect_rules_js//js:defs.bzl", "js_library")
+load("@npm//:@rollup/wasm-node/package_json.bzl", rollup = "bin")
+
+package(default_visibility = ["//visibility:public"])
+
+js_library(
+    name = "beasties_dts",
+    srcs = [
+        "index.d.ts",
+    ],
+    deps = [
+        "//packages/angular/ssr:node_modules/beasties",
+    ],
+)
+
+js_library(
+    name = "beasties_bundled",
+    srcs = [
+        ":bundled_beasties",
+    ],
+)
+
+rollup.rollup(
+    name = "bundled_beasties",
+    srcs = [
+        "rollup.config.mjs",
+        "//:node_modules/@rollup/plugin-alias",
+        "//:node_modules/@rollup/plugin-commonjs",
+        "//:node_modules/@rollup/plugin-node-resolve",
+        "//:node_modules/rollup-license-plugin",
+        "//:node_modules/unenv",
+        "//packages/angular/ssr:node_modules/beasties",
+    ],
+    outs = [
+        "THIRD_PARTY_LICENSES.txt",
+        "index.js",
+        "index.js.map",
+    ],
+    args = [
+        "--format=esm",
+        "--config=$(rootpath rollup.config.mjs)",
+        "--input=packages/angular/ssr/node_modules/beasties/dist/index.mjs",
+        "--sourcemap=true",
+        "--dir=packages/angular/ssr/third_party/beasties",
+    ],
+    progress_message = "Bundling beasties",
+)

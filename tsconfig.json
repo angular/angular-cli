@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "noEmitOnError": true,
+    "stripInternal": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es2023",
+    "lib": ["es2023"],
+    "rootDirs": [".", "./dist-schema/bin/"],
+    "paths": {
+      "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
+      "@angular-devkit/build-angular": ["./packages/angular_devkit/build_angular"],
+      "@angular-devkit/*": ["./packages/angular_devkit/*/index"],
+      "@angular/ssr": ["./packages/angular/ssr"],
+      "@angular/ssr/node": ["./packages/angular/ssr/node"],
+      "@angular/*": ["./packages/angular/*/src"],
+      "@angular/build/private": ["./packages/angular/build/src/private"],
+      "@ngtools/webpack": ["./packages/ngtools/webpack/index"],
+      "@schematics/angular": ["./packages/schematics/angular"],
+      "@schematics/angular/utility": ["./packages/schematics/angular/utility/index"]
+    }
+  },
+  "exclude": [
+    "dist/**/*",
+    "dist-schema/**",
+    "**/node_modules/**/*",
+    "**/third_party/**/*",
+    "packages/angular_devkit/schematics_cli/schematic/files/**/*",
+    "modules/testing/builder/projects/**/*",
+    "packages/angular_devkit/build_angular/test/**/*",
+    "packages/angular_devkit/build_webpack/test/**/*"
+  ]
+}

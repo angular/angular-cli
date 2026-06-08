@@ -1,0 +1,8 @@
+<% if(!!viewEncapsulation) { %>import { ViewEncapsulation } from '@angular/core';
+<% }%>import { platformBrowser } from '@angular/platform-browser';
+import { AppModule } from './app/app<%= typeSeparator %>module';
+
+platformBrowser().bootstrapModule(AppModule, {
+  <% if(!!viewEncapsulation) { %> defaultEncapsulation: ViewEncapsulation.<%= viewEncapsulation %><% } %>
+})
+  .catch(err => console.error(err));

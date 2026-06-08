@@ -1,0 +1,127 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@devinfra//bazel/api-golden:index.bzl", "api_golden_test_npm_package")
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+ts_json_schema(
+    name = "webpack_schema",
+    src = "src/builders/webpack/schema.json",
+)
+
+ts_json_schema(
+    name = "webpack_dev_server_schema",
+    src = "src/builders/webpack-dev-server/schema.json",
+)
+
+RUNTIME_ASSETS = [
+    "builders.json",
+    "package.json",
+    "src/builders/webpack-dev-server/schema.json",
+    "src/builders/webpack/schema.json",
+]
+
+ts_project(
+    name = "build_webpack",
+    srcs = glob(
+        include = ["src/**/*.ts"],
+        exclude = [
+            "src/test-utils.ts",
+            "**/*_spec.ts",
+        ],
+    ) + [
+        "index.ts",
+        "//packages/angular_devkit/build_webpack:src/builders/webpack-dev-server/schema.ts",
+        "//packages/angular_devkit/build_webpack:src/builders/webpack/schema.ts",
+    ],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/rxjs",
+        ":node_modules/webpack",
+        ":node_modules/webpack-dev-server",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_project(
+    name = "build_webpack_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "src/**/*_spec.ts",
+        ],
+    ),
+    data = glob(
+        include = [
+            "test/**/*",
+        ],
+    ),
+    deps = [
+        ":build_webpack",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@ngtools/webpack",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
+
+jasmine_test(
+    name = "build_webpack_test",
+    data = [
+        "build_webpack_test_lib",
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/tslib",
+        "//:node_modules/typescript",
+        "//:node_modules/zone.js",
+    ],
+    env = {
+        # Force IPv4 to resolve RBE resolution issues
+        "NODE_OPTIONS": "--dns-result-order=ipv4first",
+    },
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/architect:package.json",
+    ],
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":build_webpack",
+        ":license",
+    ],
+)
+
+api_golden_test_npm_package(
+    name = "build_webpack_api",
+    data = [
+        ":npm_package",
+        "//goldens:public-api",
+    ],
+    golden_dir = "goldens/public-api/angular_devkit/build_webpack",
+    npm_package = "packages/angular_devkit/build_webpack/npm_package",
+)

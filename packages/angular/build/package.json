@@ -1,0 +1,122 @@
+{
+  "name": "@angular/build",
+  "version": "0.0.0-PLACEHOLDER",
+  "description": "Official build system for Angular",
+  "keywords": [
+    "angular",
+    "angular-cli"
+  ],
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./private": {
+      "default": "./src/private.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "builders": "builders.json",
+  "dependencies": {
+    "@ampproject/remapping": "2.3.0",
+    "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
+    "@babel/core": "7.29.7",
+    "@babel/helper-annotate-as-pure": "7.29.7",
+    "@babel/helper-split-export-declaration": "7.24.7",
+    "@inquirer/confirm": "6.1.1",
+    "@vitejs/plugin-basic-ssl": "2.3.0",
+    "beasties": "0.4.2",
+    "browserslist": "^4.26.0",
+    "esbuild": "0.28.0",
+    "https-proxy-agent": "9.0.0",
+    "jsonc-parser": "3.3.1",
+    "listr2": "10.2.1",
+    "magic-string": "0.30.21",
+    "mrmime": "2.0.1",
+    "parse5-html-rewriting-stream": "8.0.1",
+    "picomatch": "4.0.4",
+    "piscina": "5.1.4",
+    "rollup": "4.61.0",
+    "sass": "1.100.0",
+    "semver": "7.8.1",
+    "source-map-support": "0.5.21",
+    "tinyglobby": "0.2.17",
+    "vite": "7.3.5",
+    "watchpack": "2.5.1"
+  },
+  "optionalDependencies": {
+    "lmdb": "3.5.5"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "workspace:*",
+    "@angular/ssr": "workspace:*",
+    "istanbul-lib-instrument": "6.0.3",
+    "jsdom": "29.1.1",
+    "less": "4.6.4",
+    "ng-packagr": "22.1.0-next.1",
+    "postcss": "8.5.15",
+    "rolldown": "1.0.3",
+    "rxjs": "7.8.2",
+    "vitest": "4.1.8"
+  },
+  "peerDependencies": {
+    "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/core": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/localize": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-browser": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/platform-server": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/service-worker": "0.0.0-ANGULAR-FW-PEER-DEP",
+    "@angular/ssr": "^0.0.0-PLACEHOLDER",
+    "istanbul-lib-instrument": "^6.0.0",
+    "karma": "^6.4.0",
+    "less": "^4.2.0",
+    "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
+    "tslib": "^2.3.0",
+    "typescript": ">=6.0 <6.1",
+    "vitest": "^4.0.8"
+  },
+  "peerDependenciesMeta": {
+    "@angular/core": {
+      "optional": true
+    },
+    "@angular/localize": {
+      "optional": true
+    },
+    "@angular/platform-browser": {
+      "optional": true
+    },
+    "@angular/platform-server": {
+      "optional": true
+    },
+    "@angular/service-worker": {
+      "optional": true
+    },
+    "@angular/ssr": {
+      "optional": true
+    },
+    "istanbul-lib-instrument": {
+      "optional": true
+    },
+    "karma": {
+      "optional": true
+    },
+    "less": {
+      "optional": true
+    },
+    "ng-packagr": {
+      "optional": true
+    },
+    "postcss": {
+      "optional": true
+    },
+    "tailwindcss": {
+      "optional": true
+    },
+    "vitest": {
+      "optional": true
+    }
+  }
+}

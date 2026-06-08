@@ -1,0 +1,20 @@
+load("//tools:defaults.bzl", "ts_project")
+
+package(default_visibility = ["//visibility:public"])
+
+ts_project(
+    name = "tests",
+    testonly = True,
+    srcs = glob(["**/*.ts"]),
+    deps = [
+        "//:node_modules/@types/express",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/semver",
+        "//:node_modules/express",
+        "//:node_modules/fast-glob",
+        "//:node_modules/puppeteer",
+        "//:node_modules/semver",
+        "//:node_modules/undici",
+        "//tests/e2e/utils",
+    ],
+)

@@ -1,0 +1,51 @@
+storage: ./storage
+
+auth:
+  auth-memory:
+    users: {}
+listen: localhost:${HTTP_PORT}
+uplinks:
+  npmjs:
+    url: https://registry.npmjs.org/
+    cache: false
+    maxage: 20m
+    max_fails: 32
+    timeout: 60s
+    agent_options:
+      keepAlive: true
+      maxSockets: 32
+      maxFreeSockets: 8
+
+packages:
+  '@angular/{build,create,cli,pwa,ssr}':
+    access: $all
+    publish: $all
+
+  '@angular-devkit/*':
+    access: $all
+    publish: $all
+
+  '@ngtools/webpack':
+    access: $all
+    publish: $all
+
+  '@schematics/{angular,schematics,update}':
+    access: $all
+    publish: $all
+
+  '@*/*':
+    access: $all
+    proxy: npmjs
+
+  '**':
+    access: $all
+    proxy: npmjs
+
+log:
+  type: stdout
+  format: pretty
+  level: warn
+
+# https://github.com/verdaccio/verdaccio/issues/301
+server:
+  keepAliveTimeout: 0

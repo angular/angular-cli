@@ -1,0 +1,7 @@
+load("//tools:defaults.bzl", "copy_to_bin")
+
+copy_to_bin(
+    name = "ng-snapshot",
+    srcs = ["package.json"],
+    visibility = ["//visibility:public"],
+)

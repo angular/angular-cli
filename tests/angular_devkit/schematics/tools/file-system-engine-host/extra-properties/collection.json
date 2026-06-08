@@ -1,0 +1,11 @@
+{
+  "name": "extra-properties",
+  "schematics": {
+    "schematic1": {
+      "description": "1",
+      "factory": "./factory",
+      "extra": "extra-schematic"
+    }
+  },
+  "extra": "extra-collection"
+}

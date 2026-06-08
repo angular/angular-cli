@@ -1,0 +1,36 @@
+load("@devinfra//bazel/spec-bundling:index.bzl", "spec_bundle")
+load("//tools:defaults.bzl", "jasmine_test", "ts_project")
+
+ts_project(
+    name = "unit_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = ["**/*.ts"],
+    ),
+    tsconfig = "//:test-tsconfig-esm",
+    deps = [
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/router",
+        "//:node_modules/@types/node",
+        "//packages/angular/ssr",
+    ],
+)
+
+spec_bundle(
+    name = "esm_tests_bundled",
+    deps = [
+        ":unit_test_lib",
+        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [
+        ":esm_tests_bundled",
+    ],
+    flaky = True,
+)

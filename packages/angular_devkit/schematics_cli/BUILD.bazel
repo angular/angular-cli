@@ -1,0 +1,84 @@
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "npm_package", "ts_project")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+RUNTIME_ASSETS = [
+    "blank/schema.json",
+    "collection.json",
+    "package.json",
+    "schematic/schema.json",
+] + glob(
+    include = [
+        "blank/project-files/**/*",
+        "blank/schematic-files/**/*",
+        "schematic/files/**/*",
+    ],
+)
+
+# @angular-devkit/schematics-cli
+ts_project(
+    name = "schematics_cli",
+    srcs = glob(
+        include = ["**/*.ts"],
+        exclude = [
+            "**/*_spec.ts",
+            "schematic/files/**",
+            "blank/project-files/**",
+            "blank/schematic-files/**",
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ) + [
+        # These files are generated from the JSON schema
+        "//packages/angular_devkit/schematics_cli:blank/schema.ts",
+        "//packages/angular_devkit/schematics_cli:schematic/schema.ts",
+    ],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@inquirer/prompts",
+        "//:node_modules/@types/node",
+    ],
+)
+
+ts_json_schema(
+    name = "blank_schema",
+    src = "blank/schema.json",
+)
+
+ts_json_schema(
+    name = "schematic_schema",
+    src = "schematic/schema.json",
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/angular_devkit/core:package.json",
+    ],
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":license",
+        ":schematics_cli",
+    ],
+)

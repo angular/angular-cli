@@ -1,0 +1,171 @@
+# Copyright Google LLC. All Rights Reserved.
+#
+# Use of this source code is governed by an MIT-style license that can be
+# found in the LICENSE file at https://angular.dev/license
+
+load("@npm//:defs.bzl", "npm_link_all_packages")
+load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
+load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
+load("//tools:ts_json_schema.bzl", "ts_json_schema")
+
+licenses(["notice"])
+
+package(default_visibility = ["//visibility:public"])
+
+npm_link_all_packages()
+
+genrule(
+    name = "angular_best_practices",
+    srcs = [
+        "//:node_modules/@angular/core/dir",
+    ],
+    outs = ["src/commands/mcp/resources/best-practices.md"],
+    cmd = """
+        cp "$(location //:node_modules/@angular/core/dir)/resources/best-practices.md" $@
+    """,
+)
+
+RUNTIME_ASSETS = glob(
+    include = [
+        "bin/**/*",
+        "src/**/*.md",
+        "src/**/*.json",
+    ],
+    exclude = [
+        "lib/config/workspace-schema.json",
+    ],
+) + [
+    "//packages/angular/cli:lib/config/schema.json",
+    ":angular_best_practices",
+]
+
+ts_project(
+    name = "angular-cli",
+    srcs = glob(
+        include = [
+            "lib/**/*.ts",
+            "src/**/*.ts",
+        ],
+        exclude = [
+            "**/*_spec.ts",
+            "**/testing/**",
+        ],
+    ) + [
+        # These files are generated from the JSON schema
+        "//packages/angular/cli:lib/config/workspace-schema.ts",
+        "//packages/angular/cli:src/commands/update/schematic/schema.ts",
+    ],
+    data = RUNTIME_ASSETS,
+    deps = [
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@inquirer/prompts",
+        ":node_modules/@listr2/prompt-adapter-inquirer",
+        ":node_modules/@modelcontextprotocol/sdk",
+        ":node_modules/@yarnpkg/lockfile",
+        ":node_modules/algoliasearch",
+        ":node_modules/ini",
+        ":node_modules/jsonc-parser",
+        ":node_modules/listr2",
+        ":node_modules/npm-package-arg",
+        ":node_modules/pacote",
+        ":node_modules/parse5-html-rewriting-stream",
+        ":node_modules/yargs",
+        ":node_modules/zod",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@types/ini",
+        "//:node_modules/@types/node",
+        "//:node_modules/@types/npm-package-arg",
+        "//:node_modules/@types/pacote",
+        "//:node_modules/@types/semver",
+        "//:node_modules/@types/yargs",
+        "//:node_modules/@types/yarnpkg__lockfile",
+        "//:node_modules/semver",
+        "//:node_modules/typescript",
+    ],
+)
+
+CLI_SCHEMA_DATA = [
+    "//packages/angular/build:schemas",
+    "//packages/angular_devkit/build_angular:schemas",
+    "//packages/schematics/angular:schemas",
+]
+
+cli_json_schema(
+    name = "cli_config_schema",
+    src = "lib/config/workspace-schema.json",
+    out = "lib/config/schema.json",
+    data = CLI_SCHEMA_DATA,
+)
+
+ts_json_schema(
+    name = "cli_schema",
+    src = "lib/config/workspace-schema.json",
+    data = CLI_SCHEMA_DATA,
+)
+
+ts_json_schema(
+    name = "update_schematic_schema",
+    src = "src/commands/update/schematic/schema.json",
+)
+
+ts_project(
+    name = "angular-cli_test_lib",
+    testonly = True,
+    srcs = glob(
+        include = [
+            "**/*_spec.ts",
+            "**/testing/**",
+        ],
+        exclude = [
+            # NB: we need to exclude the nested node_modules that is laid out by yarn workspaces
+            "node_modules/**",
+        ],
+    ),
+    deps = [
+        ":angular-cli",
+        ":node_modules/@angular-devkit/core",
+        ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@modelcontextprotocol/sdk",
+        ":node_modules/yargs",
+        "//:node_modules/@types/semver",
+        "//:node_modules/@types/yargs",
+        "//:node_modules/semver",
+        "//:node_modules/typescript",
+    ],
+)
+
+jasmine_test(
+    name = "test",
+    data = [":angular-cli_test_lib"],
+)
+
+genrule(
+    name = "license",
+    srcs = ["//:LICENSE"],
+    outs = ["LICENSE"],
+    cmd = "cp $(execpath //:LICENSE) $@",
+)
+
+npm_package(
+    name = "pkg",
+    pkg_deps = [
+        "//packages/angular_devkit/architect:package.json",
+        "//packages/angular_devkit/build_angular:package.json",
+        "//packages/angular_devkit/build_webpack:package.json",
+        "//packages/angular_devkit/core:package.json",
+        "//packages/angular_devkit/schematics:package.json",
+        "//packages/schematics/angular:package.json",
+    ],
+    stamp_files = [
+        "src/utilities/version.js",
+        "src/utilities/node-version.js",
+    ],
+    tags = ["release-package"],
+    deps = RUNTIME_ASSETS + [
+        ":README.md",
+        ":angular-cli",
+        ":license",
+    ],
+)

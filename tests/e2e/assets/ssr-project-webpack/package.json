@@ -1,0 +1,40 @@
+{
+  "name": "20-ssr-project-webpack",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "dev:ssr": "ng run ssr-project-webpack:serve-ssr",
+    "serve:ssr": "node dist/ssr-project-webpack/server/main.js",
+    "build:ssr": "ng build && ng run ssr-project-webpack:server",
+    "prerender": "ng run ssr-project-webpack:prerender"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^22.0.0-next.0",
+    "@angular/common": "^22.0.0-next.0",
+    "@angular/compiler": "^22.0.0-next.0",
+    "@angular/core": "^22.0.0-next.0",
+    "@angular/forms": "^22.0.0-next.0",
+    "@angular/platform-browser": "^22.0.0-next.0",
+    "@angular/platform-server": "^22.0.0-next.0",
+    "@angular/router": "^22.0.0-next.0",
+    "@angular/ssr": "^22.0.0-next.0",
+    "express": "^4.18.2",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.5.0",
+    "zone.js": "~0.16.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^22.0.0-next.0",
+    "@angular/cli": "^22.0.0-next.0",
+    "@angular/compiler-cli": "^22.0.0-next.0",
+    "@types/express": "^4.17.24",
+    "@types/jasmine": "~4.3.0",
+    "@types/node": "^20.17.19",
+    "typescript": "~6.0.2"
+  }
+}

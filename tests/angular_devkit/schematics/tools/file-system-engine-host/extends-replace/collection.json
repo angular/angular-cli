@@ -1,0 +1,12 @@
+{
+  "name": "extends-replace",
+  "extends": [
+    "works"
+  ],
+  "schematics": {
+    "schematic1": {
+      "description": "replaced",
+      "factory": "../null-factory"
+    }
+  }
+}
