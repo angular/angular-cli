@@ -115,7 +115,19 @@ export async function normalizeOptions(
     sslKey,
     prebundle,
     allowedHosts,
+    manualRebuild,
+    rebuildTrigger,
   } = options;
+
+  if (manualRebuild && watch === false) {
+    logger.warn(
+      `Manual rebuilds (\`manualRebuild\` option) have no effect because watching is disabled.`,
+    );
+  } else if (!manualRebuild && rebuildTrigger !== undefined) {
+    logger.warn(
+      `The \`rebuildTrigger\` option is ignored because manual rebuilds (\`manualRebuild\` option) are not enabled.`,
+    );
+  }
 
   // Return all the normalized options
   return {
@@ -142,5 +154,7 @@ export async function normalizeOptions(
     prebundle: cacheOptions.enabled && !optimization.scripts && prebundle,
     inspect,
     allowedHosts: allowedHosts ? allowedHosts : [],
+    manualRebuild: !!manualRebuild,
+    rebuildTrigger,
   };
 }

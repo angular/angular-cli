@@ -115,6 +115,19 @@ interface InternalOptions {
   incrementalResults?: boolean;
 
   /**
+   * Suspends automatic rebuilds in watch mode. File changes are buffered and coalesced until the
+   * configured trigger file is modified, at which point a single incremental rebuild is performed.
+   * This option is only intended to be used with a development server.
+   */
+  manualRebuild?: boolean;
+
+  /**
+   * The trigger file path (relative to the project root) used to flush buffered changes when
+   * `manualRebuild` is enabled. Defaults to `.ng-rebuild`.
+   */
+  rebuildTrigger?: string;
+
+  /**
    * Enables instrumentation to collect code coverage data for specific files.
    *
    * Used exclusively for tests and shouldn't be used for other kinds of builds.
@@ -517,6 +530,9 @@ export async function normalizeOptions(
     security,
     templateUpdates: !!options.templateUpdates,
     incrementalResults: !!options.incrementalResults,
+    manualRebuildTrigger: options.manualRebuild
+      ? path.normalize(path.resolve(projectRoot, options.rebuildTrigger || '.ng-rebuild'))
+      : undefined,
     customConditions: options.conditions,
     frameworkVersion: await findFrameworkVersion(projectRoot),
   };

@@ -122,11 +122,13 @@ export type DevServerBuilderOptions = {
     host?: string;
     inspect?: Inspect;
     liveReload?: boolean;
+    manualRebuild?: boolean;
     open?: boolean;
     poll?: number;
     port?: number;
     prebundle?: PrebundleUnion;
     proxyConfig?: string;
+    rebuildTrigger?: string;
     servePath?: string;
     ssl?: boolean;
     sslCert?: string;

@@ -59,6 +59,7 @@ export async function* runEsBuildBuildAction(
     colors?: boolean;
     jsonLogs?: boolean;
     incrementalResults?: boolean;
+    manualRebuildTrigger?: string;
   },
 ): AsyncIterable<Result> {
   const {
@@ -76,9 +77,15 @@ export async function* runEsBuildBuildAction(
     colors,
     jsonLogs,
     incrementalResults,
+    manualRebuildTrigger,
   } = options;
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
+
+  // Display label for the manual rebuild trigger file, relative to the project root when possible.
+  const manualTriggerLabel = manualRebuildTrigger
+    ? path.relative(projectRoot, manualRebuildTrigger) || manualRebuildTrigger
+    : undefined;
 
   // Initial build
   let result: ExecutionResult;
@@ -143,6 +150,18 @@ export async function* runEsBuildBuildAction(
 
       // Watch locations provided by the initial build result
       watcher.add(result.watchFiles);
+
+      // Explicitly watch the manual rebuild trigger file. It is not part of the build's
+      // watch files (nothing imports it) and the project root is only watched when the
+      // `NG_BUILD_WATCH_ROOT` environment variable is set, so it must be added directly.
+      if (manualRebuildTrigger) {
+        watcher.add(manualRebuildTrigger);
+
+        logger.info(
+          `Manual rebuild mode enabled. Automatic rebuilds are paused; file changes will be ` +
+            `buffered until you touch "${manualTriggerLabel}" to trigger a single rebuild.`,
+        );
+      }
     }
 
     // Output the first build results after setting up the watcher to ensure that any code executed
@@ -168,10 +187,47 @@ export async function* runEsBuildBuildAction(
 
   // Wait for changes and rebuild as needed
   const currentWatchFiles = new Set(result.watchFiles);
+  // Buffered, per-path coalesced changes accumulated while manual rebuild mode is paused.
+  let pendingChanges: ChangedFiles | undefined;
   try {
-    for await (const changes of watcher) {
+    for await (const batch of watcher) {
       if (options.signal?.aborted) {
         break;
+      }
+
+      let changes = batch;
+      if (manualRebuildTrigger) {
+        // While paused, buffer and coalesce incoming changes; only the trigger file's
+        // modification flushes the queue and drives a single incremental rebuild.
+        const flush = batch.modified.has(manualRebuildTrigger);
+        pendingChanges = mergePendingChanges(pendingChanges, batch, manualRebuildTrigger);
+
+        if (!flush) {
+          const pendingCount = pendingChanges.all.length;
+          logger.info(
+            `Manual rebuild mode: ${pendingCount} change(s) buffered. ` +
+              `Touch "${manualTriggerLabel}" to rebuild.`,
+          );
+          if (verbose) {
+            logger.info(pendingChanges.toDebugString());
+          }
+
+          // Keep serving the last successful build until the trigger file is touched.
+          continue;
+        }
+
+        if (pendingChanges.all.length === 0) {
+          // Trigger file touched but nothing was buffered; nothing to rebuild.
+          logger.info(`Manual rebuild triggered, but no changes are queued. Nothing to rebuild.`);
+          pendingChanges = undefined;
+          continue;
+        }
+
+        logger.info(
+          `Manual rebuild triggered. Rebuilding ${pendingChanges.all.length} buffered change(s)...`,
+        );
+        changes = pendingChanges;
+        pendingChanges = undefined;
       }
 
       if (clearScreen) {
@@ -426,6 +482,40 @@ function* emitOutputResults(
 
     yield updateResult;
   }
+}
+
+/**
+ * Merges a batch of watcher changes into an accumulated, per-path coalesced change set used by
+ * manual rebuild mode. Coalescing is "last event wins": repeated modifications collapse to a
+ * single modification, a modify followed by a remove becomes a remove, and a remove followed by a
+ * recreate becomes a modification. The trigger file itself is excluded since it is not a source
+ * input and only acts as the flush signal.
+ */
+function mergePendingChanges(
+  pending: ChangedFiles | undefined,
+  batch: ChangedFiles,
+  trigger: string,
+): ChangedFiles {
+  const merged = pending ?? new ChangedFiles();
+
+  // The watcher never populates `added`, but include it defensively for completeness.
+  for (const file of [...batch.added, ...batch.modified]) {
+    if (file === trigger) {
+      continue;
+    }
+    merged.removed.delete(file);
+    merged.modified.add(file);
+  }
+
+  for (const file of batch.removed) {
+    if (file === trigger) {
+      continue;
+    }
+    merged.modified.delete(file);
+    merged.removed.add(file);
+  }
+
+  return merged;
 }
 
 function isCssFilePath(filePath: string): boolean {
