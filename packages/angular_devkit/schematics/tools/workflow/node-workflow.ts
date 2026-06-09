@@ -9,7 +9,7 @@
 import { Path, getSystemPath, normalize, schema, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
 import { realpathSync } from 'node:fs';
-import { dirname, isAbsolute, relative, resolve as resolveSystemPath, sep } from 'node:path';
+import { basename, dirname, isAbsolute, relative, resolve as resolveSystemPath, sep } from 'node:path';
 import { Observable } from 'rxjs';
 import { workflow } from '../../src';
 import { BuiltinTaskExecutor } from '../../tasks/node';
@@ -32,6 +32,34 @@ export interface NodeWorkflowOptions {
 }
 
 /**
+ * Resolves the real path of a system path, walking up to the first existing ancestor if the path or
+ * its descendants do not exist, and preserving the non-existent trailing segments. This keeps the
+ * containment check working for not-yet-created files and for a workspace root that does not exist
+ * yet (e.g. during `ng new`), where `realpathSync` would otherwise throw `ENOENT`.
+ */
+function resolveRealPath(systemPath: string): string {
+  let current = resolveSystemPath(systemPath);
+  const segments: string[] = [];
+  for (;;) {
+    try {
+      const real = realpathSync(current);
+
+      return resolveSystemPath(real, ...segments.reverse());
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw e;
+      }
+      const parent = dirname(current);
+      if (parent === current) {
+        throw e;
+      }
+      segments.push(basename(current));
+      current = parent;
+    }
+  }
+}
+
+/**
  * A {@link virtualFs.ScopedHost} that additionally rejects any write/delete/rename whose real
  * (symlink-resolved) location escapes the workspace root.
  *
@@ -45,28 +73,11 @@ class WorkspaceRootHost<T extends object> extends virtualFs.ScopedHost<T> {
 
   constructor(delegate: virtualFs.Host<T>, root: Path) {
     super(delegate, root);
-    this._systemRoot = realpathSync(getSystemPath(root));
+    this._systemRoot = resolveRealPath(getSystemPath(root));
   }
 
   private _assertWithinRoot(path: Path): void {
-    // Resolve the real path, walking up to the first existing ancestor for not-yet-created files.
-    let current = resolveSystemPath(getSystemPath(this._resolve(path)));
-    let real: string;
-    for (;;) {
-      try {
-        real = realpathSync(current);
-        break;
-      } catch (e) {
-        if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
-          throw e;
-        }
-        const parent = dirname(current);
-        if (parent === current) {
-          throw e;
-        }
-        current = parent;
-      }
-    }
+    const real = resolveRealPath(getSystemPath(this._resolve(path)));
 
     const rel = relative(this._systemRoot, real);
     if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) {
