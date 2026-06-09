@@ -113,4 +113,51 @@ describe('PackageManager', () => {
       expect(manifest).toEqual({ name: 'foo', version: '1.0.0' });
     });
   });
+
+  describe('acquireTempPackage', () => {
+    it('should copy config files from the project when copyConfigFromProject is true', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const copyFileSpy = spyOn(host as any, 'copyFile').and.resolveTo();
+      spyOn(host, 'createTempDirectory').and.resolveTo('/tmp/angular-cli-packages-test');
+      spyOn(host, 'writeFile').and.resolveTo();
+      spyOn(host, 'deleteDirectory').and.resolveTo();
+
+      const pm = new PackageManager(host, '/project', descriptor);
+
+      await pm.acquireTempPackage('foo');
+
+      expect(copyFileSpy).toHaveBeenCalledWith(
+        '/project/.npmrc',
+        '/tmp/angular-cli-packages-test/.npmrc',
+      );
+    });
+
+    it('should not copy config files when copyConfigFromProject is not set', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const copyFileSpy = spyOn(host as any, 'copyFile').and.resolveTo();
+      spyOn(host, 'createTempDirectory').and.resolveTo('/tmp/angular-cli-packages-test');
+      spyOn(host, 'writeFile').and.resolveTo();
+      spyOn(host, 'deleteDirectory').and.resolveTo();
+
+      const noCopyDescriptor = { ...descriptor, copyConfigFromProject: undefined };
+      const pm = new PackageManager(host, '/project', noCopyDescriptor);
+
+      await pm.acquireTempPackage('foo');
+
+      expect(copyFileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should ignore missing config files gracefully', async () => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const copyFileSpy = spyOn(host as any, 'copyFile').and.rejectWith(new Error('ENOENT'));
+      spyOn(host, 'createTempDirectory').and.resolveTo('/tmp/angular-cli-packages-test');
+      spyOn(host, 'writeFile').and.resolveTo();
+      spyOn(host, 'deleteDirectory').and.resolveTo();
+
+      const pm = new PackageManager(host, '/project', descriptor);
+
+      await expectAsync(pm.acquireTempPackage('foo')).toBeResolved();
+      expect(copyFileSpy).toHaveBeenCalled();
+    });
+  });
 });
