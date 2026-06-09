@@ -113,4 +113,162 @@ describe('PackageManager', () => {
       expect(manifest).toEqual({ name: 'foo', version: '1.0.0' });
     });
   });
+
+  describe('getManifest with min-release-age', () => {
+    const MS_PER_DAY = 86_400_000;
+    let now: number;
+
+    beforeEach(() => {
+      now = Date.parse('2026-05-15T12:00:00.000Z');
+      jasmine.clock().install();
+      jasmine.clock().mockDate(new Date(now));
+
+      // Stub stat so the cooldown reader sees `/tmp` itself as the repo root.
+      spyOn(host, 'stat').and.callFake((path: string) => {
+        if (path === '/tmp/.git') {
+          return Promise.resolve({ isDirectory: () => true } as never);
+        }
+
+        return Promise.reject(new Error('not found'));
+      });
+    });
+
+    afterEach(() => {
+      jasmine.clock().uninstall();
+    });
+
+    /**
+     * Returns the metadata stdout the npm `view` parser expects, with one
+     * version that is "old enough" and one that is too new for a cooldown
+     * of 7 days.
+     */
+    function mockMetadataResponse(): void {
+      const metadata = {
+        name: 'foo',
+        'dist-tags': { latest: '21.4.0' },
+        versions: ['21.3.0', '21.4.0'],
+        time: {
+          // 21.3.0: 30 days ago (always old enough)
+          '21.3.0': new Date(now - 30 * MS_PER_DAY).toISOString(),
+          // 21.4.0: 1 day ago (younger than the 7-day cooldown)
+          '21.4.0': new Date(now - 1 * MS_PER_DAY).toISOString(),
+        },
+      };
+
+      runCommandSpy.and.callFake((_binary: string, args: readonly string[]) => {
+        // Metadata requests are scoped to the package without a version (`foo`).
+        // Manifest requests use a versioned specifier (`foo@<version>`).
+        const versionedSpec = args.find((a) => /^foo@\S+/.test(a));
+        if (!versionedSpec) {
+          return Promise.resolve({ stdout: JSON.stringify(metadata), stderr: '' });
+        }
+
+        const requestedVersion = /^foo@(\S+)/.exec(versionedSpec)?.[1] ?? '';
+
+        return Promise.resolve({
+          stdout: JSON.stringify({ name: 'foo', version: requestedVersion }),
+          stderr: '',
+        });
+      });
+    }
+
+    it('honors a cooldown configured in .npmrc when resolving the `latest` tag', async () => {
+      spyOn(host, 'readFile').and.callFake((path: string) => {
+        if (path === '/tmp/.npmrc') {
+          return Promise.resolve('min-release-age=7\n');
+        }
+
+        return Promise.reject(new Error('not found'));
+      });
+      mockMetadataResponse();
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      const manifest = await pm.getManifest('foo@latest');
+
+      expect(manifest?.version).toBe('21.3.0');
+    });
+
+    it('does not fetch metadata for an explicit version even when a cooldown is configured', async () => {
+      spyOn(host, 'readFile').and.callFake((path: string) => {
+        if (path === '/tmp/.npmrc') {
+          return Promise.resolve('min-release-age=7\n');
+        }
+
+        return Promise.reject(new Error('not found'));
+      });
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '21.4.0' }),
+        stderr: '',
+      });
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      const manifest = await pm.getManifest('foo@21.4.0');
+
+      // Hit `getRegistryManifest` directly. The package manager enforces the
+      // cooldown at install time; the CLI should not second-guess an explicit
+      // version, since that would block legitimate use cases like pinning.
+      expect(manifest?.version).toBe('21.4.0');
+      expect(runCommandSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not call `getRegistryMetadata` when no cooldown is configured', async () => {
+      spyOn(host, 'readFile').and.rejectWith(new Error('no .npmrc'));
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '21.4.0' }),
+        stderr: '',
+      });
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      const manifest = await pm.getManifest('foo@latest');
+
+      expect(manifest?.version).toBe('21.4.0');
+      // A single call: directly to `getRegistryManifest`. No metadata lookup.
+      expect(runCommandSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps prereleases eligible when falling back from a prerelease tag', async () => {
+      spyOn(host, 'readFile').and.callFake((path: string) => {
+        if (path === '/tmp/.npmrc') {
+          return Promise.resolve('min-release-age=7\n');
+        }
+
+        return Promise.reject(new Error('not found'));
+      });
+
+      const metadata = {
+        name: 'foo',
+        'dist-tags': { next: '22.0.0-next.5', latest: '21.3.0' },
+        versions: ['21.3.0', '22.0.0-next.4', '22.0.0-next.5'],
+        time: {
+          // Stable older release.
+          '21.3.0': new Date(now - 30 * MS_PER_DAY).toISOString(),
+          // Older prerelease, eligible.
+          '22.0.0-next.4': new Date(now - 15 * MS_PER_DAY).toISOString(),
+          // Newest prerelease, blocked by the cooldown.
+          '22.0.0-next.5': new Date(now - 1 * MS_PER_DAY).toISOString(),
+        },
+      };
+
+      runCommandSpy.and.callFake((_binary: string, args: readonly string[]) => {
+        const versionedSpec = args.find((a) => /^foo@\S+/.test(a));
+        if (!versionedSpec) {
+          return Promise.resolve({ stdout: JSON.stringify(metadata), stderr: '' });
+        }
+
+        const requestedVersion = /^foo@(\S+)/.exec(versionedSpec)?.[1] ?? '';
+
+        return Promise.resolve({
+          stdout: JSON.stringify({ name: 'foo', version: requestedVersion }),
+          stderr: '',
+        });
+      });
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      const manifest = await pm.getManifest('foo@next');
+
+      // Should pick the older prerelease, not silently downgrade to a stable
+      // version that the user never asked for.
+      expect(manifest?.version).toBe('22.0.0-next.4');
+    });
+  });
 });

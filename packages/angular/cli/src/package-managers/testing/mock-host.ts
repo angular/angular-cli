@@ -16,6 +16,7 @@ import { Host } from '../host';
 export class MockHost implements Host {
   readonly requiresQuoting = false;
   private readonly fs = new Map<string, string[] | true>();
+  private readonly fileContents = new Map<string, string>();
 
   constructor(files: Record<string, string[] | true> = {}) {
     // Normalize paths to use forward slashes for consistency in tests.
@@ -31,6 +32,18 @@ export class MockHost implements Host {
         }
       }
     }
+  }
+
+  /** Registers a file with text content for later retrieval via `readFile`. */
+  setFile(path: string, content: string): void {
+    const normalized = path.replace(/\\/g, '/');
+    this.fs.set(normalized, []);
+    this.fileContents.set(normalized, content);
+  }
+
+  /** Marks a path as a directory. */
+  setDirectory(path: string): void {
+    this.fs.set(path.replace(/\\/g, '/'), true);
   }
 
   mkdir(path: string, options?: { recursive?: boolean }): Promise<string | undefined> {
@@ -67,8 +80,14 @@ export class MockHost implements Host {
     throw new Error('Method not implemented.');
   }
 
-  readFile(): Promise<string> {
-    throw new Error('Method not implemented.');
+  readFile(path: string): Promise<string> {
+    const normalized = path.replace(/\\/g, '/');
+    const contents = this.fileContents.get(normalized);
+    if (contents === undefined) {
+      return Promise.reject(new Error(`File not found: ${path}`));
+    }
+
+    return Promise.resolve(contents);
   }
 
   copyFile(): Promise<void> {
