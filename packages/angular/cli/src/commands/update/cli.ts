@@ -254,10 +254,16 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
             packages: [],
             workspaceRoot: this.context.root,
           },
+          packageManager,
           logger,
         );
 
-        printUpdateUsageMessage(plan.packageInfoMap, logger, options.next);
+        await printUpdateUsageMessage(
+          plan.packageInfoMap,
+          plan.registryClient,
+          logger,
+          options.next,
+        );
 
         return 0;
       } catch (error) {
@@ -525,6 +531,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
           verbose: options.verbose,
           workspaceRoot: this.context.root,
         },
+        packageManager,
         logger,
       );
     } catch (error) {
