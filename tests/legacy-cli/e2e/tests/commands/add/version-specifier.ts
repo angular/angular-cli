@@ -16,6 +16,12 @@ export default async function () {
     await appendFile('.npmrc', '\nlegacy-peer-deps=true\n');
   }
 
+  // If using yarn, ignore engines check. Otherwise installing '@latest' package versions
+  // might fail if they require a newer Node.js runtime version than the E2E test runner.
+  if (getActivePackageManager() === 'yarn') {
+    await appendFile('.yarnrc', '\nignore-engines true\n');
+  }
+
   const tag = isPrereleaseCli() ? '@next' : '';
 
   await ng('add', `@angular/localize${tag}`, '--skip-confirmation');
