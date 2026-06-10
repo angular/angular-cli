@@ -42,7 +42,7 @@ export async function createNpmRegistry(
 }
 
 // Token was generated using `echo -n 'testing:s3cret' | openssl base64`.
-const VALID_TOKEN = `dGVzdGluZzpzM2NyZXQ=`;
+export const VALID_TOKEN = `dGVzdGluZzpzM2NyZXQ=`;
 
 export function createNpmConfigForAuthentication(
   /**
@@ -69,7 +69,9 @@ export function createNpmConfigForAuthentication(
     '.npmrc',
     scopedAuthentication
       ? `
-        ${registry}:_auth="${token}"
+        ${registry}/:_auth="${token}"
+        ${registry}/:always-auth=true
+        always-auth=true
         registry=http:${registry}
       `
       : `
