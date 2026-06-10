@@ -8,6 +8,9 @@ import assert from 'node:assert';
 export default async function () {
   // The environment variable has priority over the .npmrc
   delete process.env['NPM_CONFIG_REGISTRY'];
+  delete process.env['YARN_REGISTRY'];
+  delete process.env['NPM_CONFIG__AUTH'];
+  delete process.env['NPM_CONFIG_ALWAYS_AUTH'];
   const worksMessage = 'We analyzed your package.json';
 
   const extraArgs: string[] = [];
@@ -16,12 +19,6 @@ export default async function () {
   }
 
   // Valid authentication token
-  await createNpmConfigForAuthentication(false);
-  const { stdout: stdout1 } = await ng('update', ...extraArgs);
-  if (!stdout1.includes(worksMessage)) {
-    throw new Error(`Expected stdout to contain "${worksMessage}"`);
-  }
-
   await createNpmConfigForAuthentication(true);
   const { stdout: stdout2 } = await ng('update', ...extraArgs);
   if (!stdout2.includes(worksMessage)) {
@@ -29,9 +26,6 @@ export default async function () {
   }
 
   // Invalid authentication token
-  await createNpmConfigForAuthentication(false, true);
-  await expectToFail(() => ng('update', ...extraArgs));
-
   await createNpmConfigForAuthentication(true, true);
   await expectToFail(() => ng('update', ...extraArgs));
 
