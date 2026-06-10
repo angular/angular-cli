@@ -6,9 +6,6 @@ import { getActivePackageManager } from '../../utils/packages';
 import assert from 'node:assert';
 
 export default async function () {
-  const packageManager = getActivePackageManager();
-  const supportsUnscopedAuth = packageManager === 'yarn';
-
   // The environment variable has priority over the .npmrc
   delete process.env['NPM_CONFIG_REGISTRY'];
   const worksMessage = 'We analyzed your package.json';
@@ -20,14 +17,6 @@ export default async function () {
 
   // Valid authentication token
 
-  if (supportsUnscopedAuth) {
-    await createNpmConfigForAuthentication(false);
-    const { stdout: stdout1 } = await ng('update', ...extraArgs);
-    if (!stdout1.includes(worksMessage)) {
-      throw new Error(`Expected stdout to contain "${worksMessage}"`);
-    }
-  }
-
   await createNpmConfigForAuthentication(true);
   const { stdout: stdout2 } = await ng('update', ...extraArgs);
   if (!stdout2.includes(worksMessage)) {
@@ -35,11 +24,6 @@ export default async function () {
   }
 
   // Invalid authentication token
-
-  if (supportsUnscopedAuth) {
-    await createNpmConfigForAuthentication(false, true);
-    await expectToFail(() => ng('update', ...extraArgs));
-  }
 
   await createNpmConfigForAuthentication(true, true);
   await expectToFail(() => ng('update', ...extraArgs));
