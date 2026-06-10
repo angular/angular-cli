@@ -86,6 +86,42 @@ describe('PackageManager', () => {
     });
   });
 
+  describe('getRegistryMetadata', () => {
+    it('should query dist-tags and versions separately for bun', async () => {
+      const bunDescriptor = SUPPORTED_PACKAGE_MANAGERS['bun'];
+      const pm = new PackageManager(host, '/tmp', bunDescriptor);
+
+      runCommandSpy.and.callFake((binary, args) => {
+        if (args.includes('dist-tags')) {
+          return Promise.resolve({ stdout: JSON.stringify({ latest: '2.0.0' }), stderr: '' });
+        } else if (args.includes('versions')) {
+          return Promise.resolve({ stdout: JSON.stringify(['1.0.0', '2.0.0']), stderr: '' });
+        }
+
+        return Promise.resolve({ stdout: '', stderr: '' });
+      });
+
+      const metadata = await pm.getRegistryMetadata('foo');
+
+      expect(metadata).toEqual({
+        name: 'foo',
+        'dist-tags': { latest: '2.0.0' },
+        versions: ['1.0.0', '2.0.0'],
+      });
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'bun',
+        ['pm', 'view', '--json', 'foo', 'dist-tags'],
+        jasmine.anything(),
+      );
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'bun',
+        ['pm', 'view', '--json', 'foo', 'versions'],
+        jasmine.anything(),
+      );
+    });
+  });
+
   describe('initializationError', () => {
     it('should throw initializationError when running commands', async () => {
       const error = new Error('Not installed');
