@@ -1,3 +1,37 @@
+<a name="22.0.1"></a>
+
+# 22.0.1 (2026-06-10)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------- |
+| [b54e9a549](https://github.com/angular/angular-cli/commit/b54e9a549d30871f6017b1db4cf7a4ab5f3e02db) | fix  | do not sort migrations of the same version alphabetically                           |
+| [d33311612](https://github.com/angular/angular-cli/commit/d333116123c7d3d5e87713b7baac048b78f28517) | fix  | fallback to local package.json for schematic detection on first run                 |
+| [918102a93](https://github.com/angular/angular-cli/commit/918102a9373085394c41f10d9f5df3e3c17b263f) | fix  | isolate temporary package installation from parent pnpm workspace                   |
+| [b048b5f4a](https://github.com/angular/angular-cli/commit/b048b5f4a83d7b20095d79654b849808e7d58fdb) | fix  | remove forceAuth and unscoped credential parsing                                    |
+| [277934035](https://github.com/angular/angular-cli/commit/277934035138c5af803e8daeebc2313f0a4cb5b3) | fix  | validate registry option is a valid URL in ng add                                   |
+| [4510dae02](https://github.com/angular/angular-cli/commit/4510dae021ab25bb852eeed6415dbd52cfabfce5) | perf | optimize update schematic registry query counts by fetching package metadata lazily |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [c80012294](https://github.com/angular/angular-cli/commit/c8001229453211b37cd7bb12ed26a2deb9257fd5) | fix  | fix browserMode option mapping in refactor-jasmine-vitest          |
+| [a9b6bd904](https://github.com/angular/angular-cli/commit/a9b6bd9042d6b859c384a6fc782541fca30dfb68) | fix  | safely comment out multiline statements in refactor-jasmine-vitest |
+| [12199df00](https://github.com/angular/angular-cli/commit/12199df00f2e3e8436ada13e04799e5825eb3f7b) | fix  | use null objects and callbacks in karma-to-vitest migration        |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [89d1be979](https://github.com/angular/angular-cli/commit/89d1be979f388d85e9c428bbf1df4e7fb4036dce) | fix  | allow disabling Vitest isolation from builder                 |
+| [d45b84be9](https://github.com/angular/angular-cli/commit/d45b84be9a607e49b391cb216cb6de7eca274931) | fix  | exclude JSON imports from Vite dependency optimization        |
+| [e3cab4ddd](https://github.com/angular/angular-cli/commit/e3cab4dddade2538125e8a2f345f42c95e26aeae) | fix  | prevent concurrent stylesheet bundling esbuild context leaks  |
+| [bd413b0eb](https://github.com/angular/angular-cli/commit/bd413b0eb156184ea432cbb7d4e6d7f6f70813ab) | fix  | restrict application builder output paths to output directory |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.0"></a>
 
 # 22.0.0 (2026-06-03)
