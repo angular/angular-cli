@@ -153,9 +153,7 @@ export async function executeMigrations(
   if (requiredMigrations.length) {
     logger.info(colors.cyan(`** Executing migrations of package '${packageName}' **\n`));
 
-    requiredMigrations.sort(
-      (a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name),
-    );
+    requiredMigrations.sort(compareMigrations);
 
     const result = await executePackageMigrations(
       workflow,
@@ -174,9 +172,7 @@ export async function executeMigrations(
   if (optionalMigrations.length) {
     logger.info(colors.magenta(`** Optional migrations of package '${packageName}' **\n`));
 
-    optionalMigrations.sort(
-      (a, b) => semver.compare(a.version, b.version) || a.name.localeCompare(b.name),
-    );
+    optionalMigrations.sort(compareMigrations);
 
     const migrationsToRun = await getOptionalMigrationsToRun(
       logger,
@@ -371,4 +367,11 @@ function getMigrationTitleAndDescription(migration: MigrationSchematicDescriptio
       ? new URL(migration.documentation, 'https://angular.dev').href
       : undefined,
   };
+}
+
+function compareMigrations(
+  a: MigrationSchematicDescriptionWithVersion,
+  b: MigrationSchematicDescriptionWithVersion,
+): number {
+  return semver.compare(a.version, b.version);
 }
