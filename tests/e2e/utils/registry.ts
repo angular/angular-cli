@@ -63,7 +63,7 @@ export async function createNpmConfigForAuthentication(
    * _auth="dGVzdGluZzpzM2NyZXQ="`
    * ```
    */
-  scopedAuthentication: boolean,
+  scopedAuthentication = true,
   /** When true, an incorrect token is used. Use this to validate authentication failures. */
   invalidToken = false,
 ): Promise<void> {
