@@ -1,3 +1,41 @@
+<a name="22.1.0-next.0"></a>
+
+# 22.1.0-next.0 (2026-06-11)
+
+## Deprecations
+
+### @angular-devkit/core
+
+- `stringToFileBuffer` and `fileBufferToString` are deprecated. Use standard Web APIs (`TextEncoder` and `TextDecoder`) instead.
+
+  Internal usages within the repository have been removed and replaced with standard Web APIs. The public API golden file for `@angular-devkit/core` has been updated to reflect the deprecations.
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [89d7f59cd](https://github.com/angular/angular-cli/commit/89d7f59cd7cc5d821ac0e81b1fee50e27877c976) | feat | update ai-config to include Angular MCP server config |
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                            |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------- |
+| [7932caaf9](https://github.com/angular/angular-cli/commit/7932caaf987c5692d6624f6af23e65ce3f6d27fd) | fix  | robustly parse npm manifest from array |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type     | Description                                         |
+| --------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------- |
+| [fd336d365](https://github.com/angular/angular-cli/commit/fd336d365dbfe8f558db177a8da24790914a541b) | refactor | deprecate stringToFileBuffer and fileBufferToString |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [ddcef9d48](https://github.com/angular/angular-cli/commit/ddcef9d484e205c5fcfd93d184425c1c1af19c34) | fix  | correct grammar in console warning for redirected location headers |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.28"></a>
 
 # 20.3.28 (2026-06-11)
