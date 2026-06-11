@@ -704,7 +704,7 @@ function _addPackageGroup(
   if (Array.isArray(packageGroup) && !packageGroup.some((x) => typeof x != 'string')) {
     packageGroupNormalized = packageGroup.reduce(
       (acc, curr) => {
-        acc[curr] = maybePackage;
+        acc[curr] = version;
 
         return acc;
       },
