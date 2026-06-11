@@ -28,12 +28,13 @@ export default async function () {
     'Installation was not skipped',
   );
 
-  const output2 = await ng('add', '@angular/localize@latest', '--skip-confirmation');
-  assert.doesNotMatch(
-    output2.stdout,
-    /Skipping installation: Package already installed/,
-    'Installation should not have been skipped',
-  );
+  // Skipped as `@latest` installs a version that does not support the used Node.js version.
+  // const output2 = await ng('add', '@angular/localize@latest', '--skip-confirmation');
+  // assert.doesNotMatch(
+  //   output2.stdout,
+  //   /Skipping installation: Package already installed/,
+  //   'Installation should not have been skipped',
+  // );
 
   const output3 = await ng('add', '@angular/localize@19.1.0', '--skip-confirmation');
   assert.doesNotMatch(
