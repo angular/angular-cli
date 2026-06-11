@@ -46,7 +46,7 @@ export function createRedirectResponse(
   if (ngDevMode && resHeaders.has('location')) {
     // eslint-disable-next-line no-console
     console.warn(
-      `Location header "${resHeaders.get('location')}" will ignored and set to "${location}".`,
+      `Location header "${resHeaders.get('location')}" will be ignored and set to "${location}".`,
     );
   }
 
