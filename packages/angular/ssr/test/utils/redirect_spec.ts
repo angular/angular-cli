@@ -52,7 +52,7 @@ describe('Redirect Utils', () => {
       const warnSpy = spyOn(console, 'warn');
       createRedirectResponse('/home', 302, { 'Location': '/evil' });
       expect(warnSpy).toHaveBeenCalledWith(
-        'Location header "/evil" will ignored and set to "/home".',
+        'Location header "/evil" will be ignored and set to "/home".',
       );
     });
 
