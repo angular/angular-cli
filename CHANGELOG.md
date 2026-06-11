@@ -1,3 +1,16 @@
+<a name="20.3.28"></a>
+
+# 20.3.28 (2026-06-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------- |
+| [e3d564667](https://github.com/angular/angular-cli/commit/e3d5646679215d9b73a72e04d87aa7848f2c01d2) | fix  | fallback to deprecated versions when resolving ranges if no non-deprecated version is found |
+| [f12e17025](https://github.com/angular/angular-cli/commit/f12e17025a262f9432afd58971c47aec7dbfab25) | fix  | remove forceAuth and unscoped credential parsing                                            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.27"></a>
 
 # 20.3.27 (2026-06-02)
