@@ -1,3 +1,16 @@
+<a name="21.2.15"></a>
+
+# 21.2.15 (2026-06-11)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [42ac0ed0f](https://github.com/angular/angular-cli/commit/42ac0ed0ff8b98862b9df1cef048f463ddc2cd85) | fix  | remove forceAuth and unscoped credential parsing             |
+| [c7a7f1955](https://github.com/angular/angular-cli/commit/c7a7f1955619717ca775f730d67e3311047537f8) | fix  | support registry metadata fetching under bun package manager |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.1"></a>
 
 # 22.0.1 (2026-06-10)
