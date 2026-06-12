@@ -205,7 +205,16 @@ export class VitestExecutor implements TestExecutor {
 
   async [Symbol.asyncDispose](): Promise<void> {
     this.debugLog(DebugLogLevel.Info, 'Disposing VitestExecutor: Closing Vitest instance.');
-    await this.vitest?.close();
+    if (this.vitest && !this.options.watch) {
+      // In run (non-watch) mode, mirror the `vitest run` CLI by using `exit()`, which arms an
+      // unref'd `teardownTimeout` safety net (`process.exit()`) before closing. `close()` alone
+      // can wait indefinitely when a worker or service keeps the event loop alive, leaving the
+      // process hanging after all tests have completed.
+      // See https://github.com/angular/angular-cli/issues/32832
+      await this.vitest.exit();
+    } else {
+      await this.vitest?.close();
+    }
     this.debugLog(DebugLogLevel.Info, 'Vitest instance closed.');
   }
 
