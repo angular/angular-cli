@@ -3,7 +3,6 @@
 {
   "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/app",
     "types": []
   },
   "include": [
