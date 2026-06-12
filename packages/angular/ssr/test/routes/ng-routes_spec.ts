@@ -102,6 +102,62 @@ describe('extractRoutesAndCreateRouteTree', () => {
       );
     });
 
+    it("should error when 'getPrerenderParams' returns a value containing HTML-significant characters", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'store/:tenant/legacy/:slug', component: DummyComponent }],
+        [
+          {
+            path: 'store/:tenant/legacy/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [
+                {
+                  tenant: `x"><img src=x onerror=console.log("XSS_PARENT_IMG")>`,
+                  slug: 'old',
+                },
+              ];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `the 'store/:tenant/legacy/:slug' route ` +
+          `returned an unsafe value for parameter 'tenant'`,
+      );
+    });
+
+    it("should error when 'getPrerenderParams' returns a value containing control characters", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'docs/:id', component: DummyComponent }],
+        [
+          {
+            path: 'docs/:id',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ id: 'a b' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `the 'docs/:id' route returned an unsafe value for parameter 'id'`,
+      );
+    });
+
     it(`should not error when a catch-all route didn't match any Angular route`, async () => {
       setAngularAppTestingManifest(
         [{ path: 'home', component: DummyComponent }],

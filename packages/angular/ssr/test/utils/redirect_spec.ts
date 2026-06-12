@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createRedirectResponse } from '../../src/utils/redirect';
+import { createRedirectResponse, validateUrlForStaticEmission } from '../../src/utils/redirect';
 
 describe('Redirect Utils', () => {
   describe('createRedirectResponse', () => {
@@ -61,6 +61,18 @@ describe('Redirect Utils', () => {
       globalThis.ngDevMode = true;
       expect(() => createRedirectResponse('/home', 200)).toThrowError(
         /Invalid redirect status code: 200/,
+      );
+    });
+  });
+
+  describe('validateUrlForStaticEmission', () => {
+    it('should allow URL-safe values', () => {
+      expect(validateUrlForStaticEmission('docs/page-1?from=ssg&next=/home')).toBeUndefined();
+    });
+
+    it('should reject HTML-significant characters', () => {
+      expect(validateUrlForStaticEmission('/docs"><script>alert(1)</script>')).toContain(
+        'contains characters that are not allowed',
       );
     });
   });
