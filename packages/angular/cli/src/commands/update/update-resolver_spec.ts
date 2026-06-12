@@ -11,7 +11,10 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import * as semver from 'semver';
+import type { PackageManager } from '../../package-managers';
+import { getNpmPackageJson } from '../../utilities/package-metadata';
 import {
+  UpdateResolverOptions,
   angularMajorCompatGuarantee,
   applyUpdatePlan,
   resolveUserUpdatePlan,
@@ -47,6 +50,53 @@ describe('UpdateResolver', () => {
     rmSync(tempRoot, { recursive: true, force: true });
   });
 
+  async function resolvePlan(options: UpdateResolverOptions) {
+    const mockPackageManager = {
+      name: 'npm',
+      async getRegistryMetadata(packageName: string) {
+        try {
+          const metadata = await getNpmPackageJson(packageName, logger, {
+            registry: options.registry,
+          });
+          if (!metadata || !metadata.name) {
+            return null;
+          }
+
+          return {
+            name: metadata.name,
+            'dist-tags': metadata['dist-tags'] as Record<string, string>,
+            versions: Object.keys(metadata.versions || {}),
+          };
+        } catch {
+          return null;
+        }
+      },
+      async getRegistryManifest(packageName: string, version: string) {
+        try {
+          const metadata = await getNpmPackageJson(packageName, logger, {
+            registry: options.registry,
+          });
+          const manifestResult = metadata.versions?.[version];
+          if (!manifestResult) {
+            return null;
+          }
+
+          return {
+            name: manifestResult.name,
+            version: manifestResult.version,
+            dependencies: manifestResult.dependencies,
+            peerDependencies: manifestResult.peerDependencies,
+            'ng-update': manifestResult['ng-update'] as Record<string, unknown> | undefined,
+          };
+        } catch {
+          return null;
+        }
+      },
+    } as unknown as PackageManager;
+
+    return resolveUserUpdatePlan(options, mockPackageManager, logger);
+  }
+
   function createMockWorkspace(
     packageJson: Record<string, unknown>,
     nodeModules: { [name: string]: { version: string; manifest?: Record<string, unknown> } } = {},
@@ -70,13 +120,10 @@ describe('UpdateResolver', () => {
       },
     });
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: [],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: [],
+      workspaceRoot: tempRoot,
+    });
 
     expect(plan.packagesToUpdate.size).toBe(0);
   });
@@ -95,13 +142,10 @@ describe('UpdateResolver', () => {
       },
     );
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: ['@angular-devkit-tests/update-base'],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: ['@angular-devkit-tests/update-base'],
+      workspaceRoot: tempRoot,
+    });
 
     expect(plan.packagesToUpdate.get('@angular-devkit-tests/update-base')).toBe('1.1.0');
   });
@@ -125,13 +169,10 @@ describe('UpdateResolver', () => {
       },
     );
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: ['@angular/core@^6.0.0'],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: ['@angular/core@^6.0.0'],
+      workspaceRoot: tempRoot,
+    });
 
     expect(plan.packagesToUpdate.get('@angular/core')?.[0]).toBe('6');
   });
@@ -151,13 +192,10 @@ describe('UpdateResolver', () => {
       },
     );
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: ['@angular-devkit-tests/update-package-group-1'],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: ['@angular-devkit-tests/update-package-group-1'],
+      workspaceRoot: tempRoot,
+    });
 
     expect(plan.packagesToUpdate.get('@angular-devkit-tests/update-package-group-1')).toBe('1.2.0');
     expect(plan.packagesToUpdate.get('@angular-devkit-tests/update-package-group-2')).toBe('2.0.0');
@@ -182,13 +220,10 @@ describe('UpdateResolver', () => {
       JSON.stringify({ name: '@angular-devkit-tests/update-base', version: '1.0.0' }, null, 2),
     );
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: ['@angular-devkit-tests/update-base'],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: ['@angular-devkit-tests/update-base'],
+      workspaceRoot: tempRoot,
+    });
 
     await applyUpdatePlan(tempRoot, plan, logger);
 
@@ -214,13 +249,10 @@ describe('UpdateResolver', () => {
       JSON.stringify({ name: '@angular-devkit-tests/update-base', version: '1.0.0' }, null, 2),
     );
 
-    const plan = await resolveUserUpdatePlan(
-      {
-        packages: ['@angular-devkit-tests/update-base'],
-        workspaceRoot: tempRoot,
-      },
-      logger,
-    );
+    const plan = await resolvePlan({
+      packages: ['@angular-devkit-tests/update-base'],
+      workspaceRoot: tempRoot,
+    });
 
     await applyUpdatePlan(tempRoot, plan, logger);
 
