@@ -179,6 +179,10 @@ export async function* serveWithVite(
   browserOptions.templateUpdates = componentsHmrCanBeUsed && useComponentTemplateHmr;
   browserOptions.incrementalResults = true;
 
+  // Forward manual ("rebuild now") mode to the application build watch loop.
+  browserOptions.manualRebuild = serverOptions.manualRebuild;
+  browserOptions.rebuildTrigger = serverOptions.rebuildTrigger;
+
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(
     // Always enable JIT linking to support applications built with and without AOT.
