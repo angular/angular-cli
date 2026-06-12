@@ -99,6 +99,15 @@ export interface PackageManagerDescriptor {
   /** A function that formats the arguments for field-filtered registry views. */
   readonly viewCommandFieldArgFormatter?: (fields: readonly string[]) => string[];
 
+  /** An optional custom function to fetch registry metadata when the default logic is not sufficient. */
+  readonly getRegistryMetadata?: (
+    packageName: string,
+    fetchAndParse: <T>(
+      args: readonly string[],
+      parser: (stdout: string, logger?: Logger) => T | null,
+    ) => Promise<T | null>,
+  ) => Promise<PackageMetadata | null>;
+
   /** A collection of functions to parse the output of specific commands. */
   readonly outputParsers: {
     /** A function to parse the output of `listDependenciesCommand`. */
@@ -273,6 +282,38 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     versionCommand: ['--version'],
     listDependenciesCommand: ['pm', 'ls'],
     getManifestCommand: ['pm', 'view', '--json'],
+    getRegistryMetadata: async (packageName, fetchAndParse) => {
+      const [distTags, versions] = await Promise.all([
+        fetchAndParse(['pm', 'view', '--json', packageName, 'dist-tags'], (stdout) => {
+          if (!stdout) {
+            return {};
+          }
+
+          const parsed = JSON.parse(stdout);
+
+          return parsed && typeof parsed === 'object' && !Array.isArray(parsed) ? parsed : {};
+        }),
+        fetchAndParse(['pm', 'view', '--json', packageName, 'versions'], (stdout) => {
+          if (!stdout) {
+            return null;
+          }
+
+          const parsed = JSON.parse(stdout);
+
+          return Array.isArray(parsed) ? parsed : [parsed];
+        }),
+      ]);
+
+      if (!versions || versions.length === 0) {
+        return null;
+      }
+
+      return {
+        name: packageName,
+        'dist-tags': (distTags || {}) as Record<string, string>,
+        versions: versions as string[],
+      };
+    },
     outputParsers: {
       listDependencies: parseBunDependencies,
       getRegistryManifest: parseNpmLikeManifest,
