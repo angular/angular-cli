@@ -140,8 +140,14 @@ export class VitestExecutor implements TestExecutor {
     let testResults;
     if (buildResult.kind === ResultKind.Incremental) {
       // To rerun tests, Vitest needs the original test file paths, not the output paths.
-      const modifiedSourceFiles = new Set<string>();
+      // Process all modified files in a single loop.
+      const specsToRerun = [];
       for (const modifiedFile of [...buildResult.modified, ...buildResult.added]) {
+        const absoluteOutputFile = this.normalizePath(
+          path.join(this.options.workspaceRoot, modifiedFile),
+        );
+        vitest.invalidateFile(absoluteOutputFile);
+
         // The `modified` files in the build result are the output paths.
         // We need to find the original source file path to pass to Vitest.
         const source = this.entryPointToTestFile.get(modifiedFile);
@@ -150,24 +156,26 @@ export class VitestExecutor implements TestExecutor {
             DebugLogLevel.Verbose,
             `Mapped output file '${modifiedFile}' to source file '${source}' for re-run.`,
           );
-          modifiedSourceFiles.add(source);
+          vitest.invalidateFile(source);
+          const specs = vitest.getModuleSpecifications(source);
+          if (specs) {
+            specsToRerun.push(...specs);
+          }
         } else {
+          // For non-test files (e.g., services, components), find dependent test specs
+          // via Vitest's module graph so that changes to these files trigger test re-runs.
           this.debugLog(
             DebugLogLevel.Verbose,
             `Could not map output file '${modifiedFile}' to a source file. It may not be a test file.`,
           );
-        }
-        vitest.invalidateFile(
-          this.normalizePath(path.join(this.options.workspaceRoot, modifiedFile)),
-        );
-      }
-
-      const specsToRerun = [];
-      for (const file of modifiedSourceFiles) {
-        vitest.invalidateFile(file);
-        const specs = vitest.getModuleSpecifications(file);
-        if (specs) {
-          specsToRerun.push(...specs);
+          const specs = vitest.getModuleSpecifications(absoluteOutputFile);
+          if (specs) {
+            this.debugLog(
+              DebugLogLevel.Verbose,
+              `Found ${specs.length} dependent test specification(s) for non-test file '${absoluteOutputFile}'.`,
+            );
+            specsToRerun.push(...specs);
+          }
         }
       }
 
