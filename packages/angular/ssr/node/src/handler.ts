@@ -55,6 +55,14 @@ export type NodeRequestHandlerFunction = (
  * });
  * ```
  *
+ * @remarks
+ * **Security note:** `createWebRequestFromNodeRequest()` builds the request URL directly from the
+ * `Host` and `X-Forwarded-*` headers and does not validate them. When integrating with a
+ * third-party framework as shown above, configure `allowedHosts` (and, if needed,
+ * `trustProxyHeaders`) via `AngularNodeAppEngine`, or otherwise validate these headers yourself,
+ * to prevent Server-Side Request Forgery (SSRF). For more information, see
+ * https://angular.dev/best-practices/security#preventing-server-side-request-forgery-ssrf.
+ *
  * @example
  * Usage in a Fastify application:
  * ```ts
