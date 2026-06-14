@@ -34,11 +34,20 @@ export class JavaScriptTransformer {
   #commonOptions: Required<JavaScriptTransformerOptions>;
   #fileCacheKeyBase: Uint8Array;
 
+  /** Queue of pending transformation tasks waiting for an active concurrency slot. */
+  #pendingTasks: (() => void)[] = [];
+  /** Current count of actively executing transformation tasks. */
+  #activeTasks = 0;
+  /** Maximum number of transformation tasks allowed to execute concurrently. */
+  #maxConcurrent: number;
+
   constructor(
     options: JavaScriptTransformerOptions,
     readonly maxThreads: number,
     private readonly cache?: Cache<Uint8Array>,
   ) {
+    // Maintain 2 active tasks per worker thread to keep transformation pipelines fully saturated
+    this.#maxConcurrent = maxThreads * 2;
     // Extract options to ensure only the named options are serialized and sent to the worker
     const {
       sourcemap,
@@ -53,6 +62,33 @@ export class JavaScriptTransformer {
       jit,
     };
     this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
+  }
+
+  /**
+   * Executes a transformation action using a semaphore-based backpressure throttle.
+   * Prevents libuv thread pool saturation and excessive V8 heap accumulation.
+   * @param action A callback that produces a promise for the transformation result.
+   * @returns A promise resolving to the transformation result.
+   */
+  async #runWithThrottle<T>(action: () => Promise<T>): Promise<T> {
+    if (this.#activeTasks >= this.#maxConcurrent) {
+      await new Promise<void>((resolve) => {
+        this.#pendingTasks.push(resolve);
+      });
+    } else {
+      this.#activeTasks++;
+    }
+
+    try {
+      return await action();
+    } finally {
+      const next = this.#pendingTasks.shift();
+      if (next) {
+        next();
+      } else {
+        this.#activeTasks--;
+      }
+    }
   }
 
   #ensureWorkerPool(): WorkerPool {
@@ -90,56 +126,58 @@ export class JavaScriptTransformer {
     sideEffects?: boolean,
     instrumentForCoverage?: boolean,
   ): Promise<Uint8Array> {
-    const data = await readFile(filename);
+    return this.#runWithThrottle(async () => {
+      const data = await readFile(filename);
 
-    let result;
-    let cacheKey;
-    if (this.cache) {
-      // Create a cache key from the file data and options that effect the output.
-      // NOTE: If additional options are added, this may need to be updated.
-      // TODO: Consider xxhash or similar instead of SHA256
-      const hash = createHash('sha256');
-      hash.update(`${!!skipLinker}--${!!sideEffects}`);
-      hash.update(data);
-      hash.update(this.#fileCacheKeyBase);
-      cacheKey = hash.digest('hex');
+      let result;
+      let cacheKey;
+      if (this.cache) {
+        // Create a cache key from the file data and options that effect the output.
+        // NOTE: If additional options are added, this may need to be updated.
+        // TODO: Consider xxhash or similar instead of SHA256
+        const hash = createHash('sha256');
+        hash.update(`${!!skipLinker}--${!!sideEffects}`);
+        hash.update(data);
+        hash.update(this.#fileCacheKeyBase);
+        cacheKey = hash.digest('hex');
 
-      try {
-        result = await this.cache?.get(cacheKey);
-      } catch {
-        // Failure to get the value should not fail the transform
-      }
-    }
-
-    if (result === undefined) {
-      // If there is no cache or no cached entry, process the file
-      result = (await this.#ensureWorkerPool().run(
-        {
-          filename,
-          data,
-          skipLinker,
-          sideEffects,
-          instrumentForCoverage,
-          ...this.#commonOptions,
-        },
-        {
-          // The below is disable as with Yarn PNP this causes build failures with the below message
-          // `Unable to deserialize cloned data`.
-          transferList: process.versions.pnp ? undefined : [data.buffer],
-        },
-      )) as Uint8Array;
-
-      // If there is a cache then store the result
-      if (this.cache && cacheKey) {
         try {
-          await this.cache.put(cacheKey, result);
+          result = await this.cache?.get(cacheKey);
         } catch {
-          // Failure to store the value in the cache should not fail the transform
+          // Failure to get the value should not fail the transform
         }
       }
-    }
 
-    return result;
+      if (result === undefined) {
+        // If there is no cache or no cached entry, process the file
+        result = (await this.#ensureWorkerPool().run(
+          {
+            filename,
+            data,
+            skipLinker,
+            sideEffects,
+            instrumentForCoverage,
+            ...this.#commonOptions,
+          },
+          {
+            // The below is disable as with Yarn PNP this causes build failures with the below message
+            // `Unable to deserialize cloned data`.
+            transferList: process.versions.pnp ? undefined : [data.buffer],
+          },
+        )) as Uint8Array;
+
+        // If there is a cache then store the result
+        if (this.cache && cacheKey) {
+          try {
+            await this.cache.put(cacheKey, result);
+          } catch {
+            // Failure to store the value in the cache should not fail the transform
+          }
+        }
+      }
+
+      return result;
+    });
   }
 
   /**
@@ -171,14 +209,16 @@ export class JavaScriptTransformer {
       );
     }
 
-    return this.#ensureWorkerPool().run({
-      filename,
-      data,
-      skipLinker,
-      sideEffects,
-      instrumentForCoverage,
-      ...this.#commonOptions,
-    });
+    return this.#runWithThrottle(() =>
+      this.#ensureWorkerPool().run({
+        filename,
+        data,
+        skipLinker,
+        sideEffects,
+        instrumentForCoverage,
+        ...this.#commonOptions,
+      }),
+    );
   }
 
   /**
