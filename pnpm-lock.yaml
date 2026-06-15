@@ -490,8 +490,8 @@ importers:
         specifier: 13.0.2
         version: 13.0.2
       pacote:
-        specifier: 21.5.0
-        version: 21.5.0
+        specifier: 21.5.1
+        version: 21.5.1
       parse5-html-rewriting-stream:
         specifier: 8.0.1
         version: 8.0.1
@@ -6975,8 +6975,8 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  pacote@21.5.0:
-    resolution: {integrity: sha512-VtZ0SB8mb5Tzw3dXDfVAIjhyVKUHZkS/ZH9/5mpKenwC9sFOXNI0JI7kEF7IMkwOnsWMFrvAZHzx1T5fmrp9FQ==}
+  pacote@21.5.1:
+    resolution: {integrity: sha512-KvcJ9iy3crysCsgqc4+PknH/w6jkrp8JN36mpZBPwNaDRwTfMZD37YzRazNstiZUOhuF5pno9f78n9mEJBavwg==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
 
@@ -15683,7 +15683,7 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  pacote@21.5.0:
+  pacote@21.5.1:
     dependencies:
       '@gar/promise-retry': 1.0.3
       '@npmcli/git': 7.0.2
