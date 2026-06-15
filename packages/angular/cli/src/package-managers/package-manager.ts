@@ -93,6 +93,9 @@ export class PackageManager {
   readonly #initializationError?: Error;
   #dependencyCache: Map<string, InstalledPackage> | null = null;
   #version: string | undefined;
+  #activeTasks = 0;
+  readonly #pendingTasks: (() => void)[] = [];
+  readonly #maxConcurrent = 5;
 
   /**
    * Creates a new `PackageManager` instance.
@@ -159,49 +162,72 @@ export class PackageManager {
    * @param options Options for the child process.
    * @returns A promise that resolves with the standard output and standard error of the command.
    */
+  async #runWithThrottle<T>(action: () => Promise<T>): Promise<T> {
+    if (this.#activeTasks >= this.#maxConcurrent) {
+      await new Promise<void>((resolve) => {
+        this.#pendingTasks.push(resolve);
+      });
+    } else {
+      this.#activeTasks++;
+    }
+
+    try {
+      return await action();
+    } finally {
+      const next = this.#pendingTasks.shift();
+      if (next) {
+        next();
+      } else {
+        this.#activeTasks--;
+      }
+    }
+  }
+
   async #run(
     args: readonly string[],
     options: { timeout?: number; registry?: string; cwd?: string } = {},
   ): Promise<{ stdout: string; stderr: string }> {
-    this.ensureInstalled();
+    return this.#runWithThrottle(async () => {
+      this.ensureInstalled();
 
-    const { registry, cwd, ...runOptions } = options;
-    const finalArgs = [...args];
-    let finalEnv: Record<string, string> | undefined;
+      const { registry, cwd, ...runOptions } = options;
+      const finalArgs = [...args];
+      let finalEnv: Record<string, string> | undefined;
 
-    if (registry) {
-      const registryOptions = this.descriptor.getRegistryOptions?.(registry);
-      if (!registryOptions) {
-        throw new Error(
-          `The configured package manager, '${this.descriptor.binary}', does not support a custom registry.`,
+      if (registry) {
+        const registryOptions = this.descriptor.getRegistryOptions?.(registry);
+        if (!registryOptions) {
+          throw new Error(
+            `The configured package manager, '${this.descriptor.binary}', does not support a custom registry.`,
+          );
+        }
+
+        if (registryOptions.args) {
+          finalArgs.push(...registryOptions.args);
+        }
+        if (registryOptions.env) {
+          finalEnv = registryOptions.env;
+        }
+      }
+
+      const executionDirectory = cwd ?? this.cwd;
+      if (this.options.dryRun) {
+        this.options.logger?.info(
+          `[DRY RUN] Would execute in [${executionDirectory}]: ${this.descriptor.binary} ${finalArgs.join(' ')}`,
         );
+
+        return { stdout: '', stderr: '' };
       }
 
-      if (registryOptions.args) {
-        finalArgs.push(...registryOptions.args);
-      }
-      if (registryOptions.env) {
-        finalEnv = registryOptions.env;
-      }
-    }
+      const commandResult = await this.host.runCommand(this.descriptor.binary, finalArgs, {
+        ...runOptions,
+        cwd: executionDirectory,
+        stdio: 'pipe',
+        env: finalEnv,
+      });
 
-    const executionDirectory = cwd ?? this.cwd;
-    if (this.options.dryRun) {
-      this.options.logger?.info(
-        `[DRY RUN] Would execute in [${executionDirectory}]: ${this.descriptor.binary} ${finalArgs.join(' ')}`,
-      );
-
-      return { stdout: '', stderr: '' };
-    }
-
-    const commandResult = await this.host.runCommand(this.descriptor.binary, finalArgs, {
-      ...runOptions,
-      cwd: executionDirectory,
-      stdio: 'pipe',
-      env: finalEnv,
+      return { stdout: commandResult.stdout.trim(), stderr: commandResult.stderr.trim() };
     });
-
-    return { stdout: commandResult.stdout.trim(), stderr: commandResult.stderr.trim() };
   }
 
   /**
