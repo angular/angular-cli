@@ -34,6 +34,6 @@ export default async function () {
     await createNpmConfigForAuthentication(true, true);
 
     const error = await expectToFail(() => exec('yarn', 'ng', 'update', ...extraArgs));
-    assert.match(error.message, /not allowed to access package/);
+    assert.match(error.message, /not allowed to access package|status code 403/);
   }
 }

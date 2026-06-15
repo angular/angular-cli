@@ -75,10 +75,13 @@ export async function createNpmConfigForAuthentication(
     scopedAuthentication
       ? `
 ${registry}/:_auth="${token}"
+${registry}/:always-auth=true
+always-auth=true
 registry=http:${registry}
 `
       : `
 _auth="${token}"
+always-auth=true
 registry=http:${registry}
 `,
   );
@@ -88,10 +91,13 @@ registry=http:${registry}
     scopedAuthentication
       ? `
 ${registry}/:_auth "${token}"
+${registry}/:always-auth true
+always-auth true
 registry http:${registry}
 `
       : `
 _auth "${token}"
+always-auth true
 registry http:${registry}
 `,
   );
