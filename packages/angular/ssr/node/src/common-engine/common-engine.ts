@@ -175,9 +175,11 @@ export class CommonEngine {
     const isSSG = SSG_MARKER_REGEXP.test(content);
     if (isSSG) {
       this.pageIsSSG.set(pagePath, true);
+
+      return content;
     }
 
-    return isSSG ? content : undefined;
+    return undefined;
   }
 
   private async renderApplication(opts: CommonEngineRenderOptions): Promise<string> {
