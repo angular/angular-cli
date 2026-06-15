@@ -129,18 +129,33 @@ export const NodeJS_HOST: Host = {
     const isWin32 = platform() === 'win32';
 
     return new Promise((resolve, reject) => {
+      const env: Record<string, string | undefined> = {
+        ...process.env,
+        ...options.env,
+        //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
+        NO_UPDATE_NOTIFIER: '1',
+        NPM_CONFIG_UPDATE_NOTIFIER: 'false',
+      };
+
+      // When running via Yarn Classic (`yarn run <script>`), Yarn automatically injects
+      // `npm_config_registry=https://registry.yarnpkg.com` into the environment.
+      // Strip this fallback so that spawned child processes correctly respect local `.npmrc`/`.yarnrc` files.
+      if (
+        (env['npm_config_registry'] === 'https://registry.yarnpkg.com' ||
+          env['NPM_CONFIG_REGISTRY'] === 'https://registry.yarnpkg.com') &&
+        (env['npm_config_user_agent']?.includes('yarn') ||
+          env['NPM_CONFIG_USER_AGENT']?.includes('yarn'))
+      ) {
+        delete env['npm_config_registry'];
+        delete env['NPM_CONFIG_REGISTRY'];
+      }
+
       const spawnOptions = {
         shell: isWin32,
         stdio: options.stdio ?? 'pipe',
         signal,
         cwd: options.cwd,
-        env: {
-          ...process.env,
-          ...options.env,
-          //  NPM updater notifier will prevents the child process from closing until it timeout after 3 minutes.
-          NO_UPDATE_NOTIFIER: '1',
-          NPM_CONFIG_UPDATE_NOTIFIER: 'false',
-        },
+        env,
       } satisfies SpawnOptions;
       const childProcess = isWin32
         ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
