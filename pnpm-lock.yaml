@@ -328,7 +328,7 @@ importers:
         version: 28.1.0
       ng-packagr:
         specifier: 22.0.0-next.4
-        version: 22.0.0-next.4(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        version: 22.0.0-next.4(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -434,7 +434,7 @@ importers:
         version: 4.4.2
       ng-packagr:
         specifier: 21.2.3
-        version: 21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        version: 21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.12
         version: 8.5.12
@@ -491,8 +491,8 @@ importers:
         specifier: 13.0.2
         version: 13.0.2
       pacote:
-        specifier: 21.3.1
-        version: 21.3.1
+        specifier: 21.5.1
+        version: 21.5.1
       parse5-html-rewriting-stream:
         specifier: 8.0.0
         version: 8.0.0
@@ -682,7 +682,7 @@ importers:
         version: 8.5.12
       postcss-loader:
         specifier: 8.2.0
-        version: 8.2.0(postcss@8.5.12)(typescript@5.9.3)(webpack@5.105.2(esbuild@0.27.3))
+        version: 8.2.0(postcss@8.5.12)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.27.3))
       resolve-url-loader:
         specifier: 5.0.0
         version: 5.0.0
@@ -743,7 +743,7 @@ importers:
         version: 3.0.4(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       ng-packagr:
         specifier: 21.2.3
-        version: 21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3)
+        version: 21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       undici:
         specifier: 7.24.4
         version: 7.24.4
@@ -5484,9 +5484,6 @@ packages:
     resolution: {integrity: sha512-xUtoPkMggbz0MPyPiIWr1Kp4aeWJjDZ6SMvURhimjdZgsRuDplF5/s9hcgGhyXMhs+6vpnuoiZ2kFiu3FMnS8Q==}
     engines: {node: '>=18'}
 
-  err-code@2.0.3:
-    resolution: {integrity: sha512-2bmlRpNKBxT/CRmPOlyISQpNj+qSeYvcym/uT0Jx2bMOlKLtSy1ZmLuVxSEKKyor/N5yhvp/ZiG1oE3DEYMSFA==}
-
   errno@0.1.8:
     resolution: {integrity: sha512-dJ6oBr5SQ1VSd9qkk7ByRgb/1SH4JZjCHSW/mr63/QcXO9zLVxvJ6Oy13nio03rxpSnVDDjFor75SjVeZWPW/A==}
     hasBin: true
@@ -7624,8 +7621,8 @@ packages:
   package-json-from-dist@1.0.1:
     resolution: {integrity: sha512-UEZIS3/by4OC8vL3P2dTXRETpebLI2NiI5vIrjaD/5UtrkFX/tNbwjTSRAGC/+7CAo2pIcBaRgWmcBBHcsaCIw==}
 
-  pacote@21.3.1:
-    resolution: {integrity: sha512-O0EDXi85LF4AzdjG74GUwEArhdvawi/YOHcsW6IijKNj7wm8IvEWNF5GnfuxNpQ/ZpO3L37+v8hqdVh8GgWYhg==}
+  pacote@21.5.1:
+    resolution: {integrity: sha512-KvcJ9iy3crysCsgqc4+PknH/w6jkrp8JN36mpZBPwNaDRwTfMZD37YzRazNstiZUOhuF5pno9f78n9mEJBavwg==}
     engines: {node: ^20.17.0 || >=22.9.0}
     hasBin: true
 
@@ -7881,10 +7878,6 @@ packages:
     resolution: {integrity: sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==}
     engines: {node: '>=0.4.0'}
 
-  promise-retry@2.0.1:
-    resolution: {integrity: sha512-y+WKFlBR8BGXnsNlIHFGPZmyDf3DFMoLhaflAnyZgV6rG6xu+JwesTo2Q9R6XwYmtmwAFCkAk3e35jEdoeh/3g==}
-    engines: {node: '>=10'}
-
   propagate@2.0.1:
     resolution: {integrity: sha512-vGrhOavPSTz4QVNuBNdcNXePNdNMaO1xj9yBeH1ScQPjk/rhg9sSlCXPhMkFuaNNW/syTvYqsnbIJxMBfRbbag==}
     engines: {node: '>= 8'}
@@ -8133,10 +8126,6 @@ packages:
   retry-request@8.0.2:
     resolution: {integrity: sha512-JzFPAfklk1kjR1w76f0QOIhoDkNkSqW8wYKT08n9yysTmZfB+RQ2QoXoTAeOi1HD9ZipTyTAZg3c4pM/jeqgSw==}
     engines: {node: '>=18'}
-
-  retry@0.12.0:
-    resolution: {integrity: sha512-9LkiTwjUh6rT555DtE9rTX+BKByPfrMzEAtnlEtdEwr3Nkffwiihqe2bWADg+OQRjt9gl6ICdmB/ZFDCGAtSow==}
-    engines: {node: '>= 4'}
 
   retry@0.13.1:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
@@ -9694,6 +9683,22 @@ snapshots:
       yargs: 18.0.0
     optionalDependencies:
       typescript: 5.9.3
+    transitivePeerDependencies:
+      - supports-color
+
+  '@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3)':
+    dependencies:
+      '@angular/compiler': 21.2.12
+      '@babel/core': 7.29.0
+      '@jridgewell/sourcemap-codec': 1.5.5
+      chokidar: 5.0.0
+      convert-source-map: 1.9.0
+      reflect-metadata: 0.2.2
+      semver: 7.7.4
+      tslib: 2.8.1
+      yargs: 18.0.0
+    optionalDependencies:
+      typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
@@ -14335,14 +14340,14 @@ snapshots:
       object-assign: 4.1.1
       vary: 1.1.2
 
-  cosmiconfig@9.0.1(typescript@5.9.3):
+  cosmiconfig@9.0.1(typescript@6.0.3):
     dependencies:
       env-paths: 2.2.1
       import-fresh: 3.3.1
       js-yaml: 4.1.1
       parse-json: 5.2.0
     optionalDependencies:
-      typescript: 5.9.3
+      typescript: 6.0.3
 
   create-require@1.1.1: {}
 
@@ -14720,8 +14725,6 @@ snapshots:
   envinfo@7.15.0: {}
 
   environment@1.1.0: {}
-
-  err-code@2.0.3: {}
 
   errno@0.1.8:
     dependencies:
@@ -16915,10 +16918,10 @@ snapshots:
 
   netmask@2.1.1: {}
 
-  ng-packagr@21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
+  ng-packagr@21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@angular/compiler-cli': 21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3)
+      '@angular/compiler-cli': 21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.57.1)
       '@rollup/wasm-node': 4.59.0
       ajv: 8.18.0
@@ -16935,19 +16938,19 @@ snapshots:
       ora: 9.3.0
       piscina: 5.1.4
       postcss: 8.5.12
-      rollup-plugin-dts: 6.4.1(rollup@4.57.1)(typescript@5.9.3)
+      rollup-plugin-dts: 6.4.1(rollup@4.57.1)(typescript@6.0.3)
       rxjs: 7.8.2
       sass: 1.97.3
       tinyglobby: 0.2.15
       tslib: 2.8.1
-      typescript: 5.9.3
+      typescript: 6.0.3
     optionalDependencies:
       rollup: 4.57.1
 
-  ng-packagr@22.0.0-next.4(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3))(tslib@2.8.1)(typescript@5.9.3):
+  ng-packagr@22.0.0-next.4(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
-      '@angular/compiler-cli': 21.2.12(@angular/compiler@21.2.12)(typescript@5.9.3)
+      '@angular/compiler-cli': 21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3)
       '@rollup/plugin-json': 6.1.0(rollup@4.57.1)
       '@rollup/wasm-node': 4.59.0
       ajv: 8.18.0
@@ -16963,12 +16966,12 @@ snapshots:
       ora: 9.3.0
       piscina: 5.1.4
       postcss: 8.5.12
-      rollup-plugin-dts: 6.4.1(rollup@4.57.1)(typescript@5.9.3)
+      rollup-plugin-dts: 6.4.1(rollup@4.57.1)(typescript@6.0.3)
       rxjs: 7.8.2
       sass: 1.97.3
       tinyglobby: 0.2.15
       tslib: 2.8.1
-      typescript: 5.9.3
+      typescript: 6.0.3
     optionalDependencies:
       rollup: 4.57.1
 
@@ -17296,8 +17299,9 @@ snapshots:
 
   package-json-from-dist@1.0.1: {}
 
-  pacote@21.3.1:
+  pacote@21.5.1:
     dependencies:
+      '@gar/promise-retry': 1.0.3
       '@npmcli/git': 7.0.2
       '@npmcli/installed-package-contents': 4.0.0
       '@npmcli/package-json': 7.0.5
@@ -17311,7 +17315,6 @@ snapshots:
       npm-pick-manifest: 11.0.3
       npm-registry-fetch: 19.1.1
       proc-log: 6.1.0
-      promise-retry: 2.0.1
       sigstore: 4.1.0
       ssri: 13.0.1
       tar: 7.5.13
@@ -17472,9 +17475,9 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-loader@8.2.0(postcss@8.5.12)(typescript@5.9.3)(webpack@5.105.2(esbuild@0.27.3)):
+  postcss-loader@8.2.0(postcss@8.5.12)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.27.3)):
     dependencies:
-      cosmiconfig: 9.0.1(typescript@5.9.3)
+      cosmiconfig: 9.0.1(typescript@6.0.3)
       jiti: 2.6.1
       postcss: 8.5.12
       semver: 7.7.4
@@ -17540,11 +17543,6 @@ snapshots:
   process@0.11.10: {}
 
   progress@2.0.3: {}
-
-  promise-retry@2.0.1:
-    dependencies:
-      err-code: 2.0.3
-      retry: 0.12.0
 
   propagate@2.0.1: {}
 
@@ -17923,8 +17921,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  retry@0.12.0: {}
-
   retry@0.13.1: {}
 
   reusify@1.1.0: {}
@@ -17980,14 +17976,14 @@ snapshots:
     optionalDependencies:
       '@babel/code-frame': 7.29.0
 
-  rollup-plugin-dts@6.4.1(rollup@4.57.1)(typescript@5.9.3):
+  rollup-plugin-dts@6.4.1(rollup@4.57.1)(typescript@6.0.3):
     dependencies:
       '@jridgewell/remapping': 2.3.5
       '@jridgewell/sourcemap-codec': 1.5.5
       convert-source-map: 2.0.0
       magic-string: 0.30.21
       rollup: 4.57.1
-      typescript: 5.9.3
+      typescript: 6.0.3
     optionalDependencies:
       '@babel/code-frame': 7.29.0
 
