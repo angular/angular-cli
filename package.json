@@ -99,7 +99,7 @@
     "@typescript-eslint/parser": "8.59.1",
     "ajv": "8.20.0",
     "buffer": "6.0.3",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "esbuild-wasm": "0.28.0",
     "eslint": "10.3.0",
     "eslint-config-prettier": "10.1.8",

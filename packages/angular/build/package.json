@@ -27,7 +27,7 @@
     "@vitejs/plugin-basic-ssl": "2.3.0",
     "beasties": "0.4.2",
     "browserslist": "^4.26.0",
-    "esbuild": "0.28.0",
+    "esbuild": "0.28.1",
     "https-proxy-agent": "9.0.0",
     "jsonc-parser": "3.3.1",
     "listr2": "10.2.1",
