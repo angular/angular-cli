@@ -188,8 +188,8 @@ importers:
         specifier: 0.28.1
         version: 0.28.1
       esbuild-wasm:
-        specifier: 0.28.0
-        version: 0.28.0
+        specifier: 0.28.1
+        version: 0.28.1
       eslint:
         specifier: 10.3.0
         version: 10.3.0(jiti@2.7.0)
@@ -629,8 +629,8 @@ importers:
         specifier: 7.1.4
         version: 7.1.4(webpack@5.106.2(esbuild@0.28.1)(postcss@8.5.13))
       esbuild-wasm:
-        specifier: 0.28.0
-        version: 0.28.0
+        specifier: 0.28.1
+        version: 0.28.1
       http-proxy-middleware:
         specifier: 3.0.5
         version: 3.0.5
@@ -5291,8 +5291,8 @@ packages:
     resolution: {integrity: sha512-w+5mJ3GuFL+NjVtJlvydShqE1eN3h3PbI7/5LAsYJP/2qtuMXjfL2LpHSRqo4b4eSF5K/DH1JXKUAHSB2UW50g==}
     engines: {node: '>= 0.4'}
 
-  esbuild-wasm@0.28.0:
-    resolution: {integrity: sha512-5TRVKExcEmeMkccIZMzUq+Az6X2RoMAJyfl6SMMO1dMVhmvt0I2mx7gAb6zYi42n4d1ETcatFXazGKzA+aW7fg==}
+  esbuild-wasm@0.28.1:
+    resolution: {integrity: sha512-p/GD4E8oYRjg3kjdKrnMb0s4PzXgJF42e0MF4H0+ACyK/kIlFRp3e0fzOleIG+wBBm6MM3XQrbpe7soEA+vJIA==}
     engines: {node: '>=18'}
     hasBin: true
 
@@ -13702,7 +13702,7 @@ snapshots:
       is-date-object: 1.1.0
       is-symbol: 1.1.1
 
-  esbuild-wasm@0.28.0: {}
+  esbuild-wasm@0.28.1: {}
 
   esbuild@0.27.7:
     optionalDependencies:
