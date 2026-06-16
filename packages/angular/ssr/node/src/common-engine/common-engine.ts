@@ -167,17 +167,19 @@ export class CommonEngine {
 
     if (pagePath === resolve(documentFilePath) || !(await exists(pagePath))) {
       // View matches with prerender path or file does not exist.
-      this.pageIsSSG.set(pagePath, false);
-
       return undefined;
     }
 
     // Static file exists.
     const content = await fs.promises.readFile(pagePath, 'utf-8');
     const isSSG = SSG_MARKER_REGEXP.test(content);
-    this.pageIsSSG.set(pagePath, isSSG);
+    if (isSSG) {
+      this.pageIsSSG.set(pagePath, true);
 
-    return isSSG ? content : undefined;
+      return content;
+    }
+
+    return undefined;
   }
 
   private async renderApplication(opts: CommonEngineRenderOptions): Promise<string> {
