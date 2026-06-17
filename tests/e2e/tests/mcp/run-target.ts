@@ -29,11 +29,11 @@ export default async function () {
   );
 
   try {
-    // 1. Ensure `run_target` is NOT registered by default (stable-only tools registered)
+    // 1. Ensure `run_target` is registered by default (now stable)
     const { stdout: stdoutDefault } = await runInspector('--method', 'tools/list');
-    assert.doesNotMatch(stdoutDefault, /"run_target"/);
+    assert.match(stdoutDefault, /"run_target"/);
 
-    // 2. Ensure `run_target` is registered when explicitly enabled via experimental-tool flag
+    // 2. Ensure `run_target` is also registered when using the deprecated experimental-tool flag
     const { stdout: stdoutEnabled } = await runInspector(
       '-E',
       'run_target',
@@ -44,8 +44,6 @@ export default async function () {
 
     // 3. Call run_target with build target
     const { stdout: stdoutCall } = await runInspector(
-      '-E',
-      'run_target',
       '--method',
       'tools/call',
       '--tool-name',
@@ -66,8 +64,6 @@ export default async function () {
     // 4. Call run_target with test target (only for esbuild/Vite test runner, as webpack-based Karma fails on this bazel CI headless runner)
     if (esbuild) {
       const { stdout: stdoutTestCall } = await runInspector(
-        '-E',
-        'run_target',
         '--method',
         'tools/call',
         '--tool-name',
