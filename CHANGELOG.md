@@ -1,3 +1,30 @@
+<a name="22.0.2"></a>
+
+# 22.0.2 (2026-06-17)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [136fc2714](https://github.com/angular/angular-cli/commit/136fc27149af74263ef519007f0a74f9f85c5b4d) | fix  | support registry metadata fetching under bun package manager  |
+| [2653dd5c7](https://github.com/angular/angular-cli/commit/2653dd5c7d47149b61bfe6edf4ab1281347e89dd) | perf | implement semaphore backpressure throttling in PackageManager |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [0b4a48add](https://github.com/angular/angular-cli/commit/0b4a48add9d7218e698af0db974bd597bed8a121) | perf | implement semaphore backpressure throttling in JavaScriptTransformer |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [d996a27e9](https://github.com/angular/angular-cli/commit/d996a27e9744b473a7db56f81871731b8bdce585) | fix  | avoid caching non-SSG page lookups                                    |
+| [285a34e42](https://github.com/angular/angular-cli/commit/285a34e42f1cdc512468de0041b232c7190e7d7e) | fix  | correct grammar in console warning for redirected location headers    |
+| [c8088a536](https://github.com/angular/angular-cli/commit/c8088a536c2c747a273e37be682643e1b35e2f75) | fix  | prioritize options over environment variables in AngularNodeAppEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.0-next.0"></a>
 
 # 22.1.0-next.0 (2026-06-11)
