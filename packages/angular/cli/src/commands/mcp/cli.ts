@@ -54,10 +54,6 @@ export default class McpCommandModule extends CommandModule implements CommandMo
         alias: 'E',
         array: true,
         describe: 'Enable an experimental tool.',
-        choices: [
-          ...EXPERIMENTAL_TOOLS.map(({ name }) => name),
-          ...Object.keys(EXPERIMENTAL_TOOL_GROUPS),
-        ],
         hidden: true,
       });
   }
