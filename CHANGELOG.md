@@ -1,3 +1,21 @@
+<a name="20.3.29"></a>
+
+# 20.3.29 (2026-06-17)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [5f7c0328c](https://github.com/angular/angular-cli/commit/5f7c0328c3fe1a003ade44861d9aac98f485f014) | fix  | update pacote to 21.5.1 |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [a75d78e68](https://github.com/angular/angular-cli/commit/a75d78e681b10436971d8071450b8cfd93b2d72a) | fix  | prioritize options over environment variables in AngularNodeAppEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.2"></a>
 
 # 22.0.2 (2026-06-17)
