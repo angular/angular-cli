@@ -36,7 +36,7 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.4",
     "piscina": "5.2.0",
-    "rollup": "4.62.0",
+    "rolldown": "1.1.1",
     "sass": "1.101.0",
     "semver": "7.8.4",
     "source-map-support": "0.5.21",
@@ -55,7 +55,7 @@
     "less": "4.6.6",
     "ng-packagr": "22.1.0-next.2",
     "postcss": "8.5.15",
-    "rolldown": "1.1.1",
+    "rollup": "4.62.0",
     "rxjs": "7.8.2",
     "vitest": "4.1.9"
   },
@@ -73,6 +73,7 @@
     "less": "^4.2.0",
     "ng-packagr": "0.0.0-NG-PACKAGR-PEER-DEP",
     "postcss": "^8.4.0",
+    "rollup": "^4.0.0",
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "tslib": "^2.3.0",
     "typescript": ">=6.0 <6.1",
@@ -110,6 +111,9 @@
       "optional": true
     },
     "postcss": {
+      "optional": true
+    },
+    "rollup": {
       "optional": true
     },
     "tailwindcss": {

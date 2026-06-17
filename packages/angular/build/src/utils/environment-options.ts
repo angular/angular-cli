@@ -106,7 +106,7 @@ export const allowMinify = debugOptimize.minify;
  * Allows using Rolldown for chunk optimization instead of Rollup.
  * This is useful for debugging and testing scenarios.
  */
-export const useRolldownChunks = parseTristate(process.env['NG_BUILD_CHUNKS_ROLLDOWN']) ?? false;
+export const useRolldownChunks = parseTristate(process.env['NG_BUILD_CHUNKS_ROLLDOWN']) ?? true;
 
 /**
  * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
