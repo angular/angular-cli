@@ -19,7 +19,7 @@
 
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
-import { type Plugin, rollup } from 'rollup';
+import type { Plugin } from 'rollup';
 import { BundleContextResult } from '../../tools/esbuild/bundler-context';
 import {
   type BuildOutputFile,
@@ -306,6 +306,15 @@ export async function optimizeChunks(
       });
       optimizedOutput = result.output;
     } else {
+      let rollup;
+      try {
+        rollup = (await import('rollup')).rollup;
+      } catch {
+        throw new Error(
+          `Rollup is required when 'NG_BUILD_CHUNKS_ROLLDOWN' is set to false. ` +
+            `Please install 'rollup' manually (e.g. 'npm install rollup --save-dev') to use this fallback.`,
+        );
+      }
       bundle = await rollup({
         input: mainFile,
         plugins: plugins as Plugin[],

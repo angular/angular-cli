@@ -86,20 +86,20 @@ export default async function () {
     `Expected build with threshold 4 and 3 chunks to NOT be optimized. Thresh 4: ${jsFiles3Thresh4.length}, Unoptimized: ${jsFiles3Unopt.length}`,
   );
 
-  // Case 4: Opt into Rolldown
-  await installPackage('rolldown@1.0.0-rc.12');
+  // Case 4: Opt back into Rollup (requires manual install since it's an optional peer dependency)
+  await installPackage('rollup@4.62.0');
   try {
     await execWithEnv('ng', ['build', '--output-hashing=none'], {
       ...process.env,
-      NG_BUILD_CHUNKS_ROLLDOWN: '1',
+      NG_BUILD_CHUNKS_ROLLDOWN: 'false',
       NG_BUILD_OPTIMIZE_CHUNKS: 'true',
     });
-    const filesRolldown = await readdir('dist/test-project/browser');
-    const jsFilesRolldown = filesRolldown.filter((f) => f.endsWith('.js'));
+    const filesRollup = await readdir('dist/test-project/browser');
+    const jsFilesRollup = filesRollup.filter((f) => f.endsWith('.js'));
 
-    assert.ok(jsFilesRolldown.length > 0, 'Expected Rolldown build to produce output files.');
+    assert.ok(jsFilesRollup.length > 0, 'Expected Rollup build to produce output files.');
   } finally {
     // Clean up
-    await uninstallPackage('rolldown');
+    await uninstallPackage('rollup');
   }
 }
