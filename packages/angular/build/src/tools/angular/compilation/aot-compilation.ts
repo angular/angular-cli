@@ -234,6 +234,7 @@ export class AotCompilation extends AngularCompilation {
 
     const syntactic = modes & DiagnosticModes.Syntactic;
     const semantic = modes & DiagnosticModes.Semantic;
+    const skipLibCheck = typeScriptProgram.getCompilerOptions().skipLibCheck;
 
     // Collect program level diagnostics
     if (modes & DiagnosticModes.Option) {
@@ -265,13 +266,19 @@ export class AotCompilation extends AngularCompilation {
         continue;
       }
 
+      // When skipLibCheck is enabled (the default), declaration files are not
+      // type-checked, so getSemanticDiagnostics() would return nothing for them.
+      if (sourceFile.isDeclarationFile && skipLibCheck) {
+        continue;
+      }
+
       yield* profileSync(
         'NG_DIAGNOSTICS_SEMANTIC',
         () => typeScriptProgram.getSemanticDiagnostics(sourceFile),
         true,
       );
 
-      // Declaration files cannot have template diagnostics
+      // Declaration files cannot have template diagnostics.
       if (sourceFile.isDeclarationFile) {
         continue;
       }
