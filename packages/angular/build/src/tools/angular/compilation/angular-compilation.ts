@@ -9,8 +9,14 @@
 import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import type ts from 'typescript';
+import { isMainThread } from 'node:worker_threads';
 import { convertTypeScriptDiagnostic } from '../../esbuild/angular/diagnostics';
-import { profileAsync, profileSync } from '../../esbuild/profiling';
+import {
+  logCumulativeDurations,
+  profileAsync,
+  profileSync,
+  resetCumulativeDurations,
+} from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
 
 export interface EmitFileResult {
@@ -94,18 +100,37 @@ export abstract class AngularCompilation {
     // This allows for avoiding the load of typescript in the main thread when using the parallel compilation.
     const typescript = await AngularCompilation.loadTypescript();
 
-    await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
-      for (const diagnostic of await this.collectDiagnostics(modes)) {
-        const message = convertTypeScriptDiagnostic(typescript, diagnostic);
-        if (diagnostic.category === typescript.DiagnosticCategory.Error) {
-          (result.errors ??= []).push(message);
-        } else {
-          (result.warnings ??= []).push(message);
+    // When running inside a worker (ParallelCompilation), the cumulative duration Map lives in
+    // this module's memory — the main thread never sees it. So we own the full reset→log
+    // lifecycle here rather than relying on the main thread to do it.
+    // On the main thread we skip this to avoid clearing/printing timings accumulated elsewhere.
+    const flushTimings = this.shouldFlushPerformanceTimings();
+    if (flushTimings) {
+      resetCumulativeDurations();
+    }
+
+    try {
+      await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
+        for (const diagnostic of await this.collectDiagnostics(modes)) {
+          const message = convertTypeScriptDiagnostic(typescript, diagnostic);
+          if (diagnostic.category === typescript.DiagnosticCategory.Error) {
+            (result.errors ??= []).push(message);
+          } else {
+            (result.warnings ??= []).push(message);
+          }
         }
+      });
+    } finally {
+      if (flushTimings) {
+        logCumulativeDurations();
       }
-    });
+    }
 
     return result;
+  }
+
+  protected shouldFlushPerformanceTimings(): boolean {
+    return !isMainThread;
   }
 
   update?(files: Set<string>): Promise<void>;
