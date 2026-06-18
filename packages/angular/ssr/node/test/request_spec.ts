@@ -153,4 +153,62 @@ describe('createRequestUrl', () => {
     );
     expect(url.href).toBe('https://example.com:8443/test');
   });
+
+  it('should prioritize "forwarded" header over standard and x-forwarded headers', () => {
+    const url = createRequestUrl(
+      createRequest({
+        headers: {
+          host: 'localhost:8080',
+          'x-forwarded-host': 'other.com',
+          'x-forwarded-proto': 'http',
+          'forwarded': 'host=example.com;proto=https',
+        },
+        url: '/test',
+      }),
+      normalizeTrustProxyHeaders(true),
+    );
+    expect(url.href).toBe('https://example.com/test');
+  });
+
+  it('should parse forwarded parameters correctly (including quoted values)', () => {
+    const url = createRequestUrl(
+      createRequest({
+        headers: {
+          host: 'localhost:8080',
+          'forwarded': 'host="example.com:8443";proto="https"',
+        },
+        url: '/test',
+      }),
+      normalizeTrustProxyHeaders(true),
+    );
+    expect(url.href).toBe('https://example.com:8443/test');
+  });
+
+  it('should not treat parameters inside quoted values as top-level parameters in "forwarded" header', () => {
+    const url = createRequestUrl(
+      createRequest({
+        headers: {
+          host: 'localhost:8080',
+          'forwarded': 'for="192.0.2.60;host=evil.com";proto=https',
+        },
+        url: '/test',
+      }),
+      normalizeTrustProxyHeaders(true),
+    );
+    expect(url.href).toBe('https://localhost:8080/test');
+  });
+
+  it('should ignore "forwarded" header when it is not trusted', () => {
+    const url = createRequestUrl(
+      createRequest({
+        headers: {
+          host: 'localhost:8080',
+          'forwarded': 'host=example.com;proto=https',
+        },
+        url: '/test',
+      }),
+      normalizeTrustProxyHeaders(false),
+    );
+    expect(url.href).toBe('http://localhost:8080/test');
+  });
 });

@@ -28,12 +28,12 @@ export interface AngularAppEngineOptions {
   allowedHosts?: readonly string[];
 
   /**
-   * Extends the scope of trusted proxy headers (`X-Forwarded-*`).
+   * Extends the scope of trusted proxy headers (`Forwarded` or `X-Forwarded-*`).
    *
    * @remarks
    * **This is a security-sensitive option!**
    *
-   * When `trustProxyHeaders` is enabled, request headers such as `X-Forwarded-Host` and
+   * When `trustProxyHeaders` is enabled, request headers such as `Forwarded`, `X-Forwarded-Host`, and
    * `X-Forwarded-Prefix` are trusted by the server and used for routing. These
    * headers must be strictly validated and provided by a trusted client (e.g., at a reverse proxy, load
    * balancer, or API gateway) and must *not* be provided by untrusted end users.

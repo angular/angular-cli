@@ -57,12 +57,25 @@ describe('Validation Utils', () => {
       );
     });
 
+    it('should return a set containing "forwarded" when input is an array containing it', () => {
+      expect(normalizeTrustProxyHeaders(['Forwarded'])).toEqual(new Set(['forwarded']));
+    });
+
     it('should throw an error if input array contains "*"', () => {
       expect(() => normalizeTrustProxyHeaders(['*'])).toThrowError(
         '"*" is not allowed as a value for the "trustProxyHeaders" option.',
       );
       expect(() => normalizeTrustProxyHeaders(['X-Forwarded-Host', '*'])).toThrowError(
         '"*" is not allowed as a value for the "trustProxyHeaders" option.',
+      );
+    });
+
+    it('should throw an error if input array contains an invalid proxy header name', () => {
+      expect(() => normalizeTrustProxyHeaders(['invalid-header'])).toThrowError(
+        '"invalid-header" is not a valid proxy header. Trusted proxy headers must be "forwarded" or start with "x-forwarded-".',
+      );
+      expect(() => normalizeTrustProxyHeaders(['x-forward-host'])).toThrowError(
+        '"x-forward-host" is not a valid proxy header. Trusted proxy headers must be "forwarded" or start with "x-forwarded-".',
       );
     });
   });
@@ -181,6 +194,49 @@ describe('Validation Utils', () => {
       });
       expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
         'Header "x-forwarded-host" with value "example.com/bad" contains characters that are not allowed.',
+      );
+    });
+
+    it('should pass for valid request with forwarded header', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'forwarded': 'host=example.com;proto=https',
+        },
+      });
+
+      expect(() => validateRequest(req, allowedHosts, false)).not.toThrow();
+    });
+
+    it('should throw if forwarded host contains path separators', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'forwarded': 'host="example.com/bad"',
+        },
+      });
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        'Header "Forwarded "host"" with value "example.com/bad" contains characters that are not allowed.',
+      );
+    });
+
+    it('should throw if forwarded host is not allowed', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'forwarded': 'host=evil.com',
+        },
+      });
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        'Header "Forwarded "host"" with value "evil.com" is not allowed.',
+      );
+    });
+
+    it('should throw if forwarded proto is invalid', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'forwarded': 'proto=ftp',
+        },
+      });
+      expect(() => validateRequest(req, allowedHosts, false)).toThrowError(
+        'Header "forwarded" proto parameter must be either "http" or "https".',
       );
     });
 
@@ -316,6 +372,32 @@ describe('Validation Utils', () => {
 
       expect(secured).toBe(req);
       expect(secured.headers.get('accept')).toBe('application/json');
+    });
+
+    it('should scrub unallowed forwarded header by default', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'host': 'example.com',
+          'forwarded': 'host=evil.com;proto=https',
+        },
+      });
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
+
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.has('forwarded')).toBeFalse();
+    });
+
+    it('should retain allowed forwarded header when explicitly provided', () => {
+      const req = new Request('http://example.com', {
+        headers: {
+          'host': 'example.com',
+          'forwarded': 'host=proxy.com;proto=https',
+        },
+      });
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(['forwarded']));
+
+      expect(secured.headers.get('host')).toBe('example.com');
+      expect(secured.headers.get('forwarded')).toBe('host=proxy.com;proto=https');
     });
   });
 });

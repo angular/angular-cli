@@ -103,7 +103,8 @@ export function sanitizeRequestHeaders(
 
   for (const [key, value] of request.headers) {
     const lowerKey = key.toLowerCase();
-    if (lowerKey.startsWith('x-forwarded-') && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
+    const isProxyHeader = lowerKey === 'forwarded' || lowerKey.startsWith('x-forwarded-');
+    if (isProxyHeader && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
       // eslint-disable-next-line no-console
       console.warn(
         `Received "${key}" header but "trustProxyHeaders" was not set up to allow it.\n` +
@@ -199,6 +200,17 @@ function validateHeaders(
     }
   }
 
+  const forwarded = headers.get('forwarded');
+  if (forwarded) {
+    const forwardedParams = parseForwardedHeader(forwarded);
+    if (forwardedParams.host && !disableHostCheck) {
+      verifyHostAllowed('Forwarded "host"', forwardedParams.host, allowedHosts);
+    }
+    if (forwardedParams.proto && !VALID_PROTO_REGEX.test(forwardedParams.proto)) {
+      throw new Error('Header "forwarded" proto parameter must be either "http" or "https".');
+    }
+  }
+
   const xForwardedPort = getFirstHeaderValue(headers.get('x-forwarded-port'));
   if (xForwardedPort && !VALID_PORT_REGEX.test(xForwardedPort)) {
     throw new Error('Header "x-forwarded-port" must be a numeric value.');
@@ -251,12 +263,55 @@ export function normalizeTrustProxyHeaders(
     return new Set([TRUST_ALL_PROXY_HEADERS]);
   }
 
-  const normalizedTrustedProxyHeaders = new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
-  if (normalizedTrustedProxyHeaders.has(TRUST_ALL_PROXY_HEADERS)) {
-    throw new Error(
-      `"${TRUST_ALL_PROXY_HEADERS}" is not allowed as a value for the "trustProxyHeaders" option.`,
-    );
+  const normalizedTrustedProxyHeaders = new Set<string>();
+  for (const header of trustProxyHeaders) {
+    const lowerHeader = header.toLowerCase();
+    if (lowerHeader === TRUST_ALL_PROXY_HEADERS) {
+      throw new Error(
+        `"${TRUST_ALL_PROXY_HEADERS}" is not allowed as a value for the "trustProxyHeaders" option.`,
+      );
+    }
+    const isValid = lowerHeader === 'forwarded' || lowerHeader.startsWith('x-forwarded-');
+    if (!isValid) {
+      throw new Error(
+        `"${header}" is not a valid proxy header. Trusted proxy headers must be "forwarded" or start with "x-forwarded-".`,
+      );
+    }
+    normalizedTrustedProxyHeaders.add(lowerHeader);
   }
 
   return normalizedTrustedProxyHeaders;
+}
+
+/**
+ * Parses the standard `Forwarded` header (RFC 7239).
+ * It extracts the parameters from the first (leftmost) element in the header.
+ *
+ * @param headerValue - The value of the `Forwarded` header.
+ * @returns A record of lowercase parameter names to their values.
+ */
+export function parseForwardedHeader(
+  headerValue: string | null | undefined,
+): Record<string, string> {
+  if (!headerValue) {
+    return {};
+  }
+
+  const firstElement = headerValue.split(',', 1)[0];
+  const params: Record<string, string> = {};
+  const paramRegex = /([^\s;=]+)\s*=\s*("(?:[^"\\]|\\.)*"|[^;\s]*)/gi;
+
+  let match;
+  while ((match = paramRegex.exec(firstElement)) !== null) {
+    const key = match[1].toLowerCase();
+    let val = match[2];
+
+    if (val[0] === '"' && val.at(-1) === '"') {
+      val = val.slice(1, -1).replace(/\\(.)/g, '$1');
+    }
+
+    params[key] = val;
+  }
+
+  return params;
 }
