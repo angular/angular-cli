@@ -1,3 +1,15 @@
+<a name="22.0.3"></a>
+
+# 22.0.3 (2026-06-18)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [0eddea898](https://github.com/angular/angular-cli/commit/0eddea898d3bf4da8c9c5c27ec2ee79916e8be87) | fix  | remove default workspace vscode mcp.json configuration |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.16"></a>
 
 # 21.2.16 (2026-06-17)
