@@ -28,7 +28,8 @@
     "https://bcr.bazel.build/modules/aspect_rules_js/3.2.2/MODULE.bazel": "e844196321b64537cfade338f361633e7d5fe084eee3214fc531b9e7b9838813",
     "https://bcr.bazel.build/modules/aspect_rules_js/3.2.2/source.json": "0e650e493b3bc784dc3f8240ff00b4b32258cde6d021ef6b1db4e387bcfd6a9a",
     "https://bcr.bazel.build/modules/aspect_rules_ts/3.8.10/MODULE.bazel": "a17a49a21226fc90163a29b3d6eac56703697205530b8d5cc38b3c074dbac039",
-    "https://bcr.bazel.build/modules/aspect_rules_ts/3.8.10/source.json": "745c8dba237b4088409800143241bbb138e7ef37a359bd81a250c2c423f380ce",
+    "https://bcr.bazel.build/modules/aspect_rules_ts/3.8.11/MODULE.bazel": "85cefd3b02fa62c1572d8a39cc463ce7e42f0d40609a9bb0e32c51fade019d16",
+    "https://bcr.bazel.build/modules/aspect_rules_ts/3.8.11/source.json": "64aa2b10eaa911e6581b384aa5845228efc6676b7232bb5140967618812fa909",
     "https://bcr.bazel.build/modules/aspect_tools_telemetry/0.2.8/MODULE.bazel": "aa975a83e72bcaac62ee61ab12b788ea324a1d05c4aab28aadb202f647881679",
     "https://bcr.bazel.build/modules/aspect_tools_telemetry/0.3.3/MODULE.bazel": "37c764292861c2f70314efa9846bb6dbb44fc0308903b3285da6528305450183",
     "https://bcr.bazel.build/modules/aspect_tools_telemetry/0.3.3/source.json": "605086bbc197743a0d360f7ddc550a1d4dfa0441bc807236e17170f636153348",
@@ -435,7 +436,7 @@
     },
     "@@aspect_rules_ts+//ts:extensions.bzl%ext": {
       "general": {
-        "bzlTransitiveDigest": "iSTT2Cf1ed8ku80yZFxvYxZB6Lpy6M8zJBz98hxdxcU=",
+        "bzlTransitiveDigest": "VLBM+xAmHIkUBo6q6ZrBLvZrmlgr1GfV2104wKXqLWg=",
         "usagesDigest": "QQqokxpCVnBJntX7dhxnf/c13LeWUQxDTUnILYCp4Jc=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
@@ -499,7 +500,7 @@
     "@@aspect_tools_telemetry+//:extension.bzl%telemetry": {
       "general": {
         "bzlTransitiveDigest": "cl5A2O84vDL6Tt+Qga8FCj1DUDGqn+e7ly5rZ+4xvcc=",
-        "usagesDigest": "gNir09X+lMWmGxyBnlL7YHmzYUntq/va2IwI5K7Dm24=",
+        "usagesDigest": "CEiJ7Sjne8hcKXaXq1aqAmppgOlFPiQqlvsg0rJxjyw=",
         "recordedFileInputs": {},
         "recordedDirentsInputs": {},
         "envVariables": {},
@@ -509,7 +510,7 @@
             "attributes": {
               "deps": {
                 "aspect_rules_js": "3.2.2",
-                "aspect_rules_ts": "3.8.10",
+                "aspect_rules_ts": "3.8.11",
                 "aspect_rules_esbuild": "0.26.0",
                 "aspect_rules_jasmine": "2.0.4",
                 "aspect_tools_telemetry": "0.3.3"
