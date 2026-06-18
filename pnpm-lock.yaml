@@ -164,11 +164,11 @@ importers:
         specifier: ^21.0.0
         version: 21.0.3
       '@typescript-eslint/eslint-plugin':
-        specifier: 8.61.0
-        version: 8.61.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: 8.61.1
+        version: 8.61.1(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
       '@typescript-eslint/parser':
-        specifier: 8.61.0
-        version: 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+        specifier: 8.61.1
+        version: 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
       ajv:
         specifier: 8.20.0
         version: 8.20.0
@@ -189,7 +189,7 @@ importers:
         version: 10.1.8(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
       eslint-plugin-import:
         specifier: 2.32.0
-        version: 2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
+        version: 2.32.0(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
       express:
         specifier: 5.2.1
         version: 5.2.1(supports-color@10.2.2)
@@ -275,8 +275,8 @@ importers:
         specifier: 2.8.1
         version: 2.8.1
       undici:
-        specifier: 8.4.1
-        version: 8.4.1
+        specifier: 8.5.0
+        version: 8.5.0
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
@@ -463,8 +463,8 @@ importers:
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
       algoliasearch:
-        specifier: 5.54.0
-        version: 5.54.0
+        specifier: 5.55.0
+        version: 5.55.0
       jsonc-parser:
         specifier: 3.3.1
         version: 3.3.1
@@ -714,8 +714,8 @@ importers:
         specifier: 22.1.0-next.2
         version: 22.1.0-next.2(@angular/compiler-cli@22.1.0-next.1(@angular/compiler@22.1.0-next.1)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       undici:
-        specifier: 8.4.1
-        version: 8.4.1
+        specifier: 8.5.0
+        version: 8.5.0
     optionalDependencies:
       esbuild:
         specifier: 0.28.1
@@ -857,60 +857,60 @@ packages:
   '@actions/io@3.0.2':
     resolution: {integrity: sha512-nRBchcMM+QK1pdjO7/idu86rbJI5YHUKCvKs0KxnSYbVe3F51UfGxuZX4Qy/fWlp6l7gWFwIkrOzN+oUK03kfw==}
 
-  '@algolia/abtesting@1.20.0':
-    resolution: {integrity: sha512-5CqkS592H3+24b6H6CQ2RVpphdmAuIElZzv0Hngqo/ZEZpUZJ+KGLcueBhx33fv2wYBXyuuvskG5aQ7Ti+lR0g==}
+  '@algolia/abtesting@1.21.0':
+    resolution: {integrity: sha512-kGvHfBa9oQCvZh0YXeguSToBD9GNJ+gzUZQ9KPTg+KSsM36obYcsKPoX0NnlJtPflHXu7RkMaIi44xs9meR6Zw==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-abtesting@5.54.0':
-    resolution: {integrity: sha512-IXnH1x3DBsPQA4/FRO0Pvkfy79tKy5Qr+ugAV9jdcGkpzHc476D0WV1MFJ+pZxtbts0xh2JqzUVmYEqA6LkOpA==}
+  '@algolia/client-abtesting@5.55.0':
+    resolution: {integrity: sha512-Zt2GjIm7vsaf7K23tk5JmtcVNc38G9p0C2L2Lrm06miyLE/NL2etHtHInvuLc1DjxTp7Y2nId4X/tzwo372K8Q==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-analytics@5.54.0':
-    resolution: {integrity: sha512-pBpRqm1wpE0GnGy2rNLk9rjDn0Le4iywNRtnAWblLeqfjxpWKg8lWnk7nmSoTShFO31sz2jatXXzxK2lz8ipbA==}
+  '@algolia/client-analytics@5.55.0':
+    resolution: {integrity: sha512-7BueMuWYg/KBA2EX9zsQ+3OAleEyrJcB+SV5Al/9pLjMQq5mXB/8M5HaUPqZwN812g5kLzj9j43VThlZgWq0hg==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-common@5.54.0':
-    resolution: {integrity: sha512-WbuwRUlFvSOsuxqTDjSSmgusuF5KFt+oFPzobvPDvodra6EWnVwUXjz0elkNSsnsIlZGtcXlX3LhxkO7rF90jw==}
+  '@algolia/client-common@5.55.0':
+    resolution: {integrity: sha512-pJZIyhvUrs+B7c5Lw0iP5yP/NsqJMda7pKRYbfG4KtfGIVSMcAalZhdqL5UX8Z9DOC4KxO9tKV5RDeVjZU0VfQ==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-insights@5.54.0':
-    resolution: {integrity: sha512-/HNLVi3kPI+JhO59WbglLjPM2c4uECU+x4gk1iADseKtE5eYqJ/RJ+FIwM8xzPFKhFJaw+8hVq4lkd0nn8HDDg==}
+  '@algolia/client-insights@5.55.0':
+    resolution: {integrity: sha512-RydkKDhx0GWTYuw0ndTXHGM8hD8hgwftKE65FfnJZb5bPc9CevOqv3qNPUQiviAwkqT9hQNH31uDGeV3yZkgfA==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-personalization@5.54.0':
-    resolution: {integrity: sha512-6TolyyDRumIKeLGBGSFAZsSIJ8hrm6NFCGR1jO7pQTiOtSWgAIxcFE5/JRpZ3g+unG4OkNOFy+I0dUEquIDbig==}
+  '@algolia/client-personalization@5.55.0':
+    resolution: {integrity: sha512-XiS7gdFq/COWiwdWXZ8+RHuewfEo03TkGESk44zU8zTc/Z6R8fm4DNmV52swJKkeB2N9iC7NKpgpM22OOkcgTw==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-query-suggestions@5.54.0':
-    resolution: {integrity: sha512-AxW2MLBhjBtGX5kIZrVLO2SP2vRkZxJw5qHGxnQJfLcYhA04mFNP0fWRtHshlcVnDk9M8L9lwfr2lGpf3Er+hw==}
+  '@algolia/client-query-suggestions@5.55.0':
+    resolution: {integrity: sha512-LBEJ/q+hn1nJ0aYg5IcWgLNCPjWHTahWmpHNx1qUZMho+9CyWM6LaEnhac45UHjQm/j0m374HP685VrpL133lA==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/client-search@5.54.0':
-    resolution: {integrity: sha512-ngdgVGp05lJzUyA+sUzr0MDZ7AMtANcJpwIzq4ZsfpZL5B3S7A4XYfMcU2sECZc3bx3ysOhYcdbbaTjc3ve0WQ==}
+  '@algolia/client-search@5.55.0':
+    resolution: {integrity: sha512-2/9jUXKH4IcdU5qxH6cbDH46ZBe46G7xr+MrcHwgEXZcUfdAvUgLSH53MAWuMgxvw0G5yoqiWMifHc62Os0fiQ==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/ingestion@1.54.0':
-    resolution: {integrity: sha512-hee59Z7FgZ6/13FYL05ANPwRJY1pfvIlrwC8eBZYdiRFXTJVvf94IyTWOxLqRVpbseDP6eQQTW+PT7/DxTZIng==}
+  '@algolia/ingestion@1.55.0':
+    resolution: {integrity: sha512-80tKsQgxXWo+jK0v4YGCHqyTEXawhAKYyr3kOdN51ElfRqUFjZNPVhZk6vRiqSqXfvrH85ytacT3cbJR6+qolA==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/monitoring@1.54.0':
-    resolution: {integrity: sha512-diCjZVbIO7Pzw98tEKqLWIAgmQBI3Zt1sHsXyAPNGZgn32derpIXTnjjpJbZl+uAhSSznd6SfxFGdC9uYdN1TA==}
+  '@algolia/monitoring@1.55.0':
+    resolution: {integrity: sha512-4UjmAL8ywGW4rCfK6Qmgw3wIjbrO2wl2s4Eq56JTiN40L2t0XTv0HZkYAmr6nfeiXO0he/2crvZRX6SATSepag==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/recommend@5.54.0':
-    resolution: {integrity: sha512-6zeslypRAGWDgVJEJYAPuqmyquHvnw4MQwG+XXdrw5dTNDjXYIcCJdQQcCY06xPF9tUvmzy/1vHiH9QxhgwuOQ==}
+  '@algolia/recommend@5.55.0':
+    resolution: {integrity: sha512-LMpJPtIkfDsHIx5Ga+baNr22ntYbY+e2wT7MSIc/FjAnu9wnBFhx1H/GfhmP/c5/IvbThDX+3ilxPRjSfCI8aA==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/requester-browser-xhr@5.54.0':
-    resolution: {integrity: sha512-iHZax214LPXd7XizQ4BNnTsegl8f3IeKm8JcrmSNZ/5x1rZ5xLkbG/anltAWtLpoRNnfpr4Z80YdYeVVPpx6wQ==}
+  '@algolia/requester-browser-xhr@5.55.0':
+    resolution: {integrity: sha512-tDymJ7nFOAoUuecma3usK6o94dp8m4HYFDGh4ByYQXWkv14cpmDn+nWdylmcZO0Qvco107vqDo4+Anksnl8w1Q==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/requester-fetch@5.54.0':
-    resolution: {integrity: sha512-YKtuG5YwPxZ+kkfd4HmUO7Z9aICPUSMlHslzKTmtMMhxGnetxEqGj9T/v2r/PdcuOUC5oW0CHe8akJk8cpS3gQ==}
+  '@algolia/requester-fetch@5.55.0':
+    resolution: {integrity: sha512-6IDSB5o5dkDPQ4LdOW0Yuw/qy5MdWlO2xDHgPVZgW4YDjbxvnX5PAiV7/WWZdWyVObScZZnnHpPbiqfYs/zBLg==}
     engines: {node: '>= 14.0.0'}
 
-  '@algolia/requester-node-http@5.54.0':
-    resolution: {integrity: sha512-zyZDJ4WS5TnjZZ5pqywTBFO9olW7QMtY2kf2dbLnu+UTzfc9ri/HGf27jRN2NTbX9FcRPxSqPqzUhF/BZIx0VA==}
+  '@algolia/requester-node-http@5.55.0':
+    resolution: {integrity: sha512-Yyyne4l//vDSdg4MhYJkaVne+KEPi833eCj3/T/87ernTwrvP6j9biXXZELsN8sLI/f2ndV/vugDIy2jdJQB6g==}
     engines: {node: '>= 14.0.0'}
 
   '@ampproject/remapping@2.3.0':
@@ -3662,67 +3662,63 @@ packages:
   '@types/yarnpkg__lockfile@1.1.9':
     resolution: {integrity: sha512-GD4Fk15UoP5NLCNor51YdfL9MSdldKCqOC9EssrRw3HVfar9wUZ5y8Lfnp+qVD6hIinLr8ygklDYnmlnlQo12Q==}
 
-  '@typescript-eslint/eslint-plugin@8.61.0':
-    resolution: {integrity: sha512-bFNvl9ZczlVb+wR2Akszf3gHfKVj/8WanXaGJ3UstTA7brNKg0cNdk6X1Psu5V7MZ2oQtzZKOEzIUehaoxbDGw==}
+  '@typescript-eslint/eslint-plugin@8.61.1':
+    resolution: {integrity: sha512-ZPlVl3PB3et/59Ne0fv/sci6ZXz4T4Hp4nTJ56i/Y0gR89ARb+KphojTq6j+56E5PIezmOIOOWyY+aWQFd+IkQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
-      '@typescript-eslint/parser': ^8.61.0
+      '@typescript-eslint/parser': ^8.61.1
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/parser@8.61.0':
-    resolution: {integrity: sha512-5B7PfA2e1NQGCnDHd/0lW7W3gvp3d59Ryw54FYO8Uswxo9f6ikw3AZV+Xj/TvpImmpsiYyUqAfhC6kJID1jF6w==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
-      typescript: '>=4.8.4 <6.1.0'
-
-  '@typescript-eslint/project-service@8.61.0':
-    resolution: {integrity: sha512-DV42F7MLJO6Rax7SK1yg43tcnEfGUrurSpSxKuVX+a3RCTzBlH3fuxprrOJXKCJGAaw82xXocikJ0uQaqwXgGA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
-  '@typescript-eslint/scope-manager@8.61.0':
-    resolution: {integrity: sha512-IWdXFHFSb6mlC3HPc7QsLDm5zYEbUla6trDEHf32D3/dnuUyXd87plScSNXSbm0/RxMvObpI17sv/EDTGrGZkA==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-
-  '@typescript-eslint/tsconfig-utils@8.61.0':
-    resolution: {integrity: sha512-O5Amvdv9ztMpxpf+vmFULGG78IE6Qwdr3bCGvqwG4nwc9H2qXkOYJJnRbRHyMkQTjv1d03olqwwwzHLMqpFePQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
-    peerDependencies:
-      typescript: '>=4.8.4 <6.1.0'
-
-  '@typescript-eslint/type-utils@8.61.0':
-    resolution: {integrity: sha512-TuBiQYIkd97yBfInHCTKVYMbX4kvEmpOEuixIuzCU9p8BGT1SfyyO0d0IfDMbPIHcjn/hWnusUX5e8v5Xg+X8A==}
+  '@typescript-eslint/parser@8.61.1':
+    resolution: {integrity: sha512-PJ5vePq5/ognBbrIcoC5+SHO5dfpeLPzP9FpLkzWrguoYQEeeSjlJpVwOpo1JRSTEi7dRcwNy4h4dzV70PqHcg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/types@8.61.0':
-    resolution: {integrity: sha512-9QTQpZ5Iin4CdIodfbDQFSeiSJKidgYJYug1P9CC2xWgUTvlmixViqDZNciMjwLBZyJnG4tGmPl97rVAFb1AJg==}
+  '@typescript-eslint/project-service@8.61.1':
+    resolution: {integrity: sha512-PrC4JYGmR241lYnfhmKGTXkFqv8+ymbTFgSAY0fVXpY82/QkMw5TZPl+vGzuDDU2QYJk9fIDOBTntF+yDv9LEA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/scope-manager@8.61.1':
+    resolution: {integrity: sha512-L2bdIeoQS8FlKAvONAr20w6OcLXeB+qiDKbAooS9A0Ben+iSIkBef0FxqwKWYqt5sa0i4KJtxVyVmhMylKzF5w==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@typescript-eslint/tsconfig-utils@8.61.1':
+    resolution: {integrity: sha512-UN/H4di+OO7EWx2ovME+8t31YO+KVnK0RRKEHR3kOt21/Ay8BOq3M1OMvWs5vNiqcFCYGYoxK3MXPZzmMUE+yg==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      typescript: '>=4.8.4 <6.1.0'
+
+  '@typescript-eslint/type-utils@8.61.1':
+    resolution: {integrity: sha512-GYRicKmVK0C4fsKgaACaknOUAq9Oa2kwsjnpFhFcS/5p4Ht5IP9OVLbgIgcK4SRk92nVHFluurg1lumD9dBcLw==}
+    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    peerDependencies:
+      eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
+      typescript: '>=4.8.4 <6.1.0'
 
   '@typescript-eslint/types@8.61.1':
     resolution: {integrity: sha512-G+CRlPqLv7Bz1IZVs03x5K59F1veqL0EJUROAdGhKsEq8qOiRiZbI+HUojPq5l0fEGOKModD9br6lObhB8zkoA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
-  '@typescript-eslint/typescript-estree@8.61.0':
-    resolution: {integrity: sha512-42zatd5qSvvcV1JdDBCLxYRznvP4eIHpPoZXdkPFnAmanA4FuZ5dibSnCBggY8hQnqajPpoGjXFdZ7fIJKQnlA==}
+  '@typescript-eslint/typescript-estree@8.61.1':
+    resolution: {integrity: sha512-u+oQD3BqYWPc8YV9Zab4vaJElJuwOLPRc10Jm1o/qS+6Qwen14HCWwx0Seo4LnSn2wxea2Ik8DxPt2/FHmuhrg==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/utils@8.61.0':
-    resolution: {integrity: sha512-3bzFt7ImFMW/jVYwJamDoe/dMOdFLSC6pom6rRjdh4SZJEYupyMzem8e7vKZLclLfpHjlwSAXOUxtKxGXUiLqA==}
+  '@typescript-eslint/utils@8.61.1':
+    resolution: {integrity: sha512-1+P/3Dj6jvtybE1q0HQ6yBt/gq+oKJyLdEv4HdnqasaEXRSYCAsD59mXEVQnM/ULNdQxbX77tdG4jPRjIS6knA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0 || ^10.0.0
       typescript: '>=4.8.4 <6.1.0'
 
-  '@typescript-eslint/visitor-keys@8.61.0':
-    resolution: {integrity: sha512-QVLZu3ZPQEE+HICQyAMZ2yLQhxf0meY/wx6Hx14YcTNj13JB3qHlX3lJ02L3fLGHgERRH71kvYDwiXIguT3AjQ==}
+  '@typescript-eslint/visitor-keys@8.61.1':
+    resolution: {integrity: sha512-6fJ9MHWtK14C1DSkiMlHUSOmrVebL7150xZJBlJiL62jjhIA4JmOq6flwBgDxIdBKKdoiZRel+dfPD5MLfny3w==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
 
   '@verdaccio/auth@8.0.2':
@@ -3975,8 +3971,8 @@ packages:
   ajv@8.20.0:
     resolution: {integrity: sha512-Thbli+OlOj+iMPYFBVBfJ3OmCAnaSyNn4M1vz9T6Gka5Jt9ba/HIR56joy65tY6kx/FCF5VXNB819Y7/GUrBGA==}
 
-  algoliasearch@5.54.0:
-    resolution: {integrity: sha512-APAX4ajIOgsmYoUlGe++oNZkSTBgmXYM4maHC0OxC+Yo7xkaKQElV0ATZYCZA7jzrSJX1OBiqEs7mk+ZxXgYqA==}
+  algoliasearch@5.55.0:
+    resolution: {integrity: sha512-af+rI+tUVeS9KWHPAZQHIHPOIC3StPRR6IwQu2nz1aQoTL6Gs5Ty3KsHCgbXMHOpoh9QqSjq8F3KJ8xmaCZSBA==}
     engines: {node: '>= 14.0.0'}
 
   ansi-colors@4.1.3:
@@ -7820,8 +7816,8 @@ packages:
     resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
-  undici@8.4.1:
-    resolution: {integrity: sha512-RNHlB4fxZK0IrkhBsxhlbx7s8kFWwr7rzzOqj5nvZugw3ig3RsB7KW3zVlV0eu8POl+rx5d1hmL7rRg0z1owow==}
+  undici@8.5.0:
+    resolution: {integrity: sha512-xamtWoB1EshgjpmlXd7GGm2VfdDtw1+rD8uhry8pSNW3If6S8E0m2T2+orSKeZXEn/aPJMviCpDBA65WJt8zhg==}
     engines: {node: '>=22.19.0'}
 
   unenv@1.10.0:
@@ -8302,89 +8298,89 @@ snapshots:
 
   '@actions/io@3.0.2': {}
 
-  '@algolia/abtesting@1.20.0':
+  '@algolia/abtesting@1.21.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-abtesting@5.54.0':
+  '@algolia/client-abtesting@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-analytics@5.54.0':
+  '@algolia/client-analytics@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-common@5.54.0': {}
+  '@algolia/client-common@5.55.0': {}
 
-  '@algolia/client-insights@5.54.0':
+  '@algolia/client-insights@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-personalization@5.54.0':
+  '@algolia/client-personalization@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-query-suggestions@5.54.0':
+  '@algolia/client-query-suggestions@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/client-search@5.54.0':
+  '@algolia/client-search@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/ingestion@1.54.0':
+  '@algolia/ingestion@1.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/monitoring@1.54.0':
+  '@algolia/monitoring@1.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/recommend@5.54.0':
+  '@algolia/recommend@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
-  '@algolia/requester-browser-xhr@5.54.0':
+  '@algolia/requester-browser-xhr@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
+      '@algolia/client-common': 5.55.0
 
-  '@algolia/requester-fetch@5.54.0':
+  '@algolia/requester-fetch@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
+      '@algolia/client-common': 5.55.0
 
-  '@algolia/requester-node-http@5.54.0':
+  '@algolia/requester-node-http@5.55.0':
     dependencies:
-      '@algolia/client-common': 5.54.0
+      '@algolia/client-common': 5.55.0
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -11267,14 +11263,14 @@ snapshots:
 
   '@types/yarnpkg__lockfile@1.1.9': {}
 
-  '@typescript-eslint/eslint-plugin@8.61.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@typescript-eslint/eslint-plugin@8.61.1(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/regexpp': 4.12.2
-      '@typescript-eslint/parser': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
-      '@typescript-eslint/scope-manager': 8.61.0
-      '@typescript-eslint/type-utils': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
-      '@typescript-eslint/visitor-keys': 8.61.0
+      '@typescript-eslint/parser': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
+      '@typescript-eslint/scope-manager': 8.61.1
+      '@typescript-eslint/type-utils': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
+      '@typescript-eslint/visitor-keys': 8.61.1
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       ignore: 7.0.5
       natural-compare: 1.4.0
@@ -11283,41 +11279,41 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/scope-manager': 8.61.0
-      '@typescript-eslint/types': 8.61.0
-      '@typescript-eslint/typescript-estree': 8.61.0(supports-color@10.2.2)(typescript@6.0.3)
-      '@typescript-eslint/visitor-keys': 8.61.0
+      '@typescript-eslint/scope-manager': 8.61.1
+      '@typescript-eslint/types': 8.61.1
+      '@typescript-eslint/typescript-estree': 8.61.1(typescript@6.0.3)
+      '@typescript-eslint/visitor-keys': 8.61.1
       debug: 4.4.3(supports-color@10.2.2)
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/project-service@8.61.0(supports-color@10.2.2)(typescript@6.0.3)':
+  '@typescript-eslint/project-service@8.61.1(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/tsconfig-utils': 8.61.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.61.0
+      '@typescript-eslint/tsconfig-utils': 8.61.1(typescript@6.0.3)
+      '@typescript-eslint/types': 8.61.1
       debug: 4.4.3(supports-color@10.2.2)
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/scope-manager@8.61.0':
+  '@typescript-eslint/scope-manager@8.61.1':
     dependencies:
-      '@typescript-eslint/types': 8.61.0
-      '@typescript-eslint/visitor-keys': 8.61.0
+      '@typescript-eslint/types': 8.61.1
+      '@typescript-eslint/visitor-keys': 8.61.1
 
-  '@typescript-eslint/tsconfig-utils@8.61.0(typescript@6.0.3)':
+  '@typescript-eslint/tsconfig-utils@8.61.1(typescript@6.0.3)':
     dependencies:
       typescript: 6.0.3
 
-  '@typescript-eslint/type-utils@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)':
+  '@typescript-eslint/type-utils@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/types': 8.61.0
-      '@typescript-eslint/typescript-estree': 8.61.0(supports-color@10.2.2)(typescript@6.0.3)
-      '@typescript-eslint/utils': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
+      '@typescript-eslint/types': 8.61.1
+      '@typescript-eslint/typescript-estree': 8.61.1(typescript@6.0.3)
+      '@typescript-eslint/utils': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
       debug: 4.4.3(supports-color@10.2.2)
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       ts-api-utils: 2.5.0(typescript@6.0.3)
@@ -11325,16 +11321,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/types@8.61.0': {}
-
   '@typescript-eslint/types@8.61.1': {}
 
-  '@typescript-eslint/typescript-estree@8.61.0(supports-color@10.2.2)(typescript@6.0.3)':
+  '@typescript-eslint/typescript-estree@8.61.1(typescript@6.0.3)':
     dependencies:
-      '@typescript-eslint/project-service': 8.61.0(supports-color@10.2.2)(typescript@6.0.3)
-      '@typescript-eslint/tsconfig-utils': 8.61.0(typescript@6.0.3)
-      '@typescript-eslint/types': 8.61.0
-      '@typescript-eslint/visitor-keys': 8.61.0
+      '@typescript-eslint/project-service': 8.61.1(typescript@6.0.3)
+      '@typescript-eslint/tsconfig-utils': 8.61.1(typescript@6.0.3)
+      '@typescript-eslint/types': 8.61.1
+      '@typescript-eslint/visitor-keys': 8.61.1
       debug: 4.4.3(supports-color@10.2.2)
       minimatch: 10.2.5
       semver: 7.8.4
@@ -11344,20 +11338,20 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)':
+  '@typescript-eslint/utils@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.9.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
-      '@typescript-eslint/scope-manager': 8.61.0
-      '@typescript-eslint/types': 8.61.0
-      '@typescript-eslint/typescript-estree': 8.61.0(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/scope-manager': 8.61.1
+      '@typescript-eslint/types': 8.61.1
+      '@typescript-eslint/typescript-estree': 8.61.1(typescript@6.0.3)
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       typescript: 6.0.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/visitor-keys@8.61.0':
+  '@typescript-eslint/visitor-keys@8.61.1':
     dependencies:
-      '@typescript-eslint/types': 8.61.0
+      '@typescript-eslint/types': 8.61.1
       eslint-visitor-keys: 5.0.1
 
   '@verdaccio/auth@8.0.2(supports-color@10.2.2)':
@@ -11743,22 +11737,22 @@ snapshots:
       json-schema-traverse: 1.0.0
       require-from-string: 2.0.2
 
-  algoliasearch@5.54.0:
+  algoliasearch@5.55.0:
     dependencies:
-      '@algolia/abtesting': 1.20.0
-      '@algolia/client-abtesting': 5.54.0
-      '@algolia/client-analytics': 5.54.0
-      '@algolia/client-common': 5.54.0
-      '@algolia/client-insights': 5.54.0
-      '@algolia/client-personalization': 5.54.0
-      '@algolia/client-query-suggestions': 5.54.0
-      '@algolia/client-search': 5.54.0
-      '@algolia/ingestion': 1.54.0
-      '@algolia/monitoring': 1.54.0
-      '@algolia/recommend': 5.54.0
-      '@algolia/requester-browser-xhr': 5.54.0
-      '@algolia/requester-fetch': 5.54.0
-      '@algolia/requester-node-http': 5.54.0
+      '@algolia/abtesting': 1.21.0
+      '@algolia/client-abtesting': 5.55.0
+      '@algolia/client-analytics': 5.55.0
+      '@algolia/client-common': 5.55.0
+      '@algolia/client-insights': 5.55.0
+      '@algolia/client-personalization': 5.55.0
+      '@algolia/client-query-suggestions': 5.55.0
+      '@algolia/client-search': 5.55.0
+      '@algolia/ingestion': 1.55.0
+      '@algolia/monitoring': 1.55.0
+      '@algolia/recommend': 5.55.0
+      '@algolia/requester-browser-xhr': 5.55.0
+      '@algolia/requester-fetch': 5.55.0
+      '@algolia/requester-node-http': 5.55.0
 
   ansi-colors@4.1.3: {}
 
@@ -12911,17 +12905,17 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.13.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2)):
+  eslint-module-utils@2.13.0(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2)):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       eslint-import-resolver-node: 0.3.10
     transitivePeerDependencies:
       - supports-color
 
-  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2)):
+  eslint-plugin-import@2.32.0(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2)):
     dependencies:
       '@rtsao/scc': 1.1.0
       array-includes: 3.1.9
@@ -12932,7 +12926,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 10.5.0(jiti@2.7.0)(supports-color@10.2.2)
       eslint-import-resolver-node: 0.3.10
-      eslint-module-utils: 2.13.0(@typescript-eslint/parser@8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
+      eslint-module-utils: 2.13.0(@typescript-eslint/parser@8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3))(eslint-import-resolver-node@0.3.10)(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))
       hasown: 2.0.4
       is-core-module: 2.16.2
       is-glob: 4.0.3
@@ -12944,7 +12938,7 @@ snapshots:
       string.prototype.trimend: 1.0.10
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 8.61.0(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(supports-color@10.2.2)(typescript@6.0.3)
+      '@typescript-eslint/parser': 8.61.1(eslint@10.5.0(jiti@2.7.0)(supports-color@10.2.2))(typescript@6.0.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
@@ -16231,7 +16225,7 @@ snapshots:
 
   undici@7.28.0: {}
 
-  undici@8.4.1: {}
+  undici@8.5.0: {}
 
   unenv@1.10.0:
     dependencies:
