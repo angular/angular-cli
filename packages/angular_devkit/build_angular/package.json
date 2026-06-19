@@ -11,7 +11,7 @@
     "@angular-devkit/build-webpack": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular/build": "workspace:0.0.0-PLACEHOLDER",
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.7",
     "@babel/generator": "7.29.1",
     "@babel/helper-annotate-as-pure": "7.27.3",
     "@babel/helper-split-export-declaration": "7.24.7",
