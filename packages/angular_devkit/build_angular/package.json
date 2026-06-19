@@ -41,7 +41,7 @@
     "open": "11.0.0",
     "ora": "9.3.0",
     "picomatch": "4.0.4",
-    "piscina": "5.1.4",
+    "piscina": "5.2.0",
     "postcss": "8.5.12",
     "postcss-loader": "8.2.0",
     "resolve-url-loader": "5.0.0",
