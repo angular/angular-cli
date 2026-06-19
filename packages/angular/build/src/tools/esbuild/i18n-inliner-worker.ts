@@ -7,7 +7,7 @@
  */
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
-import { PluginObj, parseSync, transformFromAstAsync, types } from '@babel/core';
+import { NodePath, PluginItem, parseSync, transformFromAstAsync, types } from '@babel/core';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
 import { assertIsError } from '../../utils/error';
@@ -144,26 +144,25 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
 async function createI18nPlugins(locale: string, translation: Record<string, unknown> | undefined) {
   const { Diagnostics, makeEs2015TranslatePlugin } = await loadLocalizeTools();
 
-  const plugins: PluginObj[] = [];
+  const plugins: PluginItem[] = [];
   const diagnostics = new Diagnostics();
 
   plugins.push(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+    makeEs2015TranslatePlugin(diagnostics, translation || {}, {
       missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }),
+    }) as unknown as PluginItem,
   );
 
   // Create a plugin to replace the locale specifier constant inject by the build system with the actual specifier
-  plugins.push({
+  plugins.push(() => ({
     visitor: {
-      StringLiteral(path) {
+      StringLiteral(path: NodePath<types.StringLiteral>) {
         if (path.node.value === '___NG_LOCALE_INSERT___') {
           path.replaceWith(types.stringLiteral(locale));
         }
       },
     },
-  });
+  }));
 
   return { diagnostics, plugins };
 }

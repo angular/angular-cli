@@ -9,7 +9,7 @@
 import remapping from '@ampproject/remapping';
 import {
   NodePath,
-  ParseResult,
+  PluginItem,
   parseSync,
   template as templateBuilder,
   transformAsync,
@@ -24,6 +24,8 @@ import { InlineOptions } from './bundle-inline-options';
 import { allowMinify, shouldBeautify } from './environment-options';
 import { assertIsError } from './error';
 import { I18nOptions } from './i18n-webpack';
+
+type ParseResult = NonNullable<ReturnType<typeof parseSync>>;
 
 // Extract Sourcemap input type from the remapping function since it is not currently exported
 type SourceMapInput = Exclude<Parameters<typeof remapping>[0], unknown[]>;
@@ -69,28 +71,27 @@ async function createI18nPlugins(
 ) {
   const { Diagnostics, makeEs2015TranslatePlugin, makeLocalePlugin } = await loadLocalizeTools();
 
-  const plugins = [];
+  const plugins: PluginItem[] = [];
   const diagnostics = new Diagnostics();
 
   if (shouldInline) {
     plugins.push(
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      makeEs2015TranslatePlugin(diagnostics, (translation || {}) as any, {
+      makeEs2015TranslatePlugin(diagnostics, translation || {}, {
         missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-      }),
+      }) as unknown as PluginItem,
     );
   }
 
-  plugins.push(makeLocalePlugin(locale));
+  plugins.push(makeLocalePlugin(locale) as unknown as PluginItem);
 
   if (localeDataContent) {
-    plugins.push({
+    plugins.push(() => ({
       visitor: {
         Program(path: NodePath<types.Program>) {
           path.unshiftContainer('body', templateBuilder.ast(localeDataContent));
         },
       },
-    });
+    }));
   }
 
   return { diagnostics, plugins };
@@ -254,7 +255,8 @@ async function inlineLocalesDirect(ast: ParseResult, options: InlineOptions) {
       );
 
       const expression = localizeDiag.buildLocalizeReplacement(translated[0], translated[1]);
-      const { code } = generate(expression);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { code } = generate(expression as any);
 
       content.replace(position.start, position.end - 1, code);
     }
@@ -357,11 +359,15 @@ function unwrapTemplateLiteral(
   utils: LocalizeUtilityModule,
 ): [TemplateStringsArray, types.Expression[]] {
   const [messageParts] = utils.unwrapMessagePartsFromTemplateLiteral(
-    path.get('quasi').get('quasis'),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    path.get('quasi').get('quasis') as any,
   );
-  const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(path.get('quasi'));
+  const [expressions] = utils.unwrapExpressionsFromTemplateLiteral(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    path.get('quasi') as any,
+  );
 
-  return [messageParts, expressions];
+  return [messageParts, expressions as types.Expression[]];
 }
 
 async function loadLocaleData(path: string, optimize: boolean): Promise<string> {
@@ -380,7 +386,6 @@ async function loadLocaleData(path: string, optimize: boolean): Promise<string> 
       [
         require.resolve('@babel/preset-env'),
         {
-          bugfixes: true,
           targets: { esmodules: true },
         },
       ],

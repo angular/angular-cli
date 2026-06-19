@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { NodePath, PluginObj, PluginPass, types } from '@babel/core';
+import { NodePath, PluginObject, PluginPass, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 import splitExportDeclaration from '@babel/helper-split-export-declaration';
 
@@ -206,7 +206,7 @@ const exportDefaultAnalysis = new WeakMap<types.Class, ReturnType<typeof analyze
  * @returns A babel plugin object instance.
  */
 // eslint-disable-next-line max-lines-per-function
-export default function (): PluginObj {
+export default function (): PluginObject {
   return {
     visitor: {
       // When a class is converted to a variable declaration, the default export must be moved

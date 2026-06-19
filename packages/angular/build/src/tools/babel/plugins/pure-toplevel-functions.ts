@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { NodePath, PluginObj, PluginPass, types } from '@babel/core';
+import type { NodePath, PluginObject, PluginPass, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 import * as tslib from 'tslib';
 
@@ -57,7 +57,7 @@ interface ExtendedPluginPass extends PluginPass {
  * A babel plugin factory function for adding the PURE annotation to top-level new and call expressions.
  * @returns A babel plugin object instance.
  */
-export default function (): PluginObj {
+export default function (): PluginObject {
   return {
     visitor: {
       CallExpression(path: NodePath<types.CallExpression>, state: ExtendedPluginPass) {

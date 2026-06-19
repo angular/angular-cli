@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { transformSync } from '@babel/core';
+import { PluginItem, transformSync } from '@babel/core';
 import { format } from 'prettier';
 import pureTopLevelPlugin from './pure-toplevel-functions';
 
@@ -24,7 +24,7 @@ function testCase({
       configFile: false,
       babelrc: false,
       compact: true,
-      plugins: [[pureTopLevelPlugin, options]],
+      plugins: [[pureTopLevelPlugin, options] as unknown as PluginItem],
     });
     if (!result?.code) {
       fail('Expected babel to return a transform result.');

@@ -181,7 +181,6 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     presets.push([
       require('@babel/preset-env').default,
       {
-        bugfixes: true,
         modules: false,
         targets: options.supportedBrowsers,
         exclude: ['transform-typeof-symbol'],
@@ -236,7 +235,6 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
     plugins.push([
       require('@babel/plugin-transform-runtime').default,
       {
-        useESModules: true,
         version: require('@babel/runtime/package.json').version,
         absoluteRuntime: path.dirname(require.resolve('@babel/runtime/package.json')),
       },
