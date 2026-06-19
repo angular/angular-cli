@@ -389,8 +389,8 @@ importers:
         specifier: 4.0.4
         version: 4.0.4
       piscina:
-        specifier: 5.1.4
-        version: 5.1.4
+        specifier: 5.2.0
+        version: 5.2.0
       rollup:
         specifier: 4.60.2
         version: 4.60.2
@@ -668,8 +668,8 @@ importers:
         specifier: 4.0.4
         version: 4.0.4
       piscina:
-        specifier: 5.1.4
-        version: 5.1.4
+        specifier: 5.2.0
+        version: 5.2.0
       postcss:
         specifier: 8.5.13
         version: 8.5.13
@@ -7097,6 +7097,10 @@ packages:
 
   piscina@5.1.4:
     resolution: {integrity: sha512-7uU4ZnKeQq22t9AsmHGD2w4OYQGonwFnTypDypaWi7Qr2EvQIFVtG8J5D/3bE7W123Wdc9+v4CZDu5hJXVCtBg==}
+    engines: {node: '>=20.x'}
+
+  piscina@5.2.0:
+    resolution: {integrity: sha512-DszUCKeVN/5G5QKo6jAVHL8fmKnkJvQ0ACiVgY7YGCq3TUB2oznAOayvZPIAdEThvhczkXR+qm3IHsNXpFCYfA==}
     engines: {node: '>=20.x'}
 
   pkce-challenge@5.0.1:
@@ -15873,6 +15877,10 @@ snapshots:
       thread-stream: 3.2.0
 
   piscina@5.1.4:
+    optionalDependencies:
+      '@napi-rs/nice': 1.1.1
+
+  piscina@5.2.0:
     optionalDependencies:
       '@napi-rs/nice': 1.1.1
 
