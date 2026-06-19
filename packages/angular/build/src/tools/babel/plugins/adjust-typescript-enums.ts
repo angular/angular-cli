@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { NodePath, PluginObj, types } from '@babel/core';
+import { NodePath, PluginObject, types } from '@babel/core';
 import annotateAsPure from '@babel/helper-annotate-as-pure';
 
 /**
@@ -24,7 +24,7 @@ export function getKeywords(): Iterable<string> {
  *
  * @returns A babel plugin object instance.
  */
-export default function (): PluginObj {
+export default function (): PluginObject {
   return {
     visitor: {
       VariableDeclaration(path: NodePath<types.VariableDeclaration>) {

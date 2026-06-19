@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { NodePath, PluginObj, types } from '@babel/core';
+import { NodePath, PluginObject, PluginPass, types } from '@babel/core';
 import type { Visitor } from 'istanbul-lib-instrument';
 import assert from 'node:assert';
 
@@ -17,13 +17,13 @@ import assert from 'node:assert';
  */
 export default function (
   programVisitor: typeof import('istanbul-lib-instrument').programVisitor,
-): PluginObj {
+): PluginObject {
   const visitors = new WeakMap<NodePath, Visitor>();
 
   return {
     visitor: {
       Program: {
-        enter(path, state) {
+        enter(path: NodePath<types.Program>, state: PluginPass) {
           const visitor = programVisitor(types, state.filename, {
             // Babel returns a Converter object from the `convert-source-map` package
             inputSourceMap: (state.file.inputMap as undefined | { toObject(): object })?.toObject(),
@@ -32,7 +32,7 @@ export default function (
 
           visitor.enter(path);
         },
-        exit(path) {
+        exit(path: NodePath<types.Program>) {
           const visitor = visitors.get(path);
           assert(visitor, 'Instrumentation visitor should always be present for program path.');
 

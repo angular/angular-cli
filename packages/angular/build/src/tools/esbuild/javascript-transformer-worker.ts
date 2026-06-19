@@ -85,7 +85,7 @@ async function transformWithBabel(
 
       const { default: coveragePluginFactory } =
         await import('../babel/plugins/add-code-coverage.js');
-      plugins.push(coveragePluginFactory(programVisitor));
+      plugins.push(coveragePluginFactory(programVisitor) as unknown as PluginItem);
     } catch (error) {
       throw new Error(
         `The 'istanbul-lib-instrument' package is required for code coverage but was not found. Please install the package.`,
@@ -97,7 +97,7 @@ async function transformWithBabel(
   if (shouldLink) {
     // Lazy load the linker plugin only when linking is required
     const linkerPlugin = await createLinkerPlugin(options);
-    plugins.push(linkerPlugin);
+    plugins.push(linkerPlugin as unknown as PluginItem);
   }
 
   if (options.advancedOptimizations) {

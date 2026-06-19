@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { transformSync } from '@babel/core';
-// eslint-disable-next-line import/no-extraneous-dependencies
+import { PluginItem, transformSync } from '@babel/core';
 import { format } from 'prettier';
 import adjustStaticClassMembers from './adjust-static-class-members';
 
@@ -26,7 +25,7 @@ function testCase({
     const result = transformSync(input, {
       configFile: false,
       babelrc: false,
-      plugins: [[adjustStaticClassMembers, options]],
+      plugins: [[adjustStaticClassMembers, options] as unknown as PluginItem],
     });
     if (!result?.code) {
       fail('Expected babel to return a transform result.');

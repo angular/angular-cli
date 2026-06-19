@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { transformSync } from '@babel/core';
+import { PluginItem, transformSync } from '@babel/core';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { format } from 'prettier';
 import adjustTypeScriptEnums from './adjust-typescript-enums';
@@ -24,7 +24,7 @@ function testCase({
     const result = transformSync(input, {
       configFile: false,
       babelrc: false,
-      plugins: [[adjustTypeScriptEnums]],
+      plugins: [adjustTypeScriptEnums],
     });
     if (!result?.code) {
       fail('Expected babel to return a transform result.');
