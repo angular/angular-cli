@@ -14,6 +14,32 @@ export function resetCumulativeDurations(): void {
   cumulativeDurations?.clear();
 }
 
+export function getAndClearCumulativeDurations(): Record<string, number[]> | undefined {
+  if (!cumulativeDurations || cumulativeDurations.size === 0) {
+    return undefined;
+  }
+
+  const data = Object.fromEntries(cumulativeDurations);
+
+  cumulativeDurations.clear();
+
+  return data;
+}
+
+export function mergeCumulativeDurations(data: Record<string, number[]>): void {
+  cumulativeDurations ??= new Map();
+
+  for (const [name, durations] of Object.entries(data)) {
+    let existing = cumulativeDurations.get(name);
+    if (!existing) {
+      existing = [];
+      cumulativeDurations.set(name, existing);
+    }
+
+    existing.push(...durations);
+  }
+}
+
 export function logCumulativeDurations(): void {
   if (!debugPerformance || !cumulativeDurations) {
     return;
