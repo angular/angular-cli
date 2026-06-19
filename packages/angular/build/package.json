@@ -35,7 +35,7 @@
     "mrmime": "2.0.1",
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.4",
-    "piscina": "5.1.4",
+    "piscina": "5.2.0",
     "rollup": "4.60.2",
     "sass": "1.99.0",
     "semver": "7.7.4",
