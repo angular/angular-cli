@@ -11,6 +11,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { SourceFileCache } from '../../esbuild/angular/source-file-cache';
+import { getAndClearCumulativeDurations } from '../../esbuild/profiling';
 import type { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { AotCompilation } from './aot-compilation';
 import { JitCompilation } from './jit-compilation';
@@ -121,12 +122,17 @@ export async function initialize(request: InitRequest) {
 export async function diagnose(modes: DiagnosticModes): Promise<{
   errors?: PartialMessage[];
   warnings?: PartialMessage[];
+  timings?: Record<string, number[]>;
 }> {
   assert(compilation);
 
   const diagnostics = await compilation.diagnoseFiles(modes);
+  const timings = getAndClearCumulativeDurations();
 
-  return diagnostics;
+  return {
+    ...diagnostics,
+    timings,
+  };
 }
 
 export async function emit() {

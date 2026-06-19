@@ -12,6 +12,7 @@ import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
 import type { SourceFile } from 'typescript';
 import { WorkerPool } from '../../../utils/worker-pool';
+import { mergeCumulativeDurations } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 
@@ -124,10 +125,15 @@ export class ParallelCompilation extends AngularCompilation {
     throw new Error('Not implemented in ParallelCompilation.');
   }
 
-  override diagnoseFiles(
+  override async diagnoseFiles(
     modes = DiagnosticModes.All,
   ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
-    return this.#worker.run(modes, { name: 'diagnose' });
+    const { timings, ...result } = await this.#worker.run(modes, { name: 'diagnose' });
+    if (timings) {
+      mergeCumulativeDurations(timings);
+    }
+
+    return result;
   }
 
   override emitAffectedFiles(): Promise<Iterable<EmitFileResult>> {
