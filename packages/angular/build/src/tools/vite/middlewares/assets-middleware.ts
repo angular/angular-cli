@@ -11,7 +11,9 @@ import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
 import { extname } from 'node:path';
-import type { Connect, ViteDevServer } from 'vite';
+import type { Connect, ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { ResultFile } from '../../../builders/application/results';
 import { AngularMemoryOutputFiles, AngularOutputAssets, pathnameWithoutBasePath } from '../utils';
 

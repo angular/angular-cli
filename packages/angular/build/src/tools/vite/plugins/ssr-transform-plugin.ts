@@ -7,10 +7,12 @@
  */
 
 import remapping, { SourceMapInput } from '@ampproject/remapping';
-import type { Plugin } from 'vite';
+import type * as Vite from 'vite' with {
+  'resolution-mode': 'import',
+};
 
-export async function createAngularSsrTransformPlugin(workspaceRoot: string): Promise<Plugin> {
-  const { normalizePath } = await import('vite');
+export async function createAngularSsrTransformPlugin(workspaceRoot: string): Promise<Vite.Plugin> {
+  const { normalizePath } = (await import('vite' as string)) as typeof Vite;
 
   return {
     name: 'vite:angular-ssr-transform',

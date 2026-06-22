@@ -10,7 +10,9 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import type { Connect } from 'vite';
+import type { Connect } from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 type DevToolsJson = {
   workspace: {

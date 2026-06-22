@@ -10,7 +10,9 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import assert from 'node:assert';
 import { join } from 'node:path';
-import type { Connect, ViteDevServer } from 'vite';
+import type * as Vite from 'vite' with {
+  'resolution-mode': 'import',
+};
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import { ServerSsrMode } from '../../../tools/vite/plugins';
 import { EsbuildLoaderOption, updateExternalMetadata } from '../../../tools/vite/utils';
@@ -58,7 +60,7 @@ export async function* serveWithVite(
     indexHtml?: (content: string) => Promise<string>;
   },
   extensions?: {
-    middleware?: Connect.NextHandleFunction[];
+    middleware?: Vite.Connect.NextHandleFunction[];
     buildPlugins?: Plugin[];
   },
 ): AsyncIterableIterator<DevServerBuilderOutput> {
@@ -191,9 +193,9 @@ export async function* serveWithVite(
   // The index HTML path will be updated from the build results if provided by the builder
   let htmlIndexPath = 'index.html';
 
-  const { createServer, normalizePath } = await import('vite');
+  const { createServer, normalizePath } = (await import('vite' as string)) as typeof Vite;
 
-  let server: ViteDevServer | undefined;
+  let server: Vite.ViteDevServer | undefined;
   let serverUrl: URL | undefined;
   let hadError = false;
   const generatedFiles = new Map<string, OutputFileRecord>();

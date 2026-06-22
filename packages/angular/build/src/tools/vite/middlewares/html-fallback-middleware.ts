@@ -7,7 +7,9 @@
  */
 
 import type { ServerResponse } from 'node:http';
-import type { Connect } from 'vite';
+import type { Connect } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { lookupMimeTypeFromRequest } from '../utils';
 
 const ALLOWED_FALLBACK_METHODS = Object.freeze(['GET', 'HEAD']);

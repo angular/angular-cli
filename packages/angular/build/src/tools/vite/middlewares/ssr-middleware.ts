@@ -11,7 +11,9 @@ import type {
   ɵgetOrCreateAngularServerApp as getOrCreateAngularServerApp,
 } from '@angular/ssr';
 import type { ServerResponse } from 'node:http';
-import type { Connect, ViteDevServer } from 'vite';
+import type { Connect, ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import {
   isSsrNodeRequestHandler,
   isSsrRequestHandler,

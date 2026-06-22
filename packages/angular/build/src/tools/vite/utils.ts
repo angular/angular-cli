@@ -6,10 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { OnLoadArgs, PluginBuild } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import { builtinModules, isBuiltin } from 'node:module';
 import { extname } from 'node:path';
-import type { DepOptimizationConfig } from 'vite';
+import type { DepOptimizationConfig } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import type { ExternalResultMetadata } from '../esbuild/bundler-execution-result';
 import { JavaScriptTransformer } from '../esbuild/javascript-transformer';
 import { getFeatureSupport } from '../esbuild/utils';
@@ -78,8 +81,8 @@ export function getDepOptimizationConfig({
       name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
         thirdPartySourcemaps ? '-vendor-sourcemap' : ''
       }`,
-      setup(build) {
-        build.onLoad({ filter: /\.[cm]?js$/ }, async (args) => {
+      setup(build: PluginBuild) {
+        build.onLoad({ filter: /\.[cm]?js$/ }, async (args: OnLoadArgs) => {
           return {
             contents: await prebundleTransformer.transformFile(args.path),
             loader: 'js',

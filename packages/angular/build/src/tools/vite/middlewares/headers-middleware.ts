@@ -7,7 +7,9 @@
  */
 
 import type { ServerResponse } from 'node:http';
-import type { Connect, ViteDevServer } from 'vite';
+import type { Connect, ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 /**
  * Creates a middleware for adding custom headers.

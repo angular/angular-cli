@@ -9,7 +9,9 @@
 import type { ɵdestroyAngularServerApp as destroyAngularServerApp } from '@angular/ssr';
 import type { BuilderContext } from '@angular-devkit/architect';
 import { join } from 'node:path';
-import type { ViteDevServer } from 'vite';
+import type { ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import { BuildOutputFileType } from '../internal';
 import type { NormalizedDevServerOptions } from '../options';
