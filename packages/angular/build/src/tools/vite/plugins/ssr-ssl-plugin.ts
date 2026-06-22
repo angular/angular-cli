@@ -7,7 +7,9 @@
  */
 
 import { getCACertificates, setDefaultCACertificates } from 'node:tls';
-import type { Plugin } from 'vite';
+import type { Plugin } from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 export function createAngularServerSideSSLPlugin(): Plugin {
   return {

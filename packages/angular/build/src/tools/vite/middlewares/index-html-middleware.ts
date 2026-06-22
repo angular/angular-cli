@@ -7,7 +7,9 @@
  */
 
 import { extname } from 'node:path';
-import type { Connect, ViteDevServer } from 'vite';
+import type { Connect, ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { AngularMemoryOutputFiles, pathnameWithoutBasePath } from '../utils';
 
 export function createAngularIndexHtmlMiddleware(

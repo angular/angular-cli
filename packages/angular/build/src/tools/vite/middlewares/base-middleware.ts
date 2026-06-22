@@ -7,7 +7,9 @@
  */
 
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import type { Connect } from 'vite';
+import type { Connect } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { addLeadingSlash } from '../../../utils/url';
 
 /**

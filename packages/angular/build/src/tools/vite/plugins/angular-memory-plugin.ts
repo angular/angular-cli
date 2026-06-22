@@ -10,7 +10,9 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Plugin } from 'vite';
+import type * as Vite from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { AngularMemoryOutputFiles } from '../utils';
 
 interface AngularMemoryPluginOptions {
@@ -27,9 +29,9 @@ const FILE_PROTOCOL = 'file:';
 
 export async function createAngularMemoryPlugin(
   options: AngularMemoryPluginOptions,
-): Promise<Plugin> {
+): Promise<Vite.Plugin> {
   const { virtualProjectRoot, outputFiles, external } = options;
-  const { normalizePath } = await import('vite');
+  const { normalizePath } = (await import('vite' as string)) as typeof Vite;
 
   return {
     name: 'vite:angular-memory',

@@ -9,6 +9,9 @@
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import assert from 'node:assert';
 import path from 'node:path';
+import type * as Vite from 'vite' with {
+  'resolution-mode': 'import',
+};
 import type { Vitest } from 'vitest/node';
 import {
   DevServerExternalResultMetadata,
@@ -96,7 +99,7 @@ export class VitestExecutor implements TestExecutor {
 
   async *execute(buildResult: FullResult | IncrementalResult): AsyncIterable<BuilderOutput> {
     this.debugLog(DebugLogLevel.Info, `Executing test run (kind: ${buildResult.kind}).`);
-    this.normalizePath ??= (await import('vite')).normalizePath;
+    this.normalizePath ??= ((await import('vite' as string)) as typeof Vite).normalizePath;
 
     if (buildResult.kind === ResultKind.Full) {
       this.buildResultFiles.clear();

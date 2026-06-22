@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { Plugin } from 'vite';
+import type { Plugin } from 'vite' with {
+  'resolution-mode': 'import',
+};
 
 // NOTE: the implementation for this Vite plugin is roughly based on:
 // https://github.com/MilanKovacic/vite-plugin-externalize-dependencies

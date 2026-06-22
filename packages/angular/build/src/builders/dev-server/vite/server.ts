@@ -8,7 +8,9 @@
 
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { Connect, InlineConfig, SSROptions, ServerOptions } from 'vite';
+import type * as Vite from 'vite' with {
+  'resolution-mode': 'import',
+};
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import {
   ServerSsrMode,
@@ -30,7 +32,7 @@ async function createServerConfig(
   ssrMode: ServerSsrMode,
   preTransformRequests: boolean,
   cacheDir: string,
-): Promise<ServerOptions> {
+): Promise<Vite.ServerOptions> {
   const proxy = await loadProxyConfiguration(
     serverOptions.workspaceRoot,
     serverOptions.proxyConfig,
@@ -47,7 +49,7 @@ async function createServerConfig(
       break;
   }
 
-  const server: ServerOptions = {
+  const server: Vite.ServerOptions = {
     preTransformRequests,
     warmup: {
       ssrFiles,
@@ -101,7 +103,7 @@ function createSsrConfig(
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   thirdPartySourcemaps: boolean,
   define: ApplicationBuilderInternalOptions['define'],
-): SSROptions {
+): Vite.SSROptions {
   return {
     // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
     noExternal: /.*/,
@@ -139,11 +141,11 @@ export async function setupServer(
   templateUpdates: Map<string, string>,
   prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
   define: ApplicationBuilderInternalOptions['define'],
-  extensionMiddleware?: Connect.NextHandleFunction[],
+  extensionMiddleware?: Vite.Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
-): Promise<InlineConfig> {
-  const { normalizePath } = await import('vite');
+): Promise<Vite.InlineConfig> {
+  const { normalizePath } = (await import('vite' as string)) as typeof Vite;
 
   // Path will not exist on disk and only used to provide separate path for Vite requests
   const virtualProjectRoot = normalizePath(
@@ -161,13 +163,13 @@ export async function setupServer(
     externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
   const cacheDir = join(serverOptions.cacheOptions.path, serverOptions.buildTarget.project, 'vite');
 
-  const configuration: InlineConfig = {
+  const configuration: Vite.InlineConfig = {
     configFile: false,
     envFile: false,
     cacheDir,
     root: virtualProjectRoot,
     publicDir: false,
-    esbuild: false,
+    oxc: false,
     mode: 'development',
     // We use custom as we do not rely on Vite's htmlFallbackMiddleware and indexHtmlMiddleware.
     appType: 'custom',

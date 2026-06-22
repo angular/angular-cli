@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { Connect, ViteDevServer } from 'vite';
+import type { Connect, ViteDevServer } from 'vite' with {
+  'resolution-mode': 'import',
+};
 import { pathnameWithoutBasePath } from '../utils';
 
 const ANGULAR_COMPONENT_PREFIX = '/@ng/component';
