@@ -10,3 +10,4 @@ export * from './normalize-asset-patterns';
 export * from './normalize-optimization';
 export * from './normalize-source-maps';
 export * from './load-proxy-config';
+export * from './load-middleware-config';

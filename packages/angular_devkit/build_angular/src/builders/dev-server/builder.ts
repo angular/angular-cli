@@ -103,6 +103,7 @@ export function execute(
                 hmr: boolean;
                 allowedHosts: true | string[];
                 define: { [key: string]: string } | undefined;
+                middlewareConfig?: string;
               },
               builderName,
               (options, context, codePlugins) => {
