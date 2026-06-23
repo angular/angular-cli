@@ -9,6 +9,7 @@
 import {
   getFirstHeaderValue,
   normalizeTrustProxyHeaders,
+  parseForwardedHeader,
   sanitizeRequestHeaders,
   validateRequest,
   validateUrl,
@@ -35,6 +36,99 @@ describe('Validation Utils', () => {
 
     it('should return empty string for empty string input', () => {
       expect(getFirstHeaderValue('')).toBe('');
+    });
+  });
+
+  describe('parseForwardedHeader', () => {
+    it('should return an empty object for null, undefined, or empty string', () => {
+      expect(parseForwardedHeader(null)).toEqual({});
+      expect(parseForwardedHeader(undefined)).toEqual({});
+      expect(parseForwardedHeader('')).toEqual({});
+    });
+
+    it('should parse simple parameters correctly', () => {
+      expect(parseForwardedHeader('host=example.com;proto=https')).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should handle case-insensitivity of parameter names', () => {
+      expect(parseForwardedHeader('Host=example.com;PROTO=https')).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should handle whitespace around separators', () => {
+      expect(parseForwardedHeader('  host  =  example.com  ;  proto  =  https  ')).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should parse quoted strings correctly and remove outer quotes', () => {
+      expect(parseForwardedHeader('host="example.com";proto="https"')).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should handle escaped characters inside quoted strings', () => {
+      expect(parseForwardedHeader('host="example.com\\"escaped\\"";proto=https')).toEqual({
+        host: 'example.com"escaped"',
+        proto: 'https',
+      });
+    });
+
+    it('should handle semicolons inside quoted strings correctly', () => {
+      expect(parseForwardedHeader('host="example.com;with;semicolons";proto=https')).toEqual({
+        host: 'example.com;with;semicolons',
+        proto: 'https',
+      });
+    });
+
+    it('should handle commas inside quoted strings correctly without splitting the element', () => {
+      expect(parseForwardedHeader('host="example.com,with,commas";proto=https')).toEqual({
+        host: 'example.com,with,commas',
+        proto: 'https',
+      });
+    });
+
+    it('should only parse the first (leftmost) element in a comma-separated list', () => {
+      expect(
+        parseForwardedHeader('host=example.com;proto=https, for=192.0.2.60;proto=http'),
+      ).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should ignore parameters without values (no equals sign)', () => {
+      expect(parseForwardedHeader('host; proto=https')).toEqual({
+        proto: 'https',
+      });
+    });
+
+    it('should handle empty parameter values', () => {
+      expect(parseForwardedHeader('host=; proto=https')).toEqual({
+        host: '',
+        proto: 'https',
+      });
+    });
+
+    it('should treat spaces inside unquoted values as token terminators and ignore subsequent garbage', () => {
+      expect(parseForwardedHeader('host=example.com extra; proto=https')).toEqual({
+        host: 'example.com',
+        proto: 'https',
+      });
+    });
+
+    it('should treat spaces inside parameter names as token terminators and discard the invalid prefix', () => {
+      expect(parseForwardedHeader('ho st=value; proto=https')).toEqual({
+        st: 'value',
+        proto: 'https',
+      });
     });
   });
 

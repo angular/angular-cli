@@ -297,21 +297,124 @@ export function parseForwardedHeader(
     return {};
   }
 
-  const firstElement = headerValue.split(',', 1)[0];
   const params: Record<string, string> = {};
-  const paramRegex = /([^\s;=]+)\s*=\s*("(?:[^"\\]|\\.)*"|[^;\s]*)/gi;
+  let inQuotes = false;
+  let escaped = false;
+  let currentKey = '';
+  let currentValue = '';
+  let isParsingValue = false;
+  let isKeyEnded = false;
+  let isParsingValueEnded = false;
 
-  let match;
-  while ((match = paramRegex.exec(firstElement)) !== null) {
-    const key = match[1].toLowerCase();
-    let val = match[2];
-
-    if (val[0] === '"' && val.at(-1) === '"') {
-      val = val.slice(1, -1).replace(/\\(.)/g, '$1');
+  for (const char of headerValue) {
+    if (escaped) {
+      escaped = false;
+      if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
     }
 
-    params[key] = val;
+    if (char === '\\') {
+      if (inQuotes) {
+        escaped = true;
+      } else if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (inQuotes) {
+      if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
+    }
+
+    if (char === ',') {
+      addParam(currentKey, currentValue, isParsingValue, params);
+      break;
+    }
+
+    if (char === ';') {
+      addParam(currentKey, currentValue, isParsingValue, params);
+      currentKey = '';
+      currentValue = '';
+      isParsingValue = false;
+      isKeyEnded = false;
+      isParsingValueEnded = false;
+      continue;
+    }
+
+    if (char === '=') {
+      if (!isParsingValue) {
+        isParsingValue = true;
+      } else {
+        currentValue += char;
+      }
+      continue;
+    }
+
+    if (char === ' ' || char === '\t') {
+      if (isParsingValue) {
+        if (currentValue.length > 0) {
+          isParsingValueEnded = true;
+        }
+      } else if (currentKey.length > 0) {
+        isKeyEnded = true;
+      }
+      continue;
+    }
+
+    if (isParsingValue) {
+      if (!isParsingValueEnded) {
+        currentValue += char;
+      }
+    } else if (isKeyEnded) {
+      currentKey = char;
+      isKeyEnded = false;
+    } else {
+      currentKey += char;
+    }
+  }
+
+  if (currentKey || currentValue || isParsingValue) {
+    addParam(currentKey, currentValue, isParsingValue, params);
   }
 
   return params;
+}
+
+/**
+ * Helper function to add a parameter to the params object.
+ * @param key - The key to add.
+ * @param value - The value to add.
+ * @param hasValue - Whether the parameter has a value.
+ * @param params - The params object to add the parameter to.
+ */
+function addParam(
+  key: string,
+  value: string,
+  hasValue: boolean,
+  params: Record<string, string>,
+): void {
+  if (!hasValue) {
+    return;
+  }
+
+  const trimmedKey = key.trim().toLowerCase();
+  if (trimmedKey) {
+    params[trimmedKey] = value;
+  }
 }
