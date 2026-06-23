@@ -12,6 +12,7 @@ import {
   getFirstHeaderValue,
   isProxyHeaderAllowed,
   normalizeTrustProxyHeaders,
+  parseForwardedHeader,
 } from '../../src/utils/validation';
 
 /**
@@ -40,7 +41,7 @@ const HTTP2_PSEUDO_HEADERS: ReadonlySet<string> = new Set([
  * @param trustProxyHeaders - A boolean or an array of proxy headers to trust when constructing the request URL.
  *
  * @remarks
- * When `trustProxyHeaders` is enabled, headers such as `X-Forwarded-Host` and
+ * When `trustProxyHeaders` is enabled, headers such as `Forwarded`, `X-Forwarded-Host`, and
  * `X-Forwarded-Prefix` should ideally be strictly validated at a higher infrastructure
  * level (e.g., at the reverse proxy or API gateway) before reaching the application.
  *
@@ -97,7 +98,7 @@ function createRequestHeaders(nodeHeaders: IncomingHttpHeaders): Headers {
  * @param trustProxyHeaders - A set of allowed proxy headers.
  *
  * @remarks
- * When `trustProxyHeaders` is enabled, headers such as `X-Forwarded-Host` and
+ * When `trustProxyHeaders` is enabled, headers such as `Forwarded`, `X-Forwarded-Host`, and
  * `X-Forwarded-Prefix` should ideally be strictly validated at a higher infrastructure
  * level (e.g., at the reverse proxy or API gateway) before reaching the application.
  *
@@ -114,11 +115,16 @@ export function createRequestUrl(
     originalUrl,
   } = nodeRequest as IncomingMessage & { originalUrl?: string };
 
+  const forwardedHeaderValue = getAllowedProxyHeaderValue(headers, 'forwarded', trustProxyHeaders);
+  const forwardedParams = parseForwardedHeader(forwardedHeaderValue);
+
   const protocol =
+    forwardedParams.proto ??
     getAllowedProxyHeaderValue(headers, 'x-forwarded-proto', trustProxyHeaders) ??
     ('encrypted' in socket && socket.encrypted ? 'https' : 'http');
 
   const hostname =
+    forwardedParams.host ??
     getAllowedProxyHeaderValue(headers, 'x-forwarded-host', trustProxyHeaders) ??
     headers.host ??
     headers[':authority'];

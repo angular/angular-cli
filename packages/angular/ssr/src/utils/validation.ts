@@ -103,7 +103,8 @@ export function sanitizeRequestHeaders(
 
   for (const [key, value] of request.headers) {
     const lowerKey = key.toLowerCase();
-    if (lowerKey.startsWith('x-forwarded-') && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
+    const isProxyHeader = lowerKey === 'forwarded' || lowerKey.startsWith('x-forwarded-');
+    if (isProxyHeader && !isProxyHeaderAllowed(lowerKey, trustProxyHeaders)) {
       // eslint-disable-next-line no-console
       console.warn(
         `Received "${key}" header but "trustProxyHeaders" was not set up to allow it.\n` +
@@ -199,6 +200,17 @@ function validateHeaders(
     }
   }
 
+  const forwarded = headers.get('forwarded');
+  if (forwarded) {
+    const forwardedParams = parseForwardedHeader(forwarded);
+    if (forwardedParams.host && !disableHostCheck) {
+      verifyHostAllowed('Forwarded "host"', forwardedParams.host, allowedHosts);
+    }
+    if (forwardedParams.proto && !VALID_PROTO_REGEX.test(forwardedParams.proto)) {
+      throw new Error('Header "forwarded" proto parameter must be either "http" or "https".');
+    }
+  }
+
   const xForwardedPort = getFirstHeaderValue(headers.get('x-forwarded-port'));
   if (xForwardedPort && !VALID_PORT_REGEX.test(xForwardedPort)) {
     throw new Error('Header "x-forwarded-port" must be a numeric value.');
@@ -251,12 +263,158 @@ export function normalizeTrustProxyHeaders(
     return new Set([TRUST_ALL_PROXY_HEADERS]);
   }
 
-  const normalizedTrustedProxyHeaders = new Set(trustProxyHeaders.map((h) => h.toLowerCase()));
-  if (normalizedTrustedProxyHeaders.has(TRUST_ALL_PROXY_HEADERS)) {
-    throw new Error(
-      `"${TRUST_ALL_PROXY_HEADERS}" is not allowed as a value for the "trustProxyHeaders" option.`,
-    );
+  const normalizedTrustedProxyHeaders = new Set<string>();
+  for (const header of trustProxyHeaders) {
+    const lowerHeader = header.toLowerCase();
+    if (lowerHeader === TRUST_ALL_PROXY_HEADERS) {
+      throw new Error(
+        `"${TRUST_ALL_PROXY_HEADERS}" is not allowed as a value for the "trustProxyHeaders" option.`,
+      );
+    }
+    const isValid = lowerHeader === 'forwarded' || lowerHeader.startsWith('x-forwarded-');
+    if (!isValid) {
+      throw new Error(
+        `"${header}" is not a valid proxy header. Trusted proxy headers must be "forwarded" or start with "x-forwarded-".`,
+      );
+    }
+    normalizedTrustedProxyHeaders.add(lowerHeader);
   }
 
   return normalizedTrustedProxyHeaders;
+}
+
+/**
+ * Parses the standard `Forwarded` header (RFC 7239).
+ * It extracts the parameters from the first (leftmost) element in the header.
+ *
+ * @param headerValue - The value of the `Forwarded` header.
+ * @returns A record of lowercase parameter names to their values.
+ */
+export function parseForwardedHeader(
+  headerValue: string | null | undefined,
+): Record<string, string> {
+  if (!headerValue) {
+    return {};
+  }
+
+  const params: Record<string, string> = {};
+  let inQuotes = false;
+  let escaped = false;
+  let currentKey = '';
+  let currentValue = '';
+  let isParsingValue = false;
+  let isKeyEnded = false;
+  let isParsingValueEnded = false;
+
+  for (const char of headerValue) {
+    if (escaped) {
+      escaped = false;
+      if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
+    }
+
+    if (char === '\\') {
+      if (inQuotes) {
+        escaped = true;
+      } else if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
+    }
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if (inQuotes) {
+      if (isParsingValue) {
+        currentValue += char;
+      } else {
+        currentKey += char;
+      }
+      continue;
+    }
+
+    if (char === ',') {
+      addParam(currentKey, currentValue, isParsingValue, params);
+      break;
+    }
+
+    if (char === ';') {
+      addParam(currentKey, currentValue, isParsingValue, params);
+      currentKey = '';
+      currentValue = '';
+      isParsingValue = false;
+      isKeyEnded = false;
+      isParsingValueEnded = false;
+      continue;
+    }
+
+    if (char === '=') {
+      if (!isParsingValue) {
+        isParsingValue = true;
+      } else {
+        currentValue += char;
+      }
+      continue;
+    }
+
+    if (char === ' ' || char === '\t') {
+      if (isParsingValue) {
+        if (currentValue.length > 0) {
+          isParsingValueEnded = true;
+        }
+      } else if (currentKey.length > 0) {
+        isKeyEnded = true;
+      }
+      continue;
+    }
+
+    if (isParsingValue) {
+      if (!isParsingValueEnded) {
+        currentValue += char;
+      }
+    } else if (isKeyEnded) {
+      currentKey = char;
+      isKeyEnded = false;
+    } else {
+      currentKey += char;
+    }
+  }
+
+  if (currentKey || currentValue || isParsingValue) {
+    addParam(currentKey, currentValue, isParsingValue, params);
+  }
+
+  return params;
+}
+
+/**
+ * Helper function to add a parameter to the params object.
+ * @param key - The key to add.
+ * @param value - The value to add.
+ * @param hasValue - Whether the parameter has a value.
+ * @param params - The params object to add the parameter to.
+ */
+function addParam(
+  key: string,
+  value: string,
+  hasValue: boolean,
+  params: Record<string, string>,
+): void {
+  if (!hasValue) {
+    return;
+  }
+
+  const trimmedKey = key.trim().toLowerCase();
+  if (trimmedKey) {
+    params[trimmedKey] = value;
+  }
 }
