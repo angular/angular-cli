@@ -148,7 +148,13 @@ export async function* runEsBuildBuildAction(
     // Output the first build results after setting up the watcher to ensure that any code executed
     // higher in the iterator call stack will trigger the watcher. This is particularly relevant for
     // unit tests which execute the builder and modify the file system programmatically.
-    yield* emitOutputResults(result, outputOptions);
+    const outputResults = [...emitOutputResults(result, outputOptions)];
+    if (!watch) {
+      await result.dispose();
+      // Set to true to prevent double-disposal of the result context in the finally block on generator exit
+      watchLoopStarted = true;
+    }
+    yield* outputResults;
 
     // Finish if watch mode is not enabled
     if (!watcher) {
