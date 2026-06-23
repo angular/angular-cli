@@ -20,6 +20,7 @@ import {
   SERVER_GENERATED_EXTERNALS,
 } from '../../utils/server-rendering/manifest';
 import { AngularCompilation, NoopCompilation } from '../angular/compilation';
+import { AngularCompilationContext } from './angular/compilation-state';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import { SourceFileCache } from './angular/source-file-cache';
@@ -42,7 +43,7 @@ export function createBrowserCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
-  angularCompilation: AngularCompilation,
+  angularCompilationContext: AngularCompilationContext,
   templateUpdates: Map<string, string> | undefined,
 ): BundlerOptionsFactory {
   return (loadCache) => {
@@ -77,7 +78,7 @@ export function createBrowserCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
-        angularCompilation,
+        angularCompilationContext,
         // Component stylesheet bundler
         stylesheetBundler,
       ),
@@ -96,6 +97,7 @@ export function createBrowserPolyfillBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilationContext: AngularCompilationContext,
 ): BuildOptions | BundlerOptionsFactory | undefined {
   const namespace = 'angular:polyfills';
   const polyfillBundleOptions = getEsBuildCommonPolyfillsOptions(
@@ -138,8 +140,7 @@ export function createBrowserPolyfillBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
-        // Browser compilation handles the actual Angular code compilation
-        new NoopCompilation(),
+        angularCompilationContext,
         // Component stylesheet options are unused for polyfills but required by the plugin
         stylesheetBundler,
       ),
@@ -238,6 +239,7 @@ export function createServerMainCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilationContext: AngularCompilationContext,
 ): BundlerOptionsFactory {
   const {
     serverEntryPoint: mainServerEntryPoint,
@@ -288,8 +290,7 @@ export function createServerMainCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
-        // Browser compilation handles the actual Angular code compilation
-        new NoopCompilation(),
+        angularCompilationContext,
         // Component stylesheet bundler
         stylesheetBundler,
       ),
@@ -381,6 +382,7 @@ export function createSsrEntryCodeBundleOptions(
   target: string[],
   sourceFileCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
+  angularCompilationContext: AngularCompilationContext,
 ): BundlerOptionsFactory {
   const { workspaceRoot, ssrOptions, externalPackages } = options;
   const serverEntryPoint = ssrOptions?.entry;
@@ -432,8 +434,7 @@ export function createSsrEntryCodeBundleOptions(
       createCompilerPlugin(
         // JS/TS options
         pluginOptions,
-        // Browser compilation handles the actual Angular code compilation
-        new NoopCompilation(),
+        angularCompilationContext,
         // Component stylesheet bundler
         stylesheetBundler,
       ),

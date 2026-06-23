@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { createAngularCompilation } from '../../tools/angular/compilation';
+import { AngularCompilationContext } from '../../tools/esbuild/angular/compilation-state';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
@@ -71,61 +72,74 @@ export async function executeBuild(
   let codeBundleCache;
   let bundlingResult: BundleContextResult;
   let templateUpdates: Map<string, string> | undefined;
-  if (rebuildState) {
-    bundlerContexts = rebuildState.rebuildContexts;
-    componentStyleBundler = rebuildState.componentStyleBundler;
-    codeBundleCache = rebuildState.codeBundleCache;
-    templateUpdates = rebuildState.templateUpdates;
-    // Reset template updates for new rebuild
-    templateUpdates?.clear();
+  let angularCompilationContext: AngularCompilationContext | undefined;
+  try {
+    if (rebuildState) {
+      bundlerContexts = rebuildState.rebuildContexts;
+      componentStyleBundler = rebuildState.componentStyleBundler;
+      codeBundleCache = rebuildState.codeBundleCache;
+      templateUpdates = rebuildState.templateUpdates;
+      // Reset template updates for new rebuild
+      templateUpdates?.clear();
 
-    const allFileChanges = rebuildState.fileChanges.all;
+      const allFileChanges = rebuildState.fileChanges.all;
 
-    // Bundle all contexts that do not require TypeScript changed file checks.
-    // These will automatically use cached results based on the changed files.
-    bundlingResult = await BundlerContext.bundleAll(bundlerContexts.otherContexts, allFileChanges);
+      // Bundle all contexts that do not require TypeScript changed file checks.
+      // These will automatically use cached results based on the changed files.
+      bundlingResult = await BundlerContext.bundleAll(
+        bundlerContexts.otherContexts,
+        allFileChanges,
+      );
 
-    // Check the TypeScript code bundling cache for changes. If invalid, force a rebundle of
-    // all TypeScript related contexts.
-    const forceTypeScriptRebuild = codeBundleCache?.invalidate(allFileChanges);
-    const typescriptResults: BundleContextResult[] = [];
-    for (const typescriptContext of bundlerContexts.typescriptContexts) {
-      typescriptContext.invalidate(allFileChanges);
-      const result = await typescriptContext.bundle(forceTypeScriptRebuild);
-      typescriptResults.push(result);
+      // Check the TypeScript code bundling cache for changes. If invalid, force a rebundle of
+      // all TypeScript related contexts.
+      const forceTypeScriptRebuild = codeBundleCache?.invalidate(allFileChanges);
+      const typescriptResults: BundleContextResult[] = [];
+      for (const typescriptContext of bundlerContexts.typescriptContexts) {
+        typescriptContext.invalidate(allFileChanges);
+        const result = await typescriptContext.bundle(forceTypeScriptRebuild);
+        typescriptResults.push(result);
+      }
+      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...typescriptResults]);
+    } else {
+      const target = transformSupportedBrowsersToTargets(browsers);
+      codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
+      componentStyleBundler = createComponentStyleBundler(options, target);
+      if (options.templateUpdates) {
+        templateUpdates = new Map<string, string>();
+      }
+      const angularCompilation = await createAngularCompilation(
+        !!options.jit,
+        !options.serverEntryPoint,
+      );
+      angularCompilationContext = new AngularCompilationContext(angularCompilation);
+      bundlerContexts = setupBundlerContexts(
+        options,
+        target,
+        codeBundleCache,
+        componentStyleBundler,
+        angularCompilationContext,
+        templateUpdates,
+      );
+
+      // Bundle everything on initial build
+      bundlingResult = await BundlerContext.bundleAll([
+        ...bundlerContexts.typescriptContexts,
+        ...bundlerContexts.otherContexts,
+      ]);
     }
-    bundlingResult = BundlerContext.mergeResults([bundlingResult, ...typescriptResults]);
-  } else {
-    const target = transformSupportedBrowsersToTargets(browsers);
-    codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
-    componentStyleBundler = createComponentStyleBundler(options, target);
-    if (options.templateUpdates) {
-      templateUpdates = new Map<string, string>();
+
+    // Update any external component styles if enabled and rebuilding.
+    // TODO: Only attempt rebundling of invalidated styles once incremental build results are supported.
+    if (rebuildState && options.externalRuntimeStyles) {
+      componentStyleBundler.invalidate(rebuildState.fileChanges.all);
+
+      const componentResults = await componentStyleBundler.bundleAllFiles(true, true);
+      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
     }
-    bundlerContexts = setupBundlerContexts(
-      options,
-      target,
-      codeBundleCache,
-      componentStyleBundler,
-      // Create new reusable compilation for the appropriate mode based on the `jit` plugin option
-      await createAngularCompilation(!!options.jit, !options.serverEntryPoint),
-      templateUpdates,
-    );
-
-    // Bundle everything on initial build
-    bundlingResult = await BundlerContext.bundleAll([
-      ...bundlerContexts.typescriptContexts,
-      ...bundlerContexts.otherContexts,
-    ]);
-  }
-
-  // Update any external component styles if enabled and rebuilding.
-  // TODO: Only attempt rebundling of invalidated styles once incremental build results are supported.
-  if (rebuildState && options.externalRuntimeStyles) {
-    componentStyleBundler.invalidate(rebuildState.fileChanges.all);
-
-    const componentResults = await componentStyleBundler.bundleAllFiles(true, true);
-    bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
+  } catch (error) {
+    await angularCompilationContext?.dispose();
+    throw error;
   }
 
   const executionResult = new ExecutionResult(

@@ -27,7 +27,7 @@ import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angu
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
-import { SharedTSCompilationState, getSharedCompilationState } from './compilation-state';
+import { AngularCompilationContext } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
@@ -61,7 +61,10 @@ export interface CompilerPluginOptions {
 // eslint-disable-next-line max-lines-per-function
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
-  compilationOrFactory: AngularCompilation | (() => Promise<AngularCompilation>),
+  compilationContextOrCompilation:
+    | AngularCompilationContext
+    | AngularCompilation
+    | (() => Promise<AngularCompilation>),
   stylesheetBundler: ComponentStylesheetBundler,
 ): Plugin {
   return {
@@ -111,10 +114,15 @@ export function createCompilerPlugin(
 
       // The factory is only relevant for compatibility purposes with the private API.
       // TODO: Update private API in the next major to allow compilation function factory removal here.
-      const compilation =
-        typeof compilationOrFactory === 'function'
-          ? await compilationOrFactory()
-          : compilationOrFactory;
+      const angularCompilationContext =
+        compilationContextOrCompilation instanceof AngularCompilationContext
+          ? compilationContextOrCompilation
+          : new AngularCompilationContext(
+              typeof compilationContextOrCompilation === 'function'
+                ? await compilationContextOrCompilation()
+                : compilationContextOrCompilation,
+            );
+      const compilation: AngularCompilation = angularCompilationContext.compilation;
 
       // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
       // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
@@ -136,17 +144,12 @@ export function createCompilerPlugin(
       // Determines if transpilation should be handle by TypeScript or esbuild
       let useTypeScriptTranspilation = true;
 
-      let sharedTSCompilationState: SharedTSCompilationState | undefined;
-
       // To fully invalidate files, track resource referenced files and their referencing source
       const referencedFileTracker = new FileReferenceTracker();
 
       // eslint-disable-next-line max-lines-per-function
       build.onStart(async () => {
-        sharedTSCompilationState = getSharedCompilationState();
-        if (!(compilation instanceof NoopCompilation)) {
-          sharedTSCompilationState.markAsInProgress();
-        }
+        angularCompilationContext.markAsInProgress();
 
         const result: OnStartResult = {
           warnings: setupWarnings,
@@ -348,7 +351,7 @@ export function createCompilerPlugin(
         }
 
         if (compilation instanceof NoopCompilation) {
-          hasCompilationErrors = await sharedTSCompilationState.waitUntilReady;
+          hasCompilationErrors = await angularCompilationContext.waitUntilReady;
 
           return result;
         }
@@ -417,7 +420,7 @@ export function createCompilerPlugin(
         // Reset the setup warnings so that they are only shown during the first build.
         setupWarnings = undefined;
 
-        sharedTSCompilationState.markAsReady(hasCompilationErrors);
+        angularCompilationContext.markAsReady(hasCompilationErrors);
 
         return result;
       });
@@ -576,7 +579,7 @@ export function createCompilerPlugin(
 
       build.onEnd((result) => {
         // Ensure other compilations are unblocked if the main compilation throws during start
-        sharedTSCompilationState?.markAsReady(hasCompilationErrors);
+        angularCompilationContext.markAsReady(hasCompilationErrors);
 
         for (const { outputFiles, metafile } of additionalResults.values()) {
           // Add any additional output files to the main output files
@@ -598,8 +601,7 @@ export function createCompilerPlugin(
       });
 
       build.onDispose(() => {
-        sharedTSCompilationState?.dispose();
-        void compilation.close?.();
+        void angularCompilationContext.dispose();
         void javascriptTransformer.close();
         void cacheStore?.close();
       });
