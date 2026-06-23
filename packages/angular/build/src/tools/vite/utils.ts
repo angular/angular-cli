@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { OnLoadArgs, PluginBuild } from 'esbuild';
 import { lookup as lookupMimeType } from 'mrmime';
 import { builtinModules, isBuiltin } from 'node:module';
 import { extname } from 'node:path';
@@ -15,7 +14,6 @@ import type { DepOptimizationConfig } from 'vite' with {
 };
 import type { ExternalResultMetadata } from '../esbuild/bundler-execution-result';
 import { JavaScriptTransformer } from '../esbuild/javascript-transformer';
-import { getFeatureSupport } from '../esbuild/utils';
 
 export type AngularMemoryOutputFiles = Map<
   string,
@@ -44,23 +42,16 @@ export function lookupMimeTypeFromRequest(url: string): string | undefined {
   return extension && lookupMimeType(extension);
 }
 
-type ViteEsBuildPlugin = NonNullable<
-  NonNullable<DepOptimizationConfig['esbuildOptions']>['plugins']
->[0];
-
-export type EsbuildLoaderOption = Exclude<
-  DepOptimizationConfig['esbuildOptions'],
+export type RolldownLoaderOption = Exclude<
+  DepOptimizationConfig['rolldownOptions'],
   undefined
->['loader'];
+>['moduleTypes'];
 
 export function getDepOptimizationConfig({
   disabled,
   exclude,
   include,
-  target,
-  zoneless,
   prebundleTransformer,
-  ssr,
   loader,
   thirdPartySourcemaps,
   define = {},
@@ -68,51 +59,43 @@ export function getDepOptimizationConfig({
   disabled: boolean;
   exclude: string[];
   include: string[];
-  target: string[];
   prebundleTransformer: JavaScriptTransformer;
-  ssr: boolean;
-  zoneless: boolean;
-  loader?: EsbuildLoaderOption;
+  loader?: RolldownLoaderOption;
   thirdPartySourcemaps: boolean;
   define: Record<string, string> | undefined;
 }): DepOptimizationConfig {
-  const plugins: ViteEsBuildPlugin[] = [
-    {
-      name: `angular-vite-optimize-deps${ssr ? '-ssr' : ''}${
-        thirdPartySourcemaps ? '-vendor-sourcemap' : ''
-      }`,
-      setup(build: PluginBuild) {
-        build.onLoad({ filter: /\.[cm]?js$/ }, async (args: OnLoadArgs) => {
-          return {
-            contents: await prebundleTransformer.transformFile(args.path),
-            loader: 'js',
-          };
-        });
-      },
-    },
-  ];
-
-  return {
+  const config: DepOptimizationConfig = {
     // Exclude any explicitly defined dependencies (currently build defined externals)
     exclude,
     // NB: to disable the deps optimizer, set optimizeDeps.noDiscovery to true and optimizeDeps.include as undefined.
     // Include all implict dependencies from the external packages internal option
     include: disabled ? undefined : include,
     noDiscovery: disabled,
-    // Add an esbuild plugin to run the Angular linker on dependencies
-    esbuildOptions: {
-      // Set esbuild supported targets.
-      target,
-      supported: getFeatureSupport(zoneless),
-      plugins,
-      loader,
-      define: {
-        ...define,
-        'ngServerMode': `${ssr}`,
+    rolldownOptions: {
+      transform: {
+        define,
       },
-      resolveExtensions: ['.mjs', '.js', '.cjs'],
+      moduleTypes: loader,
+      resolve: {
+        extensions: ['.mjs', '.js', '.cjs'],
+      },
+      plugins: [
+        {
+          name: `angular-vite-optimize-deps${thirdPartySourcemaps ? '-vendor-sourcemap' : ''}`,
+          load: {
+            filter: { id: /\.[cm]?js$/ },
+            async handler(id: string) {
+              const code = await prebundleTransformer.transformFile(id);
+
+              return { code: Buffer.from(code).toString('utf-8') };
+            },
+          },
+        },
+      ],
     },
   };
+
+  return config;
 }
 
 export interface DevServerExternalResultMetadata {

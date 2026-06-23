@@ -9,7 +9,6 @@
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuildOptions, Metafile, OutputFile, formatMessages } from 'esbuild';
 import { Listr } from 'listr2';
-import { createHash } from 'node:crypto';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { brotliCompress } from 'node:zlib';

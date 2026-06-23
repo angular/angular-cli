@@ -20,7 +20,7 @@ import {
   createAngularSsrTransformPlugin,
   createRemoveIdPrefixPlugin,
 } from '../../../tools/vite/plugins';
-import { EsbuildLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
+import { RolldownLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
 import { loadProxyConfiguration } from '../../../utils';
 import { type ApplicationBuilderInternalOptions, JavaScriptTransformer } from '../internal';
 import type { NormalizedDevServerOptions } from '../options';
@@ -82,13 +82,16 @@ async function createServerConfig(
     },
   };
 
-  if (serverOptions.ssl) {
-    if (serverOptions.sslCert && serverOptions.sslKey) {
-      server.https = {
-        cert: await readFile(serverOptions.sslCert),
-        key: await readFile(serverOptions.sslKey),
-      };
-    }
+  if (serverOptions.ssl && serverOptions.sslCert && serverOptions.sslKey) {
+    const [cert, key] = await Promise.all([
+      readFile(serverOptions.sslCert),
+      readFile(serverOptions.sslKey),
+    ]);
+
+    server.https = {
+      cert,
+      key,
+    };
   }
 
   return server;
@@ -98,9 +101,7 @@ function createSsrConfig(
   externalMetadata: DevServerExternalResultMetadata,
   serverOptions: NormalizedDevServerOptions,
   prebundleTransformer: JavaScriptTransformer,
-  zoneless: boolean,
-  target: string[],
-  prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
+  prebundleLoaderExtensions: RolldownLoaderOption | undefined,
   thirdPartySourcemaps: boolean,
   define: ApplicationBuilderInternalOptions['define'],
 ): Vite.SSROptions {
@@ -116,13 +117,13 @@ function createSsrConfig(
       exclude: externalMetadata.explicitServer,
       // Include all implict dependencies from the external packages internal option
       include: externalMetadata.implicitServer,
-      ssr: true,
       prebundleTransformer,
-      zoneless,
-      target,
       loader: prebundleLoaderExtensions,
       thirdPartySourcemaps,
-      define,
+      define: {
+        ...define,
+        'ngServerMode': 'true',
+      },
     }),
   };
 }
@@ -136,10 +137,9 @@ export async function setupServer(
   ssrMode: ServerSsrMode,
   prebundleTransformer: JavaScriptTransformer,
   target: string[],
-  zoneless: boolean,
   componentStyles: Map<string, ComponentStyleRecord>,
   templateUpdates: Map<string, string>,
-  prebundleLoaderExtensions: EsbuildLoaderOption | undefined,
+  prebundleLoaderExtensions: RolldownLoaderOption | undefined,
   define: ApplicationBuilderInternalOptions['define'],
   extensionMiddleware?: Vite.Connect.NextHandleFunction[],
   indexHtmlTransformer?: (content: string) => Promise<string>,
@@ -182,7 +182,7 @@ export async function setupServer(
     assetsInclude:
       prebundleLoaderExtensions &&
       Object.entries(prebundleLoaderExtensions)
-        .filter(([, value]) => value === 'file')
+        .filter(([, value]) => value === 'asset')
         // Create a file extension glob for each key
         .map(([key]) => '*' + key),
     // Vite will normalize the `base` option by adding a leading slash.
@@ -201,6 +201,9 @@ export async function setupServer(
       preTransformRequests,
       cacheDir,
     ),
+    build: {
+      target,
+    },
     ssr:
       ssrMode === ServerSsrMode.NoSsr
         ? undefined
@@ -208,8 +211,6 @@ export async function setupServer(
             externalMetadata,
             serverOptions,
             prebundleTransformer,
-            zoneless,
-            target,
             prebundleLoaderExtensions,
             thirdPartySourcemaps,
             define,
@@ -244,10 +245,7 @@ export async function setupServer(
       exclude: externalMetadata.explicitBrowser,
       // Include all implict dependencies from the external packages internal option
       include: externalMetadata.implicitBrowser,
-      ssr: false,
       prebundleTransformer,
-      target,
-      zoneless,
       loader: prebundleLoaderExtensions,
       thirdPartySourcemaps,
       define,
