@@ -11,13 +11,14 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { platform } from 'node:os';
 import path from 'node:path';
-
 import type {
   BrowserConfigOptions,
   InlineConfig,
   ResolvedConfig,
   UserWorkspaceConfig,
+  Vite,
   VitestPlugin,
+  VitestPluginContext,
 } from 'vitest/node';
 import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
 import { toPosixPath } from '../../../../utils/path';
@@ -50,7 +51,7 @@ interface VitestConfigPluginOptions {
   projectSourceRoot: string;
   reporters?: string[] | [string, object][];
   setupFiles: string[];
-  projectPlugins: Exclude<UserWorkspaceConfig['plugins'], undefined>;
+  projectPlugins: Vite.PluginOption[];
   include: string[];
   optimizeDepsInclude: string[];
   watch: boolean;
@@ -162,7 +163,7 @@ export async function createVitestConfigPlugin(
 
   return {
     name: 'angular:vitest-configuration',
-    async config(config) {
+    async config(config: UserWorkspaceConfig & Vite.UserConfig) {
       const testConfig = config.test;
 
       const determinedProvider = determineCoverageProvider(
@@ -219,7 +220,7 @@ export async function createVitestConfigPlugin(
       // Merge user-defined plugins from the Vitest config with the CLI's internal plugins.
       if (config.plugins) {
         const userPlugins = config.plugins.filter(
-          (plugin) =>
+          (plugin: Vite.PluginOption) =>
             // Only inspect objects with a `name` property as these would be the internal injected plugins
             !plugin ||
             typeof plugin !== 'object' ||
@@ -243,7 +244,7 @@ export async function createVitestConfigPlugin(
 
       const projectResolver = createRequire(projectSourceRoot + '/').resolve;
 
-      const projectDefaults: UserWorkspaceConfig = {
+      const projectDefaults: Vite.UserConfig & UserWorkspaceConfig = {
         test: {
           setupFiles,
           globals: true,
@@ -262,7 +263,7 @@ export async function createVitestConfigPlugin(
       };
 
       const { optimizeDeps, resolve } = config;
-      const projectOverrides: UserWorkspaceConfig = {
+      const projectOverrides: Vite.UserConfig & UserWorkspaceConfig = {
         test: {
           name: projectName,
           include,
@@ -291,8 +292,7 @@ export async function createVitestConfigPlugin(
             projectName,
             determinedProvider,
           ),
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...(reporters ? ({ reporters } as any) : {}),
+          ...(reporters ? { reporters } : {}),
           projects: [projectConfig],
         },
       };
@@ -318,10 +318,10 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
     {
       name: 'angular:test-in-memory-provider',
       enforce: 'pre',
-      configureVitest(context) {
+      configureVitest(context: VitestPluginContext) {
         vitestConfig = context.vitest.config;
       },
-      resolveId: (id, importer) => {
+      resolveId: (id: string, importer: string | undefined) => {
         // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
           return id;
@@ -375,7 +375,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
         // If the module cannot be resolved from the build artifacts, let other plugins handle it.
         return undefined;
       },
-      async load(id) {
+      async load(id: string) {
         assert(buildResultFiles.size > 0, 'buildResult must be available for in-memory loading.');
 
         // Attempt to load as a source test file.
@@ -416,7 +416,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins
           };
         }
       },
-      configureServer: (server) => {
+      configureServer: (server: Vite.ViteDevServer) => {
         server.middlewares.use(createBuildAssetsMiddleware(server.config.base, buildResultFiles));
       },
     },
