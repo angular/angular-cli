@@ -414,7 +414,7 @@ export async function* serveWithVite(
       }
 
       // Copy the loader and modify the file extension to be asset
-      const loader = browserOptions.loader;
+      const loader = browserOptions.loader ? { ...browserOptions.loader } : undefined;
       if (loader) {
         for (const [key, value] of Object.entries(loader)) {
           if (value === 'file') {
