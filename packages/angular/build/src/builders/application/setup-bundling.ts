@@ -6,9 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { AngularCompilation } from '../../tools/angular/compilation';
+import type { AngularCompilationContext } from '../../tools/esbuild/angular/compilation-state';
 import { ComponentStylesheetBundler } from '../../tools/esbuild/angular/component-stylesheets';
-import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
+import type { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import {
   createBrowserCodeBundleOptions,
   createBrowserPolyfillBundleOptions,
@@ -20,7 +20,7 @@ import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
 import { getSupportedNodeTargets } from '../../tools/esbuild/utils';
-import { NormalizedApplicationBuildOptions } from './options';
+import type { NormalizedApplicationBuildOptions } from './options';
 
 /**
  * Generates one or more BundlerContext instances based on the builder provided
@@ -35,7 +35,7 @@ export function setupBundlerContexts(
   target: string[],
   codeBundleCache: SourceFileCache,
   stylesheetBundler: ComponentStylesheetBundler,
-  angularCompilation: AngularCompilation,
+  angularCompilationContext: AngularCompilationContext,
   templateUpdates: Map<string, string> | undefined,
 ): {
   typescriptContexts: BundlerContext[];
@@ -63,7 +63,7 @@ export function setupBundlerContexts(
         target,
         codeBundleCache,
         stylesheetBundler,
-        angularCompilation,
+        angularCompilationContext,
         templateUpdates,
       ),
     ),
@@ -75,6 +75,7 @@ export function setupBundlerContexts(
     target,
     codeBundleCache,
     stylesheetBundler,
+    angularCompilationContext.createSecondaryContext(),
   );
   if (browserPolyfillBundleOptions) {
     const browserPolyfillContext = new BundlerContext(
@@ -117,7 +118,13 @@ export function setupBundlerContexts(
       new BundlerContext(
         workspaceRoot,
         watch,
-        createServerMainCodeBundleOptions(options, nodeTargets, codeBundleCache, stylesheetBundler),
+        createServerMainCodeBundleOptions(
+          options,
+          nodeTargets,
+          codeBundleCache,
+          stylesheetBundler,
+          angularCompilationContext.createSecondaryContext(),
+        ),
       ),
     );
 
@@ -127,7 +134,13 @@ export function setupBundlerContexts(
         new BundlerContext(
           workspaceRoot,
           watch,
-          createSsrEntryCodeBundleOptions(options, nodeTargets, codeBundleCache, stylesheetBundler),
+          createSsrEntryCodeBundleOptions(
+            options,
+            nodeTargets,
+            codeBundleCache,
+            stylesheetBundler,
+            angularCompilationContext.createSecondaryContext(),
+          ),
         ),
       );
     }
