@@ -15,7 +15,7 @@ import type * as Vite from 'vite' with {
 };
 import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
 import { ServerSsrMode } from '../../../tools/vite/plugins';
-import { EsbuildLoaderOption, updateExternalMetadata } from '../../../tools/vite/utils';
+import { updateExternalMetadata } from '../../../tools/vite/utils';
 import { normalizeSourceMaps } from '../../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../../utils/environment-options';
 import { Result, ResultKind } from '../../application/results';
@@ -384,11 +384,16 @@ export async function* serveWithVite(
       const projectRoot = join(context.workspaceRoot, root as string);
       const browsers = getSupportedBrowsers(projectRoot, context.logger);
 
-      const target = transformSupportedBrowsersToTargets(browsers);
       // Needed for browser-esbuild as polyfills can be a string.
       const polyfills = Array.isArray((browserOptions.polyfills ??= []))
         ? browserOptions.polyfills
         : [browserOptions.polyfills];
+
+      const target = transformSupportedBrowsersToTargets(browsers);
+      if (!isZonelessApp(polyfills)) {
+        // Rolldown doesn't have an option to support Zone.js/async-await, so we need to support es2016.
+        target.push('es2016');
+      }
 
       let ssrMode: ServerSsrMode = ServerSsrMode.NoSsr;
       if (
@@ -408,6 +413,16 @@ export async function* serveWithVite(
         });
       }
 
+      // Copy the loader and modify the file extension to be asset
+      const loader = browserOptions.loader;
+      if (loader) {
+        for (const [key, value] of Object.entries(loader)) {
+          if (value === 'file') {
+            loader[key] = 'asset';
+          }
+        }
+      }
+
       // Setup server and start listening
       const serverConfiguration = await setupServer(
         serverOptions,
@@ -418,12 +433,12 @@ export async function* serveWithVite(
         ssrMode,
         prebundleTransformer,
         target,
-        isZonelessApp(polyfills),
         componentStyles,
         templateUpdates,
-        browserOptions.loader as EsbuildLoaderOption | undefined,
+        loader,
         {
           ...browserOptions.define,
+          'ngServerMode': 'false',
           'ngJitMode': browserOptions.aot ? 'false' : 'true',
           'ngHmrMode': browserOptions.templateUpdates ? 'true' : 'false',
         },
