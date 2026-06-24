@@ -8,7 +8,6 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { createAngularCompilation } from '../../tools/angular/compilation';
-import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
@@ -48,6 +47,7 @@ export async function executeBuild(
     assets,
     cacheOptions,
     serverEntryPoint,
+    codeBundleCache,
     baseHref,
     ssrOptions,
     verbose,
@@ -68,13 +68,11 @@ export async function executeBuild(
   // Reuse rebuild state or create new bundle contexts for code and global stylesheets
   let bundlerContexts;
   let componentStyleBundler;
-  let codeBundleCache;
   let bundlingResult: BundleContextResult;
   let templateUpdates: Map<string, string> | undefined;
   if (rebuildState) {
     bundlerContexts = rebuildState.rebuildContexts;
     componentStyleBundler = rebuildState.componentStyleBundler;
-    codeBundleCache = rebuildState.codeBundleCache;
     templateUpdates = rebuildState.templateUpdates;
     // Reset template updates for new rebuild
     templateUpdates?.clear();
@@ -97,7 +95,6 @@ export async function executeBuild(
     bundlingResult = BundlerContext.mergeResults([bundlingResult, ...typescriptResults]);
   } else {
     const target = transformSupportedBrowsersToTargets(browsers);
-    codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
     componentStyleBundler = createComponentStyleBundler(options, target);
     if (options.templateUpdates) {
       templateUpdates = new Map<string, string>();
