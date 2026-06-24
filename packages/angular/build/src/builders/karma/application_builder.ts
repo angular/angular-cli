@@ -11,6 +11,7 @@ import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from
 import { randomUUID } from 'node:crypto';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import { ReadableStream } from 'node:stream/web';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
@@ -199,10 +200,18 @@ async function runEsbuild(
   projectSourceRoot: string,
 ): Promise<[Result & { kind: ResultKind.Full }, AsyncIterator<Result> | null]> {
   const usesZoneJS = buildOptions.polyfills?.includes('zone.js');
+  let hasLocalize = false;
+  try {
+    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
+    projectRequire.resolve('@angular/localize');
+    hasLocalize = true;
+  } catch {}
+
   const virtualTestBedInit = createVirtualModulePlugin({
     namespace: 'angular:test-bed-init',
     loadContent: async () => {
       const contents: string[] = [
+        ...(hasLocalize ? [`import '@angular/localize/init';`] : []),
         // Initialize the Angular testing environment
         `import { NgModule${usesZoneJS ? ', provideZoneChangeDetection' : ''} } from '@angular/core';`,
         `import { getTestBed } from '@angular/core/testing';`,
