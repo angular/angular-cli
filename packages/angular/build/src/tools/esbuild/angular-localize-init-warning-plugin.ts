@@ -26,6 +26,10 @@ export function createAngularLocalizeInitWarningPlugin(): Plugin {
           return null;
         }
 
+        if (args.namespace?.startsWith('angular:')) {
+          return null;
+        }
+
         const { importer, kind, resolveDir, namespace, pluginData = {} } = args;
         pluginData[NG_LOCALIZE_RESOLUTION] = true;
 
