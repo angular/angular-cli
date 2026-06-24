@@ -34,6 +34,7 @@ function createTestBedInitVirtualFile(
   projectSourceRoot: string,
   teardown: boolean,
   zoneTestingStrategy: 'none' | 'static' | 'dynamic',
+  hasLocalize: boolean,
 ): string {
   let providersImport = 'const providers = [];';
   if (providersFile) {
@@ -58,6 +59,7 @@ function createTestBedInitVirtualFile(
   // when running Vitest in non-isolated mode with JSDOM. It looks up the
   // document dynamically on every operation instead of caching it.
   return `
+    ${hasLocalize ? "import '@angular/localize/init';" : ''}
     // Initialize the Angular testing environment
     import { NgModule, provideZoneChangeDetection } from '@angular/core';
     import { getTestBed, ɵgetCleanupHook as getCleanupHook, TestComponentRenderer } from '@angular/core/testing';
@@ -254,11 +256,19 @@ export async function getVitestBuildOptions(
   // Inject the zone.js testing polyfill if Zone.js is installed.
   const zoneTestingStrategy = getZoneTestingStrategy(buildOptions, projectSourceRoot);
 
+  let hasLocalize = false;
+  try {
+    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
+    projectRequire.resolve('@angular/localize');
+    hasLocalize = true;
+  } catch {}
+
   const testBedInitContents = createTestBedInitVirtualFile(
     providersFile,
     projectSourceRoot,
     !options.debug,
     zoneTestingStrategy,
+    hasLocalize,
   );
 
   const mockPatchContents = `
