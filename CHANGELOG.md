@@ -1,3 +1,40 @@
+<a name="22.1.0-next.1"></a>
+
+# 22.1.0-next.1 (2026-06-24)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [48f90f5d5](https://github.com/angular/angular-cli/commit/48f90f5d5e5dd6369b2ccf044a722271c82dffd6) | fix  | prevent Yarn registry environment variable override           |
+| [38e0fabc0](https://github.com/angular/angular-cli/commit/38e0fabc05eb5d622a25c68692d7d073485750e3) | fix  | support registry metadata fetching under bun package manager  |
+| [3ce6e5fc3](https://github.com/angular/angular-cli/commit/3ce6e5fc3b4f4b5fb6ac99cc82023bf01894d14c) | perf | implement semaphore backpressure throttling in PackageManager |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [01008f1c6](https://github.com/angular/angular-cli/commit/01008f1c69321d0a8b5b8344672b594a68fe83b6) | fix  | remove default workspace vscode mcp.json configuration |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------- |
+| [851711b03](https://github.com/angular/angular-cli/commit/851711b031603293b58e33357c70eea7675452e3) | fix  | aggregate parallel worker performance timings on the main thread     |
+| [585d08af8](https://github.com/angular/angular-cli/commit/585d08af881a35653dc5e7b1ee7a75b42e154517) | perf | default chunk optimization to use Rolldown                           |
+| [3019c8032](https://github.com/angular/angular-cli/commit/3019c8032ba9462d0edc614940b26ade24e45ec8) | perf | dispose builder result context early in non-watch mode               |
+| [583736a4d](https://github.com/angular/angular-cli/commit/583736a4de8b3d0b4d79709a445809c264e38c17) | perf | implement semaphore backpressure throttling in JavaScriptTransformer |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [7ef9ed24d](https://github.com/angular/angular-cli/commit/7ef9ed24d3c111474ae21c06cb2b05a21804f586) | feat | support the standard Forwarded header                                 |
+| [37f1a7491](https://github.com/angular/angular-cli/commit/37f1a749132d55a81cec231bd260ed280b10fc00) | fix  | avoid caching non-SSG page lookups                                    |
+| [5875b6024](https://github.com/angular/angular-cli/commit/5875b6024ff9e59fddf7481b6b961d73ae809963) | fix  | prioritize options over environment variables in AngularNodeAppEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.4"></a>
 
 # 22.0.4 (2026-06-24)
