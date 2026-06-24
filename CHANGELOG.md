@@ -1,3 +1,16 @@
+<a name="22.0.4"></a>
+
+# 22.0.4 (2026-06-24)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [46185ceac](https://github.com/angular/angular-cli/commit/46185ceacc86cc04819b991621b7bb4e0d865b5a) | fix  | aggregate parallel worker performance timings on the main thread |
+| [5d7e29c41](https://github.com/angular/angular-cli/commit/5d7e29c41ed3fe0abe77dcdc894d5b7875293cb5) | perf | dispose builder result context early in non-watch mode           |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.17"></a>
 
 # 21.2.17 (2026-06-24)
