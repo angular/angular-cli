@@ -55,6 +55,7 @@ interface VitestConfigPluginOptions {
   optimizeDepsInclude: string[];
   watch: boolean;
   isolate: boolean | undefined;
+  preserveSymlinks?: boolean;
 }
 
 async function findTestEnvironment(
@@ -258,6 +259,7 @@ export async function createVitestConfigPlugin(
         resolve: {
           mainFields: ['es2020', 'module', 'main'],
           conditions: ['es2015', 'es2020', 'module', ...(browser ? ['browser'] : [])],
+          preserveSymlinks: options.preserveSymlinks,
         },
       };
 
