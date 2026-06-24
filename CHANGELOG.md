@@ -1,3 +1,18 @@
+<a name="20.3.30"></a>
+
+# 20.3.30 (2026-06-24)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------- |
+| [36adca99c](https://github.com/angular/angular-cli/commit/36adca99ce72d59e5909709f53e239b1e79d703e) | fix  | bump @babel/core to 7.29.7 |
+| [7f236cfea](https://github.com/angular/angular-cli/commit/7f236cfea9023a77c6ccaf1648f388678017ce1e) | fix  | bump esbuild to 0.28.1     |
+| [94fb3c122](https://github.com/angular/angular-cli/commit/94fb3c122a14a3a8540a24e22f2f8ff87d130cb5) | fix  | bump piscina to 5.2.0      |
+| [1f283a41c](https://github.com/angular/angular-cli/commit/1f283a41c921b194c67c5bca05d4b5cff1d91857) | fix  | bump vite to 7.3.5         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.3"></a>
 
 # 22.0.3 (2026-06-18)
