@@ -134,6 +134,7 @@ export async function normalizeOptions(
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
+    preserveSymlinks: undefined as boolean | undefined,
     runnerConfig:
       typeof runnerConfig === 'string'
         ? runnerConfig.length === 0
