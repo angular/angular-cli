@@ -286,6 +286,10 @@ export async function* execute(
     return;
   }
 
+  // Resolve final preserveSymlinks option
+  normalizedOptions.preserveSymlinks =
+    buildTargetOptions.preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks');
+
   // Get runner-specific build options
   let runnerBuildOptions;
   let virtualFiles;
@@ -327,6 +331,7 @@ export async function* execute(
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
       quiet: normalizedOptions.quiet,
       ...(normalizedOptions.tsConfig ? { tsConfig: normalizedOptions.tsConfig } : {}),
+      preserveSymlinks: normalizedOptions.preserveSymlinks,
     } satisfies ApplicationBuilderInternalOptions;
 
     const dumpDirectory = normalizedOptions.dumpVirtualFiles
