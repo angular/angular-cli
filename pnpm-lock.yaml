@@ -288,8 +288,8 @@ importers:
         specifier: 2.8.1
         version: 2.8.1
       undici:
-        specifier: 7.24.4
-        version: 7.24.4
+        specifier: 7.28.0
+        version: 7.28.0
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
@@ -411,8 +411,8 @@ importers:
         specifier: 0.2.15
         version: 0.2.15
       undici:
-        specifier: 7.24.4
-        version: 7.24.4
+        specifier: 7.28.0
+        version: 7.28.0
       vite:
         specifier: 7.3.5
         version: 7.3.5(@types/node@24.12.2)(jiti@2.6.1)(less@4.4.2)(sass@1.97.3)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.4)
@@ -745,8 +745,8 @@ importers:
         specifier: 21.2.3
         version: 21.2.3(@angular/compiler-cli@21.2.12(@angular/compiler@21.2.12)(typescript@6.0.3))(tslib@2.8.1)(typescript@6.0.3)
       undici:
-        specifier: 7.24.4
-        version: 7.24.4
+        specifier: 7.28.0
+        version: 7.28.0
     optionalDependencies:
       esbuild:
         specifier: 0.28.1
@@ -9211,6 +9211,10 @@ packages:
 
   undici@7.24.4:
     resolution: {integrity: sha512-BM/JzwwaRXxrLdElV2Uo6cTLEjhSb3WXboncJamZ15NgUURmvlXvxa6xkwIOILIjPNo9i8ku136ZvWV0Uly8+w==}
+    engines: {node: '>=20.18.1'}
+
+  undici@7.28.0:
+    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -19437,6 +19441,8 @@ snapshots:
   undici@6.25.0: {}
 
   undici@7.24.4: {}
+
+  undici@7.28.0: {}
 
   unenv@1.10.0:
     dependencies:
