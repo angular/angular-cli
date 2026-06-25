@@ -25,12 +25,7 @@ import {
   SchematicsCommandArgs,
   SchematicsCommandModule,
 } from '../../command-builder/schematics-command-module';
-import {
-  NgAddSaveDependency,
-  PackageManagerError,
-  PackageManifest,
-  PackageMetadata,
-} from '../../package-managers';
+import { NgAddSaveDependency, PackageManifest, PackageMetadata } from '../../package-managers';
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
@@ -639,47 +634,36 @@ export default class AddCommandModule
     // Only show if installation will actually occur
     task.title = 'Installing package';
 
-    try {
-      if (context.savePackage === false) {
-        task.title += ' in temporary location';
+    if (context.savePackage === false) {
+      task.title += ' in temporary location';
 
-        // Temporary packages are located in a different directory
-        // Hence we need to resolve them using the temp path
-        const { workingDirectory } = await packageManager.acquireTempPackage(
-          packageIdentifier.toString(),
-          {
-            registry,
-          },
-        );
+      // Temporary packages are located in a different directory
+      // Hence we need to resolve them using the temp path
+      const { workingDirectory } = await packageManager.acquireTempPackage(
+        packageIdentifier.toString(),
+        {
+          registry,
+        },
+      );
 
-        const tempRequire = createRequire(workingDirectory + '/');
-        assert(context.collectionName, 'Collection name should always be available');
-        const resolvedCollectionPath = tempRequire.resolve(
-          join(context.collectionName, 'package.json'),
-        );
+      const tempRequire = createRequire(workingDirectory + '/');
+      assert(context.collectionName, 'Collection name should always be available');
+      const resolvedCollectionPath = tempRequire.resolve(
+        join(context.collectionName, 'package.json'),
+      );
 
-        context.collectionName = dirname(resolvedCollectionPath);
-      } else {
-        await packageManager.add(
-          packageIdentifier.toString(),
-          'none',
-          savePackage === 'devDependencies',
-          false,
-          true,
-          {
-            registry,
-          },
-        );
-      }
-    } catch (e) {
-      if (e instanceof PackageManagerError) {
-        const output = e.stderr || e.stdout;
-        if (output) {
-          throw new CommandError(`Package installation failed: ${e.message}\nOutput: ${output}`);
-        }
-      }
-
-      throw e;
+      context.collectionName = dirname(resolvedCollectionPath);
+    } else {
+      await packageManager.add(
+        packageIdentifier.toString(),
+        'none',
+        savePackage === 'devDependencies',
+        false,
+        true,
+        {
+          registry,
+        },
+      );
     }
   }
 

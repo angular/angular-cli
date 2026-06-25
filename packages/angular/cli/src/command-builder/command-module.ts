@@ -14,6 +14,7 @@ import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
 import { AnalyticsCollector } from '../analytics/analytics-collector';
 import { EventCustomDimension, EventCustomMetric } from '../analytics/analytics-parameters';
+import { PackageManagerError } from '../package-managers';
 import { considerSettingUpAutocompletion } from '../utilities/completion';
 import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
@@ -95,6 +96,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
 
   async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
     const { _, $0, ...options } = args;
+    const { logger } = this.context;
 
     // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
     const camelCasedOptions: Record<string, unknown> = {};
@@ -103,10 +105,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
     }
 
     // Set up autocompletion if appropriate.
-    const autocompletionExitCode = await considerSettingUpAutocompletion(
-      this.commandName,
-      this.context.logger,
-    );
+    const autocompletionExitCode = await considerSettingUpAutocompletion(this.commandName, logger);
     if (autocompletionExitCode !== undefined) {
       process.exitCode = autocompletionExitCode;
 
@@ -127,7 +126,13 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       exitCode = await this.run(camelCasedOptions as Options<T> & OtherOptions);
     } catch (e) {
       if (e instanceof schema.SchemaValidationException) {
-        this.context.logger.fatal(`Error: ${e.message}`);
+        logger.fatal(`Error: ${e.message}`);
+        exitCode = 1;
+      } else if (e instanceof PackageManagerError) {
+        const output = e.stderr || e.stdout;
+        logger.fatal(
+          `Error: Package installation failed: ${e.message}${output ? `\nOutput: ${output}` : ''}`,
+        );
         exitCode = 1;
       } else {
         throw e;
