@@ -18,15 +18,18 @@ import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
 import {
   parseBunDependencies,
+  parseNpmBeforeDate,
   parseNpmLikeDependencies,
   parseNpmLikeError,
   parseNpmLikeManifest,
   parseNpmLikeMetadata,
+  parsePnpmReleaseAge,
   parseYarnClassicDependencies,
   parseYarnClassicError,
   parseYarnClassicManifest,
   parseYarnClassicMetadata,
   parseYarnModernDependencies,
+  parseYarnReleaseAge,
 } from './parsers';
 
 /**
@@ -87,6 +90,9 @@ export interface PackageManagerDescriptor {
   /** The command to list all installed dependencies. */
   readonly listDependenciesCommand: readonly string[];
 
+  /** The command to get the release age configuration value. */
+  readonly getReleaseAgeConfigCommand?: readonly string[];
+
   /** The command to get the current package name. */
   readonly getPackageNameCommand?: readonly string[];
 
@@ -125,6 +131,9 @@ export interface PackageManagerDescriptor {
 
     /** A function to parse the output when a command fails. */
     getError?: (output: string, logger?: Logger) => ErrorInfo | null;
+
+    /** A function to parse the output of the release age config command. */
+    getReleaseAge?: (output: string, version: string) => number;
   };
 
   /** A function that checks if a structured error represents a "package not found" error. */
@@ -174,6 +183,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json=true', '--all=true'],
+    getReleaseAgeConfigCommand: ['config', 'get', 'before'],
     getPackageNameCommand: ['pkg', 'get', 'name'],
     getManifestCommand: ['view', '--json'],
     viewCommandFieldArgFormatter: (fields) => [...fields],
@@ -182,6 +192,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
       getError: parseNpmLikeError,
+      getReleaseAge: parseNpmBeforeDate,
     },
     isNotFound: isKnownNotFound,
   },
@@ -200,6 +211,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ env: { YARN_NPM_REGISTRY_SERVER: registry } }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['info', '--name-only', '--json'],
+    getReleaseAgeConfigCommand: ['config', 'get', 'npmMinimalAgeGate'],
     getManifestCommand: ['npm', 'info', '--json'],
     viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
     outputParsers: {
@@ -207,6 +219,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
       getError: parseNpmLikeError,
+      getReleaseAge: parseYarnReleaseAge,
     },
     isNotFound: isKnownNotFound,
   },
@@ -254,6 +267,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getReleaseAgeConfigCommand: ['config', 'get', 'minimum-release-age'],
     getPackageNameCommand: ['pkg', 'get', 'name'],
     getManifestCommand: ['view', '--json'],
     viewCommandFieldArgFormatter: (fields) => [...fields],
@@ -262,6 +276,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
       getError: parseNpmLikeError,
+      getReleaseAge: parsePnpmReleaseAge,
     },
     isNotFound: isKnownNotFound,
   },

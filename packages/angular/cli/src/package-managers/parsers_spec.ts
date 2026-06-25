@@ -8,13 +8,16 @@
 
 import {
   parseBunDependencies,
+  parseNpmBeforeDate,
   parseNpmLikeDependencies,
   parseNpmLikeError,
   parseNpmLikeManifest,
+  parsePnpmReleaseAge,
   parseYarnClassicDependencies,
   parseYarnClassicError,
   parseYarnClassicManifest,
   parseYarnModernDependencies,
+  parseYarnReleaseAge,
 } from './parsers';
 
 describe('parsers', () => {
@@ -352,6 +355,71 @@ project node_modules
 
     it('should return empty map for empty stdout', () => {
       expect(parseYarnModernDependencies('').size).toBe(0);
+    });
+  });
+
+  describe('parsePnpmReleaseAge', () => {
+    it('should parse minutes correctly', () => {
+      expect(parsePnpmReleaseAge('1440', '10.15.0')).toBe(1440 * 60000);
+      expect(parsePnpmReleaseAge(' 10 ', '10.15.0')).toBe(10 * 60000);
+    });
+
+    it('should return 0 for undefined/null/empty values when version is < 11', () => {
+      expect(parsePnpmReleaseAge('', '10.15.0')).toBe(0);
+      expect(parsePnpmReleaseAge('undefined', '10.15.0')).toBe(0);
+      expect(parsePnpmReleaseAge('null', '10.15.0')).toBe(0);
+    });
+
+    it('should return 1440 minutes for undefined/null/empty values when version is >= 11', () => {
+      expect(parsePnpmReleaseAge('', '11.2.0')).toBe(1440 * 60000);
+      expect(parsePnpmReleaseAge('undefined', '11.2.0')).toBe(1440 * 60000);
+      expect(parsePnpmReleaseAge('null', '11.2.0')).toBe(1440 * 60000);
+    });
+
+    it('should return 0 for invalid inputs', () => {
+      expect(parsePnpmReleaseAge('abc', '10.15.0')).toBe(0);
+    });
+  });
+
+  describe('parseYarnReleaseAge', () => {
+    it('should parse duration units correctly', () => {
+      expect(parseYarnReleaseAge('3d', '3.6.0')).toBe(3 * 86400000);
+      expect(parseYarnReleaseAge('24h', '3.6.0')).toBe(24 * 3600000);
+      expect(parseYarnReleaseAge('30m', '3.6.0')).toBe(30 * 60000);
+      expect(parseYarnReleaseAge('60s', '3.6.0')).toBe(60000);
+      expect(parseYarnReleaseAge('1w', '3.6.0')).toBe(604800000);
+    });
+
+    it('should parse raw numbers as minutes', () => {
+      expect(parseYarnReleaseAge('3', '3.6.0')).toBe(3 * 60000);
+      expect(parseYarnReleaseAge('60', '3.6.0')).toBe(60 * 60000);
+    });
+
+    it('should return 0 for undefined/null/empty values when version is < 4', () => {
+      expect(parseYarnReleaseAge('', '3.6.0')).toBe(0);
+      expect(parseYarnReleaseAge('undefined', '3.6.0')).toBe(0);
+      expect(parseYarnReleaseAge('null', '3.6.0')).toBe(0);
+    });
+
+    it('should return 1440 minutes for undefined/null/empty values when version is >= 4', () => {
+      expect(parseYarnReleaseAge('', '4.1.0')).toBe(1440 * 60000);
+      expect(parseYarnReleaseAge('undefined', '4.1.0')).toBe(1440 * 60000);
+      expect(parseYarnReleaseAge('null', '4.1.0')).toBe(1440 * 60000);
+    });
+  });
+
+  describe('parseNpmBeforeDate', () => {
+    it('should parse date string and convert to age limit', () => {
+      const tenDaysAgo = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+      const age = parseNpmBeforeDate(tenDaysAgo);
+      expect(age).toBeGreaterThanOrEqual(10 * 24 * 60 * 60 * 1000 - 1000);
+      expect(age).toBeLessThanOrEqual(10 * 24 * 60 * 60 * 1000 + 1000);
+    });
+
+    it('should return 0 for undefined/null/empty values', () => {
+      expect(parseNpmBeforeDate('')).toBe(0);
+      expect(parseNpmBeforeDate('undefined')).toBe(0);
+      expect(parseNpmBeforeDate('null')).toBe(0);
     });
   });
 });

@@ -24,6 +24,7 @@ export class RegistryClient {
   constructor(
     private packageManager: PackageManager,
     private logger: logging.LoggerApi,
+    readonly minReleaseAge: number = 0,
   ) {}
 
   async getMetadata(packageName: string): Promise<PackageMetadata | null> {
@@ -54,19 +55,46 @@ export class RegistryClient {
   }
 }
 
+function isReleaseAgeSatisfied(
+  registryClient: RegistryClient,
+  metadata: PackageMetadata,
+  version: string,
+): boolean {
+  const minReleaseAge = registryClient.minReleaseAge;
+  if (!minReleaseAge || !metadata.time) {
+    return true;
+  }
+
+  const publishTimeStr = metadata.time[version];
+  if (!publishTimeStr) {
+    return true;
+  }
+
+  const publishTime = Date.parse(publishTimeStr);
+  if (isNaN(publishTime)) {
+    return true;
+  }
+
+  return Date.now() - publishTime >= minReleaseAge;
+}
+
 export async function getSatisfyingVersion(
   registryClient: RegistryClient,
-  packageName: string,
-  versions: string[],
+  metadata: PackageMetadata,
   range: string,
   next?: boolean,
 ): Promise<string | null> {
   const options = { includePrerelease: next || undefined };
-  const candidates = versions.filter((v) => semver.satisfies(v, range, options));
+  let candidates = metadata.versions.filter((v) => semver.satisfies(v, range, options));
+
+  candidates = candidates.filter((version) =>
+    isReleaseAgeSatisfied(registryClient, metadata, version),
+  );
+
   const sorted = semver.rsort(candidates);
 
   for (const version of sorted) {
-    const manifest = await registryClient.getManifest(packageName, version);
+    const manifest = await registryClient.getManifest(metadata.name, version);
     if (manifest && !manifest.deprecated) {
       return version;
     }
@@ -74,7 +102,7 @@ export async function getSatisfyingVersion(
 
   // Fallback to deprecated versions if no non-deprecated version satisfies
   for (const version of sorted) {
-    const manifest = await registryClient.getManifest(packageName, version);
+    const manifest = await registryClient.getManifest(metadata.name, version);
     if (manifest) {
       return version;
     }
@@ -440,8 +468,7 @@ async function _buildPackageInfo(
   if (!installedVersion) {
     installedVersion = (await getSatisfyingVersion(
       registryClient,
-      name,
-      npmPackageJson.versions,
+      npmPackageJson,
       packageJsonRange,
     )) as VersionRange | undefined;
   }
@@ -463,16 +490,23 @@ async function _buildPackageInfo(
   let targetVersion: VersionRange | undefined = packages.get(name);
   if (targetVersion) {
     const distTags = npmPackageJson['dist-tags'] ?? {};
-    if (distTags[targetVersion]) {
-      targetVersion = distTags[targetVersion] as VersionRange;
-    } else if (targetVersion == 'next') {
-      targetVersion = distTags['latest'] as VersionRange;
+    let resolvedVersion: string | undefined =
+      distTags[targetVersion] ?? (targetVersion === 'next' ? distTags['latest'] : undefined);
+
+    if (
+      resolvedVersion &&
+      !isReleaseAgeSatisfied(registryClient, npmPackageJson, resolvedVersion)
+    ) {
+      resolvedVersion = undefined;
+    }
+
+    if (resolvedVersion) {
+      targetVersion = resolvedVersion as VersionRange;
     } else {
       targetVersion = (await getSatisfyingVersion(
         registryClient,
-        name,
-        npmPackageJson.versions,
-        targetVersion,
+        npmPackageJson,
+        distTags[targetVersion] || targetVersion === 'next' ? '*' : targetVersion,
       )) as VersionRange | undefined;
     }
   }
@@ -554,14 +588,23 @@ async function resolvePackageVersion(
   next = false,
 ): Promise<string | null> {
   const distTags = metadata['dist-tags'] ?? {};
-  if (distTags[range]) {
-    return distTags[range];
-  }
-  if (range === 'next') {
-    return distTags['latest'] ?? null;
+  let resolvedVersion: string | undefined =
+    distTags[range] ?? (range === 'next' ? distTags['latest'] : undefined);
+
+  if (resolvedVersion && !isReleaseAgeSatisfied(registryClient, metadata, resolvedVersion)) {
+    resolvedVersion = undefined;
   }
 
-  return getSatisfyingVersion(registryClient, metadata.name, metadata.versions, range, next);
+  if (resolvedVersion) {
+    return resolvedVersion;
+  }
+
+  return getSatisfyingVersion(
+    registryClient,
+    metadata,
+    distTags[range] || range === 'next' ? '*' : range,
+    next,
+  );
 }
 
 async function _addPackageGroup(
@@ -578,17 +621,21 @@ async function _addPackageGroup(
 
   const distTags = metadata['dist-tags'] ?? {};
   let version = maybePackage;
-  if (distTags[version]) {
-    version = distTags[version] as VersionRange;
-  } else if (version === 'next') {
-    version = distTags['latest'] as VersionRange;
+  let resolvedVersion: string | undefined =
+    distTags[version] ?? (version === 'next' ? distTags['latest'] : undefined);
+
+  if (resolvedVersion && !isReleaseAgeSatisfied(registryClient, metadata, resolvedVersion)) {
+    resolvedVersion = undefined;
+  }
+
+  if (resolvedVersion) {
+    version = resolvedVersion as VersionRange;
   } else {
     version =
       ((await getSatisfyingVersion(
         registryClient,
-        metadata.name,
-        metadata.versions,
-        version,
+        metadata,
+        distTags[version] || version === 'next' ? '*' : version,
       )) as VersionRange | null) ?? version;
   }
 
@@ -679,8 +726,7 @@ async function _addPeerDependencies(
         if (peerMetadata) {
           const resolvedInstalledVersion = await getSatisfyingVersion(
             registryClient,
-            peer,
-            peerMetadata.versions,
+            peerMetadata,
             packageJsonRange,
           );
 
@@ -765,7 +811,8 @@ export async function resolveUserUpdatePlan(
   const usingYarn = options.packageManager === 'yarn';
 
   const packages = _buildPackageList(options, npmDeps, logger);
-  const registryClient = new RegistryClient(packageManager, logger);
+  const minReleaseAge = await packageManager.getMinimumReleaseAge();
+  const registryClient = new RegistryClient(packageManager, logger, minReleaseAge);
 
   const getOrFetchPackageMetadata = async (
     packageName: string,

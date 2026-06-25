@@ -664,3 +664,100 @@ export function parseYarnModernDependencies(
 
   return dependencies;
 }
+
+/**
+ * Parses the output of the pnpm minimum-release-age config command.
+ * @param output The string output to parse (in minutes).
+ * @param version The active package manager version string.
+ * @returns The duration in milliseconds.
+ */
+export function parsePnpmReleaseAge(output: string, version: string): number {
+  const value = output.trim();
+  // If the setting is empty, or undefined/null string placeholder, no age limit is active.
+  if (!value || value === 'undefined' || value === 'null') {
+    // Starting with pnpm version 11, the default value for minimum-release-age is 24 hours (1440 minutes).
+    // In prior versions, it defaulted to 0.
+    const major = parseInt(version.split('.')[0], 10);
+    if (major >= 11) {
+      return 1440 * 60000;
+    }
+
+    return 0;
+  }
+
+  // PNPM config outputs duration values without a unit as minutes (e.g. 1440).
+  const minutes = parseInt(value, 10);
+
+  return isNaN(minutes) ? 0 : minutes * 60000;
+}
+
+/**
+ * Parses the output of the yarn npmMinimalAgeGate config command.
+ * @param output The string output to parse (duration string or minutes).
+ * @returns The duration in milliseconds.
+ */
+export function parseYarnReleaseAge(output: string, version: string): number {
+  const value = output.trim();
+  // If the setting is empty, or undefined/null string placeholder, no age limit is active.
+  if (!value || value === 'undefined' || value === 'null') {
+    // Starting with yarn version 4, the default value for minimum-release-age is 24 hours (1440 minutes).
+    // In prior versions, it defaulted to 0.
+    const major = parseInt(version.split('.')[0], 10);
+    if (major >= 4) {
+      return 1440 * 60000;
+    }
+
+    return 0;
+  }
+
+  // Parse Yarn duration format (e.g. "3d", "24h") or a raw minute value.
+  const match = value.match(/^(\d+)(ms|s|m|h|d|w)?$/);
+  if (!match) {
+    return 0;
+  }
+
+  const amount = parseInt(match[1], 10);
+  const unit = match[2];
+
+  if (unit) {
+    switch (unit) {
+      case 'ms':
+        return amount;
+      case 's':
+        return amount * 1000;
+      case 'm':
+        return amount * 60000;
+      case 'h':
+        return amount * 3600000;
+      case 'd':
+        return amount * 86400000;
+      case 'w':
+        return amount * 604800000;
+    }
+  }
+
+  // Yarn unit-less config value is always minutes.
+  return amount * 60000;
+}
+
+/**
+ * Parses the output of the npm before config option.
+ * Converts the absolute cutoff date into a relative age in milliseconds.
+ * @param output The date string to parse.
+ * @returns The age in milliseconds.
+ */
+export function parseNpmBeforeDate(output: string): number {
+  const trimmed = output.trim();
+  if (!trimmed || trimmed === 'null' || trimmed === 'undefined') {
+    return 0;
+  }
+
+  const parsedDate = Date.parse(trimmed);
+  if (isNaN(parsedDate)) {
+    return 0;
+  }
+
+  const age = Date.now() - parsedDate;
+
+  return age > 0 ? age : 0;
+}

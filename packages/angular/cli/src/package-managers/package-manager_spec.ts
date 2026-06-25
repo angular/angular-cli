@@ -258,4 +258,232 @@ describe('PackageManager', () => {
       expect(manifest).toEqual({ name: 'foo', version: '1.0.0' });
     });
   });
+
+  describe('getMinimumReleaseAge', () => {
+    it('should return 0 when the package manager descriptor does not support getReleaseAgeConfigCommand', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(0);
+    });
+
+    it('should query release age configuration value and parse npm before date parameter correctly', async () => {
+      const npmDescriptor = SUPPORTED_PACKAGE_MANAGERS['npm'];
+      const pm = new PackageManager(host, '/tmp', npmDescriptor);
+      const testDate = new Date(Date.now() - 10 * 24 * 60 * 60 * 1000).toISOString();
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '10.8.0', stderr: '' });
+        }
+        if (args.includes('before')) {
+          return Promise.resolve({ stdout: testDate, stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      // Allow +/- 2000ms variance due to Date.now() timing difference between mock and execution.
+      expect(age).toBeGreaterThanOrEqual(10 * 24 * 60 * 60 * 1000 - 2000);
+      expect(age).toBeLessThanOrEqual(10 * 24 * 60 * 60 * 1000 + 2000);
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'npm',
+        ['config', 'get', 'before'],
+        jasmine.anything(),
+      );
+    });
+
+    it('should query release age configuration value and parse pnpm minutes value correctly', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const pm = new PackageManager(host, '/tmp', pnpmDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '10.15.0', stderr: '' });
+        }
+        if (args.includes('minimum-release-age')) {
+          return Promise.resolve({ stdout: '1440', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(1440 * 60 * 1000);
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'pnpm',
+        ['config', 'get', 'minimum-release-age'],
+        jasmine.anything(),
+      );
+    });
+
+    it('should query release age configuration value and parse yarn duration values correctly', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '4.5.0', stderr: '' });
+        }
+        if (args.includes('npmMinimalAgeGate')) {
+          return Promise.resolve({ stdout: '3d', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(3 * 24 * 60 * 60 * 1000);
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'yarn',
+        ['config', 'get', 'npmMinimalAgeGate'],
+        jasmine.anything(),
+      );
+    });
+
+    it('should query yarn configuration value and parse raw numbers as minutes', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '4.5.0', stderr: '' });
+        }
+        if (args.includes('npmMinimalAgeGate')) {
+          return Promise.resolve({ stdout: '3', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(3 * 60 * 1000);
+    });
+
+    it('should cache the release age after the first fetch', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const pm = new PackageManager(host, '/tmp', pnpmDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '10.15.0', stderr: '' });
+        }
+        if (args.includes('minimum-release-age')) {
+          return Promise.resolve({ stdout: '1440', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age1 = await pm.getMinimumReleaseAge();
+      const age2 = await pm.getMinimumReleaseAge();
+
+      expect(age1).toBe(1440 * 60 * 1000);
+      expect(age2).toBe(1440 * 60 * 1000);
+      expect(runCommandSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should default to 1440 minutes for pnpm v11+ when config is not specified', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const pm = new PackageManager(host, '/tmp', pnpmDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('minimum-release-age')) {
+          return Promise.resolve({ stdout: 'undefined', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '11.2.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(1440 * 60 * 1000);
+    });
+
+    it('should default to 0 for pnpm v10 when config is not specified', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const pm = new PackageManager(host, '/tmp', pnpmDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('minimum-release-age')) {
+          return Promise.resolve({ stdout: 'undefined', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '10.15.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(0);
+    });
+
+    it('should respect explicitly configured 0 value for pnpm v11+', async () => {
+      const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
+      const pm = new PackageManager(host, '/tmp', pnpmDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('minimum-release-age')) {
+          return Promise.resolve({ stdout: '0', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '11.2.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(0);
+    });
+
+    it('should default to 1440 minutes for yarn v4+ when config is not specified', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('npmMinimalAgeGate')) {
+          return Promise.resolve({ stdout: 'undefined', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '4.1.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(1440 * 60 * 1000);
+    });
+
+    it('should default to 0 for yarn v3 when config is not specified', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('npmMinimalAgeGate')) {
+          return Promise.resolve({ stdout: 'undefined', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '3.6.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(0);
+    });
+
+    it('should respect explicitly configured 0 value for yarn v4+', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.callFake((binary: string, args: readonly string[]) => {
+        if (args.includes('npmMinimalAgeGate')) {
+          return Promise.resolve({ stdout: '0', stderr: '' });
+        }
+        if (args.includes('--version')) {
+          return Promise.resolve({ stdout: '4.1.0', stderr: '' });
+        }
+
+        return Promise.reject(new Error('Unknown command'));
+      });
+
+      const age = await pm.getMinimumReleaseAge();
+      expect(age).toBe(0);
+    });
+  });
 });
