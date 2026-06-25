@@ -70,7 +70,7 @@ export async function checkCLIVersion(
 
   const version = manifest.version;
 
-  return VERSION.full === version ? null : version;
+  return VERSION.full === version ? null : String(runnerVersion);
 }
 
 /**
