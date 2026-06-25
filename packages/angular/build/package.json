@@ -36,26 +36,26 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.4",
     "piscina": "5.2.0",
-    "rolldown": "1.1.1",
+    "rolldown": "1.1.2",
     "sass": "1.101.0",
-    "semver": "7.8.4",
+    "semver": "7.8.5",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.17",
-    "vite": "8.0.16",
+    "vite": "8.1.0",
     "watchpack": "2.5.2"
   },
   "optionalDependencies": {
-    "lmdb": "3.5.5"
+    "lmdb": "3.5.6"
   },
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "29.1.1",
-    "less": "4.6.6",
+    "less": "4.6.7",
     "ng-packagr": "22.1.0-next.2",
     "postcss": "8.5.15",
-    "rollup": "4.62.0",
+    "rollup": "4.62.2",
     "rxjs": "7.8.2",
     "vitest": "4.1.9"
   },
