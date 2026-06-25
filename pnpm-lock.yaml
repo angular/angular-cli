@@ -305,8 +305,8 @@ importers:
         specifier: 5.9.2
         version: 5.9.2
       undici:
-        specifier: 7.13.0
-        version: 7.13.0
+        specifier: 7.28.0
+        version: 7.28.0
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
@@ -763,8 +763,8 @@ importers:
         specifier: 20.3.0
         version: 20.3.0(@angular/compiler-cli@20.3.7(@angular/compiler@20.3.7)(typescript@5.9.2))(tslib@2.8.1)(typescript@5.9.2)
       undici:
-        specifier: 7.13.0
-        version: 7.13.0
+        specifier: 7.28.0
+        version: 7.28.0
     optionalDependencies:
       esbuild:
         specifier: 0.28.0
@@ -8976,8 +8976,8 @@ packages:
     resolution: {integrity: sha512-raqeBD6NQK4SkWhQzeYKd1KmIG6dllBOTt55Rmkt4HtI9mwdWtJljnrXjAFUBLTSN67HWrOIZ3EPF4kjUw80Bg==}
     engines: {node: '>=14.0'}
 
-  undici@7.13.0:
-    resolution: {integrity: sha512-l+zSMssRqrzDcb3fjMkjjLGmuiiK2pMIcV++mJaAc9vhjSGpvM7h43QgP+OAMb1GImHmbPyG2tBXeuyG5iY4gA==}
+  undici@7.28.0:
+    resolution: {integrity: sha512-cRZYrTDwWznlnRiPjggAGxZXanty6M8RV1ff8Wm4LWXBp7/IG8v5DnOm74DtUBp9OONpK75YlPnIjQqX0dBDtA==}
     engines: {node: '>=20.18.1'}
 
   unenv@1.10.0:
@@ -18914,7 +18914,7 @@ snapshots:
     dependencies:
       '@fastify/busboy': 2.1.1
 
-  undici@7.13.0: {}
+  undici@7.28.0: {}
 
   unenv@1.10.0:
     dependencies:
