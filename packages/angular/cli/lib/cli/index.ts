@@ -10,6 +10,7 @@ import { logging } from '@angular-devkit/core';
 import { format, stripVTControlCharacters } from 'node:util';
 import { CommandModuleError } from '../../src/command-builder/command-module';
 import { runCommand } from '../../src/command-builder/command-runner';
+import { PackageManagerError } from '../../src/package-managers';
 import { colors, supportColor } from '../../src/utilities/color';
 import { ngDebug } from '../../src/utilities/environment-options';
 import { writeErrorToLogFile } from '../../src/utilities/log-file';
@@ -80,6 +81,10 @@ export default async function (options: { cliArgs: string[] }) {
   } catch (err) {
     if (err instanceof CommandModuleError) {
       logger.fatal(`Error: ${err.message}`);
+    } else if (err instanceof PackageManagerError) {
+      const errorMessage = `Error: Package installation failed ${err.message}`;
+      const output = err.stderr || err.stdout;
+      logger.fatal(output ? `${errorMessage}\n${output}` : errorMessage);
     } else if (err instanceof Error) {
       try {
         const logPath = writeErrorToLogFile(err);
