@@ -11,7 +11,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'nod
 import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import * as semver from 'semver';
-import type { PackageManager, PackageManifest } from '../../package-managers';
+import type { PackageManager, PackageManifest, PackageMetadata } from '../../package-managers';
 import {
   RegistryClient,
   UpdateResolverOptions,
@@ -53,7 +53,7 @@ describe('UpdateResolver', () => {
   const MOCK_REGISTRY: Record<
     string,
     {
-      metadata: { name: string; 'dist-tags': Record<string, string>; versions: string[] };
+      metadata: PackageMetadata;
       manifests: Record<string, PackageManifest>;
     }
   > = {
@@ -155,9 +155,26 @@ describe('UpdateResolver', () => {
         '0.8.26': { name: 'zone.js', version: '0.8.26' },
       },
     },
+    '@angular-devkit-tests/update-release-age': {
+      metadata: {
+        name: '@angular-devkit-tests/update-release-age',
+        'dist-tags': { latest: '1.2.0' },
+        versions: ['1.0.0', '1.1.0', '1.2.0'],
+        time: {
+          '1.0.0': '2026-06-01T00:00:00.000Z',
+          '1.1.0': new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
+          '1.2.0': new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+      },
+      manifests: {
+        '1.0.0': { name: '@angular-devkit-tests/update-release-age', version: '1.0.0' },
+        '1.1.0': { name: '@angular-devkit-tests/update-release-age', version: '1.1.0' },
+        '1.2.0': { name: '@angular-devkit-tests/update-release-age', version: '1.2.0' },
+      },
+    },
   };
 
-  async function resolvePlan(options: UpdateResolverOptions) {
+  async function resolvePlan(options: UpdateResolverOptions, minReleaseAge = 0) {
     const mockPackageManager = {
       name: 'npm',
       async getRegistryMetadata(packageName: string) {
@@ -165,6 +182,9 @@ describe('UpdateResolver', () => {
       },
       async getRegistryManifest(packageName: string, version: string) {
         return MOCK_REGISTRY[packageName]?.manifests[version] ?? null;
+      },
+      async getMinimumReleaseAge() {
+        return minReleaseAge;
       },
     } as unknown as PackageManager;
 
@@ -332,6 +352,44 @@ describe('UpdateResolver', () => {
 
     const result = readFileSync(path.join(tempRoot, 'package.json'), 'utf8');
     expect(result.endsWith('}')).toBeTrue();
+  });
+
+  it('respects minimumReleaseAge and filters out versions published too recently', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular-devkit-tests/update-release-age': '1.0.0',
+        },
+      },
+      {
+        '@angular-devkit-tests/update-release-age': { version: '1.0.0' },
+      },
+    );
+
+    const planNoFilter = await resolvePlan(
+      {
+        packages: ['@angular-devkit-tests/update-release-age'],
+        workspaceRoot: tempRoot,
+      },
+      0,
+    );
+
+    expect(planNoFilter.packagesToUpdate.get('@angular-devkit-tests/update-release-age')).toBe(
+      '1.2.0',
+    );
+
+    const planWithFilter = await resolvePlan(
+      {
+        packages: ['@angular-devkit-tests/update-release-age'],
+        workspaceRoot: tempRoot,
+      },
+      3 * 24 * 60 * 60 * 1000,
+    );
+
+    expect(planWithFilter.packagesToUpdate.get('@angular-devkit-tests/update-release-age')).toBe(
+      '1.1.0',
+    );
   });
 });
 
