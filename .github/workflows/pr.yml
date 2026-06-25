@@ -20,7 +20,7 @@ jobs:
     outputs:
       snapshots: ${{ steps.filter.outputs.snapshots }}
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
       - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
@@ -38,7 +38,7 @@ jobs:
       - name: Setup Bazel
         uses: angular/dev-infra/github-actions/bazel/setup@ba726e7bca0b08b125ccc6f93c233749e1213c17
       - name: Setup ESLint Caching
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache@2c8a9bd7457de244a408f35966fab2fb45fda9c8 # v6.0.0
         with:
           path: .eslintcache
           key: ${{ runner.os }}-${{ hashFiles('.eslintrc.json') }}
