@@ -42,6 +42,10 @@ describe('AngularServerApp', () => {
         const responseInit = inject(RESPONSE_INIT);
         if (responseInit) {
           responseInit.status = 308;
+          const headers = responseInit.headers;
+          if (headers) {
+            (headers as Headers).set('X-Redirect-Header', 'custom-value');
+          }
         }
 
         void inject(Router).navigate([], {
@@ -326,6 +330,7 @@ describe('AngularServerApp', () => {
         const response = await app.handle(new Request('http://localhost/redirect-via-navigate'));
         expect(response?.headers.get('location')).toBe('/redirect-via-navigate?filter=test');
         expect(response?.status).toBe(308);
+        expect(response?.headers.get('X-Redirect-Header')).toBe('custom-value');
       });
 
       it('returns a 302 status and redirects to the correct location when `urlTree` is updated in a guard', async () => {
