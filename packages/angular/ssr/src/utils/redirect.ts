@@ -9,7 +9,9 @@
 /**
  * An set of HTTP status codes that are considered valid for redirect responses.
  */
-export const VALID_REDIRECT_RESPONSE_CODES: Set<number> = new Set([301, 302, 303, 307, 308]);
+export const VALID_REDIRECT_RESPONSE_CODES: ReadonlySet<number> = new Set([
+  301, 302, 303, 307, 308,
+]);
 
 /**
  * Checks if the given HTTP status code is a valid redirect response code.
@@ -33,7 +35,7 @@ export function isValidRedirectResponseCode(code: number): boolean {
 export function createRedirectResponse(
   location: string,
   status = 302,
-  headers?: Record<string, string>,
+  headers?: Record<string, string> | Headers,
 ): Response {
   if (ngDevMode && !isValidRedirectResponseCode(status)) {
     throw new Error(
@@ -42,7 +44,7 @@ export function createRedirectResponse(
     );
   }
 
-  const resHeaders = new Headers(headers);
+  const resHeaders = headers instanceof Headers ? headers : new Headers(headers);
   if (ngDevMode && resHeaders.has('location')) {
     // eslint-disable-next-line no-console
     console.warn(

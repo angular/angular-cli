@@ -353,7 +353,7 @@ export class AngularServerApp {
     }
 
     if (result.redirectTo) {
-      return createRedirectResponse(result.redirectTo, responseInit.status, headers);
+      return createRedirectResponse(result.redirectTo, responseInit.status, responseInit.headers);
     }
 
     if (renderMode === RenderMode.Prerender) {
