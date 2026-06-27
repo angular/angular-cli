@@ -236,14 +236,14 @@ function startNodeServer(
   const path = join(outputPath, 'main.js');
   const env = { ...process.env, PORT: '' + port, NG_ALLOWED_HOSTS: host ?? 'localhost' };
 
-  const args = ['--enable-source-maps', `"${path}"`];
+  const args = ['--enable-source-maps', path];
   if (inspectMode) {
     args.unshift('--inspect-brk');
   }
 
   return of(null).pipe(
     delay(0), // Avoid EADDRINUSE error since it will cause the kill event to be finish.
-    switchMap(() => spawnAsObservable('node', args, { env, shell: true })),
+    switchMap(() => spawnAsObservable(process.execPath, args, { env })),
     tap((res) => log({ stderr: res.stderr, stdout: res.stdout }, logger)),
     ignoreElements(),
     // Emit a signal after the process has been started
