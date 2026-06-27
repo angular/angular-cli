@@ -33,7 +33,7 @@ function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
   teardown: boolean,
-  zoneTestingStrategy: 'none' | 'static' | 'dynamic',
+  zoneTestingStrategy: 'none' | 'static' | 'dynamic' | 'dynamic-zone',
   hasLocalize: boolean,
 ): string {
   let providersImport = 'const providers = [];';
@@ -53,6 +53,10 @@ function createTestBedInitVirtualFile(
       // It must be imported dynamically to avoid a static dependency on 'zone.js'.
       await import('zone.js/testing');
     }`;
+  } else if (zoneTestingStrategy === 'dynamic-zone') {
+    zoneTestingSnippet = `
+      await import('zone.js');
+      await import('zone.js/testing');`;
   }
 
   // The DynamicDOMTestComponentRenderer is used to avoid stale document references
@@ -150,12 +154,12 @@ function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
  *
  * @param buildOptions The partial application builder options.
  * @param projectSourceRoot The root directory of the project source.
- * @returns The resolved zone testing strategy ('none', 'static', 'dynamic').
+ * @returns The resolved zone testing strategy ('none', 'static', 'dynamic', 'dynamic-zone').
  */
 function getZoneTestingStrategy(
   buildOptions: Partial<ApplicationBuilderInternalOptions>,
   projectSourceRoot: string,
-): 'none' | 'static' | 'dynamic' {
+): 'none' | 'static' | 'dynamic' | 'dynamic-zone' {
   if (buildOptions.polyfills?.includes('zone.js/testing')) {
     return 'none';
   }
@@ -167,6 +171,12 @@ function getZoneTestingStrategy(
   try {
     const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
     projectRequire.resolve('zone.js');
+
+    // If polyfills is undefined (e.g. library build target), load zone.js dynamically.
+    // If polyfills is defined but doesn't include zone.js (e.g. zoneless application), do NOT load zone.js.
+    if (buildOptions.polyfills === undefined) {
+      return 'dynamic-zone';
+    }
 
     return 'dynamic';
   } catch {
