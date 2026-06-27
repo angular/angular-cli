@@ -67,5 +67,48 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBe(true);
     });
+
+    it('should load Zone and Zone testing support when testing a library and zone.js is installed', async () => {
+      harness.withBuilderTarget(
+        'build',
+        async () => ({ success: true }),
+        {
+          project: 'ng-package.json',
+        },
+        {
+          builderName: '@angular/build:ng-packagr',
+        },
+      );
+
+      await harness.writeFile(
+        'ng-package.json',
+        JSON.stringify({
+          lib: {
+            entryFile: 'src/public-api.ts',
+          },
+        }),
+      );
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        include: ['src/app.component.spec.ts'],
+      });
+
+      await harness.writeFile(
+        'src/app.component.spec.ts',
+        `
+        import { describe, it, expect } from 'vitest';
+
+        describe('Library Zone Test', () => {
+          it('should have Zone defined', () => {
+            expect((globalThis as any).Zone).toBeDefined();
+          });
+        });
+      `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });
