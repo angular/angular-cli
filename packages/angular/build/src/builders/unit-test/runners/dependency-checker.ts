@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createRequire } from 'node:module';
+import { createProjectResolver } from '../../../utils/resolve-project';
 
 /**
  * A custom error class to represent missing dependency errors.
@@ -26,7 +26,7 @@ export class DependencyChecker {
   private readonly missingDependencies = new Set<string>();
 
   constructor(projectSourceRoot: string) {
-    this.resolver = createRequire(projectSourceRoot + '/').resolve;
+    this.resolver = createProjectResolver(projectSourceRoot);
   }
 
   /**

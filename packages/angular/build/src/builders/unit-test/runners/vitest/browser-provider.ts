@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createRequire } from 'node:module';
 import type {
   BrowserBuiltinProvider,
   BrowserConfigOptions,
   BrowserProviderOption,
 } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
+import { createProjectResolver } from '../../../../utils/resolve-project';
 
 export interface BrowserConfiguration {
   browser?: BrowserConfigOptions;
@@ -21,7 +21,7 @@ export interface BrowserConfiguration {
 }
 
 function findBrowserProvider(
-  projectResolver: NodeJS.RequireResolve,
+  projectResolver: (packageName: string) => string,
 ): BrowserBuiltinProvider | undefined {
   const requiresPreview = !!process.versions.webcontainer;
 
@@ -138,7 +138,7 @@ export async function setupBrowserConfiguration(
     return {};
   }
 
-  const projectResolver = createRequire(projectSourceRoot + '/').resolve;
+  const projectResolver = createProjectResolver(projectSourceRoot);
   let errors: string[] | undefined;
 
   const providerName = findBrowserProvider(projectResolver);

@@ -25,6 +25,7 @@ import {
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
 import { getProjectRootPaths, normalizeDirectoryPath } from '../../utils/project-metadata';
+import { createProjectResolver } from '../../utils/resolve-project';
 import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../../utils/url';
 import {
   Schema as ApplicationBuilderOptions,
@@ -728,9 +729,7 @@ function normalizeExternals(value: string[] | undefined): string[] | undefined {
 }
 
 async function findFrameworkVersion(projectRoot: string): Promise<string> {
-  // Create a custom require function for ESM compliance.
-  // NOTE: The trailing slash is significant.
-  const projectResolve = createRequire(projectRoot + '/').resolve;
+  const projectResolve = createProjectResolver(projectRoot);
 
   try {
     const manifestPath = projectResolve('@angular/core/package.json');

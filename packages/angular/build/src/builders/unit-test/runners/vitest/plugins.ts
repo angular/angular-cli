@@ -8,7 +8,6 @@
 
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import { platform } from 'node:os';
 import path from 'node:path';
 import type {
@@ -22,6 +21,7 @@ import type {
 } from 'vitest/node';
 import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
 import { toPosixPath } from '../../../../utils/path';
+import { createProjectResolver } from '../../../../utils/resolve-project';
 import type { ResultFile } from '../../../application/results';
 import type { NormalizedUnitTestBuilderOptions } from '../../options';
 import { normalizeBrowserName } from './browser-provider';
@@ -60,7 +60,7 @@ interface VitestConfigPluginOptions {
 }
 
 async function findTestEnvironment(
-  projectResolver: NodeJS.RequireResolve,
+  projectResolver: (packageName: string) => string,
 ): Promise<'jsdom' | 'happy-dom'> {
   try {
     projectResolver('happy-dom');
@@ -89,10 +89,10 @@ function determineCoverageProvider(
     if (hasNonChromium) {
       determinedProvider = 'istanbul';
     } else {
-      const projectRequire = createRequire(projectSourceRoot + '/');
+      const projectResolve = createProjectResolver(projectSourceRoot);
       const checkInstalled = (pkg: string) => {
         try {
-          projectRequire.resolve(pkg);
+          projectResolve(pkg);
 
           return true;
         } catch {
@@ -243,7 +243,7 @@ export async function createVitestConfigPlugin(
         validateBrowserCoverage(browser, testConfig?.browser, determinedProvider);
       }
 
-      const projectResolver = createRequire(projectSourceRoot + '/').resolve;
+      const projectResolver = createProjectResolver(projectSourceRoot);
 
       const projectDefaults: Vite.UserConfig & UserWorkspaceConfig = {
         test: {
