@@ -11,9 +11,9 @@
  * Provides Vitest-specific build options and virtual file contents for Angular unit testing.
  */
 
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { toPosixPath } from '../../../../utils/path';
+import { createProjectResolver } from '../../../../utils/resolve-project';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import { OutputHashing } from '../../../application/schema';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
@@ -169,8 +169,8 @@ function getZoneTestingStrategy(
   }
 
   try {
-    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
-    projectRequire.resolve('zone.js');
+    const projectResolve = createProjectResolver(projectSourceRoot);
+    projectResolve('zone.js');
 
     // If polyfills is undefined (e.g. library build target), load zone.js dynamically.
     // If polyfills is defined but doesn't include zone.js (e.g. zoneless application), do NOT load zone.js.
@@ -268,8 +268,8 @@ export async function getVitestBuildOptions(
 
   let hasLocalize = false;
   try {
-    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
-    projectRequire.resolve('@angular/localize');
+    const projectResolve = createProjectResolver(projectSourceRoot);
+    projectResolve('@angular/localize');
     hasLocalize = true;
   } catch {}
 
