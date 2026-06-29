@@ -15,6 +15,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 import { ReadableStream } from 'node:stream/web';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
+import { createProjectResolver } from '../../utils/resolve-project';
 import { writeTestFiles } from '../../utils/test-files';
 import { buildApplicationInternal } from '../application/index';
 import { ApplicationBuilderInternalOptions } from '../application/options';
@@ -202,8 +203,8 @@ async function runEsbuild(
   const usesZoneJS = buildOptions.polyfills?.includes('zone.js');
   let hasLocalize = false;
   try {
-    const projectRequire = createRequire(path.join(projectSourceRoot, 'package.json'));
-    projectRequire.resolve('@angular/localize');
+    const projectResolve = createProjectResolver(projectSourceRoot);
+    projectResolve('@angular/localize');
     hasLocalize = true;
   } catch {}
 
