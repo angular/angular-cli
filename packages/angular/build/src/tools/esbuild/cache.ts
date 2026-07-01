@@ -11,6 +11,8 @@
  * Provides infrastructure for common caching functionality within the build system.
  */
 
+import { assertIsError } from '../../utils/error';
+
 /**
  * A backing data store for one or more Cache instances.
  * The interface is intentionally designed to support using a JavaScript
@@ -36,6 +38,16 @@ export interface CacheStore<V> {
    * @param value The value to add to the cache store.
    */
   set(key: string, value: V): this | Promise<this>;
+}
+
+/**
+ * A persistent backing data store that supports namespace partitioning
+ * and manual lifecycle close operations.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export interface PersistentCacheStore<V = any> extends CacheStore<V> {
+  createCache<T = V>(namespace: string): Cache<T>;
+  close(): void | Promise<void>;
 }
 
 /**
@@ -222,5 +234,39 @@ export class MemoryCache<V> extends Cache<V, Map<string, V>> {
    */
   entries() {
     return this.store.entries();
+  }
+}
+
+/**
+ * Creates and returns a persistent cache store.
+ * Attempts to use the native LMDB store first, and falls back to the built-in SQLite store
+ * if LMDB fails to initialize.
+ *
+ * @param baseCachePath The base path of the cache file/directory without suffix/extension.
+ * @returns A promise resolving to a PersistentCacheStore instance.
+ */
+export async function createPersistentCacheStore(
+  baseCachePath: string,
+): Promise<PersistentCacheStore> {
+  try {
+    const { LmdbCacheStore } = await import('./lmdb-cache-store');
+
+    return new LmdbCacheStore(baseCachePath + '.db');
+  } catch (lmdbError) {
+    try {
+      const { SqliteCacheStore } = await import('./sqlite-cache-store');
+
+      return new SqliteCacheStore(baseCachePath + '-sqlite.db');
+    } catch (sqliteError) {
+      assertIsError(lmdbError);
+      assertIsError(sqliteError);
+
+      throw new Error(
+        'Unable to initialize JavaScript cache storage.\n' +
+          `LMDB error: ${lmdbError.message.split('\n')[0]}\n` +
+          `SQLite error: ${sqliteError.message.split('\n')[0]}`,
+        { cause: sqliteError },
+      );
+    }
   }
 }

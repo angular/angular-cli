@@ -24,6 +24,7 @@ import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { AngularHostOptions } from '../../angular/angular-host';
 import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
+import { type PersistentCacheStore, createPersistentCacheStore } from '../cache';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
@@ -62,9 +63,7 @@ export interface CompilerPluginOptions {
 export function createCompilerPlugin(
   pluginOptions: CompilerPluginOptions,
   compilationContextOrCompilation:
-    | AngularCompilationContext
-    | AngularCompilation
-    | (() => Promise<AngularCompilation>),
+    AngularCompilationContext | AngularCompilation | (() => Promise<AngularCompilation>),
   stylesheetBundler: ComponentStylesheetBundler,
 ): Plugin {
   return {
@@ -76,20 +75,21 @@ export function createCompilerPlugin(
 
       // Initialize a worker pool for JavaScript transformations.
       // Webcontainers currently do not support this persistent cache store.
-      let cacheStore: import('../lmdb-cache-store').LmdbCacheStore | undefined;
+      let cacheStore: PersistentCacheStore | undefined;
       if (pluginOptions.sourceFileCache?.persistentCachePath && !process.versions.webcontainer) {
         try {
-          const { LmdbCacheStore } = await import('../lmdb-cache-store');
-          cacheStore = new LmdbCacheStore(
-            path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler.db'),
+          cacheStore = await createPersistentCacheStore(
+            path.join(pluginOptions.sourceFileCache.persistentCachePath, 'angular-compiler'),
           );
         } catch (e) {
           setupWarnings.push({
             text: 'Unable to initialize JavaScript cache storage.',
             location: null,
             notes: [
-              // Only show first line of lmdb load error which has platform support listed
-              { text: (e as Error)?.message.split('\n')[0] ?? `${e}` },
+              ...(e as Error).message
+                .split('\n')
+                .slice(1)
+                .map((text) => ({ text })),
               {
                 text: 'This will not affect the build output content but may result in slower builds.',
               },
@@ -666,7 +666,7 @@ function createCompilerOptionsTransformer(
       // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
       // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
       // which breaks the deprecated `@Effects` NGRX decorator and potentially other existing code as well.
-      compilerOptions.target = 9 /** ES2022 */;
+      compilerOptions.target = 9; /** ES2022 */
       compilerOptions.useDefineForClassFields ??= false;
 
       // Only add the warning on the initial build

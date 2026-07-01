@@ -11,7 +11,7 @@ import { createHash } from 'node:crypto';
 import { extname, join } from 'node:path';
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
-import type { LmdbCacheStore } from './lmdb-cache-store';
+import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -38,7 +38,7 @@ export interface I18nInlinerOptions {
 export class I18nInliner {
   #cacheInitFailed = false;
   #workerPool: WorkerPool;
-  #cache: LmdbCacheStore | undefined;
+  #cache: PersistentCacheStore | undefined;
   readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
   readonly #unmodifiedFiles: Array<BuildOutputFile>;
 
@@ -162,8 +162,10 @@ export class I18nInliner {
 
         const result = await this.#workerPool.run({ filename, locale, translation });
         if (this.#cache && cacheKey) {
-          // Failure to set the value should not fail the transform
-          await this.#cache.set(cacheKey, result).catch(() => {});
+          try {
+            // Failure to set the value should not fail the transform
+            await this.#cache.set(cacheKey, result);
+          } catch {}
         }
 
         return result;
@@ -273,9 +275,7 @@ export class I18nInliner {
 
     // Initialize a persistent cache for i18n transformations.
     try {
-      const { LmdbCacheStore } = await import('./lmdb-cache-store');
-
-      this.#cache = new LmdbCacheStore(join(persistentCachePath, 'angular-i18n.db'));
+      this.#cache = await createPersistentCacheStore(join(persistentCachePath, 'angular-i18n'));
     } catch {
       this.#cacheInitFailed = true;
 
