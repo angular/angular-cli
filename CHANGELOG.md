@@ -1,3 +1,22 @@
+<a name="21.2.18"></a>
+
+# 21.2.18 (2026-07-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [61a810ab6](https://github.com/angular/angular-cli/commit/61a810ab615d1a26fc69f9e48be7cc6555a9c430) | fix  | respect release age policy in update bootstrapping logic |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [a2b6116ed](https://github.com/angular/angular-cli/commit/a2b6116eddc7a71e4539817da623221ca552a35f) | fix  | bump undici to 7.28.0 |
+| [2510ee3c9](https://github.com/angular/angular-cli/commit/2510ee3c9aefdab5428938e78b9cfcea0ada1c45) | fix  | bump vite to 7.3.6    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.17"></a>
 
 # 21.2.17 (2026-06-24)
@@ -14205,21 +14224,23 @@ Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Pa
 A number of browser and server builder options have had their default values changed. The aim of these changes is to reduce the configuration complexity and support the new "production builds by default" initiative.
 
 **Browser builder**
-| Option | Previous default value | New default value |
-|----------------------------------------|---------------------------|-------------------|
-| optimization | false | true |
-| aot | false | true |
-| buildOptimizer | false | true |
-| sourceMap | true | false |
-| extractLicenses | false | true |
-| namedChunks | true | false |
-| vendorChunk | true | false |
+
+| Option          | Previous default value | New default value |
+| --------------- | ---------------------- | ----------------- |
+| optimization    | false                  | true              |
+| aot             | false                  | true              |
+| buildOptimizer  | false                  | true              |
+| sourceMap       | true                   | false             |
+| extractLicenses | false                  | true              |
+| namedChunks     | true                   | false             |
+| vendorChunk     | true                   | false             |
 
 **Server builder**
-| Option | Previous default value | New default value |
-|---------------|------------------------|-------------------|
-| optimization | false | true |
-| sourceMap | true | false |
+
+| Option       | Previous default value | New default value |
+| ------------ | ---------------------- | ----------------- |
+| optimization | false                  | true              |
+| sourceMap    | true                   | false             |
 
 (cherry picked from commit 0a74d0d28daf68510459ed73ef048c91bfcabbbc)
 
@@ -15240,21 +15261,23 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 A number of browser and server builder options have had their default values changed. The aim of these changes is to reduce the configuration complexity and support the new "production builds by default" initiative.
 
 **Browser builder**
-| Option | Previous default value | New default value |
-|----------------------------------------|---------------------------|-------------------|
-| optimization | false | true |
-| aot | false | true |
-| buildOptimizer | false | true |
-| sourceMap | true | false |
-| extractLicenses | false | true |
-| namedChunks | true | false |
-| vendorChunk | true | false |
+
+| Option          | Previous default value | New default value |
+| --------------- | ---------------------- | ----------------- |
+| optimization    | false                  | true              |
+| aot             | false                  | true              |
+| buildOptimizer  | false                  | true              |
+| sourceMap       | true                   | false             |
+| extractLicenses | false                  | true              |
+| namedChunks     | true                   | false             |
+| vendorChunk     | true                   | false             |
 
 **Server builder**
-| Option | Previous default value | New default value |
-|---------------|------------------------|-------------------|
-| optimization | false | true |
-| sourceMap | true | false |
+
+| Option       | Previous default value | New default value |
+| ------------ | ---------------------- | ----------------- |
+| optimization | false                  | true              |
+| sourceMap    | true                   | false             |
 
 (cherry picked from commit 0a74d0d28daf68510459ed73ef048c91bfcabbbc)
 
