@@ -66,6 +66,7 @@ export function setupBundlerContexts(
         angularCompilationContext,
         templateUpdates,
       ),
+      true,
     ),
   );
 
@@ -82,6 +83,7 @@ export function setupBundlerContexts(
       workspaceRoot,
       watch,
       browserPolyfillBundleOptions,
+      true,
     );
     if (typeof browserPolyfillBundleOptions === 'function') {
       otherContexts.push(browserPolyfillContext);
@@ -95,7 +97,9 @@ export function setupBundlerContexts(
     for (const initial of [true, false]) {
       const bundleOptions = createGlobalStylesBundleOptions(options, target, initial);
       if (bundleOptions) {
-        otherContexts.push(new BundlerContext(workspaceRoot, watch, bundleOptions, () => initial));
+        otherContexts.push(
+          new BundlerContext(workspaceRoot, watch, bundleOptions, true, () => initial),
+        );
       }
     }
   }
@@ -105,7 +109,9 @@ export function setupBundlerContexts(
     for (const initial of [true, false]) {
       const bundleOptions = createGlobalScriptsBundleOptions(options, target, initial);
       if (bundleOptions) {
-        otherContexts.push(new BundlerContext(workspaceRoot, watch, bundleOptions, () => initial));
+        otherContexts.push(
+          new BundlerContext(workspaceRoot, watch, bundleOptions, true, () => initial),
+        );
       }
     }
   }
@@ -125,6 +131,7 @@ export function setupBundlerContexts(
           stylesheetBundler,
           angularCompilationContext.createSecondaryContext(),
         ),
+        true,
       ),
     );
 
@@ -141,6 +148,7 @@ export function setupBundlerContexts(
             stylesheetBundler,
             angularCompilationContext.createSecondaryContext(),
           ),
+          true,
         ),
       );
     }
@@ -153,7 +161,9 @@ export function setupBundlerContexts(
     );
 
     if (serverPolyfillBundleOptions) {
-      otherContexts.push(new BundlerContext(workspaceRoot, watch, serverPolyfillBundleOptions));
+      otherContexts.push(
+        new BundlerContext(workspaceRoot, watch, serverPolyfillBundleOptions, true),
+      );
     }
   }
 

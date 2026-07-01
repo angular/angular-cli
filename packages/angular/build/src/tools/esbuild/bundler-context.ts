@@ -70,6 +70,7 @@ export class BundlerContext {
     private workspaceRoot: string,
     private incremental: boolean,
     options: BuildOptions | BundlerOptionsFactory,
+    private alwaysUseContext = false,
     private initialFilter?: (initial: Readonly<InitialFileRecord>) => boolean,
   ) {
     // To cache the results an option factory is needed to capture the full set of dependencies
@@ -217,7 +218,7 @@ export class BundlerContext {
       if (this.#esbuildContext) {
         // Rebuild using the existing incremental build context
         result = await this.#esbuildContext.rebuild();
-      } else {
+      } else if (this.incremental || this.alwaysUseContext) {
         // Create a build context and perform the build.
         // Context creation does not perform a build.
         const esbuildContext = await context(this.#esbuildOptions);
@@ -227,6 +228,15 @@ export class BundlerContext {
         }
         this.#esbuildContext = esbuildContext;
         result = await this.#esbuildContext.rebuild();
+      } else {
+        // For non-incremental builds, perform a single build
+        if (this.#disposed) {
+          throw new Error('BundlerContext was disposed during build.');
+        }
+        result = await build(this.#esbuildOptions);
+        if (this.#disposed) {
+          throw new Error('BundlerContext was disposed during build.');
+        }
       }
     } catch (failure) {
       // Build failures will throw an exception which contains errors/warnings
