@@ -1,3 +1,21 @@
+<a name="20.3.31"></a>
+
+# 20.3.31 (2026-07-01)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [4ea787cd0](https://github.com/angular/angular-cli/commit/4ea787cd0dfc7226896643a6f8ccd99846c85c2c) | fix  | bump undici to 7.28.0 |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------ |
+| [df5a2cc2b](https://github.com/angular/angular-cli/commit/df5a2cc2bcf8d65d834164984ee5456718dfb75e) | fix  | bump vite to 7.3.6 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.0-next.1"></a>
 
 # 22.1.0-next.1 (2026-06-24)
