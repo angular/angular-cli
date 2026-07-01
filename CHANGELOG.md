@@ -1,3 +1,44 @@
+<a name="22.1.0-next.2"></a>
+
+# 22.1.0-next.2 (2026-07-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [010cef665](https://github.com/angular/angular-cli/commit/010cef6657365cad8529c164d7c594ca598180a0) | fix  | gracefully handle package manager errors in command handler       |
+| [3a2589dac](https://github.com/angular/angular-cli/commit/3a2589dac684dfe26b2151b940bd40280d7c5d8e) | fix  | respect client-side release age settings during update resolution |
+| [edb4594de](https://github.com/angular/angular-cli/commit/edb4594deb5ff96967c1ce13b4494e3fd675ebec) | fix  | respect release age policy in update bootstrapping logic          |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [0b3172e07](https://github.com/angular/angular-cli/commit/0b3172e076b75df5b8c3066a115d1151f8b0bad9) | fix  | remove unused app tsconfig outDir |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [2d3eb7fb3](https://github.com/angular/angular-cli/commit/2d3eb7fb3b43b64c476296581481dbf67cb57b1d) | fix  | prevent OS command injection in ssr-dev-server builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [75c1dce38](https://github.com/angular/angular-cli/commit/75c1dce387075d3ea9d6da572f7daa589856bc0e) | fix  | auto-inject localize/init in library unit tests                           |
+| [dc27e17fc](https://github.com/angular/angular-cli/commit/dc27e17fc2cbb91b10b508a7e46cd72734959ffa) | fix  | inherit preserveSymlinks option from build target in unit-test builder    |
+| [61e25fb1d](https://github.com/angular/angular-cli/commit/61e25fb1db56694da800f330dd65cb7e50ea2d11) | fix  | load zone.js dynamically for library unit tests                           |
+| [0010b922f](https://github.com/angular/angular-cli/commit/0010b922f8fc5a9c57b9512594f9c3b4da3fa2ae) | fix  | scope createRequire module resolution using paths to prevent parent paths |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [d9fb854c9](https://github.com/angular/angular-cli/commit/d9fb854c9a48ba8852d57f3fa8f7a9640ee0aab2) | fix  | preserve response headers during redirect |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.5"></a>
 
 # 22.0.5 (2026-07-01)
