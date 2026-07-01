@@ -1,3 +1,43 @@
+<a name="22.0.5"></a>
+
+# 22.0.5 (2026-07-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                 |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [f099e641c](https://github.com/angular/angular-cli/commit/f099e641c96a5932d81535e712af7044269b4788) | fix  | gracefully handle package manager errors in command handler |
+| [cf033ec48](https://github.com/angular/angular-cli/commit/cf033ec48e2371655fbf6bcdb588c05aff2e6662) | fix  | respect release age policy in update bootstrapping logic    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                       |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------- |
+| [862a38069](https://github.com/angular/angular-cli/commit/862a380697db60cee8cf83e8fe20641db2a6aae1) | fix  | remove unused app tsconfig outDir |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [f75085f4b](https://github.com/angular/angular-cli/commit/f75085f4b58ed61979a2901a4ef0353e56f22136) | fix  | prevent OS command injection in ssr-dev-server builder |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [dfee1e7b1](https://github.com/angular/angular-cli/commit/dfee1e7b142d767c86eecb7791ed72bce65866c5) | fix  | auto-inject localize/init in library unit tests                           |
+| [aba718403](https://github.com/angular/angular-cli/commit/aba718403df7a96310570c1449674a49254cd4af) | fix  | inherit preserveSymlinks option from build target in unit-test builder    |
+| [7c0d9f03c](https://github.com/angular/angular-cli/commit/7c0d9f03c2ae82a90a48e51b2aee731a36dc2beb) | fix  | load zone.js dynamically for library unit tests                           |
+| [4288e4452](https://github.com/angular/angular-cli/commit/4288e44525e855f29f026276f518968b1b2697db) | fix  | scope createRequire module resolution using paths to prevent parent paths |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------- |
+| [5f774f891](https://github.com/angular/angular-cli/commit/5f774f891a086bf0a2ab6f86c24485425e99f16d) | fix  | preserve response headers during redirect |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.18"></a>
 
 # 21.2.18 (2026-07-01)
@@ -14840,21 +14880,23 @@ Alan Agius, Charles Lyding, Joey Perrott, Keen Yee Liau, Luca Vazzano, Pankaj Pa
 A number of browser and server builder options have had their default values changed. The aim of these changes is to reduce the configuration complexity and support the new "production builds by default" initiative.
 
 **Browser builder**
-| Option | Previous default value | New default value |
-|----------------------------------------|---------------------------|-------------------|
-| optimization | false | true |
-| aot | false | true |
-| buildOptimizer | false | true |
-| sourceMap | true | false |
-| extractLicenses | false | true |
-| namedChunks | true | false |
-| vendorChunk | true | false |
+
+| Option          | Previous default value | New default value |
+| --------------- | ---------------------- | ----------------- |
+| optimization    | false                  | true              |
+| aot             | false                  | true              |
+| buildOptimizer  | false                  | true              |
+| sourceMap       | true                   | false             |
+| extractLicenses | false                  | true              |
+| namedChunks     | true                   | false             |
+| vendorChunk     | true                   | false             |
 
 **Server builder**
-| Option | Previous default value | New default value |
-|---------------|------------------------|-------------------|
-| optimization | false | true |
-| sourceMap | true | false |
+
+| Option       | Previous default value | New default value |
+| ------------ | ---------------------- | ----------------- |
+| optimization | false                  | true              |
+| sourceMap    | true                   | false             |
 
 (cherry picked from commit 0a74d0d28daf68510459ed73ef048c91bfcabbbc)
 
@@ -15875,21 +15917,23 @@ Alan Agius, Charles Lyding, Joey Perrott, Cédric Exbrayat, Doug Parker, Joshua 
 A number of browser and server builder options have had their default values changed. The aim of these changes is to reduce the configuration complexity and support the new "production builds by default" initiative.
 
 **Browser builder**
-| Option | Previous default value | New default value |
-|----------------------------------------|---------------------------|-------------------|
-| optimization | false | true |
-| aot | false | true |
-| buildOptimizer | false | true |
-| sourceMap | true | false |
-| extractLicenses | false | true |
-| namedChunks | true | false |
-| vendorChunk | true | false |
+
+| Option          | Previous default value | New default value |
+| --------------- | ---------------------- | ----------------- |
+| optimization    | false                  | true              |
+| aot             | false                  | true              |
+| buildOptimizer  | false                  | true              |
+| sourceMap       | true                   | false             |
+| extractLicenses | false                  | true              |
+| namedChunks     | true                   | false             |
+| vendorChunk     | true                   | false             |
 
 **Server builder**
-| Option | Previous default value | New default value |
-|---------------|------------------------|-------------------|
-| optimization | false | true |
-| sourceMap | true | false |
+
+| Option       | Previous default value | New default value |
+| ------------ | ---------------------- | ----------------- |
+| optimization | false                  | true              |
+| sourceMap    | true                   | false             |
 
 (cherry picked from commit 0a74d0d28daf68510459ed73ef048c91bfcabbbc)
 
