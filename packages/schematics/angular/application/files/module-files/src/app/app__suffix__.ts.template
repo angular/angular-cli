@@ -1,7 +1,10 @@
 import { Component, signal } from '@angular/core';
 
 @Component({
-  selector: '<%= selector %>',<% if(inlineTemplate) { %>
+  selector: '<%= selector %>',
+  standalone: false,<% if (inlineStyle) { %>
+  styles: [],<% } else { %>
+  styleUrl: './app<%= suffix %>.<%= style %>',<% } %><% if (inlineTemplate) { %>
   template: `
     <h1>Hello, {{ title() }}</h1>
     <p>Congratulations! Your app is running. 🎉</p>
@@ -11,9 +14,6 @@ import { Component, signal } from '@angular/core';
     } %>
   `,<% } else { %>
   templateUrl: './app<%= suffix %>.html',<% } %>
-  standalone: false,<% if(inlineStyle) { %>
-  styles: []<% } else { %>
-  styleUrl: './app<%= suffix %>.<%= style %>'<% } %>
 })
 export class App {
   protected readonly title = signal('<%= name %>');
