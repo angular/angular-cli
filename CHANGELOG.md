@@ -1,3 +1,22 @@
+<a name="21.2.18"></a>
+
+# 21.2.18 (2026-07-01)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [61a810ab6](https://github.com/angular/angular-cli/commit/61a810ab615d1a26fc69f9e48be7cc6555a9c430) | fix  | respect release age policy in update bootstrapping logic |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [a2b6116ed](https://github.com/angular/angular-cli/commit/a2b6116eddc7a71e4539817da623221ca552a35f) | fix  | bump undici to 7.28.0 |
+| [2510ee3c9](https://github.com/angular/angular-cli/commit/2510ee3c9aefdab5428938e78b9cfcea0ada1c45) | fix  | bump vite to 7.3.6    |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.31"></a>
 
 # 20.3.31 (2026-07-01)
