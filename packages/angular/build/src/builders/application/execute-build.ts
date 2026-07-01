@@ -7,13 +7,14 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Metafile } from 'esbuild';
 import { createAngularCompilation } from '../../tools/angular/compilation';
 import { AngularCompilationContext } from '../../tools/esbuild/angular/compilation-state';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
-import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
+import { BuildOutputFileType, type InitialFileRecord } from '../../tools/esbuild/bundler-files';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
@@ -34,6 +35,38 @@ import { executePostBundleSteps } from './execute-post-bundle';
 import { inlineI18n, loadActiveTranslations } from './i18n';
 import { NormalizedApplicationBuildOptions } from './options';
 import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundling';
+
+/**
+ * Returns a copy of the given metafile containing only outputs that appear in the
+ * provided initial-files map, with inputs filtered to those referenced by those outputs.
+ */
+function createInitialMetafile(
+  metafile: Metafile,
+  initialFiles: Map<string, InitialFileRecord>,
+): Metafile {
+  const filteredOutputs: Metafile['outputs'] = {};
+  const referencedInputs = new Set<string>();
+
+  for (const [path, output] of Object.entries(metafile.outputs)) {
+    if (!initialFiles.has(path)) {
+      continue;
+    }
+    filteredOutputs[path] = output;
+    for (const inputPath of Object.keys(output.inputs)) {
+      referencedInputs.add(inputPath);
+    }
+  }
+
+  const filteredInputs: Metafile['inputs'] = {};
+  for (const path of referencedInputs) {
+    const input = metafile.inputs[path];
+    if (input) {
+      filteredInputs[path] = input;
+    }
+  }
+
+  return { inputs: filteredInputs, outputs: filteredOutputs };
+}
 
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
@@ -336,13 +369,33 @@ export async function executeBuild(
     BuildOutputFileType.Root,
   );
 
-  // Write metafile if stats option is enabled
+  // Write metafiles if stats option is enabled
   if (options.stats) {
+    const { browserMetafile, serverMetafile } = bundlingResult;
+
     executionResult.addOutputFile(
-      'stats.json',
-      JSON.stringify(metafile, null, 2),
+      'browser-stats.json',
+      JSON.stringify(browserMetafile, null, 2),
       BuildOutputFileType.Root,
     );
+    executionResult.addOutputFile(
+      'browser-initial-stats.json',
+      JSON.stringify(createInitialMetafile(browserMetafile, initialFiles), null, 2),
+      BuildOutputFileType.Root,
+    );
+
+    if (ssrOptions) {
+      executionResult.addOutputFile(
+        'server-stats.json',
+        JSON.stringify(serverMetafile, null, 2),
+        BuildOutputFileType.Root,
+      );
+      executionResult.addOutputFile(
+        'server-initial-stats.json',
+        JSON.stringify(createInitialMetafile(serverMetafile, initialFiles), null, 2),
+        BuildOutputFileType.Root,
+      );
+    }
   }
 
   if (!jsonLogs && !options.quiet) {

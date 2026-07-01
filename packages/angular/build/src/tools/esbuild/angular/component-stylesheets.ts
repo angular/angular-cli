@@ -259,7 +259,7 @@ export class ComponentStylesheetBundler {
       }
     }
 
-    const metafile = result.metafile;
+    const { metafile, browserMetafile, serverMetafile } = result;
     // Remove entryPoint fields from outputs to prevent the internal component styles from being
     // treated as initial files. Also mark the entry as a component resource for stat reporting.
     Object.values(metafile.outputs).forEach((output) => {
@@ -274,6 +274,8 @@ export class ComponentStylesheetBundler {
       contents,
       outputFiles,
       metafile,
+      browserMetafile,
+      serverMetafile,
       referencedFiles,
       externalImports: result.externalImports,
       initialFiles: new Map(),
