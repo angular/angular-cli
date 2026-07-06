@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, resolve } from 'node:path';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { dirname, isAbsolute, join, resolve } from 'node:path';
 
 /** Version placeholder is replaced during the build process with actual package version */
 const VERSION = '0.0.0-PLACEHOLDER';
@@ -39,6 +40,46 @@ function hasCacheMetadata(value: unknown): value is { cli: { cache: CacheMetadat
   );
 }
 
+function getCacheBasePath(workspaceRoot: string, cachePathSetting: string): string {
+  if (isAbsolute(cachePathSetting)) {
+    return cachePathSetting;
+  }
+
+  try {
+    // Find the git directory, walking up from workspaceRoot if necessary
+    let currentDir = workspaceRoot;
+    while (true) {
+      const gitPath = join(currentDir, '.git');
+      if (existsSync(gitPath)) {
+        const stat = statSync(gitPath);
+        if (stat.isFile()) {
+          // Could be a git worktree (or submodule)
+          const content = readFileSync(gitPath, 'utf8');
+          const match = /^gitdir:\s*(.+)$/m.exec(content);
+          if (match) {
+            const gitdir = resolve(currentDir, match[1].trim());
+            const commondirPath = join(gitdir, 'commondir');
+            if (existsSync(commondirPath)) {
+              // It's a git worktree
+              const commondir = readFileSync(commondirPath, 'utf8').trim();
+              const commonGitDir = resolve(gitdir, commondir);
+
+              return resolve(dirname(commonGitDir), cachePathSetting);
+            }
+          }
+        }
+      }
+      const parentDir = dirname(currentDir);
+      if (parentDir === currentDir) {
+        break;
+      }
+      currentDir = parentDir;
+    }
+  } catch {}
+
+  return resolve(workspaceRoot, cachePathSetting);
+}
+
 export function normalizeCacheOptions(
   projectMetadata: unknown,
   worspaceRoot: string,
@@ -65,7 +106,7 @@ export function normalizeCacheOptions(
     }
   }
 
-  const cacheBasePath = resolve(worspaceRoot, path);
+  const cacheBasePath = getCacheBasePath(worspaceRoot, path);
 
   return {
     enabled: cacheEnabled,
