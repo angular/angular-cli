@@ -201,3 +201,19 @@ export const bazelEsbuildPluginPath =
   bazelBinDirectory && bazelExecRoot
     ? process.env['NG_INTERNAL_ESBUILD_PLUGINS_DO_NOT_USE']
     : undefined;
+
+/**
+ * The persistent cache store configuration to use.
+ * Managed by the `NG_BUILD_CACHE_STORE` environment variable.
+ * - 'lmdb': Forces the use of LMDB.
+ * - 'sqlite': Forces the use of SQLite.
+ * - undefined / 'auto' / other: Automatically uses LMDB and falls back to SQLite.
+ */
+export const persistentCacheStoreSetting = (() => {
+  const env = process.env['NG_BUILD_CACHE_STORE']?.trim().toLowerCase();
+  if (env === 'lmdb' || env === 'sqlite') {
+    return env;
+  }
+
+  return undefined;
+})();

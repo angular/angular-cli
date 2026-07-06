@@ -111,4 +111,68 @@ describe('SqliteCacheStore', () => {
     expect(checkStore.has('k1')).toBeFalse();
     checkStore.close();
   });
+
+  describe('NG_BUILD_CACHE_STORE env variable option', () => {
+    it('should force SQLite when NG_BUILD_CACHE_STORE=sqlite', () => {
+      const code = `
+        (async () => {
+          const { createPersistentCacheStore } = await import('./cache.js');
+          const { SqliteCacheStore } = await import('./sqlite-cache-store.js');
+          const store = await createPersistentCacheStore('dummy-sqlite-env');
+          if (!(store instanceof SqliteCacheStore)) {
+            console.error('Expected SqliteCacheStore, got:', store.constructor.name);
+            process.exit(1);
+          }
+        })().catch(err => {
+          console.error(err);
+          process.exit(2);
+        });
+      `;
+      const { execFileSync } = require('node:child_process');
+      execFileSync(process.execPath, ['--input-type=module', '-e', code], {
+        cwd: __dirname,
+        env: {
+          ...process.env,
+          NG_BUILD_CACHE_STORE: 'sqlite',
+        },
+      });
+    });
+
+    it('should force LMDB when NG_BUILD_CACHE_STORE=lmdb', () => {
+      const code = `
+        (async () => {
+          const { createPersistentCacheStore } = await import('./cache.js');
+          const { LmdbCacheStore } = await import('./lmdb-cache-store.js');
+          const store = await createPersistentCacheStore('dummy-lmdb-env');
+          if (!(store instanceof LmdbCacheStore)) {
+            console.error('Expected LmdbCacheStore, got:', store.constructor.name);
+            process.exit(1);
+          }
+        })().catch(err => {
+          console.error(err);
+          process.exit(2);
+        });
+      `;
+      const { execFileSync } = require('node:child_process');
+      try {
+        execFileSync(process.execPath, ['--input-type=module', '-e', code], {
+          cwd: __dirname,
+          env: {
+            ...process.env,
+            NG_BUILD_CACHE_STORE: 'lmdb',
+          },
+        });
+      } catch (e) {
+        if (e && typeof e === 'object' && 'message' in e) {
+          const error = e as { message: string; stderr?: Buffer };
+          const output = error.stderr?.toString() || error.message;
+          if (!output.includes('Unable to initialize JavaScript cache storage')) {
+            throw e;
+          }
+        } else {
+          throw e;
+        }
+      }
+    });
+  });
 });

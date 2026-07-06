@@ -11,6 +11,7 @@
  * Provides infrastructure for common caching functionality within the build system.
  */
 
+import { persistentCacheStoreSetting } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 
 /**
@@ -248,6 +249,36 @@ export class MemoryCache<V> extends Cache<V, Map<string, V>> {
 export async function createPersistentCacheStore(
   baseCachePath: string,
 ): Promise<PersistentCacheStore> {
+  if (persistentCacheStoreSetting === 'sqlite') {
+    try {
+      const { SqliteCacheStore } = await import('./sqlite-cache-store');
+
+      return new SqliteCacheStore(baseCachePath + '-sqlite.db');
+    } catch (err) {
+      assertIsError(err);
+
+      throw new Error(
+        'Unable to initialize JavaScript cache storage.\n' + `SQLite error: ${err.message}`,
+        { cause: err },
+      );
+    }
+  }
+
+  if (persistentCacheStoreSetting === 'lmdb') {
+    try {
+      const { LmdbCacheStore } = await import('./lmdb-cache-store');
+
+      return new LmdbCacheStore(baseCachePath + '.db');
+    } catch (err) {
+      assertIsError(err);
+
+      throw new Error(
+        'Unable to initialize JavaScript cache storage.\n' + `LMDB error: ${err.message}`,
+        { cause: err },
+      );
+    }
+  }
+
   try {
     const { LmdbCacheStore } = await import('./lmdb-cache-store');
 
