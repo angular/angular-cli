@@ -547,7 +547,7 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
   }
 
   // Resolve relative redirectTo based on the current route path.
-  const segments = routePath.replace(URL_PARAMETER_REGEXP, '*').split('/');
+  const segments = routePath.replace(URL_PARAMETER_GLOBAL_REGEXP, '*').split('/');
   segments.pop(); // Remove the last segment to make it relative.
 
   return joinUrlParts(...segments, redirectTo);
