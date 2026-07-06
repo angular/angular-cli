@@ -165,7 +165,7 @@ export async function setupServer(
 
   const configuration: Vite.InlineConfig = {
     configFile: false,
-    envFile: false,
+    envDir: false,
     cacheDir,
     root: virtualProjectRoot,
     publicDir: false,
