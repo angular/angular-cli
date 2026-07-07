@@ -29,7 +29,13 @@ export function createRemoveIdPrefixPlugin(externals: string[]): Plugin {
         return;
       }
 
-      const escapedExternals = externals.map((e) => escapeRegexSpecialChars(e) + '(?:/.+)?');
+      // The path suffix is bounded so that a match can never extend past the end of an
+      // import specifier string literal. With a greedy `.+`, minified (single-line) code
+      // would let the first match consume the remainder of the line, leaving all later
+      // `/@id/` occurrences on that line unstripped.
+      const escapedExternals = externals.map(
+        (e) => escapeRegexSpecialChars(e) + '(?:/[^\'"`\\s]+)?',
+      );
       const prefixedExternalRegex = new RegExp(
         `${resolvedConfig.base}${VITE_ID_PREFIX}(${escapedExternals.join('|')})`,
         'g',
