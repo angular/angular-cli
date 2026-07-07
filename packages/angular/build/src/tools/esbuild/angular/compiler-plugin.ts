@@ -318,12 +318,8 @@ export function createCompilerPlugin(
             ),
           );
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
-          // Isolated modules option ensures safe non-TypeScript transpilation.
-          // Typescript printing support for sourcemaps is not yet integrated.
           useTypeScriptTranspilation =
-            !initializationResult.compilerOptions.isolatedModules ||
-            !!initializationResult.compilerOptions.sourceMap ||
-            !!initializationResult.compilerOptions.inlineSourceMap;
+            !!initializationResult.compilerOptions['_useTypeScriptTranspilation'];
           referencedFiles = initializationResult.referencedFiles;
           externalStylesheets = initializationResult.externalStylesheets;
           if (initializationResult.templateUpdates) {
@@ -753,6 +749,12 @@ function createCompilerOptionsTransformer(
       preserveSymlinks,
       externalRuntimeStyles: pluginOptions.externalRuntimeStyles,
       _enableHmr: !!pluginOptions.templateUpdates,
+      // TypeScript transpilation is forced if:
+      // - isolatedModules is disabled (TS needs full module types to emit JS).
+      // - Karma code coverage is active (the coverage instrumentation transformer is Babel-based
+      //   and cannot parse raw TypeScript code; Vitest handles coverage instrumentation downstream).
+      _useTypeScriptTranspilation:
+        !compilerOptions.isolatedModules || !!pluginOptions.instrumentForCoverage,
       supportTestBed: !!pluginOptions.includeTestMetadata,
       supportJitMode: !!pluginOptions.includeTestMetadata,
     };

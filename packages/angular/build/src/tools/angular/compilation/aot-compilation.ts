@@ -21,6 +21,7 @@ import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
 import { collectHmrCandidates } from './hmr-candidates';
+import { printSourceFileWithMap } from './typescript-printer';
 
 /**
  * The modified files count limit for performing component HMR analysis.
@@ -37,6 +38,7 @@ class AngularCompilationState {
     public readonly affectedFiles: ReadonlySet<ts.SourceFile>,
     public readonly templateDiagnosticsOptimization: ng.OptimizeFor,
     public readonly webWorkerTransform: ts.TransformerFactory<ts.SourceFile>,
+    public readonly useTypeScriptTranspilation: boolean,
     public readonly diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>(),
   ) {}
 
@@ -75,6 +77,10 @@ export class AotCompilation extends AngularCompilation {
     } = await this.loadConfiguration(tsconfig);
     const compilerOptions =
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
+
+    const useTypeScriptTranspilation =
+      (compilerOptions['_useTypeScriptTranspilation'] as boolean | undefined) ??
+      !compilerOptions.isolatedModules;
 
     if (compilerOptions.externalRuntimeStyles) {
       hostOptions.externalStylesheets ??= new Map();
@@ -209,6 +215,7 @@ export class AotCompilation extends AngularCompilation {
       affectedFiles,
       affectedFiles.size === 1 ? OptimizeFor.SingleFile : OptimizeFor.WholeProgram,
       createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
+      useTypeScriptTranspilation,
       this.#state?.diagnosticCache,
     );
 
@@ -297,14 +304,16 @@ export class AotCompilation extends AngularCompilation {
 
   emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
-    const { affectedFiles, angularCompiler, compilerHost, typeScriptProgram, webWorkerTransform } =
-      this.#state;
+    const {
+      affectedFiles,
+      angularCompiler,
+      compilerHost,
+      typeScriptProgram,
+      webWorkerTransform,
+      useTypeScriptTranspilation,
+    } = this.#state;
     const compilerOptions = typeScriptProgram.getCompilerOptions();
     const buildInfoFilename = compilerOptions.tsBuildInfoFile ?? '.tsbuildinfo';
-    const useTypeScriptTranspilation =
-      !compilerOptions.isolatedModules ||
-      !!compilerOptions.sourceMap ||
-      !!compilerOptions.inlineSourceMap;
 
     const emittedFiles = new Map<ts.SourceFile, EmitFileResult>();
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
@@ -401,14 +410,31 @@ export class AotCompilation extends AngularCompilation {
         'TypeScript transforms should not produce multiple outputs for ' + sourceFile.fileName,
       );
 
-      let contents;
+      let contents: string;
       if (sourceFile === transformResult.transformed[0]) {
         // Use original content if no changes were made
         contents = sourceFile.text;
       } else {
-        // Otherwise, print the transformed source file
+        // Otherwise, print the transformed source file with map if needed
         const printer = ts.createPrinter(compilerOptions, transformResult);
-        contents = printer.printFile(transformResult.transformed[0]);
+        const printResult = printSourceFileWithMap(
+          transformResult.transformed[0],
+          printer,
+          compilerHost,
+          compilerOptions,
+        );
+
+        contents = printResult.code;
+
+        if (printResult.map) {
+          if (compilerOptions.inlineSourceMap) {
+            const base64Map = Buffer.from(printResult.map).toString('base64');
+            contents += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
+          } else if (compilerOptions.sourceMap) {
+            const mapFilename = sourceFile.fileName + '.map';
+            emittedFiles.set(sourceFile, { filename: mapFilename, contents: printResult.map });
+          }
+        }
       }
 
       angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);

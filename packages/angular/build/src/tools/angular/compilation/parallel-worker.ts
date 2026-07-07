@@ -114,6 +114,8 @@ export async function initialize(request: InitRequest) {
       isolatedModules: compilerOptions.isolatedModules,
       sourceMap: compilerOptions.sourceMap,
       inlineSourceMap: compilerOptions.inlineSourceMap,
+      _useTypeScriptTranspilation: compilerOptions['_useTypeScriptTranspilation'] as
+        boolean | undefined,
     },
     componentResourcesDependencies,
   };
