@@ -7,7 +7,7 @@
  */
 
 import type { Plugin, ResolveResult } from 'esbuild';
-import { createRequire } from 'node:module';
+import { createProjectResolver } from '../../utils/resolve-project';
 
 /**
  * The internal namespace used by generated locale import statements and Angular locale data plugin.
@@ -50,7 +50,7 @@ export function createAngularLocaleDataPlugin(): Plugin {
         }
 
         let exact = true;
-        let localeRequire: NodeJS.Require | undefined;
+        let projectResolve: ((packageName: string) => string) | undefined;
         while (partialLocaleTag) {
           // Angular embeds the `en`/`en-US` locale into the framework and it does not need to be included again here.
           // The onLoad hook below for the locale data namespace has an `empty` loader that will prevent inclusion.
@@ -73,10 +73,10 @@ export function createAngularLocaleDataPlugin(): Plugin {
           let result: ResolveResult | undefined;
           const { packages, absWorkingDir } = build.initialOptions;
           if (packages === 'external' && absWorkingDir) {
-            localeRequire ??= createRequire(absWorkingDir + '/');
+            projectResolve ??= createProjectResolver(absWorkingDir);
 
             try {
-              localeRequire.resolve(potentialPath);
+              projectResolve(potentialPath);
 
               result = {
                 errors: [],
@@ -94,6 +94,17 @@ export function createAngularLocaleDataPlugin(): Plugin {
               kind: 'import-statement',
               resolveDir: absWorkingDir,
             });
+            if (result && result.external && absWorkingDir) {
+              projectResolve ??= createProjectResolver(absWorkingDir);
+              try {
+                const resolvedPath = projectResolve(potentialPath);
+                result = {
+                  ...result,
+                  external: false,
+                  path: resolvedPath,
+                };
+              } catch {}
+            }
           }
 
           if (result?.path) {

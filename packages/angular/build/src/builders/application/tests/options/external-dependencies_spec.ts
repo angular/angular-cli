@@ -74,5 +74,33 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       // If not externalized, build will fail with a Node.js platform builtin error
       expect(result?.success).toBeTrue();
     });
+
+    it('should not externalize builder-injected i18n locale-data imports when @angular/common is external', async () => {
+      harness.useProject('test', {
+        root: '.',
+        sourceRoot: 'src',
+        cli: {
+          cache: {
+            enabled: false,
+          },
+        },
+        i18n: {
+          sourceLocale: 'fr',
+        },
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        externalDependencies: ['@angular/common'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/browser/polyfills.js').toExist();
+      harness
+        .expectFile('dist/browser/polyfills.js')
+        .content.not.toMatch(/['"]@angular\/common\/locales\/global\/fr['"]/);
+    });
   });
 });

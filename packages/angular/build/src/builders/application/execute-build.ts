@@ -15,6 +15,7 @@ import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
+import { LOCALE_DATA_BASE_MODULE } from '../../tools/esbuild/i18n-locale-plugin';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
 import {
@@ -210,6 +211,12 @@ export async function executeBuild(
     const explicitExternal = new Set<string>();
 
     const isExplicitExternal = (dep: string): boolean => {
+      // Locale-data imports are injected by the builder itself (see i18n-locale-plugin) and must stay resolvable
+      // even when the containing package is externalized by the user.
+      if (dep.startsWith(`${LOCALE_DATA_BASE_MODULE}/`)) {
+        return false;
+      }
+
       if (exclusions.has(dep)) {
         return true;
       }
