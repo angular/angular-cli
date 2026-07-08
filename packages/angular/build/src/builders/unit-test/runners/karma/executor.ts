@@ -91,7 +91,7 @@ export class KarmaExecutor implements TestExecutor {
       progress: unitTestOptions.buildProgress ?? buildTargetOptions.progress,
       watch: unitTestOptions.watch,
       poll: buildTargetOptions.poll,
-      preserveSymlinks: unitTestOptions.preserveSymlinks,
+      preserveSymlinks: unitTestOptions.preserveSymlinks ?? buildTargetOptions.preserveSymlinks,
       browsers: unitTestOptions.browsers?.join(','),
       codeCoverage: unitTestOptions.coverage.enabled,
       codeCoverageExclude: unitTestOptions.coverage.exclude,
