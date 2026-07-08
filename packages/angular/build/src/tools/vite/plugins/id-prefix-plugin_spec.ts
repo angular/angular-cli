@@ -6,34 +6,16 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createRemoveIdPrefixPlugin } from './id-prefix-plugin';
+import { createTransformer } from './id-prefix-plugin';
 
-/**
- * Runs the plugin's `configResolved` hook against a minimal fake resolved
- * configuration and returns the transform function of the plugin it registers.
- */
-function getTransform(externals: string[], base: string): (code: string) => string {
-  const plugin = createRemoveIdPrefixPlugin(externals);
-  const resolvedConfig = {
-    base,
-    plugins: [] as { name: string; transform?: (code: string) => string }[],
-  };
-
-  (plugin.configResolved as (config: unknown) => void)(resolvedConfig);
-
-  const pushedPlugin = resolvedConfig.plugins[0];
-  expect(pushedPlugin?.transform).toBeDefined();
-
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return pushedPlugin.transform!;
-}
-
-describe('createRemoveIdPrefixPlugin', () => {
+describe('createTransformer', () => {
   it('should strip the prefix from every occurrence on a single (minified) line', () => {
-    const transform = getTransform(
-      ['@angular/common', '@angular/common/http', '@angular/core', '@angular/router'],
-      '/',
-    );
+    const transform = createTransformer('/', [
+      '@angular/common',
+      '@angular/common/http',
+      '@angular/core',
+      '@angular/router',
+    ]);
 
     const minified =
       'import{a}from"/@id/@angular/common/http";' +
@@ -48,7 +30,7 @@ describe('createRemoveIdPrefixPlugin', () => {
   });
 
   it('should strip the prefix from an external with a deep import path', () => {
-    const transform = getTransform(['@angular/common'], '/');
+    const transform = createTransformer('/', ['@angular/common']);
 
     expect(transform('import{h}from"/@id/@angular/common/http";')).toBe(
       'import{h}from"@angular/common/http";',
@@ -56,7 +38,7 @@ describe('createRemoveIdPrefixPlugin', () => {
   });
 
   it('should strip the prefix when a non-root base is configured', () => {
-    const transform = getTransform(['@angular/router'], '/app/');
+    const transform = createTransformer('/app/', ['@angular/router']);
 
     expect(transform('import{r}from"/app/@id/@angular/router";')).toBe(
       'import{r}from"@angular/router";',
@@ -64,7 +46,7 @@ describe('createRemoveIdPrefixPlugin', () => {
   });
 
   it('should strip the prefix from multi-line (unminified) code', () => {
-    const transform = getTransform(['@angular/common', '@angular/router'], '/');
+    const transform = createTransformer('/', ['@angular/common', '@angular/router']);
 
     const code =
       'import { CommonModule } from "/@id/@angular/common";\n' +
@@ -77,18 +59,9 @@ describe('createRemoveIdPrefixPlugin', () => {
   });
 
   it('should not modify imports that are not configured externals', () => {
-    const transform = getTransform(['@angular/router'], '/');
+    const transform = createTransformer('/', ['@angular/router']);
 
     const code = 'import{x}from"/@id/some-other-package";';
     expect(transform(code)).toBe(code);
-  });
-
-  it('should not register a transform when there are no externals', () => {
-    const plugin = createRemoveIdPrefixPlugin([]);
-    const resolvedConfig = { base: '/', plugins: [] };
-
-    (plugin.configResolved as (config: unknown) => void)(resolvedConfig);
-
-    expect(resolvedConfig.plugins).toHaveSize(0);
   });
 });
