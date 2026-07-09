@@ -212,8 +212,8 @@ importers:
         specifier: ^1.18.1
         version: 1.18.1(debug@4.4.3)
       http-proxy-middleware:
-        specifier: 3.0.5
-        version: 3.0.5
+        specifier: 3.0.7
+        version: 3.0.7
       husky:
         specifier: 9.1.7
         version: 9.1.7
@@ -632,8 +632,8 @@ importers:
         specifier: 0.28.1
         version: 0.28.1
       http-proxy-middleware:
-        specifier: 3.0.5
-        version: 3.0.5
+        specifier: 3.0.7
+        version: 3.0.7
       istanbul-lib-instrument:
         specifier: 6.0.3
         version: 6.0.3
@@ -5782,9 +5782,9 @@ packages:
       '@types/express':
         optional: true
 
-  http-proxy-middleware@3.0.5:
-    resolution: {integrity: sha512-GLZZm1X38BPY4lkXA01jhwxvDoOkkXqjgVyUzVxiEK4iuRu03PZoYHhHRwxnfhQMDuaxi3vVri0YgSro/1oWqg==}
-    engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
+  http-proxy-middleware@3.0.7:
+    resolution: {integrity: sha512-iwbQltVlx8bCrqePUM8C+hllHvdawVhQJaLrj1X7qllkvFQdXFsr16pW/mo9+JDVjN+QO2XUx9jd8SmoFkE5qw==}
+    engines: {node: ^14.18.0 || ^16.10.0 || >=18.0.0}
 
   http-proxy@1.18.1:
     resolution: {integrity: sha512-7mz/721AbnJwIVbnaSv1Cz3Am0ZLT/UBwkC92VlxhXv/k/BBQfM2fXElQNC27BVGr0uwUpplYPQM9LnaBMR5NQ==}
@@ -14452,7 +14452,7 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-proxy-middleware@3.0.5:
+  http-proxy-middleware@3.0.7:
     dependencies:
       '@types/http-proxy': 1.17.17
       debug: 4.4.3(supports-color@10.2.2)
