@@ -1,3 +1,27 @@
+<a name="22.1.0-next.3"></a>
+
+# 22.1.0-next.3 (2026-07-09)
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [34d558c3c](https://github.com/angular/angular-cli/commit/34d558c3c98e1b59a2c2808fc04bfbb63dfe8acf) | feat | add built-in SQLite cache store fallback                                 |
+| [52ae7f862](https://github.com/angular/angular-cli/commit/52ae7f862a581cac97d5a9b33c9b71b830d95b19) | feat | share persistent build cache across git worktrees                        |
+| [41bd100dd](https://github.com/angular/angular-cli/commit/41bd100dd8edebdf6c7279e1c7d3847ee5f22702) | fix  | fallback to build target preserveSymlinks option in karma runner         |
+| [6d9b360e5](https://github.com/angular/angular-cli/commit/6d9b360e5f2b7ab3d4ace4db35f674166630f658) | fix  | prevent esbuild service hang on internal component stylesheet builds     |
+| [85c53d990](https://github.com/angular/angular-cli/commit/85c53d9909b8bcb35a360044a0afde5352d45d72) | fix  | prevent externalizing builder-injected i18n locale data                  |
+| [004cc4104](https://github.com/angular/angular-cli/commit/004cc410487b2dbb80001f045cd19f899c980ccc) | fix  | strip all vite id prefixes from minified code with external dependencies |
+| [09d0a11a8](https://github.com/angular/angular-cli/commit/09d0a11a8b832f156aea100ad3497c5221fc0f50) | perf | enable fast-path AST printing with sourcemaps in AotCompilation          |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [0bd22dae0](https://github.com/angular/angular-cli/commit/0bd22dae09a83e36ed3863ca2b050666cc8d7aec) | fix  | replace all route parameters when resolving relative redirects |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.6"></a>
 
 # 22.0.6 (2026-07-08)
