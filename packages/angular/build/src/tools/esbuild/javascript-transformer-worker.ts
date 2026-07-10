@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 import Piscina from 'piscina';
+import { removeSourceMappingURL } from '../../utils/source-map';
 
 interface JavaScriptTransformRequest {
   filename: string;
@@ -51,8 +52,7 @@ export default async function transformJavaScript(
  * Cached instance of the compiler-cli linker's createEs2015LinkerPlugin function.
  */
 let linkerPluginCreator:
-  | typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin
-  | undefined;
+  typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin | undefined;
 
 async function transformWithBabel(
   filename: string,
@@ -119,7 +119,7 @@ async function transformWithBabel(
   // If no additional transformations are needed, return the data directly
   if (plugins.length === 0) {
     // Strip sourcemaps if they should not be used
-    return useInputSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+    return useInputSourcemap ? data : removeSourceMappingURL(data);
   }
 
   const result = await transformAsync(data, {
@@ -137,9 +137,7 @@ async function transformWithBabel(
 
   // Strip sourcemaps if they should not be used.
   // Babel will keep the original comments even if sourcemaps are disabled.
-  return useInputSourcemap
-    ? outputCode
-    : outputCode.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '');
+  return useInputSourcemap ? outputCode : removeSourceMappingURL(outputCode);
 }
 
 async function requiresLinking(path: string, source: string): Promise<boolean> {

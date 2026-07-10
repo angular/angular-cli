@@ -9,6 +9,7 @@
 import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { IMPORT_EXEC_ARGV } from '../../utils/server-rendering/esm-in-memory-loader/utils';
+import { removeSourceMappingURL } from '../../utils/source-map';
 import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
@@ -205,10 +206,7 @@ export class JavaScriptTransformer {
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-      return Buffer.from(
-        keepSourcemap ? data : data.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, ''),
-        'utf-8',
-      );
+      return Buffer.from(keepSourcemap ? data : removeSourceMappingURL(data), 'utf-8');
     }
 
     return this.#runWithThrottle(() =>

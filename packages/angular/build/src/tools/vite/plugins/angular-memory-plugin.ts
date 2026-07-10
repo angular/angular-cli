@@ -13,6 +13,7 @@ import { fileURLToPath } from 'node:url';
 import type * as Vite from 'vite' with {
   'resolution-mode': 'import',
 };
+import { removeSourceMappingURL } from '../../../utils/source-map';
 import { AngularMemoryOutputFiles } from '../utils';
 
 interface AngularMemoryPluginOptions {
@@ -104,7 +105,7 @@ export async function createAngularMemoryPlugin(
       return {
         // Remove source map URL comments from the code if a sourcemap is present.
         // Vite will inline and add an additional sourcemap URL for the sourcemap.
-        code: mapContents ? code.replace(/^\/\/# sourceMappingURL=[^\r\n]*/gm, '') : code,
+        code: mapContents ? removeSourceMappingURL(code) : code,
         map: mapContents && Buffer.from(mapContents).toString('utf-8'),
       };
     },
