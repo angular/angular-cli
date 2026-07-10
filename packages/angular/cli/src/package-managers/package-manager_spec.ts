@@ -193,6 +193,106 @@ describe('PackageManager', () => {
         '',
       );
     });
+
+    it('should copy and sanitize .yarnrc.yml when package manager is yarn and it exists', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const testHost = new MockHost({
+        '/tmp/project/node_modules': true,
+        '/tmp/project/.yarnrc.yml': [],
+      });
+      const pm = new PackageManager(testHost, '/tmp/project', yarnDescriptor);
+
+      const createTempDirectorySpy = spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      const mockYarnRcContent = [
+        'yarnPath: .yarn/releases/yarn-4.4.1.cjs',
+        'nodeLinker: pnp',
+        'customOption:',
+        '  nodeLinker: pnp-nested',
+        '  plugins:',
+        '    - nested-plugin',
+        'plugins:',
+        '  - path: .yarn/plugins/@yarnpkg/plugin-typescript.cjs',
+        '    spec: "@yarnpkg/plugin-typescript"',
+        'npmRegistryServer: "https://registry.npmjs.org"',
+      ].join('\n');
+
+      spyOn(testHost, 'readFile').and.callFake(async (filePath) => {
+        if (filePath.replace(/\\/g, '/').endsWith('.yarnrc.yml')) {
+          return mockYarnRcContent;
+        }
+        if (filePath.replace(/\\/g, '/').endsWith('package.json')) {
+          return JSON.stringify({ packageManager: 'yarn@4.4.1' });
+        }
+        throw new Error(`Unexpected readFile call for ${filePath}`);
+      });
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '4.4.1', stderr: '' });
+
+      const { workingDirectory } = await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(workingDirectory).toBe('/tmp/project/node_modules/angular-cli-tmp-packages-abc');
+      expect(createTempDirectorySpy).toHaveBeenCalledWith('/tmp/project/node_modules');
+
+      const expectedYarnRcContent = [
+        'customOption:',
+        '  nodeLinker: pnp-nested',
+        '  plugins:',
+        '    - nested-plugin',
+        'npmRegistryServer: "https://registry.npmjs.org"',
+        'nodeLinker: node-modules',
+      ].join('\n');
+
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/.yarnrc.yml',
+        expectedYarnRcContent,
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        JSON.stringify({ packageManager: 'yarn@4.4.1' }, null, 2),
+      );
+    });
+
+    it('should copy packageManager field to temp package.json if version is resolved', async () => {
+      const npmDescriptor = SUPPORTED_PACKAGE_MANAGERS['npm'];
+      const testHost = new MockHost({
+        '/tmp/project/node_modules': true,
+      });
+      const pm = new PackageManager(testHost, '/tmp/project', npmDescriptor);
+
+      spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '10.32.1', stderr: '' });
+
+      await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        JSON.stringify({ packageManager: 'npm@10.32.1' }, null, 2),
+      );
+    });
+
+    it('should write empty package.json if package manager version cannot be resolved', async () => {
+      const npmDescriptor = SUPPORTED_PACKAGE_MANAGERS['npm'];
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', npmDescriptor);
+
+      spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        '{}',
+      );
+    });
   });
 
   describe('getRegistryMetadata', () => {

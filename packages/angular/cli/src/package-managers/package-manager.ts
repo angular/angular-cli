@@ -689,8 +689,21 @@ export class PackageManager {
 
     // Some package managers, like yarn classic, do not write a package.json when adding a package.
     // This can cause issues with subsequent `require.resolve` calls.
-    // Writing an empty package.json file beforehand prevents this.
-    await this.host.writeFile(join(workingDirectory, 'package.json'), '{}');
+    // Writing a package.json file beforehand prevents this. To ensure corepack
+    // resolves the correct package manager version, copy the project's packageManager field.
+    let packageManagerVersion: string | undefined;
+    try {
+      packageManagerVersion = await this.getVersion();
+    } catch {
+      // Ignore version lookup errors.
+    }
+    const tempPackageJson = packageManagerVersion
+      ? { packageManager: `${this.name}@${packageManagerVersion}` }
+      : {};
+    await this.host.writeFile(
+      join(workingDirectory, 'package.json'),
+      JSON.stringify(tempPackageJson, null, 2),
+    );
 
     // To prevent pnpm from traversing up the directory tree and modifying the project's workspace lockfile,
     // copy the project's `pnpm-workspace.yaml` (excluding monorepo local overrides/packages)
@@ -711,12 +724,16 @@ export class PackageManager {
       }
     }
 
-    // Copy configuration files if the package manager requires it (e.g., bun).
+    // Copy configuration files if the package manager requires it (e.g., bun, yarn).
     if (this.descriptor.copyConfigFromProject) {
       for (const configFile of this.descriptor.configFiles) {
         try {
           const configPath = join(this.cwd, configFile);
-          await this.host.copyFile(configPath, join(workingDirectory, configFile));
+          let content = await this.host.readFile(configPath);
+          if (this.name === 'yarn') {
+            content = sanitizeYarnRc(content);
+          }
+          await this.host.writeFile(join(workingDirectory, configFile), content);
         } catch {
           // Ignore missing config files.
         }
@@ -826,6 +843,53 @@ function sanitizePnpmWorkspace(content: string): string {
 
     result.push(line);
   }
+
+  return result.join('\n');
+}
+
+/**
+ * Sanitizes the contents of `.yarnrc.yml` or `.yarnrc.yaml` for temporary package installation.
+ * It removes `yarnPath`, `plugins`, and `nodeLinker` fields, and appends `nodeLinker: node-modules`.
+ * @param content The original Yarn configuration content.
+ * @returns The sanitized Yarn configuration content.
+ */
+function sanitizeYarnRc(content: string): string {
+  const lines = content.split(/\r?\n/);
+  const result: string[] = [];
+  let inBlockToRemove = false;
+  let blockIndent = 0;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      result.push(line);
+      continue;
+    }
+
+    const indent = line.length - line.trimStart().length;
+
+    if (inBlockToRemove) {
+      if (indent > blockIndent) {
+        continue;
+      }
+      inBlockToRemove = false;
+    }
+
+    if (
+      indent === 0 &&
+      (trimmed.startsWith('yarnPath:') ||
+        trimmed.startsWith('nodeLinker:') ||
+        trimmed.startsWith('plugins:'))
+    ) {
+      inBlockToRemove = true;
+      blockIndent = indent;
+      continue;
+    }
+
+    result.push(line);
+  }
+
+  result.push('nodeLinker: node-modules');
 
   return result.join('\n');
 }

@@ -208,6 +208,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     noLockfileFlag: '',
     ignoreScriptsFlag: '--mode=skip-build',
     configFiles: ['.yarnrc.yml', '.yarnrc.yaml'],
+    copyConfigFromProject: true,
     getRegistryOptions: (registry: string) => ({ env: { YARN_NPM_REGISTRY_SERVER: registry } }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['info', '--name-only', '--json'],
