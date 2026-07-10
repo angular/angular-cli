@@ -59,7 +59,7 @@
     "@angular/platform-server": "22.0.5",
     "@angular/router": "22.0.5",
     "@angular/service-worker": "22.0.5",
-    "@babel/core": "7.29.0",
+    "@babel/core": "7.29.7",
     "@bazel/bazelisk": "1.28.1",
     "@bazel/buildifier": "8.2.1",
     "@bazel/ibazel": "^0.28.0",
