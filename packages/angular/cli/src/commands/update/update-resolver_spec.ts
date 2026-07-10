@@ -172,6 +172,62 @@ describe('UpdateResolver', () => {
         '1.2.0': { name: '@angular-devkit-tests/update-release-age', version: '1.2.0' },
       },
     },
+    '@angular-devkit-tests/core-bug': {
+      metadata: {
+        name: '@angular-devkit-tests/core-bug',
+        'dist-tags': { latest: '14.0.0-next.0' },
+        versions: ['12.2.0', '13.2.0', '14.0.0-next.0'],
+      },
+      manifests: {
+        '12.2.0': { name: '@angular-devkit-tests/core-bug', version: '12.2.0' },
+        '13.2.0': {
+          name: '@angular-devkit-tests/core-bug',
+          version: '13.2.0',
+          'ng-update': {
+            packageGroup: ['@angular-devkit-tests/core-bug', '@angular-devkit-tests/common-bug'],
+          },
+        },
+        '14.0.0-next.0': { name: '@angular-devkit-tests/core-bug', version: '14.0.0-next.0' },
+      },
+    },
+    '@angular-devkit-tests/common-bug': {
+      metadata: {
+        name: '@angular-devkit-tests/common-bug',
+        'dist-tags': { latest: '14.0.0-next.0' },
+        versions: ['12.2.0', '13.2.0', '14.0.0-next.0'],
+      },
+      manifests: {
+        '12.2.0': { name: '@angular-devkit-tests/common-bug', version: '12.2.0' },
+        '13.2.0': { name: '@angular-devkit-tests/common-bug', version: '13.2.0' },
+        '14.0.0-next.0': { name: '@angular-devkit-tests/common-bug', version: '14.0.0-next.0' },
+      },
+    },
+    '@angular-devkit-tests/cdk-bug': {
+      metadata: {
+        name: '@angular-devkit-tests/cdk-bug',
+        'dist-tags': { latest: '14.0.0-next.0' },
+        versions: ['12.2.0', '13.2.0', '14.0.0-next.0'],
+      },
+      manifests: {
+        '12.2.0': {
+          name: '@angular-devkit-tests/cdk-bug',
+          version: '12.2.0',
+          peerDependencies: {
+            '@angular-devkit-tests/core-bug': '^12.0.0',
+            '@angular-devkit-tests/common-bug': '^12.0.0',
+          },
+        },
+        '13.2.0': {
+          name: '@angular-devkit-tests/cdk-bug',
+          version: '13.2.0',
+          peerDependencies: {
+            '@angular-devkit-tests/core-bug': '^13.0.0 || ^14.0.0-0',
+            '@angular-devkit-tests/common-bug': '^13.0.0 || ^14.0.0-0',
+          },
+        },
+        '14.0.0-next.0': { name: '@angular-devkit-tests/cdk-bug', version: '14.0.0-next.0' },
+      },
+    },
   };
 
   async function resolvePlan(options: UpdateResolverOptions, minReleaseAge = 0) {
@@ -390,6 +446,33 @@ describe('UpdateResolver', () => {
     expect(planWithFilter.packagesToUpdate.get('@angular-devkit-tests/update-release-age')).toBe(
       '1.1.0',
     );
+  });
+
+  it('correctly keeps packageGroup version when updating alongside peer dependencies', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular-devkit-tests/core-bug': '12.2.0',
+          '@angular-devkit-tests/common-bug': '12.2.0',
+          '@angular-devkit-tests/cdk-bug': '12.2.0',
+        },
+      },
+      {
+        '@angular-devkit-tests/core-bug': { version: '12.2.0' },
+        '@angular-devkit-tests/common-bug': { version: '12.2.0' },
+        '@angular-devkit-tests/cdk-bug': { version: '12.2.0' },
+      },
+    );
+
+    const plan = await resolvePlan({
+      packages: ['@angular-devkit-tests/cdk-bug@13', '@angular-devkit-tests/core-bug@13'],
+      workspaceRoot: tempRoot,
+    });
+
+    expect(plan.packagesToUpdate.get('@angular-devkit-tests/core-bug')).toBe('13.2.0');
+    expect(plan.packagesToUpdate.get('@angular-devkit-tests/common-bug')).toBe('13.2.0');
+    expect(plan.packagesToUpdate.get('@angular-devkit-tests/cdk-bug')).toBe('13.2.0');
   });
 });
 
