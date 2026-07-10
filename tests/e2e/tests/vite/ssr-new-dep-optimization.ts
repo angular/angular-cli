@@ -37,7 +37,7 @@ export default async function () {
 
   await Promise.all([
     waitForAnyProcessOutputToMatch(
-      /new dependencies optimized: @angular\/platform-browser\/animations\/async/,
+      /optimized: @angular\/platform-browser\/animations\/async/,
       6000,
     ),
     writeFile(
