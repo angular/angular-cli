@@ -64,6 +64,113 @@ describe('parsers', () => {
         path: undefined,
       });
     });
+
+    it('should parse dependencies from array when workspacePackageName matches a project', () => {
+      const stdout = JSON.stringify([
+        {
+          name: 'monorepo-root',
+          version: '1.0.0',
+          path: '/workspace',
+          dependencies: {
+            typescript: {
+              version: '5.9.3',
+            },
+          },
+        },
+        {
+          name: 'app',
+          version: '1.0.0',
+          path: '/workspace/apps/test-app',
+          dependencies: {
+            rxjs: {
+              version: '7.8.2',
+            },
+          },
+        },
+      ]);
+
+      const deps = parseNpmLikeDependencies(stdout, undefined, { workspacePackageName: 'app' });
+      expect(deps.size).toBe(2);
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2', path: undefined });
+      expect(deps.get('typescript')).toEqual({
+        name: 'typescript',
+        version: '5.9.3',
+        path: undefined,
+      });
+    });
+
+    it('should parse dependencies from array when workspacePackageName matches the root project', () => {
+      const stdout = JSON.stringify([
+        {
+          name: 'monorepo-root',
+          version: '1.0.0',
+          path: '/workspace',
+          dependencies: {
+            typescript: {
+              version: '5.9.3',
+            },
+          },
+        },
+        {
+          name: 'other-app',
+          version: '1.0.0',
+          path: '/workspace/apps/other-app',
+          dependencies: {
+            rxjs: {
+              version: '7.8.2',
+            },
+          },
+        },
+      ]);
+
+      const deps = parseNpmLikeDependencies(stdout, undefined, {
+        workspacePackageName: 'monorepo-root',
+      });
+      expect(deps.size).toBe(1);
+      expect(deps.get('typescript')).toEqual({
+        name: 'typescript',
+        version: '5.9.3',
+        path: undefined,
+      });
+    });
+
+    it('should parse nested dependencies and supplement with hoisted root dependencies in npm workspaces', () => {
+      const stdout = JSON.stringify({
+        name: 'monorepo-root',
+        version: '1.0.0',
+        dependencies: {
+          app: {
+            version: '1.0.0',
+            resolved: 'file:apps/test-app',
+            dependencies: {
+              rxjs: {
+                version: '7.8.2',
+              },
+            },
+          },
+          typescript: {
+            version: '5.9.3',
+          },
+        },
+      });
+
+      const deps = parseNpmLikeDependencies(stdout, undefined, {
+        workspacePackageName: 'app',
+      });
+      expect(deps.size).toBe(2);
+      expect(deps.get('rxjs')).toEqual({ name: 'rxjs', version: '7.8.2', path: undefined });
+      expect(deps.get('typescript')).toEqual({
+        name: 'typescript',
+        version: '5.9.3',
+        path: undefined,
+      });
+    });
+
+    it('should return empty map and not throw on empty array or non-object json', () => {
+      expect(parseNpmLikeDependencies('[]').size).toBe(0);
+      expect(parseNpmLikeDependencies('null').size).toBe(0);
+      expect(parseNpmLikeDependencies('"not-an-object"').size).toBe(0);
+    });
   });
 
   describe('parseNpmLikeError', () => {

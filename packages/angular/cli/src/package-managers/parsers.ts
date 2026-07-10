@@ -79,6 +79,13 @@ interface NpmListDependency {
  * @param logger An optional logger instance.
  * @returns A map of package names to their installed package details.
  */
+interface NpmListProject {
+  name?: string;
+  dependencies?: Record<string, NpmListDependency>;
+  devDependencies?: Record<string, NpmListDependency>;
+  unsavedDependencies?: Record<string, NpmListDependency>;
+}
+
 export function parseNpmLikeDependencies(
   stdout: string,
   logger?: Logger,
@@ -94,26 +101,55 @@ export function parseNpmLikeDependencies(
     return dependencies;
   }
 
-  let data = JSON.parse(stdout);
+  const data = JSON.parse(stdout);
+  const workspacePackageName = options?.workspacePackageName;
+
+  let rootProject: NpmListProject | undefined;
+  let subProject: NpmListProject | undefined;
+
   if (Array.isArray(data)) {
-    // pnpm returns an array of projects.
-    data = data[0];
+    rootProject = data[0];
+    if (workspacePackageName) {
+      subProject = data.find(
+        (project) => (project as NpmListProject | undefined)?.name === workspacePackageName,
+      );
+    }
+  } else {
+    rootProject = data;
   }
 
-  const dependencyMaps = [data.dependencies, data.devDependencies, data.unsavedDependencies].filter(
-    (d) => !!d,
-  );
-
-  if (dependencyMaps.length === 0) {
-    logger?.debug('  `dependencies` property not found. No dependencies found.');
-
+  if (!rootProject || typeof rootProject !== 'object') {
     return dependencies;
   }
 
-  const workspacePackageName = options?.workspacePackageName;
+  // 1. Extract subproject dependencies first to prioritize them
+  if (subProject) {
+    const subprojectMaps = [
+      subProject.dependencies,
+      subProject.devDependencies,
+      subProject.unsavedDependencies,
+    ].filter((d) => !!d) as Record<string, NpmListDependency>[];
 
-  if (workspacePackageName) {
-    for (const dependencyMap of dependencyMaps) {
+    for (const subprojectMap of subprojectMaps) {
+      for (const [name, info] of Object.entries(subprojectMap)) {
+        if (info && typeof info === 'object' && info.version) {
+          dependencies.set(name, {
+            name,
+            version: info.version,
+            path: info.path,
+          });
+        }
+      }
+    }
+  } else if (workspacePackageName) {
+    // Fallback to npm-like nested lookup inside the root project
+    const rootDependencyMaps = [
+      rootProject.dependencies,
+      rootProject.devDependencies,
+      rootProject.unsavedDependencies,
+    ].filter((d) => !!d) as Record<string, NpmListDependency>[];
+
+    for (const dependencyMap of rootDependencyMaps) {
       const info = dependencyMap[workspacePackageName];
       if (info && typeof info === 'object') {
         const nestedMaps = [
@@ -137,11 +173,15 @@ export function parseNpmLikeDependencies(
     }
   }
 
-  // Extract top-level dependencies (root), without overwriting subproject dependencies
-  for (const dependencyMap of dependencyMaps) {
-    for (const [name, info] of Object.entries(
-      dependencyMap as Record<string, NpmListDependency & { resolved?: string }>,
-    )) {
+  // 2. Supplement with hoisted/root dependencies (without overwriting subproject dependencies)
+  const rootDependencyMaps = [
+    rootProject.dependencies,
+    rootProject.devDependencies,
+    rootProject.unsavedDependencies,
+  ].filter((d) => !!d) as Record<string, NpmListDependency & { resolved?: string }>[];
+
+  for (const dependencyMap of rootDependencyMaps) {
+    for (const [name, info] of Object.entries(dependencyMap)) {
       if (!info || typeof info !== 'object') {
         continue;
       }
