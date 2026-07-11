@@ -4,7 +4,7 @@
   "title": "Angular AI Config File Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates AI configuration files for Angular projects. This schematic creates AGENTS.md file and Angular MCP server configuration, improving the quality of AI-generated code and suggestions.",
+  "description": "Generates AI configuration files for Angular projects and can install the official Angular Agent Skills.",
   "properties": {
     "tool": {
       "type": "array",
@@ -45,6 +45,11 @@
         "type": "string",
         "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]
       }
+    },
+    "aiSkills": {
+      "type": "boolean",
+      "description": "Installs the official Angular Agent Skills locally for the selected AI tools.",
+      "x-prompt": "Install the official Angular Agent Skills for the selected AI tools? This downloads skills from github.com/angular/skills."
     }
   }
 }

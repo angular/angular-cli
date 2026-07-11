@@ -22,6 +22,7 @@ import {
   NodePackageInstallTask,
   RepositoryInitializerTask,
 } from '@angular-devkit/schematics/tasks';
+import { createAngularSkillsTask } from '../ai-config/install-skills';
 import { Schema as ApplicationOptions } from '../application/schema';
 import { JSONFile } from '../utility/json-file';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
@@ -81,6 +82,7 @@ export default function (options: NgNewOptions): Rule {
         options.createApplication ? schematic('application', applicationOptions) : noop,
         schematic('ai-config', {
           tool: options.aiConfig?.length ? options.aiConfig : undefined,
+          aiSkills: false,
         }),
         move(options.directory),
       ]),
@@ -95,13 +97,22 @@ export default function (options: NgNewOptions): Rule {
           }),
         );
       }
+
+      let skillsTask;
+      const aiTools = (options.aiConfig ?? []).filter((tool) => tool !== 'none');
+      if (options.aiSkills && aiTools.length > 0) {
+        skillsTask = context.addTask(
+          createAngularSkillsTask(aiTools, options.directory),
+          packageTask ? [packageTask] : [],
+        );
+      }
       if (!options.skipGit) {
         const commit =
           typeof options.commit == 'object' ? options.commit : options.commit ? {} : false;
 
         context.addTask(
           new RepositoryInitializerTask(options.directory, commit),
-          packageTask ? [packageTask] : [],
+          skillsTask ? [skillsTask] : packageTask ? [packageTask] : [],
         );
       }
     },

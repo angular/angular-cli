@@ -152,11 +152,46 @@
     "aiConfig": {
       "type": "array",
       "uniqueItems": true,
+      "x-prompt": {
+        "message": "Which AI tools should Angular integrate with? https://angular.dev/ai/develop-with-ai",
+        "type": "list",
+        "items": [
+          {
+            "value": "none",
+            "label": "None"
+          },
+          {
+            "value": "claude-code",
+            "label": "Claude Code   [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "cursor",
+            "label": "Cursor        [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "gemini-cli",
+            "label": "Gemini CLI    [ `GEMINI.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "open-ai-codex",
+            "label": "Open AI Codex [ `AGENTS.md` + Angular MCP server config ]"
+          },
+          {
+            "value": "vscode",
+            "label": "VSCode        [ `AGENTS.md` + Angular MCP server config ]"
+          }
+        ]
+      },
       "description": "Specifies which AI tools to generate configuration files for. These file are used to improve the outputs of AI tools by following the best practices.",
       "items": {
         "type": "string",
         "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]
       }
+    },
+    "aiSkills": {
+      "type": "boolean",
+      "description": "Installs the official Angular Agent Skills locally for the selected AI tools. When omitted with non-interactive defaults, skills are not installed.",
+      "x-prompt": "Install the official Angular Agent Skills for the selected AI tools? This downloads skills from github.com/angular/skills."
     },
     "fileNameStyleGuide": {
       "type": "string",

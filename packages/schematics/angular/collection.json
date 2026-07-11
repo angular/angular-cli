@@ -131,6 +131,12 @@
       "schema": "./ai-config/schema.json",
       "description": "Generates an AI tool configuration file."
     },
+    "ai-config-install-skills": {
+      "factory": "./ai-config/install-skills",
+      "hidden": true,
+      "private": true,
+      "description": "[INTERNAL] Installs the official Angular Agent Skills."
+    },
     "tailwind": {
       "factory": "./tailwind",
       "schema": "./tailwind/schema.json",

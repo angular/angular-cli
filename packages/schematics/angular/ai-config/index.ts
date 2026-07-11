@@ -8,6 +8,7 @@
 
 import { Rule, chain, noop, strings } from '@angular-devkit/schematics';
 import { addBestPracticesMarkdown, addJsonMcpConfig, addTomlMcpConfig } from './file_utils';
+import { createAngularSkillsTask } from './install-skills';
 import { Schema as ConfigOptions, Tool } from './schema';
 import { ContextFileInfo, ContextFileType, FileConfigurationHandlerOptions } from './types';
 
@@ -64,7 +65,7 @@ const AI_TOOLS: { [key in Exclude<Tool, Tool.None>]: ContextFileInfo[] } = {
   ],
 };
 
-export default function ({ tool }: ConfigOptions): Rule {
+export default function ({ tool, aiSkills }: ConfigOptions): Rule {
   return (tree, context) => {
     if (!tool) {
       return noop();
@@ -102,6 +103,13 @@ export default function ({ tool }: ConfigOptions): Rule {
           }
         }),
       );
+
+    if (aiSkills) {
+      const selectedTools = tool.filter((tool) => tool !== Tool.None);
+      if (selectedTools.length > 0) {
+        context.addTask(createAngularSkillsTask(selectedTools));
+      }
+    }
 
     return chain(rules);
   };

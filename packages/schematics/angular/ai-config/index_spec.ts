@@ -9,6 +9,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse } from 'jsonc-parser';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
+import { getAngularSkillsInstallArguments } from './install-skills';
 import { Schema as ConfigOptions, Tool as ConfigTool } from './schema';
 
 describe('AI Config Schematic', () => {
@@ -24,12 +25,55 @@ describe('AI Config Schematic', () => {
   };
 
   let workspaceTree: UnitTestTree;
-  function runAiConfigSchematic(tool: ConfigTool[]): Promise<UnitTestTree> {
-    return schematicRunner.runSchematic<ConfigOptions>('ai-config', { tool }, workspaceTree);
+  function runAiConfigSchematic(
+    tool: ConfigTool[],
+    options: Partial<ConfigOptions> = {},
+  ): Promise<UnitTestTree> {
+    return schematicRunner.runSchematic<ConfigOptions>(
+      'ai-config',
+      { tool, ...options },
+      workspaceTree,
+    );
   }
 
   beforeEach(async () => {
     workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
+  });
+
+  it('should create a non-interactive skills command for each selected AI tool', () => {
+    expect(
+      getAngularSkillsInstallArguments(
+        [
+          ConfigTool.ClaudeCode,
+          ConfigTool.Cursor,
+          ConfigTool.GeminiCli,
+          ConfigTool.OpenAiCodex,
+          ConfigTool.Vscode,
+        ],
+        '^22.1.0-next.0',
+      ),
+    ).toEqual([
+      '--yes',
+      'skills',
+      'add',
+      'https://github.com/angular/skills/tree/22.1.x',
+      '--skill',
+      'angular-developer',
+      '--skill',
+      'angular-new-app',
+      '--agent',
+      'claude-code',
+      '--agent',
+      'cursor',
+      '--agent',
+      'gemini-cli',
+      '--agent',
+      'codex',
+      '--agent',
+      'github-copilot',
+      '--copy',
+      '--yes',
+    ]);
   });
 
   it('should create Angular MCP server config and AGENTS.md for Claude Code', async () => {
@@ -107,6 +151,34 @@ describe('AI Config Schematic', () => {
     } finally {
       loggerSubscription.unsubscribe();
     }
+  });
+
+  it('should schedule Angular skills installation when enabled', async () => {
+    await runAiConfigSchematic([ConfigTool.ClaudeCode], { aiSkills: true });
+
+    expect(schematicRunner.tasks.length).toBe(1);
+    expect(schematicRunner.tasks[0]).toEqual({
+      name: 'run-schematic',
+      options: {
+        collection: null,
+        name: 'ai-config-install-skills',
+        options: {
+          tools: ['claude-code'],
+        },
+      },
+    });
+  });
+
+  it('should not install Angular skills when the user declines', async () => {
+    await runAiConfigSchematic([ConfigTool.ClaudeCode], { aiSkills: false });
+
+    expect(schematicRunner.tasks).toEqual([]);
+  });
+
+  it('should not install Angular skills when no AI tool is selected', async () => {
+    await runAiConfigSchematic([ConfigTool.None], { aiSkills: true });
+
+    expect(schematicRunner.tasks).toEqual([]);
   });
 
   it('should update JSON MCP server config, if the file exists', async () => {

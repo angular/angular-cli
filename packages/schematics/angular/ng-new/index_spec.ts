@@ -115,6 +115,31 @@ describe('Ng New Schematic', () => {
     expect(files).toContain('/bar/.gemini/settings.json');
   });
 
+  it('should install Angular skills before initializing the repository', async () => {
+    await schematicRunner.runSchematic('ng-new', {
+      ...defaultOptions,
+      aiConfig: ['gemini-cli', 'claude-code'],
+      aiSkills: true,
+    });
+
+    const skillsTask = schematicRunner.tasks.find(
+      (task) => (task.options as { name?: string })?.name === 'ai-config-install-skills',
+    );
+    expect(skillsTask?.options).toEqual(
+      jasmine.objectContaining({
+        options: {
+          workingDirectory: 'bar',
+          tools: ['gemini-cli', 'claude-code'],
+        },
+      }),
+    );
+    expect(
+      schematicRunner.tasks.findIndex(
+        (task) => (task.options as { name?: string })?.name === 'ai-config-install-skills',
+      ),
+    ).toBeLessThan(schematicRunner.tasks.findIndex((task) => task.name === 'repo-init'));
+  });
+
   it('should create a tailwind project when style is tailwind', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const options = { ...defaultOptions, style: 'tailwind' as any };
