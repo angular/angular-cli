@@ -121,7 +121,7 @@
     "magic-string": "0.30.21",
     "prettier": "^3.0.0",
     "puppeteer": "25.3.0",
-    "quicktype-core": "23.3.23",
+    "quicktype-core": "24.0.2",
     "rollup": "4.62.2",
     "rollup-license-plugin": "~3.2.0",
     "rollup-plugin-dts": "6.4.1",
