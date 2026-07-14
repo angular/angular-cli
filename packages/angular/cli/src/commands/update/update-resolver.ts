@@ -541,6 +541,23 @@ async function _buildPackageInfo(
   };
 }
 
+function splitPackageName(pkg: string): { name: string; version?: string } {
+  let name = pkg;
+  let version: string | undefined;
+
+  if (pkg.startsWith('@')) {
+    const parts = pkg.split('@');
+    name = '@' + parts[1];
+    version = parts[2];
+  } else if (pkg.includes('@')) {
+    const parts = pkg.split('@');
+    name = parts[0];
+    version = parts[1];
+  }
+
+  return { name, version };
+}
+
 function _buildPackageList(
   options: UpdateResolverOptions,
   allDependencies: ReadonlyMap<string, VersionRange>,
@@ -554,28 +571,18 @@ function _buildPackageList(
   }
 
   for (const pkg of inputPackages) {
-    let pkgName = pkg;
-    let pkgVersion: string | undefined;
-
-    if (pkg.startsWith('@')) {
-      const parts = pkg.split('@');
-      pkgName = '@' + parts[1];
-      pkgVersion = parts[2];
-    } else if (pkg.includes('@')) {
-      const parts = pkg.split('@');
-      pkgName = parts[0];
-      pkgVersion = parts[1];
-    }
+    const { name: pkgName, version: pkgVersion } = splitPackageName(pkg);
 
     if (!allDependencies.has(pkgName)) {
       throw new Error(`Package ${JSON.stringify(pkgName)} is not in package.json.`);
     }
 
-    if (options.migrateOnly && !pkgVersion && options.from) {
-      pkgVersion = options.from;
+    let targetVersion = pkgVersion;
+    if (options.migrateOnly && !targetVersion && options.from) {
+      targetVersion = options.from;
     }
 
-    packages.set(pkgName, (pkgVersion || (options.next ? 'next' : 'latest')) as VersionRange);
+    packages.set(pkgName, (targetVersion || (options.next ? 'next' : 'latest')) as VersionRange);
   }
 
   return packages;
@@ -759,6 +766,74 @@ function isPkgFromRegistry(name: string, specifier: string): boolean {
   return !!result.registry;
 }
 
+async function checkCatalogUpdates(
+  normalizedPackages: string[],
+  packageJsonContent: PackageManifest,
+  registryClient: RegistryClient,
+  workspaceRoot: string,
+  options: UpdateResolverOptions,
+): Promise<void> {
+  const catalogUpdates: { name: string; current: string; target: string; specifier: string }[] = [];
+
+  for (const requestedPkg of normalizedPackages) {
+    const { name: pkgName } = splitPackageName(requestedPkg);
+    const specifier =
+      packageJsonContent.dependencies?.[pkgName] ||
+      packageJsonContent.devDependencies?.[pkgName] ||
+      packageJsonContent.peerDependencies?.[pkgName];
+
+    if (specifier?.startsWith('catalog:')) {
+      const current = getInstalledVersion(pkgName, workspaceRoot) ?? 'unknown';
+      let target = 'latest';
+      try {
+        const metadata = await registryClient.getMetadata(pkgName);
+        if (metadata) {
+          const resolved = await resolvePackageVersion(
+            registryClient,
+            metadata,
+            options.next ? 'next' : 'latest',
+            !!options.next,
+          );
+          target = resolved ?? 'latest';
+        }
+      } catch {
+        // Fallback to 'latest' tag
+      }
+
+      catalogUpdates.push({ name: pkgName, current, target, specifier });
+    }
+  }
+
+  if (catalogUpdates.length > 0) {
+    const packageManagerName = options.packageManager ?? 'your package manager';
+    const installCmd = packageManagerName === 'yarn' ? 'yarn install' : 'pnpm install';
+
+    const updatesList = catalogUpdates
+      .map((pkg) => `  - ${pkg.name} (${pkg.specifier}) -> Target version: ${pkg.target}`)
+      .join('\n');
+
+    const migrationCommands = catalogUpdates
+      .map((pkg) => {
+        const fromVer = pkg.current === 'unknown' ? '<current-version>' : pkg.current;
+
+        return `  ng update ${pkg.name} --migrate-only --from ${fromVer}`;
+      })
+      .join('\n');
+
+    throw new Error(
+      `The following packages to update are configured to use \`catalog:\`:\n` +
+        `${updatesList}\n\n` +
+        `Because catalogs are shared across the monorepo, 'ng update' cannot modify them directly.\n` +
+        `Please perform the following steps to update:\n` +
+        `  1. Manually update the versions for these packages in your catalog configuration file ` +
+        `(e.g., pnpm-workspace.yaml or .yarnrc.yml).\n` +
+        `  2. Run '${installCmd}' to install the updated versions.\n` +
+        `  3. Run the following command(s) from the workspace root to execute the migration schematics:\n` +
+        `${migrationCommands}`,
+    );
+  }
+}
+
 export async function resolveUserUpdatePlan(
   options: UpdateResolverOptions,
   packageManager: PackageManager,
@@ -810,9 +885,18 @@ export async function resolveUserUpdatePlan(
   options.to = _formatVersion(options.to);
   const usingYarn = options.packageManager === 'yarn';
 
-  const packages = _buildPackageList(options, npmDeps, logger);
   const minReleaseAge = await packageManager.getMinimumReleaseAge();
   const registryClient = new RegistryClient(packageManager, logger, minReleaseAge);
+
+  await checkCatalogUpdates(
+    normalizedPackages,
+    packageJsonContent,
+    registryClient,
+    workspaceRoot,
+    options,
+  );
+
+  const packages = _buildPackageList(options, npmDeps, logger);
 
   const getOrFetchPackageMetadata = async (
     packageName: string,

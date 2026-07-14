@@ -474,6 +474,105 @@ describe('UpdateResolver', () => {
     expect(plan.packagesToUpdate.get('@angular-devkit-tests/common-bug')).toBe('13.2.0');
     expect(plan.packagesToUpdate.get('@angular-devkit-tests/cdk-bug')).toBe('13.2.0');
   });
+
+  it('rejects updates for catalog packages and guides on manual migration steps', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular/core': 'catalog:',
+        },
+      },
+      {
+        '@angular/core': { version: '5.1.0' },
+      },
+    );
+
+    const expectedError = `
+The following packages to update are configured to use \`catalog:\`:
+  - @angular/core \\(catalog:\\) -> Target version: 6\\.0\\.0
+
+Because catalogs are shared across the monorepo, 'ng update' cannot modify them directly\\.
+Please perform the following steps to update:
+  1\\. Manually update the versions for these packages in your catalog.*
+  2\\. Run 'pnpm install' to install the updated versions\\.
+  3\\. Run the following command\\(s\\) from the workspace root to execute the migration schematics:
+  ng update @angular/core --migrate-only --from 5\\.1\\.0
+    `.trim();
+
+    await expectAsync(
+      resolvePlan({
+        packages: ['@angular/core'],
+        workspaceRoot: tempRoot,
+      }),
+    ).toBeRejectedWithError(new RegExp(expectedError));
+  });
+
+  it('rejects updates for catalog packages specified with a version suffix', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular/core': 'catalog:',
+        },
+      },
+      {
+        '@angular/core': { version: '5.1.0' },
+      },
+    );
+
+    const expectedError = `
+The following packages to update are configured to use \`catalog:\`:
+  - @angular/core \\(catalog:\\) -> Target version: 6\\.0\\.0
+
+Because catalogs are shared across the monorepo, 'ng update' cannot modify them directly\\.
+Please perform the following steps to update:
+  1\\. Manually update the versions for these packages in your catalog.*
+  2\\. Run 'pnpm install' to install the updated versions\\.
+  3\\. Run the following command\\(s\\) from the workspace root to execute the migration schematics:
+  ng update @angular/core --migrate-only --from 5\\.1\\.0
+    `.trim();
+
+    await expectAsync(
+      resolvePlan({
+        packages: ['@angular/core@6'],
+        workspaceRoot: tempRoot,
+      }),
+    ).toBeRejectedWithError(new RegExp(expectedError));
+  });
+
+  it('rejects updates for catalog packages specified with a named catalog', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular/core': 'catalog:framework',
+        },
+      },
+      {
+        '@angular/core': { version: '5.1.0' },
+      },
+    );
+
+    const expectedError = `
+The following packages to update are configured to use \`catalog:\`:
+  - @angular/core \\(catalog:framework\\) -> Target version: 6\\.0\\.0
+
+Because catalogs are shared across the monorepo, 'ng update' cannot modify them directly\\.
+Please perform the following steps to update:
+  1\\. Manually update the versions for these packages in your catalog.*
+  2\\. Run 'pnpm install' to install the updated versions\\.
+  3\\. Run the following command\\(s\\) from the workspace root to execute the migration schematics:
+  ng update @angular/core --migrate-only --from 5\\.1\\.0
+    `.trim();
+
+    await expectAsync(
+      resolvePlan({
+        packages: ['@angular/core'],
+        workspaceRoot: tempRoot,
+      }),
+    ).toBeRejectedWithError(new RegExp(expectedError));
+  });
 });
 
 describe('RegistryClient', () => {
