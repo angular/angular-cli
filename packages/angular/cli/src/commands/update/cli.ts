@@ -567,6 +567,11 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     const tasks = new Listr([
       {
         title: 'Cleaning node modules directory',
+        skip() {
+          return packageManager.name !== 'npm'
+            ? 'Cleaning not required for this package manager.'
+            : false;
+        },
         async task(_, task) {
           try {
             await fs.rm(path.join(commandRoot, 'node_modules'), {
