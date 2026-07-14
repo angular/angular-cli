@@ -108,7 +108,11 @@ describe('Application Schematic', () => {
   it('should set the right paths in the tsconfig.spec.json', async () => {
     const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
 
-    const { extends: _extends } = readJsonFile(tree, '/projects/foo/tsconfig.spec.json');
+    const { compilerOptions, extends: _extends } = readJsonFile(
+      tree,
+      '/projects/foo/tsconfig.spec.json',
+    );
+    expect(compilerOptions.outDir).toBeUndefined();
     expect(_extends).toBe('../../tsconfig.json');
   });
 
