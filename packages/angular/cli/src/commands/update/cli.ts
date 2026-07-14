@@ -541,6 +541,14 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       return 1;
     }
 
+    const packageJsonPath = path.join(this.context.root, 'package.json');
+    let originalPackageJsonContent: string | undefined;
+    try {
+      originalPackageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
+    } catch {
+      // Ignore backup errors.
+    }
+
     try {
       await applyUpdatePlan(this.context.root, plan, logger);
     } catch (error) {
@@ -596,6 +604,16 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
         Module._pathCache = Object.create(null);
       }
     } catch (e) {
+      if (originalPackageJsonContent !== undefined) {
+        try {
+          await fs.writeFile(packageJsonPath, originalPackageJsonContent, 'utf8');
+          logger.info('Restored package.json to its original state.');
+        } catch (restoreError) {
+          assertIsError(restoreError);
+          logger.error(`Failed to restore package.json: ${restoreError.message}`);
+        }
+      }
+
       if (e instanceof CommandError) {
         return 1;
       }
