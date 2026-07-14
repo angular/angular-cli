@@ -8,7 +8,6 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
-import { realpathSync } from 'node:fs';
 import { access, constants, readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import path from 'node:path';
@@ -18,6 +17,7 @@ import { useJSONBuildLogs, usePartialSsrBuild } from '../../utils/environment-op
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { canonicalizePath } from '../../utils/path';
 import {
   SearchDirectory,
   findTailwindConfiguration,
@@ -160,12 +160,7 @@ export async function normalizeOptions(
     options.preserveSymlinks ?? process.execArgv.includes('--preserve-symlinks');
 
   // Setup base paths based on workspace root and project information
-  const workspaceRoot = preserveSymlinks
-    ? context.workspaceRoot
-    : // NOTE: promises.realpath should not be used here since it uses realpath.native which
-      // can cause case conversion and other undesirable behavior on Windows systems.
-      // ref: https://github.com/nodejs/node/issues/7726
-      realpathSync(context.workspaceRoot);
+  const workspaceRoot = canonicalizePath(context.workspaceRoot, preserveSymlinks);
   const projectMetadata = await context.getProjectMetadata(projectName);
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
@@ -213,8 +208,7 @@ export async function normalizeOptions(
   }
 
   let loaderExtensions:
-    | Record<string, 'text' | 'binary' | 'file' | 'dataurl' | 'base64'>
-    | undefined;
+    Record<string, 'text' | 'binary' | 'file' | 'dataurl' | 'base64'> | undefined;
   if (options.loader) {
     for (const [extension, value] of Object.entries(options.loader)) {
       if (extension[0] !== '.' || /\.[cm]?[jt]sx?$/.test(extension)) {

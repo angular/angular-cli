@@ -10,6 +10,7 @@ import { type BuilderContext, targetFromTargetString } from '@angular-devkit/arc
 import { constants, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { canonicalizePath } from '../../utils/path';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { isTTY } from '../../utils/tty';
 import { Runner, type Schema as UnitTestBuilderOptions } from './schema';
@@ -41,18 +42,30 @@ export async function normalizeOptions(
   projectName: string,
   options: UnitTestBuilderOptions,
 ) {
+  // Target specifier defaults to the current project's build target using a development configuration
+  const buildTargetSpecifier = options.buildTarget ?? `::development`;
+  const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
+
+  // Load target options to determine preserveSymlinks setting
+  let buildTargetOptions: Record<string, unknown> | undefined;
+  try {
+    buildTargetOptions = await context.getTargetOptions(buildTarget);
+  } catch {}
+
+  const preserveSymlinks =
+    typeof buildTargetOptions?.preserveSymlinks === 'boolean'
+      ? buildTargetOptions.preserveSymlinks
+      : process.execArgv.includes('--preserve-symlinks');
+
   // Setup base paths based on workspace root and project information
-  const workspaceRoot = context.workspaceRoot;
+  const workspaceRoot = canonicalizePath(context.workspaceRoot, preserveSymlinks);
+
   const projectMetadata = await context.getProjectMetadata(projectName);
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
 
   // Gather persistent caching option and provide a project specific cache location
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
   cacheOptions.path = path.join(cacheOptions.path, projectName);
-
-  // Target specifier defaults to the current project's build target using a development configuration
-  const buildTargetSpecifier = options.buildTarget ?? `::development`;
-  const buildTarget = targetFromTargetString(buildTargetSpecifier, projectName, 'build');
 
   const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig, isolate } =
     options;
@@ -134,7 +147,7 @@ export async function normalizeOptions(
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
-    preserveSymlinks: undefined as boolean | undefined,
+    preserveSymlinks,
     runnerConfig:
       typeof runnerConfig === 'string'
         ? runnerConfig.length === 0
