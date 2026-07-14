@@ -42,7 +42,7 @@ export default async function transformJavaScript(
   const { filename, data, ...options } = request;
   const textData = typeof data === 'string' ? data : textDecoder.decode(data);
 
-  const transformedData = await transformWithBabel(filename, textData, options);
+  const transformedData = await transformJavaScriptImpl(filename, textData, options);
 
   // Transfer the data via `move` instead of cloning
   return Piscina.move(textEncoder.encode(transformedData));
@@ -54,7 +54,7 @@ export default async function transformJavaScript(
 let linkerPluginCreator:
   typeof import('@angular/compiler-cli/linker/babel').createEs2015LinkerPlugin | undefined;
 
-async function transformWithBabel(
+async function transformJavaScriptImpl(
   filename: string,
   data: string,
   options: Omit<JavaScriptTransformRequest, 'filename' | 'data'>,
@@ -64,7 +64,7 @@ async function transformWithBabel(
     options.sourcemap &&
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-  const plugins: PluginItem[] = [];
+  const babelPlugins: PluginItem[] = [];
 
   if (options.instrumentForCoverage) {
     try {
@@ -85,7 +85,7 @@ async function transformWithBabel(
 
       const { default: coveragePluginFactory } =
         await import('../babel/plugins/add-code-coverage.js');
-      plugins.push(coveragePluginFactory(programVisitor) as unknown as PluginItem);
+      babelPlugins.push(coveragePluginFactory(programVisitor) as unknown as PluginItem);
     } catch (error) {
       throw new Error(
         `The 'istanbul-lib-instrument' package is required for code coverage but was not found. Please install the package.`,
@@ -97,47 +97,52 @@ async function transformWithBabel(
   if (shouldLink) {
     // Lazy load the linker plugin only when linking is required
     const linkerPlugin = await createLinkerPlugin(options);
-    plugins.push(linkerPlugin as unknown as PluginItem);
+    babelPlugins.push(linkerPlugin as unknown as PluginItem);
   }
 
-  if (options.advancedOptimizations) {
-    const { adjustStaticMembers, adjustTypeScriptEnums, elideAngularMetadata, markTopLevelPure } =
-      await import('../babel/plugins');
+  let code = data;
 
+  // If Babel is needed, run it first
+  if (babelPlugins.length > 0) {
+    const result = await transformAsync(code, {
+      filename,
+      inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
+      sourceMaps: useInputSourcemap ? 'inline' : false,
+      compact: false,
+      configFile: false,
+      babelrc: false,
+      browserslistConfigFile: false,
+      plugins: babelPlugins,
+    });
+    code = result?.code ?? code;
+  }
+
+  // Run advanced optimizations using our fast oxc-transform
+  if (options.advancedOptimizations) {
+    const { transform } = await import('../babel/plugins/oxc-transform.js');
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
+    const topLevelSafeMode = !safeAngularPackage;
 
-    plugins.push(
-      [markTopLevelPure, { topLevelSafeMode: !safeAngularPackage }],
-      elideAngularMetadata,
-      adjustTypeScriptEnums,
-      [adjustStaticMembers, { wrapDecorators: sideEffectFree }],
-    );
+    const result = transform(filename, code, {
+      sourcemap: useInputSourcemap,
+      sideEffects: options.sideEffects,
+      jit: options.jit,
+      topLevelSafeMode,
+    });
+    code = result.code;
+
+    if (useInputSourcemap && result.map) {
+      // Strip old source map comment if Babel added one
+      code = removeSourceMappingURL(code);
+      const base64Map = Buffer.from(result.map).toString('base64');
+      code += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
+    }
   }
 
-  // If no additional transformations are needed, return the data directly
-  if (plugins.length === 0) {
-    // Strip sourcemaps if they should not be used
-    return useInputSourcemap ? data : removeSourceMappingURL(data);
-  }
-
-  const result = await transformAsync(data, {
-    filename,
-    inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-    sourceMaps: useInputSourcemap ? 'inline' : false,
-    compact: false,
-    configFile: false,
-    babelrc: false,
-    browserslistConfigFile: false,
-    plugins,
-  });
-
-  const outputCode = result?.code ?? data;
-
-  // Strip sourcemaps if they should not be used.
-  // Babel will keep the original comments even if sourcemaps are disabled.
-  return useInputSourcemap ? outputCode : removeSourceMappingURL(outputCode);
+  // Strip sourcemaps if they should not be used
+  return useInputSourcemap ? code : removeSourceMappingURL(code);
 }
 
 async function requiresLinking(path: string, source: string): Promise<boolean> {
