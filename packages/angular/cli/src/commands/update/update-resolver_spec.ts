@@ -228,6 +228,17 @@ describe('UpdateResolver', () => {
         '14.0.0-next.0': { name: '@angular-devkit-tests/cdk-bug', version: '14.0.0-next.0' },
       },
     },
+    '@types/web': {
+      metadata: {
+        name: '@types/web',
+        'dist-tags': { latest: '0.0.100' },
+        versions: ['0.0.99', '0.0.100'],
+      },
+      manifests: {
+        '0.0.99': { name: '@types/web', version: '0.0.99' },
+        '0.0.100': { name: '@types/web', version: '0.0.100' },
+      },
+    },
   };
 
   async function resolvePlan(options: UpdateResolverOptions, minReleaseAge = 0) {
@@ -572,6 +583,72 @@ Please perform the following steps to update:
         workspaceRoot: tempRoot,
       }),
     ).toBeRejectedWithError(new RegExp(expectedError));
+  });
+
+  it('correctly resolves and updates packages using npm alias syntax', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@typescript/lib-dom': 'npm:@types/web@^0.0.99',
+        },
+      },
+      {
+        '@typescript/lib-dom': {
+          version: '0.0.99',
+          manifest: { name: '@types/web' },
+        },
+      },
+    );
+
+    const plan = await resolvePlan({
+      packages: ['@typescript/lib-dom'],
+      workspaceRoot: tempRoot,
+    });
+
+    expect(plan.packagesToUpdate.get('@typescript/lib-dom')).toBe('0.0.100');
+
+    await applyUpdatePlan(tempRoot, plan, logger);
+
+    const updatedPackageJson = JSON.parse(
+      readFileSync(path.join(tempRoot, 'package.json'), 'utf8'),
+    ) as PackageManifest;
+
+    expect(updatedPackageJson.dependencies?.['@typescript/lib-dom']).toBe(
+      'npm:@types/web@^0.0.100',
+    );
+  });
+
+  it('correctly handles packages using npm alias syntax without a version range', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@typescript/lib-dom': 'npm:@types/web',
+        },
+      },
+      {
+        '@typescript/lib-dom': {
+          version: '0.0.99',
+          manifest: { name: '@types/web' },
+        },
+      },
+    );
+
+    const plan = await resolvePlan({
+      packages: ['@typescript/lib-dom'],
+      workspaceRoot: tempRoot,
+    });
+
+    expect(plan.packagesToUpdate.get('@typescript/lib-dom')).toBe('0.0.100');
+
+    await applyUpdatePlan(tempRoot, plan, logger);
+
+    const updatedPackageJson = JSON.parse(
+      readFileSync(path.join(tempRoot, 'package.json'), 'utf8'),
+    ) as PackageManifest;
+
+    expect(updatedPackageJson.dependencies?.['@typescript/lib-dom']).toBe('npm:@types/web');
   });
 });
 

@@ -25,33 +25,46 @@ export class RegistryClient {
     private packageManager: PackageManager,
     private logger: logging.LoggerApi,
     readonly minReleaseAge: number = 0,
+    private getRegistryName?: (name: string) => string,
   ) {}
 
   async getMetadata(packageName: string): Promise<PackageMetadata | null> {
-    let promise = this.metadataCache.get(packageName);
+    const registryName = this.getRegistryName ? this.getRegistryName(packageName) : packageName;
+    let promise = this.metadataCache.get(registryName);
     if (!promise) {
-      promise = this.packageManager.getRegistryMetadata(packageName).catch((e) => {
-        this.metadataCache.delete(packageName);
+      promise = this.packageManager.getRegistryMetadata(registryName).catch((e) => {
+        this.metadataCache.delete(registryName);
         throw e;
       });
-      this.metadataCache.set(packageName, promise);
+      this.metadataCache.set(registryName, promise);
     }
 
-    return promise;
+    const metadata = await promise;
+    if (metadata && registryName !== packageName) {
+      return { ...metadata, name: packageName };
+    }
+
+    return metadata;
   }
 
   async getManifest(packageName: string, version: string): Promise<PackageManifest | null> {
-    const key = `${packageName}@${version}`;
+    const registryName = this.getRegistryName ? this.getRegistryName(packageName) : packageName;
+    const key = `${registryName}@${version}`;
     let promise = this.manifestCache.get(key);
     if (!promise) {
-      promise = this.packageManager.getRegistryManifest(packageName, version).catch((e) => {
+      promise = this.packageManager.getRegistryManifest(registryName, version).catch((e) => {
         this.manifestCache.delete(key);
         throw e;
       });
       this.manifestCache.set(key, promise);
     }
 
-    return promise;
+    const manifest = await promise;
+    if (manifest && registryName !== packageName) {
+      return { ...manifest, name: packageName };
+    }
+
+    return manifest;
   }
 }
 
@@ -760,6 +773,20 @@ function _formatVersion(v?: string): string | undefined {
   return coerced ? coerced.toString() : undefined;
 }
 
+function getRegistryNameAndRange(name: string, specifier: string): { name: string; range: string } {
+  try {
+    const result = npa.resolve(name, specifier);
+    if (result.type === 'alias' && result.subSpec) {
+      return {
+        name: result.subSpec.name ?? name,
+        range: result.subSpec.fetchSpec ?? specifier,
+      };
+    }
+  } catch {}
+
+  return { name, range: specifier };
+}
+
 function isPkgFromRegistry(name: string, specifier: string): boolean {
   const result = npa.resolve(name, specifier);
 
@@ -886,7 +913,17 @@ export async function resolveUserUpdatePlan(
   const usingYarn = options.packageManager === 'yarn';
 
   const minReleaseAge = await packageManager.getMinimumReleaseAge();
-  const registryClient = new RegistryClient(packageManager, logger, minReleaseAge);
+
+  const getRegistryName = (name: string): string => {
+    const specifier = npmDeps.get(name);
+    if (specifier) {
+      return getRegistryNameAndRange(name, specifier).name;
+    }
+
+    return name;
+  };
+
+  const registryClient = new RegistryClient(packageManager, logger, minReleaseAge, getRegistryName);
 
   await checkCatalogUpdates(
     normalizedPackages,
@@ -1163,8 +1200,31 @@ export async function applyUpdatePlan(
 
   const updateDependency = (deps: Record<string, string>, name: string, newVersion: string) => {
     const oldVersion = deps[name];
-    const execResult = /^[\^~]/.exec(oldVersion);
-    deps[name] = `${execResult ? execResult[0] : ''}${newVersion}`;
+    const aliasPrefix = 'npm:';
+
+    // If the dependency uses an npm package alias (e.g., "npm:registry-name@version-range"),
+    // parse and reconstruct the alias with the new target version while preserving
+    // the original alias registry name and any version prefix character (like ^ or ~).
+    if (oldVersion.startsWith(aliasPrefix)) {
+      const specifier = oldVersion.slice(aliasPrefix.length);
+      const lastAtIndex = specifier.lastIndexOf('@');
+      if (lastAtIndex > 0) {
+        const registryName = specifier.slice(0, lastAtIndex);
+        const versionRange = specifier.slice(lastAtIndex + 1);
+        // Retain any semantic versioning operator prefix (e.g., ^ or ~) from the target version range.
+        const execResult = /^[\^~]/.exec(versionRange);
+        deps[name] =
+          `${aliasPrefix}${registryName}@${execResult ? execResult[0] : ''}${newVersion}`;
+      } else {
+        // If there's no `@` character defining a version specifier in the alias (e.g. "npm:packageName"),
+        // leave it as-is without attempting to inject a version suffix.
+        deps[name] = oldVersion;
+      }
+    } else {
+      // Standard dependency formatting, keeping any semantic versioning operator prefix (e.g., ^ or ~).
+      const execResult = /^[\^~]/.exec(oldVersion);
+      deps[name] = `${execResult ? execResult[0] : ''}${newVersion}`;
+    }
   };
 
   for (const [name, targetVersion] of plan.packagesToUpdate.entries()) {
