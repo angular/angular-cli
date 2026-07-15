@@ -1,3 +1,29 @@
+<a name="22.1.0-next.4"></a>
+
+# 22.1.0-next.4 (2026-07-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [3789ceee1](https://github.com/angular/angular-cli/commit/3789ceee18b4528c2acb7989b5d41c32d386a8a8) | fix  | copy packageManager field and yarn config for temp installs  |
+| [b0b3a47ae](https://github.com/angular/angular-cli/commit/b0b3a47ae95f4e98e1280ff5c9e3751ccecee5a8) | fix  | support resolving subproject dependencies in pnpm workspaces |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [b345bb54d](https://github.com/angular/angular-cli/commit/b345bb54d3ec7c73f9db70400f823d90aeab8fa8) | fix  | remove unused spec tsconfig outDir |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [0c18dc0f6](https://github.com/angular/angular-cli/commit/0c18dc0f6d4f36d7bbb6f35b37bfa688e8fcf7d2) | feat | emit debug ids for stable subresource integrity hashes |
+| [291caab61](https://github.com/angular/angular-cli/commit/291caab6158fa804f6221dd024a5b96e6181eaad) | fix  | prevent stripping nested sourceMappingURL comments     |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.7"></a>
 
 # 22.0.7 (2026-07-15)
