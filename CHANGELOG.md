@@ -1,3 +1,16 @@
+<a name="22.0.7"></a>
+
+# 22.0.7 (2026-07-15)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [e85c10ccb](https://github.com/angular/angular-cli/commit/e85c10ccb551eeaf9ac7e819ee6eb095317b5032) | fix  | copy packageManager field and yarn config for temp installs  |
+| [b87cafec0](https://github.com/angular/angular-cli/commit/b87cafec04b24c2f4337ecfa00388197ab5003f0) | fix  | support resolving subproject dependencies in pnpm workspaces |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.6"></a>
 
 # 22.0.6 (2026-07-08)
