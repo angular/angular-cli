@@ -7,14 +7,14 @@
  */
 
 declare module 'istanbul-lib-instrument' {
-  export interface Visitor {
-    enter(path: import('@babel/core').NodePath<types.Program>): void;
-    exit(path: import('@babel/core').NodePath<types.Program>): void;
+  export interface Instrumenter {
+    instrumentSync(code: string, filename: string, inputSourceMap?: object): string;
+    lastSourceMap(): object | undefined;
   }
 
-  export function programVisitor(
-    types: typeof import('@babel/core').types,
-    filePath?: string,
-    options?: { inputSourceMap?: object | null },
-  ): Visitor;
+  export function createInstrumenter(options?: {
+    produceSourceMap?: boolean;
+    esModules?: boolean;
+    coverageVariable?: string;
+  }): Instrumenter;
 }
