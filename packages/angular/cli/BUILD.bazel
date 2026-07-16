@@ -61,7 +61,6 @@ ts_project(
         ":node_modules/@inquirer/prompts",
         ":node_modules/@listr2/prompt-adapter-inquirer",
         ":node_modules/@modelcontextprotocol/sdk",
-        ":node_modules/algoliasearch",
         ":node_modules/jsonc-parser",
         ":node_modules/listr2",
         ":node_modules/npm-package-arg",
