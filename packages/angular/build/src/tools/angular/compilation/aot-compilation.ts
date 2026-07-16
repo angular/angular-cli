@@ -10,6 +10,7 @@ import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
+import { useTypeChecking } from '../../../utils/environment-options';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import {
   AngularHostOptions,
@@ -181,9 +182,19 @@ export class AotCompilation extends AngularCompilation {
       }
     }
 
-    const affectedFiles = profileSync('NG_FIND_AFFECTED', () =>
-      findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
-    );
+    // The affected files walk runs a full semantic type-check as a side effect
+    // (via `getSemanticDiagnosticsOfNextAffectedFile`). Its result is only consumed to
+    // scope Angular template diagnostics and to force re-emit of TS-affected files in the
+    // slow TypeScript emit path. When type-checking is disabled, template/semantic
+    // diagnostics are already suppressed at the consumption layer (see the compiler-plugin
+    // `diagnoseFiles` mask), and in the isolatedModules fast path emit is per-file, so the
+    // set is never read. Skip the walk in that case to avoid a discarded semantic pass.
+    const affectedFiles =
+      useTypeChecking || useTypeScriptTranspilation
+        ? profileSync('NG_FIND_AFFECTED', () =>
+            findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
+          )
+        : new Set<ts.SourceFile>();
 
     const componentResourcesDependencies = new Map<string, string[]>();
 
