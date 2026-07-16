@@ -354,10 +354,10 @@ export class VitestExecutor implements TestExecutor {
       config: externalConfigPath,
       root: workspaceRoot,
       project,
-      outputFile,
-      cache: cacheOptions.enabled ? undefined : (false as const),
-      testNamePattern: this.options.filter,
       watch,
+      ...(outputFile !== undefined ? { outputFile } : {}),
+      ...(cacheOptions.enabled ? {} : { cache: false as const }),
+      ...(this.options.filter !== undefined ? { testNamePattern: this.options.filter } : {}),
       ...(typeof ui === 'boolean' ? { ui } : {}),
       ...debugOptions,
     };

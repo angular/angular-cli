@@ -42,6 +42,63 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.expectFile('vitest-results.xml').toExist();
     });
 
+    it('should use custom reporters and outputFile defined as an object in runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            reporters: ['junit'],
+            outputFile: {
+              junit: './vitest-results-outputfile.xml',
+            },
+          },
+        });
+        `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('vitest-results-outputfile.xml').toExist();
+    });
+
+    it('should preserve custom coverage options (e.g. clean: false) from runnerConfig file', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.ts',
+        coverage: true,
+      });
+
+      harness.writeFile(
+        'vitest.config.ts',
+        `
+        import { defineConfig } from 'vitest/config';
+        export default defineConfig({
+          test: {
+            coverage: {
+              clean: false,
+            },
+          },
+        });
+        `,
+      );
+
+      // Create a placeholder file in the coverage directory before running the test
+      harness.writeFile('coverage/test/placeholder-file.txt', 'do-not-delete');
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      // The builder outputs to coverage/test by default.
+      // If clean: false is preserved, the placeholder-file.txt should still exist.
+      harness.expectFile('coverage/test/placeholder-file.txt').toExist();
+    });
+
     it('should override reporters defined in runnerConfig file when CLI option is present', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
