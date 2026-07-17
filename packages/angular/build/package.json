@@ -33,6 +33,7 @@
     "listr2": "10.2.2",
     "magic-string": "0.30.21",
     "mrmime": "2.0.1",
+    "oxc-parser": "0.140.0",
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.5",
     "piscina": "5.2.0",
@@ -50,6 +51,7 @@
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
+    "@oxc-project/types": "0.140.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "29.1.1",
     "less": "4.6.7",

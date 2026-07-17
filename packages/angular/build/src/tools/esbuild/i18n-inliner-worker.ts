@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { SourceMapInput } from '@ampproject/remapping';
-import { NodePath, PluginItem, parseSync, transformFromAstAsync, types } from '@babel/core';
+import remapping, { type EncodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
+import MagicString from 'magic-string';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
-import { assertIsError } from '../../utils/error';
+import { Visitor, parseSync } from 'oxc-parser';
 
 /**
  * The options passed to the inliner for each file request
@@ -80,11 +80,7 @@ export default async function inlineFile(request: InlineFileRequest) {
 
   const code = await data.text();
   const map = await files.get(request.filename + '.map')?.text();
-  const result = await transformWithBabel(
-    code,
-    map && (JSON.parse(map) as SourceMapInput),
-    request,
-  );
+  const result = await transformWithOxc(code, map && (JSON.parse(map) as SourceMapInput), request);
 
   return {
     file: request.filename,
@@ -102,7 +98,7 @@ export default async function inlineFile(request: InlineFileRequest) {
  * @returns An object containing the inlined code.
  */
 export async function inlineCode(request: InlineCodeRequest) {
-  const result = await transformWithBabel(request.code, undefined, request);
+  const result = await transformWithOxc(request.code, undefined, request);
 
   return {
     output: result.code,
@@ -136,95 +132,94 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
 }
 
 /**
- * Creates the needed Babel plugins to inline a given locale and translation for a JavaScript file.
- * @param locale A string containing the locale specifier to use.
- * @param translation A object record containing locale specific messages to use.
- * @returns An array of Babel plugins.
- */
-async function createI18nPlugins(locale: string, translation: Record<string, unknown> | undefined) {
-  const { Diagnostics, makeEs2015TranslatePlugin } = await loadLocalizeTools();
-
-  const plugins: PluginItem[] = [];
-  const diagnostics = new Diagnostics();
-
-  plugins.push(
-    makeEs2015TranslatePlugin(diagnostics, translation || {}, {
-      missingTranslation: translation === undefined ? 'ignore' : missingTranslation,
-    }) as unknown as PluginItem,
-  );
-
-  // Create a plugin to replace the locale specifier constant inject by the build system with the actual specifier
-  plugins.push(() => ({
-    visitor: {
-      StringLiteral(path: NodePath<types.StringLiteral>) {
-        if (path.node.value === '___NG_LOCALE_INSERT___') {
-          path.replaceWith(types.stringLiteral(locale));
-        }
-      },
-    },
-  }));
-
-  return { diagnostics, plugins };
-}
-
-/**
- * Transforms a JavaScript file using Babel to inline the request locale and translation.
+ * Transforms a JavaScript file using OXC and Magic-String to inline the request locale and translation.
  * @param code A string containing the JavaScript code to transform.
  * @param map A sourcemap object for the provided JavaScript code.
  * @param options The inline request options to use.
  * @returns An object containing the code, map, and diagnostics from the transformation.
  */
-async function transformWithBabel(
+async function transformWithOxc(
   code: string,
   map: SourceMapInput | undefined,
   options: InlineFileRequest,
 ) {
-  let ast;
-  try {
-    ast = parseSync(code, {
-      babelrc: false,
-      configFile: false,
-      sourceType: 'unambiguous',
-      filename: options.filename,
-    });
-  } catch (error) {
-    assertIsError(error);
-
-    // Make the error more readable.
-    // Same errors will contain the full content of the file as the error message
-    // Which makes it hard to find the actual error message.
-    const index = error.message.indexOf(')\n');
-    const msg = index !== -1 ? error.message.slice(0, index + 1) : error.message;
-    throw new Error(`${msg}\nAn error occurred inlining file "${options.filename}"`, {
-      cause: error,
-    });
-  }
-
-  if (!ast) {
-    throw new Error(`Unknown error occurred inlining file "${options.filename}"`);
-  }
-
-  const { diagnostics, plugins } = await createI18nPlugins(options.locale, options.translation);
-  const transformResult = await transformFromAstAsync(ast, code, {
-    filename: options.filename,
-    // false is a valid value but not included in the type definition
-    inputSourceMap: false as unknown as undefined,
-    sourceMaps: !!map,
-    compact: shouldOptimize,
-    configFile: false,
-    babelrc: false,
-    browserslistConfigFile: false,
-    plugins,
+  const { program } = parseSync(options.filename, code, {
+    sourceType: 'unambiguous',
   });
 
-  if (!transformResult || !transformResult.code) {
-    throw new Error(`Unknown error occurred processing bundle for "${options.filename}".`);
+  if (!program) {
+    throw new Error(`Unknown error occurred parsing file "${options.filename}" with OXC.`);
   }
 
+  const magicString = new MagicString(code);
+  const { Diagnostics, translate } = await loadLocalizeTools();
+  const diagnostics = new Diagnostics();
+
+  const visitor = new Visitor({
+    Literal(node) {
+      if (typeof node.value === 'string' && node.value === '___NG_LOCALE_INSERT___') {
+        magicString.overwrite(node.start, node.end, JSON.stringify(options.locale));
+      }
+    },
+    'TaggedTemplateExpression:exit'(node) {
+      if (node.tag.type === 'Identifier' && node.tag.name === '$localize') {
+        const cooked = node.quasi.quasis.map((q) => q.value.cooked);
+        const raw = node.quasi.quasis.map((q) => q.value.raw);
+        const messageParts = Object.assign(cooked, { raw }) as unknown as TemplateStringsArray;
+
+        const [translatedParts, translatedSubstitutions] = translate(
+          diagnostics,
+          options.translation || {},
+          messageParts,
+          node.quasi.expressions.map((_, index) => index),
+          options.translation === undefined ? 'ignore' : missingTranslation,
+        );
+
+        // Reconstruct the new template/string literal replacement
+        let replacement: string;
+        if (translatedSubstitutions.length === 0) {
+          replacement = JSON.stringify(translatedParts[0]);
+        } else {
+          replacement = '`';
+          for (let i = 0; i < translatedParts.length; i++) {
+            const escapedPart = JSON.stringify(translatedParts[i])
+              .slice(1, -1)
+              .replace(/\\"/g, '"')
+              .replace(/`/g, '\\`')
+              .replace(/\$\{/g, '\\${');
+            replacement += escapedPart;
+
+            if (i < translatedSubstitutions.length) {
+              const originalIndex = translatedSubstitutions[i];
+              const exprNode = node.quasi.expressions[originalIndex];
+              const exprCode = magicString.slice(exprNode.start, exprNode.end);
+              replacement += '${' + exprCode + '}';
+            }
+          }
+          replacement += '`';
+        }
+
+        magicString.overwrite(node.start, node.end, replacement);
+      }
+    },
+  });
+
+  visitor.visit(program);
+
+  const outputCode = magicString.toString();
   let outputMap;
-  if (map && transformResult.map) {
-    outputMap = remapping([transformResult.map as SourceMapInput, map], () => null);
+  if (map && magicString.hasChanged()) {
+    const rawMap = magicString.generateMap({
+      source: options.filename,
+      includeContent: true,
+      hires: 'boundary',
+    });
+    outputMap = remapping([rawMap as EncodedSourceMap, map], () => null);
   }
 
-  return { code: transformResult.code, map: outputMap && JSON.stringify(outputMap), diagnostics };
+  return {
+    code: outputCode,
+    map: outputMap && JSON.stringify(outputMap),
+    diagnostics,
+  };
 }
