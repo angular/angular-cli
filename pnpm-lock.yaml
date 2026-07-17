@@ -251,8 +251,8 @@ importers:
         specifier: 25.3.0
         version: 25.3.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
       quicktype-core:
-        specifier: 24.0.2
-        version: 24.0.2
+        specifier: 25.0.0
+        version: 25.0.0
       rollup:
         specifier: 4.62.2
         version: 4.62.2
@@ -5836,9 +5836,6 @@ packages:
   jose@6.2.3:
     resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
 
-  js-base64@3.8.1:
-    resolution: {integrity: sha512-5xVjhUZlHHeuO2W7w2rDFj/Kl1xLX+HjZxdOQwCsUOifl6UaoH1o1wsbsTMz+r0aeC7gCijvru02j6TfKZWzKg==}
-
   js-tokens@10.0.0:
     resolution: {integrity: sha512-lM/UBzQmfJRo9ABXbPWemivdCW8V2G8FHaHdypQaIy523snUjog0W71ayWXTjiR+ixeMyVHN2XcpnTd/liPg/Q==}
 
@@ -6650,9 +6647,6 @@ packages:
   pako@0.2.9:
     resolution: {integrity: sha512-NUcwaKxUxWrZLpDG+z/xZaCgQITkA/Dv4V/T6bw7VON6l1Xz/VnrBqrYjZQ12TamKHzITTfOEIYUj48y2KXImA==}
 
-  pako@1.0.11:
-    resolution: {integrity: sha512-4hLB8Py4zZce5s4yd9XzopqwVv/yGNhV1Bl8NTmCq1763HeK2+EwVTv+leGeL13Dnh2wfbqowVPXCIO0z4taYw==}
-
   parent-module@1.0.1:
     resolution: {integrity: sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g==}
     engines: {node: '>=6'}
@@ -6948,8 +6942,8 @@ packages:
     resolution: {integrity: sha512-WuyALRjWPDGtt/wzJiadO5AXY+8hZ80hVpe6MyivgraREW751X3SbhRvG3eLKOYN+8VEvqLcf3wdnt44Z4S4SA==}
     engines: {node: '>=10'}
 
-  quicktype-core@24.0.2:
-    resolution: {integrity: sha512-Tv3jO/2FdYrcBVDCDC+27gOIAmXzrJv2O10KPJ1CPw5b5GKw+0MSq8zVnl0zz3byp8MZ1VEFj6+uc2VOxpY63g==}
+  quicktype-core@25.0.0:
+    resolution: {integrity: sha512-Rs3LxsOBKTwOZFrm5vx4FU1YdOBXttGrojz8pJoxuLrme1I/vO7Bixmle1GzWgWE7DdCQJhDZIsDZdihSO/WTA==}
     engines: {node: '>=20.0.0'}
 
   range-parser@1.2.1:
@@ -13932,8 +13926,6 @@ snapshots:
 
   jose@6.2.3: {}
 
-  js-base64@3.8.1: {}
-
   js-tokens@10.0.0: {}
 
   js-tokens@4.0.0: {}
@@ -14759,8 +14751,6 @@ snapshots:
 
   pako@0.2.9: {}
 
-  pako@1.0.11: {}
-
   parent-module@1.0.1:
     dependencies:
       callsites: 3.1.0
@@ -15055,7 +15045,7 @@ snapshots:
 
   quick-lru@5.1.1: {}
 
-  quicktype-core@24.0.2:
+  quicktype-core@25.0.0:
     dependencies:
       '@glideapps/ts-necessities': 2.2.3
       '@types/readable-stream': 4.0.10
@@ -15063,9 +15053,7 @@ snapshots:
       browser-or-node: 3.0.0
       collection-utils: 1.0.1
       is-url: 1.2.4
-      js-base64: 3.8.1
       lodash: 4.18.1
-      pako: 1.0.11
       pluralize: 8.0.0
       readable-stream: 4.5.2
       unicode-properties: 1.4.1
