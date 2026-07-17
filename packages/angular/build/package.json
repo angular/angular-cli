@@ -25,7 +25,7 @@
     "@babel/helper-split-export-declaration": "7.24.7",
     "@inquirer/confirm": "6.1.1",
     "@vitejs/plugin-basic-ssl": "2.3.0",
-    "beasties": "0.4.2",
+    "beasties": "0.4.3",
     "browserslist": "^4.26.0",
     "esbuild": "0.28.1",
     "https-proxy-agent": "9.1.0",
@@ -36,12 +36,12 @@
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.5",
     "piscina": "5.2.0",
-    "rolldown": "1.1.5",
+    "rolldown": "1.2.0",
     "sass": "1.101.0",
     "semver": "7.8.5",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.17",
-    "vite": "8.1.4",
+    "vite": "8.1.5",
     "watchpack": "2.5.2"
   },
   "optionalDependencies": {
@@ -54,7 +54,7 @@
     "jsdom": "29.1.1",
     "less": "4.6.7",
     "ng-packagr": "22.1.0-next.3",
-    "postcss": "8.5.16",
+    "postcss": "8.5.19",
     "rollup": "4.62.2",
     "rxjs": "7.8.2",
     "vitest": "4.1.10"
