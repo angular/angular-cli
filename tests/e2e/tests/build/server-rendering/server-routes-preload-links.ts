@@ -117,8 +117,7 @@ export default async function () {
   // Test both vite and `ng build`
   await runTests(await ngServe());
 
-  // Disable chunk optimization to ensure specific chunks like `ssg.routes` are not merged.
-  // This test asserts on specific chunk names which optimization may change.
+  // Test with chunk optimization explicitly disabled
   await execWithEnv('ng', ['build', '--output-mode=server'], {
     ...process.env,
     NG_BUILD_OPTIMIZE_CHUNKS: 'false',
@@ -126,18 +125,8 @@ export default async function () {
   await runTests(await spawnServer());
 
   // Test with default build behavior (chunk optimization enabled)
-  // Only check the preload for the first entry (home)
   await ng('build', '--output-mode=server');
-  const defaultServerPort = await spawnServer();
-
-  const res = await fetch(`http://localhost:${defaultServerPort}/`);
-  const text = await res.text();
-  const homeMatch = /<link rel="modulepreload" href="(home-[a-zA-Z0-9_]{8}\.js)">/;
-  assert.match(text, homeMatch, `Response for '/': ${homeMatch} was not matched in content.`);
-
-  const link = text.match(homeMatch)?.[1];
-  const preloadRes = await fetch(`http://localhost:${defaultServerPort}/${link}`);
-  assert.equal(preloadRes.status, 200);
+  await runTests(await spawnServer());
 }
 
 const RESPONSE_EXPECTS: Record<
@@ -189,11 +178,6 @@ async function runTests(port: number): Promise<void> {
 
     for (const match of matches) {
       assert.match(text, match, `Response for '${pathname}': ${match} was not matched in content.`);
-
-      // Ensure that the url is correct and it's a 200.
-      const link = text.match(match)?.[1];
-      const preloadRes = await fetch(`http://localhost:${port}/${link}`);
-      assert.equal(preloadRes.status, 200);
     }
 
     for (const match of notMatches) {
@@ -201,6 +185,24 @@ async function runTests(port: number): Promise<void> {
         text,
         match,
         `Response for '${pathname}': ${match} was matched in content.`,
+      );
+    }
+
+    // Every emitted preload link must resolve successfully.
+    const preloadLinks = [...text.matchAll(/<link rel="modulepreload" href="([^"]+)">/g)].map(
+      (match) => match[1],
+    );
+    assert.ok(
+      preloadLinks.length > 0,
+      `Response for '${pathname}' should contain at least one modulepreload link.`,
+    );
+
+    for (const link of preloadLinks) {
+      const preloadRes = await fetch(new URL(link, `http://localhost:${port}/`));
+      assert.equal(
+        preloadRes.status,
+        200,
+        `Preload link '${link}' for '${pathname}' should resolve.`,
       );
     }
   }

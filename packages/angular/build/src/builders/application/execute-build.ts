@@ -175,10 +175,7 @@ export async function executeBuild(
 
     // Only run if the number of lazy chunks meets the configured threshold.
     // This avoids overhead for small projects with few chunks.
-
-    // TODO: Remove this log once chunk optimization is supported for server builds as this
-    // causes the file to be renamed and thus causes incorrect preloading.
-    if (!options.serverEntryPoint && lazyChunksCount >= optimizeChunksThreshold) {
+    if (lazyChunksCount >= optimizeChunksThreshold) {
       const { optimizeChunks } = await import('./chunk-optimizer');
       const optimizationResult = await profileAsync('OPTIMIZE_CHUNKS', () =>
         optimizeChunks(
