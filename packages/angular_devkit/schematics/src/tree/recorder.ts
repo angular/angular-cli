@@ -7,7 +7,7 @@
  */
 
 import { BaseException } from '@angular-devkit/core';
-import MagicString from 'magic-string';
+import { MagicString } from 'magic-string';
 import { ContentHasMutatedException } from '../exception/exception';
 import { FileEntry, UpdateRecorder } from './interface';
 

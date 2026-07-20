@@ -7,7 +7,7 @@
  */
 
 import remapping, { type EncodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
-import MagicString from 'magic-string';
+import { MagicString } from 'magic-string';
 import assert from 'node:assert';
 import { workerData } from 'node:worker_threads';
 import { Visitor, parseSync } from 'oxc-parser';

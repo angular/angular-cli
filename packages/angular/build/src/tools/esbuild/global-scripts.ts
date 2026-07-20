@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import MagicString, { Bundle } from 'magic-string';
+import { Bundle, MagicString } from 'magic-string';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';

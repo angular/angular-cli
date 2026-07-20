@@ -7,7 +7,7 @@
  */
 
 import { RawSourceMap } from '@ampproject/remapping';
-import MagicString from 'magic-string';
+import { MagicString } from 'magic-string';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';

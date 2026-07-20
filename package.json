@@ -118,7 +118,7 @@
     "karma-jasmine-html-reporter": "~2.2.0",
     "karma-source-map-support": "1.4.0",
     "lodash": "^4.17.21",
-    "magic-string": "0.30.21",
+    "magic-string": "1.0.0",
     "prettier": "^3.0.0",
     "puppeteer": "25.3.0",
     "quicktype-core": "25.0.0",
