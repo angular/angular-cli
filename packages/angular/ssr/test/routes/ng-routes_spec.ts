@@ -502,6 +502,35 @@ describe('extractRoutesAndCreateRouteTree', () => {
     ]);
   });
 
+  it('should extract nested redirects with multiple path parameters', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: ':param1/:param2',
+          children: [
+            {
+              path: '',
+              pathMatch: 'full',
+              redirectTo: 'thing',
+            },
+            {
+              path: 'thing',
+              component: DummyComponent,
+            },
+          ],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/*/*', renderMode: RenderMode.Server, redirectTo: '/*/*/thing' },
+      { route: '/*/*/thing', renderMode: RenderMode.Server },
+    ]);
+  });
+
   it('should not resolve parameterized routes for SSG when `invokeGetPrerenderParams` is false', async () => {
     setAngularAppTestingManifest(
       [
