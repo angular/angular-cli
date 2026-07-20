@@ -194,6 +194,13 @@ export const useComponentTemplateHmr = parseTristate(process.env['NG_HMR_TEMPLAT
  */
 export const usePartialSsrBuild = parseTristate(process.env['NG_BUILD_PARTIAL_SSR']) === true;
 
+/**
+ * When `NG_BUILD_BABEL_LINKER` is enabled (`1` or `true`), the Babel-based
+ * Angular Linker (`@angular/compiler-cli/linker/babel`) will be used instead of the
+ * default OXC in-place linker.
+ */
+export const useBabelLinker = parseTristate(process.env['NG_BUILD_BABEL_LINKER']) === true;
+
 const bazelBinDirectory = process.env['BAZEL_BINDIR'];
 const bazelExecRoot = process.env['JS_BINARY__EXECROOT'];
 

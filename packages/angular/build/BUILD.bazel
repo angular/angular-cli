@@ -146,6 +146,7 @@ ts_project(
         ":build",
         ":node_modules/@angular-devkit/core",
         ":node_modules/@babel/core",
+        ":node_modules/oxc-parser",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@types/jasmine",
         "//:node_modules/esbuild",
