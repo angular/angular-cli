@@ -272,6 +272,7 @@ export class VitestExecutor implements TestExecutor {
       debug,
       projectSourceRoot,
       browserViewport,
+      this.options.connectOptions,
     );
     if (browserOptions.errors?.length) {
       this.debugLog(DebugLogLevel.Info, 'Browser configuration errors found.', {

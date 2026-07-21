@@ -221,6 +221,7 @@ export type UnitTestBuilderOptions = {
     browserViewport?: string;
     browsers?: string[];
     buildTarget?: string;
+    connectOptions?: ConnectOptions;
     coverage?: boolean;
     coverageExclude?: string[];
     coverageInclude?: string[];
