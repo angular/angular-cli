@@ -468,10 +468,10 @@ describe('augment-index-html', () => {
 
     const match = content.match(/<script type="importmap">([^<]+)<\/script>/);
     expect(match).withContext('importmap script tag missing').not.toBeNull();
-    expect(match?.[1]).toContain('lazy\\u003cchunk.js');
-    expect(match?.[1]).not.toContain('lazy<chunk.js');
+    expect(match?.[1]).toContain('./lazy\\u003cchunk.js');
+    expect(match?.[1]).not.toContain('./lazy<chunk.js');
     expect(JSON.parse(match?.[1] ?? '{}')).toEqual({
-      integrity: { 'lazy<chunk.js': 'sha384-abc' },
+      integrity: { './lazy<chunk.js': 'sha384-abc' },
     });
   });
 

@@ -200,7 +200,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const importmapFiles = Object.keys(importmap.integrity);
       expect(importmapFiles.sort())
         .withContext('importmap integrity keys should match emitted lazy JS files')
-        .toEqual(lazyJsFiles.sort());
+        .toEqual(lazyJsFiles.map((f) => `./${f}`).sort());
 
       for (const [file, integrity] of Object.entries(importmap.integrity)) {
         const expectedSri =

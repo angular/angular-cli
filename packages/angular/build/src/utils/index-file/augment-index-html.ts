@@ -11,6 +11,12 @@ import { extname } from 'node:path';
 import { htmlRewritingStream } from './html-rewriting-stream';
 import { VALID_SELF_CLOSING_TAGS } from './valid-self-closing-tags';
 
+/**
+ * RegExp to check if a URL is resolvable.
+ * A URL is resolvable if it is absolute (starting with http/https) or relative (starting with `./`, `../`, or `/`).
+ */
+const RESOLVABLE_URL_REGEXP = /^(?:\.{0,2}\/|https?:\/\/)/i;
+
 export type LoadOutputFileFunctionType = (file: string) => Promise<string>;
 
 export type CrossOriginValue = 'none' | 'anonymous' | 'use-credentials';
@@ -168,7 +174,9 @@ export async function augmentIndexHtml(
       keyA.localeCompare(keyB),
     );
     for (const [url, integrityHash] of sortedEntries) {
-      integrity[generateUrl(url, deployUrl)] = integrityHash;
+      const resolvedUrl = generateUrl(url, deployUrl);
+      const key = RESOLVABLE_URL_REGEXP.test(resolvedUrl) ? resolvedUrl : `./${resolvedUrl}`;
+      integrity[key] = integrityHash;
     }
     const importMapJson = JSON.stringify({ integrity }).replace(/</g, '\\u003c');
     subResourceIntegrityTag = `<script type="importmap">${importMapJson}</script>`;
@@ -268,9 +276,11 @@ export async function augmentIndexHtml(
           if (isString(baseHref)) {
             updateAttribute(tag, 'href', baseHref);
           }
+
           if (subResourceIntegrityTag) {
             rewriter.emitRaw(subResourceIntegrityTag);
           }
+
           break;
         case 'link':
           if (readAttribute(tag, 'rel') === 'preconnect') {
