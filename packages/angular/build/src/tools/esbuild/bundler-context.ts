@@ -17,7 +17,9 @@ import {
   context,
 } from 'esbuild';
 import assert from 'node:assert';
-import { basename, extname, join, relative } from 'node:path';
+import { realpathSync } from 'node:fs';
+import { basename, extname, join, relative, resolve } from 'node:path';
+import { toPosixPath } from '../../utils/path';
 import { SERVER_GENERATED_EXTERNALS } from '../../utils/server-rendering/manifest';
 import {
   type BuildOutputFile,
@@ -64,6 +66,7 @@ export class BundlerContext {
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
   #shouldCacheResult: boolean;
   #loadCache?: MemoryLoadResultCache;
+  #realWorkspaceRoot?: string;
   readonly watchFiles = new Set<string>();
 
   constructor(
@@ -259,6 +262,17 @@ export class BundlerContext {
           }
         }
       }
+    }
+
+    // esbuild always resolves its working directory through symbolic links (including
+    // Windows directory junctions) and generates metafile paths relative to the resolved
+    // path. When `preserveSymlinks` is enabled, the workspace root is intentionally not
+    // resolved, and the metafile paths are then relative to a different base directory.
+    // The paths are remapped so that all downstream consumers can rely on the documented
+    // invariant that metafile paths are relative to the workspace root.
+    this.#realWorkspaceRoot ??= realpathSync(this.workspaceRoot);
+    if (this.#realWorkspaceRoot !== this.workspaceRoot) {
+      remapMetafileBasePath(result.metafile, this.#realWorkspaceRoot, this.workspaceRoot);
     }
 
     // Update files that should be watched.
@@ -485,6 +499,71 @@ export class BundlerContext {
       this.#esbuildContext = undefined;
     }
   }
+}
+
+/**
+ * Remaps all relative paths within an esbuild metafile from one base directory to another.
+ * Virtual files (e.g., `angular:` namespaced or bundler generated), external imports, and
+ * non-relative paths are left unmodified.
+ *
+ * @param metafile The metafile to update in place.
+ * @param fromBase The absolute base directory the metafile paths are currently relative to.
+ * @param toBase The absolute base directory the metafile paths should be made relative to.
+ */
+export function remapMetafileBasePath(metafile: Metafile, fromBase: string, toBase: string): void {
+  const remapped = new Map<string, string>();
+  const remap = (value: string): string => {
+    // Skip virtual files and paths with a scheme-like or namespace prefix (e.g., `angular:`)
+    if (
+      isInternalAngularFile(value) ||
+      isInternalBundlerFile(value) ||
+      /^[^\\/.]{2,}:/.test(value)
+    ) {
+      return value;
+    }
+
+    let result = remapped.get(value);
+    if (result === undefined) {
+      // esbuild metafile paths always use POSIX path separators
+      result = toPosixPath(relative(toBase, resolve(fromBase, value)));
+      remapped.set(value, result);
+    }
+
+    return result;
+  };
+
+  const inputs: Metafile['inputs'] = {};
+  for (const [key, value] of Object.entries(metafile.inputs)) {
+    for (const importRecord of value.imports) {
+      if (!importRecord.external) {
+        importRecord.path = remap(importRecord.path);
+      }
+    }
+    inputs[remap(key)] = value;
+  }
+  metafile.inputs = inputs;
+
+  const outputs: Metafile['outputs'] = {};
+  for (const [key, value] of Object.entries(metafile.outputs)) {
+    if (value.entryPoint !== undefined) {
+      value.entryPoint = remap(value.entryPoint);
+    }
+    if (value.cssBundle !== undefined) {
+      value.cssBundle = remap(value.cssBundle);
+    }
+    for (const importRecord of value.imports) {
+      if (!importRecord.external) {
+        importRecord.path = remap(importRecord.path);
+      }
+    }
+    const outputInputs: (typeof value)['inputs'] = {};
+    for (const [inputKey, inputValue] of Object.entries(value.inputs)) {
+      outputInputs[remap(inputKey)] = inputValue;
+    }
+    value.inputs = outputInputs;
+    outputs[remap(key)] = value;
+  }
+  metafile.outputs = outputs;
 }
 
 function isInternalAngularFile(file: string) {

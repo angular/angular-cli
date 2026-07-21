@@ -146,6 +146,7 @@ ts_project(
         ":node_modules/@babel/core",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@types/jasmine",
+        "//:node_modules/esbuild",
         "//:node_modules/prettier",
         "//:node_modules/typescript",
         "//packages/angular/build/private",
