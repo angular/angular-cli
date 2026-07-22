@@ -281,6 +281,37 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     },
     isNotFound: isKnownNotFound,
   },
+  nub: {
+    // nub is pnpm-CLI-compatible, so its descriptor mirrors pnpm's aside from
+    // the binary name and the pnpm-v9-format lockfile it writes (`nub.lock`).
+    binary: 'nub',
+    lockfiles: ['nub.lock'],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--save-exact',
+    saveTildeFlag: '--save-tilde',
+    saveDevFlag: '--save-dev',
+    noLockfileFlag: '--no-lockfile',
+    ignoreScriptsFlag: '--ignore-scripts',
+    ignorePeerDependenciesFlag: '--strict-peer-dependencies=false',
+    configFiles: ['.npmrc'],
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getReleaseAgeConfigCommand: ['config', 'get', 'minimum-release-age'],
+    getPackageNameCommand: ['pkg', 'get', 'name'],
+    getManifestCommand: ['view', '--json'],
+    viewCommandFieldArgFormatter: (fields) => [...fields],
+    outputParsers: {
+      listDependencies: parseNpmLikeDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+      getReleaseAge: parsePnpmReleaseAge,
+    },
+    isNotFound: isKnownNotFound,
+  },
   bun: {
     binary: 'bun',
     lockfiles: ['bun.lockb', 'bun.lock'],
@@ -346,6 +377,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
  */
 export const PACKAGE_MANAGER_PRECEDENCE: readonly PackageManagerName[] = [
   'pnpm',
+  'nub',
   'yarn',
   'bun',
   'npm',

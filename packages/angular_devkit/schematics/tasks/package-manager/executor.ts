@@ -45,6 +45,12 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
       installPackage: 'install',
     },
   },
+  'nub': {
+    commands: {
+      installAll: 'install',
+      installPackage: 'add',
+    },
+  },
 };
 
 export class UnknownPackageManagerException extends BaseException {
