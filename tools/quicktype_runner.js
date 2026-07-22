@@ -126,10 +126,12 @@ async function generate(inPath) {
     inputData,
     alphabetizeProperties: true,
     rendererOptions: {
-      'prefer-types': 'true',
-      'just-types': 'true',
-      'explicit-unions': 'true',
+      'prefer-types': true,
+      'just-types': true,
+      'prefer-unions': false,
+      'explicit-unions': true,
       'acronym-style': 'camel',
+      'prefer-unknown': false,
     },
   });
 

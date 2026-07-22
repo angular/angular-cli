@@ -219,7 +219,7 @@ export type NgPackagrBuilderOptions = {
 // @public
 export type UnitTestBuilderOptions = {
     browserViewport?: string;
-    browsers?: string[];
+    browsers?: [string, ...string[]];
     buildTarget?: string;
     coverage?: boolean;
     coverageExclude?: string[];
