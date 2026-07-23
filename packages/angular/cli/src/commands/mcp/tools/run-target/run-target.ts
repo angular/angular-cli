@@ -66,7 +66,7 @@ This is the single, unified interface for executing all project tasks natively.
   and disables watch mode to guarantee clean execution.
 * Output Paths: For official builders, successful builds return the build directory in 'outputPath' under the extensions metadata.
 * Watch mode (serve target or watch options) is NOT yet supported in this version of run_target.
-  You MUST use the legacy 'devserver.*' tools for background server lifecycles.
+  You MUST use the legacy 'devserver_*' tools for background server lifecycles.
 </Operational Notes>`,
   isReadOnly: false,
   isLocalOnly: true,

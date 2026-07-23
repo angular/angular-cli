@@ -96,22 +96,22 @@ export const DEVSERVER_WAIT_FOR_BUILD_TOOL: McpToolDeclaration<
   typeof devserverWaitForBuildToolInputSchema.shape,
   typeof devserverWaitForBuildToolOutputSchema.shape
 > = declareTool({
-  name: 'devserver.wait_for_build',
+  name: 'devserver_wait_for_build',
   title: 'Wait for Devserver Build',
   description: `
 <Purpose>
-Waits for a dev server that was started with the "devserver.start" tool to complete its build, then reports the build logs from its most
+Waits for a dev server that was started with the "devserver_start" tool to complete its build, then reports the build logs from its most
 recent build.
 </Purpose>
 <Use Cases>
-* **Waiting for a build:** As long as a devserver is alive ("devserver.start" was called for this project and "devserver.stop" wasn't
+* **Waiting for a build:** As long as a devserver is alive ("devserver_start" was called for this project and "devserver_stop" wasn't
   called yet), then if you're making a file change and want to ensure it was successfully built, call this tool instead of any other build
   tool or command. When it retuns you'll get build logs back **and** you'll know the user's devserver is up-to-date with the latest changes.
 </Use Cases>
 <Operational Notes>
-* This tool expects that a dev server was launched on the same project with the "devserver.start" tool, otherwise the tool will fail.
+* This tool expects that a dev server was launched on the same project with the "devserver_start" tool, otherwise the tool will fail.
 * This tool will block until the build is complete or the timeout is reached. If you expect a long build process, consider increasing the
-  timeout. Timeouts on initial run (right after "devserver.start" calls) or after a big change are not necessarily indicative of an error.
+  timeout. Timeouts on initial run (right after "devserver_start" calls) or after a big change are not necessarily indicative of an error.
 * If you encountered a timeout and it might be reasonable, just call this tool again.
 * If the dev server is not building, it will return quickly, with the logs from the last build.
 </Operational Notes>

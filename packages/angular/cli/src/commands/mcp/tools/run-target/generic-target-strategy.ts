@@ -34,7 +34,7 @@ export class GenericTargetStrategy implements TargetStrategy {
     if (input.targetName === 'serve' || input.options?.['watch'] === true) {
       throw new Error(
         `Watch mode execution (serve target or watch option) is not yet supported by 'run_target'. ` +
-          `Please use the legacy 'devserver.start' / 'devserver.wait_for_build' tools instead.`,
+          `Please use the legacy 'devserver_start' / 'devserver_wait_for_build' tools instead.`,
       );
     }
 
