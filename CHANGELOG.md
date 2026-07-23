@@ -1,3 +1,27 @@
+<a name="22.0.8"></a>
+
+# 22.0.8 (2026-07-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [41c356256](https://github.com/angular/angular-cli/commit/41c356256525469a41ea72896b1ddff91a4e6e55) | fix  | batch Prettier invocations during migration formatting   |
+| [bc87c85c3](https://github.com/angular/angular-cli/commit/bc87c85c3c660e969cf77a493dc4ee58fd831214) | fix  | update MCP devserver tool names to conform to spec regex |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [5724bf632](https://github.com/angular/angular-cli/commit/5724bf632eba59eccdd941beae8aafad35ce003e) | fix  | canonicalize drive letter casing for workspace root on Windows    |
+| [b8bdbaa1e](https://github.com/angular/angular-cli/commit/b8bdbaa1ea1c58f061580bd58c015078f57c1530) | fix  | ensure import map integrity keys are valid URL-like specifiers    |
+| [212a7bb21](https://github.com/angular/angular-cli/commit/212a7bb21eca131f32fd7b4e7b5a9ab87f2bfded) | fix  | favor istanbul coverage provider when browser testing is enabled  |
+| [bc760b005](https://github.com/angular/angular-cli/commit/bc760b005e0dae10a2dfd31a7f0f772482305398) | fix  | preserve custom config options in runnerConfig for vitest         |
+| [19cda7415](https://github.com/angular/angular-cli/commit/19cda7415693f36e911a736a32576110905b6600) | fix  | remap metafile paths when workspace root is a symlink or junction |
+| [fdcc98c79](https://github.com/angular/angular-cli/commit/fdcc98c7912f45431268fdf66c8b132bd119bc27) | perf | skip semantic affected-file walk when type checking is disabled   |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.7"></a>
 
 # 22.0.7 (2026-07-15)
