@@ -302,7 +302,7 @@ export async function optimizeChunks(
         minify: { mangle: false, compress: false },
         sourcemap,
         chunkFileNames: (chunkInfo) =>
-          `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+          `${chunkInfo.name.replace(/-[a-zA-Z0-9_-]{8}$/, '')}-[hash].js`,
       });
       optimizedOutput = result.output;
     } else {
@@ -324,7 +324,7 @@ export async function optimizeChunks(
         compact: true,
         sourcemap,
         chunkFileNames: (chunkInfo) =>
-          `${chunkInfo.name.replace(/-[a-zA-Z0-9]{8}$/, '')}-[hash].js`,
+          `${chunkInfo.name.replace(/-[a-zA-Z0-9_-]{8}$/, '')}-[hash].js`,
       });
       optimizedOutput = result.output;
     }
