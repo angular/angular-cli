@@ -1,3 +1,37 @@
+<a name="22.1.0-rc.0"></a>
+
+# 22.1.0-rc.0 (2026-07-23)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------- |
+| [f59bcf529](https://github.com/angular/angular-cli/commit/f59bcf52917bc5e25b97c863f96127ec8d0f12f5) | fix  | abort and guide manual mitigation when updating catalog packages        |
+| [5d4dda581](https://github.com/angular/angular-cli/commit/5d4dda5819a7765e98af5b93cd407e6a6e7f70e4) | fix  | batch Prettier invocations during migration formatting                  |
+| [c963ecbec](https://github.com/angular/angular-cli/commit/c963ecbec241d42dfb419ae081ba22429e37f09e) | fix  | remove algoliasearch dependency and support latest docs versions        |
+| [6859d25c3](https://github.com/angular/angular-cli/commit/6859d25c32b6c93cbbf2d4ad4143aa10b52b7588) | fix  | resolve correct registry name when using npm alias syntax during update |
+| [5c3101bff](https://github.com/angular/angular-cli/commit/5c3101bff2e1b9d0b0e4668a183e8bcab8a1540e) | fix  | revert package.json changes if installation tasks fail during update    |
+| [e12e00216](https://github.com/angular/angular-cli/commit/e12e00216cb2fcd1bc7f4895b39f6947eabdecb5) | fix  | update MCP devserver tool names to conform to spec regex                |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------- |
+| [51f69276f](https://github.com/angular/angular-cli/commit/51f69276fd2b2aab0e94901e79a51f6860ef8690) | feat | enable chunk optimization for server builds                                  |
+| [10dc30f9c](https://github.com/angular/angular-cli/commit/10dc30f9c680f46f65b5beb030f2a75c422a3e71) | feat | migrate advanced optimization Babel plugins to oxc-parser + magic-string     |
+| [917393a4c](https://github.com/angular/angular-cli/commit/917393a4cd85172574b155f727da5c1eae196fb1) | feat | migrate i18n inliner to oxc-parser + magic-string                            |
+| [95510511d](https://github.com/angular/angular-cli/commit/95510511d963384c5a03298300246aa34a62328a) | fix  | add bounded timeout to vitest executor disposal                              |
+| [62b11e316](https://github.com/angular/angular-cli/commit/62b11e316e8248161877592acee5954b2a8c9c66) | fix  | anchor debug ID comment matching and make injection idempotent               |
+| [4187e5e27](https://github.com/angular/angular-cli/commit/4187e5e2776673b1146c6a5bc3362854373377c4) | fix  | canonicalize drive letter casing for workspace root on Windows               |
+| [21b8fc0f1](https://github.com/angular/angular-cli/commit/21b8fc0f1271af956dbcfaa4a816caacd64f5dec) | fix  | ensure import map integrity keys are valid URL-like specifiers               |
+| [9a3c34bd1](https://github.com/angular/angular-cli/commit/9a3c34bd16ac04fff423dff1ddaf6d6257a374f4) | fix  | favor istanbul coverage provider when browser testing is enabled             |
+| [80edac58b](https://github.com/angular/angular-cli/commit/80edac58b3cfadfeabd97091eebeac381d4b589d) | fix  | preserve custom config options in runnerConfig for vitest                    |
+| [751adb9d7](https://github.com/angular/angular-cli/commit/751adb9d7f92889c4e58de86f5389946b3159f1e) | fix  | remap metafile paths when workspace root is a symlink or junction            |
+| [0e3ca3dfb](https://github.com/angular/angular-cli/commit/0e3ca3dfba8ef60217089d93a321660ebb6fb838) | fix  | support hyphens and underscores when stripping chunk hash in chunk optimizer |
+| [2462709d1](https://github.com/angular/angular-cli/commit/2462709d1b44ef58da0d2f0048041b4748f659a2) | perf | skip semantic affected-file walk when type checking is disabled              |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.8"></a>
 
 # 22.0.8 (2026-07-23)
