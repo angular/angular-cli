@@ -20,6 +20,7 @@ import { createRequire } from 'node:module';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { z } from 'zod';
 import { VERSION } from '../../../utilities/version';
+import { isAllowedWorkspacePath } from '../workspace-utils';
 import { type McpToolContext, declareTool } from './tool-registry';
 
 const bestPracticesInputSchema = z.object({
@@ -86,13 +87,24 @@ async function getBundledBestPractices(): Promise<string> {
  *
  * @param workspacePath The absolute path to the user's `angular.json` file.
  * @param logger The MCP tool context logger for reporting warnings.
+ * @param server The MCP server context, used to enforce the client's declared roots.
  * @returns A promise that resolves to an object containing the guide's content and source,
  *     or `undefined` if the guide could not be resolved.
  */
 async function getVersionSpecificBestPractices(
   workspacePath: string,
   logger: McpToolContext['logger'],
+  server: McpToolContext['server'],
 ): Promise<{ content: string; source: string } | undefined> {
+  if (server && !(await isAllowedWorkspacePath(server, workspacePath))) {
+    logger.warn(
+      `Workspace path is outside the allowed MCP roots: ${workspacePath}. ` +
+        'Falling back to the bundled guide.',
+    );
+
+    return undefined;
+  }
+
   // 1. Resolve the path to package.json
   let pkgJsonPath: string;
   try {
@@ -175,7 +187,7 @@ async function getVersionSpecificBestPractices(
  * @param context The MCP tool context, containing the logger.
  * @returns An async function that serves as the tool's executor.
  */
-function createBestPracticesHandler({ logger }: McpToolContext) {
+function createBestPracticesHandler({ logger, server }: McpToolContext) {
   let bundledBestPractices: Promise<string>;
 
   return async (input: BestPracticesInput) => {
@@ -184,7 +196,11 @@ function createBestPracticesHandler({ logger }: McpToolContext) {
 
     // First, try to get the version-specific guide.
     if (input.workspacePath) {
-      const versionSpecific = await getVersionSpecificBestPractices(input.workspacePath, logger);
+      const versionSpecific = await getVersionSpecificBestPractices(
+        input.workspacePath,
+        logger,
+        server,
+      );
       if (versionSpecific) {
         content = versionSpecific.content;
         source = versionSpecific.source;

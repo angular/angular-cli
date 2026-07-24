@@ -110,7 +110,7 @@ async function getAllowedWorkspaceRoots(server: McpToolContext['server']): Promi
     .filter((root): root is string => root !== null);
 }
 
-async function isAllowedWorkspacePath(
+export async function isAllowedWorkspacePath(
   server: McpToolContext['server'],
   workspacePath: string,
 ): Promise<boolean> {
