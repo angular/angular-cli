@@ -16,7 +16,7 @@
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "@inquirer/prompts": "8.5.2",
-    "@listr2/prompt-adapter-inquirer": "4.2.4",
+    "@listr2/prompt-adapter-inquirer": "4.2.5",
     "@modelcontextprotocol/sdk": "1.29.0",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "jsonc-parser": "3.3.1",
