@@ -89,7 +89,6 @@
     "@types/picomatch": "^4.0.0",
     "@types/progress": "^2.0.3",
     "@types/semver": "^7.3.12",
-    "@types/watchpack": "^2.4.4",
     "@types/yargs": "^17.0.20",
     "@types/yargs-parser": "^21.0.0",
     "@typescript-eslint/eslint-plugin": "8.66.0",

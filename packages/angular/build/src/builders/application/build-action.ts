@@ -42,6 +42,7 @@ const packageWatchFiles = [
   '.pnp.data.json',
 ];
 
+// eslint-disable-next-line max-lines-per-function
 export async function* runEsBuildBuildAction(
   action: (rebuildState?: RebuildState) => Promise<ExecutionResult>,
   options: {
@@ -116,11 +117,12 @@ export async function* runEsBuildBuildAction(
 
       // Setup a watcher
       const { createWatcher } = await import('../../tools/esbuild/watcher');
-      watcher = createWatcher({
+      watcher = await createWatcher({
         polling: typeof poll === 'number',
         interval: poll,
         followSymlinks: preserveSymlinks,
         ignored,
+        cwd: workspaceRoot,
       });
 
       // Setup abort support
@@ -218,6 +220,9 @@ export async function* runEsBuildBuildAction(
       // Remove any stale locations if the build was successful
       if (staleWatchFiles?.size) {
         watcher.remove([...staleWatchFiles]);
+        for (const staleFile of staleWatchFiles) {
+          currentWatchFiles.delete(staleFile);
+        }
       }
 
       for (const outputResult of emitOutputResults(

@@ -175,7 +175,6 @@ ts_project(
         "//:node_modules/@types/node",
         "//:node_modules/@types/picomatch",
         "//:node_modules/@types/semver",
-        "//:node_modules/@types/watchpack",
         "//:node_modules/esbuild",
         "//:node_modules/esbuild-wasm",
         "//:node_modules/karma",
