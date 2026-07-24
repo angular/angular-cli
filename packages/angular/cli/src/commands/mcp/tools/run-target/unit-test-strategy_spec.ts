@@ -65,7 +65,7 @@ describe('UnitTestTargetStrategy', () => {
       );
 
       expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
-        ['test', 'my-app', '-c', 'ci', '--browsers', 'ChromeHeadless', '--watch', 'false'],
+        ['test', 'my-app', '--configuration=ci', '--browsers', 'ChromeHeadless', '--watch', 'false'],
         { cwd: '/test' },
       );
     });
