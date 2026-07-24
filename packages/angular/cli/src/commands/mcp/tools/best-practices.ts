@@ -96,13 +96,24 @@ async function getVersionSpecificBestPractices(
   logger: McpToolContext['logger'],
   server: McpToolContext['server'],
 ): Promise<{ content: string; source: string } | undefined> {
-  if (server && !(await isAllowedWorkspacePath(server, workspacePath))) {
-    logger.warn(
-      `Workspace path is outside the allowed MCP roots: ${workspacePath}. ` +
-        'Falling back to the bundled guide.',
-    );
+  if (server) {
+    try {
+      if (!(await isAllowedWorkspacePath(server, workspacePath))) {
+        logger.warn(
+          `Workspace path is outside the allowed MCP roots: ${workspacePath}. ` +
+            'Falling back to the bundled guide.',
+        );
 
-    return undefined;
+        return undefined;
+      }
+    } catch (e) {
+      logger.warn(
+        `Failed to verify workspace path '${workspacePath}': ` +
+          `${e instanceof Error ? e.message : e}. Falling back to the bundled guide.`,
+      );
+
+      return undefined;
+    }
   }
 
   // 1. Resolve the path to package.json
