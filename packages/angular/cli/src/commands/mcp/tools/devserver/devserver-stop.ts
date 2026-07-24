@@ -69,7 +69,7 @@ Stops a running Angular development server ("ng serve") that was started with th
   time after this is called. However note that this is not a blocker for starting a new devserver.
 </Operational Notes>
 `,
-  isReadOnly: true,
+  isReadOnly: false,
   isLocalOnly: true,
   inputSchema: devserverStopToolInputSchema.shape,
   outputSchema: devserverStopToolOutputSchema.shape,
