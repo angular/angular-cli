@@ -154,9 +154,6 @@ importers:
       '@types/semver':
         specifier: ^7.3.12
         version: 7.8.0
-      '@types/watchpack':
-        specifier: ^2.4.4
-        version: 2.4.5
       '@types/yargs':
         specifier: ^17.0.20
         version: 17.0.35
@@ -339,7 +336,10 @@ importers:
         version: 8.0.1
       '@inquirer/confirm':
         specifier: 6.1.1
-        version: 6.1.1(@types/node@22.20.1)
+        version: 6.1.1(@types/node@24.13.3)
+      '@parcel/watcher':
+        specifier: 2.6.0
+        version: 2.6.0
       '@vitejs/plugin-basic-ssl':
         specifier: 2.3.0
         version: 2.3.0(vite@8.2.0(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.8.1(supports-color@11.0.0))(sass@1.102.0)(terser@5.49.1)(tsx@4.23.1)(yaml@2.9.0))
@@ -349,6 +349,9 @@ importers:
       browserslist:
         specifier: ^4.26.0
         version: 4.28.7
+      chokidar:
+        specifier: 5.0.0
+        version: 5.0.0
       esbuild:
         specifier: 0.28.1
         version: 0.28.1
@@ -397,9 +400,6 @@ importers:
       vite:
         specifier: 8.2.0
         version: 8.2.0(@types/node@22.20.1)(esbuild@0.28.1)(jiti@2.7.0)(less@4.8.1(supports-color@11.0.0))(sass@1.102.0)(terser@5.49.1)(tsx@4.23.1)(yaml@2.9.0)
-      watchpack:
-        specifier: 2.5.2
-        version: 2.5.2
       xxhash-wasm:
         specifier: 1.1.0
         version: 1.1.0
@@ -3475,9 +3475,6 @@ packages:
   '@types/gensync@1.0.5':
     resolution: {integrity: sha512-MbsRCT7mTikHwKZ0X+LVUTLRrZZRLipTuXEO9qOYO+zmjMVk81axyClMROf6uoPD9MRVu46bx8zoR0Ad9q3NAg==}
 
-  '@types/graceful-fs@4.1.9':
-    resolution: {integrity: sha512-olP3sd1qOEe5dXTSaFvQG+02VdRXcdytWLAZsAq1PecU8uqQAhkrnbli7DagjtXKW/Bl7YJbUsa8MPcuc8LHEQ==}
-
   '@types/http-cache-semantics@4.2.0':
     resolution: {integrity: sha512-L3LgimLHXtGkWikKnsPg0/VFx9OGZaC+eN1u4r+OB1XRqH3meBIAVC2zr1WdMH+RHmnRkqliQAOHNJ/E0j/e0Q==}
 
@@ -3576,9 +3573,6 @@ packages:
 
   '@types/urijs@1.19.26':
     resolution: {integrity: sha512-wkXrVzX5yoqLnndOwFsieJA7oKM8cNkOKJtf/3vVGSUFkWDKZvFHpIl9Pvqb/T9UsawBBFMTTD8xu7sK5MWuvg==}
-
-  '@types/watchpack@2.4.5':
-    resolution: {integrity: sha512-8CarnGOIYYRL342jwQyHrGwz4vCD3y5uwwYmzQVzT2Z24DqSd6wwBva6m0eNJX4S5pVmrx9xUEbOsOoqBVhWsg==}
 
   '@types/which@3.0.4':
     resolution: {integrity: sha512-liyfuo/106JdlgSchJzXEQCVArk0CvevqPote8F8HgWgJ3dRCcTHgJIsLDuee0kxk/mhbInzIZk3QWSZJ8R+2w==}
@@ -10669,7 +10663,6 @@ snapshots:
       '@parcel/watcher-linux-x64-musl': 2.6.0
       '@parcel/watcher-win32-arm64': 2.6.0
       '@parcel/watcher-win32-x64': 2.6.0
-    optional: true
 
   '@peculiar/asn1-cms@2.8.0':
     dependencies:
@@ -11103,10 +11096,6 @@ snapshots:
 
   '@types/gensync@1.0.5': {}
 
-  '@types/graceful-fs@4.1.9':
-    dependencies:
-      '@types/node': 22.20.1
-
   '@types/http-cache-semantics@4.2.0': {}
 
   '@types/http-errors@2.0.5': {}
@@ -11221,11 +11210,6 @@ snapshots:
       '@types/node': 22.20.1
 
   '@types/urijs@1.19.26': {}
-
-  '@types/watchpack@2.4.5':
-    dependencies:
-      '@types/graceful-fs': 4.1.9
-      '@types/node': 22.20.1
 
   '@types/which@3.0.4': {}
 
@@ -14656,8 +14640,7 @@ snapshots:
   node-addon-api@6.1.0:
     optional: true
 
-  node-addon-api@7.1.1:
-    optional: true
+  node-addon-api@7.1.1: {}
 
   node-domexception@1.0.0: {}
 
