@@ -119,7 +119,7 @@ the first build completes.
 * **Consistent Ports**: If making multiple calls, it is recommended to reuse the port you got from the first call for subsequent ones.
 </Operational Notes>
 `,
-  isReadOnly: true,
+  isReadOnly: false,
   isLocalOnly: true,
   inputSchema: devserverStartToolInputSchema.shape,
   outputSchema: devserverStartToolOutputSchema.shape,
