@@ -10,7 +10,7 @@ import type { OnLoadResult, PluginBuild } from 'esbuild';
 import { normalize } from 'node:path';
 
 export interface LoadResultCache {
-  get(path: string): OnLoadResult | undefined;
+  get(path: string): OnLoadResult | Promise<OnLoadResult | undefined> | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
   readonly watchFiles: ReadonlyArray<string>;
 }
@@ -25,7 +25,7 @@ export function createCachedLoad(
 
   return async (args) => {
     const loadCacheKey = `${args.namespace}:${args.path}`;
-    let result: OnLoadResult | null | undefined = cache.get(loadCacheKey);
+    let result: OnLoadResult | null | undefined = await cache.get(loadCacheKey);
 
     if (result === undefined) {
       result = await callback(args);
@@ -35,7 +35,9 @@ export function createCachedLoad(
         // Ensure requested path is included if it was a resolved file
         if (args.namespace === 'file') {
           result.watchFiles ??= [];
-          result.watchFiles.push(args.path);
+          if (!result.watchFiles.includes(args.path)) {
+            result.watchFiles.push(args.path);
+          }
         }
         await cache.put(loadCacheKey, result);
       }
