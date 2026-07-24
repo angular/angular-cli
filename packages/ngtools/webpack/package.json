@@ -20,6 +20,6 @@
     "@angular/compiler": "22.1.0-rc.0",
     "@angular/compiler-cli": "22.1.0-rc.0",
     "typescript": "6.0.3",
-    "webpack": "5.108.4"
+    "webpack": "5.109.0"
   }
 }
