@@ -28,5 +28,18 @@ describeKarmaBuilder(execute, KARMA_BUILDER_INFO, (harness, setupTarget) => {
 
       expect(result?.success).toBeFalse();
     });
+
+    it('handles stream cancellation gracefully in watch mode', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      const { result } = await harness.executeOnce({
+        outputLogsOnFailure: false,
+      });
+
+      expect(result?.success).toBeTrue();
+    });
   });
 });

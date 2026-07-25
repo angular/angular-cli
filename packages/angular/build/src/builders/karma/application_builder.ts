@@ -11,7 +11,6 @@ import type { Config, ConfigOptions, FilePattern, InlinePluginDef, Server } from
 import { randomUUID } from 'node:crypto';
 import { rmSync } from 'node:fs';
 import * as fs from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { ReadableStream } from 'node:stream/web';
 import { createVirtualModulePlugin } from '../../tools/esbuild/virtual-module-plugin';
@@ -66,8 +65,14 @@ export function execute(
         init = await initializeApplication(normalizedOptions, context, karmaOptions, transforms);
       } catch (err) {
         if (err instanceof ApplicationBuildError) {
-          controller.enqueue({ success: false, message: err.message });
-          controller.close();
+          if (controller.desiredSize !== null) {
+            try {
+              controller.enqueue({ success: false, message: err.message });
+              controller.close();
+            } catch {
+              // Stream controller may already be closed or cancelled
+            }
+          }
 
           return;
         }
@@ -85,8 +90,14 @@ export function execute(
 
       // Close the stream once the Karma server returns.
       karmaServer = new karma.Server(karmaConfig as Config, (exitCode) => {
-        controller.enqueue({ success: exitCode === 0 });
-        controller.close();
+        if (controller.desiredSize !== null) {
+          try {
+            controller.enqueue({ success: exitCode === 0 });
+            controller.close();
+          } catch {
+            // Stream controller may already be closed or cancelled
+          }
+        }
       });
 
       await karmaServer.start();
