@@ -59,8 +59,18 @@ export function injectKarmaReporter(
             break;
           }
 
+          if (controller.desiredSize === null) {
+            break;
+          }
+
           if (buildOutput.kind === ResultKind.Failure) {
-            controller.enqueue({ success: false, message: 'Build failed' });
+            if (controller.desiredSize !== null) {
+              try {
+                controller.enqueue({ success: false, message: 'Build failed' });
+              } catch {
+                // Stream controller may already be closed or cancelled
+              }
+            }
           } else if (
             buildOutput.kind === ResultKind.Incremental ||
             buildOutput.kind === ResultKind.Full
@@ -81,10 +91,12 @@ export function injectKarmaReporter(
     }
 
     onRunComplete = function (_browsers: unknown, results: RunCompleteInfo): void {
-      if (results.exitCode === 0) {
-        controller.enqueue({ success: true });
-      } else {
-        controller.enqueue({ success: false });
+      if (controller.desiredSize !== null) {
+        try {
+          controller.enqueue({ success: results.exitCode === 0 });
+        } catch {
+          // Stream controller may already be closed or cancelled
+        }
       }
     };
   }
