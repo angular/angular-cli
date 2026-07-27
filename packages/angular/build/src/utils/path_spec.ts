@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isSubDirectory } from './path';
+import { canonicalizePath, isSubDirectory } from './path';
 
 describe('isSubDirectory', () => {
   it('should return true for a direct child', () => {
@@ -38,4 +38,18 @@ describe('isSubDirectory', () => {
     expect(isSubDirectory('/foo/bar', '/foo/bar/..baz')).toBeTrue();
     expect(isSubDirectory('/foo/bar', '/foo/bar/..baz/qux')).toBeTrue();
   });
+});
+
+describe('canonicalizePath', () => {
+  it('should return the path unmodified on POSIX systems', () => {
+    expect(canonicalizePath('/foo/bar/baz')).toBe('/foo/bar/baz');
+  });
+
+  if (process.platform === 'win32') {
+    it('should uppercase Windows drive-letter casing', () => {
+      expect(canonicalizePath('c:/foo/bar')).toBe('C:/foo/bar');
+      expect(canonicalizePath('d:\\foo\\bar')).toBe('D:\\foo\\bar');
+      expect(canonicalizePath('C:/foo/bar')).toBe('C:/foo/bar');
+    });
+  }
 });
