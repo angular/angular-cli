@@ -58,7 +58,7 @@ export async function normalizeOptions(
       : process.execArgv.includes('--preserve-symlinks');
 
   // Setup base paths based on workspace root and project information
-  const workspaceRoot = canonicalizePath(context.workspaceRoot, preserveSymlinks);
+  const workspaceRoot = canonicalizePath(context.workspaceRoot);
 
   const projectMetadata = await context.getProjectMetadata(projectName);
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
