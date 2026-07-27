@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { realpathSync } from 'node:fs';
 import { isAbsolute, posix, relative, resolve } from 'node:path';
 import { platform } from 'node:process';
 
@@ -53,18 +52,15 @@ export function isSubDirectory(parent: string, child: string): boolean {
 }
 
 /**
- * Canonicalizes a file path by normalising Windows drive-letter casing to uppercase
- * and optionally resolving symbolic links.
+ * Canonicalizes a file path by normalising Windows drive-letter casing to uppercase.
  *
  * @param pathString - The file path to canonicalize.
- * @param preserveSymlinks - If true, symbolic links will not be resolved.
  * @returns The canonicalized file path.
  */
-export function canonicalizePath(pathString: string, preserveSymlinks = false): string {
-  const resolved = preserveSymlinks ? pathString : realpathSync(pathString);
-  if (platform === 'win32' && /^[a-z]:/.test(resolved)) {
-    return resolved[0].toUpperCase() + resolved.slice(1);
+export function canonicalizePath(pathString: string): string {
+  if (platform === 'win32' && /^[a-z]:/.test(pathString)) {
+    return pathString[0].toUpperCase() + pathString.slice(1);
   }
 
-  return resolved;
+  return pathString;
 }
