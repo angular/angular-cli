@@ -1,3 +1,21 @@
+<a name="22.0.9"></a>
+
+# 22.0.9 (2026-07-29)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [9ee8f9b669](https://github.com/angular/angular-cli/commit/9ee8f9b6692b8efa2d0cabd502cd5a598f436c8a) | fix  | declare devserver_start and devserver_stop as isReadOnly:false |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [d0c776d461](https://github.com/angular/angular-cli/commit/d0c776d4610e2327c29900b9b3d679e9c0f28061) | fix  | safeguard Karma builder stream controller against closed state |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.0.8"></a>
 
 # 22.0.8 (2026-07-23)
