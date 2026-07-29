@@ -23,6 +23,9 @@ export function createAngularSsrInternalMiddleware(
 ): Connect.NextHandleFunction {
   let cachedAngularServerApp: ReturnType<typeof getOrCreateAngularServerApp> | undefined;
 
+  const { allowedHosts } = server.config.server;
+  const disableAllowedHostsCheck = allowedHosts === true;
+
   return function angularSsrMiddleware(
     req: Connect.IncomingMessage,
     res: ServerResponse,
@@ -62,6 +65,20 @@ export function createAngularSsrInternalMiddleware(
       const webReq = new Request(createWebRequestFromNodeRequest(req), {
         signal: AbortSignal.timeout(30_000),
       });
+
+      if (!disableAllowedHostsCheck && Array.isArray(allowedHosts) && allowedHosts.length > 0) {
+        const { hostname } = new URL(webReq.url);
+        const isAllowed = allowedHosts.some(
+          (host) => hostname === host || hostname.endsWith(`.${host}`),
+        );
+        if (!isAllowed) {
+          res.statusCode = 400;
+          res.end('Bad Request: Host not allowed.');
+
+          return;
+        }
+      }
+
       const webRes = await angularServerApp.handle(webReq);
       if (!webRes) {
         return next();
