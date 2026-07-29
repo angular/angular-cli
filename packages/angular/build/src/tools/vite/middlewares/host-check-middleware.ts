@@ -42,7 +42,17 @@ export function patchHostValidationMiddleware(middlewares: Connect.Server): void
   };
 }
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 function html403(hostname: string): string {
+  const safeHostname = escapeHtml(hostname);
+
   return `<!doctype html>
 <html>
   <head>
@@ -61,12 +71,12 @@ function html403(hostname: string): string {
   </head>
   <body>
     <main>
-      <h1>Blocked request. This host ("${hostname}") is not allowed.</h1>
+      <h1>Blocked request. This host ("${safeHostname}") is not allowed.</h1>
       <p>To allow this host, add it to <code>allowedHosts</code> under the <code>serve</code> target in <code>angular.json</code>.</p>
       <pre><code>{
   "serve": {
     "options": {
-      "allowedHosts": ["${hostname}"]
+      "allowedHosts": ["${safeHostname}"]
     }
   }
 }</code></pre>
