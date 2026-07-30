@@ -12,6 +12,7 @@ import {
   parseNpmLikeDependencies,
   parseNpmLikeError,
   parseNpmLikeManifest,
+  parseNpmLikeMetadata,
   parsePnpmReleaseAge,
   parseYarnClassicDependencies,
   parseYarnClassicError,
@@ -231,6 +232,56 @@ describe('parsers', () => {
       const error = parseNpmLikeError('An unexpected error occurred.');
       expect(error).toBeNull();
     });
+
+    it('should parse a structured JSON error wrapped in an error property (npm 12+ format)', () => {
+      const stdout = JSON.stringify({
+        error: {
+          code: 'E404',
+          summary: 'Not Found',
+          detail: 'Package not found.',
+        },
+      });
+      const error = parseNpmLikeError(stdout);
+      expect(error).toEqual({
+        code: 'E404',
+        summary: 'Not Found',
+        detail: 'Package not found.',
+      });
+    });
+
+    it('should parse a structured JSON error wrapped in an array', () => {
+      const stdout = JSON.stringify([
+        {
+          code: 'E404',
+          summary: 'Not Found',
+          detail: 'Package not found.',
+        },
+      ]);
+      const error = parseNpmLikeError(stdout);
+      expect(error).toEqual({
+        code: 'E404',
+        summary: 'Not Found',
+        detail: 'Package not found.',
+      });
+    });
+
+    it('should parse a structured JSON error wrapped in both an array and an error property', () => {
+      const stdout = JSON.stringify([
+        {
+          error: {
+            code: 'E404',
+            summary: 'Not Found',
+            detail: 'Package not found.',
+          },
+        },
+      ]);
+      const error = parseNpmLikeError(stdout);
+      expect(error).toEqual({
+        code: 'E404',
+        summary: 'Not Found',
+        detail: 'Package not found.',
+      });
+    });
   });
 
   describe('parseNpmLikeManifest', () => {
@@ -292,6 +343,66 @@ describe('parsers', () => {
 
     it('should return null for empty stdout', () => {
       expect(parseNpmLikeManifest('')).toBeNull();
+    });
+  });
+
+  describe('parseNpmLikeMetadata', () => {
+    it('should parse a single metadata object', () => {
+      const stdout = JSON.stringify({
+        name: 'foo',
+        'dist-tags': { latest: '1.0.0' },
+        versions: ['1.0.0'],
+      });
+      expect(parseNpmLikeMetadata(stdout)).toEqual({
+        name: 'foo',
+        'dist-tags': { latest: '1.0.0' },
+        versions: ['1.0.0'],
+      });
+    });
+
+    it('should parse metadata from an array (npm 12+ format)', () => {
+      const stdout = JSON.stringify([
+        {
+          name: 'foo',
+          'dist-tags': { latest: '1.0.0' },
+          versions: ['1.0.0'],
+        },
+      ]);
+      expect(parseNpmLikeMetadata(stdout)).toEqual({
+        name: 'foo',
+        'dist-tags': { latest: '1.0.0' },
+        versions: ['1.0.0'],
+      });
+    });
+
+    it('should return the first valid metadata from an array', () => {
+      const stdout = JSON.stringify([
+        { name: 'foo' }, // Invalid (missing versions and dist-tags)
+        {
+          name: 'foo',
+          'dist-tags': { latest: '1.0.0' },
+          versions: ['1.0.0'],
+        },
+      ]);
+      expect(parseNpmLikeMetadata(stdout)).toEqual({
+        name: 'foo',
+        'dist-tags': { latest: '1.0.0' },
+        versions: ['1.0.0'],
+      });
+    });
+
+    it('should return null if no valid metadata is found in an array', () => {
+      const stdout = JSON.stringify([{ name: 'foo' }, { versions: ['1.0.0'] }]);
+      expect(parseNpmLikeMetadata(stdout)).toBeNull();
+    });
+
+    it('should return null for invalid single object', () => {
+      const stdout = JSON.stringify({ name: 'foo' }); // Missing versions and dist-tags
+      expect(parseNpmLikeMetadata(stdout)).toBeNull();
+    });
+
+    it('should return null for empty stdout', () => {
+      expect(parseNpmLikeMetadata('')).toBeNull();
     });
   });
 
