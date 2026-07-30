@@ -998,4 +998,106 @@ describe('adjust-static-class-members oxc-transform implementation', () => {
       `,
     }),
   );
+
+  it(
+    'wraps adjacent class declarations without interleaving',
+    testCase({
+      input: 'class A{static s=[1]}class B{static s=[2]}',
+      expected: `
+        let A = /*#__PURE__*/ (() => {
+          class A {
+            static s = [1]
+          }
+          return A;
+        })();
+        let B = /*#__PURE__*/ (() => {
+          class B {
+            static s = [2]
+          }
+          return B;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'wraps adjacent exported class declarations without interleaving',
+    testCase({
+      input: 'export class A{static s=[1]}export class B{static s=[2]}',
+      expected: `
+        export let A = /*#__PURE__*/ (() => {
+          class A {
+            static s = [1]
+          }
+          return A;
+        })();
+        export let B = /*#__PURE__*/ (() => {
+          class B {
+            static s = [2]
+          }
+          return B;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'wraps adjacent default export and class declarations without interleaving',
+    testCase({
+      input: 'export default class A{static s=[1]}class B{static s=[2]}',
+      expected: `
+        let A = /*#__PURE__*/ (() => {
+          class A {
+            static s = [1]
+          }
+          return A;
+        })();
+        export { A as default };
+        let B = /*#__PURE__*/ (() => {
+          class B {
+            static s = [2]
+          }
+          return B;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'splits default export without interleaving with adjacent class declaration',
+    testCase({
+      input: 'export default class A{}class B{static s=[2]}',
+      expected: `
+        class A {}
+        export { A as default };
+        let B = /*#__PURE__*/ (() => {
+          class B {
+            static s = [2]
+          }
+          return B;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'wraps adjacent variable class declarations without interleaving',
+    testCase({
+      input: 'let A=class A{static s=[1]};class B{static s=[2]}',
+      expected: `
+        let A = /*#__PURE__*/ (() => {
+          let A = class A {
+            static s = [1]
+          };
+          return A;
+        })();
+        let B = /*#__PURE__*/ (() => {
+          class B {
+            static s = [2]
+          }
+          return B;
+        })();
+      `,
+    }),
+  );
 });
