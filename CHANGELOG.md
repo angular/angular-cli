@@ -1,3 +1,21 @@
+<a name="22.1.1"></a>
+
+# 22.1.1 (2026-07-30)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
+| [ab971a8543](https://github.com/angular/angular-cli/commit/ab971a8543d80dfc93fdddf49598564f25196160) | fix  | support npm 12 metadata array and error formats |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [db24220fb8](https://github.com/angular/angular-cli/commit/db24220fb8efb5c9416e375a468672ff69d0659d) | fix  | rewrite paths from sandboxed execroots when running under Bazel |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.0"></a>
 
 # 22.1.0 (2026-07-29)
