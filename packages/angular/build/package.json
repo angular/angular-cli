@@ -33,7 +33,7 @@
     "listr2": "10.2.2",
     "magic-string": "1.0.0",
     "mrmime": "2.0.1",
-    "oxc-parser": "0.140.0",
+    "oxc-parser": "0.142.0",
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.5",
     "piscina": "5.2.0",
