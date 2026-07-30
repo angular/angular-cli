@@ -1,3 +1,21 @@
+<a name="22.1.2"></a>
+
+# 22.1.2 (2026-07-30)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [57db27ea91](https://github.com/angular/angular-cli/commit/57db27ea910b102854267dfcd77e8fe60f23993c) | fix  | add packages with built-in schematics to devDependencies only |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------ |
+| [baed978885](https://github.com/angular/angular-cli/commit/baed978885585fceadc64f0151d7474054d57d6a) | fix  | prevent IIFE wrapper interleaving for adjacent classes in minified files |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.1"></a>
 
 # 22.1.1 (2026-07-30)
