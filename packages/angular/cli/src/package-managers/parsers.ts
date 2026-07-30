@@ -262,11 +262,24 @@ function isValidManifest(obj: unknown): obj is PackageManifest {
     return false;
   }
 
-  const record = obj as Record<string, unknown>;
-  const name = record.name;
-  const version = record.version;
+  const { name, version } = obj as Record<string, unknown>;
 
   return typeof name === 'string' && typeof version === 'string' && valid(version) !== null;
+}
+
+function isValidMetadata(obj: unknown): obj is PackageMetadata {
+  if (typeof obj !== 'object' || obj === null) {
+    return false;
+  }
+
+  const { name, versions, 'dist-tags': distTags } = obj as Record<string, unknown>;
+
+  return (
+    typeof name === 'string' &&
+    Array.isArray(versions) &&
+    typeof distTags === 'object' &&
+    distTags !== null
+  );
 }
 
 /**
@@ -340,7 +353,28 @@ export function parseNpmLikeMetadata(stdout: string, logger?: Logger): PackageMe
     return null;
   }
 
-  return JSON.parse(stdout);
+  const result = JSON.parse(stdout);
+
+  // npm 12+ `npm view --json` always returns an array of objects.
+  if (Array.isArray(result)) {
+    for (const item of result) {
+      if (isValidMetadata(item)) {
+        return item;
+      }
+    }
+
+    logger?.debug('  No valid metadata found in the array.');
+
+    return null;
+  }
+
+  if (!isValidMetadata(result)) {
+    logger?.debug('  Parsed JSON is not valid metadata (missing name, versions, or dist-tags).');
+
+    return null;
+  }
+
+  return result;
 }
 
 /**
@@ -479,9 +513,16 @@ export function parseNpmLikeError(output: string, logger?: Logger): ErrorInfo | 
     return null;
   }
 
-  // Attempt to parse as JSON first (common for pnpm, modern yarn, bun)
+  // Attempt to parse as JSON first (common for pnpm, modern yarn, bun, npm 12)
   try {
-    const jsonError = JSON.parse(output);
+    let jsonError = JSON.parse(output);
+    if (Array.isArray(jsonError)) {
+      jsonError = jsonError[0];
+    }
+    if (jsonError && typeof jsonError === 'object' && 'error' in jsonError) {
+      jsonError = jsonError.error;
+    }
+
     if (
       jsonError &&
       typeof jsonError.code === 'string' &&
