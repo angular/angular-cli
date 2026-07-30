@@ -1,7 +1,7 @@
 import { ChildProcess, fork } from 'node:child_process';
 import { on } from 'node:events';
 import { mkdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { getGlobalVariable } from './env';
 import { writeFile, readFile } from './fs';
 import { existsSync } from 'node:fs';
@@ -26,7 +26,8 @@ export async function createNpmRegistry(
 
   await writeFile(configPath, configContent);
 
-  const verdaccioServer = fork(require.resolve('verdaccio/bin/verdaccio'), ['-c', configPath]);
+  const verdaccioBin = join(dirname(require.resolve('verdaccio/package.json')), 'bin/verdaccio');
+  const verdaccioServer = fork(verdaccioBin, ['-c', configPath]);
   for await (const events of on(verdaccioServer, 'message', {
     signal: AbortSignal.timeout(30_000),
   })) {
