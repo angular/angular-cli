@@ -90,4 +90,9 @@ export class MemoryLoadResultCache implements LoadResultCache {
     // are namespaced request paths and not disk-based file paths.
     return [...this.#fileDependencies.keys()];
   }
+
+  clear(): void {
+    this.#loadResults.clear();
+    this.#fileDependencies.clear();
+  }
 }

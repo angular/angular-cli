@@ -156,6 +156,17 @@ export async function executeBuild(
     executionResult.extraWatchFiles.push(...componentStyleBundler.collectReferencedFiles());
   }
 
+  // In non-watch mode, the bundler rebuild contexts and Angular compilation
+  // are no longer needed once bundling completes. Dispose them early to free
+  // worker processes, TypeScript ASTs, and caches before post-bundling steps
+  // execute or before returning bundling errors.
+  if (!options.watch) {
+    // This is fire-and-forget so worker teardown runs concurrently in the background
+    // without blocking the critical path of post-bundle optimization steps.
+    // Any in-flight disposal is awaited in the builder action's finally block.
+    void Promise.allSettled([angularCompilationContext?.dispose(), executionResult.dispose()]);
+  }
+
   // Return if the bundling has errors
   if (bundlingResult.errors) {
     executionResult.addErrors(bundlingResult.errors);
