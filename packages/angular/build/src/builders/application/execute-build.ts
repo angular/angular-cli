@@ -167,7 +167,8 @@ export async function executeBuild(
     // without blocking the critical path of post-bundle optimization steps.
     // Any in-flight disposal is awaited in the builder action's finally block.
     if (!options.watch) {
-      void Promise.allSettled([angularCompilationContext?.dispose(), executionResult.dispose()]);
+      void angularCompilationContext?.dispose();
+      void executionResult.dispose();
     }
 
     // Return if the bundling has errors

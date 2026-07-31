@@ -208,7 +208,7 @@ export class ExecutionResult {
         this.componentStyleBundler.dispose(),
       ]);
     } finally {
-      this.codeBundleCache?.dispose();
+      this.codeBundleCache?.clear();
     }
   }
 }
