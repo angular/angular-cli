@@ -707,6 +707,15 @@ async function readPackageManifest(manifestPath: string): Promise<PackageManifes
   }
 }
 
+/**
+ * Resolves migrations from installed package manifests on disk when they were omitted
+ * from the initial update plan.
+ *
+ * This fallback is necessary because private package registries (such as GitHub Packages)
+ * frequently strip custom non-npm metadata properties (like `ng-update`) from their remote
+ * registry API responses. By inspecting `node_modules/<package>/package.json` after installation,
+ * we ensure that any migration collections defined by the package are discovered and queued.
+ */
 export async function resolveFallbackMigrations(
   workspaceRoot: string,
   plan: UpdatePlan,
