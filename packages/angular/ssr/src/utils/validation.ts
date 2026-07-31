@@ -88,7 +88,7 @@ export function validateUrl(url: URL, allowedHosts: ReadonlySet<string>): void {
 
 /**
  * Sanitizes the proxy headers of a request by removing unallowed `X-Forwarded-*` headers.
- * If no headers need to be removed, the original request is returned without cloning.
+ * If no headers need to be removed, the original request is returned unchanged.
  *
  * @param request - The incoming `Request` object to sanitize.
  * @param trustProxyHeaders - A set of allowed proxy headers.
@@ -117,8 +117,7 @@ export function sanitizeRequestHeaders(
   }
 
   return headersDeleted
-    ? new Request(request.clone(), {
-        signal: request.signal,
+    ? new Request(request, {
         headers,
       })
     : request;

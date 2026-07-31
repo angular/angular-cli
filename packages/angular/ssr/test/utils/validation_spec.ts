@@ -493,5 +493,40 @@ describe('Validation Utils', () => {
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('forwarded')).toBe('host=proxy.com;proto=https');
     });
+
+    it('should transfer request body without teeing when removing unallowed headers', async () => {
+      const req = new Request('http://example.com', {
+        method: 'POST',
+        body: 'test body',
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'evil.com',
+        },
+      });
+
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
+
+      // In the Fetch specification, calling `request.clone()` tees the body stream and leaves
+      // `req.bodyUsed` as `false`. Passing `req` directly to `new Request(req, ...)` transfers the
+      // underlying stream without teeing, immediately marking `req.bodyUsed` as `true`.
+      expect(req.bodyUsed).toBeTrue();
+      expect(await secured.text()).toBe('test body');
+    });
+
+    it('should preserve abort signal when removing unallowed headers', () => {
+      const controller = new AbortController();
+      const req = new Request('http://example.com', {
+        signal: controller.signal,
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'evil.com',
+        },
+      });
+
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
+
+      controller.abort();
+      expect(secured.signal.aborted).toBeTrue();
+    });
   });
 });
