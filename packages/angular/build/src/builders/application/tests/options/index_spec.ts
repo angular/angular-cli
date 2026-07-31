@@ -79,16 +79,17 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         harness.expectFile('dist/browser/index.html').content.toContain('TEST_123');
       });
 
-      // TODO: Build needs to be fixed to not throw an unhandled exception for this case
-      xit('should fail build when a string path to non-existent file', async () => {
+      it('should fail build and terminate cleanly when a string path to non-existent file is provided', async () => {
         harness.useTarget('build', {
           ...BASE_OPTIONS,
           index: 'src/not-here.html',
         });
 
-        const { result } = await harness.executeOnce({ outputLogsOnFailure: false });
+        const { result, error } = await harness.executeOnce({ outputLogsOnException: false });
 
-        expect(result?.success).toBe(false);
+        expect(result).toBeUndefined();
+        expect(error).toEqual(jasmine.any(Error));
+        expect(error?.message).toMatch(/Failed to read index HTML file/i);
         harness.expectFile('dist/browser/index.html').toNotExist();
       });
 

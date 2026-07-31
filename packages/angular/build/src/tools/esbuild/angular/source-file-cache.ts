@@ -30,8 +30,8 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
    * rebuilds and can include the emitted contents of every TypeScript file in the
    * program. The cache is repopulated if a build is performed after this is called.
    */
-  dispose(): void {
-    this.clear();
+  override clear(): void {
+    super.clear();
     this.modifiedFiles.clear();
     this.typeScriptFileCache.clear();
     this.loadResultCache.clear();
