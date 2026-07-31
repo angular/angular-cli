@@ -7,67 +7,82 @@ const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 
 const tunnelIdentifier = process.env['SAUCE_TUNNEL_IDENTIFIER'];
 
+const capabilities = [
+  {
+    browserName: 'chrome',
+    version: '132',
+    platform: 'Windows 11',
+  },
+  {
+    browserName: 'chrome',
+    version: '131',
+    platform: 'Windows 11',
+  },
+  {
+    browserName: 'firefox',
+    version: '134',
+    platform: 'Windows 11',
+  },
+  {
+    browserName: 'firefox',
+    version: '128', // Latest Firefox ESR version as of Jan 2025
+    platform: 'Windows 11',
+  },
+  {
+    browserName: 'safari',
+    platform: 'macOS 13',
+    version: '17',
+  },
+  {
+    browserName: 'safari',
+    platform: 'macOS 12',
+    version: '16',
+  },
+  {
+    browserName: 'MicrosoftEdge',
+    platform: 'Windows 11',
+    version: '132',
+  },
+  {
+    browserName: 'MicrosoftEdge',
+    platform: 'Windows 11',
+    version: '131',
+  },
+];
+
 /**
  * @type { import("protractor").Config }
  */
 exports.config = {
   sauceUser: process.env['SAUCE_USERNAME'],
   sauceKey: process.env['SAUCE_ACCESS_KEY'],
+  sauceRegion: 'us',
 
   allScriptsTimeout: 11000,
   specs: ['./src/**/*.e2e-spec.ts'],
 
   // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
-  multiCapabilities: [
-    {
-      browserName: 'chrome',
-      version: '132',
-      platform: 'Windows 11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'chrome',
-      version: '131',
-      platform: 'Windows 11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '134',
-      platform: 'Windows 11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'firefox',
-      version: '128', // Latest Firefox ESR version as of Jan 2025
-      platform: 'Windows 11',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 13',
-      version: '17',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'safari',
-      platform: 'macOS 12',
-      version: '16',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'MicrosoftEdge',
-      platform: 'Windows 11',
-      version: '132',
-      tunnelIdentifier,
-    },
-    {
-      browserName: 'MicrosoftEdge',
-      platform: 'Windows 11',
-      version: '131',
-      tunnelIdentifier,
-    },
-  ],
+  multiCapabilities: capabilities.map((caps) => {
+    const w3cCaps = {
+      ...caps,
+      browserVersion: caps.version,
+      platformName: caps.platform,
+    };
+
+    if (tunnelIdentifier) {
+      return {
+        ...w3cCaps,
+        tunnelIdentifier,
+        tunnelName: tunnelIdentifier,
+        'sauce:options': {
+          tunnelIdentifier,
+          tunnelName: tunnelIdentifier,
+        },
+      };
+    }
+
+    return w3cCaps;
+  }),
 
   // Only allow one session at a time to prevent over saturation of Saucelabs sessions.
   maxSessions: 1,
