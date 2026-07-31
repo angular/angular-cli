@@ -493,5 +493,26 @@ describe('Validation Utils', () => {
       expect(secured.headers.get('host')).toBe('example.com');
       expect(secured.headers.get('forwarded')).toBe('host=proxy.com;proto=https');
     });
+
+    it('should not tee request body and should preserve abort signal when removing unallowed headers', async () => {
+      const controller = new AbortController();
+      const req = new Request('http://example.com', {
+        method: 'POST',
+        body: 'test body',
+        signal: controller.signal,
+        headers: {
+          'host': 'example.com',
+          'x-forwarded-host': 'evil.com',
+        },
+      });
+
+      const secured = sanitizeRequestHeaders(req, normalizeTrustProxyHeaders(undefined));
+
+      expect(req.bodyUsed).toBeTrue();
+      expect(await secured.text()).toBe('test body');
+
+      controller.abort();
+      expect(secured.signal.aborted).toBeTrue();
+    });
   });
 });
