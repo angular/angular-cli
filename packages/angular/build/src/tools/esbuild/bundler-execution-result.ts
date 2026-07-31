@@ -194,11 +194,21 @@ export class ExecutionResult {
     return changed;
   }
 
-  async dispose(): Promise<void> {
-    await Promise.allSettled([
-      ...this.rebuildContexts.typescriptContexts.map((context) => context.dispose()),
-      ...this.rebuildContexts.otherContexts.map((context) => context.dispose()),
-      this.componentStyleBundler.dispose(),
-    ]);
+  #disposal?: Promise<void>;
+
+  dispose(): Promise<void> {
+    return (this.#disposal ??= this.#dispose());
+  }
+
+  async #dispose(): Promise<void> {
+    try {
+      await Promise.allSettled([
+        ...this.rebuildContexts.typescriptContexts.map((context) => context.dispose()),
+        ...this.rebuildContexts.otherContexts.map((context) => context.dispose()),
+        this.componentStyleBundler.dispose(),
+      ]);
+    } finally {
+      this.codeBundleCache?.dispose();
+    }
   }
 }

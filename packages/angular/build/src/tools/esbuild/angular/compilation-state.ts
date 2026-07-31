@@ -46,13 +46,14 @@ export class AngularCompilationContext {
     this.#pendingCompilation = true;
   }
 
-  #disposed = false;
+  #disposal: Promise<void> | undefined;
 
-  async dispose(): Promise<void> {
-    if (this.#disposed) {
-      return;
-    }
-    this.#disposed = true;
+  dispose(): Promise<void> {
+    // Reuse any in progress disposal to ensure all callers can await completion
+    return (this.#disposal ??= this.#close());
+  }
+
+  async #close(): Promise<void> {
     this.markAsReady(true);
     try {
       await this.#compilation.close?.();
