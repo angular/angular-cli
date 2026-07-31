@@ -289,6 +289,29 @@ describe('UpdateResolver', () => {
     expect(plan.packagesToUpdate.size).toBe(0);
   });
 
+  it('includes registry metadata when listing updates with locked dependency versions in package.json', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular-devkit-tests/update-base': '1.0.0',
+        },
+      },
+      {
+        '@angular-devkit-tests/update-base': { version: '1.0.0' },
+      },
+    );
+
+    const plan = await resolvePlan({
+      packages: [],
+      workspaceRoot: tempRoot,
+    });
+
+    const info = plan.packageInfoMap.get('@angular-devkit-tests/update-base');
+    expect(info?.npmPackageJson['dist-tags']?.['latest']).toBe('1.1.0');
+    expect(info?.npmPackageJson.versions).toContain('1.1.0');
+  });
+
   it('should not error with yarn 2.0 protocols', async () => {
     createMockWorkspace(
       {
