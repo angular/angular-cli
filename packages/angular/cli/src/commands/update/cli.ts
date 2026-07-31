@@ -634,7 +634,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       }
     }
 
-    const migrations = plan.migrationsToRun;
+    const migrations = await resolveFallbackMigrations(this.context.root, plan);
 
     if (migrations) {
       for (const migration of migrations) {
@@ -705,4 +705,50 @@ async function readPackageManifest(manifestPath: string): Promise<PackageManifes
   } catch {
     return undefined;
   }
+}
+
+/**
+ * Resolves migrations from installed package manifests on disk when they were omitted
+ * from the initial update plan.
+ *
+ * This fallback is necessary because private package registries (such as GitHub Packages)
+ * frequently strip custom non-npm metadata properties (like `ng-update`) from their remote
+ * registry API responses. By inspecting `node_modules/<package>/package.json` after installation,
+ * we ensure that any migration collections defined by the package are discovered and queued.
+ */
+export async function resolveFallbackMigrations(
+  workspaceRoot: string,
+  plan: UpdatePlan,
+): Promise<{ package: string; collection: string; from: string; to: string }[]> {
+  const migrations = [...plan.migrationsToRun];
+  const existingMigrationPackages = new Set(migrations.map((m) => m.package));
+
+  for (const [packageName, targetVersion] of plan.packagesToUpdate) {
+    if (existingMigrationPackages.has(packageName)) {
+      continue;
+    }
+
+    const packageJsonPath = findPackageJson(workspaceRoot, packageName);
+    if (packageJsonPath) {
+      try {
+        const packageJson = JSON.parse(await fs.readFile(packageJsonPath, 'utf8'));
+        const ngUpdate = packageJson?.['ng-update'];
+        if (ngUpdate && typeof ngUpdate === 'object' && typeof ngUpdate.migrations === 'string') {
+          const installedVersion = plan.packageInfoMap.get(packageName)?.installed.version;
+          if (installedVersion) {
+            migrations.push({
+              package: packageName,
+              collection: ngUpdate.migrations,
+              from: installedVersion,
+              to: targetVersion,
+            });
+          }
+        }
+      } catch {
+        // Ignore read/parse errors for optional fallback
+      }
+    }
+  }
+
+  return migrations;
 }
