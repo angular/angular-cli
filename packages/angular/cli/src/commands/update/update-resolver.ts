@@ -942,11 +942,7 @@ export async function resolveUserUpdatePlan(
   };
 
   if (packages.size === 0) {
-    await Promise.all(
-      Array.from(npmDeps.keys()).map(async (depName) => {
-        await getOrFetchPackageMetadata(depName);
-      }),
-    );
+    await Promise.all(Array.from(npmDeps.keys(), (depName) => getOrFetchPackageMetadata(depName)));
   } else {
     let lastPackagesSize;
     do {
@@ -999,12 +995,13 @@ export async function resolveUserUpdatePlan(
     } while (packages.size > lastPackagesSize);
   }
 
+  const isListingUpdates = packages.size === 0;
   const packageInfoEntries = await Promise.all(
     Array.from(npmDeps.keys(), async (depName) => {
       const isUpdating = packages.has(depName);
       const localPkgJson = getInstalledPackageJson(depName, workspaceRoot);
 
-      if (isUpdating || !localPkgJson) {
+      if (isListingUpdates || isUpdating || !localPkgJson) {
         const metadata = await getOrFetchPackageMetadata(depName);
         if (metadata) {
           const info = await _buildPackageInfo(
