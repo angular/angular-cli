@@ -217,25 +217,18 @@ jobs:
         uses: angular/dev-infra/github-actions/bazel/configure-remote@24ba9709ca4bf6548bba6a9abfe2799e90645a60 # main
         with:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
+      - name: Start Sauce Connect
+        uses: saucelabs/sauce-connect-action@cb88b508c6f9ff4d84490093733315dbd55de022 # v3
+        with:
+          username: ${{ vars.SAUCE_USERNAME }}
+          accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
+          region: us-west-1
+          tunnelName: ${{ env.SAUCE_TUNNEL_IDENTIFIER }}
       - name: Run E2E Browser tests
         env:
           SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
           SAUCE_ACCESS_KEY: ${{ secrets.SAUCE_ACCESS_KEY }}
-          SAUCE_LOG_FILE: /tmp/angular/sauce-connect.log
-          SAUCE_READY_FILE: /tmp/angular/sauce-connect-ready-file.lock
-          SAUCE_PID_FILE: /tmp/angular/sauce-connect-pid-file.lock
-          SAUCE_TUNNEL_IDENTIFIER: 'angular-${{ github.run_number }}'
-          SAUCE_READY_FILE_TIMEOUT: 120
-        run: |
-          ./scripts/saucelabs/start-tunnel.sh &
-          ./scripts/saucelabs/wait-for-tunnel.sh
-          pnpm bazel test --config=saucelabs //tests:e2e.saucelabs
-          ./scripts/saucelabs/stop-tunnel.sh
-      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ failure() }}
-        with:
-          name: sauce-connect-log
-          path: ${{ env.SAUCE_CONNECT_DIR_IN_HOST }}/sauce-connect.log
+        run: pnpm bazel test --config=saucelabs //tests:e2e.saucelabs
 
   publish-snapshots:
     needs: build
