@@ -77,7 +77,11 @@ export function insertImport(
   // if there are no imports or 'use strict' statement, insert import at beginning of file
   const insertAtBeginning = allImports.length === 0 && useStrict.length === 0;
   const separator = insertAtBeginning ? '' : `;${eol}`;
-  const escapedFileName = fileName.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const escapedFileName = fileName
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r');
   const toInsert =
     `${separator}import ${open}${importExpression}${close}` +
     ` from '${escapedFileName}'${insertAtBeginning ? `;${eol}` : ''}`;

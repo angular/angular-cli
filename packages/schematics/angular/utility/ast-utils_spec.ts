@@ -768,6 +768,24 @@ describe('ast utils', () => {
 
       expect(result).toBe(fileContent);
     });
+
+    it('should escape single quotes and backslashes in the module specifier', () => {
+      const fileContent = '';
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', "foo'bar\\baz");
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe("import { Component } from 'foo\\'bar\\\\baz';");
+    });
+
+    it('should escape newlines and carriage returns in the module specifier', () => {
+      const fileContent = '';
+      const source = getTsSource(filePath, fileContent);
+      const change = insertImport(source, filePath, 'Component', 'foo\nbar\rbaz');
+      const result = applyChanges(filePath, fileContent, [change]).trim();
+
+      expect(result).toBe(`import { Component } from 'foo\\nbar\\rbaz';`);
+    });
   });
 
   describe('hasTopLevelIdentifier', () => {
