@@ -219,6 +219,7 @@ jobs:
           google_credential: ${{ secrets.RBE_TRUSTED_BUILDS_USER }}
       - name: Start Sauce Connect
         uses: saucelabs/sauce-connect-action@cb88b508c6f9ff4d84490093733315dbd55de022 # v3
+        timeout-minutes: 10
         with:
           username: ${{ vars.SAUCE_USERNAME }}
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
