@@ -107,4 +107,48 @@ describe('writeResponseToNodeResponse (HTTP/1.1)', () => {
 
     expect(response.headers['set-cookie']).toEqual(cookieValue);
   });
+
+  it('should resolve and cancel reader when client disconnects while response is backpressured', async () => {
+    let writePromise!: Promise<void>;
+    let readerCancelled = false;
+    const largeChunk = 'x'.repeat(1024 * 1024 * 4); // 4MB to ensure backpressure
+    const stream = new ReadableStream({
+      start(controller) {
+        controller.enqueue(largeChunk);
+        controller.enqueue(largeChunk);
+      },
+      cancel() {
+        readerCancelled = true;
+      },
+    });
+
+    server.once('request', (_, nodeResponse) => {
+      writePromise = writeResponseToNodeResponse(new Response(stream), nodeResponse);
+    });
+
+    await new Promise<void>((resolve) => {
+      const { port } = server.address() as AddressInfo;
+      const clientRequest = requestCb(
+        {
+          host: 'localhost',
+          port,
+        },
+        (response) => {
+          response.once('data', () => {
+            clientRequest.destroy();
+            resolve();
+          });
+        },
+      );
+
+      clientRequest.on('error', () => {
+        // Expected when destroying the socket
+      });
+
+      clientRequest.end();
+    });
+
+    await writePromise;
+    expect(readerCancelled).toBeTrue();
+  });
 });

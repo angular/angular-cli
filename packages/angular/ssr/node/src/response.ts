@@ -10,6 +10,24 @@ import type { ServerResponse } from 'node:http';
 import type { Http2ServerResponse } from 'node:http2';
 
 /**
+ * Checks whether a Node.js `ServerResponse` or `Http2ServerResponse` is destroyed, closed, or ended.
+ *
+ * @param destination - The HTTP/1.1 or HTTP/2 server response to check.
+ * @returns `true` if the response or its underlying stream is destroyed, closed, or ended; otherwise `false`.
+ */
+function isResponseDestroyedOrClosed(destination: ServerResponse | Http2ServerResponse): boolean {
+  return (
+    Boolean(destination.destroyed) ||
+    Boolean(destination.closed) ||
+    Boolean(destination.writableEnded) ||
+    ('stream' in destination &&
+      (!destination.stream ||
+        Boolean(destination.stream.destroyed) ||
+        Boolean(destination.stream.closed)))
+  );
+}
+
+/**
  * Streams a web-standard `Response` into a Node.js `ServerResponse`
  * or `Http2ServerResponse`.
  *
@@ -24,6 +42,10 @@ export async function writeResponseToNodeResponse(
   source: Response,
   destination: ServerResponse | Http2ServerResponse,
 ): Promise<void> {
+  if (isResponseDestroyedOrClosed(destination)) {
+    return;
+  }
+
   const { status, headers, body } = source;
   destination.statusCode = status;
 
@@ -48,27 +70,52 @@ export async function writeResponseToNodeResponse(
   }
 
   if (!body) {
-    destination.end();
+    if (!isResponseDestroyedOrClosed(destination)) {
+      destination.end();
+    }
 
     return;
   }
 
-  try {
-    const reader = body.getReader();
+  let isClosed = isResponseDestroyedOrClosed(destination);
+  const isDestroyedOrClosed = () => isClosed || isResponseDestroyedOrClosed(destination);
 
-    destination.on('close', () => {
-      reader.cancel().catch((error) => {
-        // eslint-disable-next-line no-console
-        console.error(
-          `An error occurred while writing the response body for: ${destination.req.url}.`,
-          error,
-        );
-      });
+  let readerCancelled = false;
+  const reader = body.getReader();
+  const cancelReader = (error?: unknown) => {
+    if (readerCancelled) {
+      return;
+    }
+    readerCancelled = true;
+    isClosed = true;
+    destination.off('close', cancelReader);
+    destination.off('error', cancelReader);
+    reader.cancel(error).catch((err) => {
+      // eslint-disable-next-line no-console
+      console.error(
+        `An error occurred while writing the response body for: ${destination.req.url}.`,
+        err,
+      );
     });
+  };
 
+  destination.once('close', cancelReader);
+  destination.once('error', cancelReader);
+
+  try {
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      if (isDestroyedOrClosed()) {
+        cancelReader();
+        break;
+      }
+
       const { done, value } = await reader.read();
+      if (isDestroyedOrClosed()) {
+        cancelReader();
+        break;
+      }
+
       if (done) {
         destination.end();
         break;
@@ -78,10 +125,39 @@ export async function writeResponseToNodeResponse(
       if (canContinue === false) {
         // Explicitly check for `false`, as AWS may return `undefined` even though this is not valid.
         // See: https://github.com/CodeGenieApp/serverless-express/issues/683
-        await new Promise<void>((resolve) => destination.once('drain', resolve));
+        await new Promise<void>((resolve) => {
+          if (isDestroyedOrClosed()) {
+            resolve();
+
+            return;
+          }
+
+          const onDrain = () => {
+            destination.off('close', onClose);
+            destination.off('error', onClose);
+            resolve();
+          };
+
+          const onClose = () => {
+            destination.off('drain', onDrain);
+            destination.off('close', onClose);
+            destination.off('error', onClose);
+            cancelReader();
+            resolve();
+          };
+
+          destination.once('drain', onDrain);
+          destination.once('close', onClose);
+          destination.once('error', onClose);
+        });
       }
     }
   } catch {
-    destination.end('Internal server error.');
+    if (!isDestroyedOrClosed()) {
+      destination.end('Internal server error.');
+    }
+  } finally {
+    destination.off('close', cancelReader);
+    destination.off('error', cancelReader);
   }
 }
