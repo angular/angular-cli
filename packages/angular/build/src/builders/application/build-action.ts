@@ -81,7 +81,7 @@ export async function* runEsBuildBuildAction(
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
 
   // Initial build
-  let result: ExecutionResult;
+  let result: ExecutionResult | undefined;
   try {
     // Perform the build action
     result = await withProgress('Building...', () => action());
@@ -89,8 +89,8 @@ export async function* runEsBuildBuildAction(
     // Log all diagnostic (error/warning/logs) messages
     await logMessages(logger, result, colors, jsonLogs);
   } finally {
-    // Ensure Sass workers are shutdown if not watching
-    if (!watch) {
+    // Ensure Sass workers are shutdown if not watching or if the initial build failed
+    if (!watch || !result) {
       shutdownSassWorkerPool();
     }
   }
