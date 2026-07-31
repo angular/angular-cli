@@ -63,19 +63,17 @@ exports.config = {
 
   // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
   multiCapabilities: capabilities.map((caps) => {
+    const { version, platform, ...rest } = caps;
     const w3cCaps = {
-      ...caps,
-      browserVersion: caps.version,
-      platformName: caps.platform,
+      ...rest,
+      browserVersion: version,
+      platformName: platform,
     };
 
     if (tunnelIdentifier) {
       return {
         ...w3cCaps,
-        tunnelIdentifier,
-        tunnelName: tunnelIdentifier,
         'sauce:options': {
-          tunnelIdentifier,
           tunnelName: tunnelIdentifier,
         },
       };
