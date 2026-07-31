@@ -224,29 +224,12 @@ export default class AddCommandModule
         {
           title: 'Confirming installation',
           enabled: !skipConfirmation && !options.dryRun,
-          skip: (context) => {
-            if (context.hasSchematics) {
-              return false;
-            }
-
-            return `The ${color.blue(context.packageIdentifier.toString())} package does not provide \`ng add\` actions.`;
-          },
           task: (context, task) => this.confirmInstallationTask(context, task),
           rendererOptions: { persistentOutput: true },
         },
         {
           title: 'Installing package',
           skip: (context) => {
-            if (!context.hasSchematics) {
-              const builtInSchematic =
-                BUILT_IN_SCHEMATICS[
-                  context.packageIdentifier.name as keyof typeof BUILT_IN_SCHEMATICS
-                ];
-              if (builtInSchematic) {
-                return `Skipping package installation.`;
-              }
-            }
-
             if (context.dryRun) {
               return `Skipping package installation. Would install package ${color.blue(
                 context.packageIdentifier.toString(),
@@ -278,6 +261,9 @@ export default class AddCommandModule
               if (localManifest['ng-add']?.save === false) {
                 shouldCleanUp = true;
               }
+            } else {
+              await this.cleanUpTemporaryDependency(result.collectionName);
+              shouldCleanUp = false;
             }
           } catch {}
         }
@@ -305,6 +291,9 @@ export default class AddCommandModule
           const builtInSchematic =
             BUILT_IN_SCHEMATICS[packageName as keyof typeof BUILT_IN_SCHEMATICS];
           if (builtInSchematic) {
+            logger.info(
+              `The ${color.blue(packageName)} package does not provide \`ng add\` actions.`,
+            );
             logger.info('The Angular CLI will use built-in actions to add it to your project.');
 
             return this.executeSchematic({
