@@ -226,6 +226,12 @@ jobs:
           region: us-west-1
           tunnelName: ${{ env.SAUCE_TUNNEL_IDENTIFIER }}
           proxyLocalhost: allow
+          # By default we disable SSL bumping for all requests. This is because SSL bumping is not needed
+          # for our test setup and in order to perform the SSL bumping, Saucelabs intercepts all HTTP
+          # requests in the tunnel VM and modifies them. This can cause flakiness as it makes all requests
+          # dependent on the SSL bumping middleware.
+          # See: https://wiki.saucelabs.com/display/DOCS/Troubleshooting+Sauce+Connect#TroubleshootingSauceConnect-DisablingSSLBumping
+          tlsPassthroughDomains: all
       - name: Run E2E Browser tests
         env:
           SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
