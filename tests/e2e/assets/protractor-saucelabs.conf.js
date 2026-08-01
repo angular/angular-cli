@@ -63,23 +63,22 @@ exports.config = {
 
   // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
   multiCapabilities: capabilities.map((caps) => {
-    const { version, platform, ...rest } = caps;
-    const w3cCaps = {
-      ...rest,
-      browserVersion: version,
-      platformName: platform,
+    const config = {
+      ...caps,
+      browserVersion: caps.version,
+      platformName: caps.platform,
     };
 
     if (tunnelIdentifier) {
       return {
-        ...w3cCaps,
+        ...config,
         'sauce:options': {
           tunnelName: tunnelIdentifier,
         },
       };
     }
 
-    return w3cCaps;
+    return config;
   }),
 
   // Only allow one session at a time to prevent over saturation of Saucelabs sessions.
