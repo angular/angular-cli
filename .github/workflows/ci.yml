@@ -225,6 +225,7 @@ jobs:
           accessKey: ${{ secrets.SAUCE_ACCESS_KEY }}
           region: us-west-1
           tunnelName: ${{ env.SAUCE_TUNNEL_IDENTIFIER }}
+          args: --proxy-localhost allow
       - name: Run E2E Browser tests
         env:
           SAUCE_USERNAME: ${{ vars.SAUCE_USERNAME }}
