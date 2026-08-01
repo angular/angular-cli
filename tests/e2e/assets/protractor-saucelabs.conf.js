@@ -62,24 +62,10 @@ exports.config = {
   specs: ['./src/**/*.e2e-spec.ts'],
 
   // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
-  multiCapabilities: capabilities.map((caps) => {
-    const config = {
-      ...caps,
-      browserVersion: caps.version,
-      platformName: caps.platform,
-    };
-
-    if (tunnelIdentifier) {
-      return {
-        ...config,
-        'sauce:options': {
-          tunnelName: tunnelIdentifier,
-        },
-      };
-    }
-
-    return config;
-  }),
+  multiCapabilities: capabilities.map((caps) => ({
+    ...caps,
+    tunnelIdentifier,
+  })),
 
   // Only allow one session at a time to prevent over saturation of Saucelabs sessions.
   maxSessions: 1,
