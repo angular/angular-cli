@@ -5,7 +5,7 @@
 
 const { SpecReporter, StacktraceOption } = require('jasmine-spec-reporter');
 
-const tunnelIdentifier = process.env['SAUCE_TUNNEL_IDENTIFIER'];
+const tunnelName = process.env['SAUCE_TUNNEL_IDENTIFIER'];
 
 const capabilities = [
   {
@@ -64,7 +64,7 @@ exports.config = {
   // NOTE: https://saucelabs.com/products/platform-configurator can be used to determine configuration values
   multiCapabilities: capabilities.map((caps) => ({
     ...caps,
-    tunnelIdentifier,
+    tunnelName,
   })),
 
   // Only allow one session at a time to prevent over saturation of Saucelabs sessions.
