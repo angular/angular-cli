@@ -71,6 +71,12 @@ export function createBrowserCodeBundleOptions(
       supported: getFeatureSupport(zoneless),
     };
 
+    if (options.disableCodeSplitting) {
+      // Splitting emits shared chunks that are read across chunk boundaries as live ESM bindings,
+      // which the unit-test runners' module loading does not reliably preserve.
+      buildOptions.splitting = false;
+    }
+
     buildOptions.plugins ??= [];
     buildOptions.plugins.push(
       createWasmPlugin({ allowAsync: zoneless, cache: loadCache }),
