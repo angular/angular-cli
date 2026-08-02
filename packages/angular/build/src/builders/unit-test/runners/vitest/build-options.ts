@@ -257,6 +257,12 @@ export async function getVitestBuildOptions(
     outputHashing: adjustOutputHashing(baseBuildOptions.outputHashing),
     optimization: false,
     entryPoints,
+    // Every spec file is its own entry point, so splitting hoists any module shared between two
+    // specs into a chunk whose exports are then read across a chunk boundary. Those reads rely on
+    // live ESM bindings, and a module placed in a shared chunk is only assigned its exported value
+    // when that chunk's lazy initializer runs, so an importing chunk can read `undefined`. Nothing
+    // downloads these bundles, so there is no benefit to weigh against that.
+    disableCodeSplitting: true,
     // Enable support for vitest browser prebundling. Excludes can be controlled with a runnerConfig
     // and the `optimizeDeps.exclude` option.
     externalPackages: true,
