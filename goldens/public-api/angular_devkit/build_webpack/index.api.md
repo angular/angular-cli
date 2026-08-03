@@ -6,6 +6,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { BuilderOutput } from '@angular-devkit/architect';
+import type { Configuration } from 'webpack-dev-server';
 import { Observable } from 'rxjs';
 import type webpack from 'webpack';
 import type WebpackDevServer from 'webpack-dev-server';
@@ -50,7 +51,7 @@ export function runWebpack(config: webpack.Configuration, context: BuilderContex
 // @public @deprecated (undocumented)
 export function runWebpackDevServer(config: webpack.Configuration, context: BuilderContext, options?: {
     shouldProvideStats?: boolean;
-    devServerConfig?: WebpackDevServer.Configuration;
+    devServerConfig?: Configuration;
     logging?: WebpackLoggingCallback;
     webpackFactory?: WebpackFactory;
     webpackDevServerFactory?: WebpackDevServerFactory;
