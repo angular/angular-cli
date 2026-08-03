@@ -12,6 +12,7 @@ import { resolve as pathResolve } from 'node:path';
 import { Observable, from, isObservable, of, switchMap } from 'rxjs';
 import type webpack from 'webpack';
 import type WebpackDevServer from 'webpack-dev-server';
+import type { Configuration } from 'webpack-dev-server';
 import { getEmittedFiles, getWebpackConfig } from '../../utils';
 import { BuildResult, WebpackFactory, WebpackLoggingCallback } from '../webpack';
 import { Schema as WebpackDevServerBuilderSchema } from './schema';
@@ -33,7 +34,7 @@ export function runWebpackDevServer(
   context: BuilderContext,
   options: {
     shouldProvideStats?: boolean;
-    devServerConfig?: WebpackDevServer.Configuration;
+    devServerConfig?: Configuration;
     logging?: WebpackLoggingCallback;
     webpackFactory?: WebpackFactory;
     webpackDevServerFactory?: WebpackDevServerFactory;
@@ -49,17 +50,6 @@ export function runWebpackDevServer(
       }
     } else {
       return from(import('webpack').then((mod) => mod.default(c)));
-    }
-  };
-
-  const createWebpackDevServer = (
-    webpack: webpack.Compiler | webpack.MultiCompiler,
-    config: WebpackDevServer.Configuration,
-  ) => {
-    if (options.webpackDevServerFactory) {
-      return new options.webpackDevServerFactory(config, webpack);
-    } else {
-      return from(import('webpack-dev-server').then((mod) => new mod.default(config, webpack)));
     }
   };
 
