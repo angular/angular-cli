@@ -622,7 +622,7 @@ importers:
         version: 4.1.3
       autoprefixer:
         specifier: 10.4.27
-        version: 10.4.27(postcss@8.5.12)
+        version: 10.4.27(postcss@8.5.23)
       babel-loader:
         specifier: 10.0.0
         version: 10.0.0(@babel/core@7.29.7)(webpack@5.105.2(esbuild@0.28.1))
@@ -678,11 +678,11 @@ importers:
         specifier: 5.2.0
         version: 5.2.0
       postcss:
-        specifier: 8.5.12
-        version: 8.5.12
+        specifier: 8.5.23
+        version: 8.5.23
       postcss-loader:
         specifier: 8.2.0
-        version: 8.2.0(postcss@8.5.12)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.28.1))
+        version: 8.2.0(postcss@8.5.23)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.28.1))
       resolve-url-loader:
         specifier: 5.0.0
         version: 5.0.0
@@ -14165,13 +14165,13 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  autoprefixer@10.4.27(postcss@8.5.12):
+  autoprefixer@10.4.27(postcss@8.5.23):
     dependencies:
       browserslist: 4.28.2
       caniuse-lite: 1.0.30001791
       fraction.js: 5.3.4
       picocolors: 1.1.1
-      postcss: 8.5.12
+      postcss: 8.5.23
       postcss-value-parser: 4.2.0
 
   available-typed-arrays@1.0.7:
@@ -17982,11 +17982,11 @@ snapshots:
 
   possible-typed-array-names@1.1.0: {}
 
-  postcss-loader@8.2.0(postcss@8.5.12)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.28.1)):
+  postcss-loader@8.2.0(postcss@8.5.23)(typescript@6.0.3)(webpack@5.105.2(esbuild@0.28.1)):
     dependencies:
       cosmiconfig: 9.0.1(typescript@6.0.3)
       jiti: 2.6.1
-      postcss: 8.5.12
+      postcss: 8.5.23
       semver: 7.7.4
     optionalDependencies:
       webpack: 5.105.2(esbuild@0.28.1)
@@ -18029,7 +18029,7 @@ snapshots:
 
   postcss@8.5.12:
     dependencies:
-      nanoid: 3.3.12
+      nanoid: 3.3.16
       picocolors: 1.1.1
       source-map-js: 1.2.1
 
