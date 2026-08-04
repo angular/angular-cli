@@ -48,12 +48,26 @@ export function createCachedLoad(
 export class MemoryLoadResultCache implements LoadResultCache {
   #loadResults = new Map<string, OnLoadResult>();
   #fileDependencies = new Map<string, Set<string>>();
+  #watchFilesPerKey = new Map<string, ReadonlyArray<string>>();
 
   get(path: string): OnLoadResult | undefined {
     return this.#loadResults.get(path);
   }
 
   async put(path: string, result: OnLoadResult): Promise<void> {
+    if (result.errors && result.errors.length > 0) {
+      const previousWatchFiles = this.#watchFilesPerKey.get(path);
+      if (previousWatchFiles) {
+        result.watchFiles = Array.from(
+          new Set([...(result.watchFiles ?? []), ...previousWatchFiles]),
+        );
+      }
+    } else if (result.watchFiles && result.watchFiles.length > 0) {
+      this.#watchFilesPerKey.set(path, [...result.watchFiles]);
+    } else {
+      this.#watchFilesPerKey.delete(path);
+    }
+
     this.#loadResults.set(path, result);
     if (result.watchFiles) {
       for (const watchFile of result.watchFiles) {
@@ -94,5 +108,6 @@ export class MemoryLoadResultCache implements LoadResultCache {
   clear(): void {
     this.#loadResults.clear();
     this.#fileDependencies.clear();
+    this.#watchFilesPerKey.clear();
   }
 }
