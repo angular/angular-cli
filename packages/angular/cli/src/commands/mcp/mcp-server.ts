@@ -7,7 +7,7 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/server';
-import { join, normalize } from 'node:path';
+import { join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
@@ -66,6 +66,7 @@ export async function createMcpServer(
     readOnly?: boolean;
     localOnly?: boolean;
     experimentalTools?: string[];
+    roots?: string[];
   },
   logger: { warn(text: string): void },
 ): Promise<McpServer> {
@@ -121,7 +122,12 @@ for equivalent actions.
     logger,
   });
 
-  const restrictedHost = createRootRestrictedHost(LocalWorkspaceHost);
+  const resolvedRoots = options.roots?.map((r) => resolve(r));
+
+  const restrictedHost = createRootRestrictedHost(
+    LocalWorkspaceHost,
+    resolvedRoots?.length ? resolvedRoots : [process.cwd()],
+  );
 
   server.server.oninitialized = () => {
     void (async () => {
@@ -163,6 +169,7 @@ for equivalent actions.
       exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
       devservers: new Map<string, Devserver>(),
       host: restrictedHost,
+      roots: resolvedRoots,
     },
     toolDeclarations,
   );

@@ -44,6 +44,9 @@ export interface MockContextOptions {
 
   /** Initial set of projects to populate the mock workspace with. */
   projects?: Record<string, workspaces.ProjectDefinition>;
+
+  /** Optional roots to configure in the mock context. */
+  roots?: string[];
 }
 
 /**
@@ -75,6 +78,7 @@ export function createMockContext(options: MockContextOptions = {}): {
     logger: { warn: () => {} },
     devservers: new Map<string, Devserver>(),
     host,
+    roots: options.roots,
   };
 
   return { host, context, projects };

@@ -24,6 +24,7 @@ export interface McpToolContext {
   exampleDatabasePath?: string;
   devservers: Map<string, Devserver>;
   host: Host;
+  roots?: string[];
 }
 
 export type McpToolCallback<TInput extends ZodRawShape = ZodRawShape> = (

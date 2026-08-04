@@ -282,11 +282,22 @@ export const LocalWorkspaceHost: Host = {
   },
 };
 
+function resolveRoots(roots: string[]): string[] {
+  return roots.map((r) => {
+    try {
+      return realpathSync(resolve(r));
+    } catch {
+      return resolve(r);
+    }
+  });
+}
+
 export function createRootRestrictedHost(
   baseHost: Host,
   initialRoots: string[] = [process.cwd()],
 ): Host {
-  let roots = initialRoots;
+  const defaultRoots = resolveRoots(initialRoots);
+  let roots = defaultRoots;
 
   function checkPath(path: string) {
     const resolvedPath = resolve(path);
@@ -332,7 +343,7 @@ export function createRootRestrictedHost(
   return {
     ...baseHost,
     setRoots(newRoots: string[]) {
-      roots = newRoots;
+      roots = newRoots.length > 0 ? resolveRoots(newRoots) : defaultRoots;
     },
     stat(path: string) {
       checkPath(path);

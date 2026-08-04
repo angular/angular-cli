@@ -386,11 +386,9 @@ async function getProjectStyleLanguage(
   fullSourceRoot: string,
 ): Promise<StyleLanguage> {
   const projectSchematics = project.extensions.schematics as
-    | Record<string, Record<string, unknown>>
-    | undefined;
+    Record<string, Record<string, unknown>> | undefined;
   const workspaceSchematics = workspace.extensions.schematics as
-    | Record<string, Record<string, unknown>>
-    | undefined;
+    Record<string, Record<string, unknown>> | undefined;
 
   // 1. Check for a project-specific schematic setting.
   let style = projectSchematics?.['@schematics/angular:component']?.['style'];
@@ -566,7 +564,7 @@ function deduplicateSearchRoots(roots: string[]): string[] {
   return deduplicated;
 }
 
-async function createListProjectsHandler({ server }: McpToolContext) {
+async function createListProjectsHandler({ server, roots: configuredRoots }: McpToolContext) {
   return async () => {
     const workspaces: WorkspaceData[] = [];
     const parsingErrors: ParsingError[] = [];
@@ -574,14 +572,16 @@ async function createListProjectsHandler({ server }: McpToolContext) {
     const seenPaths = new Set<string>();
     const versionCache = new Map<string, string | undefined>();
 
-    let searchRoots: string[];
+    let searchRoots: string[] | undefined;
     const clientCapabilities = server.server.getClientCapabilities();
     if (clientCapabilities?.roots) {
       const { roots } = await server.server.listRoots();
-      searchRoots = roots?.map((r) => normalize(fileURLToPath(r.uri))) ?? [];
-    } else {
-      // Fallback to the current working directory if client does not support roots
-      searchRoots = [process.cwd()];
+      searchRoots = roots?.map((r) => normalize(fileURLToPath(r.uri)));
+    }
+
+    if (!searchRoots || searchRoots.length === 0) {
+      searchRoots =
+        configuredRoots && configuredRoots.length > 0 ? configuredRoots : [process.cwd()];
     }
 
     searchRoots = deduplicateSearchRoots(searchRoots);
