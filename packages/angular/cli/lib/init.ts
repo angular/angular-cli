@@ -49,9 +49,13 @@ let forceExit = false;
 
   try {
     // No error implies a projectLocalCli, which will load whatever
-    // version of ng-cli you have installed in a local package.json
+    // version of ng-cli you have installed in a local package.json.
     const cwdRequire = createRequire(process.cwd() + '/');
-    const projectLocalCli = cwdRequire.resolve('@angular/cli');
+    // Instead of resolving `@angular/cli`, we resolve `@angular/cli/lib/cli/index.js`.
+    // This ensures that Node.js can only resolve the path if the specific folder
+    // structure exists in `node_modules`, and it will not be resolved if the
+    // directory structure is outside of `node_modules` (e.g., package self-referencing).
+    const projectLocalCli = cwdRequire.resolve('@angular/cli/lib/cli/index.js');
     cli = await import(projectLocalCli);
 
     const globalVersion = new SemVer(VERSION.full);
