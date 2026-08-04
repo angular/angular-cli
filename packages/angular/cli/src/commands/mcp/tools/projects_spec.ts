@@ -89,4 +89,43 @@ describe('List Projects Tool', () => {
     expect(projects[0].targets).toEqual(['build', 'test', 'lint', 'e2e']);
     expect(projects[0].unitTestFramework).toBe('vitest');
   });
+
+  it('should use configured roots when client roots capability is absent', async () => {
+    mockContext.server = {
+      server: {
+        getClientCapabilities: jasmine.createSpy('getClientCapabilities').and.returnValue({}),
+      },
+    } as unknown as NonNullable<Parameters<typeof LIST_PROJECTS_TOOL.factory>[0]['server']>;
+    mockContext.roots = [allowedRoot];
+
+    const handler = await LIST_PROJECTS_TOOL.factory(mockContext);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (handler as any)({});
+
+    expect(result.structuredContent).toBeDefined();
+    expect(result.structuredContent.workspaces.length).toBe(1);
+    expect(result.structuredContent.workspaces[0].projects[0].name).toBe('my-app');
+  });
+
+  it('should fall back to configured roots when client supports roots but returns an empty list', async () => {
+    mockContext.server = {
+      server: {
+        getClientCapabilities: jasmine.createSpy('getClientCapabilities').and.returnValue({
+          roots: { listChanged: false },
+        }),
+        listRoots: jasmine.createSpy('listRoots').and.resolveTo({
+          roots: [],
+        }),
+      },
+    } as unknown as NonNullable<Parameters<typeof LIST_PROJECTS_TOOL.factory>[0]['server']>;
+    mockContext.roots = [allowedRoot];
+
+    const handler = await LIST_PROJECTS_TOOL.factory(mockContext);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (handler as any)({});
+
+    expect(result.structuredContent).toBeDefined();
+    expect(result.structuredContent.workspaces.length).toBe(1);
+    expect(result.structuredContent.workspaces[0].projects[0].name).toBe('my-app');
+  });
 });
