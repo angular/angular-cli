@@ -157,10 +157,12 @@ export class I18nInliner {
 
       let cacheResultPromise = Promise.resolve(null);
       if (this.#cache) {
-        fileCacheKeyBase ??= Buffer.from(
-          JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }),
-          'utf-8',
-        );
+        // The options are digested here so that each file's key is derived from a fixed number
+        // of bytes. Hashing the options directly would re-hash the full set of messages, which
+        // can be several megabytes, once for every file.
+        fileCacheKeyBase ??= createHash('sha256')
+          .update(JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }))
+          .digest();
 
         // NOTE: If additional options are added, this may need to be updated.
         // TODO: Consider xxhash or similar instead of SHA256
