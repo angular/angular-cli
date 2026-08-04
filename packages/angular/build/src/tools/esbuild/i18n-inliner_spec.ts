@@ -1,0 +1,202 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
+import { transform } from 'esbuild';
+import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
+import { I18nInliner } from './i18n-inliner';
+
+/**
+ * A module that uses a `$localize` message with an explicit message identifier so that the
+ * translations for a test can be keyed by a known name.
+ */
+const GREETING_SOURCE = 'export const greeting = $localize`:@@greeting:Hello`;\n';
+
+/**
+ * Creates the parsed translation form that `@angular/localize` expects for a message without
+ * placeholders.
+ */
+function translationFor(message: string): Record<string, unknown> {
+  return { messageParts: [message], placeholderNames: [], text: message };
+}
+
+function browserFile(path: string, contents: string): BuildOutputFile {
+  return createOutputFile(path, contents, BuildOutputFileType.Browser);
+}
+
+function findFile(outputFiles: BuildOutputFile[], path: string): BuildOutputFile {
+  const file = outputFiles.find((output) => output.path === path);
+  if (!file) {
+    throw new Error(`Expected output files to contain '${path}'.`);
+  }
+
+  return file;
+}
+
+describe('I18nInliner', () => {
+  let inliner: I18nInliner | undefined;
+
+  // A single thread is used throughout so that every file of every locale is inlined by the same
+  // Worker. Any translation state that a Worker retains between requests is then observable.
+  function createInliner(outputFiles: BuildOutputFile[]): I18nInliner {
+    inliner = new I18nInliner({ missingTranslation: 'warning', outputFiles }, 1);
+
+    return inliner;
+  }
+
+  afterEach(async () => {
+    await inliner?.close();
+    inliner = undefined;
+  });
+
+  it('inlines the translations of a locale', async () => {
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(outputFiles, 'main.js').text).not.toContain('$localize');
+  });
+
+  it('inlines the translations of each locale when several are inlined in sequence', async () => {
+    const localeInliner = createInliner([browserFile('main.js', GREETING_SOURCE)]);
+
+    const french = await localeInliner.inlineForLocale('fr', {
+      greeting: translationFor('Bonjour'),
+    });
+    const german = await localeInliner.inlineForLocale('de', { greeting: translationFor('Hallo') });
+    // Repeats the first locale to cover a locale being inlined again after another has been.
+    const frenchAgain = await localeInliner.inlineForLocale('fr', {
+      greeting: translationFor('Bonjour'),
+    });
+
+    expect(findFile(french.outputFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(german.outputFiles, 'main.js').text).toContain('"Hallo"');
+    expect(findFile(frenchAgain.outputFiles, 'main.js').text).toContain('"Bonjour"');
+  });
+
+  it('inlines the translations of a locale into every file that uses them', async () => {
+    const { outputFiles } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+      browserFile('chunk.js', GREETING_SOURCE),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') });
+
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(outputFiles, 'chunk.js').text).toContain('"Bonjour"');
+  });
+
+  it('retains the original messages for a locale without translations', async () => {
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+    ]).inlineForLocale('en-US', undefined);
+
+    // A locale without translations is the source locale, so its messages are not missing.
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
+  });
+
+  it('warns and retains the original message when a locale is missing a translation', async () => {
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+    ]).inlineForLocale('fr', { unrelated: translationFor('Sans rapport') });
+
+    expect(errors).toEqual([]);
+    expect(warnings.length).toBe(1);
+    expect(warnings[0]).toContain('greeting');
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
+  });
+
+  it('replaces the locale placeholder with the locale being inlined', async () => {
+    // The placeholder is only inlined for files that use `$localize`, which is where the build
+    // inserts it, so the message is present alongside it here.
+    const { outputFiles } = await createInliner([
+      browserFile('main.js', `export const locale = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') });
+
+    expect(findFile(outputFiles, 'main.js').text).toContain('"fr"');
+    expect(findFile(outputFiles, 'main.js').text).not.toContain('___NG_LOCALE_INSERT___');
+  });
+
+  it('remaps the source map of a file it modifies', async () => {
+    // esbuild provides a map from the emitted code back to an original file, matching what the
+    // inliner receives during a build.
+    const { code, map } = await transform(GREETING_SOURCE, {
+      sourcefile: 'greeting.ts',
+      loader: 'ts',
+      sourcemap: 'external',
+    });
+
+    const { outputFiles } = await createInliner([
+      browserFile('main.js', code),
+      browserFile('main.js.map', map),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') });
+
+    const outputMap = JSON.parse(findFile(outputFiles, 'main.js.map').text) as {
+      version: number;
+      sources: string[];
+      mappings: string;
+    };
+
+    expect(outputMap.version).toBe(3);
+    // The map must still resolve to the original file rather than to the inliner's input.
+    expect(outputMap.sources).toContain('greeting.ts');
+    expect(outputMap.mappings.length).toBeGreaterThan(0);
+  });
+
+  describe('inlineTemplateUpdate', () => {
+    it('inlines the translations of a locale into a template update', async () => {
+      const { code, errors, warnings } = await createInliner([]).inlineTemplateUpdate(
+        'fr',
+        { greeting: translationFor('Bonjour') },
+        GREETING_SOURCE,
+        'template-id',
+      );
+
+      expect(errors).toEqual([]);
+      expect(warnings).toEqual([]);
+      expect(code).toContain('"Bonjour"');
+      expect(code).not.toContain('$localize');
+    });
+
+    it('retains the original messages for a locale without translations', async () => {
+      const { code, errors, warnings } = await createInliner([]).inlineTemplateUpdate(
+        'en-US',
+        undefined,
+        GREETING_SOURCE,
+        'template-id',
+      );
+
+      expect(errors).toEqual([]);
+      expect(warnings).toEqual([]);
+      expect(code).toContain('"Hello"');
+    });
+
+    it('returns the code untouched when it has no localize calls', async () => {
+      const source = 'export const answer = 42;\n';
+      const { code } = await createInliner([]).inlineTemplateUpdate(
+        'fr',
+        { greeting: translationFor('Bonjour') },
+        source,
+        'template-id',
+      );
+
+      expect(code).toBe(source);
+    });
+  });
+
+  it('leaves files without localize calls unmodified', async () => {
+    const { outputFiles } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+      browserFile('other.js', 'export const answer = 42;\n'),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') });
+
+    expect(findFile(outputFiles, 'other.js').text).toBe('export const answer = 42;\n');
+  });
+});
