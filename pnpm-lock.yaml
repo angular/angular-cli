@@ -337,12 +337,6 @@ importers:
       '@babel/core':
         specifier: 8.0.1
         version: 8.0.1
-      '@babel/helper-annotate-as-pure':
-        specifier: 8.0.0
-        version: 8.0.0
-      '@babel/helper-split-export-declaration':
-        specifier: 7.24.7
-        version: 7.24.7
       '@inquirer/confirm':
         specifier: 6.1.1
         version: 6.1.1(@types/node@22.20.1)
