@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { type EncodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
+import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
 import { MagicString } from 'magic-string';
 import assert from 'node:assert';
 import { deserialize } from 'node:v8';
@@ -260,12 +260,15 @@ async function transformWithOxc(
   const outputCode = magicString.toString();
   let outputMap;
   if (map && magicString.hasChanged()) {
-    const rawMap = magicString.generateMap({
+    // A decoded map is generated here rather than an encoded one because remapping decodes its
+    // inputs. Encoding the mappings only for remapping to immediately decode them again doubles
+    // the peak memory of the largest structure involved in inlining a file.
+    const rawMap = magicString.generateDecodedMap({
       source: options.filename,
       includeContent: true,
       hires: 'boundary',
     });
-    outputMap = remapping([rawMap as EncodedSourceMap, map], () => null);
+    outputMap = remapping([{ ...rawMap, version: 3 } satisfies DecodedSourceMap, map], () => null);
   }
 
   return {
