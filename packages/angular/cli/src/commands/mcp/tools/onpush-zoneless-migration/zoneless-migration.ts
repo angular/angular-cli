@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { ServerContext } from '@modelcontextprotocol/server';
 import { join } from 'node:path';
 import type { SourceFile } from 'typescript';
 import { z } from 'zod';
@@ -57,7 +56,7 @@ change detection (a prerequisite for zoneless applications).
 export async function registerZonelessMigrationTool(
   fileOrDirPath: string,
   host: Host,
-  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  extras: ServerContext,
 ) {
   let filesWithComponents, componentTestFiles, zoneFiles, categorizationErrors;
   try {
@@ -114,7 +113,7 @@ export async function registerZonelessMigrationTool(
 async function discoverAndCategorizeFiles(
   fileOrDirPath: string,
   host: Host,
-  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  extras: ServerContext,
 ) {
   const filePaths: string[] = [];
   const componentTestFiles = new Set<SourceFile>();
@@ -175,7 +174,7 @@ async function discoverAndCategorizeFiles(
 async function categorizeFile(
   sourceFile: SourceFile,
   host: Host,
-  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  extras: ServerContext,
   categorizedFiles: {
     filesWithComponents: Set<SourceFile>;
     componentTestFiles: Set<SourceFile>;
@@ -216,11 +215,11 @@ async function categorizeFile(
 }
 
 async function rankComponentFilesForMigration(
-  { sendRequest }: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  ctx: ServerContext,
   componentFiles: SourceFile[],
 ): Promise<SourceFile[]> {
   try {
-    const response = await sendRequest(
+    const response = await ctx.mcpReq.send(
       {
         method: 'sampling/createMessage',
         params: {

@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { ServerContext } from '@modelcontextprotocol/server';
 import type { SourceFile } from 'typescript';
 import type { Host } from '../../host';
 import { analyzeForUnsupportedZoneUses } from './analyze-for-unsupported-zone-uses';
@@ -22,7 +21,7 @@ const supportedStrategies: ReadonlySet<string> = new Set(['OnPush', 'Default', '
 export async function migrateSingleFile(
   sourceFile: SourceFile,
   host: Host,
-  extras: RequestHandlerExtra<ServerRequest, ServerNotification>,
+  extras: ServerContext,
 ): Promise<MigrationResponse | null> {
   const testBedSpecifier = await getImportSpecifier(sourceFile, '@angular/core/testing', 'TestBed');
   const isTestFile = sourceFile.fileName.endsWith('.spec.ts') || !!testBedSpecifier;

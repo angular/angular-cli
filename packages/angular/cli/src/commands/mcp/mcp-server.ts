@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import { RootsListChangedNotificationSchema } from '@modelcontextprotocol/sdk/types.js';
+import { McpServer } from '@modelcontextprotocol/server';
 import { join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AngularWorkspace } from '../../utilities/config';
@@ -134,7 +133,7 @@ for equivalent actions.
           restrictedHost.setRoots(searchRoots);
 
           if (clientCapabilities.roots.listChanged) {
-            server.server.setNotificationHandler(RootsListChangedNotificationSchema, async () => {
+            server.server.setNotificationHandler('notifications/roots/list_changed', async () => {
               try {
                 const { roots: updatedRoots } = await server.server.listRoots();
                 const updatedSearchRoots =

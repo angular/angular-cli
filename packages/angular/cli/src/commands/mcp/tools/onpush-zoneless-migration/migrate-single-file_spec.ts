@@ -6,16 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { ServerContext } from '@modelcontextprotocol/server';
 import ts from 'typescript';
 import { createMockHost } from '../../testing/test-utils';
 import { migrateSingleFile } from './migrate-single-file';
 
 const fakeExtras = {
-  sendDebugMessage: jasmine.createSpy(),
-  sendNotification: jasmine.createSpy(),
-} as unknown as RequestHandlerExtra<ServerRequest, ServerNotification>;
+  mcpReq: {
+    log: jasmine.createSpy(),
+    notify: jasmine.createSpy(),
+  },
+} as unknown as ServerContext;
 
 describe('migrateSingleFile', () => {
   const mockHost = createMockHost();
