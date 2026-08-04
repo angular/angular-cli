@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { StdioServerTransport } from '@modelcontextprotocol/server/stdio';
+import { serveStdio } from '@modelcontextprotocol/server/stdio';
 import type { Argv } from 'yargs';
 import {
   CommandModule,
   type CommandModuleImplementation,
 } from '../../command-builder/command-module';
 import { isTTY } from '../../utilities/tty';
-import { EXPERIMENTAL_TOOLS, EXPERIMENTAL_TOOL_GROUPS, createMcpServer } from './mcp-server';
+import { createMcpServer } from './mcp-server';
 
 const INTERACTIVE_MESSAGE = `
 To start using the Angular CLI MCP Server, add this configuration to your host:
@@ -76,17 +76,17 @@ export default class McpCommandModule extends CommandModule implements CommandMo
       return;
     }
 
-    const server = await createMcpServer(
-      {
-        workspace: this.context.workspace,
-        readOnly: options.readOnly,
-        localOnly: options.localOnly,
-        experimentalTools: options.experimentalTool,
-        roots: options.root,
-      },
-      this.context.logger,
+    serveStdio(() =>
+      createMcpServer(
+        {
+          workspace: this.context.workspace,
+          readOnly: options.readOnly,
+          localOnly: options.localOnly,
+          experimentalTools: options.experimentalTool,
+          roots: options.root,
+        },
+        this.context.logger,
+      ),
     );
-    const transport = new StdioServerTransport();
-    await server.connect(transport);
   }
 }
