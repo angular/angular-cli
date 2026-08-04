@@ -7,7 +7,7 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
-import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
+import { McpServer } from '@modelcontextprotocol/server';
 import { AngularWorkspace } from '../../../utilities/config';
 import { type Devserver } from '../devserver';
 import { Host } from '../host';

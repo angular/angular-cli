@@ -6,18 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { RequestHandlerExtra } from '@modelcontextprotocol/sdk/shared/protocol';
-import type { ServerNotification, ServerRequest } from '@modelcontextprotocol/sdk/types';
+import type { ServerContext } from '@modelcontextprotocol/server';
 
-export function sendDebugMessage(
-  message: string,
-  { sendNotification }: RequestHandlerExtra<ServerRequest, ServerNotification>,
-): void {
-  void sendNotification({
-    method: 'notifications/message',
-    params: {
-      level: 'debug',
-      data: message,
-    },
-  });
+export function sendDebugMessage(message: string, ctx: ServerContext): void {
+  void ctx.mcpReq.log('debug', message);
 }
