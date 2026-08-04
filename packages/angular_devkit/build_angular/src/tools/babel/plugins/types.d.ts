@@ -18,3 +18,17 @@ declare module 'istanbul-lib-instrument' {
     options?: { inputSourceMap?: object | null },
   ): Visitor;
 }
+
+declare module '@babel/helper-annotate-as-pure' {
+  export default function annotateAsPure(
+    pathOrNode: import('@babel/types').Node | { node: import('@babel/types').Node },
+  ): void;
+}
+
+declare module '@babel/helper-split-export-declaration' {
+  export default function splitExportDeclaration(
+    exportDeclaration: import('@babel/core').NodePath<
+      import('@babel/types').ExportDefaultDeclaration
+    >,
+  ): void;
+}

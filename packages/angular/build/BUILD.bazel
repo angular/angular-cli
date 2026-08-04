@@ -82,8 +82,6 @@ ts_project(
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular/ssr",
         ":node_modules/@babel/core",
-        ":node_modules/@babel/helper-annotate-as-pure",
-        ":node_modules/@babel/helper-split-export-declaration",
         ":node_modules/@inquirer/confirm",
         ":node_modules/@oxc-project/types",
         ":node_modules/@vitejs/plugin-basic-ssl",

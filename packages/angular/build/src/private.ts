@@ -32,7 +32,6 @@ export {
 } from './builders/dev-server/options';
 
 // Tools
-export * from './tools/babel/plugins';
 export type { ExternalResultMetadata } from './tools/esbuild/bundler-execution-result';
 export { emitFilesToDisk } from './tools/esbuild/utils';
 export { transformSupportedBrowsersToTargets } from './tools/esbuild/utils';

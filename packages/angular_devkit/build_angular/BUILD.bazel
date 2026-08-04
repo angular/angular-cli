@@ -200,6 +200,7 @@ ts_project(
     deps = [
         ":build_angular",
         ":build_angular_test_utils",
+        ":node_modules/@babel/core",
         ":node_modules/tinyglobby",
         "//:node_modules/@types/node",
         "//:node_modules/prettier",

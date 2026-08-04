@@ -212,17 +212,17 @@ export default function (api: unknown, options: ApplicationPresetOptions) {
   }
 
   if (options.optimize) {
-    const {
-      adjustStaticMembers,
-      adjustTypeScriptEnums,
-      elideAngularMetadata,
-      markTopLevelPure,
-    } = require('@angular/build/private');
     plugins.push(
-      [markTopLevelPure, { topLevelSafeMode: options.optimize.topLevelSafeMode }],
-      elideAngularMetadata,
-      adjustTypeScriptEnums,
-      [adjustStaticMembers, { wrapDecorators: options.optimize.wrapDecorators }],
+      [
+        require('../plugins/pure-toplevel-functions').default,
+        { topLevelSafeMode: options.optimize.topLevelSafeMode },
+      ],
+      require('../plugins/elide-angular-metadata').default,
+      require('../plugins/adjust-typescript-enums').default,
+      [
+        require('../plugins/adjust-static-class-members').default,
+        { wrapDecorators: options.optimize.wrapDecorators },
+      ],
     );
   }
 
