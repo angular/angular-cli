@@ -25,6 +25,23 @@ let forceExit = false;
 
 (async (): Promise<typeof import('./cli').default | null> => {
   /**
+   * On Windows, ensure process.cwd() uses uppercase drive letter casing.
+   * Windows cmd.exe and VS Code terminals often preserve lowercase drive letters (e.g. c:\...),
+   * which causes ESM module duplication in Node.js (e.g. loading "vitest" twice) and path
+   * lookup mismatches in tools like Vite and esbuild.
+   */
+  if (process.platform === 'win32') {
+    const cwd = process.cwd();
+    if (/^[a-z]:/.test(cwd)) {
+      try {
+        process.chdir(cwd[0].toUpperCase() + cwd.slice(1));
+      } catch {
+        // Ignore failure to change directory
+      }
+    }
+  }
+
+  /**
    * Disable Browserslist old data warning as otherwise with every release we'd need to update this dependency
    * which is cumbersome considering we pin versions and the warning is not user actionable.
    * `Browserslist: caniuse-lite is outdated. Please run next command `npm update`
