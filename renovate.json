@@ -5,6 +5,10 @@
   "ignorePaths": ["tests/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
     {
+      "matchFileNames": ["tests/e2e/ng-snapshot/package.json"],
+      "schedule": ["before 8am"]
+    },
+    {
       "enabled": false,
       "matchFileNames": ["tests/e2e/ng-snapshot/package.json"],
       "matchBaseBranches": ["!main"]
