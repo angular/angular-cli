@@ -427,6 +427,7 @@ async function compileString(
             },
           },
         ],
+        watchFiles: error.file && error.file !== filename ? [filename, error.file] : [filename],
       };
     } else {
       assertIsError(error);
