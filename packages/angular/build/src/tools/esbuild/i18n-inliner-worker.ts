@@ -9,6 +9,7 @@
 import remapping, { type EncodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
 import { MagicString } from 'magic-string';
 import assert from 'node:assert';
+import { deserialize } from 'node:v8';
 import { workerData } from 'node:worker_threads';
 import { Visitor, parseSync } from 'oxc-parser';
 
@@ -28,9 +29,11 @@ interface InlineFileRequest {
   locale: string;
 
   /**
-   * The translation messages for the locale that should be used during the inlining process of the file.
+   * The serialized translation messages for the locale that should be used during the inlining
+   * process of the file. A Blob is used so that the messages are shared with the Worker by
+   * reference instead of being copied into it for every request.
    */
-  translation?: Record<string, unknown>;
+  translation?: Blob;
 }
 
 /**
@@ -53,18 +56,54 @@ interface InlineCodeRequest {
   locale: string;
 
   /**
-   * The translation messages for the locale that should be used during the inlining process of the file.
+   * The serialized translation messages for the locale that should be used during the inlining
+   * process of the file. A Blob is used so that the messages are shared with the Worker by
+   * reference instead of being copied into it for every request.
    */
-  translation?: Record<string, unknown>;
+  translation?: Blob;
 }
 
 // Extract the application files and common options used for inline requests from the Worker context
-// TODO: Evaluate overall performance difference of passing translations here as well
 const { files, missingTranslation, shouldOptimize } = (workerData || {}) as {
   files: ReadonlyMap<string, Blob>;
   missingTranslation: 'error' | 'warning' | 'ignore';
   shouldOptimize: boolean;
 };
+
+/**
+ * The translation messages deserialized for the locale most recently requested of this Worker.
+ * Locales are inlined one at a time, so retaining only the active locale is enough to avoid
+ * deserializing the messages once per file while holding at most one set of messages in memory.
+ */
+let activeTranslation: { locale: string; messages: Promise<Record<string, unknown>> } | undefined;
+
+/**
+ * Deserializes the translation messages for an inline request, reusing the result for any
+ * subsequent request that targets the same locale.
+ * @param request An inline request containing the locale and its serialized messages.
+ * @returns The translation messages, or undefined if the locale has no translations.
+ */
+function loadTranslation(
+  request: InlineFileRequest | InlineCodeRequest,
+): Promise<Record<string, unknown>> | undefined {
+  const { locale, translation } = request;
+  if (!translation) {
+    return undefined;
+  }
+
+  if (activeTranslation?.locale !== locale) {
+    activeTranslation = {
+      locale,
+      // Deserializing within the stored promise ensures that concurrent requests for a locale
+      // share the one deserialization instead of each performing their own.
+      messages: translation
+        .arrayBuffer()
+        .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>),
+    };
+  }
+
+  return activeTranslation.messages;
+}
 
 /**
  * Inlines the provided locale and translation into a JavaScript file that contains `$localize` usage.
@@ -80,7 +119,12 @@ export default async function inlineFile(request: InlineFileRequest) {
 
   const code = await data.text();
   const map = await files.get(request.filename + '.map')?.text();
-  const result = await transformWithOxc(code, map && (JSON.parse(map) as SourceMapInput), request);
+  const result = await transformWithOxc(
+    code,
+    map && (JSON.parse(map) as SourceMapInput),
+    request,
+    await loadTranslation(request),
+  );
 
   return {
     file: request.filename,
@@ -98,7 +142,12 @@ export default async function inlineFile(request: InlineFileRequest) {
  * @returns An object containing the inlined code.
  */
 export async function inlineCode(request: InlineCodeRequest) {
-  const result = await transformWithOxc(request.code, undefined, request);
+  const result = await transformWithOxc(
+    request.code,
+    undefined,
+    request,
+    await loadTranslation(request),
+  );
 
   return {
     output: result.code,
@@ -136,12 +185,14 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
  * @param code A string containing the JavaScript code to transform.
  * @param map A sourcemap object for the provided JavaScript code.
  * @param options The inline request options to use.
+ * @param translation The translation messages to inline, or undefined for an untranslated locale.
  * @returns An object containing the code, map, and diagnostics from the transformation.
  */
 async function transformWithOxc(
   code: string,
   map: SourceMapInput | undefined,
   options: InlineFileRequest,
+  translation: Record<string, unknown> | undefined,
 ) {
   const { program } = parseSync(options.filename, code, {
     sourceType: 'unambiguous',
@@ -169,10 +220,10 @@ async function transformWithOxc(
 
         const [translatedParts, translatedSubstitutions] = translate(
           diagnostics,
-          options.translation || {},
+          translation || {},
           messageParts,
           node.quasi.expressions.map((_, index) => index),
-          options.translation === undefined ? 'ignore' : missingTranslation,
+          translation === undefined ? 'ignore' : missingTranslation,
         );
 
         // Reconstruct the new template/string literal replacement

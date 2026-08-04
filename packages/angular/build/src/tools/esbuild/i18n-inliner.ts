@@ -9,6 +9,7 @@
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import { extname, join } from 'node:path';
+import { serialize } from 'node:v8';
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
@@ -18,6 +19,20 @@ import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
  * This keyword is used to avoid processing files that would not otherwise need i18n processing.
  */
 const LOCALIZE_KEYWORD = '$localize';
+
+/**
+ * Serializes the translation messages for a locale for transfer to an inliner Worker.
+ *
+ * A Blob is used because cloning one shares its data by reference, whereas sending the messages
+ * themselves copies them into a Worker for every request that carries them. A locale can contain
+ * tens of thousands of messages, which makes that copy the dominant cost of inlining a locale.
+ *
+ * @param translation The translation messages for a locale, if the locale has any.
+ * @returns A Blob containing the serialized messages, or undefined if the locale has none.
+ */
+function serializeTranslation(translation: Record<string, unknown> | undefined): Blob | undefined {
+  return translation && new Blob([serialize(translation)]);
+}
 
 /**
  * Inlining options that should apply to all transformed code.
@@ -125,6 +140,10 @@ export class I18nInliner {
     await this.initCache();
 
     const { shouldOptimize, missingTranslation } = this.options;
+
+    // Serialized once here and then shared by the request for every file of this locale
+    const translationBlob = serializeTranslation(translation);
+
     // Request inlining for each file that contains localize calls
     const requests = [];
 
@@ -160,7 +179,11 @@ export class I18nInliner {
           return cachedResult;
         }
 
-        const result = await this.#workerPool.run({ filename, locale, translation });
+        const result = await this.#workerPool.run({
+          filename,
+          locale,
+          translation: translationBlob,
+        });
         if (this.#cache && cacheKey) {
           try {
             // Failure to set the value should not fail the transform
@@ -227,7 +250,12 @@ export class I18nInliner {
     }
 
     const { output, messages } = await this.#workerPool.run(
-      { code: templateCode, filename: templateId, locale, translation },
+      {
+        code: templateCode,
+        filename: templateId,
+        locale,
+        translation: serializeTranslation(translation),
+      },
       { name: 'inlineCode' },
     );
 
