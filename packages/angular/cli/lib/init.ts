@@ -39,6 +39,9 @@ let forceExit = false;
         // Ignore failure to change directory
       }
     }
+
+    // Ensure Windows CreateProcess does not search the current directory for bare executable names.
+    process.env['NoDefaultCurrentDirectoryInExePath'] = '1';
   }
 
   /**
@@ -48,6 +51,7 @@ let forceExit = false;
    * See: https://github.com/browserslist/browserslist/blob/819c4337456996d19db6ba953014579329e9c6e1/node.js#L324
    */
   process.env.BROWSERSLIST_IGNORE_OLD_DATA = '1';
+
   const rawCommandName = process.argv[2];
 
   /**
