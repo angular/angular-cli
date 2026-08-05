@@ -135,7 +135,7 @@ export function linkWithOxc(filename: string, code: string, options: OxcLinkerOp
     SHARED_LOGGER,
     SHARED_AST_HOST,
     astFactory,
-    { linkerJitMode: options.jit ?? false },
+    { linkerJitMode: options.jit ?? false, sourceMapping: false },
   );
 
   const fileLinker = new FileLinker(linkerEnvironment, filename as AbsoluteFsPath, code);
