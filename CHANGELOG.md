@@ -1,3 +1,34 @@
+<a name="22.1.3"></a>
+
+# 22.1.3 (2026-08-05)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [f837b788c6](https://github.com/angular/angular-cli/commit/f837b788c6a23e7661db5455192f5a84d20e9b37) | fix  | always install package during ng add to inspect manifest on disk for schematics ([#33718](https://github.com/angular/angular-cli/pull/33718)) |
+| [72ae93638d](https://github.com/angular/angular-cli/commit/72ae93638dd83b3877773ac0d9f7e4c4e9056a33) | fix  | correctly report available package updates during bare ng update                                                                              |
+| [a949e06568](https://github.com/angular/angular-cli/commit/a949e0656855786e4274159be09242ff9c4eb012) | fix  | discover migrations from installed packages when omitted by registry metadata ([#33718](https://github.com/angular/angular-cli/pull/33718))   |
+| [1d9122fd50](https://github.com/angular/angular-cli/commit/1d9122fd50f8a9b82199d44f9b0e075726279538) | fix  | normalize Windows drive-letter casing for process.cwd                                                                                         |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [a4860d505a](https://github.com/angular/angular-cli/commit/a4860d505aff0b43fc608cd0745ed187b1d407b5) | fix  | prevent build process hang on unhandled error ([#33715](https://github.com/angular/angular-cli/pull/33715))   |
+| [7686d66cab](https://github.com/angular/angular-cli/commit/7686d66cabcdfe90748ac405686d42674a19576f) | fix  | retain watch files on error in load result cache                                                              |
+| [25b7cf7504](https://github.com/angular/angular-cli/commit/25b7cf7504838d541abfba043d9ea3d616a23c04) | fix  | support case-insensitive and alternative license file names                                                   |
+| [4fd81402ce](https://github.com/angular/angular-cli/commit/4fd81402ce5f2f3db45a17ee0d116f12edf8d254) | perf | release build resources early in non-watch mode ([#33715](https://github.com/angular/angular-cli/pull/33715)) |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [6af906cb94](https://github.com/angular/angular-cli/commit/6af906cb94bd0686b4c0431989e054711c74892a) | fix  | settle writeResponseToNodeResponse when client disconnects |
+| [917d3b2254](https://github.com/angular/angular-cli/commit/917d3b22549c19b91e03ceb0775a3a758142b9de) | perf | avoid buffering request body when sanitizing headers       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.20"></a>
 
 # 21.2.20 (2026-08-05)
