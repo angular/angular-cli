@@ -177,8 +177,12 @@ export class StringAstFactory implements AstFactory<string, unknown, string> {
 
   createArrowFunctionExpression(parameters: Parameter<string>[], body: unknown): string {
     const params = parameters.map((p) => p.name).join(', ');
+    const renderedBody = this.render(body);
+    const isObjectLiteral =
+      renderedBody.startsWith('{') && renderedBody.endsWith('}') && !renderedBody.includes(';');
+    const formattedBody = isObjectLiteral ? `(${renderedBody})` : renderedBody;
 
-    return `(${params}) => ${this.render(body)}`;
+    return `(${params}) => ${formattedBody}`;
   }
 
   createDynamicImport(url: unknown): string {

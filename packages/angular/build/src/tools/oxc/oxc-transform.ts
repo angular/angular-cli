@@ -421,11 +421,14 @@ export function transform(filename: string, code: string, options: OxcTransformO
 
       // 3. Remove `Name = ` assignment in arguments if it's a simple identifier
       if (rightCallArgument.left.type === 'Identifier') {
-        s.overwrite(
-          arg.right.start,
-          arg.right.end,
-          code.substring(rightCallArgument.right.start, rightCallArgument.right.end),
+        let replacement = code.substring(
+          rightCallArgument.right.start,
+          rightCallArgument.right.end,
         );
+        if (rightCallArgument.right.type === 'AssignmentExpression') {
+          replacement = `(${replacement})`;
+        }
+        s.overwrite(arg.right.start, arg.right.end, replacement);
         markEdited(arg.right.start, arg.right.end);
       }
 
