@@ -1,3 +1,16 @@
+<a name="22.2.0-next.2"></a>
+
+# 22.2.0-next.2 (2026-08-05)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                           |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [7e5510e464](https://github.com/angular/angular-cli/commit/7e5510e464eb423d8757ae6f058f73fc17249d81) | fix  | disable linker internal source mapping in OXC linker  |
+| [bad31421cb](https://github.com/angular/angular-cli/commit/bad31421cbf23339d4fbd389a91d198df405697d) | fix  | prevent syntax corruption in linker and oxc transform |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0-next.1"></a>
 
 # 22.2.0-next.1 (2026-08-05)
