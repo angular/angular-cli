@@ -1,3 +1,21 @@
+<a name="21.2.20"></a>
+
+# 21.2.20 (2026-08-05)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description               |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [972f6db7e9](https://github.com/angular/angular-cli/commit/972f6db7e9ccf3c4b0e895341a49b104a8b0ac9b) | fix  | upgrade postcss to 8.5.23 |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description               |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [8de75ada50](https://github.com/angular/angular-cli/commit/8de75ada503d4182af7f0be957e58fe678a63b98) | fix  | upgrade postcss to 8.5.23 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.33"></a>
 
 # 20.3.33 (2026-08-05)
