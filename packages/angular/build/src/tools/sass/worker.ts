@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import mergeSourceMaps, { RawSourceMap } from '@ampproject/remapping';
+import mergeSourceMaps, { type DecodedSourceMap, type RawSourceMap } from '@ampproject/remapping';
 import { dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { MessagePort, receiveMessageOnPort } from 'node:worker_threads';
@@ -89,7 +89,7 @@ export default async function renderSassStylesheet(
   let warnings: SerializableWarningMessage[] | undefined;
   try {
     const directoryCache = new Map<string, DirectoryEntry>();
-    const rebaseSourceMaps = options.sourceMap ? new Map<string, RawSourceMap>() : undefined;
+    const rebaseSourceMaps = options.sourceMap ? new Map<string, DecodedSourceMap>() : undefined;
     if (importerChannel) {
       // When a custom importer function is present, the importer request must be proxied
       // back to the main thread where it can be executed.

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { type EncodedSourceMap } from '@ampproject/remapping';
+import remapping, { type DecodedSourceMap } from '@ampproject/remapping';
 import type { BindingIdentifier, Class, Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
 import { Visitor, parseSync } from 'oxc-parser';
@@ -749,13 +749,16 @@ export function transform(filename: string, code: string, options: OxcTransformO
 
   let map: string | undefined;
   if (options.sourcemap) {
-    const rawMap = s.generateMap({ hires: true, source: filename });
     const inputMap = loadInputSourceMap(filename, code);
 
     if (inputMap) {
-      map = remapping([rawMap as EncodedSourceMap, inputMap], () => null).toString();
+      const rawMap = s.generateDecodedMap({ hires: true, source: filename });
+      map = remapping(
+        [{ ...rawMap, version: 3 } satisfies DecodedSourceMap, inputMap],
+        () => null,
+      ).toString();
     } else {
-      map = rawMap.toString();
+      map = s.generateMap({ hires: true, source: filename }).toString();
     }
   }
 
