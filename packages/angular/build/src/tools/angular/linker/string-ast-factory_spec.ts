@@ -63,7 +63,7 @@ describe('StringAstFactory', () => {
         { kind: 'property' as const, propertyName: 'foo', value: '1', quoted: false },
         { kind: 'property' as const, propertyName: 'foo-bar', value: '2', quoted: true },
       ];
-      expect(factory.createObjectLiteral(props)).toBe('{\nfoo: 1,\n"foo-bar": 2\n}');
+      expect(factory.createObjectLiteral(props)).toContain('{\nfoo: 1,\n"foo-bar": 2\n}');
     });
 
     it('should correctly format object literals with spread properties', () => {
@@ -71,7 +71,7 @@ describe('StringAstFactory', () => {
         { kind: 'property' as const, propertyName: 'foo', value: '1', quoted: false },
         { kind: 'spread' as const, expression: 'bar' },
       ];
-      expect(factory.createObjectLiteral(props)).toBe('{\nfoo: 1,\n...bar\n}');
+      expect(factory.createObjectLiteral(props)).toContain('{\nfoo: 1,\n...bar\n}');
     });
   });
 
@@ -163,6 +163,21 @@ describe('StringAstFactory', () => {
         { name: 'b', type: null },
       ];
       expect(factory.createArrowFunctionExpression(params, 'a + b')).toBe('(a, b) => a + b');
+    });
+
+    it('should parenthesize object literal expression bodies in arrow functions even when containing semicolons', () => {
+      const params = [{ name: 'a', type: null }];
+      const obj = factory.createObjectLiteral([
+        {
+          kind: 'property',
+          propertyName: 'factory',
+          value: '() => { return new Service(); }',
+          quoted: false,
+        },
+      ]);
+      expect(factory.createArrowFunctionExpression(params, obj)).toBe(
+        '(a) => ({\nfactory: () => { return new Service(); }\n})',
+      );
     });
 
     it('should format statements', () => {

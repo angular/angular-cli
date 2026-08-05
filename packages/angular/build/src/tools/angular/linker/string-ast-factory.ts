@@ -21,6 +21,8 @@ import type {
   Parameter,
 } from '@angular/compiler-cli/src/ngtsc/translator/src/api/ast_factory';
 
+const OBJECT_LITERAL_PREFIX = '\0obj_';
+
 /**
  * An implementation of `AstFactory` that generates JavaScript code strings directly.
  */
@@ -28,10 +30,10 @@ export class StringAstFactory implements AstFactory<string, unknown, string> {
   constructor(private readonly sourceCode: string = '') {}
 
   private render(expr: unknown): string {
+    let rendered: string;
     if (typeof expr === 'string') {
-      return expr;
-    }
-    if (
+      rendered = expr;
+    } else if (
       typeof expr === 'object' &&
       expr !== null &&
       typeof (expr as { start?: number; end?: number }).start === 'number' &&
@@ -39,10 +41,16 @@ export class StringAstFactory implements AstFactory<string, unknown, string> {
     ) {
       const { start, end } = expr as { start: number; end: number };
 
-      return this.sourceCode.slice(start, end);
+      rendered = this.sourceCode.slice(start, end);
+    } else {
+      rendered = String(expr);
     }
 
-    return String(expr);
+    if (rendered.startsWith(OBJECT_LITERAL_PREFIX)) {
+      return rendered.slice(OBJECT_LITERAL_PREFIX.length);
+    }
+
+    return rendered;
   }
 
   /**
@@ -177,9 +185,8 @@ export class StringAstFactory implements AstFactory<string, unknown, string> {
 
   createArrowFunctionExpression(parameters: Parameter<string>[], body: unknown): string {
     const params = parameters.map((p) => p.name).join(', ');
+    const isObjectLiteral = typeof body === 'string' && body.startsWith(OBJECT_LITERAL_PREFIX);
     const renderedBody = this.render(body);
-    const isObjectLiteral =
-      renderedBody.startsWith('{') && renderedBody.endsWith('}') && !renderedBody.includes(';');
     const formattedBody = isObjectLiteral ? `(${renderedBody})` : renderedBody;
 
     return `(${params}) => ${formattedBody}`;
@@ -222,7 +229,7 @@ export class StringAstFactory implements AstFactory<string, unknown, string> {
       return `${key}: ${this.render(p.value)}`;
     });
 
-    return `{\n${props.join(',\n')}\n}`;
+    return `${OBJECT_LITERAL_PREFIX}{\n${props.join(',\n')}\n}`;
   }
 
   createParenthesizedExpression(expression: unknown): string {
