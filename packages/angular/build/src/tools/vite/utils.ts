@@ -48,6 +48,7 @@ export type RolldownLoaderOption = Exclude<
 >['moduleTypes'];
 
 export function getDepOptimizationConfig({
+  target,
   disabled,
   exclude,
   include,
@@ -56,6 +57,7 @@ export function getDepOptimizationConfig({
   thirdPartySourcemaps,
   define = {},
 }: {
+  target: string[];
   disabled: boolean;
   exclude: string[];
   include: string[];
@@ -73,6 +75,7 @@ export function getDepOptimizationConfig({
     noDiscovery: disabled,
     rolldownOptions: {
       transform: {
+        target,
         define,
       },
       moduleTypes: loader,

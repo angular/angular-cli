@@ -104,6 +104,7 @@ function createSsrConfig(
   prebundleLoaderExtensions: RolldownLoaderOption | undefined,
   thirdPartySourcemaps: boolean,
   define: ApplicationBuilderInternalOptions['define'],
+  target: string[],
 ): Vite.SSROptions {
   return {
     // Note: `true` and `/.*/` have different sematics. When true, the `external` option is ignored.
@@ -111,6 +112,7 @@ function createSsrConfig(
     // Exclude any Node.js built in module and provided dependencies (currently build defined externals)
     external: externalMetadata.explicitServer,
     optimizeDeps: getDepOptimizationConfig({
+      target,
       // Only enable with caching since it causes prebundle dependencies to be cached
       disabled: serverOptions.prebundle === false,
       // Exclude any explicitly defined dependencies (currently build defined externals and node.js built-ins)
@@ -214,6 +216,7 @@ export async function setupServer(
             prebundleLoaderExtensions,
             thirdPartySourcemaps,
             define,
+            target,
           ),
     plugins: [
       createAngularSetupMiddlewaresPlugin({
@@ -239,6 +242,7 @@ export async function setupServer(
     ],
     // Browser only optimizeDeps. (This does not run for SSR dependencies).
     optimizeDeps: getDepOptimizationConfig({
+      target,
       // Only enable with caching since it causes prebundle dependencies to be cached
       disabled: serverOptions.prebundle === false,
       // Exclude any explicitly defined dependencies (currently build defined externals)
