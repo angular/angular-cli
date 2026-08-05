@@ -191,6 +191,81 @@ describe('I18nInliner', () => {
     });
   });
 
+  it('safely inlines translations containing special characters, quotes, and newlines', async () => {
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+    ]).inlineForLocale('fr', {
+      greeting: translationFor('Bonjour "mon ami" \\ \' \n <script>alert(1)</script>'),
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toBe(
+      'export const greeting = "Bonjour \\"mon ami\\" \\\\ \' \\n <script>alert(1)</script>";\n',
+    );
+  });
+
+  it('inlines translations containing placeholders', async () => {
+    const source = 'export const welcome = (name) => $localize`:@@welcome:Hello ${name}!`;\n';
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', source),
+    ]).inlineForLocale('fr', {
+      welcome: {
+        messageParts: ['Bonjour ', ' !'],
+        placeholderNames: ['PH'],
+        text: 'Bonjour {$PH} !',
+      },
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toBe(
+      'export const welcome = (name) => `Bonjour ${name} !`;\n',
+    );
+  });
+
+  it('inlines multiple localize calls within the same file', async () => {
+    const source =
+      'export const a = $localize`:@@greeting:Hello`;\nexport const b = $localize`:@@farewell:Goodbye`;\n';
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', source),
+    ]).inlineForLocale('fr', {
+      greeting: translationFor('Bonjour'),
+      farewell: translationFor('Au revoir'),
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toBe(
+      'export const a = "Bonjour";\nexport const b = "Au revoir";\n',
+    );
+  });
+
+  it('inlines translations across multiple files using multiple worker threads in parallel', async () => {
+    inliner = new I18nInliner(
+      {
+        missingTranslation: 'warning',
+        outputFiles: [
+          browserFile('main.js', GREETING_SOURCE),
+          browserFile('chunk1.js', GREETING_SOURCE),
+          browserFile('chunk2.js', GREETING_SOURCE),
+          browserFile('chunk3.js', GREETING_SOURCE),
+        ],
+      },
+      4,
+    );
+
+    const { outputFiles, errors, warnings } = await inliner.inlineForLocale('fr', {
+      greeting: translationFor('Bonjour'),
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    for (const name of ['main.js', 'chunk1.js', 'chunk2.js', 'chunk3.js']) {
+      expect(findFile(outputFiles, name).text).toBe('export const greeting = "Bonjour";\n');
+    }
+  });
+
   it('leaves files without localize calls unmodified', async () => {
     const { outputFiles } = await createInliner([
       browserFile('main.js', GREETING_SOURCE),
