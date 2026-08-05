@@ -425,7 +425,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
           rightCallArgument.right.start,
           rightCallArgument.right.end,
         );
-        if (rightCallArgument.right.type === 'AssignmentExpression') {
+        if (unwrapParentheses(rightCallArgument.right).type === 'AssignmentExpression') {
           replacement = `(${replacement})`;
         }
         s.overwrite(arg.right.start, arg.right.end, replacement);
