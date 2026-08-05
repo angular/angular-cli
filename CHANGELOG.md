@@ -1,3 +1,38 @@
+<a name="22.2.0-next.1"></a>
+
+# 22.2.0-next.1 (2026-08-05)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| [41555dfb3b](https://github.com/angular/angular-cli/commit/41555dfb3b71d08cdfe2853bf2cbeca5b6942f67) | feat | add `--root` command line option to `mcp` command                                                                                             |
+| [035b9d5c9b](https://github.com/angular/angular-cli/commit/035b9d5c9bca624b98e14480f599481f294b49f3) | fix  | add packages with built-in schematics to devDependencies only                                                                                 |
+| [0ae5690c35](https://github.com/angular/angular-cli/commit/0ae5690c35b9af00f60d4851f1bab4ba5ec8eb19) | fix  | always install package during ng add to inspect manifest on disk for schematics ([#33718](https://github.com/angular/angular-cli/pull/33718)) |
+| [44ff584b33](https://github.com/angular/angular-cli/commit/44ff584b33830aa839c08feb205f014e4e7b5dca) | fix  | correctly report available package updates during bare ng update                                                                              |
+| [1d4f9ebbe9](https://github.com/angular/angular-cli/commit/1d4f9ebbe993a5eb8b23929a3fc55b506597e5aa) | fix  | discover migrations from installed packages when omitted by registry metadata ([#33718](https://github.com/angular/angular-cli/pull/33718))   |
+| [25034f97ad](https://github.com/angular/angular-cli/commit/25034f97ad1b9a12f4080f646a0e2705425f9726) | fix  | normalize Windows drive-letter casing for process.cwd                                                                                         |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
+| [ad8271320f](https://github.com/angular/angular-cli/commit/ad8271320f67c2b1502e446f1e3cb0a05444d04f) | feat | migrate Angular Linker to oxc-parser and magic-string                                                         |
+| [4fb12292c2](https://github.com/angular/angular-cli/commit/4fb12292c21498c59836f7c80e4f824bb7751cac) | fix  | prevent build process hang on unhandled error ([#33715](https://github.com/angular/angular-cli/pull/33715))   |
+| [abd8ec9f3e](https://github.com/angular/angular-cli/commit/abd8ec9f3e11f1410fcb87d0d9d60f56016912fe) | fix  | prevent IIFE wrapper interleaving for adjacent classes in minified files                                      |
+| [bcadbbef20](https://github.com/angular/angular-cli/commit/bcadbbef2054e897b9d22c1456883fc68f0383c0) | fix  | retain watch files on error in load result cache                                                              |
+| [e1c7193dce](https://github.com/angular/angular-cli/commit/e1c7193dcee1c7f2feb07fdf24a6e0656f29cfaf) | fix  | support case-insensitive and alternative license file names                                                   |
+| [f4a0f846e7](https://github.com/angular/angular-cli/commit/f4a0f846e7d14b5ff58c91d04461ef4a027c56b8) | perf | release build resources early in non-watch mode ([#33715](https://github.com/angular/angular-cli/pull/33715)) |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [b74eef889f](https://github.com/angular/angular-cli/commit/b74eef889f9c8812dcbe116400663fa3d68d6b4f) | fix  | settle writeResponseToNodeResponse when client disconnects |
+| [33169801c6](https://github.com/angular/angular-cli/commit/33169801c6ed7fc7c7dca2c04008e5d405374983) | perf | avoid buffering request body when sanitizing headers       |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.3"></a>
 
 # 22.1.3 (2026-08-05)
