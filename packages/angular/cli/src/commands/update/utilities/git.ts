@@ -60,7 +60,7 @@ export function checkCleanGit(root: string): boolean {
         return false;
       }
     }
-  } catch {} // eslint-disable-line no-empty
+  } catch {}
 
   return true;
 }
