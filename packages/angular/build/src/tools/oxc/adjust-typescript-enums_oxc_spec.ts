@@ -280,4 +280,24 @@ describe('adjust-typescript-enums oxc-transform implementation', () => {
       `,
     }),
   );
+
+  it(
+    'handles TypeScript enums with chained exports assignment (angular-split / shared-docs pattern)',
+    testCase({
+      input: `
+        var Area;
+        (function (a1) {
+            a1[a1["areaAfter"] = 0] = "areaAfter";
+            a1[a1["preserveOtherCategoryOrder"] = 1] = "preserveOtherCategoryOrder";
+        })(Area || (Area = exports.Area = {}));
+      `,
+      expected: `
+        var Area = /*#__PURE__*/ (function (a1) {
+          a1[(a1["areaAfter"] = 0)] = "areaAfter";
+          a1[(a1["preserveOtherCategoryOrder"] = 1)] = "preserveOtherCategoryOrder";
+          return a1;
+        })(Area || (exports.Area = {}));
+      `,
+    }),
+  );
 });
