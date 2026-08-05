@@ -87,4 +87,14 @@ describe('removeSourceMappingURL', () => {
     const code = '// # sourceMappingURL=main.js.map\n//# sourceMappingURL=main.js.map';
     expect(removeSourceMappingURL(code)).toBe('// # sourceMappingURL=main.js.map\n');
   });
+
+  it('should return the exact input string when no sourcemap comment is present', () => {
+    const code = 'const x = 1;\nconsole.log(x);';
+    expect(removeSourceMappingURL(code)).toBe(code);
+  });
+
+  it('should handle sourcemap comments with CRLF newlines', () => {
+    const code = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\nconst next = 2;';
+    expect(removeSourceMappingURL(code)).toBe('console.log("hello");\r\n\r\nconst next = 2;');
+  });
 });
