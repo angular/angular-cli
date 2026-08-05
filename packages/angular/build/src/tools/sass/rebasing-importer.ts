@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { RawSourceMap } from '@ampproject/remapping';
+import type { DecodedSourceMap } from '@ampproject/remapping';
 import { MagicString } from 'magic-string';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
@@ -44,7 +44,7 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
    */
   constructor(
     private entryDirectory: string,
-    private rebaseSourceMaps?: Map<string, RawSourceMap>,
+    private rebaseSourceMaps?: Map<string, DecodedSourceMap>,
   ) {}
 
   abstract canonicalize(url: string, options: { fromImport: boolean }): URL | null;
@@ -95,12 +95,15 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
       contents = updatedContents.toString();
       if (this.rebaseSourceMaps) {
         // Generate an intermediate source map for the rebasing changes
-        const map = updatedContents.generateMap({
+        const map = updatedContents.generateDecodedMap({
           hires: 'boundary',
           includeContent: true,
           source: canonicalUrl.href,
         });
-        this.rebaseSourceMaps.set(canonicalUrl.href, map as RawSourceMap);
+        this.rebaseSourceMaps.set(canonicalUrl.href, {
+          ...map,
+          version: 3,
+        } satisfies DecodedSourceMap);
       }
     }
 
@@ -134,7 +137,7 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
   constructor(
     entryDirectory: string,
     private directoryCache = new Map<string, DirectoryEntry>(),
-    rebaseSourceMaps?: Map<string, RawSourceMap>,
+    rebaseSourceMaps?: Map<string, DecodedSourceMap>,
   ) {
     super(entryDirectory, rebaseSourceMaps);
   }
@@ -322,7 +325,7 @@ export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
     directoryCache: Map<string, DirectoryEntry>,
-    rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
+    rebaseSourceMaps: Map<string, DecodedSourceMap> | undefined,
     private finder: (specifier: string, options: CanonicalizeContext) => URL | null,
   ) {
     super(entryDirectory, directoryCache, rebaseSourceMaps);
@@ -349,7 +352,7 @@ export class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
   constructor(
     entryDirectory: string,
     directoryCache: Map<string, DirectoryEntry>,
-    rebaseSourceMaps: Map<string, RawSourceMap> | undefined,
+    rebaseSourceMaps: Map<string, DecodedSourceMap> | undefined,
     private loadPaths: Iterable<string>,
   ) {
     super(entryDirectory, directoryCache, rebaseSourceMaps);

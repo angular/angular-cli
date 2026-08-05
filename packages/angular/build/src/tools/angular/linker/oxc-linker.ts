@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { EncodedSourceMap } from '@ampproject/remapping';
+import type { DecodedSourceMap } from '@ampproject/remapping';
 import remapping from '@ampproject/remapping';
 import { ConsoleLogger, LogLevel } from '@angular/compiler-cli';
 import type { DeclarationScope } from '@angular/compiler-cli/linker';
@@ -170,12 +170,15 @@ export function linkWithOxc(filename: string, code: string, options: OxcLinkerOp
 
   let map: string | undefined;
   if (options.sourcemap) {
-    const rawMap = s.generateMap({ hires: true, source: filename });
     const inputMap = loadInputSourceMap(filename, code);
     if (inputMap) {
-      map = remapping([rawMap as EncodedSourceMap, inputMap], () => null).toString();
+      const rawMap = s.generateDecodedMap({ hires: true, source: filename });
+      map = remapping(
+        [{ ...rawMap, version: 3 } satisfies DecodedSourceMap, inputMap],
+        () => null,
+      ).toString();
     } else {
-      map = rawMap.toString();
+      map = s.generateMap({ hires: true, source: filename }).toString();
     }
   }
 
