@@ -10,11 +10,10 @@ import remapping, { type EncodedSourceMap } from '@ampproject/remapping';
 import type { BindingIdentifier, Class, Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
 import { Visitor, parseSync } from 'oxc-parser';
-import { loadInputSourceMap } from '../../../utils/source-map';
+import { loadInputSourceMap } from '../../utils/source-map';
 
 export interface OxcTransformOptions {
   sourcemap?: boolean;
-  jit?: boolean;
   sideEffects?: boolean;
   topLevelSafeMode?: boolean;
   pureAnnotate?: boolean;
@@ -261,7 +260,6 @@ export function transform(filename: string, code: string, options: OxcTransformO
   const s = new MagicString(code);
 
   const sideEffectFree = options.sideEffects === false;
-  const safeAngularPackage = sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
   const topLevelSafeMode = options.topLevelSafeMode ?? false;
   const wrapDecorators = sideEffectFree;
   const pureAnnotate = options.pureAnnotate ?? true;
