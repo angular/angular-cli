@@ -48,7 +48,7 @@ importers:
         version: 20.2.10(72d1932aa29c0670c8359e3ed8a5ff55)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#b69a61793bd6ba935af262297688408d0b48252e
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b69a61793bd6ba935af262297688408d0b48252e(@modelcontextprotocol/sdk@1.26.0(zod@4.1.13))
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b69a61793bd6ba935af262297688408d0b48252e(@modelcontextprotocol/sdk@1.30.0(zod@4.1.13))
       '@angular/platform-browser':
         specifier: 20.3.7
         version: 20.3.7(@angular/animations@20.3.7(@angular/core@20.3.7(@angular/compiler@20.3.7)(rxjs@7.8.2)(zone.js@0.15.1)))(@angular/common@20.3.7(@angular/core@20.3.7(@angular/compiler@20.3.7)(rxjs@7.8.2)(zone.js@0.15.1))(rxjs@7.8.2))(@angular/core@20.3.7(@angular/compiler@20.3.7)(rxjs@7.8.2)(zone.js@0.15.1))
@@ -472,8 +472,8 @@ importers:
         specifier: 3.0.1
         version: 3.0.1(@inquirer/prompts@7.8.2(@types/node@24.9.1))(@types/node@24.9.1)(listr2@9.0.1)
       '@modelcontextprotocol/sdk':
-        specifier: 1.26.0
-        version: 1.26.0(zod@4.1.13)
+        specifier: 1.30.0
+        version: 1.30.0(zod@4.1.13)
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -2933,8 +2933,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@modelcontextprotocol/sdk@1.26.0':
-    resolution: {integrity: sha512-Y5RmPncpiDtTXDbLKswIJzTqu2hyBKxTNsgKqKclDbhIgg1wgtf1fRuvxgTnRfcnxtvvgbIEcqUOzZrJ6iSReg==}
+  '@modelcontextprotocol/sdk@1.30.0':
+    resolution: {integrity: sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -8063,10 +8063,6 @@ packages:
     resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
     engines: {node: '>=0.6'}
 
-  qs@6.14.1:
-    resolution: {integrity: sha512-4EK3+xJl8Ts67nLYNwqw/dsFVnCf+qR7RgXSK9jEEm9unao3njwMDdmsdvoKBKHzxd7tCYz5e5M+SnMjdtXGQQ==}
-    engines: {node: '>=0.6'}
-
   qs@6.15.2:
     resolution: {integrity: sha512-Rzq0KEyX/w/tEybncDgdkZrJgVUsUMk3xjh3t5bv3S1HTAtg+uOYt72+ZfwiQwKdysThkTBdL/rTi6HDmX9Ddw==}
     engines: {node: '>=0.6'}
@@ -9855,11 +9851,11 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b69a61793bd6ba935af262297688408d0b48252e(@modelcontextprotocol/sdk@1.26.0(zod@4.1.13))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/b69a61793bd6ba935af262297688408d0b48252e(@modelcontextprotocol/sdk@1.30.0(zod@4.1.13))':
     dependencies:
       '@actions/core': 1.11.1
       '@google-cloud/spanner': 8.0.0(supports-color@10.2.2)
-      '@google/genai': 1.26.0(@modelcontextprotocol/sdk@1.26.0(zod@4.1.13))(bufferutil@4.0.9)(supports-color@10.2.2)(utf-8-validate@6.0.5)
+      '@google/genai': 1.26.0(@modelcontextprotocol/sdk@1.30.0(zod@4.1.13))(bufferutil@4.0.9)(supports-color@10.2.2)(utf-8-validate@6.0.5)
       '@inquirer/prompts': 7.9.0(@types/node@24.9.1)
       '@inquirer/type': 3.0.9(@types/node@24.9.1)
       '@octokit/auth-app': 8.1.1
@@ -11461,12 +11457,12 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@1.26.0(@modelcontextprotocol/sdk@1.26.0(zod@4.1.13))(bufferutil@4.0.9)(supports-color@10.2.2)(utf-8-validate@6.0.5)':
+  '@google/genai@1.26.0(@modelcontextprotocol/sdk@1.30.0(zod@4.1.13))(bufferutil@4.0.9)(supports-color@10.2.2)(utf-8-validate@6.0.5)':
     dependencies:
       google-auth-library: 10.4.0(supports-color@10.2.2)
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.26.0(zod@4.1.13)
+      '@modelcontextprotocol/sdk': 1.30.0(zod@4.1.13)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -11874,11 +11870,11 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.4.2':
     optional: true
 
-  '@modelcontextprotocol/sdk@1.26.0(zod@4.1.13)':
+  '@modelcontextprotocol/sdk@1.30.0(zod@4.1.13)':
     dependencies:
       '@hono/node-server': 1.19.9(hono@4.11.7)
-      ajv: 8.17.1
-      ajv-formats: 3.0.1(ajv@8.17.1)
+      ajv: 8.18.0
+      ajv-formats: 3.0.1(ajv@8.18.0)
       content-type: 1.0.5
       cors: 2.8.5
       cross-spawn: 7.0.6
@@ -13596,10 +13592,6 @@ snapshots:
     dependencies:
       ajv: 8.18.0
 
-  ajv-formats@3.0.1(ajv@8.17.1):
-    optionalDependencies:
-      ajv: 8.17.1
-
   ajv-formats@3.0.1(ajv@8.18.0):
     optionalDependencies:
       ajv: 8.18.0
@@ -13985,10 +13977,10 @@ snapshots:
       bytes: 3.1.2
       content-type: 1.0.5
       debug: 4.4.3(supports-color@10.2.2)
-      http-errors: 2.0.0
+      http-errors: 2.0.1
       iconv-lite: 0.7.0
       on-finished: 2.4.1
-      qs: 6.14.1
+      qs: 6.15.2
       raw-body: 3.0.1
       type-is: 2.0.1
     transitivePeerDependencies:
@@ -14316,7 +14308,7 @@ snapshots:
       '@hapi/bourne': 3.0.0
       inflation: 2.1.0
       qs: 6.14.0
-      raw-body: 2.5.2
+      raw-body: 2.5.3
       type-is: 1.6.18
 
   co@4.6.0: {}
@@ -15356,14 +15348,14 @@ snapshots:
       etag: 1.8.1
       finalhandler: 2.1.0
       fresh: 2.0.0
-      http-errors: 2.0.0
+      http-errors: 2.0.1
       merge-descriptors: 2.0.0
       mime-types: 3.0.1
       on-finished: 2.4.1
       once: 1.4.0
       parseurl: 1.3.3
       proxy-addr: 2.0.7
-      qs: 6.14.0
+      qs: 6.15.2
       range-parser: 1.2.1
       router: 2.2.0
       send: 1.2.0
@@ -17877,10 +17869,6 @@ snapshots:
       side-channel: 1.1.0
 
   qs@6.14.0:
-    dependencies:
-      side-channel: 1.1.0
-
-  qs@6.14.1:
     dependencies:
       side-channel: 1.1.0
 
