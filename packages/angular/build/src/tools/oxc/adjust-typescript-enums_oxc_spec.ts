@@ -300,4 +300,83 @@ describe('adjust-typescript-enums oxc-transform implementation', () => {
       `,
     }),
   );
+
+  it(
+    'handles TypeScript enums wrapped in parentheses',
+    testCase({
+      input: `
+        var ChangeDetectionStrategy;
+        ((function (ChangeDetectionStrategy) {
+            ChangeDetectionStrategy[ChangeDetectionStrategy["OnPush"] = 0] = "OnPush";
+            ChangeDetectionStrategy[ChangeDetectionStrategy["Default"] = 1] = "Default";
+        })(ChangeDetectionStrategy || (ChangeDetectionStrategy = {})));
+      `,
+      expected: `
+        var ChangeDetectionStrategy = /*#__PURE__*/ (function (ChangeDetectionStrategy) {
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["OnPush"] = 0)] = "OnPush";
+          ChangeDetectionStrategy[(ChangeDetectionStrategy["Default"] = 1)] = "Default";
+          return ChangeDetectionStrategy;
+        })(ChangeDetectionStrategy || {});
+      `,
+    }),
+  );
+
+  it(
+    'wraps Crockford-style TypeScript enum IIFE without leaving dangling parentheses',
+    testCase({
+      input: `
+        var HDirection;
+        (function (HDirection) {
+          HDirection[HDirection['Backwards'] = -1] = 'Backwards';
+          HDirection[HDirection['Forwards'] = 1] = 'Forwards';
+        }(HDirection || (HDirection = {})));
+        const nextStatement = true;
+      `,
+      expected: `
+        var HDirection = /*#__PURE__*/ (function (HDirection) {
+          HDirection[(HDirection['Backwards'] = -1)] = 'Backwards';
+          HDirection[(HDirection['Forwards'] = 1)] = 'Forwards';
+          return HDirection;
+        }(HDirection || {}));
+
+        const nextStatement = true;
+      `,
+    }),
+  );
+
+  it(
+    'wraps TypeScript enum IIFE with multiple nested parentheses',
+    testCase({
+      input: `
+        var Foo;
+        (((function (Foo) {
+          Foo[Foo['A'] = 0] = 'A';
+        }(Foo || (Foo = {})))));
+      `,
+      expected: `
+        var Foo = /*#__PURE__*/ (function (Foo) {
+          Foo[(Foo['A'] = 0)] = 'A';
+          return Foo;
+        }(Foo || {}));
+      `,
+    }),
+  );
+
+  it(
+    'wraps Crockford-style TypeScript enum IIFE with chained export assignments',
+    testCase({
+      input: `
+        var Foo;
+        (function (Foo) {
+          Foo[Foo['A'] = 0] = 'A';
+        }(Foo || (Foo = exports.Foo = {})));
+      `,
+      expected: `
+        var Foo = /*#__PURE__*/ (function (Foo) {
+          Foo[(Foo['A'] = 0)] = 'A';
+          return Foo;
+        }(Foo || (exports.Foo = {})));
+      `,
+    }),
+  );
 });
