@@ -89,6 +89,10 @@ export default async function transformJavaScript(
   const transformedData = await transformJavaScriptImpl(filename, textData, options);
 
   // Transfer the data via `move` instead of cloning
+  if (transformedData === textData && typeof data !== 'string') {
+    return Piscina.move(data);
+  }
+
   return Piscina.move(textEncoder.encode(transformedData));
 }
 

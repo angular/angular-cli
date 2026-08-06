@@ -239,4 +239,56 @@ describe('JavaScriptTransformer sourcemaps', () => {
     expect(typeof map?.['mappings']).toBe('string');
     expect((map?.['mappings'] as string).length).toBeGreaterThan(0);
   });
+
+  it('should accept a Uint8Array input in transformData', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: true,
+        advancedOptimizations: true,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('var x = new SomeClass();', 'utf-8');
+    const result = await transformer.transformData('src/app.js', inputBuffer, true);
+    const text = Buffer.from(result).toString('utf-8');
+    const map = extractSourcemap(text);
+
+    expect(map).toBeDefined();
+    expect(map?.['version']).toBe(3);
+    expect(map?.['sources']).toContain('src/app.js');
+    expect(typeof map?.['mappings']).toBe('string');
+  });
+
+  it('should strip trailing sourcemap comments from Uint8Array input on fast-path', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from(
+      'console.log("hello");\n//# sourceMappingURL=app.js.map',
+      'utf-8',
+    );
+    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, true);
+    const text = Buffer.from(result).toString('utf-8');
+
+    expect(text).toBe('console.log("hello");\n');
+  });
+
+  it('should return Uint8Array input untouched on fast-path when no sourcemap comment is present', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('console.log("hello");\nconst x = 1;', 'utf-8');
+    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, true);
+
+    expect(result).toBe(inputBuffer);
+  });
 });

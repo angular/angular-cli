@@ -13,6 +13,8 @@ import { removeSourceMappingURL } from '../../utils/source-map';
 import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
+const SOURCEMAP_COMMENT_BYTES = Buffer.from('sourceMappingURL=');
+
 /**
  * Transformation options that should apply to all transformed files and data.
  */
@@ -132,12 +134,10 @@ export class JavaScriptTransformer {
     return this.#runWithThrottle(async () => {
       const data = await readFile(filename);
 
-      let result;
-      let cacheKey;
+      let cacheKey: string | undefined;
       if (this.cache) {
         // Create a cache key from the file data and options that effect the output.
         // NOTE: If additional options are added, this may need to be updated.
-        // TODO: Consider xxhash or similar instead of SHA256
         const hash = createHash('sha256');
         hash.update(`${!!skipLinker}--${!!sideEffects}`);
         hash.update(data);
@@ -145,37 +145,28 @@ export class JavaScriptTransformer {
         cacheKey = hash.digest('hex');
 
         try {
-          result = await this.cache?.get(cacheKey);
+          const cached = await this.cache.get(cacheKey);
+          if (cached !== undefined) {
+            return cached;
+          }
         } catch {
           // Failure to get the value should not fail the transform
         }
       }
 
-      if (result === undefined) {
-        // If there is no cache or no cached entry, process the file
-        result = (await this.#ensureWorkerPool().run(
-          {
-            filename,
-            data,
-            skipLinker,
-            sideEffects,
-            instrumentForCoverage,
-            ...this.#commonOptions,
-          },
-          {
-            // The below is disable as with Yarn PNP this causes build failures with the below message
-            // `Unable to deserialize cloned data`.
-            transferList: process.versions.pnp ? undefined : [data.buffer],
-          },
-        )) as Uint8Array;
+      const result = await this.transformData(
+        filename,
+        data,
+        !!skipLinker,
+        sideEffects,
+        instrumentForCoverage,
+      );
 
-        // If there is a cache then store the result
-        if (this.cache && cacheKey) {
-          try {
-            await this.cache.put(cacheKey, result);
-          } catch {
-            // Failure to store the value in the cache should not fail the transform
-          }
+      if (this.cache && cacheKey) {
+        try {
+          await this.cache.put(cacheKey, result);
+        } catch {
+          // Failure to store the value in the cache should not fail the transform
         }
       }
 
@@ -194,7 +185,7 @@ export class JavaScriptTransformer {
    */
   async transformData(
     filename: string,
-    data: string,
+    data: string | Uint8Array,
     skipLinker: boolean,
     sideEffects?: boolean,
     instrumentForCoverage?: boolean,
@@ -206,18 +197,52 @@ export class JavaScriptTransformer {
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
-      return Buffer.from(keepSourcemap ? data : removeSourceMappingURL(data), 'utf-8');
+      if (typeof data === 'string') {
+        return Buffer.from(keepSourcemap ? data : removeSourceMappingURL(data), 'utf-8');
+      }
+
+      if (keepSourcemap) {
+        return data;
+      }
+
+      const dataBuffer = Buffer.isBuffer(data)
+        ? data
+        : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+
+      // Fast check on raw ASCII bytes to avoid UTF-8 string decoding if no comment exists.
+      if (dataBuffer.indexOf(SOURCEMAP_COMMENT_BYTES) === -1) {
+        return data;
+      }
+
+      const text = dataBuffer.toString('utf-8');
+      const stripped = removeSourceMappingURL(text);
+
+      return stripped === text ? data : Buffer.from(stripped, 'utf-8');
     }
 
-    return this.#runWithThrottle(() =>
-      this.#ensureWorkerPool().run({
+    // Only standalone (non-pooled) ArrayBuffers can be transferred across worker threads.
+    // Node.js shares an internal 8KB ArrayBuffer pool for small buffers, and transferring
+    // a pooled buffer will throw a DataCloneError because detaching it invalidates other slices.
+    // In addition, SharedArrayBuffers cannot be transferred, and Yarn PnP has deserialization issues.
+    const isTransferable =
+      typeof data !== 'string' &&
+      data.buffer instanceof ArrayBuffer &&
+      data.byteOffset === 0 &&
+      data.byteLength === data.buffer.byteLength &&
+      !process.versions.pnp;
+
+    return this.#ensureWorkerPool().run(
+      {
         filename,
         data,
         skipLinker,
         sideEffects,
         instrumentForCoverage,
         ...this.#commonOptions,
-      }),
+      },
+      {
+        transferList: isTransferable ? [data.buffer] : undefined,
+      },
     );
   }
 
