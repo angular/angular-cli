@@ -6,9 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { initializeHash } from '../../utils/hash';
 import { generateNameFromPath, getTestEntrypoints } from './test-discovery';
 
 describe('getTestEntrypoints', () => {
+  beforeAll(async () => {
+    await initializeHash();
+  });
+
   const workspaceRoot = '/project';
   const projectSourceRoot = '/project/src';
   const options = { workspaceRoot, projectSourceRoot };
@@ -81,6 +86,10 @@ describe('getTestEntrypoints', () => {
 });
 
 describe('generateNameFromPath', () => {
+  beforeAll(async () => {
+    await initializeHash();
+  });
+
   const roots = ['/project/src/', '/project/'];
 
   it('should generate a dash-cased name from a simple path', () => {
@@ -127,7 +136,7 @@ describe('generateNameFromPath', () => {
 
     expect(result.length).toBeLessThanOrEqual(128);
     expect(result).toBe(
-      'a-very-long-path-that-definitely-exceeds-the-maximum-allowe-9cf40291-me-in-order-to-trigger-the-truncation-logic-in-the-function',
+      'a-very-long-path-that-definitely-exceeds-the-maximum-allowe-4af8113d-me-in-order-to-trigger-the-truncation-logic-in-the-function',
     ); // eslint-disable-line max-len
   });
 

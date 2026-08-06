@@ -10,6 +10,7 @@ import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
+import { initializeHash } from '../../../utils/hash';
 import { SourceFileCache } from '../../esbuild/angular/source-file-cache';
 import { getAndClearCumulativeDurations } from '../../esbuild/profiling';
 import type { AngularCompilation, DiagnosticModes } from './angular-compilation';
@@ -33,6 +34,7 @@ let compilation: AngularCompilation | undefined;
 const sourceFileCache = new SourceFileCache();
 
 export async function initialize(request: InitRequest) {
+  await initializeHash();
   compilation ??= request.jit
     ? new JitCompilation(request.browserOnlyBuild)
     : new AotCompilation(request.browserOnlyBuild);

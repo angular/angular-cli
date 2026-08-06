@@ -28,10 +28,10 @@
  */
 
 import type { Loader, OnLoadResult, PartialMessage } from 'esbuild';
-import { createHash } from 'node:crypto';
 import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { calculateHash, createContentHash } from '../../utils/hash';
 import type { Cache as PersistentCacheStore } from './cache';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 
@@ -70,10 +70,6 @@ export interface CachedLoadResultEntry {
   errors?: PartialMessage[];
 }
 
-function hashContent(content: string | Uint8Array): string {
-  return createHash('sha256').update(content).digest('hex');
-}
-
 /**
  * Calculates a unique cache key by updating the hash incrementally.
  * This prevents implicit string coercion of large binary content buffers.
@@ -83,13 +79,14 @@ function calculateCacheKey(
   path: string,
   content: string | Uint8Array,
 ): string {
-  return createHash('sha256')
-    .update(globalConfigHash)
-    .update('\0')
-    .update(path)
-    .update('\0')
-    .update(content)
-    .digest('hex');
+  const hasher = createContentHash();
+  hasher.update(globalConfigHash);
+  hasher.update('\0');
+  hasher.update(path);
+  hasher.update('\0');
+  hasher.update(content);
+
+  return hasher.digest();
 }
 
 /**
@@ -193,7 +190,7 @@ async function validateAndHealCacheEntry(
 
       // 3. Slow Path for dependencies: content hash fallback
       const currentContent = await readFile(filePath);
-      const currentHash = hashContent(currentContent);
+      const currentHash = calculateHash(currentContent);
       if (currentHash === expected.hash) {
         // Heal cache entry with new metadata
         watchFilesMetadata[filePath] = {
@@ -244,8 +241,9 @@ async function computeMetadataForWatchFiles(
         knownContent !== undefined ? knownContent : readFile(filePath),
         stat(filePath),
       ]);
+      const hash = calculateHash(content);
       watchFilesMetadata[filePath] = {
-        hash: hashContent(content),
+        hash,
         mtimeMs: stats.mtimeMs,
         size: stats.size,
       };

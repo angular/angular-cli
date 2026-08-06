@@ -109,6 +109,7 @@ ts_project(
         ":node_modules/vite",
         ":node_modules/vitest",
         ":node_modules/watchpack",
+        ":node_modules/xxhash-wasm",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/compiler",
         "//:node_modules/@angular/compiler-cli",

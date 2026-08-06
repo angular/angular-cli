@@ -7,7 +7,6 @@
  */
 
 import { lookup as lookupMimeType } from 'mrmime';
-import { createHash } from 'node:crypto';
 import { readFileSync } from 'node:fs';
 import type { ServerResponse } from 'node:http';
 import { extname } from 'node:path';
@@ -15,6 +14,7 @@ import type { Connect, ViteDevServer } from 'vite' with {
   'resolution-mode': 'import',
 };
 import { ResultFile } from '../../../builders/application/results';
+import { calculateHash } from '../../../utils/hash';
 import { AngularMemoryOutputFiles, AngularOutputAssets, pathnameWithoutBasePath } from '../utils';
 
 export interface ComponentStyleRecord {
@@ -50,7 +50,7 @@ export function createAngularAssetsMiddleware(
       // This is a workaround to serve extensionless, CSS, JS and TS files without Vite transformations.
       if (!extension || JS_TS_REGEXP.test(extension) || CSS_PREPROCESSOR_REGEXP.test(extension)) {
         const contents = readFileSync(asset.source);
-        const etag = `W/${createHash('sha256').update(contents).digest('hex')}`;
+        const etag = `W/${calculateHash(contents)}`;
         if (checkAndHandleEtag(req, res, etag)) {
           return;
         }
@@ -238,7 +238,7 @@ export function createBuildAssetsMiddleware(
         const contents =
           outputFile.origin === 'memory' ? outputFile.contents : readHandler(outputFile.inputPath);
 
-        const etag = `W/${createHash('sha256').update(contents).digest('hex')}`;
+        const etag = `W/${calculateHash(contents)}`;
         if (checkAndHandleEtag(req, res, etag)) {
           return;
         }

@@ -8,9 +8,9 @@
 
 import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import nodePath from 'node:path';
 import type ts from 'typescript';
+import { calculateHash } from '../../utils/hash';
 
 export type AngularCompilerOptions = ng.CompilerOptions;
 export type AngularCompilerHost = ng.CompilerHost;
@@ -46,7 +46,7 @@ export function ensureSourceFileVersions(program: ts.Program): void {
 
     for (const file of files) {
       if (file.version === undefined) {
-        file.version = createHash('sha256').update(file.text).digest('hex');
+        file.version = calculateHash(file.text);
       }
     }
 
@@ -227,7 +227,7 @@ export function createAngularCompilerHost(
     // For external stylesheets, create a unique identifier and store the mapping
     let externalId = hostOptions.externalStylesheets.get(resolvedPath);
     if (externalId === undefined) {
-      externalId = createHash('sha256').update(resolvedPath).digest('hex');
+      externalId = calculateHash(resolvedPath);
       hostOptions.externalStylesheets.set(resolvedPath, externalId);
     }
 

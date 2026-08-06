@@ -22,6 +22,7 @@ import {
 } from '../../../tools/vite/plugins';
 import { RolldownLoaderOption, getDepOptimizationConfig } from '../../../tools/vite/utils';
 import { loadProxyConfiguration } from '../../../utils';
+import { initializeHash } from '../../../utils/hash';
 import { type ApplicationBuilderInternalOptions, JavaScriptTransformer } from '../internal';
 import type { NormalizedDevServerOptions } from '../options';
 import { DevServerExternalResultMetadata, OutputAssetRecord, OutputFileRecord } from './utils';
@@ -147,6 +148,7 @@ export async function setupServer(
   indexHtmlTransformer?: (content: string) => Promise<string>,
   thirdPartySourcemaps = false,
 ): Promise<Vite.InlineConfig> {
+  await initializeHash();
   const { normalizePath } = (await import('vite' as string)) as typeof Vite;
 
   // Path will not exist on disk and only used to provide separate path for Vite requests

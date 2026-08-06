@@ -15,6 +15,7 @@ import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-lan
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { shouldWatchRoot } from '../../utils/environment-options';
+import { initializeHash } from '../../utils/hash';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { toPosixPath } from '../../utils/path';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
@@ -77,6 +78,8 @@ export async function* runEsBuildBuildAction(
     jsonLogs,
     incrementalResults,
   } = options;
+
+  await initializeHash();
 
   const withProgress: typeof withSpinner = progress ? withSpinner : withNoProgress;
 

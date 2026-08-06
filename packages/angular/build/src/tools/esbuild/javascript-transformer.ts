@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
+import { createContentHash } from '../../utils/hash';
 import { IMPORT_EXEC_ARGV } from '../../utils/server-rendering/esm-in-memory-loader/utils';
 import { removeSourceMappingURL } from '../../utils/source-map';
 import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
@@ -138,11 +138,11 @@ export class JavaScriptTransformer {
       if (this.cache) {
         // Create a cache key from the file data and options that effect the output.
         // NOTE: If additional options are added, this may need to be updated.
-        const hash = createHash('sha256');
-        hash.update(`${!!skipLinker}--${!!sideEffects}`);
-        hash.update(data);
-        hash.update(this.#fileCacheKeyBase);
-        cacheKey = hash.digest('hex');
+        const hasher = createContentHash();
+        hasher.update(`${!!skipLinker}--${!!sideEffects}`);
+        hasher.update(data);
+        hasher.update(this.#fileCacheKeyBase);
+        cacheKey = hasher.digest();
 
         try {
           const cached = await this.cache.get(cacheKey);

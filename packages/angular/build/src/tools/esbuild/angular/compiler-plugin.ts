@@ -18,10 +18,10 @@ import type {
   PluginBuild,
 } from 'esbuild';
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
+import { calculateHash, initializeHash } from '../../../utils/hash';
 import { AngularHostOptions } from '../../angular/angular-host';
 import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
 import { type PersistentCacheStore, createPersistentCacheStore } from '../cache';
@@ -149,6 +149,7 @@ export function createCompilerPlugin(
 
       // eslint-disable-next-line max-lines-per-function
       build.onStart(async () => {
+        await initializeHash();
         angularCompilationContext.markAsInProgress();
 
         const result: OnStartResult = {
@@ -205,11 +206,7 @@ export function createCompilerPlugin(
                 // invalid the output and force a full page reload for HMR cases. The containing file and order
                 // of the style within the containing file is used.
                 pluginOptions.externalRuntimeStyles
-                  ? createHash('sha256')
-                      .update(containingFile)
-                      .update((order ?? 0).toString())
-                      .update(className ?? '')
-                      .digest('hex')
+                  ? calculateHash(`${containingFile}${order ?? 0}${className ?? ''}`)
                   : undefined,
               );
               // Adjust result source for inline styles.

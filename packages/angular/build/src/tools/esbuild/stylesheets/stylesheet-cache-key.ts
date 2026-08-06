@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createHash } from 'node:crypto';
+import { calculateHash } from '../../../utils/hash';
 import type { BundleStylesheetOptions } from './bundle-options';
 
 /**
@@ -39,34 +39,30 @@ export function calculateGlobalStylesheetConfigHash(
   options: BundleStylesheetOptions,
   packageVersion: string = '',
 ): string {
-  return createHash('sha256')
-    .update(
-      JSON.stringify({
-        optimization: options.optimization,
-        sourcemap: options.sourcemap,
-        sourcesContent: options.sourcesContent,
-        includePaths: options.includePaths,
-        sassOptions: options.sass
-          ? {
-              futureDeprecations: options.sass.futureDeprecations,
-              fatalDeprecations: options.sass.fatalDeprecations,
-              silenceDeprecations: options.sass.silenceDeprecations,
-            }
-          : undefined,
-        target: options.target,
-        publicPath: options.publicPath,
-        outputNames: options.outputNames,
-        inlineFonts: options.inlineFonts,
-        preserveSymlinks: options.preserveSymlinks,
-        externalDependencies: options.externalDependencies,
-        postcssConfig: options.postcssConfiguration?.configPath
-          ? options.postcssConfiguration.configPath
-          : '',
-        tailwindConfig: options.tailwindConfiguration?.file
-          ? options.tailwindConfiguration.file
-          : '',
-        packageVersion,
-      }),
-    )
-    .digest('hex');
+  return calculateHash(
+    JSON.stringify({
+      optimization: options.optimization,
+      sourcemap: options.sourcemap,
+      sourcesContent: options.sourcesContent,
+      includePaths: options.includePaths,
+      sassOptions: options.sass
+        ? {
+            futureDeprecations: options.sass.futureDeprecations,
+            fatalDeprecations: options.sass.fatalDeprecations,
+            silenceDeprecations: options.sass.silenceDeprecations,
+          }
+        : undefined,
+      target: options.target,
+      publicPath: options.publicPath,
+      outputNames: options.outputNames,
+      inlineFonts: options.inlineFonts,
+      preserveSymlinks: options.preserveSymlinks,
+      externalDependencies: options.externalDependencies,
+      postcssConfig: options.postcssConfiguration?.configPath
+        ? options.postcssConfiguration.configPath
+        : '',
+      tailwindConfig: options.tailwindConfiguration?.file ? options.tailwindConfiguration.file : '',
+      packageVersion,
+    }),
+  );
 }

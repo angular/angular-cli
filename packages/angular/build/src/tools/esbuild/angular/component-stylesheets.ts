@@ -7,8 +7,8 @@
  */
 
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import path from 'node:path';
+import { createContentHash } from '../../../utils/hash';
 import { BundleContextResult, BundlerContext } from '../bundler-context';
 import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
 import { MemoryCache } from '../cache';
@@ -103,11 +103,10 @@ export class ComponentStylesheetBundler {
   ): Promise<ComponentStylesheetResult> {
     // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
     // to the actual stylesheet file path.
-    // TODO: Consider xxhash instead for hashing
-    const id = createHash('sha256')
-      .update(data)
-      .update(externalId ?? '')
-      .digest('hex');
+    const hasher = createContentHash();
+    hasher.update(data);
+    hasher.update(externalId ?? '');
+    const id = hasher.digest();
     const entry = [language, id, filename].join(';');
 
     const bundlerContext = await this.#inlineContexts.getOrCreate(entry, () => {
