@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import remapping, { type DecodedSourceMap, type EncodedSourceMap } from '@ampproject/remapping';
 import { type PluginItem, transformAsync } from '@babel/core';
 import { createRequire } from 'node:module';
 import Piscina from 'piscina';
@@ -39,7 +40,7 @@ async function instrumentCoverage(
   filename: string,
   data: string,
   useInputSourcemap: boolean,
-): Promise<string> {
+): Promise<{ code: string; map?: EncodedSourceMap }> {
   try {
     let resolvedPath = 'istanbul-lib-instrument';
     try {
@@ -63,15 +64,14 @@ async function instrumentCoverage(
       filename,
       inputSourceMap as Parameters<typeof instrumenter.instrumentSync>[2],
     );
-    const lastMap = instrumenter.lastSourceMap();
+    const lastMap = useInputSourcemap
+      ? (instrumenter.lastSourceMap() as EncodedSourceMap)
+      : undefined;
 
-    if (useInputSourcemap && lastMap) {
-      const inlineMap = Buffer.from(JSON.stringify(lastMap)).toString('base64');
-
-      return instrumentedCode + `\n//# sourceMappingURL=data:application/json;base64,${inlineMap}`;
-    }
-
-    return removeSourceMappingURL(instrumentedCode);
+    return {
+      code: instrumentedCode,
+      map: lastMap ?? undefined,
+    };
   } catch (error) {
     throw new Error(
       `The 'istanbul-lib-instrument' package is required for code coverage but was not found. Please install the package.`,
@@ -97,6 +97,11 @@ export default async function transformJavaScript(
  */
 let oxcLinkerModule: typeof import('../angular/linker/oxc-linker.js') | undefined;
 
+/**
+ * Cached instance of the OXC transform module.
+ */
+let oxcTransformModule: typeof import('../oxc/oxc-transform.js') | undefined;
+
 async function transformJavaScriptImpl(
   filename: string,
   data: string,
@@ -108,9 +113,13 @@ async function transformJavaScriptImpl(
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   let code = data;
+  const maps: (DecodedSourceMap | EncodedSourceMap)[] = [];
+  let coverageMap: EncodedSourceMap | undefined;
 
   if (options.instrumentForCoverage) {
-    code = await instrumentCoverage(filename, code, useInputSourcemap);
+    const result = await instrumentCoverage(filename, code, useInputSourcemap);
+    code = result.code;
+    coverageMap = result.map;
   }
 
   if (shouldLink) {
@@ -120,8 +129,8 @@ async function transformJavaScriptImpl(
 
       const result = await transformAsync(code, {
         filename,
-        inputSourceMap: (useInputSourcemap ? undefined : false) as undefined,
-        sourceMaps: useInputSourcemap ? 'inline' : false,
+        inputSourceMap: false,
+        sourceMaps: !!useInputSourcemap,
         compact: false,
         configFile: false,
         babelrc: false,
@@ -144,6 +153,9 @@ async function transformJavaScriptImpl(
       });
 
       code = result?.code ?? code;
+      if (result?.map) {
+        maps.push(result.map as EncodedSourceMap);
+      }
     } else {
       oxcLinkerModule ??= await import('../angular/linker/oxc-linker.js');
       const result = oxcLinkerModule.linkWithOxc(filename, code, {
@@ -152,39 +164,52 @@ async function transformJavaScriptImpl(
         skipCheck: true,
       });
       code = result.code;
-      if (useInputSourcemap && result.map) {
-        code = removeSourceMappingURL(code);
-        const base64Map = Buffer.from(result.map).toString('base64');
-        code += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
+      if (result.map) {
+        maps.push(result.map);
       }
     }
   }
 
   // Run advanced optimizations using our fast oxc-transform
   if (options.advancedOptimizations) {
-    const { transform } = await import('../oxc/oxc-transform.js');
+    oxcTransformModule ??= await import('../oxc/oxc-transform.js');
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
     const topLevelSafeMode = !safeAngularPackage;
 
-    const result = transform(filename, code, {
+    const result = oxcTransformModule.transform(filename, code, {
       sourcemap: useInputSourcemap,
       sideEffects: options.sideEffects,
       topLevelSafeMode,
     });
     code = result.code;
-
-    if (useInputSourcemap && result.map) {
-      // Strip old source map comment if Babel added one
-      code = removeSourceMappingURL(code);
-      const base64Map = Buffer.from(result.map).toString('base64');
-      code += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
+    if (result.map) {
+      maps.push(result.map);
     }
   }
 
+  if (useInputSourcemap) {
+    const baseMap = coverageMap ?? loadInputSourceMap(filename, data);
+    if (maps.length > 0 || coverageMap) {
+      code = removeSourceMappingURL(code);
+      const remappingChain: (DecodedSourceMap | EncodedSourceMap)[] = maps.reverse();
+      if (baseMap) {
+        remappingChain.push(baseMap);
+      }
+
+      if (remappingChain.length > 0) {
+        const finalMap = remapping(remappingChain, () => null).toString();
+        const base64Map = Buffer.from(finalMap).toString('base64');
+        code += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
+      }
+    }
+
+    return code;
+  }
+
   // Strip sourcemaps if they should not be used
-  return useInputSourcemap ? code : removeSourceMappingURL(code);
+  return removeSourceMappingURL(code);
 }
 
 function requiresLinking(path: string, source: string): boolean {
