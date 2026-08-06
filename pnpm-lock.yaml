@@ -51,7 +51,7 @@ importers:
         version: 22.1.1(a4e933d23056dc70c004544c614123c9)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#f38f36f8492a38b5e897a67064e5e90b01f09628
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f38f36f8492a38b5e897a67064e5e90b01f09628(@modelcontextprotocol/sdk@1.29.0(supports-color@11.0.0)(zod@4.4.3))
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f38f36f8492a38b5e897a67064e5e90b01f09628(@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3))
       '@angular/platform-browser':
         specifier: 22.1.0
         version: 22.1.0(@angular/animations@22.1.0(@angular/core@22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2)))(@angular/common@22.1.0(@angular/core@22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2))(rxjs@7.8.2))(@angular/core@22.1.0(@angular/compiler@22.1.0)(rxjs@7.8.2)(zone.js@0.16.2))
@@ -463,8 +463,8 @@ importers:
         specifier: 4.2.4
         version: 4.2.4(@inquirer/prompts@8.5.2(@types/node@22.20.1))(@types/node@22.20.1)(listr2@10.2.2)
       '@modelcontextprotocol/sdk':
-        specifier: 1.29.0
-        version: 1.29.0(supports-color@11.0.0)(zod@4.4.3)
+        specifier: 1.30.0
+        version: 1.30.0(supports-color@11.0.0)(zod@4.4.3)
       '@schematics/angular':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../schematics/angular
@@ -2514,8 +2514,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@modelcontextprotocol/sdk@1.29.0':
-    resolution: {integrity: sha512-zo37mZA9hJWpULgkRpowewez1y6ML5GsXJPY8FI0tBBCd77HEvza4jDqRKOXgHNn867PVGCyTdzqpz0izu5ZjQ==}
+  '@modelcontextprotocol/sdk@1.30.0':
+    resolution: {integrity: sha512-xKd8OIzlqNzcqcNumGAa6g+PW2kjD5vrpcKOnfldAUPP3j7lnqMPwlTXQm8gF+UwH72z0lqaRbjr9hqGz0eITA==}
     engines: {node: '>=18'}
     peerDependencies:
       '@cfworker/json-schema': ^4.1.1
@@ -8548,12 +8548,12 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f38f36f8492a38b5e897a67064e5e90b01f09628(@modelcontextprotocol/sdk@1.29.0(supports-color@11.0.0)(zod@4.4.3))':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f38f36f8492a38b5e897a67064e5e90b01f09628(@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3))':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 3.1.0(conventional-commits-filter@6.0.1)(conventional-commits-parser@7.1.2)
       '@google-cloud/spanner': 8.0.0(supports-color@11.0.0)
-      '@google/genai': 2.15.0(@modelcontextprotocol/sdk@1.29.0(supports-color@11.0.0)(zod@4.4.3))(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)
+      '@google/genai': 2.15.0(@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3))(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)
       '@inquirer/prompts': 8.5.2(@types/node@24.13.3)
       '@inquirer/type': 4.0.7(@types/node@24.13.3)
       '@octokit/auth-app': 8.3.0
@@ -9943,14 +9943,14 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@2.15.0(@modelcontextprotocol/sdk@1.29.0(supports-color@11.0.0)(zod@4.4.3))(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)':
+  '@google/genai@2.15.0(@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3))(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)':
     dependencies:
       google-auth-library: 10.9.1(supports-color@11.0.0)
       p-retry: 4.6.2
       protobufjs: 7.6.5
       ws: 8.21.1(bufferutil@4.1.0)(utf-8-validate@6.0.6)
     optionalDependencies:
-      '@modelcontextprotocol/sdk': 1.29.0(supports-color@11.0.0)(zod@4.4.3)
+      '@modelcontextprotocol/sdk': 1.30.0(supports-color@11.0.0)(zod@4.4.3)
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -10435,7 +10435,7 @@ snapshots:
   '@lmdb/lmdb-win32-x64@3.5.6':
     optional: true
 
-  '@modelcontextprotocol/sdk@1.29.0(supports-color@11.0.0)(zod@4.4.3)':
+  '@modelcontextprotocol/sdk@1.30.0(supports-color@11.0.0)(zod@4.4.3)':
     dependencies:
       '@hono/node-server': 1.19.17(hono@4.12.34)
       ajv: 8.20.0
