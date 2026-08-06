@@ -6,10 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { initializeHash } from '../../../utils/hash';
 import type { BundleStylesheetOptions } from './bundle-options';
 import { calculateGlobalStylesheetConfigHash } from './stylesheet-cache-key';
 
 describe('Stylesheet Global Config Hash', () => {
+  beforeAll(async () => {
+    await initializeHash();
+  });
+
   const baseOptions: BundleStylesheetOptions = {
     workspaceRoot: '/root',
     optimization: true,

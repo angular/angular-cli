@@ -7,7 +7,7 @@
  */
 
 import type { OutputFile } from 'esbuild';
-import { createHash } from 'node:crypto';
+import { calculateHash } from '../../utils/hash';
 
 export interface InitialFileRecord {
   entrypoint: boolean;
@@ -63,9 +63,7 @@ export function createOutputFile(
         return this.contents.byteLength;
       },
       get hash(): string {
-        cachedHash ??= createHash('sha256')
-          .update(cachedText ?? this.contents)
-          .digest('hex');
+        cachedHash ??= calculateHash(cachedText ?? this.contents);
 
         return cachedHash;
       },
@@ -97,7 +95,7 @@ export function createOutputFile(
         return cachedText;
       },
       get hash(): string {
-        cachedHash ??= createHash('sha256').update(this.contents).digest('hex');
+        cachedHash ??= calculateHash(this.contents);
 
         return cachedHash;
       },

@@ -6,11 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { createHash } from 'node:crypto';
 import { type PathLike, constants, promises as fs } from 'node:fs';
 import os from 'node:os';
 import { basename, dirname, extname, isAbsolute, join, relative } from 'node:path';
 import { glob, isDynamicPattern } from 'tinyglobby';
+import { calculateHash, initializeHash } from '../../utils/hash';
 import { toPosixPath } from '../../utils/path';
 
 /**
@@ -41,6 +41,7 @@ export async function findTests(
   workspaceRoot: string,
   projectSourceRoot: string,
 ): Promise<string[]> {
+  await initializeHash();
   const resolvedTestFiles = new Set<string>();
   const dynamicPatterns: string[] = [];
 
@@ -194,7 +195,7 @@ function truncateName(name: string, originalPath: string): string {
     return name;
   }
 
-  const hash = createHash('sha256').update(originalPath).digest('hex').substring(0, 8);
+  const hash = calculateHash(originalPath).substring(0, 8);
   const availableLength = MAX_FILENAME_LENGTH - hash.length - 2; // 2 for '-' separators
   const prefixLength = Math.floor(availableLength / 2);
   const suffixLength = availableLength - prefixLength;

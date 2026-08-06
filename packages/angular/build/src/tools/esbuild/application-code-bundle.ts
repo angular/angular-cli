@@ -8,11 +8,11 @@
 
 import type { BuildOptions, Plugin } from 'esbuild';
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import { extname, relative } from 'node:path';
 import type { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { Platform } from '../../builders/application/schema';
 import { allowMangle } from '../../utils/environment-options';
+import { calculateHash } from '../../utils/hash';
 import { toPosixPath } from '../../utils/path';
 import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
@@ -566,7 +566,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
       '',
     );
 
-    footer = { js: `/**i18n:${createHash('sha256').update(i18nHash).digest('hex')}*/` };
+    footer = { js: `/**i18n:${calculateHash(i18nHash)}*/` };
   }
 
   // Core conditions that are always included

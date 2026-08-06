@@ -7,9 +7,9 @@
  */
 
 import assert from 'node:assert';
-import { createHash } from 'node:crypto';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
+import { calculateHash, createContentHash } from '../../utils/hash';
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
@@ -147,7 +147,7 @@ export class I18nInliner {
     // Request inlining for each file that contains localize calls
     const requests = [];
 
-    let fileCacheKeyBase: Uint8Array | undefined;
+    let fileCacheKeyBase: string | undefined;
 
     for (const [filename, file] of this.#localizeFiles) {
       let cacheKey: string | undefined;
@@ -160,17 +160,16 @@ export class I18nInliner {
         // The options are digested here so that each file's key is derived from a fixed number
         // of bytes. Hashing the options directly would re-hash the full set of messages, which
         // can be several megabytes, once for every file.
-        fileCacheKeyBase ??= createHash('sha256')
-          .update(JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }))
-          .digest();
+        fileCacheKeyBase ??= calculateHash(
+          JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }),
+        );
 
         // NOTE: If additional options are added, this may need to be updated.
-        // TODO: Consider xxhash or similar instead of SHA256
-        cacheKey = createHash('sha256')
-          .update(file.hash)
-          .update(filename)
-          .update(fileCacheKeyBase)
-          .digest('hex');
+        const hasher = createContentHash();
+        hasher.update(file.hash);
+        hasher.update(filename);
+        hasher.update(fileCacheKeyBase);
+        cacheKey = hasher.digest();
 
         // Failure to get the value should not fail the transform
         cacheResultPromise = this.#cache.get(cacheKey).catch(() => null);
