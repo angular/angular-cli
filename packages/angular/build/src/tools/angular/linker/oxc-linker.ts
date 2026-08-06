@@ -7,7 +7,6 @@
  */
 
 import type { DecodedSourceMap } from '@ampproject/remapping';
-import remapping from '@ampproject/remapping';
 import { ConsoleLogger, LogLevel } from '@angular/compiler-cli';
 import type { DeclarationScope } from '@angular/compiler-cli/linker';
 import { FileLinker, LinkerEnvironment, needsLinking } from '@angular/compiler-cli/linker';
@@ -18,7 +17,6 @@ import type {
 import type { CallExpression, Node } from '@oxc-project/types';
 import MagicString from 'magic-string';
 import { parseSync, visitorKeys } from 'oxc-parser';
-import { loadInputSourceMap } from '../../../utils/source-map';
 import { OxcAstHost } from './oxc-ast-host';
 import { StringAstFactory } from './string-ast-factory';
 
@@ -168,18 +166,10 @@ export function linkWithOxc(filename: string, code: string, options: OxcLinkerOp
     return { code, map: undefined };
   }
 
-  let map: string | undefined;
+  let map: DecodedSourceMap | undefined;
   if (options.sourcemap) {
-    const inputMap = loadInputSourceMap(filename, code);
-    if (inputMap) {
-      const rawMap = s.generateDecodedMap({ hires: true, source: filename });
-      map = remapping(
-        [{ ...rawMap, version: 3 } satisfies DecodedSourceMap, inputMap],
-        () => null,
-      ).toString();
-    } else {
-      map = s.generateMap({ hires: true, source: filename }).toString();
-    }
+    const rawMap = s.generateDecodedMap({ hires: true, source: filename });
+    map = { ...rawMap, version: 3 };
   }
 
   return {
