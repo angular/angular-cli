@@ -448,5 +448,39 @@ describe('Watcher', () => {
 
       await watcher.close();
     }, 10000);
+
+    it('should ignore changes matching glob patterns in polling mode (chokidar)', async () => {
+      const ignoredDir = path.join(tempDir, 'dist');
+      fs.mkdirSync(ignoredDir);
+      const ignoredFile = path.join(ignoredDir, 'bundle.js');
+      const watchedFile = path.join(tempDir, 'src.ts');
+      fs.writeFileSync(ignoredFile, 'initial-dist');
+      fs.writeFileSync(watchedFile, 'initial-src');
+
+      const watcher = await createWatcher({
+        polling: true,
+        interval: 50,
+        cwd: tempDir,
+        ignored: [`${toPosixPathNormalized(ignoredDir)}/**`],
+      });
+
+      watcher.add(tempDir);
+      await setTimeout(100);
+
+      const iterator = watcher[Symbol.asyncIterator]();
+      const nextPromise = iterator.next();
+
+      // Trigger changes in ignored file and watched file
+      fs.writeFileSync(ignoredFile, 'updated-dist');
+      fs.writeFileSync(watchedFile, 'updated-src');
+
+      const result = await nextPromise;
+      expect(result.done).toBeFalsy();
+      const emitted = result.value?.all ?? [];
+      expect(emitted.some((f: string) => f.includes('src.ts'))).toBeTrue();
+      expect(emitted.some((f: string) => f.includes('bundle.js'))).toBeFalse();
+
+      await watcher.close();
+    }, 10000);
   });
 });

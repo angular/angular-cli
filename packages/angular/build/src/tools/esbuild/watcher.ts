@@ -10,6 +10,7 @@ import type * as ParcelWatcher from '@parcel/watcher';
 import type * as Chokidar from 'chokidar';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import picomatch from 'picomatch';
 import { toPosixPath } from '../../utils/path';
 
 export class ChangedFiles {
@@ -517,9 +518,19 @@ async function createChokidarWatcher(
   const rootDirPosix = toPosixPathNormalized(rootDir);
   const rootDirLookupKey = toLookupKey(rootDirPosix, isCaseSensitive);
 
+  const ignored = options?.ignored?.map((pattern) => {
+    if (/[*?[\]{}()]/.test(pattern)) {
+      const isMatch = picomatch(pattern, { dot: true });
+
+      return (filePath: string) => isMatch(toPosixPathNormalized(filePath));
+    }
+
+    return { path: toPosixPathNormalized(pattern), recursive: true };
+  });
+
   const watcher = chokidar.watch(rootDir, {
     ignoreInitial: true,
-    ignored: options?.ignored,
+    ignored,
     followSymlinks: options?.followSymlinks,
     usePolling: !!options?.polling,
     interval: options?.interval,
