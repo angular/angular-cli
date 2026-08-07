@@ -13,7 +13,7 @@ export { getFeatureSupport, isZonelessApp } from '../../tools/esbuild/utils';
 export { type IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 export { purgeStaleBuildCache } from '../../utils/purge-cache';
 export { getSupportedBrowsers } from '../../utils/supported-browsers';
-export { transformSupportedBrowsersToTargets } from '../../tools/esbuild/utils';
+export { transformSupportedBrowsersToTargets } from '../../tools/esbuild/target';
 export { buildApplicationInternal } from '../../builders/application';
 export type { ApplicationBuilderInternalOptions } from '../../builders/application/options';
 export type { ExternalResultMetadata } from '../../tools/esbuild/bundler-execution-result';

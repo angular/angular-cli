@@ -18,11 +18,8 @@ import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { LOCALE_DATA_BASE_MODULE } from '../../tools/esbuild/i18n-locale-plugin';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
 import { profileAsync } from '../../tools/esbuild/profiling';
-import {
-  calculateEstimatedTransferSizes,
-  logBuildStats,
-  transformSupportedBrowsersToTargets,
-} from '../../tools/esbuild/utils';
+import { transformSupportedBrowsersToTargets } from '../../tools/esbuild/target';
+import { calculateEstimatedTransferSizes, logBuildStats } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { optimizeChunksThreshold } from '../../utils/environment-options';
 import { resolveAssets } from '../../utils/resolve-assets';

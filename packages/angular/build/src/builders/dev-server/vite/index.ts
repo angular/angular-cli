@@ -389,15 +389,11 @@ export async function* serveWithVite(
         ? browserOptions.polyfills
         : [browserOptions.polyfills];
 
-      // TODO(alanagius): This is a workaround for https://github.com/rolldown/rolldown/issues/10633
-      const target = isZonelessApp(polyfills) ? ['es2022'] : ['es2016'];
-
-      // Once the above issue is fixed, uncomment the below code.
-      // const target = transformSupportedBrowsersToTargets(browsers);
-      // if (!isZonelessApp(polyfills)) {
-      //   // Rolldown doesn't have an option to support Zone.js/async-await, so we need to support es2016.
-      //   target.push('es2016');
-      // }
+      const target = transformSupportedBrowsersToTargets(browsers);
+      if (!isZonelessApp(polyfills)) {
+        // Rolldown doesn't have an option to support Zone.js/async-await, so we need to support es2016.
+        target.push('es2016');
+      }
 
       let ssrMode: ServerSsrMode = ServerSsrMode.NoSsr;
       if (
