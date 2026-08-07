@@ -14,6 +14,7 @@ import '@angular/compiler';
 import { APP_BASE_HREF } from '@angular/common';
 import { Component, PlatformRef, REQUEST, RESPONSE_INIT, inject } from '@angular/core';
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
+import { setTimeout } from 'node:timers/promises';
 import { AngularServerApp } from '../src/app';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
@@ -363,6 +364,16 @@ describe('AngularServerApp', () => {
         const response = await app.handle(request);
         expect(response?.status).toBe(200);
         expect(await response?.text()).toContain('Home works');
+      });
+
+      it('should destroy the platform when the response stream is cancelled', async () => {
+        const destroySpy = spyOn(PlatformRef.prototype, 'destroy').and.callThrough();
+        const response = await app.handle(new Request('http://localhost/home'));
+        expect(response?.body).toBeInstanceOf(ReadableStream);
+        await response?.body?.cancel();
+        // Wait for the macrotask queue to clear since destroy is called asynchronously
+        await setTimeout(0);
+        expect(destroySpy).toHaveBeenCalled();
       });
 
       describe('APP_BASE_HREF / X-Forwarded-Prefix', () => {

@@ -34,8 +34,7 @@ import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSla
  * - A function that returns a `Promise<ApplicationRef>`, which resolves with the root application reference.
  */
 export type AngularBootstrap =
-  | Type<unknown>
-  | ((context: BootstrapContext) => Promise<ApplicationRef>);
+  Type<unknown> | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
 /**
  * Renders an Angular application or module to an HTML string.
@@ -60,7 +59,12 @@ export async function renderAngular(
   serverContext: string,
 ): Promise<
   | { hasNavigationError: true }
-  | { hasNavigationError: boolean; redirectTo?: string; content: () => Promise<string> }
+  | {
+      hasNavigationError: boolean;
+      redirectTo?: string;
+      content: () => Promise<string>;
+      destroy: () => void;
+    }
 > {
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
   const urlToRender = stripIndexHtmlFromURL(url);
@@ -134,6 +138,7 @@ export async function renderAngular(
     }
 
     return {
+      destroy: () => void asyncDestroyPlatform(platformRef),
       hasNavigationError,
       redirectTo,
       content: () =>
@@ -177,6 +182,10 @@ export function isNgModule(value: AngularBootstrap): value is Type<unknown> {
  * @param platformRef - The platform reference to be destroyed.
  */
 function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
+  if (platformRef.destroyed) {
+    return Promise.resolve();
+  }
+
   return new Promise((resolve) => {
     setTimeout(() => {
       if (!platformRef.destroyed) {
