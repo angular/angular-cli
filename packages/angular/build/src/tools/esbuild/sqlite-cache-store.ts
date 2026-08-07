@@ -15,6 +15,8 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   #hasStmt: StatementSync | undefined;
   #setStmt: StatementSync | undefined;
   #updateAccessedStmt: StatementSync | undefined;
+  readonly #pendingAccessedKeys = new Set<string>();
+  #flushTimeout: NodeJS.Timeout | undefined;
 
   constructor(
     readonly cachePath: string,
@@ -29,6 +31,9 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       this.#db.exec('PRAGMA auto_vacuum = FULL;');
       this.#db.exec('PRAGMA journal_mode = WAL;');
       this.#db.exec('PRAGMA synchronous = NORMAL;');
+      this.#db.exec('PRAGMA busy_timeout = 5000;');
+      this.#db.exec('PRAGMA temp_store = MEMORY;');
+      this.#db.exec('PRAGMA mmap_size = 268435456;');
       this.#db.exec(
         'CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
       );
@@ -46,13 +51,51 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
     return this.#db;
   }
 
+  #queueAccessUpdate(key: string): void {
+    this.#pendingAccessedKeys.add(key);
+
+    if (this.#pendingAccessedKeys.size >= 100) {
+      this.#flushAccessUpdates();
+    } else if (!this.#flushTimeout) {
+      this.#flushTimeout = setTimeout(() => this.#flushAccessUpdates(), 500);
+      this.#flushTimeout.unref?.();
+    }
+  }
+
+  #flushAccessUpdates(): void {
+    if (this.#flushTimeout) {
+      clearTimeout(this.#flushTimeout);
+      this.#flushTimeout = undefined;
+    }
+
+    if (!this.#db || this.#pendingAccessedKeys.size === 0 || !this.#updateAccessedStmt) {
+      return;
+    }
+
+    try {
+      this.#db.exec('BEGIN IMMEDIATE TRANSACTION;');
+      for (const key of this.#pendingAccessedKeys) {
+        this.#updateAccessedStmt.run(key);
+      }
+      this.#db.exec('COMMIT;');
+    } catch {
+      try {
+        this.#db.exec('ROLLBACK;');
+      } catch {
+        // Ignore rollback errors if transaction was not active
+      }
+    } finally {
+      this.#pendingAccessedKeys.clear();
+    }
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(key: string): Promise<any> {
     this.#ensureDb();
     const row = this.#getStmt?.get(key) as { value: string } | undefined;
 
     if (row) {
-      this.#updateAccessedStmt?.run(key);
+      this.#queueAccessUpdate(key);
 
       try {
         return JSON.parse(row.value);
@@ -72,6 +115,7 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
 
   async set(key: string, value: unknown): Promise<this> {
     this.#ensureDb();
+    this.#pendingAccessedKeys.delete(key);
     this.#setStmt?.run(key, JSON.stringify(value));
 
     return this;
@@ -84,6 +128,9 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   close(): void {
     if (this.#db) {
       try {
+        // Flush any pending access updates in one transaction before pruning
+        this.#flushAccessUpdates();
+
         // 1. Delete items older than N days
         this.#db
           .prepare("DELETE FROM cache WHERE last_accessed < unixepoch('now', ?);")
@@ -103,6 +150,12 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       } catch {
         // Pruning errors should not block build success
       } finally {
+        if (this.#flushTimeout) {
+          clearTimeout(this.#flushTimeout);
+          this.#flushTimeout = undefined;
+        }
+        this.#pendingAccessedKeys.clear();
+
         this.#getStmt = undefined;
         this.#hasStmt = undefined;
         this.#setStmt = undefined;
