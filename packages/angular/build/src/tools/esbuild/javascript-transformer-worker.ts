@@ -11,7 +11,12 @@ import { type PluginItem, transformAsync } from '@babel/core';
 import { createRequire } from 'node:module';
 import Piscina from 'piscina';
 import { useBabelLinker } from '../../utils/environment-options.js';
-import { loadInputSourceMap, removeSourceMappingURL } from '../../utils/source-map';
+import {
+  isTrailingSourceMapComment,
+  loadInputSourceMap,
+  loadInputSourceMapFromUrl,
+  removeSourceMappingURL,
+} from '../../utils/source-map';
 
 interface JavaScriptTransformRequest {
   filename: string;
@@ -25,8 +30,14 @@ interface JavaScriptTransformRequest {
   instrumentForCoverage?: boolean;
 }
 
+interface TransformOptions extends Omit<JavaScriptTransformRequest, 'filename' | 'data'> {
+  inputSourceMap?: EncodedSourceMap;
+  isAlreadyStripped?: boolean;
+}
+
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
+const SOURCEMAP_COMMENT_BYTES = Buffer.from('//# sourceMappingURL=');
 
 /**
  * The function name prefix for all Angular partial compilation functions.
@@ -84,9 +95,70 @@ export default async function transformJavaScript(
   request: JavaScriptTransformRequest,
 ): Promise<unknown> {
   const { filename, data, ...options } = request;
-  const textData = typeof data === 'string' ? data : textDecoder.decode(data);
 
-  const transformedData = await transformJavaScriptImpl(filename, textData, options);
+  const useInputSourcemap =
+    options.sourcemap &&
+    (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+
+  let textData: string;
+  let inputSourceMap: EncodedSourceMap | undefined;
+  let isAlreadyStripped = false;
+
+  if (typeof data !== 'string') {
+    const dataBuffer = Buffer.isBuffer(data)
+      ? data
+      : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+
+    const firstIndex = dataBuffer.indexOf(SOURCEMAP_COMMENT_BYTES);
+    if (firstIndex === -1) {
+      // 0 comments: fast path, no sourcemap to load or strip
+      textData = textDecoder.decode(data);
+      isAlreadyStripped = true;
+    } else {
+      const lastIndex = dataBuffer.lastIndexOf(SOURCEMAP_COMMENT_BYTES);
+      let prevIdx = lastIndex - 1;
+      while (prevIdx >= 0 && (dataBuffer[prevIdx] === 32 || dataBuffer[prevIdx] === 9)) {
+        prevIdx--;
+      }
+      const isLineStart = prevIdx < 0 || dataBuffer[prevIdx] === 10 || dataBuffer[prevIdx] === 13;
+
+      if (firstIndex === lastIndex && isLineStart) {
+        const urlLine = dataBuffer
+          .subarray(lastIndex + SOURCEMAP_COMMENT_BYTES.length)
+          .toString('utf-8');
+
+        if (useInputSourcemap) {
+          inputSourceMap = loadInputSourceMapFromUrl(filename, urlLine);
+          if (inputSourceMap !== undefined) {
+            // Valid trailing sourcemap comment confirmed: safe to slice code buffer
+            textData = textDecoder.decode(dataBuffer.subarray(0, prevIdx < 0 ? 0 : prevIdx + 1));
+            isAlreadyStripped = true;
+          } else {
+            // Not a valid trailing sourcemap (e.g. inside template literal): fallback to full decode
+            textData = textDecoder.decode(data);
+          }
+        } else if (isTrailingSourceMapComment(urlLine)) {
+          // Valid trailing sourcemap comment confirmed: safe to slice code buffer
+          textData = textDecoder.decode(dataBuffer.subarray(0, prevIdx < 0 ? 0 : prevIdx + 1));
+          isAlreadyStripped = true;
+        } else {
+          // Fallback to full decode and state-machine stripping
+          textData = textDecoder.decode(data);
+        }
+      } else {
+        // Multiple comments or comment not at line start: fall back to full decode and string parser
+        textData = textDecoder.decode(data);
+      }
+    }
+  } else {
+    textData = data;
+  }
+
+  const transformedData = await transformJavaScriptImpl(filename, textData, {
+    ...options,
+    inputSourceMap,
+    isAlreadyStripped,
+  });
 
   // Transfer the data via `move` instead of cloning
   if (transformedData === textData && typeof data !== 'string') {
@@ -109,7 +181,7 @@ let oxcTransformModule: typeof import('../oxc/oxc-transform.js') | undefined;
 async function transformJavaScriptImpl(
   filename: string,
   data: string,
-  options: Omit<JavaScriptTransformRequest, 'filename' | 'data'>,
+  options: TransformOptions,
 ): Promise<string> {
   const shouldLink = !options.skipLinker && requiresLinking(filename, data);
   const useInputSourcemap =
@@ -194,9 +266,11 @@ async function transformJavaScriptImpl(
   }
 
   if (useInputSourcemap) {
-    const baseMap = coverageMap ?? loadInputSourceMap(filename, data);
+    const baseMap = coverageMap ?? options.inputSourceMap ?? loadInputSourceMap(filename, data);
     if (maps.length > 0 || coverageMap) {
-      code = removeSourceMappingURL(code);
+      if (!options.isAlreadyStripped) {
+        code = removeSourceMappingURL(code);
+      }
       const remappingChain: (DecodedSourceMap | EncodedSourceMap)[] = maps.reverse();
       if (baseMap) {
         remappingChain.push(baseMap);
@@ -213,7 +287,7 @@ async function transformJavaScriptImpl(
   }
 
   // Strip sourcemaps if they should not be used
-  return removeSourceMappingURL(code);
+  return options.isAlreadyStripped ? code : removeSourceMappingURL(code);
 }
 
 function requiresLinking(path: string, source: string): boolean {
