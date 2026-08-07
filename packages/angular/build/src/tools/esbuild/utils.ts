@@ -12,7 +12,6 @@ import { Listr } from 'listr2';
 import { basename, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { brotliCompress } from 'node:zlib';
-import { coerce } from 'semver';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { OutputMode } from '../../builders/application/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
@@ -213,7 +212,7 @@ export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
   writeFileCallback: (file: T) => Promise<void>,
 ): Promise<void> {
   // Write files in groups of MAX_CONCURRENT_WRITES to avoid too many open files
-  for (let fileIndex = 0; fileIndex < files.length; ) {
+  for (let fileIndex = 0; fileIndex < files.length;) {
     const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, files.length);
 
     const actions = [];
@@ -223,71 +222,6 @@ export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
 
     await Promise.all(actions);
   }
-}
-
-/**
- * Transform browserlists result to esbuild target.
- * @see https://esbuild.github.io/api/#target
- */
-export function transformSupportedBrowsersToTargets(supportedBrowsers: string[]): string[] {
-  const transformed: string[] = [];
-
-  // https://esbuild.github.io/api/#target
-  const esBuildSupportedBrowsers = new Set([
-    'chrome',
-    'edge',
-    'firefox',
-    'ie',
-    'ios',
-    'node',
-    'opera',
-    'safari',
-  ]);
-
-  for (const browser of supportedBrowsers) {
-    let [browserName, version] = browser.toLowerCase().split(' ');
-
-    // browserslist uses the name `ios_saf` for iOS Safari whereas esbuild uses `ios`
-    if (browserName === 'ios_saf') {
-      browserName = 'ios';
-    }
-
-    // browserslist uses ranges `15.2-15.3` versions but only the lowest is required
-    // to perform minimum supported feature checks. esbuild also expects a single version.
-    [version] = version.split('-');
-
-    if (esBuildSupportedBrowsers.has(browserName)) {
-      if (browserName === 'safari' && version === 'tp') {
-        // esbuild only supports numeric versions so `TP` is converted to a high number (999) since
-        // a Technology Preview (TP) of Safari is assumed to support all currently known features.
-        version = '999';
-      } else if (!version.includes('.')) {
-        // A lone major version is considered by esbuild to include all minor versions. However,
-        // browserslist does not and is also inconsistent in its `.0` version naming. For example,
-        // Safari 15.0 is named `safari 15` but Safari 16.0 is named `safari 16.0`.
-        version += '.0';
-      }
-
-      transformed.push(browserName + version);
-    }
-  }
-
-  return transformed;
-}
-
-const SUPPORTED_NODE_VERSIONS = '0.0.0-ENGINES-NODE';
-
-/**
- * Transform supported Node.js versions to esbuild target.
- * @see https://esbuild.github.io/api/#target
- */
-export function getSupportedNodeTargets(): string[] {
-  if (SUPPORTED_NODE_VERSIONS.charAt(0) === '0') {
-    // Unlike `pkg_npm`, `ts_library` which is used to run unit tests does not support substitutions.
-    return [];
-  }
-
-  return SUPPORTED_NODE_VERSIONS.split('||').map((v) => 'node' + coerce(v)?.version);
 }
 
 interface BuildManifest {

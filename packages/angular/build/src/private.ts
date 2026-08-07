@@ -34,7 +34,7 @@ export {
 // Tools
 export type { ExternalResultMetadata } from './tools/esbuild/bundler-execution-result';
 export { emitFilesToDisk } from './tools/esbuild/utils';
-export { transformSupportedBrowsersToTargets } from './tools/esbuild/utils';
+export { transformSupportedBrowsersToTargets } from './tools/esbuild/target';
 export { SassWorkerImplementation } from './tools/sass/sass-service';
 
 export { SourceFileCache } from './tools/esbuild/angular/source-file-cache';
