@@ -10,8 +10,6 @@ import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
 import { SemVer, major } from 'semver';
-import { colors } from '../src/utilities/color';
-import { isWarningEnabled } from '../src/utilities/config';
 import { disableVersionCheck } from '../src/utilities/environment-options';
 import { VERSION } from '../src/utilities/version';
 
@@ -125,15 +123,23 @@ let forceExit = false;
         cli.VERSION.major - globalVersion.major <= 1
       ) {
         cli = await import('./cli');
-      } else if (await isWarningEnabled('versionMismatch')) {
-        // Otherwise, use local version and warn if global is newer than local
-        const warning =
-          `Your global Angular CLI version (${globalVersion}) is greater than your local ` +
-          `version (${localVersion}). The local Angular CLI version is used.\n\n` +
-          'To disable this warning use "ng config -g cli.warnings.versionMismatch false".';
+      } else {
+        try {
+          const { isWarningEnabled } = await import('../src/utilities/config');
+          if (await isWarningEnabled('versionMismatch')) {
+            // Otherwise, use local version and warn if global is newer than local
+            const warning =
+              `Your global Angular CLI version (${globalVersion}) is greater than your local ` +
+              `version (${localVersion}). The local Angular CLI version is used.\n\n` +
+              'To disable this warning use "ng config -g cli.warnings.versionMismatch false".';
 
-        // eslint-disable-next-line  no-console
-        console.error(colors.yellow(warning));
+            const { colors } = await import('../src/utilities/color');
+            // eslint-disable-next-line  no-console
+            console.error(colors.yellow(warning));
+          }
+        } catch {
+          // Ignore errors during warning check to avoid falling back to global CLI
+        }
       }
     }
   } catch {
