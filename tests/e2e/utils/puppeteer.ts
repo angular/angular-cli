@@ -40,7 +40,7 @@ export async function executeBrowserTest(options: BrowserTestOptions = {}) {
     const browser = await launch({
       executablePath: process.env['CHROME_BIN'],
       headless: true,
-      args: ['--no-sandbox'],
+      args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
     });
     try {
       const page = await browser.newPage();

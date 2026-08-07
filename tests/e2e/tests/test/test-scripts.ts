@@ -5,10 +5,6 @@ import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 
 export default async function () {
-  // TODO(architect): Delete this test. It is now in devkit/build-angular.
-
-  await ng('test', '--watch=false');
-
   // prepare global scripts test files
   await writeMultipleFiles({
     'src/string-script.js': `globalThis.stringScriptGlobal = 'string-scripts.js';`,
