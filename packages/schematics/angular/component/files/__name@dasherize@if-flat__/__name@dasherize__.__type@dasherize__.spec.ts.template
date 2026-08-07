@@ -7,10 +7,9 @@ describe('<%= classifiedName %>', () => {
   let fixture: ComponentFixture<<%= classifiedName %>>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({
+    TestBed.configureTestingModule({
       <%= standalone ? 'imports' : 'declarations' %>: [<%= classifiedName %>]
-    })
-    .compileComponents();
+    });
 
     fixture = TestBed.createComponent(<%= classifiedName %>);
     component = fixture.componentInstance;
