@@ -273,7 +273,6 @@ async function renderPages(
           errors.push(
             `An error occurred while prerendering route '${route}'.\n\n${err.stack ?? err.message ?? err.code ?? err}`,
           );
-          void renderWorker.destroy();
         });
 
       renderingPromises.push(renderResult);
