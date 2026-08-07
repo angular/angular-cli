@@ -7,6 +7,32 @@ import { execAndWaitForOutputToMatch, waitForAnyProcessOutputToMatch } from '../
 
 const buildReadyRegEx = /Application bundle generation complete\./;
 
+async function getOutputFiles(
+  dir: string,
+  predicate: (files: string[]) => boolean,
+  timeout = 10_000,
+): Promise<string[]> {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    try {
+      const files = await readdir(dir);
+      if (predicate(files)) {
+        return files;
+      }
+    } catch (err: any) {
+      if (err?.code !== 'ENOENT') {
+        throw err;
+      }
+    }
+    await setTimeout(50);
+  }
+
+  const files = await readdir(dir);
+  assert(predicate(files), `Condition not met for files in ${dir}: ${JSON.stringify(files)}`);
+
+  return files;
+}
+
 export default async function () {
   const usingApplicationBuilder = getGlobalVariable('argv')['esbuild'];
   assert(
@@ -20,15 +46,17 @@ export default async function () {
     ['build', '--watch', '--configuration=development'],
     buildReadyRegEx,
   );
-  await setTimeout(500);
-  const initialOutputFiles = await readdir('dist/test-project/browser');
+  const initialOutputFiles = await getOutputFiles(
+    'dist/test-project/browser',
+    (files) => files.length > 0,
+  );
 
   const originalMain = await readFile('src/main.ts');
 
   // Add a dynamic import to create an additional output chunk
   await Promise.all([
     waitForAnyProcessOutputToMatch(buildReadyRegEx),
-    await writeFile(
+    writeFile(
       'src/a.ts',
       `
   export function sayHi() {
@@ -38,8 +66,10 @@ export default async function () {
     ),
     appendToFile('src/main.ts', `\nimport('./a').then((m) => m.sayHi());`),
   ]);
-  await setTimeout(500);
-  const intermediateOutputFiles = await readdir('dist/test-project/browser');
+  const intermediateOutputFiles = await getOutputFiles(
+    'dist/test-project/browser',
+    (files) => files.length > initialOutputFiles.length,
+  );
   assert(
     initialOutputFiles.length < intermediateOutputFiles.length,
     'Additional chunks should be present',
@@ -50,8 +80,10 @@ export default async function () {
     waitForAnyProcessOutputToMatch(buildReadyRegEx),
     writeFile('src/main.ts', originalMain),
   ]);
-  await setTimeout(500);
-  const finalOutputFiles = await readdir('dist/test-project/browser');
+  const finalOutputFiles = await getOutputFiles(
+    'dist/test-project/browser',
+    (files) => files.length === initialOutputFiles.length,
+  );
   assert.equal(
     initialOutputFiles.length,
     finalOutputFiles.length,
