@@ -6,7 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { removeSourceMappingURL } from './source-map';
+import {
+  isTrailingSourceMapComment,
+  loadInputSourceMap,
+  loadInputSourceMapFromUrl,
+  removeSourceMappingURL,
+} from './source-map';
 
 describe('removeSourceMappingURL', () => {
   it('should remove top-level sourcemap comments', () => {
@@ -96,5 +101,89 @@ describe('removeSourceMappingURL', () => {
   it('should handle sourcemap comments with CRLF newlines', () => {
     const code = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\nconst next = 2;';
     expect(removeSourceMappingURL(code)).toBe('console.log("hello");\r\n\r\nconst next = 2;');
+  });
+});
+
+describe('loadInputSourceMapFromUrl', () => {
+  it('should decode inline base64 sourcemaps', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const urlLine = `data:application/json;charset=utf-8;base64,${base64}\n`;
+
+    expect(loadInputSourceMapFromUrl('/src/foo.js', urlLine)).toEqual(map as never);
+  });
+
+  it('should return undefined for invalid base64 payloads', () => {
+    expect(
+      loadInputSourceMapFromUrl('/src/foo.js', 'data:application/json;base64,invalid!!!'),
+    ).toBeUndefined();
+  });
+
+  it('should return undefined when no base64 marker is found in data URI', () => {
+    expect(
+      loadInputSourceMapFromUrl('/src/foo.js', 'data:application/json;utf8,{}'),
+    ).toBeUndefined();
+  });
+});
+
+describe('loadInputSourceMap', () => {
+  it('should extract and decode sourcemap from source string', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const code = `console.log("hello");\n//# sourceMappingURL=data:application/json;base64,${base64}\n`;
+
+    expect(loadInputSourceMap('/src/foo.js', code)).toEqual(map as never);
+  });
+
+  it('should return undefined when no sourceMappingURL comment is present', () => {
+    expect(loadInputSourceMap('/src/foo.js', 'console.log("hello");')).toBeUndefined();
+  });
+
+  it('should return undefined for comments inside template strings with code after them', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const code = `const str = \`\n//# sourceMappingURL=data:application/json;base64,${base64}\n\`;\nconsole.log(str);`;
+
+    expect(loadInputSourceMap('/src/foo.js', code)).toBeUndefined();
+  });
+
+  it('should return undefined for comments inside template strings ending with backticks', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const code = `const str = \`\n//# sourceMappingURL=data:application/json;base64,${base64}\n\`;`;
+
+    expect(loadInputSourceMap('/src/foo.js', code)).toBeUndefined();
+  });
+
+  it('should return undefined for single-line template literals', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const code = `const str = \`//# sourceMappingURL=data:application/json;base64,${base64}\`;`;
+
+    expect(loadInputSourceMap('/src/foo.js', code)).toBeUndefined();
+  });
+});
+
+describe('isTrailingSourceMapComment', () => {
+  it('should return true for valid inline data URIs at end of file', () => {
+    const map = { version: 3, sources: ['foo.ts'], mappings: 'AAAA;' };
+    const base64 = Buffer.from(JSON.stringify(map)).toString('base64');
+    const urlLine = `data:application/json;charset=utf-8;base64,${base64}\n`;
+
+    expect(isTrailingSourceMapComment(urlLine)).toBe(true);
+  });
+
+  it('should return true for external sourcemap URLs at end of file', () => {
+    expect(isTrailingSourceMapComment('main.js.map\n')).toBe(true);
+    expect(isTrailingSourceMapComment('main.js.map')).toBe(true);
+  });
+
+  it('should return false when followed by non-whitespace characters', () => {
+    expect(isTrailingSourceMapComment('main.js.map\n`;\nconsole.log("hi");')).toBe(false);
+    expect(isTrailingSourceMapComment('main.js.map`;')).toBe(false);
+  });
+
+  it('should return false for invalid data URI format', () => {
+    expect(isTrailingSourceMapComment('data:application/json;utf8,{}')).toBe(false);
   });
 });
