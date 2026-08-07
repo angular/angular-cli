@@ -13,10 +13,10 @@ import {
   FileSystemSchematicDescription,
   NodeWorkflow,
 } from '@angular-devkit/schematics/tools';
+import { color as colors, figures } from 'listr2';
 import { SpawnSyncReturns } from 'node:child_process';
 import * as semver from 'semver';
 import { subscribeToWorkflow } from '../../../command-builder/utilities/schematic-workflow';
-import { colors, figures } from '../../../utilities/color';
 import { assertIsError } from '../../../utilities/error';
 import { writeErrorToLogFile } from '../../../utilities/log-file';
 import { formatFiles } from '../../../utilities/prettier';
