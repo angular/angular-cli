@@ -34,8 +34,7 @@ import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSla
  * - A function that returns a `Promise<ApplicationRef>`, which resolves with the root application reference.
  */
 export type AngularBootstrap =
-  | Type<unknown>
-  | ((context: BootstrapContext) => Promise<ApplicationRef>);
+  Type<unknown> | ((context: BootstrapContext) => Promise<ApplicationRef>);
 
 /**
  * Renders an Angular application or module to an HTML string.
@@ -111,13 +110,13 @@ export async function renderAngular(
 
     // TODO(alanagius): Find a way to avoid rendering here especially for redirects as any output will be discarded.
     const envInjector = applicationRef.injector;
-    const routerIsProvided = !!envInjector.get(ActivatedRoute, null);
-    const router = envInjector.get(Router);
-    const lastSuccessfulNavigation = router.lastSuccessfulNavigation();
+    const router = envInjector.get(Router, null, { optional: true });
+    const routerIsProvided = router !== null && !!envInjector.get(ActivatedRoute, null);
+    const lastSuccessfulNavigation = router?.lastSuccessfulNavigation();
 
     if (!routerIsProvided) {
       hasNavigationError = false;
-    } else if (lastSuccessfulNavigation?.finalUrl) {
+    } else if (router && lastSuccessfulNavigation?.finalUrl) {
       hasNavigationError = false;
 
       const requestPrefix =
