@@ -456,7 +456,7 @@ export function createCompilerPlugin(
           if (!requiresAngularCompiler(directContents)) {
             return {
               warnings: [createMissingFileDiagnostic(request, args.path, diangosticRoot, false)],
-              contents,
+              contents: directContents,
               loader: 'ts',
               resolveDir: path.dirname(request),
             };
