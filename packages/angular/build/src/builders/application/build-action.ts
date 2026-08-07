@@ -108,10 +108,14 @@ export async function* runEsBuildBuildAction(
         logger.info('Watch mode enabled. Watching for file changes...');
       }
 
+      const normalizedOutputBase = toPosixPath(outputOptions.base);
+      const normalizedCacheBase = toPosixPath(cacheOptions.basePath);
       const ignored: string[] = [
         // Ignore the output and cache paths to avoid infinite rebuild cycles
-        outputOptions.base,
-        cacheOptions.basePath,
+        normalizedOutputBase,
+        `${normalizedOutputBase}/**`,
+        normalizedCacheBase,
+        `${normalizedCacheBase}/**`,
         `${toPosixPath(workspaceRoot)}/**/.*/**`,
       ];
 
