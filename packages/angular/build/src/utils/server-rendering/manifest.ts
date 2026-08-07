@@ -7,8 +7,8 @@
  */
 
 import type { Metafile } from 'esbuild';
+import { Buffer } from 'node:buffer';
 import { extname } from 'node:path';
-import { runInThisContext } from 'node:vm';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import {
   type BuildOutputFile,
@@ -174,9 +174,14 @@ export function generateAngularServerAppManifest(
         ),
       );
 
-      // This is needed because JavaScript engines script parser convert `\r\n` to `\n` in template literals,
-      // which can result in an incorrect byte length.
-      const size = runInThisContext(`new TextEncoder().encode(\`${escapedContent}\`).byteLength`);
+      // JavaScript engine script parsers normalize `\r\n` (2 bytes in UTF-8) to `\n` (1 byte in UTF-8) in template literals.
+      // Subtracting the count of `\r\n` occurrences avoids allocating any temporary strings or match arrays for large assets.
+      let size = Buffer.byteLength(file.text);
+      let pos = file.text.indexOf('\r\n');
+      while (pos !== -1) {
+        size--;
+        pos = file.text.indexOf('\r\n', pos + 2);
+      }
 
       serverAssets[file.path] =
         `{size: ${size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
