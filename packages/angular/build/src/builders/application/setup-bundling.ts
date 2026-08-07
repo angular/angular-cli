@@ -19,7 +19,7 @@ import {
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
-import { getSupportedNodeTargets } from '../../tools/esbuild/utils';
+import { getSupportedNodeTargets } from '../../tools/esbuild/target';
 import type { NormalizedApplicationBuildOptions } from './options';
 
 /**
