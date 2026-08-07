@@ -152,6 +152,8 @@ function calculateSizes(budget: BudgetEntry, stats: BudgetStats): Size[] {
 }
 
 abstract class Calculator {
+  private assetMap?: ReadonlyMap<string, number>;
+
   constructor(
     protected budget: BudgetEntry,
     protected chunks: BudgetChunk[],
@@ -167,15 +169,24 @@ abstract class Calculator {
       return 0;
     }
 
+    if (!this.assetMap) {
+      const map = new Map<string, number>();
+      for (const asset of this.assets) {
+        map.set(asset.name, asset.size);
+      }
+      this.assetMap = map;
+    }
+    const assetMap = this.assetMap;
+
     return chunk.files
       .filter((file) => !file.endsWith('.map'))
       .map((file) => {
-        const asset = this.assets.find((asset) => asset.name === file);
-        if (!asset) {
+        const assetSize = assetMap.get(file);
+        if (assetSize === undefined) {
           throw new Error(`Could not find asset for file: ${file}`);
         }
 
-        return asset.size;
+        return assetSize;
       })
       .reduce((l, r) => l + r, 0);
   }
