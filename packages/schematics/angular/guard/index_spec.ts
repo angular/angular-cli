@@ -165,7 +165,7 @@ describe('Guard Schematic', () => {
     const options = { ...defaultOptions, implements: implementationOptions, functional: false };
     const tree = await schematicRunner.runSchematic('guard', options, appTree);
     const fileString = tree.readContent('/projects/bar/src/app/foo-guard.ts');
-    const expectedImports = `import { CanMatch, GuardResult, MaybeAsync, Route, subPath } from '@angular/router';`;
+    const expectedImports = `import { CanMatch, GuardResult, MaybeAsync, Route, UrlSegment } from '@angular/router';`;
 
     expect(fileString).toContain(expectedImports);
   });
@@ -198,7 +198,7 @@ describe('Guard Schematic', () => {
     const fileString = tree.readContent('/projects/bar/src/app/foo-guard.ts');
     const expectedImports =
       `import { ActivatedRouteSnapshot, CanActivate, CanActivateChild, CanMatch, GuardResult, ` +
-      `MaybeAsync, Route, RouterStateSnapshot, subPath } from '@angular/router';`;
+      `MaybeAsync, Route, RouterStateSnapshot, UrlSegment } from '@angular/router';`;
 
     expect(fileString).toContain(expectedImports);
   });
