@@ -42,7 +42,7 @@ describe('Run Target Tool', () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runTarget({ target: 'build', configuration: 'production' }, mockContext);
     expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
-      ['build', 'my-app', '-c', 'production'],
+      ['build', 'my-app', '--configuration=production'],
       {
         cwd: '/test',
       },
@@ -53,7 +53,7 @@ describe('Run Target Tool', () => {
     mockContext.workspace.extensions['defaultProject'] = 'my-app';
     await runTarget({ target: 'storybook', configuration: 'docs' }, mockContext);
     expect(mockHost.executeNgCommand).toHaveBeenCalledWith(
-      ['run', 'my-app:storybook', '-c', 'docs'],
+      ['run', 'my-app:storybook', '--configuration=docs'],
       { cwd: '/test' },
     );
   });

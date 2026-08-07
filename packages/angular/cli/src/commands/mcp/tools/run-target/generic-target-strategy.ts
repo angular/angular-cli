@@ -46,7 +46,7 @@ export class GenericTargetStrategy implements TargetStrategy {
     }
 
     if (input.configuration) {
-      args.push('-c', input.configuration);
+      args.push(`--configuration=${input.configuration}`);
     }
 
     let options = input.options;
