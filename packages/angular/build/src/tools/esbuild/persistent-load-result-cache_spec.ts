@@ -10,6 +10,7 @@ import type { OnLoadResult } from 'esbuild';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { initializeHash } from '../../utils/hash';
 import type { Cache as PersistentCacheStore } from './cache';
 import {
   type CachedLoadResultEntry,
@@ -39,6 +40,10 @@ describe('PersistentLoadResultCache', () => {
   let persistentStore: PersistentCacheStore<CachedLoadResultEntry>;
   let tmpDir: string;
   let file1: string;
+
+  beforeAll(async () => {
+    await initializeHash();
+  });
 
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'persistent-cache-test-'));
