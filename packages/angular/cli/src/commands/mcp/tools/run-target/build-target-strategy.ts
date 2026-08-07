@@ -29,7 +29,7 @@ export class BuildTargetStrategy implements TargetStrategy {
   ): Promise<RunTargetOutput> {
     const args = ['build', input.projectName];
     if (input.configuration) {
-      args.push('-c', input.configuration);
+      args.push(`--configuration=${input.configuration}`);
     }
 
     args.push(...serializeOptions(input.options));
