@@ -98,6 +98,15 @@
       "description": "Rebuild on change.",
       "default": true
     },
+    "manualRebuild": {
+      "type": "boolean",
+      "description": "Suspend automatic rebuilds and only rebuild when the trigger file is touched. File changes are buffered and coalesced while paused; the development server stays live and keeps serving the last successful build.",
+      "default": false
+    },
+    "rebuildTrigger": {
+      "type": "string",
+      "description": "Path, relative to the project root, of the file whose modification flushes the buffered changes and triggers a single incremental rebuild. Only used when 'manualRebuild' is enabled. Defaults to '.ng-rebuild'."
+    },
     "poll": {
       "type": "number",
       "description": "Enable and define the file watching poll time period in milliseconds."

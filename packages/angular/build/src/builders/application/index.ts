@@ -137,6 +137,7 @@ export async function* buildApplicationInternal(
       colors: normalizedOptions.colors,
       jsonLogs: normalizedOptions.jsonLogs,
       incrementalResults: normalizedOptions.incrementalResults,
+      manualRebuildTrigger: normalizedOptions.manualRebuildTrigger,
       logger,
       signal,
     },

@@ -94,6 +94,9 @@ export function execute(
           normalizedOptions.allowedHosts ??= [];
         }
 
+        // Manual ("rebuild now") mode is not supported by this Webpack compatibility builder.
+        (normalizedOptions as unknown as { manualRebuild: boolean }).manualRebuild = false;
+
         return defer(() =>
           Promise.all([import('@angular/build/private'), import('../browser-esbuild')]),
         ).pipe(
@@ -103,6 +106,8 @@ export function execute(
                 hmr: boolean;
                 allowedHosts: true | string[];
                 define: { [key: string]: string } | undefined;
+                manualRebuild: boolean;
+                rebuildTrigger: string | undefined;
               },
               builderName,
               (options, context, codePlugins) => {
