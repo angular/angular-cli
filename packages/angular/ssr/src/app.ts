@@ -366,10 +366,18 @@ export class AngularServerApp {
     // Use a stream to send the response before finishing rendering and inling critical CSS, improving performance via header flushing.
     const stream = new ReadableStream({
       start: async (controller) => {
-        const renderedHtml = await result.content();
-        const finalHtml = await this.inlineCriticalCssWithCache(renderedHtml, url);
-        controller.enqueue(finalHtml);
-        controller.close();
+        try {
+          const renderedHtml = await result.content();
+          const finalHtml = await this.inlineCriticalCssWithCache(renderedHtml, url);
+          controller.enqueue(finalHtml);
+          controller.close();
+        } catch (error) {
+          result.destroy();
+          controller.error(error);
+        }
+      },
+      cancel: () => {
+        result.destroy();
       },
     });
 
