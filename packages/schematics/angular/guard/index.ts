@@ -34,7 +34,7 @@ export default function (options: GuardOptions): Rule {
     const routerNamedImports: string[] = [...options.implements, 'MaybeAsync', 'GuardResult'];
 
     if (options.implements.includes(GuardInterface.CanMatch)) {
-      routerNamedImports.push('Route', 'subPath');
+      routerNamedImports.push('Route', 'UrlSegment');
 
       if (options.implements.length > 1) {
         routerNamedImports.push(...commonRouterNameImports);
