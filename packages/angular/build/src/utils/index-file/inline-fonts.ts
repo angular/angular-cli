@@ -150,8 +150,9 @@ export class InlineFontsProcessor {
             attrs.find(({ name, value }) => name === 'href' && hrefsContent.has(value));
           if (hrefAttr) {
             const href = hrefAttr.value;
-            const cssContent = hrefsContent.get(href);
-            rewriter.emitRaw(`<style>${cssContent}</style>`);
+            const cssContent = hrefsContent.get(href) ?? '';
+            // Prevent the CSS from terminating the generated raw-text style element.
+            rewriter.emitRaw(`<style>${cssContent.replace(/<\/(?=style)/gi, '<\\/')}</style>`);
           } else {
             rewriter.emitStartTag(tag);
           }

@@ -6,7 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { htmlRewritingStream } from './html-rewriting-stream';
 import { InlineFontsProcessor } from './inline-fonts';
+import { addNonce } from './nonce';
 
 describe('InlineFontsProcessor', () => {
   describe('Google fonts', () => {
@@ -99,6 +101,32 @@ describe('InlineFontsProcessor', () => {
       expect(html).toContain(
         `<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>`,
       );
+    });
+
+    it('should escape closing style tags in inlined CSS', async () => {
+      const inlineFontsProcessor = new InlineFontsProcessor({
+        minify: true,
+      });
+      spyOn(inlineFontsProcessor, 'processURL').and.resolveTo(
+        'body { color: red; }</StYlE><script>globalThis.attack = true;</script><style>',
+      );
+
+      const html = await inlineFontsProcessor.process(`
+        <html>
+          <head>
+            <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+          </head>
+          <body><app-root ngCspNonce="trusted-nonce"></app-root></body>
+        </html>`);
+      const htmlWithNonce = await addNonce(html);
+      const { rewriter, transformedContent } = await htmlRewritingStream(htmlWithNonce);
+      const elementNames: string[] = [];
+      rewriter.on('startTag', ({ tagName }) => elementNames.push(tagName));
+      await transformedContent();
+
+      expect(htmlWithNonce).toContain('body { color: red; }<\\/StYlE>');
+      expect(elementNames.filter((name) => name === 'style')).toHaveSize(1);
+      expect(elementNames).not.toContain('script');
     });
   });
 
