@@ -7,8 +7,23 @@
  */
 
 import { WriteStream } from 'node:tty';
+import { styleText } from 'node:util';
 
-export { color as colors, figures } from 'listr2';
+export const colors = Object.freeze({
+  black: (text: string) => styleText('black', text),
+  blue: (text: string) => styleText('blue', text),
+  bold: (text: string) => styleText('bold', text),
+  cyan: (text: string) => styleText('cyan', text),
+  dim: (text: string) => styleText('dim', text),
+  gray: (text: string) => styleText('gray', text),
+  green: (text: string) => styleText('green', text),
+  italic: (text: string) => styleText('italic', text),
+  magenta: (text: string) => styleText('magenta', text),
+  red: (text: string) => styleText('red', text),
+  underline: (text: string) => styleText('underline', text),
+  white: (text: string) => styleText('white', text),
+  yellow: (text: string) => styleText('yellow', text),
+});
 
 export function supportColor(stream: NodeJS.WritableStream = process.stdout): boolean {
   if (stream instanceof WriteStream) {
