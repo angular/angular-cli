@@ -154,6 +154,87 @@ describe('setupBrowserConfiguration', () => {
     );
   });
 
+  describe('connectOptions', () => {
+    it('should forward connectOptions to the Playwright provider', async () => {
+      const connectOptions = {
+        wsEndpoint: 'ws://localhost:1234/playwright',
+        exposeNetwork: '*',
+      };
+
+      const { browser } = await setupBrowserConfiguration(
+        ['chromium'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+        connectOptions,
+      );
+
+      expect(browser?.provider?.options).toEqual(jasmine.objectContaining({ connectOptions }));
+    });
+
+    it('should not set connectOptions when none are provided', async () => {
+      const { browser } = await setupBrowserConfiguration(
+        ['chromium'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+      );
+
+      expect(browser?.provider?.options).not.toEqual(
+        jasmine.objectContaining({ connectOptions: jasmine.anything() }),
+      );
+    });
+
+    it('should ignore connectOptions and warn when no browsers are configured', async () => {
+      const { browser, messages } = await setupBrowserConfiguration(
+        undefined,
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+        { wsEndpoint: 'ws://localhost:1234/playwright' },
+      );
+
+      expect(browser).toBeUndefined();
+      expect(messages).toEqual([
+        'The "connectOptions" option is ignored when no browsers are configured.',
+      ]);
+    });
+
+    it('should warn when connectOptions is used with a non-Playwright provider', async () => {
+      // Swap the Playwright mock for a WebdriverIO mock so a non-Playwright provider is resolved.
+      await rm(join(workspaceRoot, 'node_modules/@vitest/browser-playwright'), {
+        recursive: true,
+        force: true,
+      });
+      const wdioPkgPath = join(workspaceRoot, 'node_modules/@vitest/browser-webdriverio');
+      await mkdir(wdioPkgPath, { recursive: true });
+      await writeFile(
+        join(wdioPkgPath, 'package.json'),
+        JSON.stringify({ name: '@vitest/browser-webdriverio', main: 'index.js' }),
+      );
+      await writeFile(
+        join(wdioPkgPath, 'index.js'),
+        'module.exports = { webdriverio: (options) => ({ name: "webdriverio", options }) };',
+      );
+
+      const { messages } = await setupBrowserConfiguration(
+        ['chrome'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+        { wsEndpoint: 'ws://localhost:1234/playwright' },
+      );
+
+      expect(messages).toContain(
+        'The "connectOptions" option is only supported by the Playwright browser provider and will be ignored.',
+      );
+    });
+  });
+
   it('should support Preview provider forcing headless false', async () => {
     // Create mock preview package
     const previewPkgPath = join(workspaceRoot, 'node_modules/@vitest/browser-preview');
@@ -277,6 +358,28 @@ describe('setupBrowserConfiguration', () => {
 
       // Verify firefox does not
       expect(browser?.instances?.[1]?.provider).toBeUndefined();
+    });
+
+    it('should forward connectOptions alongside executablePath on per-instance providers', async () => {
+      const connectOptions = { wsEndpoint: 'ws://localhost:1234/playwright' };
+      const { browser } = await setupBrowserConfiguration(
+        ['ChromeHeadless'],
+        undefined,
+        false,
+        workspaceRoot,
+        undefined,
+        connectOptions,
+      );
+
+      // The per-instance provider should carry both the connect options and the executable path.
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (browser?.instances?.[0]?.provider as any)?.options?.connectOptions,
+      ).toEqual(connectOptions);
+      expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (browser?.instances?.[0]?.provider as any)?.options?.launchOptions?.executablePath,
+      ).toBe('/custom/path/to/chrome');
     });
   });
 

@@ -13,6 +13,7 @@ import type {
 } from 'vitest/node';
 import { assertIsError } from '../../../../utils/error';
 import { createProjectResolver } from '../../../../utils/resolve-project';
+import type { NormalizedUnitTestBuilderOptions } from '../../options';
 
 export interface BrowserConfiguration {
   browser?: BrowserConfigOptions;
@@ -119,6 +120,7 @@ export function applyHeadlessConfiguration(
  * @param debug Whether the builder is running in watch or debug mode.
  * @param projectSourceRoot The root directory of the project being tested for resolving installed packages.
  * @param viewport Optional viewport dimensions to apply to the launched browser instances.
+ * @param connectOptions Optional Playwright connection options (e.g. `wsEndpoint`) forwarded to the provider.
  * @returns A fully resolved Vitest browser configuration object alongside any generated warning or error messages.
  */
 export async function setupBrowserConfiguration(
@@ -127,15 +129,18 @@ export async function setupBrowserConfiguration(
   debug: boolean,
   projectSourceRoot: string,
   viewport: { width: number; height: number } | undefined,
+  connectOptions?: NormalizedUnitTestBuilderOptions['connectOptions'],
 ): Promise<BrowserConfiguration> {
   if (browsers === undefined) {
+    const messages: string[] = [];
     if (headless !== undefined) {
-      return {
-        messages: ['The "headless" option is ignored when no browsers are configured.'],
-      };
+      messages.push('The "headless" option is ignored when no browsers are configured.');
+    }
+    if (connectOptions) {
+      messages.push('The "connectOptions" option is ignored when no browsers are configured.');
     }
 
-    return {};
+    return messages.length > 0 ? { messages } : {};
   }
 
   const projectResolver = createProjectResolver(projectSourceRoot);
@@ -168,6 +173,9 @@ export async function setupBrowserConfiguration(
               // Enables `prefer-color-scheme` for Vitest browser instead of `light`
               colorScheme: null,
             },
+            // Forward user-provided Playwright connection options (e.g. a custom `wsEndpoint`)
+            // so tests can run against a remote or shared browser server.
+            ...(connectOptions ? { connectOptions } : {}),
           };
 
           provider = providerFactory(baseOptions);
@@ -215,6 +223,12 @@ export async function setupBrowserConfiguration(
 
   const isCI = !!process.env['CI'];
   const messages = applyHeadlessConfiguration(instances, providerName, headless, isCI);
+
+  if (connectOptions && providerName !== 'playwright') {
+    messages.push(
+      'The "connectOptions" option is only supported by the Playwright browser provider and will be ignored.',
+    );
+  }
 
   const browser = {
     enabled: true,
