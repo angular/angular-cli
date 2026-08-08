@@ -126,6 +126,20 @@ interface InternalOptions {
    * Suppress build summary and stats table.
    */
   quiet?: boolean;
+
+  /**
+   * Disables esbuild code splitting for the browser code bundle.
+   *
+   * Splitting emits shared chunks whose exports are read across chunk boundaries as live ESM
+   * bindings. A module hoisted into a shared chunk is wrapped in a lazy initializer, so its exported
+   * value is only assigned once that initializer runs. Runners that load the generated output
+   * through a module runner rather than the browser's own ESM implementation do not reliably
+   * preserve those bindings, and an importing chunk can observe the export as `undefined`.
+   *
+   * Test bundles are never downloaded by a browser, so there is nothing for splitting to optimize
+   * there. Used exclusively for tests and shouldn't be used for other kinds of builds.
+   */
+  disableCodeSplitting?: boolean;
 }
 
 /** Full set of options for `application` builder. */
@@ -439,6 +453,7 @@ export async function normalizeOptions(
     partialSSRBuild = false,
     externalRuntimeStyles,
     instrumentForCoverage,
+    disableCodeSplitting,
   } = options;
 
   // Return all the normalized options
@@ -475,6 +490,7 @@ export async function normalizeOptions(
     watch,
     workspaceRoot,
     entryPoints,
+    disableCodeSplitting,
     optimizationOptions,
     outputOptions,
     outExtension,
