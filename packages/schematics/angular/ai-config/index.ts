@@ -19,7 +19,11 @@ const AGENTS_MD_CFG: ContextFileInfo = {
 
 const AI_TOOLS: { [key in Exclude<Tool, Tool.None>]: ContextFileInfo[] } = {
   ['claude-code']: [
-    AGENTS_MD_CFG,
+    {
+      type: ContextFileType.BestPracticesMd,
+      name: 'CLAUDE.md',
+      directory: '.',
+    },
     {
       type: ContextFileType.McpConfig,
       name: '.mcp.json',

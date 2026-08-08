@@ -32,9 +32,9 @@ describe('AI Config Schematic', () => {
     workspaceTree = await schematicRunner.runSchematic('workspace', workspaceOptions);
   });
 
-  it('should create Angular MCP server config and AGENTS.md for Claude Code', async () => {
+  it('should create Angular MCP server config and CLAUDE.md for Claude Code', async () => {
     const tree = await runAiConfigSchematic([ConfigTool.ClaudeCode]);
-    expect(tree.exists('AGENTS.md')).toBeTruthy();
+    expect(tree.exists('CLAUDE.md')).toBeTruthy();
     expect(tree.exists('.mcp.json')).toBeTruthy();
   });
 
@@ -89,7 +89,7 @@ describe('AI Config Schematic', () => {
 
   it('should omit best practices creation, if the file already exists', async () => {
     const customContent = 'custom user content';
-    workspaceTree.create('AGENTS.md', customContent);
+    workspaceTree.create('CLAUDE.md', customContent);
 
     const messages: string[] = [];
     const loggerSubscription = schematicRunner.logger.subscribe((x) => messages.push(x.message));
@@ -97,9 +97,9 @@ describe('AI Config Schematic', () => {
     try {
       const tree = await runAiConfigSchematic([ConfigTool.ClaudeCode]);
 
-      expect(tree.readContent('AGENTS.md')).toBe(customContent);
+      expect(tree.readContent('CLAUDE.md')).toBe(customContent);
       expect(messages).toContain(
-        `Skipping configuration file for 'ClaudeCode' at './AGENTS.md' because it already exists.\n` +
+        `Skipping configuration file for 'ClaudeCode' at './CLAUDE.md' because it already exists.\n` +
           'This is to prevent overwriting a potentially customized file. ' +
           'If you want to regenerate it with Angular recommended defaults, please delete the existing file and re-run the command.\n' +
           'You can review the latest recommendations at https://angular.dev/ai/develop-with-ai.\n',
