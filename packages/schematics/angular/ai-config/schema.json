@@ -4,7 +4,7 @@
   "title": "Angular AI Config File Options Schema",
   "type": "object",
   "additionalProperties": false,
-  "description": "Generates AI configuration files for Angular projects. This schematic creates AGENTS.md file and Angular MCP server configuration, improving the quality of AI-generated code and suggestions.",
+  "description": "Generates AI configuration files for Angular projects. This schematic creates instruction files (e.g. AGENTS.md, CLAUDE.md) and Angular MCP server configuration, improving the quality of AI-generated code and suggestions.",
   "properties": {
     "tool": {
       "type": "array",
@@ -20,7 +20,7 @@
           },
           {
             "value": "claude-code",
-            "label": "Claude Code   [ `AGENTS.md` + Angular MCP server config ]"
+            "label": "Claude Code   [ `CLAUDE.md` + Angular MCP server config ]"
           },
           {
             "value": "cursor",
@@ -40,7 +40,7 @@
           }
         ]
       },
-      "description": "Specifies which AI tools to generate configuration files (AGENTS.md, MCP server config) for.",
+      "description": "Specifies which AI tools to generate configuration files (AGENTS.md, CLAUDE.md, MCP server config) for.",
       "items": {
         "type": "string",
         "enum": ["none", "claude-code", "cursor", "gemini-cli", "open-ai-codex", "vscode"]

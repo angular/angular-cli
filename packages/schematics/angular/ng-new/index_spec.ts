@@ -109,7 +109,7 @@ describe('Ng New Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('ng-new', options);
     const files = tree.files;
-    expect(files).toContain('/bar/AGENTS.md');
+    expect(files).toContain('/bar/CLAUDE.md');
     expect(files).toContain('/bar/.mcp.json');
     expect(files).toContain('/bar/.gemini/GEMINI.md');
     expect(files).toContain('/bar/.gemini/settings.json');
