@@ -14,6 +14,33 @@ import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
 const SOURCEMAP_COMMENT_BYTES = Buffer.from('sourceMappingURL=');
+const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
+const LINKER_DECLARATION_PREFIX_BYTES = Buffer.from(LINKER_DECLARATION_PREFIX, 'utf-8');
+
+/**
+ * Determines whether JavaScript code requires Angular linker processing.
+ *
+ * @param path The full path to the file.
+ * @param data The data (string or Buffer) of the file.
+ * @returns True if the code contains an Angular partial declaration; otherwise false.
+ */
+function requiresLinking(path: string, data: string | Uint8Array): boolean {
+  // @angular/core and @angular/compiler will cause false positives
+  // Also, TypeScript files do not require linking
+  if (/[\\/]@angular[\\/](?:compiler|core)[\\/]|\.[cm]?tsx?$/.test(path)) {
+    return false;
+  }
+
+  if (typeof data === 'string') {
+    return data.includes(LINKER_DECLARATION_PREFIX);
+  }
+
+  const dataBuffer = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+
+  return dataBuffer.includes(LINKER_DECLARATION_PREFIX_BYTES);
+}
 
 /**
  * Transformation options that should apply to all transformed files and data.
@@ -190,9 +217,11 @@ export class JavaScriptTransformer {
     sideEffects?: boolean,
     instrumentForCoverage?: boolean,
   ): Promise<Uint8Array> {
+    const shouldLink = !skipLinker && requiresLinking(filename, data);
+
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
-    if (skipLinker && !this.#commonOptions.advancedOptimizations && !instrumentForCoverage) {
+    if (!shouldLink && !this.#commonOptions.advancedOptimizations && !instrumentForCoverage) {
       const keepSourcemap =
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
@@ -235,7 +264,7 @@ export class JavaScriptTransformer {
       {
         filename,
         data,
-        skipLinker,
+        skipLinker: !shouldLink,
         sideEffects,
         instrumentForCoverage,
         ...this.#commonOptions,
