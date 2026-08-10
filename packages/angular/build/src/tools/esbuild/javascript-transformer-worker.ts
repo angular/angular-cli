@@ -39,14 +39,6 @@ const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
 const SOURCEMAP_COMMENT_BYTES = Buffer.from('//# sourceMappingURL=');
 
-/**
- * The function name prefix for all Angular partial compilation functions.
- * Used to determine if linking of a JavaScript file is required.
- * If any additional declarations are added or otherwise changed in the linker,
- * the names MUST begin with this prefix.
- */
-const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
-
 async function instrumentCoverage(
   filename: string,
   data: string,
@@ -188,7 +180,7 @@ async function transformJavaScriptImpl(
   data: string,
   options: TransformOptions,
 ): Promise<string> {
-  const shouldLink = !options.skipLinker && requiresLinking(filename, data);
+  const shouldLink = !options.skipLinker;
   const useInputSourcemap =
     options.sourcemap &&
     (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
@@ -293,17 +285,4 @@ async function transformJavaScriptImpl(
 
   // Strip sourcemaps if they should not be used
   return options.isAlreadyStripped ? code : removeSourceMappingURL(code);
-}
-
-function requiresLinking(path: string, source: string): boolean {
-  // @angular/core and @angular/compiler will cause false positives
-  // Also, TypeScript files do not require linking
-  if (/[\\/]@angular[\\/](?:compiler|core)|\.tsx?$/.test(path)) {
-    return false;
-  }
-
-  // Check if the source code includes one of the declaration functions.
-  // There is a low chance of a false positive but the names are fairly unique
-  // and the result would be an unnecessary no-op additional plugin pass.
-  return source.includes(LINKER_DECLARATION_PREFIX);
 }

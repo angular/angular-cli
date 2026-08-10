@@ -291,4 +291,87 @@ describe('JavaScriptTransformer sourcemaps', () => {
 
     expect(result).toBe(inputBuffer);
   });
+
+  it('should return Uint8Array untouched when skipLinker is false but file contains no linker declarations', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('console.log("no linking required");\nconst x = 1;', 'utf-8');
+    const result = await transformer.transformData(
+      'node_modules/my-lib/lib.js',
+      inputBuffer,
+      false, // skipLinker: false
+    );
+
+    expect(result).toBe(inputBuffer);
+  });
+
+  it('should bypass worker and skip linking for @angular/core and @angular/compiler paths', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('export const ɵɵngDeclareDirective = () => {};', 'utf-8');
+    const result = await transformer.transformData(
+      'node_modules/@angular/core/fesm2022/core.mjs',
+      inputBuffer,
+      false,
+    );
+
+    expect(result).toBe(inputBuffer);
+  });
+
+  it('should bypass worker and skip linking for TypeScript file extensions (.ts, .tsx, .mts, .cts)', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('export const ɵɵngDeclareDirective = () => {};', 'utf-8');
+
+    for (const ext of ['.ts', '.tsx', '.mts', '.cts']) {
+      const result = await transformer.transformData(`src/app/directive${ext}`, inputBuffer, false);
+
+      expect(result).toBe(inputBuffer);
+    }
+  });
+
+  it('should not exclude packages with similar prefixes such as @angular/compiler-cli', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    const input = `
+      import * as i0 from "@angular/core";
+      export class MyDirective {}
+      MyDirective.ɵdir = i0.ɵɵngDeclareDirective({
+        minVersion: "12.0.0",
+        version: "14.0.0",
+        ngImport: i0,
+        type: MyDirective,
+        selector: "[my-dir]"
+      });
+    `;
+
+    const result = await transformer.transformData(
+      'node_modules/@angular/compiler-cli/test.js',
+      input,
+      false,
+    );
+    const text = Buffer.from(result).toString('utf-8');
+
+    expect(text).not.toContain('i0.ɵɵngDeclareDirective');
+  });
 });
