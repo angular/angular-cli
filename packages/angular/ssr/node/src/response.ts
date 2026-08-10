@@ -17,13 +17,11 @@ import type { Http2ServerResponse } from 'node:http2';
  */
 function isResponseDestroyedOrClosed(destination: ServerResponse | Http2ServerResponse): boolean {
   return (
-    Boolean(destination.destroyed) ||
-    Boolean(destination.closed) ||
-    Boolean(destination.writableEnded) ||
+    destination.destroyed ||
+    destination.closed ||
+    destination.writableEnded ||
     ('stream' in destination &&
-      (!destination.stream ||
-        Boolean(destination.stream.destroyed) ||
-        Boolean(destination.stream.closed)))
+      (!destination.stream || destination.stream.destroyed || destination.stream.closed))
   );
 }
 
