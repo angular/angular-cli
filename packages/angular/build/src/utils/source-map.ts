@@ -11,17 +11,90 @@ import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+export const SOURCEMAP_COMMENT_PREFIX = '//# sourceMappingURL=';
+export const SOURCEMAP_COMMENT_BYTES = Buffer.from(SOURCEMAP_COMMENT_PREFIX);
+
+/**
+ * Checks for a single trailing `//# sourceMappingURL=` comment on a raw buffer.
+ *
+ * @param data The raw byte buffer to inspect.
+ * @returns An object containing the sliced code buffer and URL snippet if a single trailing comment exists,
+ *          `null` if no sourcemap comment exists in the buffer, or `undefined` if multiple/non-trailing comments exist.
+ */
+export function findTrailingSourceMapComment(
+  data: Uint8Array,
+): { code: Uint8Array; urlLine: string } | null | undefined {
+  const dataBuffer = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+
+  const firstIndex = dataBuffer.indexOf(SOURCEMAP_COMMENT_BYTES);
+  if (firstIndex === -1) {
+    return null;
+  }
+
+  const lastIndex = dataBuffer.lastIndexOf(SOURCEMAP_COMMENT_BYTES);
+  // Skip any preceding horizontal whitespace (spaces/tabs) to find the start of the line.
+  let prevIdx = lastIndex - 1;
+  while (prevIdx >= 0 && (dataBuffer[prevIdx] === 32 || dataBuffer[prevIdx] === 9)) {
+    prevIdx--;
+  }
+  // Ensure the comment starts at the beginning of a line or the start of the file,
+  // preventing false positives for occurrences inside inline string literals or code.
+  const isLineStart = prevIdx < 0 || dataBuffer[prevIdx] === 10 || dataBuffer[prevIdx] === 13;
+
+  if (firstIndex === lastIndex && isLineStart) {
+    const urlLine = dataBuffer
+      .subarray(lastIndex + SOURCEMAP_COMMENT_BYTES.length)
+      .toString('utf-8');
+
+    return {
+      code: dataBuffer.subarray(0, prevIdx < 0 ? 0 : prevIdx + 1),
+      urlLine,
+    };
+  }
+
+  return undefined;
+}
+
 /**
  * Removes `//# sourceMappingURL=` comments safely from the given JavaScript code,
  * ignoring any occurrences that are inside string literals, template literals, or block comments.
  *
- * It uses a lightweight state-machine parser to accurately handle nested template literals.
+ * For raw Uint8Array / Buffer inputs, it optimizes performance by inspecting trailing byte sequences
+ * to slice the buffer directly without full string decoding.
  *
- * @param code The JavaScript source code.
+ * @param code The JavaScript source code as a string or Uint8Array.
  * @returns The code with top-level sourcemap comments removed.
  */
-export function removeSourceMappingURL(code: string): string {
-  if (!code.includes('//# sourceMappingURL=')) {
+export function removeSourceMappingURL(code: string): string;
+export function removeSourceMappingURL(code: Uint8Array): Uint8Array;
+export function removeSourceMappingURL(code: string | Uint8Array): string | Uint8Array {
+  if (typeof code === 'string') {
+    return removeSourceMappingURLFromString(code);
+  }
+
+  const trailing = findTrailingSourceMapComment(code);
+  if (trailing === null) {
+    return code;
+  }
+
+  if (trailing && isTrailingSourceMapComment(trailing.urlLine)) {
+    return trailing.code;
+  }
+
+  // Fallback to full decode and state-machine stripping for multiple comments or non-trailing comments
+  const dataBuffer = Buffer.isBuffer(code)
+    ? code
+    : Buffer.from(code.buffer, code.byteOffset, code.byteLength);
+  const text = dataBuffer.toString('utf-8');
+  const stripped = removeSourceMappingURLFromString(text);
+
+  return stripped === text ? code : Buffer.from(stripped, 'utf-8');
+}
+
+function removeSourceMappingURLFromString(code: string): string {
+  if (!code.includes(SOURCEMAP_COMMENT_PREFIX)) {
     return code;
   }
 
@@ -64,12 +137,12 @@ export function removeSourceMappingURL(code: string): string {
           }
         }
 
-        if (!isEscaped && code.startsWith('//# sourceMappingURL=', i)) {
+        if (!isEscaped && code.startsWith(SOURCEMAP_COMMENT_PREFIX, i)) {
           if (i > lastCopiedIndex) {
             result.push(code.slice(lastCopiedIndex, i));
           }
           // Skip the rest of the comment line up to the newline
-          i += 21;
+          i += SOURCEMAP_COMMENT_PREFIX.length;
           while (i < len && code[i] !== '\n' && code[i] !== '\r') {
             i++;
           }
@@ -308,7 +381,7 @@ export function loadInputSourceMapFromUrl(
 export function loadInputSourceMap(filename: string, code: string): EncodedSourceMap | undefined {
   // Locate the last sourceMappingURL comment using lastIndexOf to avoid scanning
   // the entire file with a regular expression (significant for large files).
-  const lastSourceMapIndex = code.lastIndexOf('//# sourceMappingURL=');
+  const lastSourceMapIndex = code.lastIndexOf(SOURCEMAP_COMMENT_PREFIX);
   if (lastSourceMapIndex === -1) {
     return undefined;
   }
@@ -325,5 +398,8 @@ export function loadInputSourceMap(filename: string, code: string): EncodedSourc
     }
   }
 
-  return loadInputSourceMapFromUrl(filename, code.slice(lastSourceMapIndex + 21));
+  return loadInputSourceMapFromUrl(
+    filename,
+    code.slice(lastSourceMapIndex + SOURCEMAP_COMMENT_PREFIX.length),
+  );
 }
