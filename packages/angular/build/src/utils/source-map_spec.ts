@@ -102,6 +102,42 @@ describe('removeSourceMappingURL', () => {
     const code = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\nconst next = 2;';
     expect(removeSourceMappingURL(code)).toBe('console.log("hello");\r\n\r\nconst next = 2;');
   });
+
+  describe('with Uint8Array / Buffer inputs', () => {
+    it('should strip trailing sourcemap comment from Uint8Array buffer', () => {
+      const buffer = Buffer.from(
+        'console.log("hello");\n//# sourceMappingURL=main.js.map',
+        'utf-8',
+      );
+      const result = removeSourceMappingURL(buffer);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe('console.log("hello");\n');
+    });
+
+    it('should return exact input buffer when no sourcemap comment is present', () => {
+      const buffer = Buffer.from('console.log("hello");\nconst x = 1;', 'utf-8');
+      const result = removeSourceMappingURL(buffer);
+
+      expect(result).toBe(buffer);
+    });
+
+    it('should handle multiple sourcemap comments in a buffer via fallback', () => {
+      const buffer = Buffer.from(
+        '//# sourceMappingURL=first.js.map\nconsole.log("mid");\n//# sourceMappingURL=second.js.map',
+        'utf-8',
+      );
+      const result = removeSourceMappingURL(buffer);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe('\nconsole.log("mid");\n');
+    });
+
+    it('should not strip sourcemap comments inside template strings in a buffer', () => {
+      const buffer = Buffer.from('const str = `\n//# sourceMappingURL=inline.js.map\n`;', 'utf-8');
+      const result = removeSourceMappingURL(buffer);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe(buffer.toString('utf-8'));
+    });
+  });
 });
 
 describe('loadInputSourceMapFromUrl', () => {

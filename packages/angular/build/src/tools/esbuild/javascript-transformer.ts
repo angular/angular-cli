@@ -13,7 +13,6 @@ import { removeSourceMappingURL } from '../../utils/source-map';
 import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
-const SOURCEMAP_COMMENT_BYTES = Buffer.from('sourceMappingURL=');
 const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
 const LINKER_DECLARATION_PREFIX_BYTES = Buffer.from(LINKER_DECLARATION_PREFIX, 'utf-8');
 
@@ -230,23 +229,7 @@ export class JavaScriptTransformer {
         return Buffer.from(keepSourcemap ? data : removeSourceMappingURL(data), 'utf-8');
       }
 
-      if (keepSourcemap) {
-        return data;
-      }
-
-      const dataBuffer = Buffer.isBuffer(data)
-        ? data
-        : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
-
-      // Fast check on raw ASCII bytes to avoid UTF-8 string decoding if no comment exists.
-      if (dataBuffer.indexOf(SOURCEMAP_COMMENT_BYTES) === -1) {
-        return data;
-      }
-
-      const text = dataBuffer.toString('utf-8');
-      const stripped = removeSourceMappingURL(text);
-
-      return stripped === text ? data : Buffer.from(stripped, 'utf-8');
+      return keepSourcemap ? data : removeSourceMappingURL(data);
     }
 
     // Only standalone (non-pooled) ArrayBuffers can be transferred across worker threads.
