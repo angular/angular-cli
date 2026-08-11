@@ -97,15 +97,9 @@ async function getVersionSpecificBestPractices(
   server: McpToolContext['server'],
 ): Promise<{ content: string; source: string } | undefined> {
   if (server) {
+    let isAllowed: boolean;
     try {
-      if (!(await isAllowedWorkspacePath(server, workspacePath))) {
-        logger.warn(
-          `Workspace path is outside the allowed MCP roots: ${workspacePath}. ` +
-            'Falling back to the bundled guide.',
-        );
-
-        return undefined;
-      }
+      isAllowed = await isAllowedWorkspacePath(server, workspacePath);
     } catch (e) {
       logger.warn(
         `Failed to verify workspace path '${workspacePath}': ` +
@@ -113,6 +107,13 @@ async function getVersionSpecificBestPractices(
       );
 
       return undefined;
+    }
+
+    if (!isAllowed) {
+      throw new Error(
+        `Workspace path is outside the allowed MCP roots: ${workspacePath}. ` +
+          "You can use 'list_projects' to find available workspaces.",
+      );
     }
   }
 
