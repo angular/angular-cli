@@ -93,6 +93,7 @@ export class JavaScriptTransformer {
       jit,
     };
     this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
+    this.#workerPool = this.#ensureWorkerPool();
   }
 
   /**
@@ -130,6 +131,8 @@ export class JavaScriptTransformer {
     const workerPoolOptions: WorkerPoolOptions = {
       filename: require.resolve('./javascript-transformer-worker'),
       maxThreads: this.maxThreads,
+      minThreads: this.maxThreads,
+      workerData: this.#commonOptions,
     };
 
     // Prevent passing SSR `--import` (loader-hooks) from parent to child worker.
@@ -250,7 +253,6 @@ export class JavaScriptTransformer {
         skipLinker: !shouldLink,
         sideEffects,
         instrumentForCoverage,
-        ...this.#commonOptions,
       },
       {
         transferList: isTransferable ? [data.buffer] : undefined,

@@ -9,6 +9,7 @@
 import remapping, { type DecodedSourceMap, type EncodedSourceMap } from '@ampproject/remapping';
 import { type PluginItem, transformAsync } from '@babel/core';
 import { createRequire } from 'node:module';
+import { workerData } from 'node:worker_threads';
 import Piscina from 'piscina';
 import { useBabelLinker } from '../../utils/environment-options.js';
 import {
@@ -18,16 +19,15 @@ import {
   loadInputSourceMapFromUrl,
   removeSourceMappingURL,
 } from '../../utils/source-map';
+import { linkWithOxc } from '../angular/linker/oxc-linker.js';
+import { transform as transformWithOxc } from '../oxc/oxc-transform.js';
+import type { JavaScriptTransformerOptions } from './javascript-transformer';
 
 interface JavaScriptTransformRequest {
   filename: string;
   data: string | Uint8Array;
-  sourcemap: boolean;
-  thirdPartySourcemaps: boolean;
-  advancedOptimizations: boolean;
   skipLinker?: boolean;
   sideEffects?: boolean;
-  jit: boolean;
   instrumentForCoverage?: boolean;
 }
 
@@ -35,6 +35,13 @@ interface TransformOptions extends Omit<JavaScriptTransformRequest, 'filename' |
   inputSourceMap?: EncodedSourceMap;
   isAlreadyStripped?: boolean;
 }
+
+const {
+  sourcemap = false,
+  thirdPartySourcemaps = false,
+  advancedOptimizations = false,
+  jit = false,
+} = (workerData || {}) as Partial<JavaScriptTransformerOptions>;
 
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
@@ -89,8 +96,7 @@ export default async function transformJavaScript(
   const { filename, data, ...options } = request;
 
   const useInputSourcemap =
-    options.sourcemap &&
-    (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+    sourcemap && (!!thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   let textData: string;
   let inputSourceMap: EncodedSourceMap | undefined;
@@ -145,16 +151,6 @@ export default async function transformJavaScript(
   return Piscina.move(textEncoder.encode(transformedData));
 }
 
-/**
- * Cached instance of the OXC linker module.
- */
-let oxcLinkerModule: typeof import('../angular/linker/oxc-linker.js') | undefined;
-
-/**
- * Cached instance of the OXC transform module.
- */
-let oxcTransformModule: typeof import('../oxc/oxc-transform.js') | undefined;
-
 async function transformJavaScriptImpl(
   filename: string,
   data: string,
@@ -162,8 +158,7 @@ async function transformJavaScriptImpl(
 ): Promise<string> {
   const shouldLink = !options.skipLinker;
   const useInputSourcemap =
-    options.sourcemap &&
-    (!!options.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+    sourcemap && (!!thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   let code = data;
   const maps: (DecodedSourceMap | EncodedSourceMap)[] = [];
@@ -198,7 +193,7 @@ async function transformJavaScriptImpl(
               relative: (_from: string, to: string) => to,
             } as never,
             logger: new ConsoleLogger(LogLevel.info),
-            linkerJitMode: options.jit,
+            linkerJitMode: jit,
             // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
             sourceMapping: false,
           }) as PluginItem,
@@ -210,10 +205,9 @@ async function transformJavaScriptImpl(
         maps.push(result.map as EncodedSourceMap);
       }
     } else {
-      oxcLinkerModule ??= await import('../angular/linker/oxc-linker.js');
-      const result = oxcLinkerModule.linkWithOxc(filename, code, {
+      const result = linkWithOxc(filename, code, {
         sourcemap: useInputSourcemap,
-        jit: options.jit,
+        jit,
         skipCheck: true,
       });
       code = result.code;
@@ -224,14 +218,13 @@ async function transformJavaScriptImpl(
   }
 
   // Run advanced optimizations using our fast oxc-transform
-  if (options.advancedOptimizations) {
-    oxcTransformModule ??= await import('../oxc/oxc-transform.js');
+  if (advancedOptimizations) {
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
     const topLevelSafeMode = !safeAngularPackage;
 
-    const result = oxcTransformModule.transform(filename, code, {
+    const result = transformWithOxc(filename, code, {
       sourcemap: useInputSourcemap,
       sideEffects: options.sideEffects,
       topLevelSafeMode,
