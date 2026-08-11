@@ -20,6 +20,7 @@
         "packages/schematics/angular/utility/latest-versions/package.json"
       ],
       "matchPackageNames": ["*"],
+      "matchUpdateTypes": ["minor", "patch"],
       "groupName": "schematics dependencies",
       "lockFileMaintenance": {
         "enabled": false
