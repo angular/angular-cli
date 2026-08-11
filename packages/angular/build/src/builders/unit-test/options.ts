@@ -10,7 +10,7 @@ import { type BuilderContext, targetFromTargetString } from '@angular-devkit/arc
 import { constants, promises as fs } from 'node:fs';
 import path from 'node:path';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { canonicalizePath } from '../../utils/path';
+import { canonicalizePath, toPosixPath } from '../../utils/path';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { isTTY } from '../../utils/tty';
 import { Runner, type Schema as UnitTestBuilderOptions } from './schema';
@@ -143,7 +143,7 @@ export async function normalizeOptions(
     quiet: options.quiet ?? (process.env['CI'] ? false : true),
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
     setupFiles: options.setupFiles
-      ? options.setupFiles.map((setupFile) => path.join(workspaceRoot, setupFile))
+      ? options.setupFiles.map((setupFile) => toPosixPath(path.join(workspaceRoot, setupFile)))
       : [],
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
