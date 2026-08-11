@@ -17,7 +17,7 @@
     "@angular-devkit/schematics": "^<%= schematicsVersion %>"
   },
   "devDependencies": {
-    "@types/node": "^20.17.19",
+    "@types/node": "^26.0.0",
     "@types/jasmine": "~6.0.0",
     "jasmine": "~6.3.0",
     "typescript": "~6.0.2"
