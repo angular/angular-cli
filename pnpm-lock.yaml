@@ -484,8 +484,8 @@ importers:
         specifier: 7.8.5
         version: 7.8.5
       yargs:
-        specifier: 18.0.0
-        version: 18.0.0
+        specifier: 18.1.0
+        version: 18.1.0
       zod:
         specifier: 4.4.3
         version: 4.4.3
@@ -942,7 +942,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c71d9b6af7560faa3d002534d416a8045111adae':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c71d9b6af7560faa3d002534d416a8045111adae}
+    resolution: {gitHosted: true, integrity: sha512-/32ipAQZed8P+Sgp4Hqk++iJpQVcwwvaCgRCD2fVJi1q17t9qUP+F66uthOE+MTQktgdTXg1Ayi3YWwJWBapnw==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/c71d9b6af7560faa3d002534d416a8045111adae}
     version: 0.0.0-92c6b596e59e320c9edbc6d6490c1047264c4a0d
     hasBin: true
 
@@ -10993,7 +10993,7 @@ snapshots:
   '@puppeteer/browsers@3.0.6':
     dependencies:
       modern-tar: 0.7.7
-      yargs: 18.0.0
+      yargs: 18.1.0
 
   '@rolldown/binding-android-arm64@1.1.5':
     optional: true
