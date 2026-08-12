@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import Beasties from 'beasties';
 import { readFile } from 'node:fs/promises';
 
 /**
@@ -95,147 +94,184 @@ interface PartialDocument {
   querySelector(selector: string): PartialHTMLElement | null;
 }
 
-/* eslint-disable @typescript-eslint/no-unsafe-declaration-merging */
-
-// We use Typescript declaration merging because `embedLinkedStylesheet` it's not declared in
-// the `Beasties` types which means that we can't call the `super` implementation.
 interface BeastiesBase {
   embedLinkedStylesheet(link: PartialHTMLElement, document: PartialDocument): Promise<unknown>;
+  readFile(path: string): Promise<string>;
+  process(html: string): Promise<string>;
 }
-class BeastiesBase extends Beasties {}
-/* eslint-enable @typescript-eslint/no-unsafe-declaration-merging */
 
-class BeastiesExtended extends BeastiesBase {
-  readonly warnings: string[] = [];
-  readonly errors: string[] = [];
-  private addedCspScriptsDocuments = new WeakSet<PartialDocument>();
-  private documentNonces = new WeakMap<PartialDocument, string | null>();
+interface BeastiesExtendedInstance {
+  readonly warnings: string[];
+  readonly errors: string[];
+  process(html: string): Promise<string>;
+}
 
-  constructor(
-    private readonly optionsExtended: InlineCriticalCssProcessorOptions &
-      InlineCriticalCssProcessOptions,
-  ) {
-    super({
-      logger: {
-        warn: (s: string) => this.warnings.push(s),
-        error: (s: string) => this.errors.push(s),
-        info: () => {},
-      },
-      logLevel: 'warn',
-      path: optionsExtended.outputPath,
-      publicPath: optionsExtended.deployUrl,
-      compress: !!optionsExtended.minify,
-      pruneSource: false,
-      reduceInlineStyles: false,
-      mergeStylesheets: false,
-      // Note: if `preload` changes to anything other than `media`, the logic in
-      // `embedLinkedStylesheet` will have to be updated.
-      preload: 'media',
-      noscriptFallback: true,
-      inlineFonts: true,
-    });
+let beastiesClassPromise:
+  | Promise<
+      new (
+        options: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions,
+      ) => BeastiesExtendedInstance
+    >
+  | undefined;
+
+async function getBeastiesClass(): Promise<
+  new (
+    options: InlineCriticalCssProcessorOptions & InlineCriticalCssProcessOptions,
+  ) => BeastiesExtendedInstance
+> {
+  if (beastiesClassPromise) {
+    return beastiesClassPromise;
   }
 
-  public override readFile(path: string): Promise<string> {
-    const readAsset = this.optionsExtended.readAsset;
+  beastiesClassPromise = import('beasties').then(({ default: Beasties }) => {
+    return class BeastiesExtended
+      extends (Beasties as unknown as new (options: unknown) => BeastiesBase)
+      implements BeastiesExtendedInstance
+    {
+      private _warnings?: string[];
+      private _errors?: string[];
 
-    return readAsset ? readAsset(path) : readFile(path, 'utf-8');
-  }
-
-  /**
-   * Override of the Beasties `embedLinkedStylesheet` method
-   * that makes it work with Angular's CSP APIs.
-   */
-  override async embedLinkedStylesheet(
-    link: PartialHTMLElement,
-    document: PartialDocument,
-  ): Promise<unknown> {
-    if (link.getAttribute('media') === 'print' && link.next?.name === 'noscript') {
-      // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
-      // NB: this is only needed for the webpack based builders.
-      const media = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
-      if (media) {
-        link.removeAttribute('onload');
-        link.setAttribute('media', media[1]);
-        link?.next?.remove();
-      }
-    }
-
-    const returnValue = await super.embedLinkedStylesheet(link, document);
-    const cspNonce = this.findCspNonce(document);
-
-    if (cspNonce || this.optionsExtended.autoCsp) {
-      const beastiesMedia = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
-
-      if (beastiesMedia) {
-        // If there's a Beasties-generated `onload` handler and the file has an Angular CSP nonce,
-        // we have to remove the handler, because it's incompatible with CSP. We save the value
-        // in a different attribute and we generate a script tag with the nonce that uses
-        // `addEventListener` to apply the media query instead.
-        link.removeAttribute('onload');
-        link.setAttribute(CSP_MEDIA_ATTR, beastiesMedia[1]);
-        this.conditionallyInsertCspLoadingScript(document, cspNonce, link);
+      get warnings(): string[] {
+        return (this._warnings ??= []);
       }
 
-      // Ideally we would hook in at the time Beasties inserts the `style` tags, but there isn't
-      // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
-      // inserted. We mitigate it by only iterating the direct children of the `<head>` which
-      // should be pretty shallow.
-      if (cspNonce) {
-        document.head.children.forEach((child) => {
-          if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
-            child.setAttribute('nonce', cspNonce);
-          }
+      get errors(): string[] {
+        return (this._errors ??= []);
+      }
+      private addedCspScriptsDocuments = new WeakSet<PartialDocument>();
+      private documentNonces = new WeakMap<PartialDocument, string | null>();
+
+      constructor(
+        private readonly optionsExtended: InlineCriticalCssProcessorOptions &
+          InlineCriticalCssProcessOptions,
+      ) {
+        super({
+          logger: {
+            warn: (s: string) => this.warnings.push(s),
+            error: (s: string) => this.errors.push(s),
+            info: () => {},
+          },
+          logLevel: 'warn',
+          path: optionsExtended.outputPath,
+          publicPath: optionsExtended.deployUrl,
+          compress: !!optionsExtended.minify,
+          pruneSource: false,
+          reduceInlineStyles: false,
+          mergeStylesheets: false,
+          // Note: if `preload` changes to anything other than `media`, the logic in
+          // `embedLinkedStylesheet` will have to be updated.
+          preload: 'media',
+          noscriptFallback: true,
+          inlineFonts: true,
         });
       }
-    }
 
-    return returnValue;
-  }
+      public override readFile(path: string): Promise<string> {
+        const readAsset = this.optionsExtended.readAsset;
 
-  /**
-   * Finds the CSP nonce for a specific document.
-   */
-  private findCspNonce(document: PartialDocument): string | null {
-    if (this.documentNonces.has(document)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      return this.documentNonces.get(document)!;
-    }
+        return readAsset ? readAsset(path) : readFile(path, 'utf-8');
+      }
 
-    // HTML attribute are case-insensitive, but the parser used by Beasties is case-sensitive.
-    const nonceElement = document.querySelector('[ngCspNonce], [ngcspnonce]');
-    const cspNonce =
-      nonceElement?.getAttribute('ngCspNonce') || nonceElement?.getAttribute('ngcspnonce') || null;
+      /**
+       * Override of the Beasties `embedLinkedStylesheet` method
+       * that makes it work with Angular's CSP APIs.
+       */
+      override async embedLinkedStylesheet(
+        link: PartialHTMLElement,
+        document: PartialDocument,
+      ): Promise<unknown> {
+        if (link.getAttribute('media') === 'print' && link.next?.name === 'noscript') {
+          // Workaround for https://github.com/GoogleChromeLabs/critters/issues/64
+          // NB: this is only needed for the webpack based builders.
+          const media = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
+          if (media) {
+            link.removeAttribute('onload');
+            link.setAttribute('media', media[1]);
+            link?.next?.remove();
+          }
+        }
 
-    this.documentNonces.set(document, cspNonce);
+        const returnValue = await super.embedLinkedStylesheet(link, document);
+        const cspNonce = this.findCspNonce(document);
 
-    return cspNonce;
-  }
+        if (cspNonce || this.optionsExtended.autoCsp) {
+          const beastiesMedia = link.getAttribute('onload')?.match(MEDIA_SET_HANDLER_PATTERN);
 
-  /**
-   * Inserts the `script` tag that swaps the critical CSS at runtime,
-   * if one hasn't been inserted into the document already.
-   */
-  private conditionallyInsertCspLoadingScript(
-    document: PartialDocument,
-    nonce: string | null,
-    link: PartialHTMLElement,
-  ): void {
-    if (this.addedCspScriptsDocuments.has(document)) {
-      return;
-    }
+          if (beastiesMedia) {
+            // If there's a Beasties-generated `onload` handler and the file has an Angular CSP nonce,
+            // we have to remove the handler, because it's incompatible with CSP. We save the value
+            // in a different attribute and we generate a script tag with the nonce that uses
+            // `addEventListener` to apply the media query instead.
+            link.removeAttribute('onload');
+            link.setAttribute(CSP_MEDIA_ATTR, beastiesMedia[1]);
+            this.conditionallyInsertCspLoadingScript(document, cspNonce, link);
+          }
 
-    const script = document.createElement('script');
-    script.textContent = LINK_LOAD_SCRIPT_CONTENT;
-    if (nonce) {
-      script.setAttribute('nonce', nonce);
-    }
+          // Ideally we would hook in at the time Beasties inserts the `style` tags, but there isn't
+          // a way of doing that at the moment so we fall back to doing it any time a `link` tag is
+          // inserted. We mitigate it by only iterating the direct children of the `<head>` which
+          // should be pretty shallow.
+          if (cspNonce) {
+            document.head.children.forEach((child) => {
+              if (child.tagName === 'style' && !child.hasAttribute('nonce')) {
+                child.setAttribute('nonce', cspNonce);
+              }
+            });
+          }
+        }
 
-    // Prepend the script to the head since it needs to
-    // run as early as possible, before the `link` tags.
-    document.head.insertBefore(script, link);
-    this.addedCspScriptsDocuments.add(document);
-  }
+        return returnValue;
+      }
+
+      /**
+       * Finds the CSP nonce for a specific document.
+       */
+      private findCspNonce(document: PartialDocument): string | null {
+        if (this.documentNonces.has(document)) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          return this.documentNonces.get(document)!;
+        }
+
+        // HTML attribute are case-insensitive, but the parser used by Beasties is case-sensitive.
+        const nonceElement = document.querySelector('[ngCspNonce], [ngcspnonce]');
+        const cspNonce =
+          nonceElement?.getAttribute('ngCspNonce') ||
+          nonceElement?.getAttribute('ngcspnonce') ||
+          null;
+
+        this.documentNonces.set(document, cspNonce);
+
+        return cspNonce;
+      }
+
+      /**
+       * Inserts the `script` tag that swaps the critical CSS at runtime,
+       * if one hasn't been inserted into the document already.
+       */
+      private conditionallyInsertCspLoadingScript(
+        document: PartialDocument,
+        nonce: string | null,
+        link: PartialHTMLElement,
+      ): void {
+        if (this.addedCspScriptsDocuments.has(document)) {
+          return;
+        }
+
+        const script = document.createElement('script');
+        script.textContent = LINK_LOAD_SCRIPT_CONTENT;
+        if (nonce) {
+          script.setAttribute('nonce', nonce);
+        }
+
+        // Prepend the script to the head since it needs to
+        // run as early as possible, before the `link` tags.
+        document.head.insertBefore(script, link);
+        this.addedCspScriptsDocuments.add(document);
+      }
+    };
+  });
+
+  return beastiesClassPromise;
 }
 
 export class InlineCriticalCssProcessor {
@@ -245,7 +281,8 @@ export class InlineCriticalCssProcessor {
     html: string,
     options: InlineCriticalCssProcessOptions,
   ): Promise<{ content: string; warnings: string[]; errors: string[] }> {
-    const beasties = new BeastiesExtended({ ...this.options, ...options });
+    const BeastiesClass = await getBeastiesClass();
+    const beasties = new BeastiesClass({ ...this.options, ...options });
     const content = await beasties.process(html);
 
     return {
