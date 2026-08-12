@@ -1,3 +1,21 @@
+<a name="20.3.34"></a>
+
+# 20.3.34 (2026-08-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
+| [3962517b9](https://github.com/angular/angular-cli/commit/3962517b95c76016ff7bcb53662704dff18c0552) | fix  | update dependency @modelcontextprotocol/sdk to v1.30.0 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description           |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [f348efe8b](https://github.com/angular/angular-cli/commit/f348efe8b6d9c9d7014afb331eecda0a9478ba0a) | fix  | bump undici to 7.29.0 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0-next.2"></a>
 
 # 22.2.0-next.2 (2026-08-05)
