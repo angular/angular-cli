@@ -274,4 +274,25 @@ describe('I18nInliner', () => {
 
     expect(findFile(outputFiles, 'other.js').text).toBe('export const answer = 42;\n');
   });
+
+  it('inlines nested $localize calls in post-order', async () => {
+    const source =
+      'export const msg = $localize`:@@outer:You selected ${$localize`:@@inner:Apple`} for delivery.`;\n';
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', source),
+    ]).inlineForLocale('fr', {
+      inner: translationFor('Pomme'),
+      outer: {
+        messageParts: ['Vous avez sélectionné ', ' pour la livraison.'],
+        placeholderNames: ['PH'],
+        text: 'Vous avez sélectionné {$PH} pour la livraison.',
+      },
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toBe(
+      'export const msg = `Vous avez sélectionné ${"Pomme"} pour la livraison.`;\n',
+    );
+  });
 });
