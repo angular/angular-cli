@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Metafile } from 'esbuild';
+import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
   ExecutionResult,
@@ -18,6 +19,7 @@ import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
 import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
+import { createProjectResolver } from '../../utils/resolve-project';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { NormalizedApplicationBuildOptions, getLocaleBaseHref } from './options';
 
@@ -48,6 +50,7 @@ export async function inlineI18n(
       outputFiles: executionResult.outputFiles,
       shouldOptimize: optimizationOptions.scripts,
       persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
+      localizeVersion: i18nOptions.localizeVersion,
     },
     maxWorkers,
   );
@@ -72,10 +75,21 @@ export async function inlineI18n(
 
   try {
     for (const locale of i18nOptions.inlineLocales) {
+      const localeDescription = i18nOptions.locales[locale];
+      let translationIntegrity: string | undefined = '';
+      for (const file of localeDescription.files) {
+        if (!file.integrity) {
+          translationIntegrity = undefined;
+          break;
+        }
+        translationIntegrity += (translationIntegrity ? '|' : '') + file.integrity;
+      }
+
       // A locale specific set of files is returned from the inliner.
       const localeInlineResult = await inliner.inlineForLocale(
         locale,
-        i18nOptions.locales[locale].translation,
+        localeDescription.translation,
+        translationIntegrity,
       );
       const localeOutputFiles = localeInlineResult.outputFiles;
       inlineResult.errors.push(...localeInlineResult.errors);
@@ -176,6 +190,15 @@ export async function loadActiveTranslations(
   context: BuilderContext,
   i18n: NormalizedApplicationBuildOptions['i18nOptions'],
 ) {
+  if (!i18n.localizeVersion) {
+    try {
+      const projectResolve = createProjectResolver(context.workspaceRoot);
+      const manifestPath = projectResolve('@angular/localize/package.json');
+      const manifest = JSON.parse(await readFile(manifestPath, 'utf-8')) as { version?: string };
+      i18n.localizeVersion = manifest.version;
+    } catch {}
+  }
+
   // Load locale data and translations (if present)
   let loader;
   for (const [locale, desc] of Object.entries(i18n.locales)) {

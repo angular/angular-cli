@@ -42,6 +42,7 @@ export interface I18nInlinerOptions {
   outputFiles: BuildOutputFile[];
   shouldOptimize?: boolean;
   persistentCachePath?: string;
+  localizeVersion?: string;
 }
 
 /**
@@ -131,11 +132,13 @@ export class I18nInliner {
    * of the localize function keyword.
    * @param locale The string representing the locale to inline.
    * @param translation The translation messages to use when inlining.
+   * @param translationIntegrity An optional integrity value for the translation messages to use for caching.
    * @returns A promise that resolves to an array of OutputFiles representing a translated result.
    */
   async inlineForLocale(
     locale: string,
     translation: Record<string, unknown> | undefined,
+    translationIntegrity?: string,
   ): Promise<{ outputFiles: BuildOutputFile[]; errors: string[]; warnings: string[] }> {
     await this.initCache();
 
@@ -161,7 +164,13 @@ export class I18nInliner {
         // of bytes. Hashing the options directly would re-hash the full set of messages, which
         // can be several megabytes, once for every file.
         fileCacheKeyBase ??= calculateHash(
-          JSON.stringify({ locale, translation, missingTranslation, shouldOptimize }),
+          JSON.stringify({
+            locale,
+            translation: translationIntegrity ?? translation,
+            missingTranslation,
+            shouldOptimize,
+            localizeVersion: this.options.localizeVersion,
+          }),
         );
 
         // NOTE: If additional options are added, this may need to be updated.

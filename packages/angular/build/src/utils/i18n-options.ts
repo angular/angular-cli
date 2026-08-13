@@ -28,6 +28,7 @@ export interface I18nOptions {
   flatOutput?: boolean;
   readonly shouldInline: boolean;
   hasDefinedSourceLocale?: boolean;
+  localizeVersion?: string;
 }
 
 function normalizeTranslationFileOption(
