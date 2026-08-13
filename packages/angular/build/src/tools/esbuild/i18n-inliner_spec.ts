@@ -295,4 +295,16 @@ describe('I18nInliner', () => {
       'export const msg = `Vous avez sélectionné ${"Pomme"} pour la livraison.`;\n',
     );
   });
+
+  it('reports an error diagnostic when a $localize template has a malformed escape sequence', async () => {
+    const source = 'export const msg = $localize`:@@id:\\unicode:`;\n';
+    const { errors } = await createInliner([browserFile('main.js', source)]).inlineForLocale(
+      'fr',
+      {},
+    );
+
+    expect(errors).toEqual([
+      'Malformed escape sequence in $localize template literal in file "main.js".',
+    ]);
+  });
 });
