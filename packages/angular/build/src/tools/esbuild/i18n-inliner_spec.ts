@@ -307,4 +307,37 @@ describe('I18nInliner', () => {
       'Malformed escape sequence in $localize template literal in file "main.js".',
     ]);
   });
+
+  it('inlines the translations of a locale when translationIntegrity is provided', async () => {
+    const { outputFiles, errors, warnings } = await createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+    ]).inlineForLocale('fr', { greeting: translationFor('Bonjour') }, 'sha256-test-integrity');
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(outputFiles, 'main.js').text).not.toContain('$localize');
+  });
+
+  it('inlines the translations of a locale when localizeVersion is configured in options', async () => {
+    inliner = new I18nInliner(
+      {
+        missingTranslation: 'warning',
+        outputFiles: [browserFile('main.js', GREETING_SOURCE)],
+        localizeVersion: '20.2.0',
+      },
+      1,
+    );
+
+    const { outputFiles, errors, warnings } = await inliner.inlineForLocale(
+      'fr',
+      { greeting: translationFor('Bonjour') },
+      'sha256-test-integrity',
+    );
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(outputFiles, 'main.js').text).not.toContain('$localize');
+  });
 });
