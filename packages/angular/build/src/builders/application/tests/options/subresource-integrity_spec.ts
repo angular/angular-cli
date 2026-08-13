@@ -238,5 +238,21 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .withContext('importmap must precede the first module script tag')
         .toBeLessThan(moduleScriptIdx);
     });
+
+    it(`preserves integrity and crossorigin in autoCsp loader when autoCsp is also enabled`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        subresourceIntegrity: true,
+        security: { autoCsp: true },
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const indexHtml = harness.readFile('dist/browser/index.html');
+      expect(indexHtml).toMatch(
+        /const scripts = \[\[(?:'[^']+', 'module', false, false, 'sha384-[^']+', 'anonymous'(?:, )?)+\]\];/,
+      );
+    });
   });
 });

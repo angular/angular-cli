@@ -22,6 +22,8 @@ interface SrcScriptTag {
   type?: string;
   async: boolean;
   defer: boolean;
+  integrity?: string;
+  crossOrigin?: string;
 }
 
 /**
@@ -106,11 +108,14 @@ export async function autoCsp(html: string, unsafeEval = false): Promise<string>
         // If there are any interesting attributes, note them down.
         const scriptType = getScriptAttributeValue(tag, 'type');
         if (shouldDynamicallyLoadScriptTagBasedOnType(scriptType)) {
+          const crossOrigin = getScriptAttributeValue(tag, 'crossorigin');
           scriptContent.push({
             src: src,
             type: scriptType,
             async: getScriptAttributeValue(tag, 'async') !== undefined,
             defer: getScriptAttributeValue(tag, 'defer') !== undefined,
+            integrity: getScriptAttributeValue(tag, 'integrity'),
+            crossOrigin: crossOrigin === '' ? 'anonymous' : crossOrigin,
           });
 
           return; // Skip writing my script tag until we've read it all.
@@ -267,36 +272,50 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
       const srcAttr = encodeURI(s.src).replaceAll("'", "\\'");
       // Can only be 'module' or a JS MIME type or an empty string.
       const typeAttr = s.type ? "'" + s.type + "'" : "''";
-      const asyncAttr = s.async ? 'true' : 'false';
-      const deferAttr = s.defer ? 'true' : 'false';
+      const asyncAttr = !!s.async;
+      const deferAttr = !!s.defer;
+      const integrityAttr = s.integrity ? "'" + s.integrity.replaceAll("'", "\\'") + "'" : null;
+      const crossOriginAttr = s.crossOrigin ? `'${s.crossOrigin.replaceAll("'", "\\'")}'` : null;
 
-      return `['${srcAttr}', ${typeAttr}, ${asyncAttr}, ${deferAttr}]`;
+      return `['${srcAttr}', ${typeAttr}, ${asyncAttr}, ${deferAttr}, ${integrityAttr}, ${crossOriginAttr}]`;
     })
     .join();
 
   return enableTrustedTypes
     ? `
-  var scripts = [${srcListFormatted}];
-  var policy = self.trustedTypes && self.trustedTypes.createPolicy ?
+  const scripts = [${srcListFormatted}];
+  const policy = self.trustedTypes && self.trustedTypes.createPolicy ?
     self.trustedTypes.createPolicy('angular#auto-csp', {createScriptURL: function(u) {
-      return scripts.includes(u) ? u : null;
+      return scripts.some(function(s) { return s[0] === u; }) ? u : null;
     }}) : { createScriptURL: function(u) { return u; } };
   scripts.forEach(function(scriptUrl) {
-    var s = document.createElement('script');
+    const s = document.createElement('script');
     s.src = policy.createScriptURL(scriptUrl[0]);
     s.type = scriptUrl[1];
-    s.async = !!scriptUrl[2];
-    s.defer = !!scriptUrl[3];
+    s.async = scriptUrl[2];
+    s.defer = scriptUrl[3];
+    if (scriptUrl[4]) {
+      s.integrity = scriptUrl[4];
+    }
+    if (scriptUrl[5]) {
+      s.crossOrigin = scriptUrl[5];
+    }
     document.lastElementChild.appendChild(s);
   });\n`
     : `
-  var scripts = [${srcListFormatted}];
+  const scripts = [${srcListFormatted}];
   scripts.forEach(function(scriptUrl) {
-    var s = document.createElement('script');
+    const s = document.createElement('script');
     s.src = scriptUrl[0];
     s.type = scriptUrl[1];
-    s.async = !!scriptUrl[2];
-    s.defer = !!scriptUrl[3];
+    s.async = scriptUrl[2];
+    s.defer = scriptUrl[3];
+    if (scriptUrl[4]) {
+      s.integrity = scriptUrl[4];
+    }
+    if (scriptUrl[5]) {
+      s.crossOrigin = scriptUrl[5];
+    }
     document.lastElementChild.appendChild(s);
   });\n`;
 }
