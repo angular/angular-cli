@@ -20,7 +20,12 @@ import {
 import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
 import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
-import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
+import {
+  AngularCompilation,
+  AngularCompilationResult,
+  DiagnosticModes,
+  EmitFileResult,
+} from './angular-compilation';
 import { collectHmrCandidates } from './hmr-candidates';
 import { printSourceFileWithMap } from './typescript-printer';
 
@@ -59,14 +64,7 @@ export class AotCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{
-    affectedFiles: ReadonlySet<ts.SourceFile>;
-    compilerOptions: ng.CompilerOptions;
-    referencedFiles: readonly string[];
-    externalStylesheets?: ReadonlyMap<string, string>;
-    templateUpdates?: ReadonlyMap<string, string>;
-    componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
-  }> {
+  ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
 
@@ -231,7 +229,6 @@ export class AotCompilation extends AngularCompilation {
     );
 
     return {
-      affectedFiles,
       compilerOptions,
       referencedFiles,
       externalStylesheets: hostOptions.externalStylesheets,
@@ -240,7 +237,7 @@ export class AotCompilation extends AngularCompilation {
     };
   }
 
-  *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
+  protected override *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
     assert(this.#state, 'Angular compilation must be initialized prior to collecting diagnostics.');
     const {
       affectedFiles,
@@ -313,7 +310,7 @@ export class AotCompilation extends AngularCompilation {
     }
   }
 
-  emitAffectedFiles(): Iterable<EmitFileResult> {
+  override emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
     const {
       affectedFiles,

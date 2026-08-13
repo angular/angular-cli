@@ -14,7 +14,12 @@ import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
 import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
-import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
+import {
+  AngularCompilation,
+  AngularCompilationResult,
+  DiagnosticModes,
+  EmitFileResult,
+} from './angular-compilation';
 
 class JitCompilationState {
   constructor(
@@ -37,11 +42,7 @@ export class JitCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{
-    affectedFiles: ReadonlySet<ts.SourceFile>;
-    compilerOptions: ng.CompilerOptions;
-    referencedFiles: readonly string[];
-  }> {
+  ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
     const { constructorParametersDownlevelTransform } =
       await import('@angular/compiler-cli/private/tooling');
@@ -85,10 +86,10 @@ export class JitCompilation extends AngularCompilation {
       .getSourceFiles()
       .map((sourceFile) => sourceFile.fileName);
 
-    return { affectedFiles, compilerOptions, referencedFiles };
+    return { compilerOptions, referencedFiles };
   }
 
-  *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
+  protected override *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
     assert(this.#state, 'Compilation must be initialized prior to collecting diagnostics.');
     const { typeScriptProgram } = this.#state;
 
@@ -110,7 +111,7 @@ export class JitCompilation extends AngularCompilation {
     }
   }
 
-  emitAffectedFiles(): Iterable<EmitFileResult> {
+  override emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Compilation must be initialized prior to emitting files.');
     const {
       compilerHost,

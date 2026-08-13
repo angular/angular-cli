@@ -13,7 +13,11 @@ import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { initializeHash } from '../../../utils/hash';
 import { SourceFileCache } from '../../esbuild/angular/source-file-cache';
 import { getAndClearCumulativeDurations } from '../../esbuild/profiling';
-import type { AngularCompilation, DiagnosticModes } from './angular-compilation';
+import type {
+  AngularCompilation,
+  AngularCompilationResult,
+  DiagnosticModes,
+} from './angular-compilation';
 import { AotCompilation } from './aot-compilation';
 import { JitCompilation } from './jit-compilation';
 
@@ -33,7 +37,7 @@ let compilation: AngularCompilation | undefined;
 
 const sourceFileCache = new SourceFileCache();
 
-export async function initialize(request: InitRequest) {
+export async function initialize(request: InitRequest): Promise<AngularCompilationResult> {
   await initializeHash();
   compilation ??= request.jit
     ? new JitCompilation(request.browserOnlyBuild)

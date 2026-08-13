@@ -19,6 +19,28 @@ export interface EmitFileResult {
   dependencies?: readonly string[];
 }
 
+export interface FileTransformResult {
+  contents: string;
+  watchFiles?: readonly string[];
+}
+
+export interface AngularCompilationOptions {
+  allowJs?: boolean;
+  isolatedModules?: boolean;
+  sourceMap?: boolean;
+  inlineSourceMap?: boolean;
+  _useTypeScriptTranspilation?: boolean;
+  [key: string]: unknown;
+}
+
+export interface AngularCompilationResult {
+  compilerOptions: AngularCompilationOptions;
+  referencedFiles: readonly string[];
+  externalStylesheets?: ReadonlyMap<string, string>;
+  templateUpdates?: ReadonlyMap<string, string>;
+  componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
+}
+
 export enum DiagnosticModes {
   None = 0,
   Option = 1 << 0,
@@ -70,24 +92,25 @@ export abstract class AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{
-    affectedFiles: ReadonlySet<ts.SourceFile>;
-    compilerOptions: ng.CompilerOptions;
-    referencedFiles: readonly string[];
-    externalStylesheets?: ReadonlyMap<string, string>;
-    templateUpdates?: ReadonlyMap<string, string>;
-    componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
-  }>;
+  ): Promise<AngularCompilationResult>;
 
-  abstract emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>>;
+  emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>> {
+    return [];
+  }
 
-  protected abstract collectDiagnostics(
+  transformFile?(filename: string, content: string): Promise<FileTransformResult | null>;
+
+  protected collectDiagnostics?(
     modes: DiagnosticModes,
   ): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
 
   async diagnoseFiles(
     modes = DiagnosticModes.All,
   ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
+    if (!this.collectDiagnostics) {
+      return {};
+    }
+
     const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
 
     // Avoid loading typescript until actually needed.
@@ -95,7 +118,12 @@ export abstract class AngularCompilation {
     const typescript = await AngularCompilation.loadTypescript();
 
     await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
-      for (const diagnostic of await this.collectDiagnostics(modes)) {
+      const diagnostics = await this.collectDiagnostics?.(modes);
+      if (!diagnostics) {
+        return;
+      }
+
+      for (const diagnostic of diagnostics) {
         const message = convertTypeScriptDiagnostic(typescript, diagnostic);
         if (diagnostic.category === typescript.DiagnosticCategory.Error) {
           (result.errors ??= []).push(message);

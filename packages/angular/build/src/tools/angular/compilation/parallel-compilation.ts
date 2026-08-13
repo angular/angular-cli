@@ -10,11 +10,15 @@ import type { CompilerOptions } from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
-import type { SourceFile } from 'typescript';
 import { WorkerPool } from '../../../utils/worker-pool';
 import { mergeCumulativeDurations } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
-import { AngularCompilation, DiagnosticModes, EmitFileResult } from './angular-compilation';
+import {
+  AngularCompilation,
+  AngularCompilationResult,
+  DiagnosticModes,
+  EmitFileResult,
+} from './angular-compilation';
 
 /**
  * An Angular compilation which uses a Node.js Worker thread to load and execute
@@ -47,12 +51,7 @@ export class ParallelCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: CompilerOptions) => CompilerOptions,
-  ): Promise<{
-    affectedFiles: ReadonlySet<SourceFile>;
-    compilerOptions: CompilerOptions;
-    referencedFiles: readonly string[];
-    externalStylesheets?: ReadonlyMap<string, string>;
-  }> {
+  ): Promise<AngularCompilationResult> {
     const stylesheetChannel = new MessageChannel();
     // The request identifier is required because Angular can issue multiple concurrent requests
     stylesheetChannel.port1.on(
