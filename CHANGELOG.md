@@ -1,3 +1,48 @@
+<a name="22.1.4"></a>
+
+# 22.1.4 (2026-08-13)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                                                                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [67a29899b](https://github.com/angular/angular-cli/commit/67a29899b07f760bac9582cbc6175966cce1c5d2) | fix  | disable searching current directory for bare executable names on Windows                                                              |
+| [1b0ba5c17](https://github.com/angular/angular-cli/commit/1b0ba5c17f0be2679b31bad1bee8b435315dac1a) | fix  | serialize configuration as a single argv token in run_target strategies ([#33657](https://github.com/angular/angular-cli/pull/33657)) |
+| [9440432d2](https://github.com/angular/angular-cli/commit/9440432d273c044965508d80e808c2fe123af0aa) | perf | avoid eager module loading during global bootstrap                                                                                    |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                             |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
+| [d4a48e3ab](https://github.com/angular/angular-cli/commit/d4a48e3abe320e090eefe17cb70abdf8e7eafaed) | fix  | generate CLAUDE.md for Claude Code instead of AGENTS.md |
+| [d451f15b2](https://github.com/angular/angular-cli/commit/d451f15b2838a8282363dcb30161dd5dc858750f) | fix  | import UrlSegment instead of subPath in guard generator |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [46fcb29d6](https://github.com/angular/angular-cli/commit/46fcb29d6c1ded962de95449d63716c13950f59a) | fix  | count statically imported chunks in the initial total             |
+| [796b57684](https://github.com/angular/angular-cli/commit/796b576843191a4d5c74e4f9363ec0e46ae3a881) | fix  | normalize setupFiles paths to POSIX for vitest runner             |
+| [c805e5cfb](https://github.com/angular/angular-cli/commit/c805e5cfb308d02a1944ef446d0a01af8a7ec6d2) | fix  | prevent syntax corruption for Crockford-style enum IIFE           |
+| [cc6c17716](https://github.com/angular/angular-cli/commit/cc6c17716df5c411efca5e6f4c960f0565f45d90) | fix  | prevent syntax corruption in oxc transform                        |
+| [a142f6f83](https://github.com/angular/angular-cli/commit/a142f6f83d2f501b64f2404909ef9325bbfa70fb) | fix  | return direct file contents for non-Angular TypeScript files      |
+| [956c6578d](https://github.com/angular/angular-cli/commit/956c6578d31d8482c04dc45723d7ab3b4fe355a5) | fix  | return only lowest version per target engine                      |
+| [689b5b116](https://github.com/angular/angular-cli/commit/689b5b116717140da98494e61ac5ea5ad7b68d73) | fix  | set target for Rolldown dependency prebundling in Vite dev server |
+| [70461f6ed](https://github.com/angular/angular-cli/commit/70461f6ed2e30aeaad2b93400ad00d9274665967) | perf | avoid encoding the inline source map before remapping             |
+| [22cce7563](https://github.com/angular/angular-cli/commit/22cce7563e82f17373b69e590d3e445767bd9264) | perf | batch last_accessed updates in sqlite cache store                 |
+| [ab2ed18d5](https://github.com/angular/angular-cli/commit/ab2ed18d5739e8565403062ca74aa2d5cb3b95ec) | perf | hash the i18n inline cache key options once per locale            |
+| [34516ff73](https://github.com/angular/angular-cli/commit/34516ff736185e20ef8239b1fed8eda1f0193f62) | perf | optimize template string size calculation in server manifest      |
+| [712971c37](https://github.com/angular/angular-cli/commit/712971c370738beaebff18f6995859b1713ed8ae) | perf | share i18n translations with the inliner workers by reference     |
+| [78f8c5fef](https://github.com/angular/angular-cli/commit/78f8c5fef44dc6ff466b17c98fa1d01222cb1781) | perf | use Map for chunk asset size lookups in budget calculator         |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [2331c1047](https://github.com/angular/angular-cli/commit/2331c10476830e7a53e0f2fa4a2f37dad58e2d5d) | fix  | destroy platform when response stream is cancelled |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.3"></a>
 
 # 22.1.3 (2026-08-05)
