@@ -7,33 +7,28 @@
  */
 
 import type * as ng from '@angular/compiler-cli';
-import type ts from 'typescript';
 import { AngularHostOptions } from '../angular-host';
-import { AngularCompilation } from './angular-compilation';
+import { AngularCompilation, AngularCompilationResult } from './angular-compilation';
 
 export class NoopCompilation extends AngularCompilation {
   async initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
-  ): Promise<{
-    affectedFiles: ReadonlySet<ts.SourceFile>;
-    compilerOptions: ng.CompilerOptions;
-    referencedFiles: readonly string[];
-  }> {
+  ): Promise<AngularCompilationResult> {
     // Load the compiler configuration and transform as needed
     const { options: originalCompilerOptions } = await this.loadConfiguration(tsconfig);
     const compilerOptions =
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
-    return { affectedFiles: new Set(), compilerOptions, referencedFiles: [] };
+    return { compilerOptions, referencedFiles: [] };
   }
 
-  collectDiagnostics(): never {
+  protected override collectDiagnostics(): never {
     throw new Error('Not available when using noop compilation.');
   }
 
-  emitAffectedFiles(): never {
+  override emitAffectedFiles(): never {
     throw new Error('Not available when using noop compilation.');
   }
 }

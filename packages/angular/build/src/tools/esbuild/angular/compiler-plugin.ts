@@ -362,24 +362,26 @@ export function createCompilerPlugin(
           }
         }
 
-        // Update TypeScript file output cache for all affected files
-        try {
-          await profileAsync('NG_EMIT_TS', async () => {
-            for (const { filename, contents } of await compilation.emitAffectedFiles()) {
-              typeScriptFileCache.set(path.normalize(filename), contents);
-            }
-          });
-        } catch (error) {
-          (result.errors ??= []).push({
-            text: 'Angular compilation emit failed.',
-            location: null,
-            notes: [
-              {
-                text: error instanceof Error ? (error.stack ?? error.message) : `${error}`,
-                location: null,
-              },
-            ],
-          });
+        // Update TypeScript file output cache for all affected files if not using on-demand transforms
+        if (!compilation.transformFile) {
+          try {
+            await profileAsync('NG_EMIT_TS', async () => {
+              for (const { filename, contents } of await compilation.emitAffectedFiles()) {
+                typeScriptFileCache.set(path.normalize(filename), contents);
+              }
+            });
+          } catch (error) {
+            (result.errors ??= []).push({
+              text: 'Angular compilation emit failed.',
+              location: null,
+              notes: [
+                {
+                  text: error instanceof Error ? (error.stack ?? error.message) : `${error}`,
+                  location: null,
+                },
+              ],
+            });
+          }
         }
 
         const diagnostics = await compilation.diagnoseFiles(
@@ -434,6 +436,35 @@ export function createCompilerPlugin(
         // cache is later stored to disk, then the options that affect transform output
         // would need to be added to the key as well as a check for any change of content.
         let contents = typeScriptFileCache.get(request);
+        let directContents: string | undefined;
+
+        if (contents === undefined && compilation.transformFile) {
+          try {
+            directContents = await readFile(request, 'utf-8');
+            const transformResult = await compilation.transformFile(request, directContents);
+            if (transformResult) {
+              contents = transformResult.contents;
+              if (transformResult.watchFiles) {
+                referencedFileTracker.add(request, transformResult.watchFiles);
+              }
+            }
+          } catch (error) {
+            return {
+              errors: [
+                {
+                  text: 'Angular compilation transform failed.',
+                  location: { file: request },
+                  notes: [
+                    {
+                      text: error instanceof Error ? (error.stack ?? error.message) : `${error}`,
+                      location: null,
+                    },
+                  ],
+                },
+              ],
+            };
+          }
+        }
 
         if (contents === undefined) {
           // If the Angular compilation had errors the file may not have been emitted.
@@ -452,7 +483,7 @@ export function createCompilerPlugin(
 
           // Evaluate whether the file requires the Angular compiler transpilation.
           // If not, issue a warning but allow bundler to process the file (no type-checking).
-          const directContents = await readFile(request, 'utf-8');
+          directContents ??= await readFile(request, 'utf-8');
           if (!requiresAngularCompiler(directContents)) {
             return {
               warnings: [createMissingFileDiagnostic(request, args.path, diangosticRoot, false)],
