@@ -187,7 +187,6 @@ export function createCompilerPlugin(
         const hostOptions: AngularHostOptions = {
           fileReplacements: pluginOptions.fileReplacements,
           modifiedFiles,
-          sourceFileCache: pluginOptions.sourceFileCache,
           async transformStylesheet(data, containingFile, stylesheetFile, order, className) {
             let stylesheetResult;
             let resultSource = stylesheetFile ?? containingFile;
