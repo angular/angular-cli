@@ -11,7 +11,6 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { initializeHash } from '../../../utils/hash';
-import { SourceFileCache } from '../../esbuild/angular/source-file-cache';
 import { getAndClearCumulativeDurations } from '../../esbuild/profiling';
 import type {
   AngularCompilation,
@@ -35,9 +34,12 @@ export interface InitRequest {
 
 let compilation: AngularCompilation | undefined;
 
-const sourceFileCache = new SourceFileCache();
+const modifiedFiles = new Set<string>();
 
 export async function initialize(request: InitRequest): Promise<AngularCompilationResult> {
+  const currentModifiedFiles = new Set(modifiedFiles);
+  modifiedFiles.clear();
+
   await initializeHash();
   compilation ??= request.jit
     ? new JitCompilation(request.browserOnlyBuild)
@@ -62,8 +64,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
     request.tsconfig,
     {
       fileReplacements: request.fileReplacements,
-      sourceFileCache,
-      modifiedFiles: sourceFileCache.modifiedFiles,
+      modifiedFiles: currentModifiedFiles,
       transformStylesheet(data, containingFile, stylesheetFile, order, className) {
         const requestId = randomUUID();
         const resultPromise = new Promise<string>((resolve, reject) =>
@@ -151,6 +152,9 @@ export async function emit() {
   return [...files];
 }
 
-export function update(files: Set<string>): void {
-  sourceFileCache.invalidate(files);
+export async function update(files: Set<string>): Promise<void> {
+  for (const file of files) {
+    modifiedFiles.add(file);
+  }
+  await compilation?.update?.(files);
 }

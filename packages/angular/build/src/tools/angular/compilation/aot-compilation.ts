@@ -11,6 +11,7 @@ import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
 import { useTypeChecking } from '../../../utils/environment-options';
+import { toPosixPath } from '../../../utils/path';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import {
   AngularHostOptions,
@@ -55,6 +56,7 @@ class AngularCompilationState {
 
 export class AotCompilation extends AngularCompilation {
   #state?: AngularCompilationState;
+  readonly #sourceFiles = new Map<string, ts.SourceFile>();
 
   constructor(private readonly browserOnlyBuild: boolean) {
     super();
@@ -97,27 +99,37 @@ export class AotCompilation extends AngularCompilation {
 
     let staleSourceFiles;
     let clearPackageJsonCache = false;
-    if (hostOptions.modifiedFiles && this.#state) {
+    if (hostOptions.modifiedFiles) {
       for (const modifiedFile of hostOptions.modifiedFiles) {
-        // Clear package.json cache if a node modules file was modified
-        if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
-          clearPackageJsonCache = true;
-          packageJsonCache?.clear();
-        }
+        this.#sourceFiles.delete(toPosixPath(modifiedFile));
 
-        // Collect stale source files for HMR analysis of inline component resources
-        if (useHmr) {
-          const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
-          if (sourceFile) {
-            staleSourceFiles ??= new Map<string, ts.SourceFile>();
-            staleSourceFiles.set(modifiedFile, sourceFile);
+        if (this.#state) {
+          // Clear package.json cache if a node modules file was modified
+          if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
+            clearPackageJsonCache = true;
+            packageJsonCache?.clear();
+          }
+
+          // Collect stale source files for HMR analysis of inline component resources
+          if (useHmr) {
+            const sourceFile = this.#state.typeScriptProgram.getSourceFile(modifiedFile);
+            if (sourceFile) {
+              staleSourceFiles ??= new Map<string, ts.SourceFile>();
+              staleSourceFiles.set(modifiedFile, sourceFile);
+            }
           }
         }
       }
     }
 
     // Create Angular compiler host
-    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions, packageJsonCache);
+    const host = createAngularCompilerHost(
+      ts,
+      compilerOptions,
+      hostOptions,
+      packageJsonCache,
+      this.#sourceFiles,
+    );
 
     // Create the Angular specific program that contains the Angular compiler
     const angularProgram = profileSync(
@@ -450,6 +462,12 @@ export class AotCompilation extends AngularCompilation {
     }
 
     return emittedFiles.values();
+  }
+
+  override async update(files: Set<string>): Promise<void> {
+    for (const file of files) {
+      this.#sourceFiles.delete(toPosixPath(file));
+    }
   }
 }
 

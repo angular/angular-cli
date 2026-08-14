@@ -9,6 +9,7 @@
 import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
+import { toPosixPath } from '../../../utils/path';
 import { profileSync } from '../../esbuild/profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
@@ -33,6 +34,7 @@ class JitCompilationState {
 
 export class JitCompilation extends AngularCompilation {
   #state?: JitCompilationState;
+  readonly #sourceFiles = new Map<string, ts.SourceFile>();
 
   constructor(private readonly browserOnlyBuild: boolean) {
     super();
@@ -56,8 +58,20 @@ export class JitCompilation extends AngularCompilation {
     const compilerOptions =
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
+    if (hostOptions.modifiedFiles) {
+      for (const modifiedFile of hostOptions.modifiedFiles) {
+        this.#sourceFiles.delete(toPosixPath(modifiedFile));
+      }
+    }
+
     // Create Angular compiler host
-    const host = createAngularCompilerHost(ts, compilerOptions, hostOptions, undefined);
+    const host = createAngularCompilerHost(
+      ts,
+      compilerOptions,
+      hostOptions,
+      undefined,
+      this.#sourceFiles,
+    );
 
     // Create the TypeScript Program
     const typeScriptProgram = profileSync('TS_CREATE_PROGRAM', () =>
@@ -68,10 +82,6 @@ export class JitCompilation extends AngularCompilation {
         this.#state?.typeScriptProgram ?? ts.readBuilderProgram(compilerOptions, host),
         configurationDiagnostics,
       ),
-    );
-
-    const affectedFiles = profileSync('TS_FIND_AFFECTED', () =>
-      findAffectedFiles(typeScriptProgram),
     );
 
     this.#state = new JitCompilationState(
@@ -157,17 +167,10 @@ export class JitCompilation extends AngularCompilation {
 
     return emittedFiles;
   }
-}
 
-function findAffectedFiles(
-  builder: ts.EmitAndSemanticDiagnosticsBuilderProgram,
-): Set<ts.SourceFile> {
-  const affectedFiles = new Set<ts.SourceFile>();
-
-  let result;
-  while ((result = builder.getSemanticDiagnosticsOfNextAffectedFile())) {
-    affectedFiles.add(result.affected as ts.SourceFile);
+  override async update(files: Set<string>): Promise<void> {
+    for (const file of files) {
+      this.#sourceFiles.delete(toPosixPath(file));
+    }
   }
-
-  return affectedFiles;
 }

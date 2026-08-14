@@ -6,32 +6,24 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { platform } from 'node:os';
 import * as path from 'node:path';
-import type ts from 'typescript';
 import { MemoryLoadResultCache } from '../load-result-cache';
 
-const USING_WINDOWS = platform() === 'win32';
-const WINDOWS_SEP_REGEXP = new RegExp(`\\${path.win32.sep}`, 'g');
-
-export class SourceFileCache extends Map<string, ts.SourceFile> {
+export class SourceFileCache {
   readonly modifiedFiles = new Set<string>();
   readonly typeScriptFileCache = new Map<string, string | Uint8Array>();
   readonly loadResultCache = new MemoryLoadResultCache();
 
   referencedFiles?: readonly string[];
 
-  constructor(readonly persistentCachePath?: string) {
-    super();
-  }
+  constructor(readonly persistentCachePath?: string) {}
 
   /**
    * Releases all cached content. The cached data is only needed for incremental
    * rebuilds and can include the emitted contents of every TypeScript file in the
    * program. The cache is repopulated if a build is performed after this is called.
    */
-  override clear(): void {
-    super.clear();
+  clear(): void {
     this.modifiedFiles.clear();
     this.typeScriptFileCache.clear();
     this.loadResultCache.clear();
@@ -50,13 +42,6 @@ export class SourceFileCache extends Map<string, ts.SourceFile> {
       file = path.normalize(file);
       invalid = this.loadResultCache.invalidate(file) || invalid;
       invalid = extraWatchFiles.has(file) || invalid;
-
-      // Normalize separators to allow matching TypeScript Host paths
-      if (USING_WINDOWS) {
-        file = file.replace(WINDOWS_SEP_REGEXP, path.posix.sep);
-      }
-
-      invalid = this.delete(file) || invalid;
       this.modifiedFiles.add(file);
     }
 

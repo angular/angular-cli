@@ -17,7 +17,6 @@ export type AngularCompilerHost = ng.CompilerHost;
 
 export interface AngularHostOptions {
   fileReplacements?: Record<string, string>;
-  sourceFileCache?: Map<string, ts.SourceFile>;
   modifiedFiles?: Set<string>;
   externalStylesheets?: Map<string, string>;
   transformStylesheet(
@@ -165,6 +164,7 @@ export function createAngularCompilerHost(
   compilerOptions: AngularCompilerOptions,
   hostOptions: AngularHostOptions,
   packageJsonCache: ts.PackageJsonInfoCache | undefined,
+  sourceFileCache?: Map<string, ts.SourceFile>,
 ): AngularCompilerHost {
   // Create TypeScript compiler host
   const host: AngularCompilerHost = typescript.createIncrementalCompilerHost(compilerOptions);
@@ -254,8 +254,8 @@ export function createAngularCompilerHost(
   }
 
   // Augment TypeScript Host with source file caching if provided
-  if (hostOptions.sourceFileCache) {
-    augmentHostWithCaching(host, hostOptions.sourceFileCache);
+  if (sourceFileCache) {
+    augmentHostWithCaching(host, sourceFileCache);
   }
 
   return host;
