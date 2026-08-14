@@ -78,7 +78,7 @@ describe('auto-csp', () => {
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     // Our loader script appears after the HTML text content.
     expect(result).toMatch(
-      /Some text<\/div>\s*<script>\s*const scripts = \[\['.\/main.js', '', false, false, null, null\]\];/,
+      /Some text<\/div>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\]\];/,
     );
   });
 
@@ -166,12 +166,12 @@ describe('auto-csp', () => {
     // Loader script for main.js and main2.js appear after 'foo' and before 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('foo'\);<\/script>\s*<script>\s*const scripts = \[\['.\/main.js', '', false, false, null, null\],\['.\/main2.js', '', false, false, null, null\]\];[\s\S]*console.log\('bar'\);/,
+      /console.log\('foo'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\],\['.\/main2.js', '', false, false, null, null\]\];[\s\S]*console.log\('bar'\);/,
     );
     // Loader script for main3.js and main4.js appear after 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('bar'\);<\/script>\s*<script>\s*const scripts = \[\['.\/main3.js', '', false, false, null, null\],\['.\/main4.js', '', false, false, null, null\]\];/,
+      /console.log\('bar'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main3.js', '', false, false, null, null\],\['.\/main4.js', '', false, false, null, null\]\];/,
     );
     // Exactly 4 scripts should be left.
     expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(4);
@@ -238,7 +238,7 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', 'module', false, false, 'sha384-xyz123', 'anonymous']];`,
+      `const scripts = [['./main.js', 'module', false, false, "sha384-xyz123", "anonymous"]];`,
     );
   });
 
@@ -258,7 +258,7 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', '', false, false, 'sha384-xyz123', null]];`,
+      `const scripts = [['./main.js', '', false, false, "sha384-xyz123", null]];`,
     );
   });
 
@@ -278,7 +278,7 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', '', false, false, null, 'anonymous']];`,
+      `const scripts = [['./main.js', '', false, false, null, "anonymous"]];`,
     );
   });
 });

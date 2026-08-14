@@ -274,15 +274,15 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
       const typeAttr = s.type ? "'" + s.type + "'" : "''";
       const asyncAttr = !!s.async;
       const deferAttr = !!s.defer;
-      const integrityAttr = s.integrity ? "'" + s.integrity.replaceAll("'", "\\'") + "'" : null;
-      const crossOriginAttr = s.crossOrigin ? `'${s.crossOrigin.replaceAll("'", "\\'")}'` : null;
+      const integrityAttr = JSON.stringify(s.integrity ?? null).replaceAll('<', '\\u003c');
+      const crossOriginAttr = JSON.stringify(s.crossOrigin ?? null).replaceAll('<', '\\u003c');
 
       return `['${srcAttr}', ${typeAttr}, ${asyncAttr}, ${deferAttr}, ${integrityAttr}, ${crossOriginAttr}]`;
     })
     .join();
 
   return enableTrustedTypes
-    ? `
+    ? `(() => {
   const scripts = [${srcListFormatted}];
   const policy = self.trustedTypes && self.trustedTypes.createPolicy ?
     self.trustedTypes.createPolicy('angular#auto-csp', {createScriptURL: function(u) {
@@ -301,8 +301,9 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
       s.crossOrigin = scriptUrl[5];
     }
     document.lastElementChild.appendChild(s);
-  });\n`
-    : `
+  });
+})();\n`
+    : `(() => {
   const scripts = [${srcListFormatted}];
   scripts.forEach(function(scriptUrl) {
     const s = document.createElement('script');
@@ -317,5 +318,6 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
       s.crossOrigin = scriptUrl[5];
     }
     document.lastElementChild.appendChild(s);
-  });\n`;
+  });
+})();\n`;
 }

@@ -251,7 +251,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const indexHtml = harness.readFile('dist/browser/index.html');
       expect(indexHtml).toMatch(
-        /const scripts = \[\[(?:'[^']+', 'module', false, false, 'sha384-[^']+', 'anonymous'(?:, )?)+\]\];/,
+        /const scripts = \[\[(?:'[^']+', 'module', false, false, "sha384-[^"]+", "anonymous"(?:, )?)+\]\];/,
       );
     });
   });
