@@ -58,7 +58,7 @@ describe('auto-csp', () => {
     const csps = getCsps(result);
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
-    expect(result).toContain(`var scripts = [['./main.js', '', false, false]];`);
+    expect(result).toContain(`const scripts = [['./main.js', '', false, false, null, null]];`);
   });
 
   it('should rewrite a single source script in place', async () => {
@@ -78,7 +78,7 @@ describe('auto-csp', () => {
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     // Our loader script appears after the HTML text content.
     expect(result).toMatch(
-      /Some text<\/div>\s*<script>\s*var scripts = \[\['.\/main.js', '', false, false\]\];/,
+      /Some text<\/div>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\]\];/,
     );
   });
 
@@ -103,7 +103,7 @@ describe('auto-csp', () => {
     expect(csps[0]).toMatch(CSP_TWO_HASHES_REGEX);
     expect(result).toContain(
       // eslint-disable-next-line max-len
-      `var scripts = [['./main1.js', '', false, false],['./main2.js', '', true, false],['./main3.js', 'module', true, true]];`,
+      `const scripts = [['./main1.js', '', false, false, null, null],['./main2.js', '', true, false, null, null],['./main3.js', 'module', true, true, null, null]];`,
     );
     // Head loader script is in the head.
     expect(result).toContain(`</script></head>`);
@@ -166,12 +166,12 @@ describe('auto-csp', () => {
     // Loader script for main.js and main2.js appear after 'foo' and before 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('foo'\);<\/script>\s*<script>\s*var scripts = \[\['.\/main.js', '', false, false\],\['.\/main2.js', '', false, false\]\];[\s\S]*console.log\('bar'\);/,
+      /console.log\('foo'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\],\['.\/main2.js', '', false, false, null, null\]\];[\s\S]*console.log\('bar'\);/,
     );
     // Loader script for main3.js and main4.js appear after 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('bar'\);<\/script>\s*<script>\s*var scripts = \[\['.\/main3.js', '', false, false\],\['.\/main4.js', '', false, false\]\];/,
+      /console.log\('bar'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main3.js', '', false, false, null, null\],\['.\/main4.js', '', false, false, null, null\]\];/,
     );
     // Exactly 4 scripts should be left.
     expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(4);
@@ -220,5 +220,65 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(csps[0]).toContain(hashTextContent(`\r\nconsole.log('foo');\r\n`));
+  });
+
+  it('should preserve integrity and crossorigin attributes in loader script', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script src="./main.js" type="module" crossorigin="anonymous" integrity="sha384-xyz123"></script>
+          <div>Some text </div>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', 'module', false, false, "sha384-xyz123", "anonymous"]];`,
+    );
+  });
+
+  it('should preserve only integrity attribute when crossorigin is omitted', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script src="./main.js" integrity="sha384-xyz123"></script>
+          <div>Some text </div>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', '', false, false, "sha384-xyz123", null]];`,
+    );
+  });
+
+  it('should map empty crossorigin attribute to anonymous', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script src="./main.js" crossorigin></script>
+          <div>Some text </div>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', '', false, false, null, "anonymous"]];`,
+    );
   });
 });
