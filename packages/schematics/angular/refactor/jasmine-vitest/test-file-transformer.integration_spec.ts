@@ -392,14 +392,14 @@ describe('Jasmine to Vitest Transformer - Integration Tests', () => {
 
         it('should handle fail()', () => {
           if (true) {
-            throw new Error('This should not have happened');
+            expect.fail('This should not have happened');
           }
         });
 
         it('should handle fail() with a specific error', () => {
           try {
             expect(1).toBe(2);
-            throw new Error('Expected test to fail');
+            expect.fail('Expected test to fail');
           } catch (err) {
             expect(err.message).toBe('1 !== 2');
           }

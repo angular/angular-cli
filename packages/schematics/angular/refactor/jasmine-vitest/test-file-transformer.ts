@@ -144,6 +144,7 @@ const callExpressionTransformers = [
 
   // **Stage 3: Global Functions & Cleanup**
   // These handle global Jasmine functions and catch-alls for unsupported APIs.
+  transformFail,
   transformTimerMocks,
   transformUnsupportedGlobalFunctions,
   transformUnsupportedJasmineCalls,
@@ -168,7 +169,6 @@ const expressionStatementTransformers = [
   transformCalledOnceWith,
   transformArrayWithExactContents,
   transformExpectNothing,
-  transformFail,
   transformJasmineMembers,
 ];
 
@@ -227,18 +227,16 @@ export function transformJasmineToVitest(
         }
 
         for (const transformer of callExpressionTransformers) {
-          if (
-            !(
-              (options.browserMode && transformer === transformToHaveClass) ||
-              (options.fakeAsync === false &&
-                [
-                  transformFakeAsyncFlush,
-                  transformFakeAsyncFlushMicrotasks,
-                  transformFakeAsyncTick,
-                  transformFakeAsyncTest,
-                ].includes(transformer))
-            )
-          ) {
+          if (!(
+            (options.browserMode && transformer === transformToHaveClass) ||
+            (options.fakeAsync === false &&
+              [
+                transformFakeAsyncFlush,
+                transformFakeAsyncFlushMicrotasks,
+                transformFakeAsyncTick,
+                transformFakeAsyncTest,
+              ].includes(transformer))
+          )) {
             transformedNode = transformer(transformedNode, refactorCtx);
           }
         }
