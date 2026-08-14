@@ -65,18 +65,52 @@ interface InlineCodeRequest {
 }
 
 // Extract the application files and common options used for inline requests from the Worker context
-const { files, missingTranslation, shouldOptimize } = (workerData || {}) as {
+const { files, missingTranslation } = (workerData || {}) as {
   files: ReadonlyMap<string, Blob>;
   missingTranslation: 'error' | 'warning' | 'ignore';
-  shouldOptimize: boolean;
 };
 
 /**
- * The translation messages deserialized for the locale most recently requested of this Worker.
- * Locales are inlined one at a time, so retaining only the active locale is enough to avoid
- * deserializing the messages once per file while holding at most one set of messages in memory.
+ * Cached file data including code and extracted localization metadata.
  */
-let activeTranslation: { locale: string; messages: Promise<Record<string, unknown>> } | undefined;
+interface CachedFileData {
+  code: string;
+  metadata: FileLocalizeMetadata;
+}
+
+/**
+ * Cache of file data promises keyed by filename.
+ */
+const fileDataCache = new Map<string, Promise<CachedFileData>>();
+
+/**
+ * Cache of deserialized translation messages keyed by locale.
+ */
+const deserializedTranslations = new Map<string, Promise<Record<string, unknown>>>();
+
+/**
+ * Retrieves the cached file data for a filename, loading and extracting it on the first request.
+ *
+ * @param filename The name of the file to load.
+ * @returns The cached code and localization metadata.
+ */
+function getFileData(filename: string): Promise<CachedFileData> {
+  let fileDataPromise = fileDataCache.get(filename);
+  if (!fileDataPromise) {
+    fileDataPromise = (async () => {
+      const data = files.get(filename);
+      assert(data !== undefined, `Invalid inline request for file '${filename}'.`);
+
+      const code = await data.text();
+      const metadata = extractLocalizeMetadata(filename, code);
+
+      return { code, metadata };
+    })();
+    fileDataCache.set(filename, fileDataPromise);
+  }
+
+  return fileDataPromise;
+}
 
 /**
  * Deserializes the translation messages for an inline request, reusing the result for any
@@ -92,18 +126,15 @@ function loadTranslation(
     return undefined;
   }
 
-  if (activeTranslation?.locale !== locale) {
-    activeTranslation = {
-      locale,
-      // Deserializing within the stored promise ensures that concurrent requests for a locale
-      // share the one deserialization instead of each performing their own.
-      messages: translation
-        .arrayBuffer()
-        .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>),
-    };
+  let messagesPromise = deserializedTranslations.get(locale);
+  if (!messagesPromise) {
+    messagesPromise = translation
+      .arrayBuffer()
+      .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>);
+    deserializedTranslations.set(locale, messagesPromise);
   }
 
-  return activeTranslation.messages;
+  return messagesPromise;
 }
 
 /**
@@ -114,17 +145,22 @@ function loadTranslation(
  * @returns An object containing the inlined file and optional map content.
  */
 export default async function inlineFile(request: InlineFileRequest) {
-  const data = files.get(request.filename);
+  const { code, metadata } = await getFileData(request.filename);
 
-  assert(data !== undefined, `Invalid inline request for file '${request.filename}'.`);
+  // Sourcemaps are parsed on demand per request rather than cached long-term to prevent
+  // monotonic memory growth as a worker processes multiple files across the build.
+  // When multi-locale batching is implemented, the sourcemap can be parsed once per batch and released
+  // upon batch completion.
+  const rawMap = await files.get(request.filename + '.map')?.text();
+  const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
 
-  const code = await data.text();
-  const map = await files.get(request.filename + '.map')?.text();
-  const result = await transformWithOxc(
+  const result = await inlineLocalize(
     code,
-    map && (JSON.parse(map) as SourceMapInput),
-    request,
+    map,
+    metadata,
+    request.locale,
     await loadTranslation(request),
+    request.filename,
   );
 
   return {
@@ -143,11 +179,14 @@ export default async function inlineFile(request: InlineFileRequest) {
  * @returns An object containing the inlined code.
  */
 export async function inlineCode(request: InlineCodeRequest) {
-  const result = await transformWithOxc(
+  const metadata = extractLocalizeMetadata(request.filename, request.code);
+  const result = await inlineLocalize(
     request.code,
     undefined,
-    request,
+    metadata,
+    request.locale,
     await loadTranslation(request),
+    request.filename,
   );
 
   return {
@@ -401,23 +440,4 @@ async function inlineLocalize(
     map: outputMap && JSON.stringify(outputMap),
     diagnostics,
   };
-}
-
-/**
- * Transforms a JavaScript file using OXC and Magic-String to inline the request locale and translation.
- * @param code A string containing the JavaScript code to transform.
- * @param map A sourcemap object for the provided JavaScript code.
- * @param options The inline request options to use.
- * @param translation The translation messages to inline, or undefined for an untranslated locale.
- * @returns An object containing the code, map, and diagnostics from the transformation.
- */
-async function transformWithOxc(
-  code: string,
-  map: SourceMapInput | undefined,
-  options: InlineFileRequest | InlineCodeRequest,
-  translation: Record<string, unknown> | undefined,
-) {
-  const metadata = extractLocalizeMetadata(options.filename, code);
-
-  return inlineLocalize(code, map, metadata, options.locale, translation, options.filename);
 }
