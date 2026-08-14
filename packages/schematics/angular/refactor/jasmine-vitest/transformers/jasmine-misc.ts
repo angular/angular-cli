@@ -90,29 +90,53 @@ export function transformTimerMocks(node: ts.Node, ctx: RefactorContext): ts.Nod
   return node;
 }
 
-export function transformFail(node: ts.Node, { sourceFile, reporter }: RefactorContext): ts.Node {
+export function transformFail(
+  node: ts.Node,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
+): ts.Node {
   if (
-    ts.isExpressionStatement(node) &&
-    ts.isCallExpression(node.expression) &&
-    ts.isIdentifier(node.expression.expression) &&
-    node.expression.expression.text === 'fail'
+    ts.isCallExpression(node) &&
+    ts.isIdentifier(node.expression) &&
+    node.expression.text === 'fail'
   ) {
-    reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `throw new Error()`.');
+    addVitestValueImport(pendingVitestValueImports, 'expect');
+    reporter.reportTransformation(sourceFile, node, 'Transformed `fail()` to `expect.fail()`.');
 
-    const arg = node.expression.arguments[0];
-    let throwExpression: ts.Expression;
+    const arg = node.arguments[0];
+    let replacementArg: ts.Expression | undefined = arg;
+    let hasNonStringArg = false;
 
-    if (arg && ts.isNewExpression(arg)) {
-      throwExpression = arg;
-    } else {
-      throwExpression = ts.factory.createNewExpression(
-        ts.factory.createIdentifier('Error'),
-        undefined,
-        arg ? [arg] : [],
-      );
+    if (arg) {
+      if (ts.isNewExpression(arg)) {
+        replacementArg = arg.arguments && arg.arguments.length > 0 ? arg.arguments[0] : undefined;
+      } else if (
+        !ts.isStringLiteral(arg) &&
+        !ts.isNoSubstitutionTemplateLiteral(arg) &&
+        !ts.isTemplateExpression(arg)
+      ) {
+        replacementArg = ts.factory.createCallExpression(
+          ts.factory.createIdentifier('String'),
+          undefined,
+          [arg],
+        );
+        hasNonStringArg = true;
+      }
     }
 
-    const replacement = ts.factory.createThrowStatement(throwExpression);
+    const replacement = ts.factory.createCallExpression(
+      ts.factory.createPropertyAccessExpression(
+        ts.factory.createIdentifier('expect'),
+        ts.factory.createIdentifier('fail'),
+      ),
+      undefined,
+      replacementArg ? [replacementArg] : [],
+    );
+
+    if (hasNonStringArg) {
+      const category = 'fail-non-string-argument';
+      reporter.recordTodo(category, sourceFile, node);
+      addTodoComment(replacement, category);
+    }
 
     return ts.setOriginalNode(ts.setTextRange(replacement, node), node);
   }
@@ -197,11 +221,7 @@ const UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES = new Set<TodoCategory>([
 function isUnsupportedGlobalFunction(
   methodName: string,
 ): methodName is
-  | 'setSpecProperty'
-  | 'setSuiteProperty'
-  | 'throwUnless'
-  | 'throwUnlessAsync'
-  | 'getSpecProperty' {
+  'setSpecProperty' | 'setSuiteProperty' | 'throwUnless' | 'throwUnlessAsync' | 'getSpecProperty' {
   return UNSUPPORTED_GLOBAL_FUNCTION_CATEGORIES.has(methodName as TodoCategory);
 }
 
