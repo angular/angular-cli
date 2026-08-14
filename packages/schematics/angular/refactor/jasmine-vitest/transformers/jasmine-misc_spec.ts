@@ -59,19 +59,31 @@ jasmine.clock().withMock(noop);`,
 describe('transformFail', () => {
   const testCases = [
     {
-      description: 'should transform fail() to throw new Error()',
+      description: 'should transform fail() to expect.fail()',
       input: `fail('This should not happen');`,
-      expected: `throw new Error('This should not happen');`,
+      expected: `expect.fail('This should not happen');`,
     },
     {
-      description: 'should transform fail() without a message to throw new Error()',
+      description: 'should transform fail() without a message to expect.fail()',
       input: `fail();`,
-      expected: `throw new Error();`,
+      expected: `expect.fail();`,
     },
     {
       description: 'should transform fail() with an Error object',
       input: `fail(new TypeError('Invalid input'));`,
-      expected: `throw new TypeError('Invalid input');`,
+      expected: `expect.fail('Invalid input');`,
+    },
+    {
+      description: 'should transform fail() with an empty Error object',
+      input: `fail(new Error());`,
+      expected: `expect.fail();`,
+    },
+    {
+      description: 'should transform fail() with a non-string argument and add a TODO note',
+      input: `fail(err);`,
+      // eslint-disable-next-line max-len
+      expected: `// TODO: vitest-migration: expect.fail() only accepts a string message. Verify that converting this argument with String() produces the expected failure output. See: https://vitest.dev/api/expect.html#expect-fail
+expect.fail(String(err));`,
     },
   ];
 

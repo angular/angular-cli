@@ -178,4 +178,24 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
       `;
     await expectTransformation(input, expected, true);
   });
+
+  it('should add import for `expect` when `fail()` is used and addImports is true', async () => {
+    const input = `
+        describe('My Suite', () => {
+          it('fails', () => {
+            fail('Something went wrong');
+          });
+        });
+      `;
+    const expected = `
+        import { describe, expect, it } from 'vitest';
+
+        describe('My Suite', () => {
+          it('fails', () => {
+            expect.fail('Something went wrong');
+          });
+        });
+      `;
+    await expectTransformation(input, expected, true);
+  });
 });
