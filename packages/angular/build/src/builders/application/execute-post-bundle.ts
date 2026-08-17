@@ -36,7 +36,7 @@ import { OutputMode } from './schema';
 
 /**
  * Run additional builds steps including SSG, AppShell, Index HTML file and Service worker generation.
- * @param metafile An esbuild metafile object.
+ * @param browserMetafile An esbuild metafile object.
  * @param options The normalized application builder options used to create the build.
  * @param outputFiles The output files of an executed build.
  * @param assetFiles The assets of an executed build.
@@ -45,7 +45,7 @@ import { OutputMode } from './schema';
  */
 // eslint-disable-next-line max-lines-per-function
 export async function executePostBundleSteps(
-  metafile: Metafile,
+  browserMetafile: Metafile,
   options: NormalizedApplicationBuildOptions,
   outputFiles: BuildOutputFile[],
   assetFiles: BuildOutputAsset[],
@@ -131,7 +131,7 @@ export async function executePostBundleSteps(
       locale,
       baseHref,
       initialFilesPaths,
-      metafile,
+      browserMetafile,
       publicPath,
     );
 
@@ -214,7 +214,7 @@ export async function executePostBundleSteps(
         locale,
         baseHref,
         initialFilesPaths,
-        metafile,
+        browserMetafile,
         publicPath,
       );
 

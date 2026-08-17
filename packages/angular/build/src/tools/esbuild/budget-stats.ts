@@ -30,12 +30,12 @@ export function generateBudgetStats(
   };
 
   for (const { path: file, size, type } of outputFiles) {
-    if (!file.endsWith('.js') && !file.endsWith('.css')) {
+    // Exclude server bundles
+    if (type === BuildOutputFileType.ServerApplication || type === BuildOutputFileType.ServerRoot) {
       continue;
     }
 
-    // Exclude server bundles
-    if (type === BuildOutputFileType.ServerApplication || type === BuildOutputFileType.ServerRoot) {
+    if (!file.endsWith('.js') && !file.endsWith('.css')) {
       continue;
     }
 
