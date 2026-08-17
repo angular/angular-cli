@@ -33,13 +33,27 @@ export type BundleContextResult =
       errors: undefined;
       warnings: Message[];
       metafile: Metafile;
-      browserMetafile: Metafile;
-      serverMetafile: Metafile;
+      platform: 'browser' | 'server';
+      outputFiles: BuildOutputFile[];
+      initialFiles: Map<string, InitialFileRecord>;
+      externalImports: Set<string>;
+      externalConfiguration?: string[];
+    };
+
+export type BundleMergedContextResult =
+  | { errors: Message[]; warnings: Message[] }
+  | {
+      errors: undefined;
+      warnings: Message[];
+      metafiles: {
+        browser: Metafile;
+        server: Metafile;
+      };
       outputFiles: BuildOutputFile[];
       initialFiles: Map<string, InitialFileRecord>;
       externalImports: {
-        server?: Set<string>;
-        browser?: Set<string>;
+        server: Set<string>;
+        browser: Set<string>;
       };
       externalConfiguration?: string[];
     };
@@ -88,11 +102,11 @@ export class BundlerContext {
     };
   }
 
-  static async bundleAll(
+  static bundleAll(
     contexts: Iterable<BundlerContext>,
     changedFiles?: Iterable<string>,
-  ): Promise<BundleContextResult> {
-    const individualResults = await Promise.all(
+  ): Promise<BundleContextResult[]> {
+    return Promise.all(
       [...contexts].map((context) => {
         if (changedFiles) {
           context.invalidate(changedFiles);
@@ -101,19 +115,11 @@ export class BundlerContext {
         return context.bundle();
       }),
     );
-
-    return BundlerContext.mergeResults(individualResults);
   }
 
-  static mergeResults(results: BundleContextResult[]): BundleContextResult {
-    // Return directly if only one result
-    if (results.length === 1) {
-      return results[0];
-    }
-
+  static mergeResults(results: BundleContextResult[]): BundleMergedContextResult {
     let errors: Message[] | undefined;
     const warnings: Message[] = [];
-    const metafile: Metafile = { inputs: {}, outputs: {} };
     const browserMetafile: Metafile = { inputs: {}, outputs: {} };
     const serverMetafile: Metafile = { inputs: {}, outputs: {} };
     const initialFiles = new Map<string, InitialFileRecord>();
@@ -130,22 +136,20 @@ export class BundlerContext {
         continue;
       }
 
+      const platformIsBrowser = result.platform === 'browser';
+
       // Combine metafiles used for the bundle budgets and console output
       if (result.metafile) {
+        const metafile = platformIsBrowser ? browserMetafile : serverMetafile;
         Object.assign(metafile.inputs, result.metafile.inputs);
         Object.assign(metafile.outputs, result.metafile.outputs);
       }
 
-      Object.assign(browserMetafile.inputs, result.browserMetafile.inputs);
-      Object.assign(browserMetafile.outputs, result.browserMetafile.outputs);
-      Object.assign(serverMetafile.inputs, result.serverMetafile.inputs);
-      Object.assign(serverMetafile.outputs, result.serverMetafile.outputs);
+      const externalImports = platformIsBrowser ? externalImportsBrowser : externalImportsServer;
+      result.externalImports?.forEach((value) => externalImports.add(value));
 
       result.initialFiles.forEach((value, key) => initialFiles.set(key, value));
-
       outputFiles.push(...result.outputFiles);
-      result.externalImports.browser?.forEach((value) => externalImportsBrowser.add(value));
-      result.externalImports.server?.forEach((value) => externalImportsServer.add(value));
 
       if (result.externalConfiguration) {
         externalConfiguration ??= new Set<string>();
@@ -162,14 +166,15 @@ export class BundlerContext {
     return {
       errors,
       warnings,
-      metafile,
-      browserMetafile,
-      serverMetafile,
       initialFiles,
       outputFiles,
       externalImports: {
         browser: externalImportsBrowser,
         server: externalImportsServer,
+      },
+      metafiles: {
+        browser: browserMetafile,
+        server: serverMetafile,
       },
       externalConfiguration: externalConfiguration ? [...externalConfiguration] : undefined,
     };
@@ -427,11 +432,8 @@ export class BundlerContext {
       ...result,
       outputFiles,
       initialFiles,
-      browserMetafile: isPlatformServer ? { inputs: {}, outputs: {} } : result.metafile,
-      serverMetafile: isPlatformServer ? result.metafile : { inputs: {}, outputs: {} },
-      externalImports: {
-        [isPlatformServer ? 'server' : 'browser']: externalImports,
-      },
+      externalImports,
+      platform: isPlatformServer ? 'server' : 'browser',
       externalConfiguration,
       errors: undefined,
     };

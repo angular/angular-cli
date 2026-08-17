@@ -60,124 +60,132 @@ const EXTRACTION_FILE_SEPARATOR = '-'.repeat(80) + '\n';
  * @param rootDirectory The root directory of the workspace.
  * @returns A string containing the content of the output licenses file.
  */
-export async function extractLicenses(metafile: Metafile, rootDirectory: string) {
+export async function extractLicenses(
+  metafiles: Metafile[],
+  rootDirectory: string,
+): Promise<string> {
   let extractedLicenseContent = `${EXTRACTION_FILE_HEADER}\n${EXTRACTION_FILE_SEPARATOR}`;
 
   const seenPaths = new Set<string>();
   const seenPackageDirectories = new Set<string>();
   const seenPackages = new Set<string>();
 
-  for (const entry of Object.values(metafile.outputs)) {
-    for (const [inputPath, { bytesInOutput }] of Object.entries(entry.inputs)) {
-      // Skip if not included in output
-      if (bytesInOutput <= 0) {
-        continue;
-      }
-
-      // Skip already processed paths
-      if (seenPaths.has(inputPath)) {
-        continue;
-      }
-      seenPaths.add(inputPath);
-
-      // Skip non-package paths
-      if (!inputPath.includes(NODE_MODULE_SEGMENT)) {
-        continue;
-      }
-
-      // Extract the package name from the path
-      let baseDirectory = path.join(rootDirectory, inputPath);
-      let nameOrScope, nameOrFile;
-      let found = false;
-      while (baseDirectory !== path.dirname(baseDirectory)) {
-        const segment = path.basename(baseDirectory);
-        if (segment === NODE_MODULE_SEGMENT) {
-          found = true;
-          break;
+  for (const metafile of metafiles) {
+    for (const entry of Object.values(metafile.outputs)) {
+      for (const [inputPath, { bytesInOutput }] of Object.entries(entry.inputs)) {
+        // Skip if not included in output
+        if (bytesInOutput <= 0) {
+          continue;
         }
 
-        nameOrFile = nameOrScope;
-        nameOrScope = segment;
-        baseDirectory = path.dirname(baseDirectory);
-      }
-
-      // Skip non-package path edge cases that are not caught in the includes check above
-      if (!found || !nameOrScope) {
-        continue;
-      }
-
-      const packageName = nameOrScope.startsWith('@')
-        ? `${nameOrScope}/${nameOrFile}`
-        : nameOrScope;
-      const packageDirectory = path.join(baseDirectory, packageName);
-
-      if (seenPackageDirectories.has(packageDirectory)) {
-        continue;
-      }
-      seenPackageDirectories.add(packageDirectory);
-
-      // Load the package's metadata to find the package's name, version, and license type
-      const packageJsonPath = path.join(packageDirectory, 'package.json');
-      let packageJson;
-      try {
-        packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8')) as {
-          name: string;
-          version: string;
-          // The object form is deprecated and should only be present in old packages
-          license?: string | { type: string };
-        };
-      } catch {
-        // Invalid package
-        continue;
-      }
-
-      // Skip already processed packages
-      const packageId = `${packageName}@${packageJson.version}`;
-      if (seenPackages.has(packageId)) {
-        continue;
-      }
-      seenPackages.add(packageId);
-
-      // Attempt to find license text inside package
-      let licenseText = '';
-      if (
-        typeof packageJson.license === 'string' &&
-        packageJson.license.toUpperCase().startsWith(CUSTOM_LICENSE_TEXT)
-      ) {
-        // Attempt to load the package's custom license
-        let customLicensePath;
-        const customLicenseFile = path.normalize(
-          packageJson.license.slice(CUSTOM_LICENSE_TEXT.length).trim(),
-        );
-        if (customLicenseFile.startsWith('..') || path.isAbsolute(customLicenseFile)) {
-          // Path is attempting to access files outside of the package
-          // TODO: Issue warning?
-        } else {
-          customLicensePath = path.join(packageDirectory, customLicenseFile);
-          try {
-            licenseText = await readFile(customLicensePath, 'utf-8');
-          } catch {}
+        // Skip already processed paths
+        if (seenPaths.has(inputPath)) {
+          continue;
         }
-      } else {
-        // Search for a license file within the root of the package
-        const entries = await readdir(packageDirectory, { withFileTypes: true }).catch(() => []);
+        seenPaths.add(inputPath);
 
-        for (const entry of entries) {
-          if ((entry.isFile() || entry.isSymbolicLink()) && LICENSE_FILE_REGEXP.test(entry.name)) {
-            const packageLicensePath = path.join(packageDirectory, entry.name);
+        // Skip non-package paths
+        if (!inputPath.includes(NODE_MODULE_SEGMENT)) {
+          continue;
+        }
+
+        // Extract the package name from the path
+        let baseDirectory = path.join(rootDirectory, inputPath);
+        let nameOrScope, nameOrFile;
+        let found = false;
+        while (baseDirectory !== path.dirname(baseDirectory)) {
+          const segment = path.basename(baseDirectory);
+          if (segment === NODE_MODULE_SEGMENT) {
+            found = true;
+            break;
+          }
+
+          nameOrFile = nameOrScope;
+          nameOrScope = segment;
+          baseDirectory = path.dirname(baseDirectory);
+        }
+
+        // Skip non-package path edge cases that are not caught in the includes check above
+        if (!found || !nameOrScope) {
+          continue;
+        }
+
+        const packageName = nameOrScope.startsWith('@')
+          ? `${nameOrScope}/${nameOrFile}`
+          : nameOrScope;
+        const packageDirectory = path.join(baseDirectory, packageName);
+
+        if (seenPackageDirectories.has(packageDirectory)) {
+          continue;
+        }
+        seenPackageDirectories.add(packageDirectory);
+
+        // Load the package's metadata to find the package's name, version, and license type
+        const packageJsonPath = path.join(packageDirectory, 'package.json');
+        let packageJson;
+        try {
+          packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8')) as {
+            name: string;
+            version: string;
+            // The object form is deprecated and should only be present in old packages
+            license?: string | { type: string };
+          };
+        } catch {
+          // Invalid package
+          continue;
+        }
+
+        // Skip already processed packages
+        const packageId = `${packageName}@${packageJson.version}`;
+        if (seenPackages.has(packageId)) {
+          continue;
+        }
+        seenPackages.add(packageId);
+
+        // Attempt to find license text inside package
+        let licenseText = '';
+        if (
+          typeof packageJson.license === 'string' &&
+          packageJson.license.toUpperCase().startsWith(CUSTOM_LICENSE_TEXT)
+        ) {
+          // Attempt to load the package's custom license
+          let customLicensePath;
+          const customLicenseFile = path.normalize(
+            packageJson.license.slice(CUSTOM_LICENSE_TEXT.length).trim(),
+          );
+          if (customLicenseFile.startsWith('..') || path.isAbsolute(customLicenseFile)) {
+            // Path is attempting to access files outside of the package
+            // TODO: Issue warning?
+          } else {
+            customLicensePath = path.join(packageDirectory, customLicenseFile);
             try {
-              licenseText = await readFile(packageLicensePath, 'utf-8');
-              break;
+              licenseText = await readFile(customLicensePath, 'utf-8');
             } catch {}
           }
-        }
-      }
+        } else {
+          // Search for a license file within the root of the package
+          const entries = await readdir(packageDirectory, { withFileTypes: true }).catch(() => []);
 
-      // Generate the package's license entry in the output content
-      extractedLicenseContent += `Package: ${packageJson.name}\n`;
-      extractedLicenseContent += `License: ${JSON.stringify(packageJson.license, null, 2)}\n`;
-      extractedLicenseContent += `\n${licenseText}\n`;
-      extractedLicenseContent += EXTRACTION_FILE_SEPARATOR;
+          for (const entry of entries) {
+            if (
+              (entry.isFile() || entry.isSymbolicLink()) &&
+              LICENSE_FILE_REGEXP.test(entry.name)
+            ) {
+              const packageLicensePath = path.join(packageDirectory, entry.name);
+              try {
+                licenseText = await readFile(packageLicensePath, 'utf-8');
+                break;
+              } catch {}
+            }
+          }
+        }
+
+        // Generate the package's license entry in the output content
+        extractedLicenseContent += `Package: ${packageJson.name}\n`;
+        extractedLicenseContent += `License: ${JSON.stringify(packageJson.license, null, 2)}\n`;
+        extractedLicenseContent += `\n${licenseText}\n`;
+        extractedLicenseContent += EXTRACTION_FILE_SEPARATOR;
+      }
     }
   }
 

@@ -20,7 +20,7 @@
 import type { Message, Metafile } from 'esbuild';
 import assert from 'node:assert';
 import type { Plugin } from 'rollup';
-import { BundleContextResult } from '../../tools/esbuild/bundler-context';
+import { BundleMergedContextResult } from '../../tools/esbuild/bundler-context';
 import {
   type BuildOutputFile,
   BuildOutputFileType,
@@ -212,9 +212,9 @@ function createChunkOptimizationFailureMessage(message: string): Message {
  */
 // eslint-disable-next-line max-lines-per-function
 export async function optimizeChunks(
-  original: BundleContextResult,
+  original: BundleMergedContextResult,
   sourcemap: boolean | 'hidden',
-): Promise<BundleContextResult> {
+): Promise<BundleMergedContextResult> {
   // Failed builds cannot be optimized
   if (original.errors) {
     return original;
@@ -235,7 +235,7 @@ export async function optimizeChunks(
   }
 
   // No action required if no browser main entrypoint or metafile for stats
-  if (!mainFile || !original.metafile) {
+  if (!mainFile || !original.metafiles.browser) {
     return original;
   }
 
@@ -340,9 +340,9 @@ export async function optimizeChunks(
   }
 
   // Update metafile
-  const newMetafile = bundleOutputToEsbuildMetafile(optimizedOutput, original.metafile);
+  const newMetafile = bundleOutputToEsbuildMetafile(optimizedOutput, original.metafiles.browser);
   // Add back the outputs that were not part of the optimization
-  for (const [path, output] of Object.entries(original.metafile.outputs)) {
+  for (const [path, output] of Object.entries(original.metafiles.browser.outputs)) {
     if (usedChunks.has(path)) {
       continue;
     }
@@ -350,11 +350,11 @@ export async function optimizeChunks(
     newMetafile.outputs[path] = output;
     for (const inputPath of Object.keys(output.inputs)) {
       if (!newMetafile.inputs[inputPath]) {
-        newMetafile.inputs[inputPath] = original.metafile.inputs[inputPath];
+        newMetafile.inputs[inputPath] = original.metafiles.browser.inputs[inputPath];
       }
     }
   }
-  original.metafile = newMetafile;
+  original.metafiles.browser = newMetafile;
 
   // Remove used chunks and associated sourcemaps from the original result
   original.outputFiles = original.outputFiles.filter(
@@ -422,26 +422,6 @@ export async function optimizeChunks(
       entriesToAnalyze.push([importPath, record]);
     }
   }
-
-  // Rebuild browserMetafile from the updated combined metafile and output files.
-  // Chunk optimization only affects browser chunks, so serverMetafile is unchanged.
-  const browserOutputPaths = new Set(
-    original.outputFiles.filter((f) => f.type === BuildOutputFileType.Browser).map((f) => f.path),
-  );
-  const newBrowserMetafile: Metafile = { inputs: {}, outputs: {} };
-  for (const [path, output] of Object.entries(original.metafile.outputs)) {
-    if (!browserOutputPaths.has(path)) {
-      continue;
-    }
-    newBrowserMetafile.outputs[path] = output;
-    for (const inputPath of Object.keys(output.inputs)) {
-      const input = original.metafile.inputs[inputPath];
-      if (input) {
-        newBrowserMetafile.inputs[inputPath] ??= input;
-      }
-    }
-  }
-  original.browserMetafile = newBrowserMetafile;
 
   return original;
 }

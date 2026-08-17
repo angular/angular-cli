@@ -25,7 +25,7 @@ import {
 import { type BuildOutputFile, BuildOutputFileType, type InitialFileRecord } from './bundler-files';
 
 export function logBuildStats(
-  metafile: Metafile,
+  metafiles: Metafile[],
   outputFiles: BuildOutputFile[],
   initial: Map<string, InitialFileRecord>,
   budgetFailures: BudgetCalculatorResult[] | undefined,
@@ -65,12 +65,12 @@ export function logBuildStats(
     }
 
     // Skip logging external component stylesheets used for HMR
-    if (metafile.outputs[file] && 'ng-component' in metafile.outputs[file]) {
+    if (metafiles.some((mf) => mf.outputs[file] && 'ng-component' in mf.outputs[file])) {
       componentStyleChange = true;
       continue;
     }
 
-    const name = initial.get(file)?.name ?? getChunkNameFromMetafile(metafile, file);
+    const name = initial.get(file)?.name ?? getChunkNameFromMetafile(metafiles, file);
     const stat: BundleStats = {
       initial: initial.has(file),
       stats: [file, name ?? '-', size, estimatedTransferSizes?.get(file) ?? '-'],
@@ -108,9 +108,15 @@ export function logBuildStats(
   return '';
 }
 
-export function getChunkNameFromMetafile(metafile: Metafile, file: string): string | undefined {
-  if (metafile.outputs[file]?.entryPoint) {
-    return getEntryPointName(metafile.outputs[file].entryPoint);
+export function getChunkNameFromMetafile(
+  metafiles: Metafile[] | Metafile,
+  file: string,
+): string | undefined {
+  const metafileArray = Array.isArray(metafiles) ? metafiles : [metafiles];
+  for (const metafile of metafileArray) {
+    if (metafile.outputs[file]?.entryPoint) {
+      return getEntryPointName(metafile.outputs[file].entryPoint);
+    }
   }
 }
 

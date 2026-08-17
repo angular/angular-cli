@@ -7,14 +7,13 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import type { Metafile } from 'esbuild';
 import { createAngularCompilation } from '../../tools/angular/compilation';
 import { AngularCompilationContext } from '../../tools/esbuild/angular/compilation-state';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
 import { ExecutionResult, RebuildState } from '../../tools/esbuild/bundler-execution-result';
-import { BuildOutputFileType, type InitialFileRecord } from '../../tools/esbuild/bundler-files';
+import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { LOCALE_DATA_BASE_MODULE } from '../../tools/esbuild/i18n-locale-plugin';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
@@ -41,39 +40,6 @@ import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundl
 /** The esbuild error text prefix used to detect top-level await errors. */
 const TOP_LEVEL_AWAIT_ERROR_TEXT =
   'Top-level await is not available in the configured target environment';
-
-/**
- * Returns a copy of the given metafile containing only outputs that appear in the
- * provided initial-files map, with inputs filtered to those referenced by those outputs.
- */
-function createInitialMetafile(
-  metafile: Metafile,
-  initialFiles: Map<string, InitialFileRecord>,
-): Metafile {
-  const filteredOutputs: Metafile['outputs'] = {};
-  const referencedInputs = new Set<string>();
-
-  for (const [path, output] of Object.entries(metafile.outputs)) {
-    if (!initialFiles.has(path)) {
-      continue;
-    }
-    filteredOutputs[path] = output;
-    for (const inputPath of Object.keys(output.inputs)) {
-      referencedInputs.add(inputPath);
-    }
-  }
-
-  const filteredInputs: Metafile['inputs'] = {};
-  for (const path of referencedInputs) {
-    const input = metafile.inputs[path];
-    if (input) {
-      filteredInputs[path] = input;
-    }
-  }
-
-  return { inputs: filteredInputs, outputs: filteredOutputs };
-}
-
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
@@ -109,7 +75,7 @@ export async function executeBuild(
   let bundlerContexts;
   let componentStyleBundler;
   let codeBundleCache;
-  let bundlingResult: BundleContextResult;
+  let bundlingIndividualResults: BundleContextResult[];
   let templateUpdates: Map<string, string> | undefined;
   let angularCompilationContext: AngularCompilationContext | undefined;
   let executionResult: ExecutionResult | undefined;
@@ -132,7 +98,7 @@ export async function executeBuild(
 
       // Bundle all contexts that do not require TypeScript changed file checks.
       // These will automatically use cached results based on the changed files.
-      bundlingResult = await BundlerContext.bundleAll(
+      bundlingIndividualResults = await BundlerContext.bundleAll(
         bundlerContexts.otherContexts,
         allFileChanges,
       );
@@ -146,7 +112,8 @@ export async function executeBuild(
         const result = await typescriptContext.bundle(forceTypeScriptRebuild);
         typescriptResults.push(result);
       }
-      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...typescriptResults]);
+
+      bundlingIndividualResults.push(...typescriptResults);
     } else {
       const target = transformSupportedBrowsersToTargets(browsers);
       codeBundleCache = new SourceFileCache(cacheOptions.enabled ? cacheOptions.path : undefined);
@@ -175,7 +142,7 @@ export async function executeBuild(
       );
 
       // Bundle everything on initial build
-      bundlingResult = await BundlerContext.bundleAll([
+      bundlingIndividualResults = await BundlerContext.bundleAll([
         ...bundlerContexts.typescriptContexts,
         ...bundlerContexts.otherContexts,
       ]);
@@ -187,8 +154,10 @@ export async function executeBuild(
       componentStyleBundler.invalidate(rebuildState.fileChanges.all);
 
       const componentResults = await componentStyleBundler.bundleAllFiles(true, true);
-      bundlingResult = BundlerContext.mergeResults([bundlingResult, ...componentResults]);
+      bundlingIndividualResults.push(...componentResults);
     }
+
+    let bundlingResult = BundlerContext.mergeResults(bundlingIndividualResults);
 
     executionResult.addWarnings(bundlingResult.warnings);
 
@@ -239,8 +208,8 @@ export async function executeBuild(
     if (options.optimizationOptions.scripts) {
       // Count lazy chunks (files not needed for initial load).
       // Advanced chunk optimization is most beneficial when there are multiple lazy chunks.
-      const { metafile, initialFiles } = bundlingResult;
-      const lazyChunksCount = Object.keys(metafile.outputs).filter(
+      const { metafiles, initialFiles } = bundlingResult;
+      const lazyChunksCount = Object.keys(metafiles.browser.outputs || {}).filter(
         (path) => path.endsWith('.js') && !initialFiles.has(path),
       ).length;
 
@@ -319,14 +288,19 @@ export async function executeBuild(
       executionResult.setExternalMetadata(implicitBrowser, implicitServer, [...explicitExternal]);
     }
 
-    const { metafile, initialFiles, outputFiles } = bundlingResult;
+    const {
+      metafiles: { browser: browserMetafile, server: serverMetafile },
+      initialFiles,
+      outputFiles,
+    } = bundlingResult;
+    const metafiles = [browserMetafile, serverMetafile];
 
     executionResult.outputFiles.push(...outputFiles);
 
     // Analyze files for bundle budget failures if present
     let budgetFailures: BudgetCalculatorResult[] | undefined;
     if (options.budgets) {
-      const compatStats = generateBudgetStats(metafile, outputFiles, initialFiles);
+      const compatStats = generateBudgetStats(browserMetafile, outputFiles, initialFiles);
       budgetFailures = [...checkBudgets(options.budgets, compatStats, true)];
       for (const { message, severity } of budgetFailures) {
         if (severity === 'error') {
@@ -345,7 +319,7 @@ export async function executeBuild(
 
     // Check metafile for CommonJS module usage if optimizing scripts
     if (optimizationOptions.scripts) {
-      const messages = checkCommonJSModules(metafile, options.allowedCommonJsDependencies);
+      const messages = checkCommonJSModules(browserMetafile, options.allowedCommonJsDependencies);
       executionResult.addWarnings(messages);
     }
 
@@ -358,7 +332,7 @@ export async function executeBuild(
     if (options.extractLicenses) {
       executionResult.addOutputFile(
         '3rdpartylicenses.txt',
-        await extractLicenses(metafile, workspaceRoot),
+        await extractLicenses(metafiles, workspaceRoot),
         BuildOutputFileType.Root,
       );
     }
@@ -381,13 +355,13 @@ export async function executeBuild(
 
     // Perform i18n translation inlining if enabled
     if (i18nOptions.shouldInline) {
-      const result = await inlineI18n(metafile, options, executionResult, initialFiles);
+      const result = await inlineI18n(browserMetafile, options, executionResult, initialFiles);
       executionResult.addErrors(result.errors);
       executionResult.addWarnings(result.warnings);
       executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
     } else {
       const result = await executePostBundleSteps(
-        metafile,
+        browserMetafile,
         options,
         executionResult.outputFiles,
         executionResult.assetFiles,
@@ -405,36 +379,26 @@ export async function executeBuild(
       executionResult.assetFiles.push(...result.additionalAssets);
     }
 
-    executionResult.addOutputFile(
-      'prerendered-routes.json',
-      JSON.stringify({ routes: executionResult.prerenderedRoutes }, null, 2),
-      BuildOutputFileType.Root,
-    );
+    if (serverEntryPoint) {
+      executionResult.addOutputFile(
+        'prerendered-routes.json',
+        JSON.stringify({ routes: executionResult.prerenderedRoutes }, null, 2),
+        BuildOutputFileType.Root,
+      );
+    }
 
     // Write metafiles if stats option is enabled
     if (options.stats) {
-      const { browserMetafile, serverMetafile } = bundlingResult;
-
       executionResult.addOutputFile(
         'browser-stats.json',
         JSON.stringify(browserMetafile, null, 2),
         BuildOutputFileType.Root,
       );
-      executionResult.addOutputFile(
-        'browser-initial-stats.json',
-        JSON.stringify(createInitialMetafile(browserMetafile, initialFiles), null, 2),
-        BuildOutputFileType.Root,
-      );
 
-      if (ssrOptions) {
+      if (serverEntryPoint) {
         executionResult.addOutputFile(
           'server-stats.json',
           JSON.stringify(serverMetafile, null, 2),
-          BuildOutputFileType.Root,
-        );
-        executionResult.addOutputFile(
-          'server-initial-stats.json',
-          JSON.stringify(createInitialMetafile(serverMetafile, initialFiles), null, 2),
           BuildOutputFileType.Root,
         );
       }
@@ -445,7 +409,7 @@ export async function executeBuild(
         rebuildState && executionResult.findChangedFiles(rebuildState.previousOutputInfo);
       executionResult.addLog(
         logBuildStats(
-          metafile,
+          metafiles,
           outputFiles,
           initialFiles,
           budgetFailures,
