@@ -19,7 +19,6 @@ import {
   loadInputSourceMapFromUrl,
   removeSourceMappingURL,
 } from '../../utils/source-map';
-import { linkWithOxc } from '../angular/linker/oxc-linker.js';
 import { transform as transformWithOxc } from '../oxc/oxc-transform.js';
 import type { JavaScriptTransformerOptions } from './javascript-transformer';
 
@@ -170,61 +169,53 @@ async function transformJavaScriptImpl(
     coverageMap = result.map;
   }
 
-  if (shouldLink) {
-    if (useBabelLinker) {
-      const { createEs2015LinkerPlugin } = await import('@angular/compiler-cli/linker/babel');
-      const { ConsoleLogger, LogLevel } = await import('@angular/compiler-cli');
+  if (shouldLink && useBabelLinker) {
+    const { createEs2015LinkerPlugin } = await import('@angular/compiler-cli/linker/babel');
+    const { ConsoleLogger, LogLevel } = await import('@angular/compiler-cli');
 
-      const result = await transformAsync(code, {
-        filename,
-        inputSourceMap: false,
-        sourceMaps: !!useInputSourcemap,
-        compact: false,
-        configFile: false,
-        babelrc: false,
-        browserslistConfigFile: false,
-        plugins: [
-          createEs2015LinkerPlugin({
-            fileSystem: {
-              exists: () => false,
-              readFile: () => '',
-              resolve: (...paths: string[]) => paths.join('/'),
-              dirname: (path: string) => path.split('/').slice(0, -1).join('/'),
-              relative: (_from: string, to: string) => to,
-            } as never,
-            logger: new ConsoleLogger(LogLevel.info),
-            linkerJitMode: jit,
-            // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
-            sourceMapping: false,
-          }) as PluginItem,
-        ],
-      });
+    const result = await transformAsync(code, {
+      filename,
+      inputSourceMap: false,
+      sourceMaps: !!useInputSourcemap,
+      compact: false,
+      configFile: false,
+      babelrc: false,
+      browserslistConfigFile: false,
+      plugins: [
+        createEs2015LinkerPlugin({
+          fileSystem: {
+            exists: () => false,
+            readFile: () => '',
+            resolve: (...paths: string[]) => paths.join('/'),
+            dirname: (path: string) => path.split('/').slice(0, -1).join('/'),
+            relative: (_from: string, to: string) => to,
+          } as never,
+          logger: new ConsoleLogger(LogLevel.info),
+          linkerJitMode: jit,
+          // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
+          sourceMapping: false,
+        }) as PluginItem,
+      ],
+    });
 
-      code = result?.code ?? code;
-      if (result?.map) {
-        maps.push(result.map as EncodedSourceMap);
-      }
-    } else {
-      const result = linkWithOxc(filename, code, {
-        sourcemap: useInputSourcemap,
-        jit,
-        skipCheck: true,
-      });
-      code = result.code;
-      if (result.map) {
-        maps.push(result.map);
-      }
+    code = result?.code ?? code;
+    if (result?.map) {
+      maps.push(result.map as EncodedSourceMap);
     }
   }
 
-  // Run advanced optimizations using our fast oxc-transform
-  if (advancedOptimizations) {
+  // Run Oxc linking and/or advanced optimizations in a single unified AST traversal pass
+  const oxcLink = shouldLink && !useBabelLinker;
+  if (oxcLink || advancedOptimizations) {
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
     const topLevelSafeMode = !safeAngularPackage;
 
     const result = transformWithOxc(filename, code, {
+      link: oxcLink,
+      jit,
+      advancedOptimizations,
       sourcemap: useInputSourcemap,
       sideEffects: options.sideEffects,
       topLevelSafeMode,
