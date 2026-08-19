@@ -1,3 +1,32 @@
+<a name="22.1.5"></a>
+
+# 22.1.5 (2026-08-19)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [e672271f8](https://github.com/angular/angular-cli/commit/e672271f81e7b8b422b98c17fca5b67896d40844) | fix  | enforce MCP roots in get_best_practices tool                     |
+| [a14916cc4](https://github.com/angular/angular-cli/commit/a14916cc4b13412205d3e4a1c32d7e40be52f0e1) | fix  | handle errors from isAllowedWorkspacePath in best-practices tool |
+| [d6e1cddff](https://github.com/angular/angular-cli/commit/d6e1cddff92842f6889585ae7899efc028decc78) | fix  | throw on out-of-roots workspace in best-practices tool           |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [ba2b0e4c2](https://github.com/angular/angular-cli/commit/ba2b0e4c291842c699fdbeaaddec1531dbdd7952) | fix  | transform fail() to expect.fail() in refactor-jasmine-vitest |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [cba72902d](https://github.com/angular/angular-cli/commit/cba72902d42022bd5a1bd17b23d65cacc0013e35) | fix  | correct misleading error message for top-level await          |
+| [b4679998c](https://github.com/angular/angular-cli/commit/b4679998c205b6cce01d40fad24c4ee7954aa48d) | fix  | disable code splitting for unit test builds                   |
+| [ff1d3565e](https://github.com/angular/angular-cli/commit/ff1d3565e87749a8347c3be98cd4a7ebccb69fc0) | fix  | preserve integrity and crossorigin in autoCsp loader          |
+| [1fc1fb05c](https://github.com/angular/angular-cli/commit/1fc1fb05cfe2c69ee7b9345b582d3c2177b923fd) | perf | traverse AST with iterative post-order walker in i18n inliner |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.4"></a>
 
 # 22.1.4 (2026-08-13)
