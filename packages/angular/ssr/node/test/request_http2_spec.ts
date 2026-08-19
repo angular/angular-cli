@@ -188,4 +188,24 @@ describe('createWebRequestFromNodeRequest (HTTP/2)', () => {
       expect(await webRequest.text()).toBe('');
     });
   });
+
+  describe('abort handling', () => {
+    it('should abort the web request signal when the node request is aborted', async () => {
+      const nodeRequest = await extractNodeRequest(() => {
+        client
+          .request({
+            ':path': '/abort',
+            ':method': 'GET',
+          })
+          .end();
+      });
+
+      const webRequest = createWebRequestFromNodeRequest(nodeRequest);
+      expect(webRequest.signal.aborted).toBeFalse();
+
+      nodeRequest.emit('aborted');
+
+      expect(webRequest.signal.aborted).toBeTrue();
+    });
+  });
 });

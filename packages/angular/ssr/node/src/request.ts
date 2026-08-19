@@ -55,9 +55,18 @@ export function createWebRequestFromNodeRequest(
   const { headers, method = 'GET' } = nodeRequest;
   const withBody = method !== 'GET' && method !== 'HEAD';
   const referrer = headers.referer && URL.canParse(headers.referer) ? headers.referer : undefined;
+  const controller = new AbortController();
+  if (nodeRequest.aborted) {
+    controller.abort();
+  } else {
+    const onAbort = () => controller.abort();
+    nodeRequest.once('aborted', onAbort);
+    nodeRequest.once('close', () => nodeRequest.off('aborted', onAbort));
+  }
 
   return new Request(createRequestUrl(nodeRequest, trustProxyHeadersNormalized), {
     method,
+    signal: controller.signal,
     headers: createRequestHeaders(headers),
     body: withBody ? nodeRequest : undefined,
     duplex: withBody ? 'half' : undefined,
