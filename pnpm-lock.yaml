@@ -460,8 +460,8 @@ importers:
         specifier: 8.5.2
         version: 8.5.2(@types/node@22.20.1)
       '@listr2/prompt-adapter-inquirer':
-        specifier: 4.2.4
-        version: 4.2.4(@inquirer/prompts@8.5.2(@types/node@22.20.1))(@types/node@22.20.1)(listr2@10.2.2)
+        specifier: 4.2.5
+        version: 4.2.5(@inquirer/prompts@8.5.2(@types/node@22.20.1))(@types/node@22.20.1)(listr2@10.2.2)
       '@modelcontextprotocol/sdk':
         specifier: 1.30.0
         version: 1.30.0(supports-color@11.0.0)(zod@4.4.3)
@@ -941,7 +941,7 @@ packages:
       rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/fe8d168ef720af0b12276b21f820b2c93e3d342e':
-    resolution: {gitHosted: true, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/fe8d168ef720af0b12276b21f820b2c93e3d342e}
+    resolution: {gitHosted: true, integrity: sha512-6sQRCd29gx7lREERjAupLXS6orZKqCwNssMKW2YQYBYwulyLTK4G31M2yu5+m2Izly7VsfVQyeOVk+ZmD9j2jA==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/fe8d168ef720af0b12276b21f820b2c93e3d342e}
     version: 0.0.0-630fa0aa7ce9b7127b1ec4464b6af02d34f8154b
     hasBin: true
 
@@ -2471,12 +2471,12 @@ packages:
   '@leichtgewicht/ip-codec@2.0.5':
     resolution: {integrity: sha512-Vo+PSpZG2/fmgmiNzYK9qWRh8h/CHrwD0mo1h1DzL4yzHNSfWYujGTYsWGreD000gcgmZ7K4Ys6Tx9TxtsKdDw==}
 
-  '@listr2/prompt-adapter-inquirer@4.2.4':
-    resolution: {integrity: sha512-/KRI2DMD7JGSYaREF0Ygl7AefJ/2ase4Gc5cBiKqT5l4tFjsSJfhFGcc5nSkgl0Sp9LkCQNzl/cqbVJYP2L3dw==}
+  '@listr2/prompt-adapter-inquirer@4.2.5':
+    resolution: {integrity: sha512-pYGy9dTdTwXdasPgyohkr0HoQ4FrkAzFnsUZl/gcnadDArbpZ8e+fgr+F9WBdNEl2y00mb9bCM4WgmoBkZJ27A==}
     engines: {node: '>=22.13.0'}
     peerDependencies:
       '@inquirer/prompts': '>= 3 < 9'
-      listr2: 10.2.1
+      listr2: 11.0.0
 
   '@lmdb/lmdb-darwin-arm64@3.5.6':
     resolution: {integrity: sha512-mY5FG4TjPAkY4P0w+OhHaUka5mDh2TX2WKYIwuKzJ1zeW3VvRgxdam/lGJTquI+bthTx5CSHDW+BAQCnNAzkEA==}
@@ -10393,7 +10393,7 @@ snapshots:
 
   '@leichtgewicht/ip-codec@2.0.5': {}
 
-  '@listr2/prompt-adapter-inquirer@4.2.4(@inquirer/prompts@8.5.2(@types/node@22.20.1))(@types/node@22.20.1)(listr2@10.2.2)':
+  '@listr2/prompt-adapter-inquirer@4.2.5(@inquirer/prompts@8.5.2(@types/node@22.20.1))(@types/node@22.20.1)(listr2@10.2.2)':
     dependencies:
       '@inquirer/prompts': 8.5.2(@types/node@22.20.1)
       '@inquirer/type': 4.0.7(@types/node@22.20.1)
