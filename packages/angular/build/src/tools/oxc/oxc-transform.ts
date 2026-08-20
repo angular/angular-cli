@@ -7,15 +7,20 @@
  */
 
 import type { DecodedSourceMap } from '@ampproject/remapping';
+import { needsLinking } from '@angular/compiler-cli/linker';
 import type { BindingIdentifier, Class, Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
 import { Visitor, parseSync } from 'oxc-parser';
+import { OxcLinker } from '../angular/linker/oxc-linker';
 
 export interface OxcTransformOptions {
   sourcemap?: boolean;
   sideEffects?: boolean;
   topLevelSafeMode?: boolean;
   pureAnnotate?: boolean;
+  link?: boolean;
+  jit?: boolean;
+  advancedOptimizations?: boolean;
 }
 
 /**
@@ -256,8 +261,12 @@ function analyzeClassStaticProperties(classNode: Node, code: string): boolean {
 // eslint-disable-next-line max-lines-per-function
 export function transform(filename: string, code: string, options: OxcTransformOptions) {
   const { program } = parseSync(filename, code, { range: true });
-  const s = new MagicString(code);
+  const source = new MagicString(code);
 
+  const shouldLink = options.link && needsLinking(filename, code);
+  const linker = shouldLink ? new OxcLinker(filename, code, options.jit) : undefined;
+
+  const advancedOptimizations = options.advancedOptimizations ?? true;
   const sideEffectFree = options.sideEffects === false;
   const topLevelSafeMode = options.topLevelSafeMode ?? false;
   const wrapDecorators = sideEffectFree;
@@ -412,12 +421,12 @@ export function transform(filename: string, code: string, options: OxcTransformO
       }
 
       // 1. Remove leading/trailing characters/parentheses of the expression statement
-      s.remove(nextStatement.start, nextExpr.start);
-      s.remove(nextExpr.end, nextStatement.end);
+      source.remove(nextStatement.start, nextExpr.start);
+      source.remove(nextExpr.end, nextStatement.end);
       markEdited(nextStatement.start, nextStatement.end);
 
       // 2. Add return statement inside IIFE body
-      s.appendRight(callee.body.end - 1, `; return ${paramName};`);
+      source.appendRight(callee.body.end - 1, `; return ${paramName};`);
 
       // 3. Remove `Name = ` assignment in arguments if it's a simple identifier
       if (rightCallArgument.left.type === 'Identifier') {
@@ -428,13 +437,13 @@ export function transform(filename: string, code: string, options: OxcTransformO
         if (unwrapParentheses(rightCallArgument.right).type === 'AssignmentExpression') {
           replacement = `(${replacement})`;
         }
-        s.overwrite(arg.right.start, arg.right.end, replacement);
+        source.overwrite(arg.right.start, arg.right.end, replacement);
         markEdited(arg.right.start, arg.right.end);
       }
 
       // 4. Move IIFE to the var initializer
-      s.move(nextExpr.start, nextExpr.end, decl.id.end);
-      s.appendLeft(decl.id.end, ' = /*#__PURE__*/ ');
+      source.move(nextExpr.start, nextExpr.end, decl.id.end);
+      source.appendLeft(decl.id.end, ' = /*#__PURE__*/ ');
     }
   }
 
@@ -562,7 +571,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
       // Perform elisions immediately
       for (const item of wrapStatementPaths) {
         if (item.type === 'elide') {
-          s.remove(item.statement.start, item.statement.end);
+          source.remove(item.statement.start, item.statement.end);
           markEdited(item.statement.start, item.statement.end);
         }
       }
@@ -582,27 +591,30 @@ export function transform(filename: string, code: string, options: OxcTransformO
 
         if (isExportDefault) {
           // 1. Remove `export default `
-          s.overwrite(statement.start, classNode.start, '');
+          source.overwrite(statement.start, classNode.start, '');
           // 2. Wrap in IIFE
-          s.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
-          s.appendLeft(
+          source.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
+          source.appendLeft(
             lastStatement.end,
             `\nreturn ${classIdName};\n})();\nexport { ${classIdName} as default };`,
           );
         } else if (isExportNamed) {
           // 1. Export is kept, turn `class` into `let ClassName = IIFE`
-          s.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
-          s.appendLeft(lastStatement.end, `\nreturn ${classIdName};\n})();`);
+          source.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
+          source.appendLeft(lastStatement.end, `\nreturn ${classIdName};\n})();`);
         } else if (isVariableClass) {
           // Wrap class inside init: `/*#__PURE__*/ (() => { let ClassName = class ClassName {}; return ClassName; })()`
-          s.appendRight(classNode.start, `/*#__PURE__*/ (() => {\nlet ${classIdName} = `);
+          source.appendRight(classNode.start, `/*#__PURE__*/ (() => {\nlet ${classIdName} = `);
           const terminator = activeWrapPaths.length === 0 ? ';' : '';
           const iifeClosing = activeWrapPaths.length === 0 ? '})()' : '})();';
-          s.appendLeft(lastStatement.end, `${terminator}\nreturn ${classIdName};\n${iifeClosing}`);
+          source.appendLeft(
+            lastStatement.end,
+            `${terminator}\nreturn ${classIdName};\n${iifeClosing}`,
+          );
         } else {
           // Standard ClassDeclaration
-          s.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
-          s.appendLeft(lastStatement.end, `\nreturn ${classIdName};\n})();`);
+          source.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
+          source.appendLeft(lastStatement.end, `\nreturn ${classIdName};\n})();`);
         }
 
         markEdited(statement.start, lastStatement.end);
@@ -611,8 +623,8 @@ export function transform(filename: string, code: string, options: OxcTransformO
         i += wrapStatementPaths.length;
       } else if (isExportDefault && !hasPotentialSideEffects) {
         // Splitting default export even when not wrapped
-        s.overwrite(statement.start, classNode.start, '');
-        s.appendLeft(classNode.end, `\nexport { ${classIdName} as default };`);
+        source.overwrite(statement.start, classNode.start, '');
+        source.appendLeft(classNode.end, `\nexport { ${classIdName} as default };`);
         markEdited(statement.start, classNode.end);
       }
     }
@@ -655,16 +667,34 @@ export function transform(filename: string, code: string, options: OxcTransformO
       functionDepth--;
       functionStack.pop();
     },
-    Program(node) {
-      adjustTypeScriptEnumsInStatements(node.body);
-      adjustStaticMembersInStatements(node.body);
+    'Program:exit'(node) {
+      if (advancedOptimizations) {
+        adjustTypeScriptEnumsInStatements(node.body);
+        adjustStaticMembersInStatements(node.body);
+      }
     },
-    BlockStatement(node) {
-      adjustTypeScriptEnumsInStatements(node.body);
-      adjustStaticMembersInStatements(node.body);
+    'BlockStatement:exit'(node) {
+      if (advancedOptimizations) {
+        adjustTypeScriptEnumsInStatements(node.body);
+        adjustStaticMembersInStatements(node.body);
+      }
     },
     CallExpression(node) {
       if (isAlreadyEdited(node.start, node.end)) {
+        return;
+      }
+
+      if (linker) {
+        const linkedCode = linker.linkCallExpression(node);
+        if (linkedCode !== undefined) {
+          source.overwrite(node.start, node.end, linkedCode);
+          markEdited(node.start, node.end);
+
+          return;
+        }
+      }
+
+      if (!advancedOptimizations) {
         return;
       }
 
@@ -686,7 +716,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
           (parentFunc.type === 'FunctionExpression' ||
             parentFunc.type === 'ArrowFunctionExpression')
         ) {
-          s.overwrite(node.start, node.end, 'void 0');
+          source.overwrite(node.start, node.end, 'void 0');
           markEdited(node.start, node.end);
 
           return;
@@ -714,11 +744,12 @@ export function transform(filename: string, code: string, options: OxcTransformO
       }
 
       if (!hasPureComment(node.start)) {
-        s.appendLeft(node.start, '/*#__PURE__*/ ');
+        source.appendLeft(node.start, '/*#__PURE__*/ ');
       }
     },
     NewExpression(node) {
       if (
+        !advancedOptimizations ||
         !pureAnnotate ||
         functionDepth > 0 ||
         classDepth > 0 ||
@@ -729,7 +760,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
 
       if (!topLevelSafeMode) {
         if (!hasPureComment(node.start)) {
-          s.appendLeft(node.start, '/*#__PURE__*/ ');
+          source.appendLeft(node.start, '/*#__PURE__*/ ');
         }
 
         return;
@@ -738,7 +769,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
       const callee = node.callee;
       if (callee.type === 'Identifier' && sideEffectFreeConstructors.has(callee.name)) {
         if (!hasPureComment(node.start)) {
-          s.appendLeft(node.start, '/*#__PURE__*/ ');
+          source.appendLeft(node.start, '/*#__PURE__*/ ');
         }
       }
     },
@@ -748,12 +779,12 @@ export function transform(filename: string, code: string, options: OxcTransformO
 
   let map: DecodedSourceMap | undefined;
   if (options.sourcemap) {
-    const rawMap = s.generateDecodedMap({ hires: true, source: filename });
+    const rawMap = source.generateDecodedMap({ hires: true, source: filename });
     map = { ...rawMap, version: 3 };
   }
 
   return {
-    code: s.toString(),
+    code: source.toString(),
     map,
   };
 }

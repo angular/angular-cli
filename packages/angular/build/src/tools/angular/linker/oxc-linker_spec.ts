@@ -6,12 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { linkWithOxc } from './oxc-linker';
+import { transform } from '../../oxc/oxc-transform';
 
-describe('linkWithOxc', () => {
+describe('oxc-linker', () => {
   it('should not modify code that does not need linking', () => {
     const input = 'const x = 1;';
-    const result = linkWithOxc('test.js', input);
+    const result = transform('test.js', input, { link: true, advancedOptimizations: false });
     expect(result.code).toBe(input);
     expect(result.map).toBeUndefined();
   });
@@ -29,7 +29,7 @@ describe('linkWithOxc', () => {
       });
     `;
 
-    const result = linkWithOxc('test.js', input);
+    const result = transform('test.js', input, { link: true, advancedOptimizations: false });
     expect(result.code).toContain('i0.ɵɵdefineDirective');
     expect(result.code).not.toContain('i0.ɵɵngDeclareDirective');
   });
@@ -49,7 +49,7 @@ describe('linkWithOxc', () => {
       });
     `;
 
-    const result = linkWithOxc('test.js', input);
+    const result = transform('test.js', input, { link: true, advancedOptimizations: false });
     expect(result.code).toContain('i0.ɵɵdefineComponent');
     expect(result.code).not.toContain('i0.ɵɵngDeclareComponent');
   });
@@ -67,7 +67,11 @@ describe('linkWithOxc', () => {
       });
     `;
 
-    const result = linkWithOxc('test.js', input, { sourcemap: true });
+    const result = transform('test.js', input, {
+      link: true,
+      advancedOptimizations: false,
+      sourcemap: true,
+    });
     expect(result.map).toBeDefined();
     expect(result.map?.version).toBe(3);
     expect(result.map?.sources).toContain('test.js');
