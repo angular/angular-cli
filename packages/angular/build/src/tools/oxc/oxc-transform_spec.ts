@@ -74,6 +74,7 @@ describe('oxc-transform', () => {
       });
       expect(result.code).toContain('i0.ɵɵdefineComponent');
       expect(result.code).not.toContain('i0.ɵɵngDeclareComponent');
+      expect(result.code).toContain('let MyComponent = /*#__PURE__*/ (() => {');
     });
   });
 });
