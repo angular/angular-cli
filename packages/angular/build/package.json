@@ -31,9 +31,9 @@
     "https-proxy-agent": "9.1.0",
     "jsonc-parser": "3.3.1",
     "listr2": "11.0.0",
-    "magic-string": "1.1.1",
+    "magic-string": "1.2.1",
     "mrmime": "2.0.1",
-    "oxc-parser": "0.144.0",
+    "oxc-parser": "0.145.0",
     "parse5-html-rewriting-stream": "8.0.1",
     "picomatch": "4.0.5",
     "piscina": "5.3.0",
@@ -51,15 +51,15 @@
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
-    "@oxc-project/types": "0.144.0",
+    "@oxc-project/types": "0.145.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "30.0.1",
-    "less": "4.8.1",
+    "less": "4.9.0",
     "ng-packagr": "22.2.0-next.3",
     "postcss": "8.5.26",
     "rollup": "4.62.4",
     "rxjs": "7.8.2",
-    "vitest": "4.1.10"
+    "vitest": "4.1.11"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
