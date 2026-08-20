@@ -207,5 +207,23 @@ describe('createWebRequestFromNodeRequest (HTTP/2)', () => {
 
       expect(webRequest.signal.aborted).toBeTrue();
     });
+
+    it('should create an aborted web request signal when the node request is already aborted', async () => {
+      const nodeRequest = await extractNodeRequest(() => {
+        client
+          .request({
+            ':path': '/already-aborted',
+            ':method': 'GET',
+          })
+          .end();
+      });
+
+      Object.defineProperty(nodeRequest, 'aborted', { get: () => true, configurable: true });
+
+      const webRequest = createWebRequestFromNodeRequest(nodeRequest);
+      expect(webRequest.signal.aborted).toBeTrue();
+
+      delete (nodeRequest as { aborted?: boolean }).aborted;
+    });
   });
 });
