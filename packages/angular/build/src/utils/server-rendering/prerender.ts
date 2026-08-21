@@ -26,7 +26,7 @@ import {
   WritableSerializableRouteTreeNode,
 } from './models';
 import type { RenderWorkerData } from './render-worker';
-import { generateRedirectStaticPage } from './utils';
+import { generateRedirectStaticPage, validateStaticRedirectUrl } from './utils';
 
 type PrerenderOptions = NormalizedApplicationBuildOptions['prerenderOptions'];
 type AppShellOptions = NormalizedApplicationBuildOptions['appShellOptions'];
@@ -131,6 +131,14 @@ export async function prerenderPages(
 
   const serializableRouteTreeNodeForPrerender: WritableSerializableRouteTreeNode = [];
   for (const metadata of serializableRouteTreeNode) {
+    if (outputMode === OutputMode.Static) {
+      const invalidStaticRedirect = validateExtractedStaticRedirect(metadata);
+      if (invalidStaticRedirect) {
+        errors.push(invalidStaticRedirect);
+        continue;
+      }
+    }
+
     if (outputMode !== OutputMode.Static && metadata.redirectTo) {
       // Skip redirects if output mode is not static.
       continue;
@@ -288,6 +296,37 @@ async function renderPages(
     errors,
     output,
   };
+}
+
+function validateExtractedStaticRedirect({
+  route,
+  redirectTo,
+  headers,
+}: SerializableRouteTreeNode[number]): string | undefined {
+  if (redirectTo !== undefined) {
+    const invalidRedirectReason = validateStaticRedirectUrl(redirectTo);
+    if (invalidRedirectReason) {
+      return (
+        `Invalid 'redirectTo' for route '${stripLeadingSlash(route)}': ${invalidRedirectReason} ` +
+        `Such values would be embedded verbatim in the generated static redirect page, ` +
+        `which can lead to HTML injection. Percent-encode the value or sanitize the source.`
+      );
+    }
+  }
+
+  const location = headers?.['Location'] ?? headers?.['location'];
+  if (location !== undefined) {
+    const invalidLocationReason = validateStaticRedirectUrl(location);
+    if (invalidLocationReason) {
+      return (
+        `Invalid 'headers.Location' for route '${stripLeadingSlash(route)}': ${invalidLocationReason} ` +
+        `Such values would be embedded verbatim in the generated static redirect page, ` +
+        `which can lead to HTML injection. Percent-encode the value or sanitize the source.`
+      );
+    }
+  }
+
+  return undefined;
 }
 
 async function getAllRoutes(

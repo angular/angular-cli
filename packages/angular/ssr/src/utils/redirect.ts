@@ -24,6 +24,47 @@ export function isValidRedirectResponseCode(code: number): boolean {
 }
 
 /**
+ * Characters that must never appear in a statically-emitted redirect target or
+ * in a value substituted into a prerendered URL. They are rejected during route
+ * extraction so they cannot break out of generated HTML contexts or smuggle
+ * markup through the route path.
+ *
+ * - C0 controls and DEL (`\u0000`-`\u001F`, `\u007F`) and whitespace
+ * - Backslash (`\`) - not a valid URL path separator
+ * - HTML-significant characters: `<`, `>`, `"`, `'`, `` ` ``
+ */
+const UNSAFE_URL_CHARACTERS_REGEXP = /[\\<>"'`]/;
+
+function hasUnsafeUrlCharacters(value: string): boolean {
+  for (let index = 0; index < value.length; index++) {
+    const characterCode = value.charCodeAt(index);
+    if (characterCode <= 0x20 || characterCode === 0x7f) {
+      return true;
+    }
+  }
+
+  return UNSAFE_URL_CHARACTERS_REGEXP.test(value);
+}
+
+/**
+ * Validates that the given value is safe to embed in a generated redirect page
+ * or to use as a prerendered URL path segment.
+ *
+ * Returns `undefined` when the value is safe, otherwise returns a human-readable
+ * error message describing why it was rejected.
+ */
+export function validateUrlForStaticEmission(value: string): string | undefined {
+  if (hasUnsafeUrlCharacters(value)) {
+    return (
+      `the value '${value}' contains characters that are not allowed in a statically ` +
+      `emitted URL (control characters, whitespace, backslash, or HTML-significant characters).`
+    );
+  }
+
+  return undefined;
+}
+
+/**
  * Creates an HTTP redirect response with a specified location and status code.
  *
  * @param location - The URL to which the response should redirect.
