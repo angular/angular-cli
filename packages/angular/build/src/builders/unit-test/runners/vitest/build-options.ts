@@ -29,7 +29,7 @@ import { RunnerOptions } from '../api';
  * @param zoneTestingStrategy How zone.js should be loaded during initialization.
  * @returns The string content of the virtual initialization file.
  */
-function createTestBedInitVirtualFile(
+export function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
   teardown: boolean,
@@ -41,7 +41,12 @@ function createTestBedInitVirtualFile(
     const relativePath = path.relative(projectSourceRoot, providersFile);
     const { dir, name } = path.parse(relativePath);
     const importPath = toPosixPath(path.join(dir, name));
-    providersImport = `import providers from './${importPath}';`;
+    // The import path is derived from the `providersFile` value in the project's
+    // configuration and must be embedded as a single JavaScript string literal.
+    // Building the specifier with `JSON.stringify` escapes any quotes, backslashes,
+    // or newlines it contains, so a crafted value cannot terminate the string early
+    // and inject executable code into this generated file.
+    providersImport = `import providers from ${JSON.stringify('./' + importPath)};`;
   }
 
   let zoneTestingSnippet = '';
