@@ -183,8 +183,10 @@ export function generateAngularServerAppManifest(
         pos = file.text.indexOf('\r\n', pos + 2);
       }
 
+      // Asset paths can contain prerendered route values. Serialize both path uses before embedding
+      // them in the executable server manifest so they remain JavaScript string data.
       serverAssets[file.path] =
-        `{size: ${size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
+        `{size: ${size}, hash: '${file.hash}', text: () => import(${JSON.stringify(`./${jsChunkFilePath}`)}).then(m => m.default)}`;
     }
   }
 
@@ -203,7 +205,7 @@ export default {
   entryPointToBrowserMapping: ${JSON.stringify(entryPointToBrowserMapping, undefined, 2)},
   assets: {
     ${Object.entries(serverAssets)
-      .map(([key, value]) => `'${key}': ${value}`)
+      .map(([key, value]) => `${JSON.stringify(key)}: ${value}`)
       .join(',\n    ')}
   },
 };
