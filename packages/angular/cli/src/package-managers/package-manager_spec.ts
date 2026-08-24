@@ -84,6 +84,58 @@ describe('PackageManager', () => {
       expect(version).toBe('4.5.6');
       expect(runCommandSpy).not.toHaveBeenCalled();
     });
+
+    it('should switch yarn descriptor to yarn-classic when resolved version is < 2', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.resolveTo({ stdout: '1.22.19', stderr: '' });
+
+      const version = await pm.getVersion();
+      expect(version).toBe('1.22.19');
+
+      // Now call an operation that differs in flags between classic and modern
+      await pm.add('foo', 'none', false, true, true);
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'yarn',
+        ['add', 'foo', '--no-lockfile', '--ignore-scripts'],
+        jasmine.anything(),
+      );
+    });
+
+    it('should keep yarn modern descriptor when resolved version is >= 2', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const pm = new PackageManager(host, '/tmp', yarnDescriptor);
+      runCommandSpy.and.resolveTo({ stdout: '4.4.1', stderr: '' });
+
+      const version = await pm.getVersion();
+      expect(version).toBe('4.4.1');
+
+      // In modern yarn, ignoreScriptsFlag is --mode=skip-build and noLockfileFlag is empty
+      await pm.add('foo', 'none', false, true, true);
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'yarn',
+        ['add', 'foo', '--mode=skip-build'],
+        jasmine.anything(),
+      );
+    });
+  });
+
+  describe('version getter', () => {
+    it('should return undefined before getVersion() is called', () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      expect(pm.version).toBeUndefined();
+    });
+
+    it('should return constructor version synchronously', () => {
+      const pm = new PackageManager(host, '/tmp', descriptor, { version: '10.0.0' });
+      expect(pm.version).toBe('10.0.0');
+    });
+
+    it('should return resolved version after getVersion() is called', async () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      await pm.getVersion();
+      expect(pm.version).toBe('1.2.3');
+    });
   });
 
   describe('acquireTempPackage', () => {

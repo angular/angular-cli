@@ -162,16 +162,9 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
       return undefined;
     }
 
-    let version: string | undefined;
-    try {
-      version = await this.context.packageManager.getVersion();
-    } catch {
-      // Ignore errors if the package manager is not available.
-    }
-
     return new AnalyticsCollector(this.context.logger, userId, {
       name: this.context.packageManager.name,
-      version,
+      version: this.context.packageManager.version,
     });
   }
 

@@ -14,11 +14,11 @@
 
 import { join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
-import { maxSatisfying, valid } from 'semver';
+import { major, maxSatisfying, valid } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
-import { PackageManagerDescriptor } from './package-manager-descriptor';
+import { PackageManagerDescriptor, SUPPORTED_PACKAGE_MANAGERS } from './package-manager-descriptor';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
 
@@ -97,6 +97,7 @@ export class PackageManager {
   #activeTasks = 0;
   readonly #pendingTasks: (() => void)[] = [];
   readonly #maxConcurrent = 5;
+  #descriptor: PackageManagerDescriptor;
 
   /**
    * Creates a new `PackageManager` instance.
@@ -108,12 +109,13 @@ export class PackageManager {
   constructor(
     private readonly host: Host,
     private readonly cwd: string,
-    private readonly descriptor: PackageManagerDescriptor,
+    descriptor: PackageManagerDescriptor,
     private readonly options: PackageManagerOptions = {},
   ) {
     if (this.options.dryRun && !this.options.logger) {
       throw new Error('A logger must be provided when dryRun is enabled.');
     }
+    this.#descriptor = descriptor;
     this.#version = options.version;
     this.#initializationError = options.initializationError;
   }
@@ -122,7 +124,28 @@ export class PackageManager {
    * The name of the package manager's binary.
    */
   get name(): string {
-    return this.descriptor.binary;
+    return this.#descriptor.binary;
+  }
+
+  /**
+   * The resolved or configured version of the package manager, if known.
+   */
+  get version(): string | undefined {
+    return this.#version;
+  }
+
+  /**
+   * Ensures the correct descriptor is selected for package managers with version-dependent
+   * behavior (such as yarn classic vs modern).
+   */
+  async #ensureDescriptor(): Promise<void> {
+    if (this.#descriptor.binary === 'yarn' && !this.#version && !this.options.dryRun) {
+      try {
+        await this.getVersion();
+      } catch {
+        // Ignore version lookup errors and fall back to modern yarn descriptor.
+      }
+    }
   }
 
   /**
@@ -147,11 +170,13 @@ export class PackageManager {
       return this.#dependencyCache;
     }
 
-    const args = this.descriptor.listDependenciesCommand;
+    await this.#ensureDescriptor();
+
+    const args = this.#descriptor.listDependenciesCommand;
 
     const workspacePackageName = await this.getCurrentPackageName();
     const dependencies = await this.#fetchAndParse(args, (stdout, logger) =>
-      this.descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
+      this.#descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
     );
 
     return (this.#dependencyCache = dependencies ?? new Map());
@@ -196,10 +221,10 @@ export class PackageManager {
       let finalEnv: Record<string, string> | undefined;
 
       if (registry) {
-        const registryOptions = this.descriptor.getRegistryOptions?.(registry);
+        const registryOptions = this.#descriptor.getRegistryOptions?.(registry);
         if (!registryOptions) {
           throw new Error(
-            `The configured package manager, '${this.descriptor.binary}', does not support a custom registry.`,
+            `The configured package manager, '${this.#descriptor.binary}', does not support a custom registry.`,
           );
         }
 
@@ -214,13 +239,13 @@ export class PackageManager {
       const executionDirectory = cwd ?? this.cwd;
       if (this.options.dryRun) {
         this.options.logger?.info(
-          `[DRY RUN] Would execute in [${executionDirectory}]: ${this.descriptor.binary} ${finalArgs.join(' ')}`,
+          `[DRY RUN] Would execute in [${executionDirectory}]: ${this.#descriptor.binary} ${finalArgs.join(' ')}`,
         );
 
         return { stdout: '', stderr: '' };
       }
 
-      const commandResult = await this.host.runCommand(this.descriptor.binary, finalArgs, {
+      const commandResult = await this.host.runCommand(this.#descriptor.binary, finalArgs, {
         ...runOptions,
         cwd: executionDirectory,
         stdio: 'pipe',
@@ -278,17 +303,17 @@ export class PackageManager {
     // Yarn classic can exit with code 0 even when an error occurs.
     // To ensure we capture these cases, we will always attempt to parse a
     // structured error from the output, regardless of the exit code.
-    const getError = this.descriptor.outputParsers.getError;
+    const getError = this.#descriptor.outputParsers.getError;
     const parsedError =
       getError?.(stdout, this.options.logger) ?? getError?.(stderr, this.options.logger) ?? null;
 
     if (parsedError) {
       this.options.logger?.debug(
-        `[${this.descriptor.binary}] Structured error (code: ${parsedError.code}): ${parsedError.summary}`,
+        `[${this.#descriptor.binary}] Structured error (code: ${parsedError.code}): ${parsedError.summary}`,
       );
 
       // Special case for 'not found' errors (e.g., E404). Return null for these.
-      if (this.descriptor.isNotFound(parsedError)) {
+      if (this.#descriptor.isNotFound(parsedError)) {
         if (cache && cacheKey) {
           cache.set(cacheKey, null);
         }
@@ -343,16 +368,17 @@ export class PackageManager {
     ignoreScripts: boolean,
     options: { registry?: string } = {},
   ): Promise<void> {
+    await this.#ensureDescriptor();
     const flags = [
-      asDevDependency ? this.descriptor.saveDevFlag : '',
-      save === 'exact' ? this.descriptor.saveExactFlag : '',
-      save === 'tilde' ? this.descriptor.saveTildeFlag : '',
-      noLockfile ? this.descriptor.noLockfileFlag : '',
-      ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
+      asDevDependency ? this.#descriptor.saveDevFlag : '',
+      save === 'exact' ? this.#descriptor.saveExactFlag : '',
+      save === 'tilde' ? this.#descriptor.saveTildeFlag : '',
+      noLockfile ? this.#descriptor.noLockfileFlag : '',
+      ignoreScripts ? this.#descriptor.ignoreScriptsFlag : '',
     ].filter((flag) => flag);
 
     const specifier = this.host.requiresQuoting ? `"${packageName}"` : packageName;
-    const args = [this.descriptor.addCommand, specifier, ...flags];
+    const args = [this.#descriptor.addCommand, specifier, ...flags];
 
     await this.#run(args, options);
 
@@ -377,12 +403,13 @@ export class PackageManager {
       ignorePeerDependencies?: boolean;
     } = { ignoreScripts: true },
   ): Promise<void> {
+    await this.#ensureDescriptor();
     const flags = [
-      options.force ? this.descriptor.forceFlag : '',
-      options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
-      options.ignorePeerDependencies ? (this.descriptor.ignorePeerDependenciesFlag ?? '') : '',
+      options.force ? this.#descriptor.forceFlag : '',
+      options.ignoreScripts ? this.#descriptor.ignoreScriptsFlag : '',
+      options.ignorePeerDependencies ? (this.#descriptor.ignorePeerDependenciesFlag ?? '') : '',
     ].filter((flag) => flag);
-    const args = [...this.descriptor.installCommand, ...flags];
+    const args = [...this.#descriptor.installCommand, ...flags];
 
     await this.#run(args, options);
 
@@ -393,9 +420,9 @@ export class PackageManager {
    * Gets the name of the package in the current project.
    */
   async getCurrentPackageName(): Promise<string | undefined> {
-    if (this.descriptor.getPackageNameCommand) {
+    if (this.#descriptor.getPackageNameCommand) {
       try {
-        const { stdout } = await this.#run(this.descriptor.getPackageNameCommand);
+        const { stdout } = await this.#run(this.#descriptor.getPackageNameCommand);
         if (stdout) {
           return JSON.parse(stdout);
         }
@@ -422,11 +449,16 @@ export class PackageManager {
       return this.#version;
     }
 
-    const { stdout } = await this.#run(this.descriptor.versionCommand);
+    const { stdout } = await this.#run(this.#descriptor.versionCommand);
     this.#version = stdout.trim();
 
     if (!valid(this.#version)) {
       throw new Error(`Invalid semver version for ${this.name}: "${this.#version}"`);
+    }
+
+    if (this.#descriptor.binary === 'yarn' && major(this.#version) < 2) {
+      this.#descriptor = SUPPORTED_PACKAGE_MANAGERS['yarn-classic'];
+      this.options.logger?.debug(`Detected yarn classic. Using 'yarn-classic'.`);
     }
 
     return this.#version;
@@ -468,6 +500,7 @@ export class PackageManager {
     packageName: string,
     options: { timeout?: number; registry?: string; bypassCache?: boolean } = {},
   ): Promise<PackageMetadata | null> {
+    await this.#ensureDescriptor();
     const cacheKey = options.registry ? `${packageName}|${options.registry}` : packageName;
 
     if (!options.bypassCache) {
@@ -478,20 +511,20 @@ export class PackageManager {
     }
 
     let metadata: PackageMetadata | null;
-    if (this.descriptor.getRegistryMetadata) {
-      metadata = await this.descriptor.getRegistryMetadata(packageName, (args, parser) =>
+    if (this.#descriptor.getRegistryMetadata) {
+      metadata = await this.#descriptor.getRegistryMetadata(packageName, (args, parser) =>
         this.#fetchAndParse(args, parser, options),
       );
     } else {
-      const commandArgs = [...this.descriptor.getManifestCommand, packageName];
-      const formatter = this.descriptor.viewCommandFieldArgFormatter;
+      const commandArgs = [...this.#descriptor.getManifestCommand, packageName];
+      const formatter = this.#descriptor.viewCommandFieldArgFormatter;
       if (formatter) {
         commandArgs.push(...formatter(METADATA_FIELDS));
       }
 
       metadata = await this.#fetchAndParse(
         commandArgs,
-        (stdout, logger) => this.descriptor.outputParsers.getRegistryMetadata(stdout, logger),
+        (stdout, logger) => this.#descriptor.outputParsers.getRegistryMetadata(stdout, logger),
         options,
       );
     }
@@ -517,11 +550,12 @@ export class PackageManager {
     version: string,
     options: { timeout?: number; registry?: string; bypassCache?: boolean } = {},
   ): Promise<PackageManifest | null> {
+    await this.#ensureDescriptor();
     const specifier = this.host.requiresQuoting
       ? `"${packageName}@${version}"`
       : `${packageName}@${version}`;
-    const commandArgs = [...this.descriptor.getManifestCommand, specifier];
-    const formatter = this.descriptor.viewCommandFieldArgFormatter;
+    const commandArgs = [...this.#descriptor.getManifestCommand, specifier];
+    const formatter = this.#descriptor.viewCommandFieldArgFormatter;
     if (formatter) {
       commandArgs.push(...formatter(MANIFEST_FIELDS));
     }
@@ -530,7 +564,7 @@ export class PackageManager {
 
     const manifest = await this.#fetchAndParse(
       commandArgs,
-      (stdout, logger) => this.descriptor.outputParsers.getRegistryManifest(stdout, logger),
+      (stdout, logger) => this.#descriptor.outputParsers.getRegistryManifest(stdout, logger),
       { ...options, cache: this.#manifestCache, cacheKey },
     );
 
@@ -561,6 +595,7 @@ export class PackageManager {
     specifier: string | npa.Result,
     options: { timeout?: number; registry?: string; bypassCache?: boolean } = {},
   ): Promise<PackageManifest | null> {
+    await this.#ensureDescriptor();
     const { name, type, fetchSpec } = typeof specifier === 'string' ? npa(specifier) : specifier;
 
     switch (type) {
@@ -573,7 +608,7 @@ export class PackageManager {
 
         // `fetchSpec` is the version, range, or tag.
         let versionSpec = fetchSpec ?? 'latest';
-        if (this.descriptor.requiresManifestVersionLookup) {
+        if (this.#descriptor.requiresManifestVersionLookup) {
           if (type === 'tag' || !fetchSpec) {
             const metadata = await this.getRegistryMetadata(name, options);
             if (!metadata) {
@@ -725,8 +760,8 @@ export class PackageManager {
     }
 
     // Copy configuration files if the package manager requires it (e.g., bun, yarn).
-    if (this.descriptor.copyConfigFromProject) {
-      for (const configFile of this.descriptor.configFiles) {
+    if (this.#descriptor.copyConfigFromProject) {
+      for (const configFile of this.#descriptor.configFiles) {
         try {
           const configPath = join(this.cwd, configFile);
           let content = await this.host.readFile(configPath);
@@ -740,10 +775,10 @@ export class PackageManager {
       }
     }
 
-    const flags = [options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : ''].filter(
+    const flags = [options.ignoreScripts ? this.#descriptor.ignoreScriptsFlag : ''].filter(
       (flag) => flag,
     );
-    const args: readonly string[] = [this.descriptor.addCommand, specifier, ...flags];
+    const args: readonly string[] = [this.#descriptor.addCommand, specifier, ...flags];
 
     try {
       await this.#run(args, { ...options, cwd: workingDirectory });
@@ -774,12 +809,15 @@ export class PackageManager {
    * @returns A promise that resolves to the limit in milliseconds, or `0` if not set.
    */
   async #resolveMinimumReleaseAge(): Promise<number> {
-    if (this.descriptor.getReleaseAgeConfigCommand && this.descriptor.outputParsers.getReleaseAge) {
+    if (
+      this.#descriptor.getReleaseAgeConfigCommand &&
+      this.#descriptor.outputParsers.getReleaseAge
+    ) {
       try {
-        const { stdout } = await this.#run(this.descriptor.getReleaseAgeConfigCommand);
+        const { stdout } = await this.#run(this.#descriptor.getReleaseAgeConfigCommand);
         const version = await this.getVersion();
 
-        return this.descriptor.outputParsers.getReleaseAge(stdout, version);
+        return this.#descriptor.outputParsers.getReleaseAge(stdout, version);
       } catch {
         // Ignore failures and fallback to 0
       }
