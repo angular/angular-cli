@@ -516,4 +516,28 @@ describe('I18nInliner', () => {
       await fs.rm(cacheDir, { recursive: true, force: true });
     }
   });
+
+  it('inlines across sliding windows when locale count exceeds window size', async () => {
+    const locales = Array.from({ length: 20 }, (_, i) => ({
+      locale: `locale-${i}`,
+      translation: { greeting: translationFor(`Hello ${i}`) },
+    }));
+
+    const inliner = new I18nInliner(
+      {
+        missingTranslation: 'warning',
+        outputFiles: [browserFile('main.js', GREETING_SOURCE)],
+      },
+      2,
+    );
+
+    const results = await inliner.inlineAll(locales);
+
+    expect(results.size).toBe(20);
+    for (let i = 0; i < 20; i++) {
+      const localeResult = results.get(`locale-${i}`);
+      expect(localeResult?.errors).toEqual([]);
+      expect(findFile(localeResult?.outputFiles ?? [], 'main.js').text).toContain(`"Hello ${i}"`);
+    }
+  });
 });

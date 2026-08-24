@@ -84,6 +84,12 @@ interface InlineFileBatchRequest {
    * Typically true when all remaining locales for the file are processed in a single batch.
    */
   ephemeral?: boolean;
+
+  /**
+   * The list of active locales in the current inlining window. Any cached translation dictionaries
+   * not present in this list will be evicted from the Worker's memory cache.
+   */
+  activeLocales?: string[];
 }
 
 /**
@@ -237,6 +243,15 @@ export default async function inlineFile(request: InlineFileRequest) {
 export async function inlineFileBatch(
   request: InlineFileBatchRequest,
 ): Promise<InlineFileBatchResult> {
+  if (request.activeLocales) {
+    const activeSet = new Set(request.activeLocales);
+    for (const locale of deserializedTranslations.keys()) {
+      if (!activeSet.has(locale)) {
+        deserializedTranslations.delete(locale);
+      }
+    }
+  }
+
   const { code, metadata } = await loadFileData(request.filename, !request.ephemeral);
 
   // Parse the sourcemap once for the entire batch.
