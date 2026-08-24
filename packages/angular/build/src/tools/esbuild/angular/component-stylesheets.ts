@@ -176,6 +176,7 @@ export class ComponentStylesheetBundler {
     }
 
     const normalizedFiles = [...files].map(path.normalize);
+    const normalizedFilesSet = new Set(normalizedFiles);
     let entries: string[] | undefined;
 
     for (const [entry, bundler] of this.#fileContexts.entries()) {
@@ -184,8 +185,17 @@ export class ComponentStylesheetBundler {
         entries.push(entry);
       }
     }
-    for (const bundler of this.#inlineContexts.values()) {
-      bundler.invalidate(normalizedFiles);
+    for (const [entry, bundler] of this.#inlineContexts.entries()) {
+      // Entry is format: [language, id, filename].join(';')
+      const firstSemi = entry.indexOf(';');
+      const secondSemi = firstSemi !== -1 ? entry.indexOf(';', firstSemi + 1) : -1;
+      const filename = secondSemi !== -1 ? entry.slice(secondSemi + 1) : '';
+      if (filename && normalizedFilesSet.has(path.normalize(filename))) {
+        this.#inlineContexts.delete(entry);
+        void bundler.dispose();
+      } else {
+        bundler.invalidate(normalizedFiles);
+      }
     }
 
     return entries;

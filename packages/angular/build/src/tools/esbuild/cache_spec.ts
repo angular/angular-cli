@@ -141,4 +141,21 @@ describe('MemoryCache', () => {
     const val2 = await cache.getOrCreate('key', () => 'should-not-run');
     expect(val2).toBe('override-value');
   });
+
+  it('should delete a cached key and allow creating a new value', async () => {
+    await cache.put('key', 'value-1');
+    expect(await cache.get('key')).toBe('value-1');
+
+    const deleted = cache.delete('key');
+    expect(deleted).toBeTrue();
+    expect(await cache.get('key')).toBeUndefined();
+
+    // Subsequent getOrCreate should call creator
+    const newValue = await cache.getOrCreate('key', () => 'value-2');
+    expect(newValue).toBe('value-2');
+  });
+
+  it('should return false when deleting a non-existent key', () => {
+    expect(cache.delete('non-existent')).toBeFalse();
+  });
 });

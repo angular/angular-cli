@@ -82,4 +82,35 @@ describe('MemoryLoadResultCache', () => {
     expect(invalidated).toBeTrue();
     expect(cache.get('file:/test/styles.css')).toBeUndefined();
   });
+
+  it('should clean up previous file dependencies when put updates watchFiles', async () => {
+    const initialResult = {
+      contents: 'body { color: red; }',
+      loader: 'css' as const,
+      watchFiles: ['/test/styles.css', '/test/old-dep.json'],
+    };
+
+    await cache.put('file:/test/styles.css', initialResult);
+    expect(cache.watchFiles).toContain('/test/old-dep.json');
+
+    // Update with new watch files (not containing old-dep.json)
+    const updatedResult = {
+      contents: 'body { color: blue; }',
+      loader: 'css' as const,
+      watchFiles: ['/test/styles.css', '/test/new-dep.json'],
+    };
+
+    await cache.put('file:/test/styles.css', updatedResult);
+    expect(cache.watchFiles).not.toContain('/test/old-dep.json');
+    expect(cache.watchFiles).toContain('/test/new-dep.json');
+
+    // Invalidating old dependency should not affect the cache
+    expect(cache.invalidate('/test/old-dep.json')).toBeFalse();
+    expect(cache.get('file:/test/styles.css')).toBe(updatedResult);
+
+    // Invalidating new dependency should invalidate the cache
+    expect(cache.invalidate('/test/new-dep.json')).toBeTrue();
+    expect(cache.get('file:/test/styles.css')).toBeUndefined();
+    expect(cache.watchFiles).not.toContain('/test/new-dep.json');
+  });
 });

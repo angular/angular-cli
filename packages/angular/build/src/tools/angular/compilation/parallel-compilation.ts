@@ -30,6 +30,7 @@ import {
  */
 export class ParallelCompilation extends AngularCompilation {
   readonly #worker: WorkerPool;
+  #webWorkerChannel?: MessageChannel;
 
   constructor(
     private readonly jit: boolean,
@@ -47,7 +48,7 @@ export class ParallelCompilation extends AngularCompilation {
     });
   }
 
-  override initialize(
+  override async initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionsTransformer?: (compilerOptions: CompilerOptions) => CompilerOptions,
@@ -64,9 +65,12 @@ export class ParallelCompilation extends AngularCompilation {
       },
     );
 
+    this.#webWorkerChannel?.port1.close();
+
     // The web worker processing is a synchronous operation and uses shared memory combined with
     // the Atomics API to block execution here until a response is received.
     const webWorkerChannel = new MessageChannel();
+    this.#webWorkerChannel = webWorkerChannel;
     const webWorkerSignal = new Int32Array(new SharedArrayBuffer(4));
     webWorkerChannel.port1.on('message', ({ workerFile, containingFile }) => {
       try {
@@ -89,31 +93,44 @@ export class ParallelCompilation extends AngularCompilation {
         const transformedOptions = compilerOptionsTransformer?.(compilerOptions) ?? compilerOptions;
         optionsChannel.port1.postMessage({ transformedOptions });
       } catch (error) {
-        webWorkerChannel.port1.postMessage({ error });
+        optionsChannel.port1.postMessage({ error });
       } finally {
         Atomics.store(optionsSignal, 0, 1);
         Atomics.notify(optionsSignal, 0);
       }
     });
 
-    // Execute the initialize function in the worker thread
-    return this.#worker.run(
-      {
-        fileReplacements: hostOptions.fileReplacements,
-        tsconfig,
-        jit: this.jit,
-        browserOnlyBuild: this.browserOnlyBuild,
-        stylesheetPort: stylesheetChannel.port2,
-        optionsPort: optionsChannel.port2,
-        optionsSignal,
-        webWorkerPort: webWorkerChannel.port2,
-        webWorkerSignal,
-      },
-      {
-        name: 'initialize',
-        transferList: [stylesheetChannel.port2, optionsChannel.port2, webWorkerChannel.port2],
-      },
-    );
+    let success = false;
+    try {
+      // Execute the initialize function in the worker thread
+      const result = await this.#worker.run(
+        {
+          fileReplacements: hostOptions.fileReplacements,
+          tsconfig,
+          jit: this.jit,
+          browserOnlyBuild: this.browserOnlyBuild,
+          stylesheetPort: stylesheetChannel.port2,
+          optionsPort: optionsChannel.port2,
+          optionsSignal,
+          webWorkerPort: webWorkerChannel.port2,
+          webWorkerSignal,
+        },
+        {
+          name: 'initialize',
+          transferList: [stylesheetChannel.port2, optionsChannel.port2, webWorkerChannel.port2],
+        },
+      );
+      success = true;
+
+      return result;
+    } finally {
+      stylesheetChannel.port1.close();
+      optionsChannel.port1.close();
+      if (!success) {
+        this.#webWorkerChannel?.port1.close();
+        this.#webWorkerChannel = undefined;
+      }
+    }
   }
 
   /**
@@ -135,8 +152,13 @@ export class ParallelCompilation extends AngularCompilation {
     return result;
   }
 
-  override emitAffectedFiles(): Promise<Iterable<EmitFileResult>> {
-    return this.#worker.run(undefined, { name: 'emit' });
+  override async emitAffectedFiles(): Promise<Iterable<EmitFileResult>> {
+    try {
+      return await this.#worker.run(undefined, { name: 'emit' });
+    } finally {
+      this.#webWorkerChannel?.port1.close();
+      this.#webWorkerChannel = undefined;
+    }
   }
 
   override update(files: Set<string>): Promise<void> {
@@ -144,6 +166,9 @@ export class ParallelCompilation extends AngularCompilation {
   }
 
   override close() {
+    this.#webWorkerChannel?.port1.close();
+    this.#webWorkerChannel = undefined;
+
     return this.#worker.destroy();
   }
 }

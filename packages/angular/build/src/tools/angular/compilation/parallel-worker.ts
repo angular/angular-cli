@@ -33,99 +33,122 @@ export interface InitRequest {
 }
 
 let compilation: AngularCompilation | undefined;
+let activeWebWorkerPort: MessagePort | undefined;
 
 const modifiedFiles = new Set<string>();
 
 export async function initialize(request: InitRequest): Promise<AngularCompilationResult> {
+  activeWebWorkerPort?.close();
+  activeWebWorkerPort = request.webWorkerPort;
+
   const currentModifiedFiles = new Set(modifiedFiles);
   modifiedFiles.clear();
 
-  await initializeHash();
-  compilation ??= request.jit
-    ? new JitCompilation(request.browserOnlyBuild)
-    : new AotCompilation(request.browserOnlyBuild);
+  let success = false;
+  try {
+    await initializeHash();
+    compilation ??= request.jit
+      ? new JitCompilation(request.browserOnlyBuild)
+      : new AotCompilation(request.browserOnlyBuild);
 
-  const stylesheetRequests = new Map<string, [(value: string) => void, (reason: Error) => void]>();
-  request.stylesheetPort.on('message', ({ requestId, value, error }) => {
-    if (error) {
-      stylesheetRequests.get(requestId)?.[1](error);
-    } else {
-      stylesheetRequests.get(requestId)?.[0](value);
-    }
-  });
+    const stylesheetRequests = new Map<
+      string,
+      [(value: string) => void, (reason: Error) => void]
+    >();
+    request.stylesheetPort.on('message', ({ requestId, value, error }) => {
+      const handlers = stylesheetRequests.get(requestId);
+      if (handlers) {
+        stylesheetRequests.delete(requestId);
+        if (error) {
+          handlers[1](error);
+        } else {
+          handlers[0](value);
+        }
+      }
+    });
 
-  const {
-    compilerOptions,
-    referencedFiles,
-    externalStylesheets,
-    templateUpdates,
-    componentResourcesDependencies,
-  } = await compilation.initialize(
-    request.tsconfig,
-    {
-      fileReplacements: request.fileReplacements,
-      modifiedFiles: currentModifiedFiles,
-      transformStylesheet(data, containingFile, stylesheetFile, order, className) {
-        const requestId = randomUUID();
-        const resultPromise = new Promise<string>((resolve, reject) =>
-          stylesheetRequests.set(requestId, [resolve, reject]),
-        );
+    const {
+      compilerOptions,
+      referencedFiles,
+      externalStylesheets,
+      templateUpdates,
+      componentResourcesDependencies,
+    } = await compilation.initialize(
+      request.tsconfig,
+      {
+        fileReplacements: request.fileReplacements,
+        modifiedFiles: currentModifiedFiles,
+        transformStylesheet(data, containingFile, stylesheetFile, order, className) {
+          const requestId = randomUUID();
+          const resultPromise = new Promise<string>((resolve, reject) =>
+            stylesheetRequests.set(requestId, [resolve, reject]),
+          );
 
-        request.stylesheetPort.postMessage({
-          requestId,
-          data,
-          containingFile,
-          stylesheetFile,
-          order,
-          className,
-        });
+          request.stylesheetPort.postMessage({
+            requestId,
+            data,
+            containingFile,
+            stylesheetFile,
+            order,
+            className,
+          });
 
-        return resultPromise;
+          return resultPromise;
+        },
+        processWebWorker(workerFile, containingFile) {
+          Atomics.store(request.webWorkerSignal, 0, 0);
+          request.webWorkerPort.postMessage({ workerFile, containingFile });
+
+          Atomics.wait(request.webWorkerSignal, 0, 0);
+          const result = receiveMessageOnPort(request.webWorkerPort)?.message;
+
+          if (result?.error) {
+            throw result.error;
+          }
+
+          return result?.workerCodeFile ?? workerFile;
+        },
       },
-      processWebWorker(workerFile, containingFile) {
-        Atomics.store(request.webWorkerSignal, 0, 0);
-        request.webWorkerPort.postMessage({ workerFile, containingFile });
+      (compilerOptions) => {
+        Atomics.store(request.optionsSignal, 0, 0);
+        request.optionsPort.postMessage(compilerOptions);
 
-        Atomics.wait(request.webWorkerSignal, 0, 0);
-        const result = receiveMessageOnPort(request.webWorkerPort)?.message;
+        Atomics.wait(request.optionsSignal, 0, 0);
+        const result = receiveMessageOnPort(request.optionsPort)?.message;
 
         if (result?.error) {
           throw result.error;
         }
 
-        return result?.workerCodeFile ?? workerFile;
+        return result?.transformedOptions ?? compilerOptions;
       },
-    },
-    (compilerOptions) => {
-      Atomics.store(request.optionsSignal, 0, 0);
-      request.optionsPort.postMessage(compilerOptions);
+    );
 
-      Atomics.wait(request.optionsSignal, 0, 0);
-      const result = receiveMessageOnPort(request.optionsPort)?.message;
+    success = true;
 
-      if (result?.error) {
-        throw result.error;
-      }
-
-      return result?.transformedOptions ?? compilerOptions;
-    },
-  );
-
-  return {
-    externalStylesheets,
-    templateUpdates,
-    referencedFiles,
-    // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
-    compilerOptions: {
-      allowJs: compilerOptions.allowJs,
-      isolatedModules: compilerOptions.isolatedModules,
-      sourceMap: compilerOptions.sourceMap,
-      inlineSourceMap: compilerOptions.inlineSourceMap,
-      _useTypeScriptTranspilation: compilerOptions['_useTypeScriptTranspilation'] as
-        boolean | undefined,
-    },
-    componentResourcesDependencies,
-  };
+    return {
+      externalStylesheets,
+      templateUpdates,
+      referencedFiles,
+      // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
+      compilerOptions: {
+        allowJs: compilerOptions.allowJs,
+        isolatedModules: compilerOptions.isolatedModules,
+        sourceMap: compilerOptions.sourceMap,
+        inlineSourceMap: compilerOptions.inlineSourceMap,
+        _useTypeScriptTranspilation: compilerOptions['_useTypeScriptTranspilation'] as
+          boolean | undefined,
+      },
+      componentResourcesDependencies,
+    };
+  } finally {
+    request.stylesheetPort.close();
+    request.optionsPort.close();
+    if (!success) {
+      activeWebWorkerPort?.close();
+      activeWebWorkerPort = undefined;
+    }
+  }
 }
 
 export async function diagnose(modes: DiagnosticModes): Promise<{
@@ -147,9 +170,14 @@ export async function diagnose(modes: DiagnosticModes): Promise<{
 export async function emit() {
   assert(compilation);
 
-  const files = await compilation.emitAffectedFiles();
+  try {
+    const files = await compilation.emitAffectedFiles();
 
-  return [...files];
+    return [...files];
+  } finally {
+    activeWebWorkerPort?.close();
+    activeWebWorkerPort = undefined;
+  }
 }
 
 export async function update(files: Set<string>): Promise<void> {
