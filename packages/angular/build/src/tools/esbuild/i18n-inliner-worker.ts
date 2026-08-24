@@ -64,10 +64,45 @@ interface InlineCodeRequest {
   translation?: Blob;
 }
 
+/**
+ * The options passed to the inliner for a batch file request
+ */
+interface InlineFileBatchRequest {
+  /**
+   * The filename that should be processed. The data for the file is provided to the Worker
+   * during Worker initialization.
+   */
+  filename: string;
+
+  /**
+   * The locale specifiers or locale objects that should be used during the inlining process of the file.
+   */
+  locales: (string | { locale: string; translation?: Blob })[];
+}
+
+/**
+ * The result for a single locale within a batch file request.
+ */
+interface InlineLocaleResult {
+  locale: string;
+  code: string;
+  map?: string;
+  messages: { type: 'error' | 'warning'; message: string }[];
+}
+
+/**
+ * The response returned from a batch file request.
+ */
+interface InlineFileBatchResult {
+  file: string;
+  results: InlineLocaleResult[];
+}
+
 // Extract the application files and common options used for inline requests from the Worker context
-const { files, missingTranslation } = (workerData || {}) as {
+const { files, missingTranslation, translations } = (workerData || {}) as {
   files: ReadonlyMap<string, Blob>;
   missingTranslation: 'error' | 'warning' | 'ignore';
+  translations?: ReadonlyMap<string, Blob>;
 };
 
 /**
@@ -113,24 +148,30 @@ function getFileData(filename: string): Promise<CachedFileData> {
 }
 
 /**
- * Deserializes the translation messages for an inline request, reusing the result for any
+ * Deserializes the translation messages for a locale, reusing the result for any
  * subsequent request that targets the same locale.
- * @param request An inline request containing the locale and its serialized messages.
+ * @param locale The locale identifier.
+ * @param translation Optional serialized translation messages. If omitted, workerData.translations is used.
  * @returns The translation messages, or undefined if the locale has no translations.
  */
 function loadTranslation(
-  request: InlineFileRequest | InlineCodeRequest,
+  locale: string,
+  translation?: Blob,
 ): Promise<Record<string, unknown>> | undefined {
-  const { locale, translation } = request;
-  if (!translation) {
+  const translationBlob = translation ?? translations?.get(locale);
+  if (!translationBlob) {
     return undefined;
   }
 
   let messagesPromise = deserializedTranslations.get(locale);
   if (!messagesPromise) {
-    messagesPromise = translation
+    messagesPromise = translationBlob
       .arrayBuffer()
-      .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>);
+      .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>)
+      .catch((error) => {
+        deserializedTranslations.delete(locale);
+        throw error;
+      });
     deserializedTranslations.set(locale, messagesPromise);
   }
 
@@ -149,8 +190,6 @@ export default async function inlineFile(request: InlineFileRequest) {
 
   // Sourcemaps are parsed on demand per request rather than cached long-term to prevent
   // monotonic memory growth as a worker processes multiple files across the build.
-  // When multi-locale batching is implemented, the sourcemap can be parsed once per batch and released
-  // upon batch completion.
   const rawMap = await files.get(request.filename + '.map')?.text();
   const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
 
@@ -159,7 +198,7 @@ export default async function inlineFile(request: InlineFileRequest) {
     map,
     metadata,
     request.locale,
-    await loadTranslation(request),
+    await loadTranslation(request.locale, request.translation),
     request.filename,
   );
 
@@ -168,6 +207,50 @@ export default async function inlineFile(request: InlineFileRequest) {
     code: result.code,
     map: result.map,
     messages: result.diagnostics.messages,
+  };
+}
+
+/**
+ * Inlines multiple locales and translations into a JavaScript file that contains `$localize` usage.
+ *
+ * @param request An InlineFileBatchRequest object representing the options for inlining.
+ * @returns An object containing the inlined results for each requested locale.
+ */
+export async function inlineFileBatch(
+  request: InlineFileBatchRequest,
+): Promise<InlineFileBatchResult> {
+  const { code, metadata } = await getFileData(request.filename);
+
+  // Parse the sourcemap once for the entire batch.
+  // It will naturally be garbage-collected after this batch action returns.
+  const rawMap = await files.get(request.filename + '.map')?.text();
+  const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
+
+  const results = await Promise.all(
+    request.locales.map(async (entry) => {
+      const locale = typeof entry === 'string' ? entry : entry.locale;
+      const translation = typeof entry === 'string' ? undefined : entry.translation;
+      const result = await inlineLocalize(
+        code,
+        map,
+        metadata,
+        locale,
+        await loadTranslation(locale, translation),
+        request.filename,
+      );
+
+      return {
+        locale,
+        code: result.code,
+        map: result.map,
+        messages: result.diagnostics.messages,
+      };
+    }),
+  );
+
+  return {
+    file: request.filename,
+    results,
   };
 }
 
@@ -185,7 +268,7 @@ export async function inlineCode(request: InlineCodeRequest) {
     undefined,
     metadata,
     request.locale,
-    await loadTranslation(request),
+    await loadTranslation(request.locale, request.translation),
     request.filename,
   );
 

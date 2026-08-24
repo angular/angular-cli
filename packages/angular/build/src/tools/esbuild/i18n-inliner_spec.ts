@@ -7,6 +7,9 @@
  */
 
 import { transform } from 'esbuild';
+import fs from 'node:fs/promises';
+import os from 'node:os';
+import path from 'node:path';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { I18nInliner } from './i18n-inliner';
 
@@ -339,5 +342,173 @@ describe('I18nInliner', () => {
     expect(warnings).toEqual([]);
     expect(findFile(outputFiles, 'main.js').text).toContain('"Bonjour"');
     expect(findFile(outputFiles, 'main.js').text).not.toContain('$localize');
+  });
+
+  it('inlines multiple locales in parallel via inlineAll', async () => {
+    const localeInliner = createInliner([
+      browserFile('main.js', GREETING_SOURCE),
+      browserFile('chunk.js', GREETING_SOURCE),
+      browserFile('other.js', 'export const answer = 42;\n'),
+    ]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+      { locale: 'de', translation: { greeting: translationFor('Hallo') } },
+      { locale: 'es', translation: { greeting: translationFor('Hola') } },
+      { locale: 'en-US', translation: undefined },
+    ]);
+
+    expect(results.size).toBe(4);
+
+    const fr = results.get('fr');
+    expect(fr).toBeDefined();
+    expect(fr?.errors).toEqual([]);
+    expect(fr?.warnings).toEqual([]);
+    expect(findFile(fr?.outputFiles ?? [], 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(fr?.outputFiles ?? [], 'chunk.js').text).toContain('"Bonjour"');
+    expect(findFile(fr?.outputFiles ?? [], 'other.js').text).toBe('export const answer = 42;\n');
+
+    const de = results.get('de');
+    expect(de).toBeDefined();
+    expect(de?.errors).toEqual([]);
+    expect(findFile(de?.outputFiles ?? [], 'main.js').text).toContain('"Hallo"');
+
+    const es = results.get('es');
+    expect(es).toBeDefined();
+    expect(es?.errors).toEqual([]);
+    expect(findFile(es?.outputFiles ?? [], 'main.js').text).toContain('"Hola"');
+
+    const en = results.get('en-US');
+    expect(en).toBeDefined();
+    expect(en?.errors).toEqual([]);
+    expect(findFile(en?.outputFiles ?? [], 'main.js').text).toContain('"Hello"');
+  });
+
+  it('inlines multiple locales with sourcemaps in parallel via inlineAll', async () => {
+    const { code, map } = await transform(GREETING_SOURCE, {
+      sourcefile: 'greeting.ts',
+      loader: 'ts',
+      sourcemap: 'external',
+    });
+
+    const localeInliner = createInliner([
+      browserFile('main.js', code),
+      browserFile('main.js.map', map),
+      browserFile('other.js', 'export const answer = 42;\n'),
+    ]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+      { locale: 'de', translation: { greeting: translationFor('Hallo') } },
+      { locale: 'en-US', translation: undefined },
+    ]);
+
+    expect(results.size).toBe(3);
+
+    for (const [locale, greeting] of [
+      ['fr', 'Bonjour'],
+      ['de', 'Hallo'],
+      ['en-US', 'Hello'],
+    ] as const) {
+      const localeResult = results.get(locale);
+      expect(localeResult).toBeDefined();
+      expect(localeResult?.errors).toEqual([]);
+      expect(localeResult?.warnings).toEqual([]);
+
+      const mainJs = findFile(localeResult?.outputFiles ?? [], 'main.js');
+      expect(mainJs.text).toContain(`"${greeting}"`);
+
+      const mainMap = findFile(localeResult?.outputFiles ?? [], 'main.js.map');
+      const outputMap = JSON.parse(mainMap.text) as {
+        version: number;
+        sources: string[];
+        mappings: string;
+      };
+      expect(outputMap.version).toBe(3);
+      expect(outputMap.sources).toContain('greeting.ts');
+      expect(outputMap.mappings.length).toBeGreaterThan(0);
+
+      const otherJs = findFile(localeResult?.outputFiles ?? [], 'other.js');
+      expect(otherJs.text).toBe('export const answer = 42;\n');
+    }
+  });
+
+  it('inlines multiple locales with partial cache hits and misses via inlineAll', async () => {
+    const cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), 'i18n-cache-test-'));
+
+    try {
+      const initialInliner = new I18nInliner(
+        {
+          missingTranslation: 'warning',
+          outputFiles: [
+            browserFile('main.js', GREETING_SOURCE),
+            browserFile('other.js', 'export const answer = 42;\n'),
+          ],
+          persistentCachePath: cacheDir,
+        },
+        2,
+      );
+
+      // Pre-populate cache for 'fr'
+      await initialInliner.inlineForLocale(
+        'fr',
+        { greeting: translationFor('Bonjour') },
+        'integrity-fr-1',
+      );
+      await initialInliner.close();
+
+      // Create new inliner with same cache path, inlining cached 'fr' alongside uncached 'de' and 'es'
+      inliner = new I18nInliner(
+        {
+          missingTranslation: 'warning',
+          outputFiles: [
+            browserFile('main.js', GREETING_SOURCE),
+            browserFile('other.js', 'export const answer = 42;\n'),
+          ],
+          persistentCachePath: cacheDir,
+        },
+        2,
+      );
+
+      const results = await inliner.inlineAll([
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+          translationIntegrity: 'integrity-fr-1',
+        },
+        {
+          locale: 'de',
+          translation: { greeting: translationFor('Hallo') },
+          translationIntegrity: 'integrity-de-1',
+        },
+        {
+          locale: 'es',
+          translation: { greeting: translationFor('Hola') },
+          translationIntegrity: 'integrity-es-1',
+        },
+      ]);
+
+      expect(results.size).toBe(3);
+
+      const fr = results.get('fr');
+      expect(fr?.errors).toEqual([]);
+      expect(findFile(fr?.outputFiles ?? [], 'main.js').text).toContain('"Bonjour"');
+      expect(findFile(fr?.outputFiles ?? [], 'other.js').text).toBe('export const answer = 42;\n');
+
+      const de = results.get('de');
+      expect(de?.errors).toEqual([]);
+      expect(findFile(de?.outputFiles ?? [], 'main.js').text).toContain('"Hallo"');
+
+      const es = results.get('es');
+      expect(es?.errors).toEqual([]);
+      expect(findFile(es?.outputFiles ?? [], 'main.js').text).toContain('"Hola"');
+
+      // Verify deterministic file order matching input order
+      for (const localeResult of results.values()) {
+        expect(localeResult.outputFiles.map((f) => f.path)).toEqual(['main.js', 'other.js']);
+      }
+    } finally {
+      await fs.rm(cacheDir, { recursive: true, force: true });
+    }
   });
 });
