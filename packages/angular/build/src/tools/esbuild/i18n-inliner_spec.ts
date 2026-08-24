@@ -10,6 +10,7 @@ import { transform } from 'esbuild';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { initializeHash } from '../../utils/hash';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { I18nInliner } from './i18n-inliner';
 
@@ -42,6 +43,10 @@ function findFile(outputFiles: BuildOutputFile[], path: string): BuildOutputFile
 
 describe('I18nInliner', () => {
   let inliner: I18nInliner | undefined;
+
+  beforeAll(async () => {
+    await initializeHash();
+  });
 
   // A single thread is used throughout so that every file of every locale is inlined by the same
   // Worker. Any translation state that a Worker retains between requests is then observable.

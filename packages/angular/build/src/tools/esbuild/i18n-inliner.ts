@@ -9,7 +9,7 @@
 import assert from 'node:assert';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
-import { calculateHash, createContentHash } from '../../utils/hash';
+import { calculateHash, createContentHash, initializeHash } from '../../utils/hash';
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
@@ -377,6 +377,7 @@ export class I18nInliner {
     const workerTasks: Promise<void>[] = [];
 
     for (const [filename, entries] of uncachedByFile) {
+      const ephemeral = entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {
         const batchEntries = entries.slice(i, i + localesPerBatch);
         const task = (async () => {
@@ -387,6 +388,7 @@ export class I18nInliner {
                 locale: e.locale,
                 translation: e.translation,
               })),
+              ephemeral,
             },
             { name: 'inlineFileBatch' },
           )) as {
@@ -518,7 +520,11 @@ export class I18nInliner {
 
     // Initialize a persistent cache for i18n transformations.
     try {
-      this.#cache = await createPersistentCacheStore(join(persistentCachePath, 'angular-i18n'));
+      const [, cache] = await Promise.all([
+        initializeHash(),
+        createPersistentCacheStore(join(persistentCachePath, 'angular-i18n')),
+      ]);
+      this.#cache = cache;
     } catch {
       this.#cacheInitFailed = true;
 
