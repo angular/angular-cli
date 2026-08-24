@@ -111,6 +111,9 @@ describe('MemoryLoadResultCache', () => {
     // Invalidating new dependency should invalidate the cache
     expect(cache.invalidate('/test/new-dep.json')).toBeTrue();
     expect(cache.get('file:/test/styles.css')).toBeUndefined();
-    expect(cache.watchFiles).not.toContain('/test/new-dep.json');
+    // Invalidating a file marks its cached results stale, but preserves watch file tracking
+    // so the file watcher continues monitoring the dependency for subsequent changes until
+    // a new build pass (via put) updates the active dependencies.
+    expect(cache.watchFiles).toContain('/test/new-dep.json');
   });
 });
