@@ -11,9 +11,10 @@ import assert from 'node:assert';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
 import { calculateHash, createContentHash, initializeHash } from '../../utils/hash';
-import { WorkerPool } from '../../utils/worker-pool';
+import { type WorkerPool, getSharedBuildWorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type Cache, type PersistentCacheStore, createPersistentCacheStore } from './cache';
+import type { InlineCodeResult, InlineDiagnosticMessage } from './i18n-inliner-worker';
 import { encodeTranslationToBuffer } from './i18n-translation-encoder';
 
 /**
@@ -62,33 +63,37 @@ async function serializeTranslation(
   }
 
   if (typeof SharedArrayBuffer !== 'undefined') {
-    if (translationIntegrity && translationCache) {
-      // Look up or generate binary translation data in the persistent cache.
-      // A Uint8Array view is stored in the cache store to allow binary persistence.
-      const binaryData = await translationCache.getOrCreate(translationIntegrity, () => {
-        return new Uint8Array(encodeTranslationToBuffer(translation));
-      });
+    try {
+      if (translationIntegrity && translationCache) {
+        // Look up or generate binary translation data in the persistent cache.
+        // A Uint8Array view is stored in the cache store to allow binary persistence.
+        const binaryData = await translationCache.getOrCreate(translationIntegrity, () => {
+          return new Uint8Array(encodeTranslationToBuffer(translation));
+        });
 
-      // On a cache miss, getOrCreate returns the newly created Uint8Array backed by the
-      // original SharedArrayBuffer. Return it directly to avoid an unnecessary allocation and copy.
-      if (
-        binaryData.buffer instanceof SharedArrayBuffer &&
-        binaryData.byteOffset === 0 &&
-        binaryData.byteLength === binaryData.buffer.byteLength
-      ) {
-        return binaryData.buffer;
+        // On a cache miss, getOrCreate returns the newly created Uint8Array backed by the
+        // original SharedArrayBuffer. Return it directly to avoid an unnecessary allocation and copy.
+        if (
+          binaryData.buffer instanceof SharedArrayBuffer &&
+          binaryData.byteOffset === 0 &&
+          binaryData.byteLength === binaryData.buffer.byteLength
+        ) {
+          return binaryData.buffer;
+        }
+
+        // On a warm cache hit, the restored data is backed by a standard ArrayBuffer from disk.
+        // Copy it into a SharedArrayBuffer so worker threads can access it via zero-copy shared memory.
+        const buffer = new SharedArrayBuffer(binaryData.byteLength);
+        new Uint8Array(buffer).set(binaryData);
+
+        return buffer;
       }
 
-      // On a warm cache hit, the restored data is backed by a standard ArrayBuffer from disk.
-      // Copy it into a SharedArrayBuffer so worker threads can access it via zero-copy shared memory.
-      const buffer = new SharedArrayBuffer(binaryData.byteLength);
-      new Uint8Array(buffer).set(binaryData);
-
-      return buffer;
+      // When persistent caching is not configured, encode directly into a SharedArrayBuffer.
+      return encodeTranslationToBuffer(translation);
+    } catch {
+      // Fall back to Blob serialization if SharedArrayBuffer allocation is restricted
     }
-
-    // When persistent caching is not configured, encode directly into a SharedArrayBuffer.
-    return encodeTranslationToBuffer(translation);
   }
 
   return new Blob([serialize(translation)]);
@@ -143,6 +148,33 @@ interface TransformedFileResult {
   messages: { type: 'error' | 'warning'; message: string }[];
 }
 
+export interface InlineTemplateUpdateResult {
+  code: string;
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Partitions diagnostic messages into error and warning strings.
+ */
+function partitionDiagnostics(messages: readonly InlineDiagnosticMessage[]): {
+  errors: string[];
+  warnings: string[];
+} {
+  const errors: string[] = [];
+  const warnings: string[] = [];
+
+  for (const message of messages) {
+    if (message.type === 'error') {
+      errors.push(message.message);
+    } else {
+      warnings.push(message.message);
+    }
+  }
+
+  return { errors, warnings };
+}
+
 /**
  * An uncached transformation request entry for a file within a specific locale.
  */
@@ -150,6 +182,7 @@ interface UncachedLocaleEntry {
   locale: string;
   cacheKey?: string;
   translation?: Blob | SharedArrayBuffer;
+  translationKey?: string;
 }
 
 /**
@@ -170,23 +203,22 @@ export class I18nInliner {
 
   constructor(
     private readonly options: I18nInlinerOptions,
-    maxThreads?: number,
+    _maxThreads?: number,
   ) {
     this.#unmodifiedFiles = [];
-    const { outputFiles, missingTranslation } = options;
+    const { outputFiles } = options;
     const files = new Map<string, BuildOutputFile>();
 
-    const pendingMaps = [];
+    const pendingMaps: BuildOutputFile[] = [];
     for (const file of outputFiles) {
       if (file.type === BuildOutputFileType.Root || file.type === BuildOutputFileType.ServerRoot) {
         // Skip also the server entry-point.
-        // Skip stats and similar files.
+        this.#unmodifiedFiles.push(file);
         continue;
       }
 
       const fileExtension = extname(file.path);
       if (fileExtension === '.js' || fileExtension === '.mjs') {
-        // Check if localizations are present
         const contentBuffer = Buffer.isBuffer(file.contents)
           ? file.contents
           : Buffer.from(file.contents.buffer, file.contents.byteOffset, file.contents.byteLength);
@@ -218,14 +250,7 @@ export class I18nInliner {
 
     this.#localizeFiles = files;
 
-    this.#workerPool = new WorkerPool({
-      filename: require.resolve('./i18n-inliner-worker'),
-      maxThreads,
-      // Extract options to ensure only the named options are serialized and sent to the worker
-      workerData: {
-        missingTranslation,
-      },
-    });
+    this.#workerPool = getSharedBuildWorkerPool();
   }
 
   /**
@@ -271,6 +296,7 @@ export class I18nInliner {
       // Pre-calculate cache key bases and serialized Blobs for each locale in this window
       const localeCacheBases = new Map<string, string>();
       const localeBlobs = new Map<string, Blob | SharedArrayBuffer | undefined>();
+      const localeKeys = new Map<string, string | undefined>();
 
       await Promise.all(
         windowLocales.map(async ({ locale, translation, translationIntegrity }) => {
@@ -280,6 +306,11 @@ export class I18nInliner {
             this.#translationCache,
           );
           localeBlobs.set(locale, serialized);
+          localeKeys.set(
+            locale,
+            translationIntegrity ??
+              (translation ? calculateHash(JSON.stringify(translation)) : undefined),
+          );
 
           if (this.#cacheStore) {
             localeCacheBases.set(
@@ -331,6 +362,7 @@ export class I18nInliner {
                 locale,
                 cacheKey,
                 translation: localeBlobs.get(locale),
+                translationKey: localeKeys.get(locale),
               };
             },
           );
@@ -353,6 +385,7 @@ export class I18nInliner {
             windowLocales.map(({ locale }) => ({
               locale,
               translation: localeBlobs.get(locale),
+              translationKey: localeKeys.get(locale),
             })),
           );
         }
@@ -403,13 +436,11 @@ export class I18nInliner {
             outputFiles.push(originalMap.clone());
           }
 
-          for (const message of fileResult.messages) {
-            if (message.type === 'error') {
-              errors.push(message.message);
-            } else {
-              warnings.push(message.message);
-            }
-          }
+          const { errors: newErrors, warnings: newWarnings } = partitionDiagnostics(
+            fileResult.messages,
+          );
+          errors.push(...newErrors);
+          warnings.push(...newWarnings);
         }
       }
 
@@ -434,7 +465,6 @@ export class I18nInliner {
     generation?: number,
   ): Promise<void> {
     const workerCount = this.#workerPool.maxThreads || 1;
-
     // Extract file data and identify the heaviest file size in a single pass
     let maxFileSize = 0;
     const sortedFiles = Array.from(uncachedByFile, ([filename, entries]) => {
@@ -459,6 +489,7 @@ export class I18nInliner {
       const mapFile = this.#localizeFiles.get(filename + '.map');
       const codeBlob = new Blob([codeFile.contents]);
       const mapBlob = mapFile ? new Blob([mapFile.contents]) : undefined;
+      const fileKey = `${filename}\0${codeFile.hash}`;
 
       let localesPerBatch: number;
       if (uncachedByFile.size === 1) {
@@ -475,22 +506,28 @@ export class I18nInliner {
         localesPerBatch = Math.max(1, Math.ceil(entries.length / 2));
       }
 
-      const ephemeral = isLastWindow && entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {
         const batchEntries = entries.slice(i, i + localesPerBatch);
+        const ephemeral = isLastWindow && entries.length <= localesPerBatch;
         const task = (async () => {
-          const batchResult = (await this.#workerPool.run(
-            {
-              filename,
-              code: codeBlob,
-              map: mapBlob,
-              locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
-              ephemeral,
-              activeLocales,
-              generation,
-            },
-            { name: 'inlineFileBatch' },
-          )) as
+          const batchResult = (await this.#workerPool.run({
+            tag: 'inline-i18n',
+            action: 'inlineFileBatch',
+            filename,
+            code: codeBlob,
+            map: mapBlob,
+            fileKey,
+            missingTranslation: this.options.missingTranslation,
+            ephemeral,
+            activeLocales,
+            generation,
+            locales: new Map(
+              batchEntries.map((e) => [
+                e.locale,
+                { translation: e.translation, translationKey: e.translationKey },
+              ]),
+            ),
+          })) as
             | {
                 file: string;
                 unmodified: true;
@@ -574,7 +611,7 @@ export class I18nInliner {
     templateCode: string,
     templateId: string,
     translationIntegrity?: string,
-  ): Promise<{ code: string; errors: string[]; warnings: string[] }> {
+  ): Promise<InlineTemplateUpdateResult> {
     const hasLocalize = templateCode.includes(LOCALIZE_KEYWORD);
 
     if (!hasLocalize) {
@@ -585,29 +622,26 @@ export class I18nInliner {
       };
     }
 
-    const { output, messages } = await this.#workerPool.run(
-      {
-        code: templateCode,
-        filename: templateId,
-        locale,
-        translation: await serializeTranslation(
-          translation,
-          translationIntegrity,
-          this.#translationCache,
-        ),
-      },
-      { name: 'inlineCode' },
+    const translationData = await serializeTranslation(
+      translation,
+      translationIntegrity,
+      this.#translationCache,
     );
+    const translationKey =
+      translationIntegrity ??
+      (translation ? calculateHash(JSON.stringify(translation)) : undefined);
+    const { output, messages } = (await this.#workerPool.run({
+      tag: 'inline-i18n',
+      action: 'inlineCode',
+      code: templateCode,
+      filename: templateId,
+      locale,
+      translation: translationData,
+      translationKey,
+      missingTranslation: this.options.missingTranslation,
+    })) as InlineCodeResult;
 
-    const errors: string[] = [];
-    const warnings: string[] = [];
-    for (const message of messages) {
-      if (message.type === 'error') {
-        errors.push(message.message);
-      } else {
-        warnings.push(message.message);
-      }
-    }
+    const { errors, warnings } = partitionDiagnostics(messages);
 
     return {
       code: output,
@@ -621,7 +655,11 @@ export class I18nInliner {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
-    await Promise.allSettled([this.#cacheStore?.close(), this.#workerPool.destroy()]);
+    if (this.#workerPool !== getSharedBuildWorkerPool()) {
+      await Promise.allSettled([this.#cacheStore?.close(), this.#workerPool.destroy()]);
+    } else {
+      await this.#cacheStore?.close();
+    }
   }
 
   /**
