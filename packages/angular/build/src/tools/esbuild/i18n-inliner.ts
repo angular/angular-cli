@@ -43,6 +43,71 @@ export interface I18nInlinerOptions {
   shouldOptimize?: boolean;
   persistentCachePath?: string;
   localizeVersion?: string;
+  translations?: ReadonlyMap<string, Blob>;
+}
+
+/**
+ * Options for inlining a specific locale.
+ */
+export interface LocaleInlineOptions {
+  /**
+   * The locale specifier string.
+   */
+  locale: string;
+
+  /**
+   * The translation messages for the locale, or undefined for the source/untranslated locale.
+   */
+  translation?: Record<string, unknown>;
+
+  /**
+   * An optional content integrity hash of the translation file(s) for fast cache key calculation.
+   */
+  translationIntegrity?: string;
+}
+
+/**
+ * Result of inlining for a specific locale.
+ */
+export interface LocaleInlineResult {
+  outputFiles: BuildOutputFile[];
+  errors: string[];
+  warnings: string[];
+}
+
+/**
+ * Transformation result for a single file and locale combination.
+ */
+interface TransformedFileResult {
+  file: string;
+  code: string;
+  map?: string;
+  messages: { type: 'error' | 'warning'; message: string }[];
+}
+
+/**
+ * Represents an in-flight asynchronous cache lookup for a single (file x locale) transformation.
+ */
+interface CacheCheckItem {
+  /**
+   * The relative file path of the JavaScript file to transform.
+   */
+  filename: string;
+
+  /**
+   * The locale specifier being targeted for translation.
+   */
+  locale: string;
+
+  /**
+   * The computed cache key hash, or undefined if persistent caching is not configured.
+   */
+  cacheKey: string | undefined;
+
+  /**
+   * A promise that resolves to the cached transform result, or null if uncached or on lookup failure.
+   */
+  cachedResult: Promise<TransformedFileResult | null>;
 }
 
 /**
@@ -63,7 +128,7 @@ export class I18nInliner {
     maxThreads?: number,
   ) {
     this.#unmodifiedFiles = [];
-    const { outputFiles, shouldOptimize, missingTranslation } = options;
+    const { outputFiles, shouldOptimize, missingTranslation, translations } = options;
     const files = new Map<string, BuildOutputFile>();
 
     const pendingMaps = [];
@@ -115,6 +180,7 @@ export class I18nInliner {
       workerData: {
         missingTranslation,
         shouldOptimize,
+        translations,
         // A Blob is an immutable data structure that allows sharing the data between workers
         // without copying until the data is actually used within a Worker. This is useful here
         // since each file may not actually be processed in each Worker and the Blob avoids
@@ -124,6 +190,241 @@ export class I18nInliner {
         ),
       },
     });
+  }
+
+  /**
+   * Performs inlining of translations across multiple locales in parallel.
+   *
+   * An adaptive 2D task-partitioning algorithm distributes (files x locales) work units
+   * across all worker threads while caching AST metadata and sourcemaps in worker memory.
+   *
+   * @param locales The locales and translations to inline.
+   * @returns A map of locale names to their inlined output files and diagnostics.
+   */
+  async inlineAll(
+    locales: Iterable<LocaleInlineOptions>,
+  ): Promise<Map<string, LocaleInlineResult>> {
+    await this.initCache();
+
+    const { shouldOptimize, missingTranslation, localizeVersion } = this.options;
+    const localeList = Array.from(locales);
+
+    if (localeList.length === 0) {
+      return new Map();
+    }
+
+    const fileResultsByLocale = new Map<string, Map<string, TransformedFileResult>>();
+    for (const { locale } of localeList) {
+      fileResultsByLocale.set(locale, new Map());
+    }
+
+    // Pre-calculate cache key bases and serialized Blobs for each requested locale
+    const localeCacheBases = new Map<string, string>();
+    const localeBlobs = new Map<string, Blob | undefined>();
+
+    for (const { locale, translation, translationIntegrity } of localeList) {
+      localeBlobs.set(locale, serializeTranslation(translation));
+
+      if (this.#cache) {
+        localeCacheBases.set(
+          locale,
+          calculateHash(
+            JSON.stringify({
+              locale,
+              translation: translationIntegrity || translation,
+              missingTranslation,
+              shouldOptimize,
+              localizeVersion,
+            }),
+          ),
+        );
+      }
+    }
+
+    const filenames = Array.from(this.#localizeFiles.keys()).filter(
+      (name) => !name.endsWith('.map'),
+    );
+
+    const cacheChecks: CacheCheckItem[] = [];
+
+    for (const filename of filenames) {
+      const file = this.#localizeFiles.get(filename);
+      assert(file !== undefined, 'Localize file must exist: ' + filename);
+
+      for (const { locale } of localeList) {
+        let cacheKey: string | undefined;
+        let cachedResultPromise: Promise<TransformedFileResult | null> = Promise.resolve(null);
+
+        if (this.#cache) {
+          const fileCacheKeyBase = localeCacheBases.get(locale);
+          assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
+
+          const hasher = createContentHash();
+          hasher.update(file.hash);
+          hasher.update(filename);
+          hasher.update(fileCacheKeyBase);
+          cacheKey = hasher.digest();
+
+          cachedResultPromise = this.#cache.get(cacheKey).catch(() => null);
+        }
+
+        cacheChecks.push({
+          filename,
+          locale,
+          cacheKey,
+          cachedResult: cachedResultPromise,
+        });
+      }
+    }
+
+    // Await all cache checks
+    const resolvedChecks = await Promise.all(
+      cacheChecks.map(async (item) => ({
+        ...item,
+        result: await item.cachedResult,
+      })),
+    );
+
+    // Group uncached items by filename
+    const uncachedByFile = new Map<
+      string,
+      Array<{ locale: string; cacheKey?: string; translation?: Blob }>
+    >();
+
+    for (const item of resolvedChecks) {
+      if (item.result) {
+        // Cache hit: store directly in locale file results
+        fileResultsByLocale.get(item.locale)?.set(item.filename, item.result);
+      } else {
+        // Cache miss: needs worker processing
+        let fileEntries = uncachedByFile.get(item.filename);
+        if (!fileEntries) {
+          fileEntries = [];
+          uncachedByFile.set(item.filename, fileEntries);
+        }
+        fileEntries.push({
+          locale: item.locale,
+          cacheKey: item.cacheKey,
+          translation: localeBlobs.get(item.locale),
+        });
+      }
+    }
+
+    // Adaptive 2D Sharding for uncached tasks
+    if (uncachedByFile.size > 0) {
+      await this.#processUncachedBatches(uncachedByFile, localeList.length, fileResultsByLocale);
+    }
+
+    // Assemble final results in deterministic order per locale
+    const resultsByLocale = new Map<string, LocaleInlineResult>();
+
+    for (const { locale } of localeList) {
+      const fileResults = fileResultsByLocale.get(locale);
+      const outputFiles: BuildOutputFile[] = [];
+      const errors: string[] = [];
+      const warnings: string[] = [];
+
+      if (fileResults) {
+        for (const filename of filenames) {
+          const fileResult = fileResults.get(filename);
+          if (!fileResult) {
+            continue;
+          }
+
+          const type = this.#localizeFiles.get(filename)?.type;
+          assert(type !== undefined, 'localized file should always have a type: ' + filename);
+
+          outputFiles.push(createOutputFile(filename, fileResult.code, type));
+          if (fileResult.map) {
+            outputFiles.push(createOutputFile(filename + '.map', fileResult.map, type));
+          }
+
+          for (const message of fileResult.messages) {
+            if (message.type === 'error') {
+              errors.push(message.message);
+            } else {
+              warnings.push(message.message);
+            }
+          }
+        }
+      }
+
+      // Include cloned unmodified files for every locale
+      outputFiles.push(...this.#unmodifiedFiles.map((file) => file.clone()));
+
+      resultsByLocale.set(locale, {
+        outputFiles,
+        errors,
+        warnings,
+      });
+    }
+
+    return resultsByLocale;
+  }
+
+  async #processUncachedBatches(
+    uncachedByFile: Map<string, Array<{ locale: string; cacheKey?: string; translation?: Blob }>>,
+    localeCount: number,
+    fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
+  ): Promise<void> {
+    const workerCount = this.#workerPool.maxThreads || 1;
+    const targetTaskCount = Math.max(uncachedByFile.size, workerCount * 2);
+    const localesPerBatch = Math.max(
+      1,
+      Math.ceil(localeCount / (targetTaskCount / (uncachedByFile.size || 1))),
+    );
+
+    const workerTasks: Promise<void>[] = [];
+
+    for (const [filename, entries] of uncachedByFile) {
+      for (let i = 0; i < entries.length; i += localesPerBatch) {
+        const batchEntries = entries.slice(i, i + localesPerBatch);
+        const task = (async () => {
+          const batchResult = (await this.#workerPool.run(
+            {
+              filename,
+              locales: batchEntries.map((e) => ({
+                locale: e.locale,
+                translation: e.translation,
+              })),
+            },
+            { name: 'inlineFileBatch' },
+          )) as {
+            file: string;
+            results: Array<TransformedFileResult & { locale: string }>;
+          };
+
+          const cachePromises: Promise<unknown>[] = [];
+          for (const res of batchResult.results) {
+            const matchingEntry = batchEntries.find((e) => e.locale === res.locale);
+            const cacheKey = matchingEntry?.cacheKey;
+
+            if (this.#cache && cacheKey) {
+              // `CacheStore.set` may return `this` synchronously or a `Promise<this>`.
+              // `Promise.resolve` normalizes both return values into a Promise so `Promise.allSettled`
+              // can safely handle any synchronous or asynchronous cache store errors.
+              cachePromises.push(
+                Promise.resolve(
+                  this.#cache.set(cacheKey, {
+                    file: filename,
+                    code: res.code,
+                    map: res.map,
+                    messages: res.messages,
+                  }),
+                ),
+              );
+            }
+
+            fileResultsByLocale.get(res.locale)?.set(filename, res);
+          }
+          await Promise.allSettled(cachePromises);
+        })();
+
+        workerTasks.push(task);
+      }
+    }
+
+    await Promise.all(workerTasks);
   }
 
   /**
@@ -139,108 +440,12 @@ export class I18nInliner {
     locale: string,
     translation: Record<string, unknown> | undefined,
     translationIntegrity?: string,
-  ): Promise<{ outputFiles: BuildOutputFile[]; errors: string[]; warnings: string[] }> {
-    await this.initCache();
+  ): Promise<LocaleInlineResult> {
+    const results = await this.inlineAll([{ locale, translation, translationIntegrity }]);
+    const result = results.get(locale);
+    assert(result !== undefined, `Result for locale '${locale}' should be present.`);
 
-    const { shouldOptimize, missingTranslation } = this.options;
-
-    // Serialized once here and then shared by the request for every file of this locale
-    const translationBlob = serializeTranslation(translation);
-
-    // Request inlining for each file that contains localize calls
-    const requests = [];
-
-    let fileCacheKeyBase: string | undefined;
-
-    for (const [filename, file] of this.#localizeFiles) {
-      let cacheKey: string | undefined;
-      if (filename.endsWith('.map')) {
-        continue;
-      }
-
-      let cacheResultPromise = Promise.resolve(null);
-      if (this.#cache) {
-        // The options are digested here so that each file's key is derived from a fixed number
-        // of bytes. Hashing the options directly would re-hash the full set of messages, which
-        // can be several megabytes, once for every file.
-        fileCacheKeyBase ??= calculateHash(
-          JSON.stringify({
-            locale,
-            translation: translationIntegrity ?? translation,
-            missingTranslation,
-            shouldOptimize,
-            localizeVersion: this.options.localizeVersion,
-          }),
-        );
-
-        // NOTE: If additional options are added, this may need to be updated.
-        const hasher = createContentHash();
-        hasher.update(file.hash);
-        hasher.update(filename);
-        hasher.update(fileCacheKeyBase);
-        cacheKey = hasher.digest();
-
-        // Failure to get the value should not fail the transform
-        cacheResultPromise = this.#cache.get(cacheKey).catch(() => null);
-      }
-
-      const fileResult = cacheResultPromise.then(async (cachedResult) => {
-        if (cachedResult) {
-          return cachedResult;
-        }
-
-        const result = await this.#workerPool.run({
-          filename,
-          locale,
-          translation: translationBlob,
-        });
-        if (this.#cache && cacheKey) {
-          try {
-            // Failure to set the value should not fail the transform
-            await this.#cache.set(cacheKey, result);
-          } catch {}
-        }
-
-        return result;
-      });
-
-      requests.push(fileResult);
-    }
-
-    // Wait for all file requests to complete
-    const rawResults = await Promise.all(requests);
-
-    // Convert raw results to output file objects and include all unmodified files
-    const errors: string[] = [];
-    const warnings: string[] = [];
-    const outputFiles = [
-      ...rawResults.flatMap(({ file, code, map, messages }) => {
-        const type = this.#localizeFiles.get(file)?.type;
-        assert(type !== undefined, 'localized file should always have a type' + file);
-
-        const resultFiles = [createOutputFile(file, code, type)];
-        if (map) {
-          resultFiles.push(createOutputFile(file + '.map', map, type));
-        }
-
-        for (const message of messages) {
-          if (message.type === 'error') {
-            errors.push(message.message);
-          } else {
-            warnings.push(message.message);
-          }
-        }
-
-        return resultFiles;
-      }),
-      ...this.#unmodifiedFiles.map((file) => file.clone()),
-    ];
-
-    return {
-      outputFiles,
-      errors,
-      warnings,
-    };
+    return result;
   }
 
   async inlineTemplateUpdate(

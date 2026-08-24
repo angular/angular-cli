@@ -8,6 +8,7 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import type { Metafile } from 'esbuild';
+import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import {
@@ -74,7 +75,7 @@ export async function inlineI18n(
   );
 
   try {
-    for (const locale of i18nOptions.inlineLocales) {
+    const localesToInline = Array.from(i18nOptions.inlineLocales, (locale) => {
       const localeDescription = i18nOptions.locales[locale];
       let translationIntegrity: string | undefined = '';
       for (const file of localeDescription.files) {
@@ -85,12 +86,18 @@ export async function inlineI18n(
         translationIntegrity += (translationIntegrity ? '|' : '') + file.integrity;
       }
 
-      // A locale specific set of files is returned from the inliner.
-      const localeInlineResult = await inliner.inlineForLocale(
+      return {
         locale,
-        localeDescription.translation,
+        translation: localeDescription.translation,
         translationIntegrity,
-      );
+      };
+    });
+
+    const inlinedLocales = await inliner.inlineAll(localesToInline);
+
+    for (const locale of i18nOptions.inlineLocales) {
+      const localeInlineResult = inlinedLocales.get(locale);
+      assert(localeInlineResult !== undefined, 'Inlined result must exist for locale: ' + locale);
       const localeOutputFiles = localeInlineResult.outputFiles;
       inlineResult.errors.push(...localeInlineResult.errors);
       inlineResult.warnings.push(...localeInlineResult.warnings);
