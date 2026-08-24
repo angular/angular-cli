@@ -13,6 +13,7 @@ import assert from 'node:assert';
 import { deserialize } from 'node:v8';
 import { workerData } from 'node:worker_threads';
 import { parseSync, visitorKeys } from 'oxc-parser';
+import { createSharedTranslationProxy } from './i18n-translation-reader';
 
 /**
  * The options passed to the inliner for each file request
@@ -31,10 +32,10 @@ interface InlineFileRequest {
 
   /**
    * The serialized translation messages for the locale that should be used during the inlining
-   * process of the file. A Blob is used so that the messages are shared with the Worker by
-   * reference instead of being copied into it for every request.
+   * process of the file. A SharedArrayBuffer or Blob is used so that the messages are shared with
+   * the Worker by reference instead of being copied into it for every request.
    */
-  translation?: Blob;
+  translation?: Blob | SharedArrayBuffer;
 }
 
 /**
@@ -58,10 +59,10 @@ interface InlineCodeRequest {
 
   /**
    * The serialized translation messages for the locale that should be used during the inlining
-   * process of the file. A Blob is used so that the messages are shared with the Worker by
-   * reference instead of being copied into it for every request.
+   * process of the file. A SharedArrayBuffer or Blob is used so that the messages are shared with
+   * the Worker by reference instead of being copied into it for every request.
    */
-  translation?: Blob;
+  translation?: Blob | SharedArrayBuffer;
 }
 
 /**
@@ -77,7 +78,7 @@ interface InlineFileBatchRequest {
   /**
    * The locale specifiers or locale objects that should be used during the inlining process of the file.
    */
-  locales: (string | { locale: string; translation?: Blob })[];
+  locales: (string | { locale: string; translation?: Blob | SharedArrayBuffer })[];
 
   /**
    * Whether the file data should be treated as ephemeral and not cached long-term in the Worker.
@@ -114,7 +115,7 @@ interface InlineFileBatchResult {
 const { files, missingTranslation, translations } = (workerData || {}) as {
   files: ReadonlyMap<string, Blob>;
   missingTranslation: 'error' | 'warning' | 'ignore';
-  translations?: ReadonlyMap<string, Blob>;
+  translations?: ReadonlyMap<string, Blob | SharedArrayBuffer>;
 };
 
 /**
@@ -172,30 +173,34 @@ function loadFileData(filename: string, cache = true): Promise<CachedFileData> {
 }
 
 /**
- * Deserializes the translation messages for a locale, reusing the result for any
+ * Deserializes or wraps the translation messages for a locale, reusing the result for any
  * subsequent request that targets the same locale.
  * @param locale The locale identifier.
- * @param translation Optional serialized translation messages. If omitted, workerData.translations is used.
+ * @param translation Optional serialized translation messages (SharedArrayBuffer or Blob).
  * @returns The translation messages, or undefined if the locale has no translations.
  */
 function loadTranslation(
   locale: string,
-  translation?: Blob,
+  translation?: Blob | SharedArrayBuffer,
 ): Promise<Record<string, unknown>> | undefined {
-  const translationBlob = translation ?? translations?.get(locale);
-  if (!translationBlob) {
+  const translationData = translation ?? translations?.get(locale);
+  if (!translationData) {
     return undefined;
   }
 
   let messagesPromise = deserializedTranslations.get(locale);
   if (!messagesPromise) {
-    messagesPromise = translationBlob
-      .arrayBuffer()
-      .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>)
-      .catch((error) => {
-        deserializedTranslations.delete(locale);
-        throw error;
-      });
+    if (translationData instanceof Blob) {
+      messagesPromise = translationData
+        .arrayBuffer()
+        .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>)
+        .catch((error) => {
+          deserializedTranslations.delete(locale);
+          throw error;
+        });
+    } else {
+      messagesPromise = Promise.resolve(createSharedTranslationProxy(translationData));
+    }
     deserializedTranslations.set(locale, messagesPromise);
   }
 
