@@ -8,9 +8,8 @@
 
 import { readFile } from 'node:fs/promises';
 import { createContentHash } from '../../utils/hash';
-import { IMPORT_EXEC_ARGV } from '../../utils/server-rendering/esm-in-memory-loader/utils';
 import { removeSourceMappingURL } from '../../utils/source-map';
-import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
+import { WorkerPool, getSharedBuildWorkerPool } from '../../utils/worker-pool';
 import { Cache } from './cache';
 
 const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
@@ -89,7 +88,7 @@ async function hasAdvancedOptimizationCandidates(
  * Determines whether JavaScript code requires Angular linker processing.
  *
  * @param path The full path to the file.
- * @param data The data (string or Buffer) of the file.
+ * @param data The data (string or Uint8Array) of the file.
  * @returns True if the code contains an Angular partial declaration; otherwise false.
  */
 function requiresLinking(path: string, data: string | Uint8Array): boolean {
@@ -138,6 +137,21 @@ export interface TransformOptions {
 }
 
 /**
+ * Bitmask flags for serializing transformer options and task parameters across IPC in a single SMI integer.
+ */
+export enum JavaScriptTransformFlags {
+  None = 0,
+  Sourcemap = 1 << 0,
+  ThirdPartySourcemaps = 1 << 1,
+  AdvancedOptimizations = 1 << 2,
+  Jit = 1 << 3,
+  SkipLinker = 1 << 4,
+  InstrumentForCoverage = 1 << 5,
+  SideEffectsSet = 1 << 6,
+  SideEffectsValue = 1 << 7,
+}
+
+/**
  * A class that performs transformation of JavaScript files and raw data.
  * A worker pool is used to distribute the transformation actions and allow
  * parallel processing. Transformation behavior is based on the filename and
@@ -148,6 +162,8 @@ export class JavaScriptTransformer {
   #workerPool: WorkerPool | undefined;
   #commonOptions: Required<JavaScriptTransformerOptions>;
   #fileCacheKeyBase: Uint8Array;
+  #baseFlags = JavaScriptTransformFlags.None;
+  #isClosed = false;
 
   /** Queue of pending transformation tasks waiting for an active concurrency slot. */
   #pendingTasks: { resolve: () => void; reject: (reason: Error) => void }[] = [];
@@ -179,6 +195,22 @@ export class JavaScriptTransformer {
       jit,
     };
     this.#fileCacheKeyBase = Buffer.from(JSON.stringify(this.#commonOptions), 'utf-8');
+
+    let baseFlags = JavaScriptTransformFlags.None;
+    if (sourcemap) {
+      baseFlags |= JavaScriptTransformFlags.Sourcemap;
+    }
+    if (thirdPartySourcemaps) {
+      baseFlags |= JavaScriptTransformFlags.ThirdPartySourcemaps;
+    }
+    if (advancedOptimizations) {
+      baseFlags |= JavaScriptTransformFlags.AdvancedOptimizations;
+    }
+    if (jit) {
+      baseFlags |= JavaScriptTransformFlags.Jit;
+    }
+    this.#baseFlags = baseFlags;
+
     this.#workerPool = this.#ensureWorkerPool();
   }
 
@@ -189,12 +221,26 @@ export class JavaScriptTransformer {
    * @returns A promise resolving to the transformation result.
    */
   async #runWithThrottle<T>(action: () => Promise<T>): Promise<T> {
+    if (this.#isClosed) {
+      throw new Error('JavaScriptTransformer closed.');
+    }
+
     if (this.#activeTasks >= this.#maxConcurrent) {
       await new Promise<void>((resolve, reject) => {
         this.#pendingTasks.push({ resolve, reject });
       });
     } else {
       this.#activeTasks++;
+    }
+
+    if (this.#isClosed) {
+      const next = this.#pendingTasks.shift();
+      if (next) {
+        next.resolve();
+      } else {
+        this.#activeTasks--;
+      }
+      throw new Error('JavaScriptTransformer closed.');
     }
 
     try {
@@ -210,24 +256,11 @@ export class JavaScriptTransformer {
   }
 
   #ensureWorkerPool(): WorkerPool {
-    if (this.#workerPool) {
-      return this.#workerPool;
+    if (this.#isClosed) {
+      throw new Error('JavaScriptTransformer closed.');
     }
 
-    const workerPoolOptions: WorkerPoolOptions = {
-      filename: require.resolve('./javascript-transformer-worker'),
-      maxThreads: this.maxThreads,
-      minThreads: this.maxThreads,
-      workerData: this.#commonOptions,
-    };
-
-    // Prevent passing SSR `--import` (loader-hooks) from parent to child worker.
-    const filteredExecArgv = process.execArgv.filter((v) => v !== IMPORT_EXEC_ARGV);
-    if (process.execArgv.length !== filteredExecArgv.length) {
-      workerPoolOptions.execArgv = filteredExecArgv;
-    }
-
-    this.#workerPool = new WorkerPool(workerPoolOptions);
+    this.#workerPool ??= getSharedBuildWorkerPool();
 
     return this.#workerPool;
   }
@@ -251,7 +284,8 @@ export class JavaScriptTransformer {
    * Performs JavaScript transformations on the provided data of a file. The file does not need
    * to exist on the filesystem.
    * @param filename The full path of the file represented by the data.
-   * @param data The data of the file that should be transformed.
+   * @param data The data of the file that should be transformed. Standalone transferable Uint8Array
+   * buffers may be detached upon worker transfer.
    * @param options Transformation options specific to this file data.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
@@ -260,6 +294,10 @@ export class JavaScriptTransformer {
     data: string | Uint8Array,
     options?: TransformOptions,
   ): Promise<Uint8Array> {
+    if (this.#isClosed) {
+      throw new Error('JavaScriptTransformer closed.');
+    }
+
     let resolvedSideEffects: boolean | undefined;
     let sideEffectsQueried = false;
 
@@ -326,13 +364,26 @@ export class JavaScriptTransformer {
       data.byteLength === data.buffer.byteLength &&
       !process.versions.pnp;
 
+    let flags = this.#baseFlags;
+    if (!shouldLink) {
+      flags |= JavaScriptTransformFlags.SkipLinker;
+    }
+    if (resolvedSideEffects !== undefined) {
+      flags |= JavaScriptTransformFlags.SideEffectsSet;
+      if (resolvedSideEffects) {
+        flags |= JavaScriptTransformFlags.SideEffectsValue;
+      }
+    }
+    if (options?.instrumentForCoverage) {
+      flags |= JavaScriptTransformFlags.InstrumentForCoverage;
+    }
+
     const result = (await this.#ensureWorkerPool().run(
       {
+        tag: 'transform-js',
         filename,
         data,
-        skipLinker: !shouldLink,
-        sideEffects: resolvedSideEffects,
-        instrumentForCoverage: options?.instrumentForCoverage,
+        flags,
       },
       {
         transferList: isTransferable ? [data.buffer] : undefined,
@@ -355,18 +406,25 @@ export class JavaScriptTransformer {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
+    if (this.#isClosed) {
+      return;
+    }
+    this.#isClosed = true;
+
     const pending = this.#pendingTasks;
     this.#pendingTasks = [];
     for (const task of pending) {
       task.reject(new Error('JavaScriptTransformer closed.'));
     }
 
-    if (this.#workerPool) {
+    if (this.#workerPool && this.#workerPool !== getSharedBuildWorkerPool()) {
       try {
         await this.#workerPool.destroy();
       } finally {
         this.#workerPool = undefined;
       }
+    } else {
+      this.#workerPool = undefined;
     }
   }
 }

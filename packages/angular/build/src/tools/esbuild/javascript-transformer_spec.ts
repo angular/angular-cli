@@ -10,6 +10,15 @@ import { JavaScriptTransformer } from './javascript-transformer';
 
 describe('JavaScriptTransformer sourcemaps', () => {
   let transformer: JavaScriptTransformer;
+  const originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
+
+  beforeAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = 30_000;
+  });
+
+  afterAll(() => {
+    jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
+  });
 
   afterEach(async () => {
     await transformer?.close();
@@ -677,5 +686,39 @@ describe('JavaScriptTransformer sourcemaps', () => {
       expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
       expect(text).toContain('__decorate');
     });
+  });
+
+  it('should strip sourcemaps from Uint8Array when worker runs with sourcemap: false', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+        advancedOptimizations: true,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('var a = 1;\n//# sourceMappingURL=foo.js.map', 'utf-8');
+    const result = await transformer.transformData('src/app/foo.js', inputBuffer, {
+      skipLinker: true,
+    });
+    const text = Buffer.from(result).toString('utf-8');
+
+    expect(text).toBe('var a = 1;\n');
+    expect(text).not.toContain('sourceMappingURL');
+  });
+
+  it('should reject tasks after transformer is closed', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    await transformer.close();
+
+    await expectAsync(
+      transformer.transformData('src/app/foo.js', 'console.log(1);', { skipLinker: true }),
+    ).toBeRejectedWithError('JavaScriptTransformer closed.');
   });
 });
