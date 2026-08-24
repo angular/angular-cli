@@ -64,7 +64,12 @@ describe('I18nInliner', () => {
 
   beforeAll(async () => {
     await initializeHash();
-  });
+    const warmup = createInliner();
+    await warmup.inlineForLocale([browserFile('warmup.js', GREETING_SOURCE)], 'fr', {
+      greeting: translationFor('Bonjour'),
+    });
+    await warmup.close();
+  }, 30_000);
 
   // A single thread is used throughout so that every file of every locale is inlined by the same
   // Worker. Any translation state that a Worker retains between requests is then observable.
@@ -1134,13 +1139,13 @@ describe('I18nInliner', () => {
       expect(destroySpy).not.toHaveBeenCalled();
     });
 
-    it('destroys internally created workerPool on close()', async () => {
+    it('does not destroy shared workerPool on close()', async () => {
       const destroySpy = spyOn(WorkerPool.prototype, 'destroy').and.callThrough();
 
       inliner = new I18nInliner({ missingTranslation: 'warning', maxConcurrency: 1 });
       await inliner.close();
 
-      expect(destroySpy).toHaveBeenCalled();
+      expect(destroySpy).not.toHaveBeenCalled();
     });
 
     it('supports multiple sequential inlining passes with the same supplied workerPool', async () => {
