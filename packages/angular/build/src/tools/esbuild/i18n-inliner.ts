@@ -12,7 +12,7 @@ import { serialize } from 'node:v8';
 import { calculateHash, createContentHash, initializeHash } from '../../utils/hash';
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
-import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
+import { type Cache, type PersistentCacheStore, createPersistentCacheStore } from './cache';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -125,7 +125,8 @@ interface CacheCheckItem {
 export class I18nInliner {
   #cacheInitFailed = false;
   #workerPool: WorkerPool;
-  #cache: PersistentCacheStore | undefined;
+  #cacheStore: PersistentCacheStore | undefined;
+  #cache: Cache<TransformedFileResult> | undefined;
   readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
   readonly #unmodifiedFiles: Array<BuildOutputFile>;
 
@@ -241,7 +242,7 @@ export class I18nInliner {
       for (const { locale, translation, translationIntegrity } of windowLocales) {
         localeBlobs.set(locale, serializeTranslation(translation));
 
-        if (this.#cache) {
+        if (this.#cacheStore) {
           localeCacheBases.set(
             locale,
             calculateHash(
@@ -277,7 +278,10 @@ export class I18nInliner {
             hasher.update(fileCacheKeyBase);
             cacheKey = hasher.digest();
 
-            cachedResultPromise = this.#cache.get(cacheKey).catch(() => null);
+            cachedResultPromise = this.#cache
+              .get(cacheKey)
+              .then((val) => val ?? null)
+              .catch(() => null);
           }
 
           cacheChecks.push({
@@ -424,18 +428,13 @@ export class I18nInliner {
             const cacheKey = matchingEntry?.cacheKey;
 
             if (this.#cache && cacheKey) {
-              // `CacheStore.set` may return `this` synchronously or a `Promise<this>`.
-              // `Promise.resolve` normalizes both return values into a Promise so `Promise.allSettled`
-              // can safely handle any synchronous or asynchronous cache store errors.
               cachePromises.push(
-                Promise.resolve(
-                  this.#cache.set(cacheKey, {
-                    file: filename,
-                    code: res.code,
-                    map: res.map,
-                    messages: res.messages,
-                  }),
-                ),
+                this.#cache.put(cacheKey, {
+                  file: filename,
+                  code: res.code,
+                  map: res.map,
+                  messages: res.messages,
+                }),
               );
             }
 
@@ -520,7 +519,7 @@ export class I18nInliner {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
-    await Promise.allSettled([this.#cache?.close(), this.#workerPool.destroy()]);
+    await Promise.allSettled([this.#cacheStore?.close(), this.#workerPool.destroy()]);
   }
 
   /**
@@ -530,7 +529,7 @@ export class I18nInliner {
    * @returns A promise that resolves once the cache initialization process is complete.
    */
   private async initCache(): Promise<void> {
-    if (this.#cache || this.#cacheInitFailed) {
+    if (this.#cacheStore || this.#cacheInitFailed) {
       return;
     }
 
@@ -542,11 +541,12 @@ export class I18nInliner {
 
     // Initialize a persistent cache for i18n transformations.
     try {
-      const [, cache] = await Promise.all([
+      const [, cacheStore] = await Promise.all([
         initializeHash(),
         createPersistentCacheStore(join(persistentCachePath, 'angular-i18n')),
       ]);
-      this.#cache = cache;
+      this.#cacheStore = cacheStore;
+      this.#cache = cacheStore.createCache('transforms');
     } catch {
       this.#cacheInitFailed = true;
 
