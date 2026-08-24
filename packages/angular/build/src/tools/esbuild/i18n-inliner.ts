@@ -21,6 +21,12 @@ import { type PersistentCacheStore, createPersistentCacheStore } from './cache';
 const LOCALIZE_KEYWORD = '$localize';
 
 /**
+ * The maximum number of locales to process concurrently in a single sliding window.
+ * This caps peak worker memory while maintaining multi-locale batching throughput.
+ */
+const DEFAULT_LOCALE_WINDOW_SIZE = 8;
+
+/**
  * Serializes the translation messages for a locale for transfer to an inliner Worker.
  *
  * A Blob is used because cloning one shares its data by reference, whereas sending the messages
@@ -218,101 +224,114 @@ export class I18nInliner {
       fileResultsByLocale.set(locale, new Map());
     }
 
-    // Pre-calculate cache key bases and serialized Blobs for each requested locale
-    const localeCacheBases = new Map<string, string>();
-    const localeBlobs = new Map<string, Blob | undefined>();
-
-    for (const { locale, translation, translationIntegrity } of localeList) {
-      localeBlobs.set(locale, serializeTranslation(translation));
-
-      if (this.#cache) {
-        localeCacheBases.set(
-          locale,
-          calculateHash(
-            JSON.stringify({
-              locale,
-              translation: translationIntegrity || translation,
-              missingTranslation,
-              shouldOptimize,
-              localizeVersion,
-            }),
-          ),
-        );
-      }
-    }
-
     const filenames = Array.from(this.#localizeFiles.keys()).filter(
       (name) => !name.endsWith('.map'),
     );
 
-    const cacheChecks: CacheCheckItem[] = [];
+    // Process locales in sliding windows to cap peak worker memory
+    for (let i = 0; i < localeList.length; i += DEFAULT_LOCALE_WINDOW_SIZE) {
+      const windowLocales = localeList.slice(i, i + DEFAULT_LOCALE_WINDOW_SIZE);
+      const activeLocales = windowLocales.map((item) => item.locale);
+      const isLastWindow = i + DEFAULT_LOCALE_WINDOW_SIZE >= localeList.length;
 
-    for (const filename of filenames) {
-      const file = this.#localizeFiles.get(filename);
-      assert(file !== undefined, 'Localize file must exist: ' + filename);
+      // Pre-calculate cache key bases and serialized Blobs for each locale in this window
+      const localeCacheBases = new Map<string, string>();
+      const localeBlobs = new Map<string, Blob | undefined>();
 
-      for (const { locale } of localeList) {
-        let cacheKey: string | undefined;
-        let cachedResultPromise: Promise<TransformedFileResult | null> = Promise.resolve(null);
+      for (const { locale, translation, translationIntegrity } of windowLocales) {
+        localeBlobs.set(locale, serializeTranslation(translation));
 
         if (this.#cache) {
-          const fileCacheKeyBase = localeCacheBases.get(locale);
-          assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
-
-          const hasher = createContentHash();
-          hasher.update(file.hash);
-          hasher.update(filename);
-          hasher.update(fileCacheKeyBase);
-          cacheKey = hasher.digest();
-
-          cachedResultPromise = this.#cache.get(cacheKey).catch(() => null);
+          localeCacheBases.set(
+            locale,
+            calculateHash(
+              JSON.stringify({
+                locale,
+                translation: translationIntegrity || translation,
+                missingTranslation,
+                shouldOptimize,
+                localizeVersion,
+              }),
+            ),
+          );
         }
-
-        cacheChecks.push({
-          filename,
-          locale,
-          cacheKey,
-          cachedResult: cachedResultPromise,
-        });
       }
-    }
 
-    // Await all cache checks
-    const resolvedChecks = await Promise.all(
-      cacheChecks.map(async (item) => ({
-        ...item,
-        result: await item.cachedResult,
-      })),
-    );
+      const cacheChecks: CacheCheckItem[] = [];
 
-    // Group uncached items by filename
-    const uncachedByFile = new Map<
-      string,
-      Array<{ locale: string; cacheKey?: string; translation?: Blob }>
-    >();
+      for (const filename of filenames) {
+        const file = this.#localizeFiles.get(filename);
+        assert(file !== undefined, 'Localize file must exist: ' + filename);
 
-    for (const item of resolvedChecks) {
-      if (item.result) {
-        // Cache hit: store directly in locale file results
-        fileResultsByLocale.get(item.locale)?.set(item.filename, item.result);
-      } else {
-        // Cache miss: needs worker processing
-        let fileEntries = uncachedByFile.get(item.filename);
-        if (!fileEntries) {
-          fileEntries = [];
-          uncachedByFile.set(item.filename, fileEntries);
+        for (const { locale } of windowLocales) {
+          let cacheKey: string | undefined;
+          let cachedResultPromise: Promise<TransformedFileResult | null> = Promise.resolve(null);
+
+          if (this.#cache) {
+            const fileCacheKeyBase = localeCacheBases.get(locale);
+            assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
+
+            const hasher = createContentHash();
+            hasher.update(file.hash);
+            hasher.update(filename);
+            hasher.update(fileCacheKeyBase);
+            cacheKey = hasher.digest();
+
+            cachedResultPromise = this.#cache.get(cacheKey).catch(() => null);
+          }
+
+          cacheChecks.push({
+            filename,
+            locale,
+            cacheKey,
+            cachedResult: cachedResultPromise,
+          });
         }
-        fileEntries.push({
-          locale: item.locale,
-          cacheKey: item.cacheKey,
-          translation: localeBlobs.get(item.locale),
-        });
       }
-    }
 
-    // Adaptive 2D Sharding for uncached tasks
-    if (uncachedByFile.size > 0) {
-      await this.#processUncachedBatches(uncachedByFile, localeList.length, fileResultsByLocale);
+      // Await all cache checks for this window
+      const resolvedChecks = await Promise.all(
+        cacheChecks.map(async (item) => ({
+          ...item,
+          result: await item.cachedResult,
+        })),
+      );
+
+      // Group uncached items by filename for this window
+      const uncachedByFile = new Map<
+        string,
+        Array<{ locale: string; cacheKey?: string; translation?: Blob }>
+      >();
+
+      for (const item of resolvedChecks) {
+        if (item.result) {
+          // Cache hit: store directly in locale file results
+          fileResultsByLocale.get(item.locale)?.set(item.filename, item.result);
+        } else {
+          // Cache miss: needs worker processing
+          let fileEntries = uncachedByFile.get(item.filename);
+          if (!fileEntries) {
+            fileEntries = [];
+            uncachedByFile.set(item.filename, fileEntries);
+          }
+          fileEntries.push({
+            locale: item.locale,
+            cacheKey: item.cacheKey,
+            translation: localeBlobs.get(item.locale),
+          });
+        }
+      }
+
+      // Adaptive 2D Sharding for uncached tasks in this window
+      if (uncachedByFile.size > 0) {
+        await this.#processUncachedBatches(
+          uncachedByFile,
+          windowLocales.length,
+          fileResultsByLocale,
+          activeLocales,
+          isLastWindow,
+        );
+      }
     }
 
     // Assemble final results in deterministic order per locale
@@ -366,6 +385,8 @@ export class I18nInliner {
     uncachedByFile: Map<string, Array<{ locale: string; cacheKey?: string; translation?: Blob }>>,
     localeCount: number,
     fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
+    activeLocales?: string[],
+    isLastWindow = true,
   ): Promise<void> {
     const workerCount = this.#workerPool.maxThreads || 1;
     const targetTaskCount = Math.max(uncachedByFile.size, workerCount * 2);
@@ -377,7 +398,7 @@ export class I18nInliner {
     const workerTasks: Promise<void>[] = [];
 
     for (const [filename, entries] of uncachedByFile) {
-      const ephemeral = entries.length <= localesPerBatch;
+      const ephemeral = isLastWindow && entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {
         const batchEntries = entries.slice(i, i + localesPerBatch);
         const task = (async () => {
@@ -389,6 +410,7 @@ export class I18nInliner {
                 translation: e.translation,
               })),
               ephemeral,
+              activeLocales,
             },
             { name: 'inlineFileBatch' },
           )) as {
