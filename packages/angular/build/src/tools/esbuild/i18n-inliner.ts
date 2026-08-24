@@ -13,6 +13,7 @@ import { calculateHash, createContentHash, initializeHash } from '../../utils/ha
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type Cache, type PersistentCacheStore, createPersistentCacheStore } from './cache';
+import { encodeTranslationToBuffer } from './i18n-translation-encoder';
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -29,15 +30,25 @@ const DEFAULT_LOCALE_WINDOW_SIZE = 8;
 /**
  * Serializes the translation messages for a locale for transfer to an inliner Worker.
  *
- * A Blob is used because cloning one shares its data by reference, whereas sending the messages
- * themselves copies them into a Worker for every request that carries them. A locale can contain
- * tens of thousands of messages, which makes that copy the dominant cost of inlining a locale.
+ * A SharedArrayBuffer is preferred because it enables zero-copy shared memory access
+ * and on-demand string decoding across all worker threads. Falls back to a Blob when
+ * SharedArrayBuffer is unavailable.
  *
  * @param translation The translation messages for a locale, if the locale has any.
- * @returns A Blob containing the serialized messages, or undefined if the locale has none.
+ * @returns A SharedArrayBuffer or Blob containing the serialized messages, or undefined if none.
  */
-function serializeTranslation(translation: Record<string, unknown> | undefined): Blob | undefined {
-  return translation && new Blob([serialize(translation)]);
+function serializeTranslation(
+  translation: Record<string, unknown> | undefined,
+): SharedArrayBuffer | Blob | undefined {
+  if (!translation) {
+    return undefined;
+  }
+
+  if (typeof SharedArrayBuffer !== 'undefined') {
+    return encodeTranslationToBuffer(translation);
+  }
+
+  return new Blob([serialize(translation)]);
 }
 
 /**
@@ -49,7 +60,7 @@ export interface I18nInlinerOptions {
   shouldOptimize?: boolean;
   persistentCachePath?: string;
   localizeVersion?: string;
-  translations?: ReadonlyMap<string, Blob>;
+  translations?: ReadonlyMap<string, Blob | SharedArrayBuffer>;
 }
 
 /**
@@ -114,6 +125,15 @@ interface CacheCheckItem {
    * A promise that resolves to the cached transform result, or null if uncached or on lookup failure.
    */
   cachedResult: Promise<TransformedFileResult | null>;
+}
+
+/**
+ * An uncached transformation request entry for a file within a specific locale.
+ */
+interface UncachedLocaleEntry {
+  locale: string;
+  cacheKey?: string;
+  translation?: Blob | SharedArrayBuffer;
 }
 
 /**
@@ -237,7 +257,7 @@ export class I18nInliner {
 
       // Pre-calculate cache key bases and serialized Blobs for each locale in this window
       const localeCacheBases = new Map<string, string>();
-      const localeBlobs = new Map<string, Blob | undefined>();
+      const localeBlobs = new Map<string, Blob | SharedArrayBuffer | undefined>();
 
       for (const { locale, translation, translationIntegrity } of windowLocales) {
         localeBlobs.set(locale, serializeTranslation(translation));
@@ -302,10 +322,7 @@ export class I18nInliner {
       );
 
       // Group uncached items by filename for this window
-      const uncachedByFile = new Map<
-        string,
-        Array<{ locale: string; cacheKey?: string; translation?: Blob }>
-      >();
+      const uncachedByFile = new Map<string, UncachedLocaleEntry[]>();
 
       for (const item of resolvedChecks) {
         if (item.result) {
@@ -386,7 +403,7 @@ export class I18nInliner {
   }
 
   async #processUncachedBatches(
-    uncachedByFile: Map<string, Array<{ locale: string; cacheKey?: string; translation?: Blob }>>,
+    uncachedByFile: Map<string, UncachedLocaleEntry[]>,
     localeCount: number,
     fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
     activeLocales?: string[],
