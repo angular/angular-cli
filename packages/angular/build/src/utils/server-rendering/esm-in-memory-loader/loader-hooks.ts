@@ -16,6 +16,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
  * @note For some unknown reason, setting `globalThis.ngServerMode = true` does not work when using ESM loader hooks.
  */
 const NG_SERVER_MODE_INIT_BYTES = new TextEncoder().encode('var ngServerMode=true;');
+const UTF8_DECODER = new TextDecoder();
 
 /**
  * Node.js ESM loader to redirect imports to in memory files.
@@ -25,12 +26,12 @@ const NG_SERVER_MODE_INIT_BYTES = new TextEncoder().encode('var ngServerMode=tru
 const MEMORY_URL_SCHEME = 'memory://';
 
 export interface ESMInMemoryFileLoaderWorkerData {
-  outputFiles: Record<string, string>;
+  outputFiles: Record<string, string | Uint8Array>;
   workspaceRoot: string;
 }
 
 let memoryVirtualRootUrl: string;
-let outputFiles: Record<string, string>;
+let outputFiles: Record<string, string | Uint8Array>;
 
 export function initialize(data: ESMInMemoryFileLoaderWorkerData) {
   // This path does not actually exist but is used to overlay the in memory files with the
@@ -84,7 +85,7 @@ export function resolve(
     } catch {}
 
     if (
-      specifierUrl?.pathname &&
+      specifierUrl?.href.startsWith(memoryVirtualRootUrl) &&
       Object.hasOwn(outputFiles, specifierUrl.href.slice(memoryVirtualRootUrl.length))
     ) {
       return {
@@ -114,12 +115,14 @@ export async function load(url: string, context: { format?: string | null }, nex
 
   // Load the file from memory if the URL is based in the virtual root
   if (url.startsWith(memoryVirtualRootUrl)) {
-    const source = outputFiles[url.slice(memoryVirtualRootUrl.length)];
-    assert(source !== undefined, 'Resolved in-memory ESM file should always exist: ' + url);
+    const rawSource = outputFiles[url.slice(memoryVirtualRootUrl.length)];
+    assert(rawSource !== undefined, 'Resolved in-memory ESM file should always exist: ' + url);
+
+    const source = typeof rawSource === 'string' ? rawSource : UTF8_DECODER.decode(rawSource);
 
     // In-memory files have already been transformer during bundling and can be returned directly
     return {
-      format,
+      format: format ?? 'module',
       shortCircuit: true,
       source,
     };
@@ -128,13 +131,14 @@ export async function load(url: string, context: { format?: string | null }, nex
   // Only module files potentially require transformation. Angular libraries that would
   // need linking are ESM only.
   if (format === 'module' && isFileProtocol(url)) {
-    const filePath = fileURLToPath(url);
-    let source = await readFile(filePath);
-
-    if (filePath.includes('@angular/')) {
-      // Prepend 'var ngServerMode=true;' to the source.
-      source = Buffer.concat([NG_SERVER_MODE_INIT_BYTES, source]);
+    // Check url instead of filePath so the check is robust across Windows and POSIX path separators.
+    if (!url.includes('/@angular/')) {
+      return nextLoad(url, context);
     }
+
+    const filePath = fileURLToPath(url);
+    const fileBytes = await readFile(filePath);
+    const source = Buffer.concat([NG_SERVER_MODE_INIT_BYTES, fileBytes]);
 
     return {
       format,
