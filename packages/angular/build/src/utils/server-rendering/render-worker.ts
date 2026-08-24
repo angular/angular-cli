@@ -8,6 +8,7 @@
 
 import { workerData } from 'node:worker_threads';
 import type { OutputMode } from '../../builders/application/schema';
+import { assertIsError } from '../error';
 import type { ESMInMemoryFileLoaderWorkerData } from './esm-in-memory-loader/loader-hooks';
 import { patchFetchToLoadInMemoryAssets } from './fetch-patch';
 import { DEFAULT_URL, launchServer } from './launch-server';
@@ -20,9 +21,13 @@ export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
   hasSsrEntry: boolean;
 }
 
-export interface RenderOptions {
+export interface RenderResultItem {
   url: string;
+  content: string | null;
+  error?: string;
 }
+
+export type RenderResult = RenderResultItem[];
 
 /**
  * This is passed as workerData when setting up the worker via the `piscina` package.
@@ -35,16 +40,12 @@ const { outputMode, hasSsrEntry } = workerData as {
 let serverURL = DEFAULT_URL;
 
 /**
- * Renders each route in routes and writes them to <outputPath>/<route>/index.html.
+ * Renders a single route URL.
  */
-async function renderPage({ url }: RenderOptions): Promise<string | null> {
-  const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } =
-    await loadEsmModuleFromMemory('./main.server.mjs');
-
-  const angularServerApp = getOrCreateAngularServerApp({
-    allowStaticRouteRender: true,
-  });
-
+async function renderPage(
+  url: string,
+  angularServerApp: { handle: (request: Request) => Promise<Response | null> },
+): Promise<string | null> {
   const response = await angularServerApp.handle(
     new Request(new URL(url, serverURL), { signal: AbortSignal.timeout(30_000) }),
   );
@@ -58,6 +59,35 @@ async function renderPage({ url }: RenderOptions): Promise<string | null> {
   return location ? generateRedirectStaticPage(location) : response.text();
 }
 
+/**
+ * Renders routes in batch or individual URL.
+ */
+async function renderPages(urls: string[]): Promise<RenderResult> {
+  const { ɵgetOrCreateAngularServerApp: getOrCreateAngularServerApp } =
+    await loadEsmModuleFromMemory('./main.server.mjs');
+
+  const angularServerApp = getOrCreateAngularServerApp({
+    allowStaticRouteRender: true,
+  });
+
+  const results: RenderResult = [];
+  for (const currentUrl of urls) {
+    try {
+      const content = await renderPage(currentUrl, angularServerApp);
+      results.push({ url: currentUrl, content });
+    } catch (err) {
+      assertIsError(err);
+      results.push({
+        url: currentUrl,
+        content: null,
+        error: err.stack ?? err.message ?? err.code ?? `${err}`,
+      });
+    }
+  }
+
+  return results;
+}
+
 async function initialize() {
   // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
   // which must be processed by the runtime linker, even if they are not used.
@@ -69,7 +99,7 @@ async function initialize() {
 
   patchFetchToLoadInMemoryAssets(serverURL);
 
-  return renderPage;
+  return renderPages;
 }
 
 export default initialize();
