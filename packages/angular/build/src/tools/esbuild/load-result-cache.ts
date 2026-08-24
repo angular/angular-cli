@@ -12,6 +12,7 @@ import { normalize } from 'node:path';
 export interface LoadResultCache {
   get(path: string): OnLoadResult | Promise<OnLoadResult | undefined> | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
+  invalidate(path: string): boolean;
   readonly watchFiles: ReadonlyArray<string>;
 }
 
@@ -108,18 +109,15 @@ export class MemoryLoadResultCache implements LoadResultCache {
 
   invalidate(path: string): boolean {
     const affectedPaths = this.#fileDependencies.get(path);
-    let found = false;
-
-    if (affectedPaths) {
-      for (const affected of affectedPaths) {
-        if (this.#loadResults.delete(affected)) {
-          found = true;
-        }
-      }
-      this.#fileDependencies.delete(path);
+    if (!affectedPaths) {
+      return false;
     }
 
-    return found;
+    for (const affected of affectedPaths) {
+      this.#loadResults.delete(affected);
+    }
+
+    return true;
   }
 
   get watchFiles(): string[] {
