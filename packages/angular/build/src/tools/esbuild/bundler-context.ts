@@ -106,7 +106,7 @@ export class BundlerContext {
 
   static bundleAll(
     contexts: Iterable<BundlerContext>,
-    changedFiles?: Iterable<string>,
+    changedFiles?: Iterable<string> | ReadonlySet<string>,
   ): Promise<BundleContextResult[]> {
     return Promise.all(
       [...contexts].map((context) => {
@@ -482,18 +482,72 @@ export class BundlerContext {
    * to be stored.
    * @returns True, if the result was invalidated; False, otherwise.
    */
-  invalidate(files: Iterable<string>): boolean {
+  invalidate(files: Iterable<string> | ReadonlySet<string>): boolean {
     if (!this.incremental) {
       return false;
     }
 
+    let candidateFiles: ReadonlySet<string>;
+    if (files instanceof Set) {
+      let isCandidateReady = true;
+      for (const file of files) {
+        if (
+          file !== normalize(file) ||
+          (!isAbsolute(file) && !files.has(normalize(join(this.workspaceRoot, file))))
+        ) {
+          isCandidateReady = false;
+          break;
+        }
+      }
+
+      if (isCandidateReady) {
+        candidateFiles = files;
+      } else {
+        const normalizedFiles = new Set<string>();
+        for (const file of files) {
+          const normalized = normalize(file);
+          normalizedFiles.add(normalized);
+          if (!isAbsolute(normalized)) {
+            normalizedFiles.add(normalize(join(this.workspaceRoot, normalized)));
+          }
+        }
+        candidateFiles = normalizedFiles;
+      }
+    } else {
+      const normalizedFiles = new Set<string>();
+      for (const file of files) {
+        const normalized = normalize(file);
+        normalizedFiles.add(normalized);
+        if (!isAbsolute(normalized)) {
+          normalizedFiles.add(normalize(join(this.workspaceRoot, normalized)));
+        }
+      }
+      candidateFiles = normalizedFiles;
+    }
+
     let invalid = false;
-    for (const file of files) {
-      const normalizedFile = isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file);
+    for (const file of candidateFiles) {
+      if (this.#loadCache?.invalidate(file)) {
+        invalid = true;
+      }
+    }
 
-      this.#loadCache?.invalidate(normalizedFile);
-
-      invalid ||= this.watchFiles.has(normalizedFile);
+    if (!invalid) {
+      if (this.watchFiles.size < candidateFiles.size) {
+        for (const file of this.watchFiles) {
+          if (candidateFiles.has(file)) {
+            invalid = true;
+            break;
+          }
+        }
+      } else {
+        for (const file of candidateFiles) {
+          if (this.watchFiles.has(file)) {
+            invalid = true;
+            break;
+          }
+        }
+      }
     }
 
     if (invalid) {
