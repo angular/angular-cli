@@ -75,6 +75,9 @@ export function createBrowserCodeBundleOptions(
       // Splitting emits shared chunks that are read across chunk boundaries as live ESM bindings,
       // which the unit-test runners' module loading does not reliably preserve.
       buildOptions.splitting = false;
+      // In unit test builds, package.json "sideEffects": false annotations can cause esbuild
+      // to incorrectly elide statically-referenced barrel module bodies across multiple entry points.
+      buildOptions.ignoreAnnotations = true;
     }
 
     buildOptions.plugins ??= [];
