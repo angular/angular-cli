@@ -19,6 +19,7 @@ import {
 import { BundlerContext } from '../../tools/esbuild/bundler-context';
 import { createGlobalScriptsBundleOptions } from '../../tools/esbuild/global-scripts';
 import { createGlobalStylesBundleOptions } from '../../tools/esbuild/global-styles';
+import { MemoryLoadResultCache } from '../../tools/esbuild/load-result-cache';
 import { getSupportedNodeTargets } from '../../tools/esbuild/target';
 import type { NormalizedApplicationBuildOptions } from './options';
 
@@ -94,11 +95,19 @@ export function setupBundlerContexts(
 
   // Global Stylesheets
   if (options.globalStyles.length > 0) {
+    const globalStylesCache = new MemoryLoadResultCache();
     for (const initial of [true, false]) {
       const bundleOptions = createGlobalStylesBundleOptions(options, target, initial);
       if (bundleOptions) {
         otherContexts.push(
-          new BundlerContext(workspaceRoot, watch, bundleOptions, true, () => initial),
+          new BundlerContext(
+            workspaceRoot,
+            watch,
+            bundleOptions,
+            true,
+            () => initial,
+            globalStylesCache,
+          ),
         );
       }
     }
