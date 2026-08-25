@@ -13,6 +13,7 @@ import os from 'node:os';
 import path from 'node:path';
 import { initializeHash } from '../../utils/hash';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
+import { createPersistentCacheStore } from './cache';
 import { I18nInliner } from './i18n-inliner';
 
 /**
@@ -212,6 +213,34 @@ describe('I18nInliner', () => {
       );
 
       expect(code).toBe(source);
+    });
+
+    it('inlines translations with translationIntegrity and persistent caching', async () => {
+      const cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), 'i18n-template-cache-test-'));
+
+      try {
+        const inliner = new I18nInliner({
+          missingTranslation: 'error',
+          outputFiles: [],
+          persistentCachePath: cacheDir,
+        });
+
+        const translationIntegrity = 'hash-template-integrity-123';
+        const { code, errors, warnings } = await inliner.inlineTemplateUpdate(
+          'fr',
+          { greeting: translationFor('Bonjour') },
+          GREETING_SOURCE,
+          'template-id',
+          translationIntegrity,
+        );
+
+        expect(errors).toEqual([]);
+        expect(warnings).toEqual([]);
+        expect(code).toContain('"Bonjour"');
+        await inliner.close();
+      } finally {
+        await fs.rm(cacheDir, { recursive: true, force: true });
+      }
     });
   });
 
@@ -722,5 +751,76 @@ describe('I18nInliner', () => {
     } finally {
       await fs.rm(cacheDir, { recursive: true, force: true });
     }
+  });
+
+  it('caches binary translation buffer in persistent cache store when translationIntegrity is provided', async () => {
+    const cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), 'i18n-inliner-trans-cache-test-'));
+
+    try {
+      const inliner1 = new I18nInliner({
+        missingTranslation: 'error',
+        outputFiles: [browserFile('main.js', GREETING_SOURCE)],
+        persistentCachePath: cacheDir,
+      });
+
+      const translationIntegrity = 'hash-test-integrity-12345';
+      const results1 = await inliner1.inlineAll([
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+          translationIntegrity,
+        },
+      ]);
+
+      expect(results1.get('fr')?.errors).toEqual([]);
+      expect(findFile(results1.get('fr')?.outputFiles ?? [], 'main.js').text).toContain(
+        '"Bonjour"',
+      );
+      await inliner1.close();
+
+      // Verify directly that the binary translation buffer was persisted on disk
+      const store = await createPersistentCacheStore(path.join(cacheDir, 'angular-i18n'));
+      try {
+        const translationCache = store.createCache<Uint8Array>('translations');
+        const cachedData = await translationCache.get(translationIntegrity);
+        expect(cachedData).toBeInstanceOf(Uint8Array);
+        expect(cachedData?.byteLength).toBeGreaterThan(0);
+      } finally {
+        await store.close();
+      }
+
+      const inliner2 = new I18nInliner({
+        missingTranslation: 'error',
+        outputFiles: [browserFile('main.js', GREETING_SOURCE)],
+        persistentCachePath: cacheDir,
+      });
+
+      const results2 = await inliner2.inlineAll([
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+          translationIntegrity,
+        },
+      ]);
+
+      expect(results2.get('fr')?.errors).toEqual([]);
+      expect(findFile(results2.get('fr')?.outputFiles ?? [], 'main.js').text).toContain(
+        '"Bonjour"',
+      );
+      await inliner2.close();
+    } finally {
+      await fs.rm(cacheDir, { recursive: true, force: true });
+    }
+  });
+
+  it('throws an error when duplicate locales are provided to inlineAll', async () => {
+    const localeInliner = createInliner([browserFile('main.js', GREETING_SOURCE)]);
+
+    await expectAsync(
+      localeInliner.inlineAll([
+        { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+        { locale: 'fr', translation: { greeting: translationFor('Salut') } },
+      ]),
+    ).toBeRejectedWithError(/Duplicate locale provided to inliner: fr/);
   });
 });
