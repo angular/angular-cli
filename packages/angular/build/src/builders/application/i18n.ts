@@ -161,19 +161,20 @@ export async function inlineI18n(
     if (executionResult.templateUpdates?.size) {
       // The development server only allows a single locale but issue a warning if used programmatically (experimental)
       // with multiple locales and template HMR.
-      if (i18nOptions.inlineLocales.size > 1) {
+      if (localesToInline.length > 1) {
         inlineResult.warnings.push(
           `Component HMR updates can only be inlined with a single locale. The first locale will be used.`,
         );
       }
-      const firstLocale = [...i18nOptions.inlineLocales][0];
+      const targetLocale = localesToInline[0];
 
       for (const [id, content] of executionResult.templateUpdates) {
         const templateUpdateResult = await inliner.inlineTemplateUpdate(
-          firstLocale,
-          i18nOptions.locales[firstLocale].translation,
+          targetLocale.locale,
+          targetLocale.translation,
           content,
           id,
+          targetLocale.translationIntegrity,
         );
         executionResult.templateUpdates.set(id, templateUpdateResult.code);
         inlineResult.errors.push(...templateUpdateResult.errors);
