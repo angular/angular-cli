@@ -277,8 +277,9 @@ export class BundlerContext {
         const isInternal = isInternalAngularFile(input) || isInternalBundlerFile(input);
 
         // Input file paths are always relative to the workspace root unless already absolute
-        const absoluteInput = isAbsolute(input) ? input : join(this.workspaceRoot, input);
-        const normalizedAbsoluteInput = normalize(absoluteInput);
+        const normalizedAbsoluteInput = isAbsolute(input)
+          ? normalize(input)
+          : join(this.workspaceRoot, input);
 
         if (!isInternal) {
           this.watchFiles.add(normalizedAbsoluteInput);
@@ -287,12 +288,13 @@ export class BundlerContext {
         if (this.#loadCache) {
           const cachedLoad = await (this.#loadCache.get(input) ??
             this.#loadCache.get(input.replace(';', ':')) ??
-            this.#loadCache.get('file:' + absoluteInput) ??
             this.#loadCache.get('file:' + normalizedAbsoluteInput));
           if (cachedLoad?.watchFiles) {
             for (const file of cachedLoad.watchFiles) {
               if (!isInternalAngularFile(file)) {
-                this.watchFiles.add(isAbsolute(file) ? file : join(this.workspaceRoot, file));
+                this.watchFiles.add(
+                  isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file),
+                );
               }
             }
           }
@@ -452,14 +454,12 @@ export class BundlerContext {
     for (const error of result.errors) {
       let file = error.location?.file;
       if (file && !isInternalAngularFile(file)) {
-        const absoluteFile = isAbsolute(file) ? file : join(this.workspaceRoot, file);
-        this.watchFiles.add(normalize(absoluteFile));
+        this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
       }
       for (const note of error.notes) {
         file = note.location?.file;
         if (file && !isInternalAngularFile(file)) {
-          const absoluteFile = isAbsolute(file) ? file : join(this.workspaceRoot, file);
-          this.watchFiles.add(normalize(absoluteFile));
+          this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
         }
       }
     }
@@ -469,7 +469,7 @@ export class BundlerContext {
     if (this.incremental && this.#loadCache) {
       for (const file of this.#loadCache.watchFiles) {
         if (!isInternalAngularFile(file)) {
-          this.watchFiles.add(isAbsolute(file) ? file : join(this.workspaceRoot, file));
+          this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
         }
       }
     }
@@ -489,13 +489,9 @@ export class BundlerContext {
 
     let invalid = false;
     for (const file of files) {
-      const absoluteFile = isAbsolute(file) ? file : join(this.workspaceRoot, file);
-      const normalizedFile = normalize(absoluteFile);
+      const normalizedFile = isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file);
 
-      if (this.#loadCache?.invalidate(normalizedFile)) {
-        invalid = true;
-        continue;
-      }
+      this.#loadCache?.invalidate(normalizedFile);
 
       invalid ||= this.watchFiles.has(normalizedFile);
     }
