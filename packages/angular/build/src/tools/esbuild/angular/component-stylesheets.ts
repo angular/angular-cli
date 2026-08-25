@@ -12,6 +12,7 @@ import { createContentHash } from '../../../utils/hash';
 import { BundleContextResult, BundlerContext } from '../bundler-context';
 import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
 import { MemoryCache } from '../cache';
+import { MemoryLoadResultCache } from '../load-result-cache';
 import {
   BundleStylesheetOptions,
   createStylesheetBundleOptions,
@@ -30,11 +31,12 @@ export type ComponentStylesheetResult = BundleContextResult & {
 export class ComponentStylesheetBundler {
   readonly #fileContexts = new MemoryCache<BundlerContext>();
   readonly #inlineContexts = new MemoryCache<BundlerContext>();
+  readonly #loadCache = new MemoryLoadResultCache();
 
   /**
-   *
    * @param options An object containing the stylesheet bundling options.
-   * @param cache A load result cache to use when bundling.
+   * @param defaultInlineLanguage The default language to use for inline component styles.
+   * @param incremental True if incremental watch mode is enabled.
    */
   constructor(
     private readonly options: BundleStylesheetOptions,
@@ -54,29 +56,38 @@ export class ComponentStylesheetBundler {
     externalId?: string | boolean,
     direct?: boolean,
   ): Promise<ComponentStylesheetResult> {
+    entry = path.normalize(entry);
+
     const bundlerContext = await this.#fileContexts.getOrCreate(entry, () => {
-      return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
-        const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
-        if (externalId) {
-          assert(
-            typeof externalId === 'string',
-            'Initial external component stylesheets must have a string identifier',
-          );
+      return new BundlerContext(
+        this.options.workspaceRoot,
+        this.incremental,
+        (loadCache) => {
+          const buildOptions = createStylesheetBundleOptions(this.options, loadCache);
+          if (externalId) {
+            assert(
+              typeof externalId === 'string',
+              'Initial external component stylesheets must have a string identifier',
+            );
 
-          buildOptions.entryPoints = { [externalId]: entry };
-          buildOptions.entryNames = '[name]';
-          delete buildOptions.publicPath;
-        } else {
-          buildOptions.entryPoints = [entry];
-        }
+            buildOptions.entryPoints = { [externalId]: entry };
+            buildOptions.entryNames = '[name]';
+            delete buildOptions.publicPath;
+          } else {
+            buildOptions.entryPoints = [entry];
+          }
 
-        // Angular encapsulation does not support nesting
-        // See: https://github.com/angular/angular/issues/58996
-        buildOptions.supported ??= {};
-        buildOptions.supported['nesting'] = false;
+          // Angular encapsulation does not support nesting
+          // See: https://github.com/angular/angular/issues/58996
+          buildOptions.supported ??= {};
+          buildOptions.supported['nesting'] = false;
 
-        return buildOptions;
-      });
+          return buildOptions;
+        },
+        /* useContext */ false,
+        /* initialFilter */ undefined,
+        this.#loadCache,
+      );
     });
 
     return this.extractResult(
@@ -101,6 +112,8 @@ export class ComponentStylesheetBundler {
     language = this.defaultInlineLanguage,
     externalId?: string,
   ): Promise<ComponentStylesheetResult> {
+    filename = path.normalize(filename);
+
     // Use a hash of the inline stylesheet content to ensure a consistent identifier. External stylesheets will resolve
     // to the actual stylesheet file path.
     const hasher = createContentHash();
@@ -112,48 +125,55 @@ export class ComponentStylesheetBundler {
     const bundlerContext = await this.#inlineContexts.getOrCreate(entry, () => {
       const namespace = 'angular:styles/component';
 
-      return new BundlerContext(this.options.workspaceRoot, this.incremental, (loadCache) => {
-        const buildOptions = createStylesheetBundleOptions(this.options, loadCache, {
-          [entry]: data,
-        });
-        if (externalId) {
-          buildOptions.entryPoints = { [externalId]: `${namespace};${entry}` };
-          buildOptions.entryNames = '[name]';
-          delete buildOptions.publicPath;
-        } else {
-          buildOptions.entryPoints = [`${namespace};${entry}`];
-        }
+      return new BundlerContext(
+        this.options.workspaceRoot,
+        this.incremental,
+        (loadCache) => {
+          const buildOptions = createStylesheetBundleOptions(this.options, loadCache, {
+            [entry]: data,
+          });
+          if (externalId) {
+            buildOptions.entryPoints = { [externalId]: `${namespace};${entry}` };
+            buildOptions.entryNames = '[name]';
+            delete buildOptions.publicPath;
+          } else {
+            buildOptions.entryPoints = [`${namespace};${entry}`];
+          }
 
-        // Angular encapsulation does not support nesting
-        // See: https://github.com/angular/angular/issues/58996
-        buildOptions.supported ??= {};
-        buildOptions.supported['nesting'] = false;
+          // Angular encapsulation does not support nesting
+          // See: https://github.com/angular/angular/issues/58996
+          buildOptions.supported ??= {};
+          buildOptions.supported['nesting'] = false;
 
-        buildOptions.plugins.push({
-          name: 'angular-component-styles',
-          setup(build) {
-            build.onResolve({ filter: /^angular:styles\/component;/ }, (args) => {
-              if (args.kind !== 'entry-point') {
-                return null;
-              }
+          buildOptions.plugins.push({
+            name: 'angular-component-styles',
+            setup(build) {
+              build.onResolve({ filter: /^angular:styles\/component;/ }, (args) => {
+                if (args.kind !== 'entry-point') {
+                  return null;
+                }
 
-              return {
-                path: entry,
-                namespace,
-              };
-            });
-            build.onLoad({ filter: /^css;/, namespace }, () => {
-              return {
-                contents: data,
-                loader: 'css',
-                resolveDir: path.dirname(filename),
-              };
-            });
-          },
-        });
+                return {
+                  path: entry,
+                  namespace,
+                };
+              });
+              build.onLoad({ filter: /^css;/, namespace }, () => {
+                return {
+                  contents: data,
+                  loader: 'css',
+                  resolveDir: path.dirname(filename),
+                };
+              });
+            },
+          });
 
-        return buildOptions;
-      });
+          return buildOptions;
+        },
+        /* useContext */ false,
+        /* initialFilter */ undefined,
+        this.#loadCache,
+      );
     });
 
     // Extract the result of the bundling from the output files
@@ -170,13 +190,20 @@ export class ComponentStylesheetBundler {
    * @param files The group of files that have been modified
    * @returns An array of file based stylesheet entries if any were invalidated; otherwise, undefined.
    */
-  invalidate(files: Iterable<string>): string[] | undefined {
+  invalidate(files: Iterable<string> | ReadonlySet<string>): string[] | undefined {
     if (!this.incremental) {
       return;
     }
 
-    const normalizedFiles = [...files].map(path.normalize);
-    const normalizedFilesSet = new Set(normalizedFiles);
+    const normalizedFiles = new Set<string>();
+    for (const file of files) {
+      const normalized = path.normalize(file);
+      normalizedFiles.add(normalized);
+      if (!path.isAbsolute(normalized)) {
+        normalizedFiles.add(path.normalize(path.join(this.options.workspaceRoot, normalized)));
+      }
+    }
+
     let entries: string[] | undefined;
 
     for (const [entry, bundler] of this.#fileContexts.entries()) {
@@ -190,7 +217,7 @@ export class ComponentStylesheetBundler {
       const firstSemi = entry.indexOf(';');
       const secondSemi = firstSemi !== -1 ? entry.indexOf(';', firstSemi + 1) : -1;
       const filename = secondSemi !== -1 ? entry.slice(secondSemi + 1) : '';
-      if (filename && normalizedFilesSet.has(path.normalize(filename))) {
+      if (filename && normalizedFiles.has(path.normalize(filename))) {
         this.#inlineContexts.delete(entry);
         void bundler.dispose();
       } else {
@@ -214,6 +241,7 @@ export class ComponentStylesheetBundler {
     const contexts = [...this.#fileContexts.values(), ...this.#inlineContexts.values()];
     this.#fileContexts.clear();
     this.#inlineContexts.clear();
+    this.#loadCache.clear();
 
     await Promise.allSettled(contexts.map((context) => context.dispose()));
   }
@@ -268,14 +296,18 @@ export class ComponentStylesheetBundler {
       }
     }
 
-    const { metafile } = result;
-    // Remove entryPoint fields from outputs to prevent the internal component styles from being
-    // treated as initial files. Also mark the entry as a component resource for stat reporting.
-    Object.values(metafile.outputs).forEach((output) => {
-      delete output.entryPoint;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (output as any)['ng-component'] = true;
-    });
+    // Clone metafile to prevent mutation of the cached result by downstream plugins
+    const metafile = {
+      inputs: { ...result.metafile.inputs },
+      outputs: Object.fromEntries(
+        Object.entries(result.metafile.outputs).map(([key, output]) => {
+          const cloned = { ...output, ['ng-component']: true };
+          delete cloned.entryPoint;
+
+          return [key, cloned];
+        }),
+      ),
+    };
 
     return {
       errors,
