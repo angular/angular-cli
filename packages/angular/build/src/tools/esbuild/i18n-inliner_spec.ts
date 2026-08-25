@@ -10,6 +10,7 @@ import { transform } from 'esbuild';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { initializeHash } from '../../utils/hash';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { I18nInliner } from './i18n-inliner';
 
@@ -50,6 +51,10 @@ describe('I18nInliner', () => {
 
     return inliner;
   }
+
+  beforeAll(async () => {
+    await initializeHash();
+  });
 
   afterEach(async () => {
     await inliner?.close();
