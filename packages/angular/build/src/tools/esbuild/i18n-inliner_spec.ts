@@ -56,6 +56,10 @@ describe('I18nInliner', () => {
     return inliner;
   }
 
+  beforeAll(async () => {
+    await initializeHash();
+  });
+
   afterEach(async () => {
     await inliner?.close();
     inliner = undefined;

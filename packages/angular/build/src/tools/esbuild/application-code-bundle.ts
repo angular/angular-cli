@@ -19,7 +19,6 @@ import {
   SERVER_APP_MANIFEST_FILENAME,
   SERVER_GENERATED_EXTERNALS,
 } from '../../utils/server-rendering/manifest';
-import { AngularCompilation, NoopCompilation } from '../angular/compilation';
 import { AngularCompilationContext } from './angular/compilation-state';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
