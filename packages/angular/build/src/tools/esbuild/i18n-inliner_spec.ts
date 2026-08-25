@@ -544,4 +544,96 @@ describe('I18nInliner', () => {
       expect(findFile(localeResult?.outputFiles ?? [], 'main.js').text).toContain(`"Hello ${i}"`);
     }
   });
+
+  it('injects locale data alongside ___NG_LOCALE_INSERT___ for non-English locales', async () => {
+    const source = `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`;
+    const localeInliner = createInliner([browserFile('polyfills.js', source)]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+      { locale: 'en-US', translation: undefined },
+    ]);
+
+    const fr = results.get('fr');
+    expect(fr?.errors).toEqual([]);
+    const frPolyfills = findFile(fr?.outputFiles ?? [], 'polyfills.js').text;
+    expect(frPolyfills).toContain('(globalThis.$localize ??= {}).locale = "fr";');
+    expect(frPolyfills).toContain('ng.common.locales');
+
+    const en = results.get('en-US');
+    expect(en?.errors).toEqual([]);
+    const enPolyfills = findFile(en?.outputFiles ?? [], 'polyfills.js').text;
+    expect(enPolyfills).toContain('(globalThis.$localize ??= {}).locale = "en-US";');
+    expect(enPolyfills).not.toContain('ng.common.locales');
+  });
+
+  it('warns and uses parent locale data when a subtag locale is not directly available', async () => {
+    const source = `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`;
+    const localeInliner = createInliner([browserFile('polyfills.js', source)]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr-ZZ', translation: { greeting: translationFor('Bonjour') } },
+    ]);
+
+    const frZZ = results.get('fr-ZZ');
+    expect(frZZ?.errors).toEqual([]);
+    expect(frZZ?.warnings).toEqual([
+      "Locale data for 'fr-ZZ' cannot be found. Using locale data for 'fr'.",
+    ]);
+    const polyfills = findFile(frZZ?.outputFiles ?? [], 'polyfills.js').text;
+    expect(polyfills).toContain('(globalThis.$localize ??= {}).locale = "fr-ZZ";');
+    expect(polyfills).toContain('ng.common.locales');
+  });
+
+  it('warns and includes no locale data when locale data cannot be found', async () => {
+    const source = `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`;
+    const localeInliner = createInliner([browserFile('polyfills.js', source)]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'xx-YY', translation: { greeting: translationFor('Test') } },
+    ]);
+
+    const xxYY = results.get('xx-YY');
+    expect(xxYY?.errors).toEqual([]);
+    expect(xxYY?.warnings).toEqual([
+      "Locale data for 'xx-YY' cannot be found. No locale data will be included for this locale.",
+    ]);
+    const polyfills = findFile(xxYY?.outputFiles ?? [], 'polyfills.js').text;
+    expect(polyfills).toContain('(globalThis.$localize ??= {}).locale = "xx-YY";');
+    expect(polyfills).not.toContain('ng.common.locales');
+  });
+
+  it('reports an error diagnostic when an invalid or unsupported locale is provided', async () => {
+    const source = `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`;
+    const localeInliner = createInliner([browserFile('polyfills.js', source)]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'invalid locale tag', translation: { greeting: translationFor('Test') } },
+    ]);
+
+    const invalid = results.get('invalid locale tag');
+    expect(invalid?.errors).toEqual([
+      'Invalid or unsupported locale provided in configuration: "invalid locale tag"',
+    ]);
+  });
+
+  it('injects locale data script only once when multiple ___NG_LOCALE_INSERT___ sites are present', async () => {
+    const source =
+      `(globalThis.$localize ??= {}).locale = "___NG_LOCALE_INSERT___";\n` +
+      `const secondary = "___NG_LOCALE_INSERT___";\n${GREETING_SOURCE}`;
+    const localeInliner = createInliner([browserFile('polyfills.js', source)]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+    ]);
+
+    const fr = results.get('fr');
+    expect(fr?.errors).toEqual([]);
+    const frPolyfills = findFile(fr?.outputFiles ?? [], 'polyfills.js').text;
+    expect(frPolyfills).toContain('(globalThis.$localize ??= {}).locale = "fr";');
+    expect(frPolyfills).toContain('const secondary = "fr";');
+
+    const iifeMatches = frPolyfills.match(/function\s*\(global/g);
+    expect(iifeMatches?.length).toBe(1);
+  });
 });
