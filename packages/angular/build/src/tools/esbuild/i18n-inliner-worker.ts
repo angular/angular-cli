@@ -13,6 +13,7 @@ import assert from 'node:assert';
 import { deserialize } from 'node:v8';
 import { workerData } from 'node:worker_threads';
 import { parseSync, visitorKeys } from 'oxc-parser';
+import { loadLocaleData } from './i18n-locale-plugin';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
 
 /**
@@ -502,8 +503,22 @@ async function inlineLocalize(
     }
   }
 
-  for (const site of metadata.localeInsertSites) {
-    magicString.overwrite(site.start, site.end, JSON.stringify(locale));
+  if (metadata.localeInsertSites.length > 0) {
+    const localeData = await loadLocaleData(locale);
+    if (localeData.error) {
+      diagnostics.error(localeData.error);
+    } else if (localeData.warning) {
+      diagnostics.warn(localeData.warning);
+    }
+    let injected = false;
+    for (const site of metadata.localeInsertSites) {
+      magicString.overwrite(
+        site.start,
+        site.end,
+        JSON.stringify(locale) + (localeData.code && !injected ? `;\n${localeData.code}\n;` : ''),
+      );
+      injected = true;
+    }
   }
 
   for (const callSite of metadata.callSites) {
