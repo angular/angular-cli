@@ -199,7 +199,7 @@ export async function* buildApplication(
     // Writes the output files to disk and ensures the containing directories are present
     const directoryExists = new Set<string>();
     try {
-      await emitFilesToDisk(Object.entries(result.files), async ([filePath, file]) => {
+      await emitFilesToDisk(result.files, async (file) => {
         if (
           outputOptions.ignoreServer &&
           (file.type === BuildOutputFileType.ServerApplication ||
@@ -208,7 +208,7 @@ export async function* buildApplication(
           return;
         }
 
-        const fullFilePath = generateFullPath(filePath, file.type, outputOptions);
+        const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
 
         // Ensure output subdirectories exist
         const fileBasePath = path.dirname(fullFilePath);

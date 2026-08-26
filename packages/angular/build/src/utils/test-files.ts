@@ -17,21 +17,18 @@ import { emitFilesToDisk } from '../tools/esbuild/utils';
  * This function handles both in-memory and on-disk files, creating subdirectories
  * as needed.
  *
- * @param files A map of file paths to `ResultFile` objects, representing the build output.
+ * @param files A collection of `ResultFile` objects, representing the build output.
  * @param testDir The absolute path to the directory where the files should be written.
  */
-export async function writeTestFiles(
-  files: Record<string, ResultFile>,
-  testDir: string,
-): Promise<void> {
+export async function writeTestFiles(files: readonly ResultFile[], testDir: string): Promise<void> {
   const directoryExists = new Set<string>();
   // Writes the test related output files to disk and ensures the containing directories are present
-  await emitFilesToDisk(Object.entries(files), async ([filePath, file]) => {
+  await emitFilesToDisk(files, async (file) => {
     if (file.type !== BuildOutputFileType.Browser && file.type !== BuildOutputFileType.Media) {
       return;
     }
 
-    const fullFilePath = path.join(testDir, filePath);
+    const fullFilePath = path.join(testDir, file.path);
 
     // Ensure output subdirectories exist
     const fileBasePath = path.dirname(fullFilePath);

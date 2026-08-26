@@ -30,7 +30,6 @@ export interface DevServerExternalResultMetadata extends Omit<ExternalResultMeta
 }
 
 export function updateResultRecord(
-  outputPath: string,
   file: ResultFile,
   normalizePath: (id: string) => string,
   htmlIndexPath: string,
@@ -40,7 +39,7 @@ export function updateResultRecord(
   initial = false,
 ): void {
   if (file.origin === 'disk') {
-    assetFiles.set('/' + normalizePath(outputPath), {
+    assetFiles.set('/' + normalizePath(file.path), {
       source: normalizePath(file.inputPath),
       updated: !initial,
     });
@@ -49,12 +48,12 @@ export function updateResultRecord(
   }
 
   let filePath;
-  if (outputPath === htmlIndexPath) {
+  if (file.path === htmlIndexPath) {
     // Convert custom index output path to standard index path for dev-server usage.
     // This mimics the Webpack dev-server behavior.
     filePath = '/index.html';
   } else {
-    filePath = '/' + normalizePath(outputPath);
+    filePath = '/' + normalizePath(file.path);
   }
 
   const servable =
@@ -71,6 +70,12 @@ export function updateResultRecord(
       updated: false,
     });
 
+    return;
+  }
+
+  // Avoid overwriting a servable browser file with a non-servable server file of the same path (e.g. CSS chunks)
+  const existing = generatedFiles.get(filePath);
+  if (existing?.servable && !servable) {
     return;
   }
 

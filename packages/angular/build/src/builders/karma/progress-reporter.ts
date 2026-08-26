@@ -76,12 +76,14 @@ export function injectKarmaReporter(
             buildOutput.kind === ResultKind.Full
           ) {
             if (buildOutput.kind === ResultKind.Full) {
-              this.latestBuildFiles.files = buildOutput.files;
+              this.latestBuildFiles.files.clear();
             } else {
-              this.latestBuildFiles.files = {
-                ...this.latestBuildFiles.files,
-                ...buildOutput.files,
-              };
+              for (const { path } of buildOutput.removed) {
+                this.latestBuildFiles.files.delete(path);
+              }
+            }
+            for (const file of buildOutput.files) {
+              this.latestBuildFiles.files.set(file.path, file);
             }
             await writeTestFiles(buildOutput.files, buildOptions.outputPath);
             this.emitter.refreshFiles();

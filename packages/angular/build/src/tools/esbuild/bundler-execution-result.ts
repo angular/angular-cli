@@ -27,7 +27,10 @@ export interface RebuildState {
   componentStyleBundler: ComponentStylesheetBundler;
   codeBundleCache?: SourceFileCache;
   fileChanges: ChangedFiles;
-  previousOutputInfo: ReadonlyMap<string, { hash: string; type: BuildOutputFileType }>;
+  previousOutputInfo: ReadonlyMap<
+    string,
+    { hash: string; type: BuildOutputFileType; path: string }
+  >;
   previousAssetsInfo: ReadonlyMap<string, string>;
   templateUpdates?: Map<string, string>;
 }
@@ -171,7 +174,7 @@ export class ExecutionResult {
       componentStyleBundler: this.componentStyleBundler,
       fileChanges,
       previousOutputInfo: new Map(
-        this.outputFiles.map(({ path, hash, type }) => [path, { hash, type }]),
+        this.outputFiles.map(({ path, hash, type }) => [`${type}:${path}`, { hash, type, path }]),
       ),
       previousAssetsInfo: new Map(
         this.assetFiles.map(({ source, destination }) => [source, destination]),
@@ -185,7 +188,7 @@ export class ExecutionResult {
   ): Set<string> {
     const changed = new Set<string>();
     for (const file of this.outputFiles) {
-      const previousHash = previousOutputHashes.get(file.path)?.hash;
+      const previousHash = previousOutputHashes.get(`${file.type}:${file.path}`)?.hash;
       if (previousHash === undefined || previousHash !== file.hash) {
         changed.add(file.path);
       }

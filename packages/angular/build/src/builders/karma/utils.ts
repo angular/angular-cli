@@ -8,8 +8,8 @@
 
 import type { BuilderContext } from '@angular-devkit/architect';
 import { createRequire } from 'node:module';
-import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { getProjectRootPaths } from '../../utils/project-metadata';
+import type { ResultFile } from '../application/results';
 import { findTests, getTestEntrypoints } from './find-tests';
 import type { NormalizedKarmaBuilderOptions } from './options';
 
@@ -62,9 +62,9 @@ export async function collectEntrypoints(
   return getTestEntrypoints(testFiles, { projectSourceRoot, workspaceRoot: context.workspaceRoot });
 }
 
-export function hasChunkOrWorkerFiles(files: Record<string, unknown>): boolean {
-  return Object.keys(files).some((filename) => {
-    return /(?:^|\/)(?:worker|chunk)[^/]+\.js$/.test(filename);
+export function hasChunkOrWorkerFiles(files: readonly ResultFile[]): boolean {
+  return files.some((file) => {
+    return /(?:^|\/)(?:worker|chunk)[^/]+\.js$/.test(file.path);
   });
 }
 

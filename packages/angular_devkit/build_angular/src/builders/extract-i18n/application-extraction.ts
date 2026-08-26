@@ -70,12 +70,12 @@ export async function extractMessages(
 
     // Extract messages from each output JavaScript file.
     // Output files are only present on a successful build.
-    for (const filePath of Object.keys(builderResult.files)) {
-      if (!filePath.endsWith('.js')) {
+    for (const file of builderResult.files) {
+      if (!file.path.endsWith('.js')) {
         continue;
       }
 
-      const fileMessages = extractor.extractMessages(filePath);
+      const fileMessages = extractor.extractMessages(file.path);
       messages.push(...fileMessages);
     }
 
@@ -93,9 +93,10 @@ export async function extractMessages(
 
 function setupLocalizeExtractor(
   extractorConstructor: typeof MessageExtractor,
-  files: Record<string, ResultFile>,
+  files: readonly ResultFile[],
   context: BuilderContext,
 ): MessageExtractor {
+  const fileMap = new Map(files.map((file) => [file.path, file]));
   const textDecoder = new TextDecoder();
   // Setup a virtual file system instance for the extractor
   // * MessageExtractor itself uses readFile, relative and resolve
@@ -105,7 +106,7 @@ function setupLocalizeExtractor(
       // Output files are stored as relative to the workspace root
       const requestedPath = nodePath.relative(context.workspaceRoot, path);
 
-      const file = files[requestedPath];
+      const file = fileMap.get(requestedPath);
       let content;
       if (file?.origin === 'memory') {
         content = textDecoder.decode(file.contents);
@@ -128,7 +129,7 @@ function setupLocalizeExtractor(
       // Output files are stored as relative to the workspace root
       const requestedPath = nodePath.relative(context.workspaceRoot, path);
 
-      return files[requestedPath] !== undefined;
+      return fileMap.has(requestedPath);
     },
     dirname(path: string): string {
       return nodePath.dirname(path);

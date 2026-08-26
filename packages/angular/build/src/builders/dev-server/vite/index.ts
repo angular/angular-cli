@@ -262,9 +262,8 @@ export async function* serveWithVite(
         componentStyles.clear();
         generatedFiles.clear();
 
-        for (const [outputPath, file] of Object.entries(result.files)) {
+        for (const file of result.files) {
           updateResultRecord(
-            outputPath,
             file,
             normalizePath,
             htmlIndexPath,
@@ -292,22 +291,9 @@ export async function* serveWithVite(
           assetFiles.delete(filePath);
         }
 
-        for (const modified of result.modified) {
+        for (const file of result.files) {
           updateResultRecord(
-            modified,
-            result.files[modified],
-            normalizePath,
-            htmlIndexPath,
-            generatedFiles,
-            assetFiles,
-            componentStyles,
-          );
-        }
-
-        for (const added of result.added) {
-          updateResultRecord(
-            added,
-            result.files[added],
+            file,
             normalizePath,
             htmlIndexPath,
             generatedFiles,
