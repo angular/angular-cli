@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize';
 import assert from 'node:assert';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
@@ -38,7 +39,7 @@ const DEFAULT_LOCALE_WINDOW_SIZE = 8;
  * @returns A SharedArrayBuffer or Blob containing the serialized messages, or undefined if none.
  */
 function serializeTranslation(
-  translation: Record<string, unknown> | undefined,
+  translation: Record<string, ɵParsedTranslation> | undefined,
 ): SharedArrayBuffer | Blob | undefined {
   if (!translation) {
     return undefined;
@@ -73,7 +74,7 @@ export interface LocaleInlineOptions {
   /**
    * The translation messages for the locale, or undefined for the source/untranslated locale.
    */
-  translation?: Record<string, unknown>;
+  translation?: Record<string, ɵParsedTranslation>;
 
   /**
    * An optional content integrity hash of the translation file(s) for fast cache key calculation.
@@ -470,7 +471,7 @@ export class I18nInliner {
    */
   async inlineForLocale(
     locale: string,
-    translation: Record<string, unknown> | undefined,
+    translation: Record<string, ɵParsedTranslation> | undefined,
     translationIntegrity?: string,
   ): Promise<LocaleInlineResult> {
     const results = await this.inlineAll([{ locale, translation, translationIntegrity }]);
@@ -482,7 +483,7 @@ export class I18nInliner {
 
   async inlineTemplateUpdate(
     locale: string,
-    translation: Record<string, unknown> | undefined,
+    translation: Record<string, ɵParsedTranslation> | undefined,
     templateCode: string,
     templateId: string,
   ): Promise<{ code: string; errors: string[]; warnings: string[] }> {

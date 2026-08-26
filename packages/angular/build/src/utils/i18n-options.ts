@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize';
 import path from 'node:path';
 import type { TranslationLoader } from './load-translations';
 
@@ -15,7 +16,7 @@ export interface LocaleDescription {
     integrity?: string;
     format?: string;
   }[];
-  translation?: Record<string, unknown>;
+  translation?: Record<string, ɵParsedTranslation>;
   dataPath?: string;
   baseHref?: string;
   subPath: string;
@@ -244,7 +245,7 @@ export function loadTranslations(
   usedFormats?: Set<string>,
   duplicateTranslation?: 'ignore' | 'error' | 'warning',
 ) {
-  let translations: Record<string, unknown> | undefined = undefined;
+  let translations: Record<string, ɵParsedTranslation> | undefined = undefined;
   for (const file of desc.files) {
     const loadResult = loader(path.join(workspaceRoot, file.path));
 

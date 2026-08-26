@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize';
+
 /**
  * Magic header identifier for i18n SharedArrayBuffer translation tables ('I18N').
  */
@@ -19,7 +21,9 @@ export const I18N_MAGIC_ID = 0x4931384e;
  * @param translation The translation dictionary object.
  * @returns A SharedArrayBuffer containing the binary encoded translation catalog.
  */
-export function encodeTranslationToBuffer(translation: Record<string, unknown>): SharedArrayBuffer {
+export function encodeTranslationToBuffer<T = ɵParsedTranslation>(
+  translation: Record<string, T>,
+): SharedArrayBuffer {
   const encoder = new TextEncoder();
   const entries = Object.entries(translation);
   const entryCount = entries.length;

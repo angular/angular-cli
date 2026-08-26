@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize';
 import { transform } from 'esbuild';
 import fs from 'node:fs/promises';
 import os from 'node:os';
@@ -21,11 +22,22 @@ import { I18nInliner } from './i18n-inliner';
 const GREETING_SOURCE = 'export const greeting = $localize`:@@greeting:Hello`;\n';
 
 /**
- * Creates the parsed translation form that `@angular/localize` expects for a message without
- * placeholders.
+ * Creates the parsed translation form that `@angular/localize` expects.
  */
-function translationFor(message: string): Record<string, unknown> {
-  return { messageParts: [message], placeholderNames: [], text: message };
+function parsedTranslation(
+  parts: string[],
+  placeholderNames: string[] = [],
+  text?: string,
+): ɵParsedTranslation {
+  return {
+    messageParts: Object.assign([...parts], { raw: [...parts] }),
+    placeholderNames,
+    text: text ?? parts.join(''),
+  };
+}
+
+function translationFor(message: string): ɵParsedTranslation {
+  return parsedTranslation([message], [], message);
 }
 
 function browserFile(path: string, contents: string): BuildOutputFile {
@@ -222,11 +234,7 @@ describe('I18nInliner', () => {
     const { outputFiles, errors, warnings } = await createInliner([
       browserFile('main.js', source),
     ]).inlineForLocale('fr', {
-      welcome: {
-        messageParts: ['Bonjour ', ' !'],
-        placeholderNames: ['PH'],
-        text: 'Bonjour {$PH} !',
-      },
+      welcome: parsedTranslation(['Bonjour ', ' !'], ['PH'], 'Bonjour {$PH} !'),
     });
 
     expect(errors).toEqual([]);
@@ -294,11 +302,11 @@ describe('I18nInliner', () => {
       browserFile('main.js', source),
     ]).inlineForLocale('fr', {
       inner: translationFor('Pomme'),
-      outer: {
-        messageParts: ['Vous avez sélectionné ', ' pour la livraison.'],
-        placeholderNames: ['PH'],
-        text: 'Vous avez sélectionné {$PH} pour la livraison.',
-      },
+      outer: parsedTranslation(
+        ['Vous avez sélectionné ', ' pour la livraison.'],
+        ['PH'],
+        'Vous avez sélectionné {$PH} pour la livraison.',
+      ),
     });
 
     expect(errors).toEqual([]);

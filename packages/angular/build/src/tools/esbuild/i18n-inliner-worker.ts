@@ -7,6 +7,7 @@
  */
 
 import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
+import type { ɵParsedTranslation } from '@angular/localize';
 import type { Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
 import assert from 'node:assert';
@@ -111,7 +112,7 @@ const fileDataCache = new Map<string, Promise<CachedFileData>>();
 /**
  * Cache of deserialized translation messages keyed by locale.
  */
-const deserializedTranslations = new Map<string, Promise<Record<string, unknown>>>();
+const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsedTranslation>>>();
 
 /**
  * Retrieves the file data for a filename, loading and extracting localization metadata.
@@ -159,7 +160,7 @@ function loadFileData(filename: string, cache = true): Promise<CachedFileData> {
 function loadTranslation(
   locale: string,
   translation?: Blob | SharedArrayBuffer,
-): Promise<Record<string, unknown>> | undefined {
+): Promise<Record<string, ɵParsedTranslation>> | undefined {
   if (!translation) {
     return undefined;
   }
@@ -169,7 +170,7 @@ function loadTranslation(
     if (translation instanceof Blob) {
       messagesPromise = translation
         .arrayBuffer()
-        .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>)
+        .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, ɵParsedTranslation>)
         .catch((error) => {
           deserializedTranslations.delete(locale);
           throw error;
@@ -431,7 +432,7 @@ async function inlineLocalize(
   map: SourceMapInput | undefined,
   metadata: FileLocalizeMetadata,
   locale: string,
-  translation: Record<string, unknown> | undefined,
+  translation: Record<string, ɵParsedTranslation> | undefined,
   filename: string,
 ) {
   const magicString = new MagicString(code);
