@@ -96,7 +96,7 @@ export interface LocaleInlineResult {
  */
 interface TransformedFileResult {
   file: string;
-  code: string;
+  code?: string;
   map?: string;
   messages: { type: 'error' | 'warning'; message: string }[];
 }
@@ -362,17 +362,26 @@ export class I18nInliner {
 
       if (fileResults) {
         for (const filename of filenames) {
+          const originalFile = this.#localizeFiles.get(filename);
+          assert(originalFile !== undefined, 'Localize file must exist: ' + filename);
+
           const fileResult = fileResults.get(filename);
           if (!fileResult) {
             continue;
           }
 
-          const type = this.#localizeFiles.get(filename)?.type;
-          assert(type !== undefined, 'localized file should always have a type: ' + filename);
+          const type = originalFile.type;
+          if (fileResult.code != undefined) {
+            outputFiles.push(createOutputFile(filename, fileResult.code, type));
+          } else {
+            outputFiles.push(originalFile.clone());
+          }
 
-          outputFiles.push(createOutputFile(filename, fileResult.code, type));
-          if (fileResult.map) {
+          const originalMap = this.#localizeFiles.get(filename + '.map');
+          if (fileResult.map !== undefined) {
             outputFiles.push(createOutputFile(filename + '.map', fileResult.map, type));
+          } else if (originalMap !== undefined) {
+            outputFiles.push(originalMap.clone());
           }
 
           for (const message of fileResult.messages) {
@@ -427,30 +436,54 @@ export class I18nInliner {
               activeLocales,
             },
             { name: 'inlineFileBatch' },
-          )) as {
-            file: string;
-            results: Array<TransformedFileResult & { locale: string }>;
-          };
+          )) as
+            | {
+                file: string;
+                unmodified: true;
+                messages: { type: 'error' | 'warning'; message: string }[];
+              }
+            | {
+                file: string;
+                unmodified?: false;
+                results: Array<TransformedFileResult & { locale: string }>;
+              };
 
-          const cachePromises: Promise<unknown>[] = [];
-          for (const res of batchResult.results) {
-            const matchingEntry = batchEntries.find((e) => e.locale === res.locale);
-            const cacheKey = matchingEntry?.cacheKey;
+          if (batchResult.unmodified) {
+            const unmodifiedResult: TransformedFileResult = {
+              file: filename,
+              messages: batchResult.messages,
+            };
 
-            if (this.#cache && cacheKey) {
-              cachePromises.push(
-                this.#cache.put(cacheKey, {
-                  file: filename,
-                  code: res.code,
-                  map: res.map,
-                  messages: res.messages,
-                }),
-              );
+            const cachePromises: Promise<unknown>[] = [];
+            for (const { locale, cacheKey } of batchEntries) {
+              fileResultsByLocale.get(locale)?.set(filename, unmodifiedResult);
+
+              if (this.#cache && cacheKey) {
+                cachePromises.push(this.#cache.put(cacheKey, unmodifiedResult));
+              }
             }
+            await Promise.allSettled(cachePromises);
+          } else {
+            const cachePromises: Promise<unknown>[] = [];
+            for (const res of batchResult.results) {
+              const matchingEntry = batchEntries.find((e) => e.locale === res.locale);
+              const cacheKey = matchingEntry?.cacheKey;
 
-            fileResultsByLocale.get(res.locale)?.set(filename, res);
+              if (this.#cache && cacheKey) {
+                cachePromises.push(
+                  this.#cache.put(cacheKey, {
+                    file: filename,
+                    code: res.code,
+                    map: res.map,
+                    messages: res.messages,
+                  }),
+                );
+              }
+
+              fileResultsByLocale.get(res.locale)?.set(filename, res);
+            }
+            await Promise.allSettled(cachePromises);
           }
-          await Promise.allSettled(cachePromises);
         })();
 
         workerTasks.push(task);
