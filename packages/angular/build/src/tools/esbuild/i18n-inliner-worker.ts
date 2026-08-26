@@ -17,29 +17,6 @@ import { loadLocaleData } from './i18n-locale-plugin';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
 
 /**
- * The options passed to the inliner for each file request
- */
-interface InlineFileRequest {
-  /**
-   * The filename that should be processed. The data for the file is provided to the Worker
-   * during Worker initialization.
-   */
-  filename: string;
-
-  /**
-   * The locale specifier that should be used during the inlining process of the file.
-   */
-  locale: string;
-
-  /**
-   * The serialized translation messages for the locale that should be used during the inlining
-   * process of the file. A SharedArrayBuffer or Blob is used so that the messages are shared with
-   * the Worker by reference instead of being copied into it for every request.
-   */
-  translation?: Blob | SharedArrayBuffer;
-}
-
-/**
  * The options passed to the inliner for each code request
  */
 interface InlineCodeRequest {
@@ -77,9 +54,9 @@ interface InlineFileBatchRequest {
   filename: string;
 
   /**
-   * The locale specifiers or locale objects that should be used during the inlining process of the file.
+   * The locale specifiers and optional translations to use during the inlining process of the file.
    */
-  locales: (string | { locale: string; translation?: Blob | SharedArrayBuffer })[];
+  locales: ReadonlyMap<string, Blob | SharedArrayBuffer | undefined>;
 
   /**
    * Whether the file data should be treated as ephemeral and not cached long-term in the Worker.
@@ -113,10 +90,9 @@ interface InlineFileBatchResult {
 }
 
 // Extract the application files and common options used for inline requests from the Worker context
-const { files, missingTranslation, translations } = (workerData || {}) as {
+const { files, missingTranslation } = (workerData || {}) as {
   files: ReadonlyMap<string, Blob>;
   missingTranslation: 'error' | 'warning' | 'ignore';
-  translations?: ReadonlyMap<string, Blob | SharedArrayBuffer>;
 };
 
 /**
@@ -184,15 +160,14 @@ function loadTranslation(
   locale: string,
   translation?: Blob | SharedArrayBuffer,
 ): Promise<Record<string, unknown>> | undefined {
-  const translationData = translation ?? translations?.get(locale);
-  if (!translationData) {
+  if (!translation) {
     return undefined;
   }
 
   let messagesPromise = deserializedTranslations.get(locale);
   if (!messagesPromise) {
-    if (translationData instanceof Blob) {
-      messagesPromise = translationData
+    if (translation instanceof Blob) {
+      messagesPromise = translation
         .arrayBuffer()
         .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, unknown>)
         .catch((error) => {
@@ -200,44 +175,12 @@ function loadTranslation(
           throw error;
         });
     } else {
-      messagesPromise = Promise.resolve(createSharedTranslationProxy(translationData));
+      messagesPromise = Promise.resolve(createSharedTranslationProxy(translation));
     }
     deserializedTranslations.set(locale, messagesPromise);
   }
 
   return messagesPromise;
-}
-
-/**
- * Inlines the provided locale and translation into a JavaScript file that contains `$localize` usage.
- * This function is the main entry for the Worker's action that is called by the worker pool.
- *
- * @param request An InlineRequest object representing the options for inlining
- * @returns An object containing the inlined file and optional map content.
- */
-export default async function inlineFile(request: InlineFileRequest) {
-  const { code, metadata } = await loadFileData(request.filename, true);
-
-  // Sourcemaps are parsed on demand per request rather than cached long-term to prevent
-  // monotonic memory growth as a worker processes multiple files across the build.
-  const rawMap = await files.get(request.filename + '.map')?.text();
-  const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
-
-  const result = await inlineLocalize(
-    code,
-    map,
-    metadata,
-    request.locale,
-    await loadTranslation(request.locale, request.translation),
-    request.filename,
-  );
-
-  return {
-    file: request.filename,
-    code: result.code,
-    map: result.map,
-    messages: result.diagnostics.messages,
-  };
 }
 
 /**
@@ -266,9 +209,7 @@ export async function inlineFileBatch(
   const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
 
   const results = await Promise.all(
-    request.locales.map(async (entry) => {
-      const locale = typeof entry === 'string' ? entry : entry.locale;
-      const translation = typeof entry === 'string' ? undefined : entry.translation;
+    Array.from(request.locales, async ([locale, translation]) => {
       const result = await inlineLocalize(
         code,
         map,

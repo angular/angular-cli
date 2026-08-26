@@ -42,14 +42,13 @@ export async function inlineI18n(
   warnings: string[];
   prerenderedRoutes: PrerenderedRoutesRecord;
 }> {
-  const { i18nOptions, optimizationOptions, baseHref, cacheOptions } = options;
+  const { i18nOptions, baseHref, cacheOptions } = options;
 
   // Create the multi-threaded inliner with common options and the files generated from the build.
   const inliner = new I18nInliner(
     {
       missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
       outputFiles: executionResult.outputFiles,
-      shouldOptimize: optimizationOptions.scripts,
       persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
       localizeVersion: i18nOptions.localizeVersion,
     },
