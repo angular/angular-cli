@@ -104,8 +104,8 @@ export class VitestExecutor implements TestExecutor {
 
     if (buildResult.kind === ResultKind.Full) {
       this.buildResultFiles.clear();
-      for (const [path, file] of Object.entries(buildResult.files)) {
-        this.buildResultFiles.set(this.normalizePath(path), file);
+      for (const file of buildResult.files) {
+        this.buildResultFiles.set(this.normalizePath(file.path), file);
       }
       this.debugLog(
         DebugLogLevel.Info,
@@ -124,8 +124,8 @@ export class VitestExecutor implements TestExecutor {
       for (const file of buildResult.removed) {
         this.buildResultFiles.delete(this.normalizePath(file.path));
       }
-      for (const [path, file] of Object.entries(buildResult.files)) {
-        this.buildResultFiles.set(this.normalizePath(path), file);
+      for (const file of buildResult.files) {
+        this.buildResultFiles.set(this.normalizePath(file.path), file);
       }
     }
 

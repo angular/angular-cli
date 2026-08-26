@@ -386,7 +386,7 @@ async function configureKarma(
     );
   }
 
-  parsedKarmaConfig.plugins.push(AngularAssetsMiddleware.createPlugin(buildOutput));
+  parsedKarmaConfig.plugins.push(AngularAssetsMiddleware.createPlugin(buildOutput.files));
   parsedKarmaConfig.middleware ??= [];
   parsedKarmaConfig.middleware.push(AngularAssetsMiddleware.NAME);
 

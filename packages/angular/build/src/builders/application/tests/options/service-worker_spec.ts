@@ -19,7 +19,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             name: 'app',
             installMode: 'prefetch',
             resources: {
-              files: ['/favicon.ico', '/index.html'],
+              files: ['/favicon.ico', '/index.html', '/*.css', '/*.js'],
             },
           },
           {
@@ -87,6 +87,41 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const config = await harness.readFile('dist/browser/ngsw.json');
       expect(JSON.parse(config)).toEqual(jasmine.objectContaining({ index: '/index.csr.html' }));
+    });
+
+    it('should write JS-imported CSS chunk to browser dist when SSR is enabled', async () => {
+      await harness.modifyFile('src/tsconfig.app.json', (content) => {
+        const tsConfig = JSON.parse(content);
+        tsConfig.files ??= [];
+        tsConfig.files.push('main.server.ts', 'server.ts', 'extra.d.ts');
+
+        return JSON.stringify(tsConfig);
+      });
+
+      await harness.writeFile('src/extra.d.ts', `declare module '*.css';`);
+      await harness.writeFile('src/server.ts', `console.log('Server!');`);
+      await harness.writeFile('src/extra.css', `body { color: red; }`);
+      await harness.modifyFile('src/main.ts', (content) => `import './extra.css';\n${content}`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        ssr: { entry: 'src/server.ts' },
+        serviceWorker: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const config = JSON.parse(harness.readFile('dist/browser/ngsw.json'));
+      const hashTable = config.hashTable as Record<string, string>;
+
+      const cssChunkUrls = Object.keys(hashTable).filter((url) => url.endsWith('.css'));
+      expect(cssChunkUrls.length).toBeGreaterThan(0);
+
+      for (const url of Object.keys(hashTable)) {
+        harness.expectFile(`dist/browser${url}`).toExist();
+      }
     });
   });
 });

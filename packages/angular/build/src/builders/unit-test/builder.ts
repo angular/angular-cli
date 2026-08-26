@@ -227,7 +227,7 @@ export async function* execute(
       await using executor = await runner.createExecutor(context, normalizedOptions, undefined);
       yield* executor.execute({
         kind: ResultKind.Full,
-        files: {},
+        files: [],
       });
     } catch (e) {
       assertIsError(e);
