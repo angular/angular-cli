@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { ɵParsedTranslation } from '@angular/localize';
 import { I18N_MAGIC_ID } from './i18n-translation-encoder';
 
 /**
@@ -43,13 +44,13 @@ function compareBytes(
  * A zero-copy reader that queries translation messages directly from a SharedArrayBuffer
  * using binary search over a sorted key index.
  */
-export class SharedTranslationDictionary {
+export class SharedTranslationDictionary<T = ɵParsedTranslation> {
   private readonly entryCount: number;
   private readonly uint32Index: Uint32Array;
   private readonly uint8Pool: Uint8Array;
   private readonly decoder = new TextDecoder();
   private readonly encoder = new TextEncoder();
-  private readonly lazyCache = new Map<string, unknown>();
+  private readonly lazyCache = new Map<string, T | typeof NOT_FOUND>();
 
   constructor(buffer: SharedArrayBuffer) {
     if (buffer.byteLength < 16) {
@@ -86,7 +87,7 @@ export class SharedTranslationDictionary {
    * @param targetKey The message key ID to search for.
    * @returns The parsed translation message, or undefined if not found.
    */
-  get(targetKey: string): unknown | undefined {
+  get(targetKey: string): T | undefined {
     const cached = this.lazyCache.get(targetKey);
     if (cached !== undefined) {
       return cached === NOT_FOUND ? undefined : cached;
@@ -117,7 +118,7 @@ export class SharedTranslationDictionary {
         const valJson = this.decoder.decode(valBytes);
 
         try {
-          const val = JSON.parse(valJson);
+          const val = JSON.parse(valJson) as T;
           this.lazyCache.set(targetKey, val);
 
           return val;
@@ -150,8 +151,10 @@ export class SharedTranslationDictionary {
  * @param buffer The SharedArrayBuffer containing binary encoded translation catalog.
  * @returns A Proxy object that intercepts property reads and queries the SharedTranslationDictionary.
  */
-export function createSharedTranslationProxy(buffer: SharedArrayBuffer): Record<string, unknown> {
-  const dictionary = new SharedTranslationDictionary(buffer);
+export function createSharedTranslationProxy<T = ɵParsedTranslation>(
+  buffer: SharedArrayBuffer,
+): Record<string, T> {
+  const dictionary = new SharedTranslationDictionary<T>(buffer);
 
   return new Proxy(
     {},

@@ -22,7 +22,7 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
     };
 
     const buffer = encodeTranslationToBuffer(translation);
-    const dictionary = new SharedTranslationDictionary(buffer);
+    const dictionary = new SharedTranslationDictionary<unknown>(buffer);
 
     expect(dictionary.get('greeting')).toEqual('Hello');
     expect(dictionary.get('farewell')).toEqual('Goodbye');
@@ -38,7 +38,7 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
     };
 
     const buffer = encodeTranslationToBuffer(translation);
-    const proxy = createSharedTranslationProxy(buffer);
+    const proxy = createSharedTranslationProxy<string>(buffer);
 
     expect(proxy['msg1']).toEqual('Message 1');
     expect(proxy['msg2']).toEqual('Message 2');
@@ -54,7 +54,7 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
     };
 
     const buffer = encodeTranslationToBuffer(translation);
-    const proxy = createSharedTranslationProxy(buffer);
+    const proxy = createSharedTranslationProxy<string>(buffer);
 
     expect(Object.prototype.hasOwnProperty.call(proxy, 'msg1')).toBeTrue();
     expect(Object.prototype.hasOwnProperty.call(proxy, 'unknown')).toBeFalse();
@@ -83,7 +83,7 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
     };
 
     const buffer = encodeTranslationToBuffer(translation);
-    const dictionary = new SharedTranslationDictionary(buffer);
+    const dictionary = new SharedTranslationDictionary<string>(buffer);
 
     expect(dictionary.get('😀')).toEqual('emoji message');
     expect(dictionary.get('\uE000')).toEqual('uE000 message');
@@ -102,8 +102,8 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
       msg1: 'Message 1',
     };
 
-    const buffer = encodeTranslationToBuffer(translation);
-    const dictionary = new SharedTranslationDictionary(buffer);
+    const buffer = encodeTranslationToBuffer<string>(translation);
+    const dictionary = new SharedTranslationDictionary<string>(buffer);
 
     // First lookup for missing key
     expect(dictionary.get('missingKey')).toBeUndefined();
