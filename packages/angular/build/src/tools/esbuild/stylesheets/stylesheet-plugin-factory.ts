@@ -11,7 +11,7 @@ import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { dirname, extname } from 'node:path';
-import type { Options } from 'sass';
+import type { Options } from 'sass-embedded';
 import { glob } from 'tinyglobby';
 import { assertIsError } from '../../../utils/error';
 import type { PostcssConfiguration } from '../../../utils/postcss-configuration';

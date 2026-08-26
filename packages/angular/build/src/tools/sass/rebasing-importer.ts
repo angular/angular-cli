@@ -11,7 +11,7 @@ import { MagicString } from 'magic-string';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { basename, dirname, extname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass';
+import type { CanonicalizeContext, Importer, ImporterResult, Syntax } from 'sass-embedded';
 import { assertIsError } from '../../utils/error';
 import { toPosixPath } from '../../utils/path';
 import { findUrls } from './lexer';
@@ -340,6 +340,44 @@ export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
     result &&= super.canonicalize(result.href, options);
 
     return result;
+  }
+}
+
+/**
+ * Provides the Sass importer logic to resolve module (npm package) stylesheet imports asynchronously
+ * and also rebase any `url()` function usage within those stylesheets.
+ */
+export class AsyncModuleUrlRebasingImporter implements Importer<'async'> {
+  private relativeImporter: RelativeUrlRebasingImporter;
+
+  constructor(
+    entryDirectory: string,
+    directoryCache: Map<string, DirectoryEntry>,
+    rebaseSourceMaps: Map<string, DecodedSourceMap> | undefined,
+    private finder: (
+      specifier: string,
+      options: CanonicalizeContext,
+    ) => Promise<URL | null> | URL | null,
+  ) {
+    this.relativeImporter = new RelativeUrlRebasingImporter(
+      entryDirectory,
+      directoryCache,
+      rebaseSourceMaps,
+    );
+  }
+
+  async canonicalize(url: string, options: CanonicalizeContext): Promise<URL | null> {
+    if (url.startsWith('file://')) {
+      return this.relativeImporter.canonicalize(url, options);
+    }
+
+    const result = await this.finder(url, options);
+
+    return result ? this.relativeImporter.canonicalize(result.href, options) : null;
+  }
+
+  load(canonicalUrl: URL): ImporterResult | null {
+    return this.relativeImporter.load(canonicalUrl);
   }
 }
 

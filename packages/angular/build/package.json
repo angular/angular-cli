@@ -39,6 +39,7 @@
     "piscina": "5.3.1",
     "rolldown": "1.2.5",
     "sass": "1.103.1",
+    "sass-embedded": "1.103.1",
     "semver": "7.8.5",
     "source-map-support": "0.5.21",
     "tinyglobby": "0.2.17",
