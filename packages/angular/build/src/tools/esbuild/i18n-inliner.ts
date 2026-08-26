@@ -57,10 +57,8 @@ function serializeTranslation(
 export interface I18nInlinerOptions {
   missingTranslation: 'error' | 'warning' | 'ignore';
   outputFiles: BuildOutputFile[];
-  shouldOptimize?: boolean;
   persistentCachePath?: string;
   localizeVersion?: string;
-  translations?: ReadonlyMap<string, Blob | SharedArrayBuffer>;
 }
 
 /**
@@ -155,7 +153,7 @@ export class I18nInliner {
     maxThreads?: number,
   ) {
     this.#unmodifiedFiles = [];
-    const { outputFiles, shouldOptimize, missingTranslation, translations } = options;
+    const { outputFiles, missingTranslation } = options;
     const files = new Map<string, BuildOutputFile>();
 
     const pendingMaps = [];
@@ -206,8 +204,6 @@ export class I18nInliner {
       // Extract options to ensure only the named options are serialized and sent to the worker
       workerData: {
         missingTranslation,
-        shouldOptimize,
-        translations,
         // A Blob is an immutable data structure that allows sharing the data between workers
         // without copying until the data is actually used within a Worker. This is useful here
         // since each file may not actually be processed in each Worker and the Blob avoids
@@ -233,7 +229,7 @@ export class I18nInliner {
   ): Promise<Map<string, LocaleInlineResult>> {
     await this.initCache();
 
-    const { shouldOptimize, missingTranslation, localizeVersion } = this.options;
+    const { missingTranslation, localizeVersion } = this.options;
     const localeList = Array.from(locales);
 
     if (localeList.length === 0) {
@@ -270,7 +266,6 @@ export class I18nInliner {
                 locale,
                 translation: translationIntegrity || translation,
                 missingTranslation,
-                shouldOptimize,
                 localizeVersion,
               }),
             ),
@@ -426,10 +421,7 @@ export class I18nInliner {
           const batchResult = (await this.#workerPool.run(
             {
               filename,
-              locales: batchEntries.map((e) => ({
-                locale: e.locale,
-                translation: e.translation,
-              })),
+              locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
               ephemeral,
               activeLocales,
             },
