@@ -1,3 +1,15 @@
+<a name="20.3.35"></a>
+
+# 20.3.35 (2026-08-26)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------- |
+| [94b620acd7](https://github.com/angular/angular-cli/commit/94b620acd76e39c7d5cc8527dfc6fe9096855cbd) | fix  | update webpack-dev-server to 5.2.6 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0-next.4"></a>
 
 # 22.2.0-next.4 (2026-08-19)
