@@ -1,3 +1,27 @@
+<a name="22.2.0-next.5"></a>
+
+# 22.2.0-next.5 (2026-08-26)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                      |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
+| [4d0be683b7](https://github.com/angular/angular-cli/commit/4d0be683b780a9a1629dc8f9cddad49153bddabf) | fix  | ignore side-effect annotations in unit test builds                               |
+| [e4111ae818](https://github.com/angular/angular-cli/commit/e4111ae8180f3cd5800f248c23010844aa1730ad) | fix  | prevent memory leaks in parallel compilation and caches                          |
+| [62999cabf4](https://github.com/angular/angular-cli/commit/62999cabf4d65cf1060598150a77494e147fcc2a) | perf | batch prerender routes and share in-memory server bundles                        |
+| [0589edd9cd](https://github.com/angular/angular-cli/commit/0589edd9cdc493ecf34a160cc7b8491618b59f72) | perf | consolidate component stylesheet bundling with shared load result cache          |
+| [a877aa7ebd](https://github.com/angular/angular-cli/commit/a877aa7ebdbf919d6bc17e6ec0920ca702db0db4) | perf | implement SharedArrayBuffer translation dictionaries for zero-copy worker access |
+| [f1cc959439](https://github.com/angular/angular-cli/commit/f1cc959439d8ca11a45d693520c34dd94e0b6548) | perf | implement sliding-window batching and worker translation eviction                |
+| [f4dad31cce](https://github.com/angular/angular-cli/commit/f4dad31cce41bc3e8ed8767256d9e50a712c3a72) | perf | unify Oxc linking and optimization AST traversal passes                          |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                           |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [f8576e3c8b](https://github.com/angular/angular-cli/commit/f8576e3c8bfe3490b1b0b85832b489593a4e43ac) | fix  | abort web request signal when node request is aborted |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.6"></a>
 
 # 22.1.6 (2026-08-26)
