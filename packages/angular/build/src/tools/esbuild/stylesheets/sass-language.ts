@@ -9,26 +9,27 @@
 import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass';
-import type { SassWorkerImplementation } from '../../sass/sass-service';
+import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass-embedded';
+import { useSassWorker } from '../../../utils/environment-options';
+import type { SassServiceImplementation } from '../../sass/sass-service';
 import { MemoryCache } from '../cache';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
-let sassWorkerPool: SassWorkerImplementation | undefined;
-let sassWorkerPoolPromise: Promise<SassWorkerImplementation> | undefined;
+let sassService: SassServiceImplementation | undefined;
+let sassServicePromise: Promise<SassServiceImplementation> | undefined;
 
 function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
 }
 
 export function shutdownSassWorkerPool(): void {
-  if (sassWorkerPool) {
-    void sassWorkerPool.close();
-    sassWorkerPool = undefined;
-  } else if (sassWorkerPoolPromise) {
-    void sassWorkerPoolPromise.then(shutdownSassWorkerPool);
+  if (sassService) {
+    void sassService.close();
+    sassService = undefined;
+  } else if (sassServicePromise) {
+    void sassServicePromise.then(shutdownSassWorkerPool);
   }
-  sassWorkerPoolPromise = undefined;
+  sassServicePromise = undefined;
 }
 
 export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
@@ -78,13 +79,21 @@ async function compileString(
   resolveUrl: (url: string, options: CanonicalizeContext) => Promise<ResolveResult>,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
-  if (sassWorkerPool === undefined) {
-    if (sassWorkerPoolPromise === undefined) {
-      sassWorkerPoolPromise = import('../../sass/sass-service').then(
-        (sassService) => new sassService.SassWorkerImplementation(true),
-      );
+  if (sassService === undefined) {
+    if (sassServicePromise === undefined) {
+      sassServicePromise = useSassWorker
+        ? import('../../sass/sass-worker-implementation').then(
+            (sassService) => new sassService.SassWorkerImplementation(true),
+          )
+        : import('../../sass/sass-async-compiler-implementation').then(
+            (sassService) => new sassService.SassAsyncCompilerImplementation(),
+          );
     }
-    sassWorkerPool = await sassWorkerPoolPromise;
+    try {
+      sassService = await sassServicePromise;
+    } finally {
+      sassServicePromise = undefined;
+    }
   }
 
   // Cache is currently local to individual compile requests.
@@ -99,7 +108,7 @@ async function compileString(
   const { silenceDeprecations, futureDeprecations, fatalDeprecations } = options.sass ?? {};
 
   try {
-    const { css, sourceMap, loadedUrls } = await sassWorkerPool.compileStringAsync(data, {
+    const { css, sourceMap, loadedUrls } = await sassService.compileStringAsync(data, {
       url: pathToFileURL(filePath),
       style: 'expanded',
       syntax,
@@ -226,7 +235,7 @@ function* extractFilesFromStack(stack: string): Iterable<string> {
     }
 
     if (path) {
-      // Stack paths from dart-sass are relative to the current working directory (not input file or workspace root)
+      // Stack paths from sass are relative to the current working directory (not input file or workspace root)
       yield join(cwd, path);
     }
   }

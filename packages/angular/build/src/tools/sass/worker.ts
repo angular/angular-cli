@@ -25,7 +25,10 @@ import {
   RelativeUrlRebasingImporter,
   sassBindWorkaround,
 } from './rebasing-importer';
-import type { SerializableDeprecation, SerializableWarningMessage } from './sass-service';
+import type {
+  SerializableDeprecation,
+  SerializableWarningMessage,
+} from './sass-worker-implementation';
 
 /**
  * A request to render a Sass stylesheet using the supplied options.
