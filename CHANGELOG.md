@@ -1,3 +1,22 @@
+<a name="22.1.6"></a>
+
+# 22.1.6 (2026-08-26)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                               |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [3f132eaa97](https://github.com/angular/angular-cli/commit/3f132eaa97b95e16c58b8095c2566e3c78190446) | fix  | ignore side-effect annotations in unit test builds        |
+| [5b1028936f](https://github.com/angular/angular-cli/commit/5b1028936f6e9582917f95ac37942dca0ee2c659) | perf | batch prerender routes and share in-memory server bundles |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                           |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [76818cb811](https://github.com/angular/angular-cli/commit/76818cb811a8fe669575f988fec2e4528dca8c73) | fix  | abort web request signal when node request is aborted |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.22"></a>
 
 # 21.2.22 (2026-08-26)
