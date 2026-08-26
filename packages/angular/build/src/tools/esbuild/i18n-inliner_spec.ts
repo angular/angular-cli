@@ -644,4 +644,83 @@ describe('I18nInliner', () => {
     const iifeMatches = frPolyfills.match(/function\s*\(global/g);
     expect(iifeMatches?.length).toBe(1);
   });
+
+  it('preserves code and sourcemaps when a file contains the $localize keyword only in comments', async () => {
+    const source = '// $localize keyword in comment\nexport const message = "hello world";\n';
+    const { code, map } = await transform(source, {
+      sourcefile: 'comment-only.ts',
+      loader: 'ts',
+      sourcemap: 'external',
+    });
+
+    const localeInliner = createInliner([
+      browserFile('main.js', code),
+      browserFile('main.js.map', map),
+    ]);
+
+    const results = await localeInliner.inlineAll([
+      { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+      { locale: 'de', translation: { greeting: translationFor('Hallo') } },
+    ]);
+
+    expect(results.size).toBe(2);
+
+    for (const locale of ['fr', 'de'] as const) {
+      const localeResult = results.get(locale);
+      expect(localeResult).toBeDefined();
+      expect(localeResult?.errors).toEqual([]);
+      expect(localeResult?.warnings).toEqual([]);
+
+      const mainJs = findFile(localeResult?.outputFiles ?? [], 'main.js');
+      expect(mainJs.text).toBe(code);
+
+      const mainMap = findFile(localeResult?.outputFiles ?? [], 'main.js.map');
+      expect(mainMap.text).toBe(map);
+    }
+  });
+
+  it('correctly handles persistent caching for unmodified files', async () => {
+    const cacheDir = await fs.mkdtemp(path.join(os.tmpdir(), 'i18n-unmodified-cache-test-'));
+    const source = '// $localize comment only\nexport const value = 123;\n';
+
+    try {
+      const inliner1 = new I18nInliner({
+        missingTranslation: 'error',
+        outputFiles: [browserFile('main.js', source)],
+        persistentCachePath: cacheDir,
+      });
+
+      const results1 = await inliner1.inlineAll([
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+          translationIntegrity: 'fr-1',
+        },
+      ]);
+
+      expect(results1.get('fr')?.errors).toEqual([]);
+      expect(findFile(results1.get('fr')?.outputFiles ?? [], 'main.js').text).toBe(source);
+      await inliner1.close();
+
+      const inliner2 = new I18nInliner({
+        missingTranslation: 'error',
+        outputFiles: [browserFile('main.js', source)],
+        persistentCachePath: cacheDir,
+      });
+
+      const results2 = await inliner2.inlineAll([
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+          translationIntegrity: 'fr-1',
+        },
+      ]);
+
+      expect(results2.get('fr')?.errors).toEqual([]);
+      expect(findFile(results2.get('fr')?.outputFiles ?? [], 'main.js').text).toBe(source);
+      await inliner2.close();
+    } finally {
+      await fs.rm(cacheDir, { recursive: true, force: true });
+    }
+  });
 });
