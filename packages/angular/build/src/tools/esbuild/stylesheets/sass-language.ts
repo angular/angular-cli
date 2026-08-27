@@ -10,13 +10,12 @@ import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'e
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass-embedded';
-import { useSassWorker } from '../../../utils/environment-options';
-import type { SassServiceImplementation } from '../../sass/sass-service';
+import type { SassCompiler } from '../../sass/sass-service';
 import { MemoryCache } from '../cache';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
-let sassService: SassServiceImplementation | undefined;
-let sassServicePromise: Promise<SassServiceImplementation> | undefined;
+let sassService: SassCompiler | undefined;
+let sassServicePromise: Promise<SassCompiler> | undefined;
 
 function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
@@ -81,13 +80,9 @@ async function compileString(
   // Lazily load Sass when a Sass file is found
   if (sassService === undefined) {
     if (sassServicePromise === undefined) {
-      sassServicePromise = useSassWorker
-        ? import('../../sass/sass-worker-implementation').then(
-            (sassService) => new sassService.SassWorkerImplementation(true),
-          )
-        : import('../../sass/sass-async-compiler-implementation').then(
-            (sassService) => new sassService.SassAsyncCompilerImplementation(),
-          );
+      sassServicePromise = import('../../sass/sass-service').then(
+        (sassService) => new sassService.SassCompiler(true),
+      );
     }
     try {
       sassService = await sassServicePromise;

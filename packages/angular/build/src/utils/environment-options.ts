@@ -202,11 +202,12 @@ export const usePartialSsrBuild = parseTristate(process.env['NG_BUILD_PARTIAL_SS
 export const useBabelLinker = parseTristate(process.env['NG_BUILD_BABEL_LINKER']) === true;
 
 /**
- * When `NG_BUILD_SASS_WORKER` is enabled (`1` or `true`), the worker-based
- * Sass implementation will be used instead of the native asynchronous compiler.
+ * When `NG_BUILD_SASS_EMBEDDED` is set to `0` or `false`, or when running within a
+ * WebContainer environment, the native embedded Sass compiler is disabled
+ * and the pure-JavaScript Sass compiler is used instead.
  */
-export const useSassWorker =
-  !!process.versions.webcontainer || parseTristate(process.env['NG_BUILD_SASS_WORKER']) === true;
+export const useSassEmbedded =
+  !process.versions.webcontainer && parseTristate(process.env['NG_BUILD_SASS_EMBEDDED']) !== false;
 
 const bazelBinDirectory = process.env['BAZEL_BINDIR'];
 const bazelExecRoot = process.env['JS_BINARY__EXECROOT'];

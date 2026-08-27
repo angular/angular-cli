@@ -45,7 +45,9 @@ abstract class UrlRebasingImporter implements Importer<'sync'> {
   constructor(
     private entryDirectory: string,
     private rebaseSourceMaps?: Map<string, DecodedSourceMap>,
-  ) {}
+  ) {
+    this.load = this.load.bind(this);
+  }
 
   abstract canonicalize(url: string, options: { fromImport: boolean }): URL | null;
 
@@ -140,6 +142,7 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
     rebaseSourceMaps?: Map<string, DecodedSourceMap>,
   ) {
     super(entryDirectory, rebaseSourceMaps);
+    this.canonicalize = this.canonicalize.bind(this);
   }
 
   canonicalize(url: string, options: { fromImport: boolean }): URL | null {
@@ -317,33 +320,6 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
 }
 
 /**
- * Provides the Sass importer logic to resolve module (npm package) stylesheet imports via both import and
- * use rules and also rebase any `url()` function usage within those stylesheets. The rebasing will ensure that
- * the URLs in the output of the Sass compiler reflect the final filesystem location of the output CSS file.
- */
-export class ModuleUrlRebasingImporter extends RelativeUrlRebasingImporter {
-  constructor(
-    entryDirectory: string,
-    directoryCache: Map<string, DirectoryEntry>,
-    rebaseSourceMaps: Map<string, DecodedSourceMap> | undefined,
-    private finder: (specifier: string, options: CanonicalizeContext) => URL | null,
-  ) {
-    super(entryDirectory, directoryCache, rebaseSourceMaps);
-  }
-
-  override canonicalize(url: string, options: CanonicalizeContext): URL | null {
-    if (url.startsWith('file://')) {
-      return super.canonicalize(url, options);
-    }
-
-    let result = this.finder(url, options);
-    result &&= super.canonicalize(result.href, options);
-
-    return result;
-  }
-}
-
-/**
  * Provides the Sass importer logic to resolve module (npm package) stylesheet imports asynchronously
  * and also rebase any `url()` function usage within those stylesheets.
  */
@@ -364,6 +340,8 @@ export class AsyncModuleUrlRebasingImporter implements Importer<'async'> {
       directoryCache,
       rebaseSourceMaps,
     );
+    this.canonicalize = this.canonicalize.bind(this);
+    this.load = this.load.bind(this);
   }
 
   async canonicalize(url: string, options: CanonicalizeContext): Promise<URL | null> {
@@ -411,17 +389,4 @@ export class LoadPathsUrlRebasingImporter extends RelativeUrlRebasingImporter {
 
     return result;
   }
-}
-
-/**
- * Workaround for Sass not calling instance methods with `this`.
- * The `canonicalize` and `load` methods will be bound to the class instance.
- * @param importer A Sass importer to bind.
- * @returns The bound Sass importer.
- */
-export function sassBindWorkaround<T extends Importer>(importer: T): T {
-  importer.canonicalize = importer.canonicalize.bind(importer);
-  importer.load = importer.load.bind(importer);
-
-  return importer;
 }
