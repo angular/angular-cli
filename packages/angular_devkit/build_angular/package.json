@@ -40,7 +40,7 @@
     "mini-css-extract-plugin": "2.10.2",
     "open": "11.0.1",
     "ora": "9.4.1",
-    "picomatch": "4.0.5",
+    "picomatch": "4.0.7",
     "piscina": "5.3.1",
     "postcss": "8.5.26",
     "postcss-loader": "8.2.1",
