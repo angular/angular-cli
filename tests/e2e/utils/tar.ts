@@ -33,7 +33,7 @@ export function extractFile(tarball: string, filePath: string): Promise<Buffer> 
       }
 
       const chunks: Buffer[] = [];
-      stream.on('data', (chunk) => chunks.push(chunk));
+      stream.on('data', (chunk) => chunks.push(chunk as Buffer));
       stream.on('error', reject);
       stream.on('end', () => {
         resolve(Buffer.concat(chunks));
@@ -43,6 +43,13 @@ export function extractFile(tarball: string, filePath: string): Promise<Buffer> 
 
     extractor.on('finish', () => reject(new Error(`'${filePath}' not found in '${tarball}'.`)));
 
-    createReadStream(tarball).pipe(createGunzip()).pipe(extractor).on('error', reject);
+    const readStream = createReadStream(tarball);
+    const gunzip = createGunzip();
+
+    readStream.on('error', reject);
+    gunzip.on('error', reject);
+    extractor.on('error', reject);
+
+    readStream.pipe(gunzip).pipe(extractor as unknown as NodeJS.WritableStream);
   });
 }
