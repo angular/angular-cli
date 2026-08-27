@@ -13,7 +13,8 @@ import { MagicString } from 'magic-string';
 import assert from 'node:assert';
 import { deserialize } from 'node:v8';
 import { workerData } from 'node:worker_threads';
-import { parseSync, visitorKeys } from 'oxc-parser';
+import { parseSync } from 'oxc-parser';
+import { traversePostOrder } from '../oxc/traversal';
 import { loadLocaleData } from './i18n-locale-plugin';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
 
@@ -285,55 +286,6 @@ async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
 }
 
 /**
- * Traverses ESTree AST nodes in post-order (bottom-up) without recursion.
- * Bottom-up traversal ensures that nested `$localize` expressions are transformed and
- * written to MagicString before outer containing templates are evaluated.
- *
- * @param root The root AST node to traverse.
- * @param onExit Callback invoked on each AST node in post-order.
- */
-function walkAstPostOrder(root: Node, onExit: (node: Node) => void): void {
-  const traverseStack: Node[] = [root];
-  const postOrderNodes: Node[] = [];
-
-  while (traverseStack.length > 0) {
-    const current = traverseStack.pop();
-    if (!current) {
-      continue;
-    }
-
-    postOrderNodes.push(current);
-
-    const keys = visitorKeys[current.type];
-    if (!keys) {
-      continue;
-    }
-
-    for (let i = 0; i < keys.length; i++) {
-      const child = (current as unknown as Record<string, Node | Node[]>)[keys[i]];
-      if (!child) {
-        continue;
-      }
-
-      if (Array.isArray(child)) {
-        for (const item of child) {
-          if (item) {
-            traverseStack.push(item);
-          }
-        }
-      } else {
-        traverseStack.push(child);
-      }
-    }
-  }
-
-  // Process collected nodes in reverse order to achieve bottom-up (post-order) traversal
-  for (let i = postOrderNodes.length - 1; i >= 0; i--) {
-    onExit(postOrderNodes[i]);
-  }
-}
-
-/**
  * Metadata for a `$localize` tagged template expression extracted from the AST.
  */
 interface LocalizeCallSite {
@@ -372,7 +324,7 @@ function extractLocalizeMetadata(filename: string, code: string): FileLocalizeMe
   const localeInsertSites: { start: number; end: number }[] = [];
   let diagnostics: string[] | undefined;
 
-  walkAstPostOrder(program, (node) => {
+  traversePostOrder(program, (node) => {
     if (node.type === 'Literal') {
       if (typeof node.value === 'string' && node.value === '___NG_LOCALE_INSERT___') {
         localeInsertSites.push({ start: node.start, end: node.end });
