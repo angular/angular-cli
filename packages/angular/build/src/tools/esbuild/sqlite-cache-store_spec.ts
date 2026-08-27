@@ -36,6 +36,81 @@ describe('SqliteCacheStore', () => {
     expect(result).toEqual(data);
   });
 
+  it('should preserve binary values', async () => {
+    const data = new TextEncoder().encode('export const value = 1;\n');
+    await store.set('binary-key', data);
+
+    const result = await store.get('binary-key');
+    expect(result).toBeInstanceOf(Uint8Array);
+    expect(result).toEqual(data);
+  });
+
+  it('should preserve binary values nested within an object', async () => {
+    const data = {
+      contents: new TextEncoder().encode('export const value = 1;\n'),
+      loader: 'js',
+      watchFiles: ['/some/file.js'],
+    };
+    await store.set('nested-binary-key', data);
+
+    const result = await store.get('nested-binary-key');
+    expect(result.contents).toBeInstanceOf(Uint8Array);
+    expect(result).toEqual(data);
+  });
+
+  it('should preserve binary values across store instances', async () => {
+    const data = new TextEncoder().encode('export const value = 1;\n');
+    await store.set('persisted-binary-key', data);
+    store.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('persisted-binary-key');
+      expect(result).toBeInstanceOf(Uint8Array);
+      expect(result).toEqual(data);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should treat a corrupt payload as a cache miss', async () => {
+    await store.set('corrupt-key', 'value');
+    store.close();
+
+    // Simulate an entry with an invalid/corrupt payload that fails deserialization.
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    directDb
+      .prepare('UPDATE cache SET value = ? WHERE key = ?')
+      .run(new Uint8Array([0x00, 0x01, 0x02]), 'corrupt-key');
+    directDb.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      expect(await reopenedStore.get('corrupt-key')).toBeUndefined();
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should treat a non-binary payload as a cache miss', async () => {
+    await store.set('text-key', 'value');
+    store.close();
+
+    // SQLite column types are dynamic, so a stored value is not guaranteed to be binary.
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    directDb.prepare('UPDATE cache SET value = ? WHERE key = ?').run('"value"', 'text-key');
+    directDb.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      expect(await reopenedStore.get('text-key')).toBeUndefined();
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
   it('should return undefined for non-existent key', async () => {
     const result = await store.get('missing-key');
     expect(result).toBeUndefined();
@@ -89,8 +164,8 @@ describe('SqliteCacheStore', () => {
     store.close();
 
     // Create a store with a tiny size limit (e.g. 25 bytes)
-    // Keys 'k1', 'k2', 'k3' are small (each is 10 bytes: key + JSON.stringify(value)).
-    // Total size of k1 + k2 + k3 is 30 bytes, which exceeds the 25 bytes limit.
+    // Keys 'k1', 'k2', 'k3' are small (each is 12 bytes: 2 byte key + 10 byte serialized value).
+    // Total size of k1 + k2 + k3 is 36 bytes, which exceeds the 25 bytes limit.
     const sizeStore = new SqliteCacheStore(cachePath, 25);
 
     // Set k1, then k2, then k3.

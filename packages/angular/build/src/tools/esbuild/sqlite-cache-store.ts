@@ -7,8 +7,17 @@
  */
 
 import { DatabaseSync, StatementSync } from 'node:sqlite';
+import { deserialize, serialize } from 'node:v8';
 import { Cache, PersistentCacheStore } from './cache';
 
+/**
+ * A persistent cache store backed by SQLite.
+ *
+ * Values are persisted with the V8 structured clone serialization API instead of JSON. Cached
+ * values include binary data such as the `Uint8Array` output of the JavaScript transformer and
+ * the `contents` of an esbuild load result. A JSON round-trip converts those into plain objects
+ * (`{"0":105,"1":109,...}`), which breaks consumers on any build that reads them back from disk.
+ */
 export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   #db: DatabaseSync | undefined;
   #getStmt: StatementSync | undefined;
@@ -35,7 +44,7 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       this.#db.exec('PRAGMA temp_store = MEMORY;');
       this.#db.exec('PRAGMA mmap_size = 268435456;');
       this.#db.exec(
-        'CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value TEXT, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
+        'CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value BLOB, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
       );
 
       this.#getStmt = this.#db.prepare('SELECT value FROM cache WHERE key = ?');
@@ -92,15 +101,18 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(key: string): Promise<any> {
     this.#ensureDb();
-    const row = this.#getStmt?.get(key) as { value: string } | undefined;
+    // SQLite column types are dynamic, so the stored value is only known at runtime.
+    const row = this.#getStmt?.get(key) as { value: unknown } | undefined;
 
     if (row) {
       this.#queueAccessUpdate(key);
 
-      try {
-        return JSON.parse(row.value);
-      } catch {
-        return undefined;
+      if (row.value instanceof Uint8Array) {
+        try {
+          return deserialize(row.value);
+        } catch {
+          // Treat corrupt or unparseable cached payloads as a cache miss.
+        }
       }
     }
 
@@ -116,7 +128,7 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   async set(key: string, value: unknown): Promise<this> {
     this.#ensureDb();
     this.#pendingAccessedKeys.delete(key);
-    this.#setStmt?.run(key, JSON.stringify(value));
+    this.#setStmt?.run(key, serialize(value));
 
     return this;
   }
