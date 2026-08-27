@@ -54,7 +54,7 @@
     "@oxc-project/types": "0.140.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "29.1.1",
-    "less": "4.6.7",
+    "less": "4.9.0",
     "ng-packagr": "22.1.1",
     "postcss": "8.5.25",
     "rollup": "4.62.2",
