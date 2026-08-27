@@ -11,7 +11,6 @@ import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
 import { useTypeChecking } from '../../../utils/environment-options';
-import { toPosixPath } from '../../../utils/path';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import {
   AngularHostOptions,
@@ -28,6 +27,7 @@ import {
   EmitFileResult,
 } from './angular-compilation';
 import { collectHmrCandidates } from './hmr-candidates';
+import { TypeScriptCompilation } from './typescript-compilation';
 import { printSourceFileWithMap } from './typescript-printer';
 
 /**
@@ -54,9 +54,8 @@ class AngularCompilationState {
   }
 }
 
-export class AotCompilation extends AngularCompilation {
+export class AotCompilation extends TypeScriptCompilation {
   #state?: AngularCompilationState;
-  readonly #sourceFiles = new Map<string, ts.SourceFile>();
 
   constructor(private readonly browserOnlyBuild: boolean) {
     super();
@@ -100,9 +99,9 @@ export class AotCompilation extends AngularCompilation {
     let staleSourceFiles;
     let clearPackageJsonCache = false;
     if (hostOptions.modifiedFiles) {
-      for (const modifiedFile of hostOptions.modifiedFiles) {
-        this.#sourceFiles.delete(toPosixPath(modifiedFile));
+      this.invalidateFiles(hostOptions.modifiedFiles);
 
+      for (const modifiedFile of hostOptions.modifiedFiles) {
         if (this.#state) {
           // Clear package.json cache if a node modules file was modified
           if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
@@ -128,7 +127,7 @@ export class AotCompilation extends AngularCompilation {
       compilerOptions,
       hostOptions,
       packageJsonCache,
-      this.#sourceFiles,
+      this.sourceFiles,
     );
 
     // Create the Angular specific program that contains the Angular compiler
@@ -462,12 +461,6 @@ export class AotCompilation extends AngularCompilation {
     }
 
     return emittedFiles.values();
-  }
-
-  override async update(files: Set<string>): Promise<void> {
-    for (const file of files) {
-      this.#sourceFiles.delete(toPosixPath(file));
-    }
   }
 }
 

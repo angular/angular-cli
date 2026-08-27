@@ -16,3 +16,4 @@ export {
 } from './angular-compilation';
 export { createAngularCompilation, type AngularCompilationMode } from './factory';
 export { NoopCompilation } from './noop-compilation';
+export { TypeScriptCompilation } from './typescript-compilation';

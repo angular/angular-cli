@@ -8,9 +8,7 @@
 
 import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
-import type ts from 'typescript';
-import { convertTypeScriptDiagnostic } from '../../esbuild/angular/diagnostics';
-import { profileAsync, profileSync } from '../../esbuild/profiling';
+import { profileSync } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
 
 export interface EmitFileResult {
@@ -51,18 +49,11 @@ export enum DiagnosticModes {
 
 export abstract class AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
-  static #typescriptModule?: typeof ts;
 
   static async loadCompilerCli(): Promise<typeof ng> {
     AngularCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
 
     return AngularCompilation.#angularCompilerCliModule;
-  }
-
-  static async loadTypescript(): Promise<typeof ts> {
-    AngularCompilation.#typescriptModule ??= await import('typescript');
-
-    return AngularCompilation.#typescriptModule;
   }
 
   protected async loadConfiguration(tsconfig: string): Promise<ng.CompilerOptions> {
@@ -100,40 +91,10 @@ export abstract class AngularCompilation {
 
   transformFile?(filename: string, content: string): Promise<FileTransformResult | null>;
 
-  protected collectDiagnostics?(
-    modes: DiagnosticModes,
-  ): Iterable<ts.Diagnostic> | Promise<Iterable<ts.Diagnostic>>;
-
   async diagnoseFiles(
-    modes = DiagnosticModes.All,
+    modes?: DiagnosticModes,
   ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {
-    if (!this.collectDiagnostics) {
-      return {};
-    }
-
-    const result: { errors?: PartialMessage[]; warnings?: PartialMessage[] } = {};
-
-    // Avoid loading typescript until actually needed.
-    // This allows for avoiding the load of typescript in the main thread when using the parallel compilation.
-    const typescript = await AngularCompilation.loadTypescript();
-
-    await profileAsync('NG_DIAGNOSTICS_TOTAL', async () => {
-      const diagnostics = await this.collectDiagnostics?.(modes);
-      if (!diagnostics) {
-        return;
-      }
-
-      for (const diagnostic of diagnostics) {
-        const message = convertTypeScriptDiagnostic(typescript, diagnostic);
-        if (diagnostic.category === typescript.DiagnosticCategory.Error) {
-          (result.errors ??= []).push(message);
-        } else {
-          (result.warnings ??= []).push(message);
-        }
-      }
-    });
-
-    return result;
+    return {};
   }
 
   update?(files: Set<string>): Promise<void>;

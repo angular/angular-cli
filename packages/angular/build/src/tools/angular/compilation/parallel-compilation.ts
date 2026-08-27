@@ -133,14 +133,6 @@ export class ParallelCompilation extends AngularCompilation {
     }
   }
 
-  /**
-   * This is not needed with this compilation type since the worker will already send a response
-   * with the serializable esbuild compatible diagnostics.
-   */
-  protected override collectDiagnostics(): never {
-    throw new Error('Not implemented in ParallelCompilation.');
-  }
-
   override async diagnoseFiles(
     modes = DiagnosticModes.All,
   ): Promise<{ errors?: PartialMessage[]; warnings?: PartialMessage[] }> {

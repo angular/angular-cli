@@ -6,11 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
 import {
   AngularCompilation,
   AngularCompilationResult,
+  DiagnosticModes,
   NoopCompilation,
+  TypeScriptCompilation,
   createAngularCompilation,
 } from './index';
 
@@ -68,14 +71,89 @@ describe('AngularCompilation', () => {
       expect(result.compilerOptions['customOption']).toBe(true);
     });
 
-    it('throws when calling collectDiagnostics or emitAffectedFiles', () => {
+    it('throws when calling emitAffectedFiles', () => {
       const compilation = new NoopCompilation();
-      expect(() =>
-        (compilation as unknown as { collectDiagnostics(): unknown }).collectDiagnostics(),
-      ).toThrowError('Not available when using noop compilation.');
       expect(() => compilation.emitAffectedFiles()).toThrowError(
         'Not available when using noop compilation.',
       );
+    });
+
+    it('returns empty diagnostics from diagnoseFiles', async () => {
+      const compilation = new NoopCompilation();
+      const diagnostics = await compilation.diagnoseFiles();
+      expect(diagnostics).toEqual({});
+    });
+  });
+
+  describe('TypeScriptCompilation', () => {
+    class MockTypeScriptCompilation extends TypeScriptCompilation {
+      async initialize(): Promise<AngularCompilationResult> {
+        return { compilerOptions: {}, referencedFiles: [] };
+      }
+
+      protected override *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {
+        if (modes & DiagnosticModes.Option) {
+          yield {
+            category: ts.DiagnosticCategory.Error,
+            code: 1234,
+            messageText: 'Mock option error',
+            file: undefined,
+            start: undefined,
+            length: undefined,
+          };
+        }
+        if (modes & DiagnosticModes.Semantic) {
+          yield {
+            category: ts.DiagnosticCategory.Warning,
+            code: 5678,
+            messageText: 'Mock semantic warning',
+            file: undefined,
+            start: undefined,
+            length: undefined,
+          };
+        }
+      }
+
+      public getCachedSourceFiles(): Map<string, ts.SourceFile> {
+        return this.sourceFiles;
+      }
+    }
+
+    it('collects and converts diagnostics categorized by error and warning', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const diagnostics = await compilation.diagnoseFiles(DiagnosticModes.All);
+
+      expect(diagnostics.errors?.length).toBe(1);
+      expect(diagnostics.errors?.[0].text).toContain('Mock option error');
+      expect(diagnostics.warnings?.length).toBe(1);
+      expect(diagnostics.warnings?.[0].text).toContain('Mock semantic warning');
+    });
+
+    it('filters diagnostics according to requested DiagnosticModes', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const diagnostics = await compilation.diagnoseFiles(DiagnosticModes.Option);
+
+      expect(diagnostics.errors?.length).toBe(1);
+      expect(diagnostics.errors?.[0].text).toContain('Mock option error');
+      expect(diagnostics.warnings).toBeUndefined();
+    });
+
+    it('returns empty diagnostics immediately when mode is DiagnosticModes.None', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const diagnostics = await compilation.diagnoseFiles(DiagnosticModes.None);
+
+      expect(diagnostics).toEqual({});
+    });
+
+    it('evicts files from AST cache on update and invalidateFiles', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const mockSourceFile = ts.createSourceFile('test.ts', '', ts.ScriptTarget.Latest);
+      compilation.getCachedSourceFiles().set('/src/test.ts', mockSourceFile);
+
+      expect(compilation.getCachedSourceFiles().has('/src/test.ts')).toBeTrue();
+
+      await compilation.update?.(new Set(['/src/test.ts']));
+      expect(compilation.getCachedSourceFiles().has('/src/test.ts')).toBeFalse();
     });
   });
 
