@@ -7,7 +7,7 @@
  */
 
 import {
-  SassWorkerImplementation,
+  SassCompiler,
   findTailwindConfiguration,
   generateSearchDirectories,
   loadPostcssConfiguration,
@@ -66,11 +66,11 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
     }
   }
 
-  const sassImplementation = new SassWorkerImplementation();
+  const sassImplementation = new SassCompiler(false);
 
   extraPlugins.push({
     apply(compiler) {
-      compiler.hooks.shutdown.tap('sass-worker', () => {
+      compiler.hooks.shutdown.tap('sass-service', () => {
         void sassImplementation.close();
       });
     },
@@ -332,7 +332,7 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
 
 function getSassLoaderOptions(
   root: string,
-  implementation: SassWorkerImplementation,
+  implementation: SassCompiler,
   includePaths: string[],
   indentedSyntax: boolean,
   verbose: boolean,
