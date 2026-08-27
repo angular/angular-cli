@@ -667,9 +667,6 @@ importers:
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
-      sass:
-        specifier: 1.103.1
-        version: 1.103.1
       sass-loader:
         specifier: 17.0.0
         version: 17.0.0(sass-embedded@1.103.1)(sass@1.103.1)(webpack@5.109.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.26)(uglify-js@3.19.3))
@@ -716,6 +713,9 @@ importers:
       ng-packagr:
         specifier: 22.2.0-next.4
         version: 22.2.0-next.4(@angular/compiler-cli@22.2.0-next.4(@angular/compiler@22.2.0-next.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+      sass:
+        specifier: 1.103.1
+        version: 1.103.1
       undici:
         specifier: 8.10.0
         version: 8.10.0
