@@ -52,7 +52,7 @@
     "@angular/ssr": "workspace:*",
     "@angular-devkit/core": "workspace:*",
     "jsdom": "26.1.0",
-    "less": "4.4.0",
+    "less": "4.9.0",
     "ng-packagr": "20.3.0",
     "postcss": "8.5.23",
     "rxjs": "7.8.2",
