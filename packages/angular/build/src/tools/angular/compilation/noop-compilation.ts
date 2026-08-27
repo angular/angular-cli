@@ -24,10 +24,6 @@ export class NoopCompilation extends AngularCompilation {
     return { compilerOptions, referencedFiles: [] };
   }
 
-  protected override collectDiagnostics(): never {
-    throw new Error('Not available when using noop compilation.');
-  }
-
   override emitAffectedFiles(): never {
     throw new Error('Not available when using noop compilation.');
   }

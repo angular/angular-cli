@@ -9,7 +9,6 @@
 import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { toPosixPath } from '../../../utils/path';
 import { profileSync } from '../../esbuild/profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
@@ -21,6 +20,7 @@ import {
   DiagnosticModes,
   EmitFileResult,
 } from './angular-compilation';
+import { TypeScriptCompilation } from './typescript-compilation';
 
 class JitCompilationState {
   constructor(
@@ -32,9 +32,8 @@ class JitCompilationState {
   ) {}
 }
 
-export class JitCompilation extends AngularCompilation {
+export class JitCompilation extends TypeScriptCompilation {
   #state?: JitCompilationState;
-  readonly #sourceFiles = new Map<string, ts.SourceFile>();
 
   constructor(private readonly browserOnlyBuild: boolean) {
     super();
@@ -59,9 +58,7 @@ export class JitCompilation extends AngularCompilation {
       compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
 
     if (hostOptions.modifiedFiles) {
-      for (const modifiedFile of hostOptions.modifiedFiles) {
-        this.#sourceFiles.delete(toPosixPath(modifiedFile));
-      }
+      this.invalidateFiles(hostOptions.modifiedFiles);
     }
 
     // Create Angular compiler host
@@ -70,7 +67,7 @@ export class JitCompilation extends AngularCompilation {
       compilerOptions,
       hostOptions,
       undefined,
-      this.#sourceFiles,
+      this.sourceFiles,
     );
 
     // Create the TypeScript Program
@@ -166,11 +163,5 @@ export class JitCompilation extends AngularCompilation {
     }
 
     return emittedFiles;
-  }
-
-  override async update(files: Set<string>): Promise<void> {
-    for (const file of files) {
-      this.#sourceFiles.delete(toPosixPath(file));
-    }
   }
 }
