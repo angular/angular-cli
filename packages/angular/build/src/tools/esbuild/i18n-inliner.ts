@@ -286,58 +286,52 @@ export class I18nInliner {
       const uncachedByFile = new Map<string, UncachedLocaleEntry[]>();
 
       if (this.#transformedFileCache) {
+        const cache = this.#transformedFileCache;
         const cacheChecks: Promise<void>[] = [];
 
         for (const filename of filenames) {
           const file = this.#localizeFiles.get(filename);
           assert(file !== undefined, 'Localize file must exist: ' + filename);
 
-          const fileEntries: UncachedLocaleEntry[] = [];
+          const fileEntriesPromises = windowLocales.map(
+            async ({ locale }): Promise<UncachedLocaleEntry | undefined> => {
+              const fileCacheKeyBase = localeCacheBases.get(locale);
+              assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
 
-          for (const { locale } of windowLocales) {
-            const fileCacheKeyBase = localeCacheBases.get(locale);
-            assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
+              const hasher = createContentHash();
+              hasher.update(file.hash);
+              hasher.update(filename);
+              hasher.update(fileCacheKeyBase);
+              const cacheKey = hasher.digest();
 
-            const hasher = createContentHash();
-            hasher.update(file.hash);
-            hasher.update(filename);
-            hasher.update(fileCacheKeyBase);
-            const cacheKey = hasher.digest();
+              try {
+                const result = await cache.get(cacheKey);
+                if (result) {
+                  fileResultsByLocale.get(locale)?.set(filename, result);
 
-            cacheChecks.push(
-              this.#transformedFileCache
-                .get(cacheKey)
-                .then((result) => {
-                  if (result) {
-                    fileResultsByLocale.get(locale)?.set(filename, result);
-                  } else {
-                    fileEntries.push({
-                      locale,
-                      cacheKey,
-                      translation: localeBlobs.get(locale),
-                    });
-                  }
-                })
-                .catch(() => {
-                  fileEntries.push({
-                    locale,
-                    cacheKey,
-                    translation: localeBlobs.get(locale),
-                  });
-                }),
-            );
-          }
+                  return;
+                }
+              } catch {}
 
-          uncachedByFile.set(filename, fileEntries);
+              return {
+                locale,
+                cacheKey,
+                translation: localeBlobs.get(locale),
+              };
+            },
+          );
+
+          cacheChecks.push(
+            Promise.all(fileEntriesPromises).then((entries) => {
+              const filtered = entries.filter((e): e is UncachedLocaleEntry => e !== undefined);
+              if (filtered.length > 0) {
+                uncachedByFile.set(filename, filtered);
+              }
+            }),
+          );
         }
 
         await Promise.all(cacheChecks);
-
-        for (const [filename, entries] of uncachedByFile) {
-          if (entries.length === 0) {
-            uncachedByFile.delete(filename);
-          }
-        }
       } else {
         for (const filename of filenames) {
           uncachedByFile.set(
