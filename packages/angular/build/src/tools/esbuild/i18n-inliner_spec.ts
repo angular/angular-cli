@@ -853,4 +853,21 @@ describe('I18nInliner', () => {
       await localeInliner.close();
     }
   });
+
+  it('correctly escapes backticks, double quotes, and expression delimiters in translated template literals', async () => {
+    const source = 'export const msg = $localize`:@@msg:Hello ${name}:name:!`;\n';
+    const inliner = createInliner([browserFile('main.js', source)]);
+
+    const results = await inliner.inlineAll([
+      {
+        locale: 'fr',
+        translation: {
+          msg: parsedTranslation(['Bonjour "', '` with ${injected} and \\backslash!'], ['name']),
+        },
+      },
+    ]);
+
+    const outputText = findFile(results.get('fr')?.outputFiles ?? [], 'main.js').text;
+    expect(outputText).toContain('`Bonjour "${name}\\` with \\${injected} and \\\\backslash!`');
+  });
 });

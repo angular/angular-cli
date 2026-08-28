@@ -421,6 +421,17 @@ function extractLocalizeMetadata(filename: string, code: string): FileLocalizeMe
 }
 
 /**
+ * Escapes a template literal string part for insertion into an ES template literal (backticks).
+ * Uses JSON.stringify for base escaping of control characters and backslashes, then unescapes
+ * double quotes and escapes backticks and `${` expression delimiters in a single pass.
+ */
+function escapeTemplatePart(part: string): string {
+  return JSON.stringify(part)
+    .slice(1, -1)
+    .replace(/\\"|`|\$\{/g, (match) => (match === '\\"' ? '"' : '\\' + match));
+}
+
+/**
  * Inlines translations into code using previously extracted localization metadata.
  *
  * @param code The source code to transform.
@@ -483,12 +494,7 @@ async function inlineLocalize(
     } else {
       replacement = '`';
       for (let i = 0; i < translatedParts.length; i++) {
-        const escapedPart = JSON.stringify(translatedParts[i])
-          .slice(1, -1)
-          .replace(/\\"/g, '"')
-          .replace(/`/g, '\\`')
-          .replace(/\$\{/g, '\\${');
-        replacement += escapedPart;
+        replacement += escapeTemplatePart(translatedParts[i]);
 
         if (i < translatedSubstitutions.length) {
           const originalIndex = translatedSubstitutions[i];
