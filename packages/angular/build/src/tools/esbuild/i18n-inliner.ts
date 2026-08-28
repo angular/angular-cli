@@ -459,6 +459,8 @@ export class I18nInliner {
       const codeFile = this.#localizeFiles.get(filename);
       assert(codeFile !== undefined, 'Localize file must exist: ' + filename);
       const mapFile = this.#localizeFiles.get(filename + '.map');
+      const codeBlob = new Blob([codeFile.contents]);
+      const mapBlob = mapFile ? new Blob([mapFile.contents]) : undefined;
 
       const ephemeral = isLastWindow && entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {
@@ -467,8 +469,8 @@ export class I18nInliner {
           const batchResult = (await this.#workerPool.run(
             {
               filename,
-              code: new Blob([codeFile.contents]),
-              map: mapFile ? new Blob([mapFile.contents]) : undefined,
+              code: codeBlob,
+              map: mapBlob,
               locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
               ephemeral,
               activeLocales,
