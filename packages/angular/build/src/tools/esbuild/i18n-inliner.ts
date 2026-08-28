@@ -132,31 +132,6 @@ interface TransformedFileResult {
 }
 
 /**
- * Represents an in-flight asynchronous cache lookup for a single (file x locale) transformation.
- */
-interface CacheCheckItem {
-  /**
-   * The relative file path of the JavaScript file to transform.
-   */
-  filename: string;
-
-  /**
-   * The locale specifier being targeted for translation.
-   */
-  locale: string;
-
-  /**
-   * The computed cache key hash, or undefined if persistent caching is not configured.
-   */
-  cacheKey: string | undefined;
-
-  /**
-   * A promise that resolves to the cached transform result, or null if uncached or on lookup failure.
-   */
-  cachedResult: Promise<TransformedFileResult | null>;
-}
-
-/**
  * An uncached transformation request entry for a file within a specific locale.
  */
 interface UncachedLocaleEntry {
@@ -306,17 +281,18 @@ export class I18nInliner {
         }),
       );
 
-      const cacheChecks: CacheCheckItem[] = [];
+      const uncachedByFile = new Map<string, UncachedLocaleEntry[]>();
 
-      for (const filename of filenames) {
-        const file = this.#localizeFiles.get(filename);
-        assert(file !== undefined, 'Localize file must exist: ' + filename);
+      if (this.#transformedFileCache) {
+        const cacheChecks: Promise<void>[] = [];
 
-        for (const { locale } of windowLocales) {
-          let cacheKey: string | undefined;
-          let cachedResultPromise: Promise<TransformedFileResult | null> = Promise.resolve(null);
+        for (const filename of filenames) {
+          const file = this.#localizeFiles.get(filename);
+          assert(file !== undefined, 'Localize file must exist: ' + filename);
 
-          if (this.#transformedFileCache) {
+          const fileEntries: UncachedLocaleEntry[] = [];
+
+          for (const { locale } of windowLocales) {
             const fileCacheKeyBase = localeCacheBases.get(locale);
             assert(fileCacheKeyBase !== undefined, 'Cache base must exist for locale: ' + locale);
 
@@ -324,50 +300,51 @@ export class I18nInliner {
             hasher.update(file.hash);
             hasher.update(filename);
             hasher.update(fileCacheKeyBase);
-            cacheKey = hasher.digest();
+            const cacheKey = hasher.digest();
 
-            cachedResultPromise = this.#transformedFileCache
-              .get(cacheKey)
-              .then((val) => val ?? null)
-              .catch(() => null);
+            cacheChecks.push(
+              this.#transformedFileCache
+                .get(cacheKey)
+                .then((result) => {
+                  if (result) {
+                    fileResultsByLocale.get(locale)?.set(filename, result);
+                  } else {
+                    fileEntries.push({
+                      locale,
+                      cacheKey,
+                      translation: localeBlobs.get(locale),
+                    });
+                  }
+                })
+                .catch(() => {
+                  fileEntries.push({
+                    locale,
+                    cacheKey,
+                    translation: localeBlobs.get(locale),
+                  });
+                }),
+            );
           }
 
-          cacheChecks.push({
-            filename,
-            locale,
-            cacheKey,
-            cachedResult: cachedResultPromise,
-          });
+          uncachedByFile.set(filename, fileEntries);
         }
-      }
 
-      // Await all cache checks for this window
-      const resolvedChecks = await Promise.all(
-        cacheChecks.map(async (item) => ({
-          ...item,
-          result: await item.cachedResult,
-        })),
-      );
+        await Promise.all(cacheChecks);
 
-      // Group uncached items by filename for this window
-      const uncachedByFile = new Map<string, UncachedLocaleEntry[]>();
-
-      for (const item of resolvedChecks) {
-        if (item.result) {
-          // Cache hit: store directly in locale file results
-          fileResultsByLocale.get(item.locale)?.set(item.filename, item.result);
-        } else {
-          // Cache miss: needs worker processing
-          let fileEntries = uncachedByFile.get(item.filename);
-          if (!fileEntries) {
-            fileEntries = [];
-            uncachedByFile.set(item.filename, fileEntries);
+        for (const [filename, entries] of uncachedByFile) {
+          if (entries.length === 0) {
+            uncachedByFile.delete(filename);
           }
-          fileEntries.push({
-            locale: item.locale,
-            cacheKey: item.cacheKey,
-            translation: localeBlobs.get(item.locale),
-          });
+        }
+      } else {
+        for (const filename of filenames) {
+          uncachedByFile.set(
+            filename,
+            windowLocales.map(({ locale }) => ({
+              locale,
+              translation: localeBlobs.get(locale),
+            })),
+          );
         }
       }
 
