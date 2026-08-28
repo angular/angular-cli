@@ -243,6 +243,7 @@ export type UnitTestBuilderOptions = {
     runner?: Runner;
     runnerConfig?: RunnerConfig;
     setupFiles?: string[];
+    splitting?: boolean;
     tsConfig?: string;
     ui?: boolean;
     watch?: boolean;

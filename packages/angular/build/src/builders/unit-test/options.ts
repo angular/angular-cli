@@ -67,8 +67,17 @@ export async function normalizeOptions(
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
   cacheOptions.path = path.join(cacheOptions.path, projectName);
 
-  const { runner, browsers, progress, filter, browserViewport, ui, runnerConfig, isolate } =
-    options;
+  const {
+    runner,
+    browsers,
+    progress,
+    filter,
+    browserViewport,
+    ui,
+    runnerConfig,
+    isolate,
+    splitting = true,
+  } = options;
 
   if (ui && runner !== Runner.Vitest) {
     throw new Error('The "ui" option is only available for the "vitest" runner.');
@@ -140,6 +149,7 @@ export async function normalizeOptions(
     debug: options.debug ?? false,
     ui: process.env['CI'] ? false : ui,
     isolate,
+    splitting,
     quiet: options.quiet ?? (process.env['CI'] ? false : true),
     providersFile: options.providersFile && path.join(workspaceRoot, options.providersFile),
     setupFiles: options.setupFiles

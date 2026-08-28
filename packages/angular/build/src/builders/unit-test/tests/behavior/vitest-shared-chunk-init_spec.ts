@@ -37,6 +37,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       harness.useTarget('test', {
         ...BASE_OPTIONS,
+        splitting: false,
       });
 
       // Keep the default project's spec deterministic; a third spec entry that does not touch
