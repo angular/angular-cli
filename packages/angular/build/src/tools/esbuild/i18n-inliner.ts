@@ -236,13 +236,6 @@ export class I18nInliner {
       // Extract options to ensure only the named options are serialized and sent to the worker
       workerData: {
         missingTranslation,
-        // A Blob is an immutable data structure that allows sharing the data between workers
-        // without copying until the data is actually used within a Worker. This is useful here
-        // since each file may not actually be processed in each Worker and the Blob avoids
-        // unneeded repeat copying of potentially large JavaScript files.
-        files: new Map<string, Blob>(
-          Array.from(files, ([name, file]) => [name, new Blob([file.contents])]),
-        ),
       },
     });
   }
@@ -463,6 +456,10 @@ export class I18nInliner {
     const workerTasks: Promise<void>[] = [];
 
     for (const [filename, entries] of uncachedByFile) {
+      const codeFile = this.#localizeFiles.get(filename);
+      assert(codeFile !== undefined, 'Localize file must exist: ' + filename);
+      const mapFile = this.#localizeFiles.get(filename + '.map');
+
       const ephemeral = isLastWindow && entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {
         const batchEntries = entries.slice(i, i + localesPerBatch);
@@ -470,6 +467,8 @@ export class I18nInliner {
           const batchResult = (await this.#workerPool.run(
             {
               filename,
+              code: new Blob([codeFile.contents]),
+              map: mapFile ? new Blob([mapFile.contents]) : undefined,
               locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
               ephemeral,
               activeLocales,
