@@ -7,6 +7,7 @@
  */
 
 import type * as ng from '@angular/compiler-cli';
+import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileSync } from '../../esbuild/profiling';
@@ -20,6 +21,7 @@ import {
   DiagnosticModes,
   EmitFileResult,
 } from './angular-compilation';
+import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
 
 class JitCompilationState {
@@ -42,7 +44,7 @@ export class JitCompilation extends TypeScriptCompilation {
   async initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
-    compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
+    compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
     const { constructorParametersDownlevelTransform } =
@@ -54,8 +56,13 @@ export class JitCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
     } = await this.loadConfiguration(tsconfig);
-    const compilerOptions =
-      compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
+
+    const { compilerOptions, warnings } = transformCompilerOptions(
+      ts,
+      originalCompilerOptions,
+      compilerOptionOverrides,
+      tsconfig,
+    );
 
     if (hostOptions.modifiedFiles) {
       this.invalidateFiles(hostOptions.modifiedFiles);
@@ -93,7 +100,7 @@ export class JitCompilation extends TypeScriptCompilation {
       .getSourceFiles()
       .map((sourceFile) => sourceFile.fileName);
 
-    return { compilerOptions, referencedFiles };
+    return { compilerOptions, referencedFiles, warnings };
   }
 
   protected override *collectDiagnostics(modes: DiagnosticModes): Iterable<ts.Diagnostic> {

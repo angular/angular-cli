@@ -18,6 +18,7 @@ import type {
   DiagnosticModes,
 } from './angular-compilation';
 import { AotCompilation } from './aot-compilation';
+import type { CompilerOptionOverrides } from './compiler-options';
 import { JitCompilation } from './jit-compilation';
 
 export interface InitRequest {
@@ -25,9 +26,8 @@ export interface InitRequest {
   browserOnlyBuild: boolean;
   tsconfig: string;
   fileReplacements?: Record<string, string>;
+  compilerOptionOverrides?: CompilerOptionOverrides;
   stylesheetPort: MessagePort;
-  optionsPort: MessagePort;
-  optionsSignal: Int32Array;
   webWorkerPort: MessagePort;
   webWorkerSignal: Int32Array;
 }
@@ -73,6 +73,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
       externalStylesheets,
       templateUpdates,
       componentResourcesDependencies,
+      warnings,
     } = await compilation.initialize(
       request.tsconfig,
       {
@@ -109,19 +110,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
           return result?.workerCodeFile ?? workerFile;
         },
       },
-      (compilerOptions) => {
-        Atomics.store(request.optionsSignal, 0, 0);
-        request.optionsPort.postMessage(compilerOptions);
-
-        Atomics.wait(request.optionsSignal, 0, 0);
-        const result = receiveMessageOnPort(request.optionsPort)?.message;
-
-        if (result?.error) {
-          throw result.error;
-        }
-
-        return result?.transformedOptions ?? compilerOptions;
-      },
+      request.compilerOptionOverrides,
     );
 
     success = true;
@@ -130,6 +119,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
       externalStylesheets,
       templateUpdates,
       referencedFiles,
+      warnings,
       // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
       compilerOptions: {
         allowJs: compilerOptions.allowJs,
@@ -143,7 +133,6 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
     };
   } finally {
     request.stylesheetPort.close();
-    request.optionsPort.close();
     if (!success) {
       activeWebWorkerPort?.close();
       activeWebWorkerPort = undefined;

@@ -7,6 +7,7 @@
  */
 
 import type * as ng from '@angular/compiler-cli';
+import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
@@ -26,6 +27,7 @@ import {
   DiagnosticModes,
   EmitFileResult,
 } from './angular-compilation';
+import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { collectHmrCandidates } from './hmr-candidates';
 import { TypeScriptCompilation } from './typescript-compilation';
 import { printSourceFileWithMap } from './typescript-printer';
@@ -64,7 +66,7 @@ export class AotCompilation extends TypeScriptCompilation {
   async initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
-    compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
+    compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
     const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
@@ -75,8 +77,13 @@ export class AotCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
     } = await this.loadConfiguration(tsconfig);
-    const compilerOptions =
-      compilerOptionsTransformer?.(originalCompilerOptions) ?? originalCompilerOptions;
+
+    const { compilerOptions, warnings } = transformCompilerOptions(
+      ts,
+      originalCompilerOptions,
+      compilerOptionOverrides,
+      tsconfig,
+    );
 
     const useTypeScriptTranspilation =
       (compilerOptions['_useTypeScriptTranspilation'] as boolean | undefined) ??
@@ -245,6 +252,7 @@ export class AotCompilation extends TypeScriptCompilation {
       externalStylesheets: hostOptions.externalStylesheets,
       templateUpdates,
       componentResourcesDependencies,
+      warnings,
     };
   }
 
