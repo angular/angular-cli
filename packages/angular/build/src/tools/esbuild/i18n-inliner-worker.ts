@@ -321,6 +321,7 @@ interface LocalizeCallSite {
   end: number;
   messageParts: TemplateStringsArray;
   expressions: { start: number; end: number }[];
+  expressionIndexes: number[];
 }
 
 /**
@@ -381,12 +382,14 @@ function extractLocalizeMetadata(filename: string, code: string): FileLocalizeMe
             start: expr.start,
             end: expr.end,
           }));
+          const expressionIndexes = expressions.map((_, index) => index);
 
           callSites.push({
             start: node.start,
             end: node.end,
             messageParts,
             expressions,
+            expressionIndexes,
           });
         }
       }
@@ -448,7 +451,7 @@ async function inlineLocalize(
       diagnostics,
       translation || {},
       callSite.messageParts,
-      callSite.expressions.map((_, index) => index),
+      callSite.expressionIndexes,
       translation === undefined ? 'ignore' : missingTranslation,
     );
 
