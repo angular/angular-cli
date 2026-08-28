@@ -54,7 +54,7 @@
     "@angular/forms": "22.1.4",
     "@angular/localize": "22.1.4",
     "@angular/material": "22.1.4",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#beec8fe17573a33c9934487ce99ce9cce3e3f6bf",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#151e36ffa910f4a01aafe1c482ed8294e2050566",
     "@angular/platform-browser": "22.1.4",
     "@angular/platform-server": "22.1.4",
     "@angular/router": "22.1.4",
