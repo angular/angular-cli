@@ -14,6 +14,6 @@ export {
   type EmitFileResult,
   type FileTransformResult,
 } from './angular-compilation';
+export type { CompilerOptionOverrides } from './compiler-options';
 export { createAngularCompilation, type AngularCompilationMode } from './factory';
 export { NoopCompilation } from './noop-compilation';
-export { TypeScriptCompilation } from './typescript-compilation';

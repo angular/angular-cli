@@ -8,12 +8,13 @@
 
 import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
+import { transformCompilerOptions } from './compiler-options';
+import { TypeScriptCompilation } from './typescript-compilation';
 import {
   AngularCompilation,
   AngularCompilationResult,
   DiagnosticModes,
   NoopCompilation,
-  TypeScriptCompilation,
   createAngularCompilation,
 } from './index';
 
@@ -62,13 +63,24 @@ describe('AngularCompilation', () => {
     it('initializes with empty referencedFiles and compiler options', async () => {
       const compilation = new NoopCompilation();
       const mockHostOptions = {} as AngularHostOptions;
-      const result = await compilation.initialize('tsconfig.json', mockHostOptions, (opts) => ({
-        ...opts,
-        customOption: true,
-      }));
+      const result = await compilation.initialize('tsconfig.json', mockHostOptions);
 
       expect(result.referencedFiles).toEqual([]);
-      expect(result.compilerOptions['customOption']).toBe(true);
+      expect(result.compilerOptions).toBeDefined();
+    });
+
+    it('initializes with CompilerOptionOverrides object', async () => {
+      const compilation = new NoopCompilation();
+      const mockHostOptions = {} as AngularHostOptions;
+      const result = await compilation.initialize('tsconfig.json', mockHostOptions, {
+        sourcemap: true,
+        enableHmr: true,
+      });
+
+      expect(result.referencedFiles).toEqual([]);
+      expect(result.compilerOptions.inlineSources).toBe(true);
+      expect(result.compilerOptions.inlineSourceMap).toBe(true);
+      expect(result.compilerOptions['_enableHmr']).toBe(true);
     });
 
     it('throws when calling emitAffectedFiles', () => {
@@ -182,6 +194,162 @@ describe('AngularCompilation', () => {
       await expectAsync(createAngularCompilation('transform', true, false)).toBeRejectedWithError(
         'Transform compilation mode is not supported.',
       );
+    });
+  });
+
+  describe('transformCompilerOptions', () => {
+    it('does not mutate the input compiler options object', () => {
+      const originalOptions: ts.CompilerOptions = {
+        target: ts.ScriptTarget.ES2020,
+        module: ts.ModuleKind.CommonJS,
+      };
+      const originalCopy = { ...originalOptions };
+
+      transformCompilerOptions(ts, originalOptions);
+
+      expect(originalOptions).toEqual(originalCopy);
+    });
+
+    it('sets target to ES2022 and useDefineForClassFields to false when target is undefined', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(
+        ts,
+        { module: ts.ModuleKind.ES2022 },
+        undefined,
+        'tsconfig.json',
+      );
+
+      expect(compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(compilerOptions.useDefineForClassFields).toBe(false);
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].text).toContain(
+        "TypeScript compiler options 'target' and 'useDefineForClassFields'",
+      );
+      expect(warnings[0].location?.file).toBe('tsconfig.json');
+    });
+
+    it('preserves existing useDefineForClassFields if target < ES2022', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(
+        ts,
+        {
+          target: ts.ScriptTarget.ES2020,
+          useDefineForClassFields: true,
+          module: ts.ModuleKind.ES2022,
+        },
+        undefined,
+        'tsconfig.json',
+      );
+
+      expect(compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(compilerOptions.useDefineForClassFields).toBe(true);
+      expect(warnings.length).toBe(1);
+    });
+
+    it('sets compilationMode to full and warns when compilationMode is partial', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(ts, {
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.ES2022,
+        compilationMode: 'partial',
+      });
+
+      expect(compilerOptions.compilationMode).toBe('full');
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].text).toContain('Angular partial compilation mode is not supported');
+    });
+
+    it('configures incremental and tsBuildInfoFile when cachePath is provided', () => {
+      const { compilerOptions } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022 },
+        { cachePath: '/tmp/cache' },
+      );
+
+      expect(compilerOptions.incremental).toBe(true);
+      expect(compilerOptions.tsBuildInfoFile).toContain('.tsbuildinfo');
+    });
+
+    it('sets incremental to false when cachePath is not provided or incremental is false', () => {
+      const { compilerOptions: opt1 } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022 },
+        undefined,
+      );
+      expect(opt1.incremental).toBe(false);
+
+      const { compilerOptions: opt2 } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022, incremental: false },
+        { cachePath: '/tmp/cache' },
+      );
+      expect(opt2.incremental).toBe(false);
+    });
+
+    it('sets module to ES2022 and warns when module < ES2015', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(ts, {
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.CommonJS,
+      });
+
+      expect(compilerOptions.module).toBe(ts.ModuleKind.ES2022);
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].text).toContain(
+        "TypeScript compiler options 'module' values 'CommonJS', 'UMD'",
+      );
+    });
+
+    it('warns when isolatedModules is enabled with emitDecoratorMetadata', () => {
+      const { warnings } = transformCompilerOptions(ts, {
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.ES2022,
+        isolatedModules: true,
+        emitDecoratorMetadata: true,
+      });
+
+      expect(warnings.length).toBe(1);
+      expect(warnings[0].text).toContain(
+        "TypeScript compiler option 'isolatedModules' may prevent",
+      );
+    });
+
+    it('synchronizes customConditions when moduleResolution is Bundler or module is Preserve', () => {
+      const { compilerOptions: bundlerOptions } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022, moduleResolution: ts.ModuleResolutionKind.Bundler },
+        { customConditions: ['development'] },
+      );
+      expect(bundlerOptions.customConditions).toEqual(['development']);
+
+      const { compilerOptions: preserveOptions } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022, module: ts.ModuleKind.Preserve },
+        { customConditions: ['development'] },
+      );
+      expect(preserveOptions.customConditions).toEqual(['development']);
+    });
+
+    it('applies override options correctly', () => {
+      const { compilerOptions } = transformCompilerOptions(
+        ts,
+        { target: ts.ScriptTarget.ES2022, isolatedModules: true },
+        {
+          sourcemap: true,
+          preserveSymlinks: true,
+          externalRuntimeStyles: true,
+          enableHmr: true,
+          instrumentForCoverage: true,
+          includeTestMetadata: true,
+        },
+      );
+
+      expect(compilerOptions.inlineSources).toBe(true);
+      expect(compilerOptions.inlineSourceMap).toBe(true);
+      expect(compilerOptions.preserveSymlinks).toBe(true);
+      expect(compilerOptions.externalRuntimeStyles).toBe(true);
+      expect(compilerOptions['_enableHmr']).toBe(true);
+      expect(compilerOptions['_useTypeScriptTranspilation']).toBe(true);
+      expect(compilerOptions.supportTestBed).toBe(true);
+      expect(compilerOptions.supportJitMode).toBe(true);
+      expect(compilerOptions.noEmitOnError).toBe(false);
+      expect(compilerOptions.composite).toBe(false);
     });
   });
 });

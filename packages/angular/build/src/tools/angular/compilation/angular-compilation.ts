@@ -10,6 +10,7 @@ import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import { profileSync } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
+import type { CompilerOptionOverrides } from './compiler-options';
 
 export interface EmitFileResult {
   filename: string;
@@ -37,6 +38,7 @@ export interface AngularCompilationResult {
   externalStylesheets?: ReadonlyMap<string, string>;
   templateUpdates?: ReadonlyMap<string, string>;
   componentResourcesDependencies?: ReadonlyMap<string, readonly string[]>;
+  warnings?: readonly PartialMessage[];
 }
 
 export enum DiagnosticModes {
@@ -82,7 +84,7 @@ export abstract class AngularCompilation {
   abstract initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
-    compilerOptionsTransformer?: (compilerOptions: ng.CompilerOptions) => ng.CompilerOptions,
+    compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<AngularCompilationResult>;
 
   emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>> {

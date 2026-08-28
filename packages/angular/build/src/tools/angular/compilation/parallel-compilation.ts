@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { CompilerOptions } from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
@@ -19,6 +18,7 @@ import {
   DiagnosticModes,
   EmitFileResult,
 } from './angular-compilation';
+import type { CompilerOptionOverrides } from './compiler-options';
 
 /**
  * An Angular compilation which uses a Node.js Worker thread to load and execute
@@ -51,7 +51,7 @@ export class ParallelCompilation extends AngularCompilation {
   override async initialize(
     tsconfig: string,
     hostOptions: AngularHostOptions,
-    compilerOptionsTransformer?: (compilerOptions: CompilerOptions) => CompilerOptions,
+    compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<AngularCompilationResult> {
     const stylesheetChannel = new MessageChannel();
     // The request identifier is required because Angular can issue multiple concurrent requests
@@ -84,22 +84,6 @@ export class ParallelCompilation extends AngularCompilation {
       }
     });
 
-    // The compiler options transformation is a synchronous operation and uses shared memory combined
-    // with the Atomics API to block execution here until a response is received.
-    const optionsChannel = new MessageChannel();
-    const optionsSignal = new Int32Array(new SharedArrayBuffer(4));
-    optionsChannel.port1.on('message', (compilerOptions) => {
-      try {
-        const transformedOptions = compilerOptionsTransformer?.(compilerOptions) ?? compilerOptions;
-        optionsChannel.port1.postMessage({ transformedOptions });
-      } catch (error) {
-        optionsChannel.port1.postMessage({ error });
-      } finally {
-        Atomics.store(optionsSignal, 0, 1);
-        Atomics.notify(optionsSignal, 0);
-      }
-    });
-
     let success = false;
     try {
       // Execute the initialize function in the worker thread
@@ -109,15 +93,14 @@ export class ParallelCompilation extends AngularCompilation {
           tsconfig,
           jit: this.jit,
           browserOnlyBuild: this.browserOnlyBuild,
+          compilerOptionOverrides,
           stylesheetPort: stylesheetChannel.port2,
-          optionsPort: optionsChannel.port2,
-          optionsSignal,
           webWorkerPort: webWorkerChannel.port2,
           webWorkerSignal,
         },
         {
           name: 'initialize',
-          transferList: [stylesheetChannel.port2, optionsChannel.port2, webWorkerChannel.port2],
+          transferList: [stylesheetChannel.port2, webWorkerChannel.port2],
         },
       );
       success = true;
@@ -125,7 +108,6 @@ export class ParallelCompilation extends AngularCompilation {
       return result;
     } finally {
       stylesheetChannel.port1.close();
-      optionsChannel.port1.close();
       if (!success) {
         this.#webWorkerChannel?.port1.close();
         this.#webWorkerChannel = undefined;
