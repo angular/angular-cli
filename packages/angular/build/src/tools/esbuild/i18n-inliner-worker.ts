@@ -49,10 +49,19 @@ interface InlineCodeRequest {
  */
 interface InlineFileBatchRequest {
   /**
-   * The filename that should be processed. The data for the file is provided to the Worker
-   * during Worker initialization.
+   * The filename that should be processed.
    */
   filename: string;
+
+  /**
+   * The file content as a Blob.
+   */
+  code: Blob;
+
+  /**
+   * Optional sourcemap content as a Blob.
+   */
+  map?: Blob;
 
   /**
    * The locale specifiers and optional translations to use during the inlining process of the file.
@@ -97,9 +106,8 @@ type InlineFileBatchResult =
       results: InlineLocaleResult[];
     };
 
-// Extract the application files and common options used for inline requests from the Worker context
-const { files, missingTranslation } = (workerData || {}) as {
-  files: ReadonlyMap<string, Blob>;
+// Extract common options used for inline requests from the Worker context
+const { missingTranslation } = (workerData || {}) as {
   missingTranslation: 'error' | 'warning' | 'ignore';
 };
 
@@ -128,20 +136,18 @@ const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsed
  * to be garbage-collected once the batch request finishes.
  *
  * @param filename The name of the file to load.
+ * @param codeBlob The source code file as a Blob.
  * @param cache Whether to cache the loaded file data in the Worker's long-term cache.
  * @returns The cached or newly extracted code and localization metadata.
  */
-function loadFileData(filename: string, cache = true): Promise<CachedFileData> {
+function loadFileData(filename: string, codeBlob: Blob, cache = true): Promise<CachedFileData> {
   const existing = fileDataCache.get(filename);
   if (existing) {
     return existing;
   }
 
   const fileDataPromise = (async () => {
-    const data = files.get(filename);
-    assert(data !== undefined, `Invalid inline request for file '${filename}'.`);
-
-    const code = await data.text();
+    const code = await codeBlob.text();
     const metadata = extractLocalizeMetadata(filename, code);
 
     return { code, metadata };
@@ -209,7 +215,7 @@ export async function inlineFileBatch(
     }
   }
 
-  const { code, metadata } = await loadFileData(request.filename, !request.ephemeral);
+  const { code, metadata } = await loadFileData(request.filename, request.code, !request.ephemeral);
 
   // Fast path: file has no $localize call sites or locale insert sites
   if (metadata.callSites.length === 0 && metadata.localeInsertSites.length === 0) {
@@ -223,10 +229,13 @@ export async function inlineFileBatch(
     };
   }
 
-  // Parse the sourcemap once for the entire batch.
+  // Parse the sourcemap once for the entire batch if provided.
   // It will naturally be garbage-collected after this batch action returns.
-  const rawMap = await files.get(request.filename + '.map')?.text();
-  const map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
+  let map: SourceMapInput | undefined;
+  if (request.map) {
+    const rawMap = await request.map.text();
+    map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
+  }
 
   const results = await Promise.all(
     Array.from(request.locales, async ([locale, translation]) => {
