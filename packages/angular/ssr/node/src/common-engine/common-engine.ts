@@ -10,7 +10,7 @@ import { ApplicationRef, StaticProvider, Type } from '@angular/core';
 import { BootstrapContext } from '@angular/platform-browser';
 import { renderApplication, renderModule, ɵSERVER_CONTEXT } from '@angular/platform-server';
 import * as fs from 'node:fs';
-import { dirname, join, normalize, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { URL } from 'node:url';
 import { validateUrl } from '../../../src/utils/validation';
 import { getAllowedHostsFromEnv } from '../environment-options';
@@ -155,14 +155,16 @@ export class CommonEngine {
     // See: https://portswigger.net/web-security/file-path-traversal
     const pagePath = join(publicPath, pathname, 'index.html');
 
+    const relativePath = relative(publicPath, pagePath);
+    const isOutside =
+      relativePath === '..' || relativePath.startsWith('../') || relativePath.startsWith('..\\');
+    if (isOutside || isAbsolute(relativePath)) {
+      return undefined;
+    }
+
     if (this.pageIsSSG.get(pagePath)) {
       // Serve pre-rendered page.
       return fs.promises.readFile(pagePath, 'utf-8');
-    }
-
-    if (!pagePath.startsWith(normalize(publicPath))) {
-      // Potential path traversal detected.
-      return undefined;
     }
 
     if (pagePath === resolve(documentFilePath) || !(await exists(pagePath))) {
