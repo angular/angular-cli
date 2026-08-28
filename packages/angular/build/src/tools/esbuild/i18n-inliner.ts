@@ -23,10 +23,22 @@ import { encodeTranslationToBuffer } from './i18n-translation-encoder';
 const LOCALIZE_KEYWORD = '$localize';
 
 /**
- * The maximum number of locales to process concurrently in a single sliding window.
- * This caps peak worker memory while maintaining multi-locale batching throughput.
+ * The baseline number of locales to process concurrently in a single sliding window.
+ * This caps peak worker memory on low-core machines while maintaining multi-locale batching throughput.
  */
 const DEFAULT_LOCALE_WINDOW_SIZE = 8;
+
+/**
+ * Minimum byte size threshold for a file to be eligible for multi-batch sharding.
+ * Files below this threshold (< 100 KB) are processed in a single batch to minimize IPC overhead.
+ */
+const SMALL_FILE_FLOOR_BYTES = 100 * 1024;
+
+/**
+ * Ratio of the maximum file size in a window to consider a file "dominant".
+ * Files within 70% of the largest file are sharded across all workers for maximum concurrency.
+ */
+const DOMINANT_FILE_RATIO = 0.7;
 
 /**
  * Serializes the translation messages for a locale for transfer to an inliner Worker.
@@ -248,11 +260,13 @@ export class I18nInliner {
       (name) => !name.endsWith('.map'),
     );
 
-    // Process locales in sliding windows to cap peak worker memory
-    for (let i = 0; i < localeList.length; i += DEFAULT_LOCALE_WINDOW_SIZE) {
-      const windowLocales = localeList.slice(i, i + DEFAULT_LOCALE_WINDOW_SIZE);
+    // Process locales in sliding windows to cap peak worker memory.
+    // Ensure the window has at least enough locales to saturate all available workers on high-core machines.
+    const windowSize = Math.max(DEFAULT_LOCALE_WINDOW_SIZE, this.#workerPool.maxThreads || 1);
+    for (let i = 0; i < localeList.length; i += windowSize) {
+      const windowLocales = localeList.slice(i, i + windowSize);
       const activeLocales = windowLocales.map((item) => item.locale);
-      const isLastWindow = i + DEFAULT_LOCALE_WINDOW_SIZE >= localeList.length;
+      const isLastWindow = i + windowSize >= localeList.length;
 
       // Pre-calculate cache key bases and serialized Blobs for each locale in this window
       const localeCacheBases = new Map<string, string>();
@@ -348,7 +362,6 @@ export class I18nInliner {
       if (uncachedByFile.size > 0) {
         await this.#processUncachedBatches(
           uncachedByFile,
-          windowLocales.length,
           fileResultsByLocale,
           activeLocales,
           isLastWindow,
@@ -415,27 +428,52 @@ export class I18nInliner {
 
   async #processUncachedBatches(
     uncachedByFile: Map<string, UncachedLocaleEntry[]>,
-    localeCount: number,
     fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
     activeLocales?: string[],
     isLastWindow = true,
     generation?: number,
   ): Promise<void> {
     const workerCount = this.#workerPool.maxThreads || 1;
-    const targetTaskCount = Math.max(uncachedByFile.size, workerCount * 2);
-    const localesPerBatch = Math.max(
-      1,
-      Math.ceil(localeCount / (targetTaskCount / (uncachedByFile.size || 1))),
-    );
+
+    // Extract file data and identify the heaviest file size in a single pass
+    let maxFileSize = 0;
+    const sortedFiles = Array.from(uncachedByFile, ([filename, entries]) => {
+      const codeFile = this.#localizeFiles.get(filename);
+      assert(codeFile !== undefined, 'Localize file must exist: ' + filename);
+      const fileSize = codeFile.contents.byteLength;
+      if (fileSize > maxFileSize) {
+        maxFileSize = fileSize;
+      }
+
+      return { filename, entries, codeFile, fileSize };
+    });
+
+    // Sort files descending by byte size (Longest Processing Time First / LPT).
+    // Heavy files (e.g. main.js) are queued first to saturate all worker threads immediately,
+    // while small files act as gap fillers near the window barrier to prevent tail stragglers.
+    sortedFiles.sort((a, b) => b.fileSize - a.fileSize);
 
     const workerTasks: Promise<void>[] = [];
 
-    for (const [filename, entries] of uncachedByFile) {
-      const codeFile = this.#localizeFiles.get(filename);
-      assert(codeFile !== undefined, 'Localize file must exist: ' + filename);
+    for (const { filename, entries, codeFile, fileSize } of sortedFiles) {
       const mapFile = this.#localizeFiles.get(filename + '.map');
       const codeBlob = new Blob([codeFile.contents]);
       const mapBlob = mapFile ? new Blob([mapFile.contents]) : undefined;
+
+      let localesPerBatch: number;
+      if (uncachedByFile.size === 1) {
+        // Single file in window: shard across all workers to avoid idle threads
+        localesPerBatch = Math.max(1, Math.ceil(entries.length / workerCount));
+      } else if (fileSize < SMALL_FILE_FLOOR_BYTES) {
+        // Small chunks (< 100 KB): process all locales in 1 batch to eliminate IPC overhead
+        localesPerBatch = entries.length;
+      } else if (fileSize >= maxFileSize * DOMINANT_FILE_RATIO) {
+        // Dominant file(s): shard across all workers for maximum multi-core parallelism
+        localesPerBatch = Math.max(1, Math.ceil(entries.length / workerCount));
+      } else {
+        // Intermediate files: moderate sharding
+        localesPerBatch = Math.max(1, Math.ceil(entries.length / 2));
+      }
 
       const ephemeral = isLastWindow && entries.length <= localesPerBatch;
       for (let i = 0; i < entries.length; i += localesPerBatch) {

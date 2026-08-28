@@ -870,4 +870,57 @@ describe('I18nInliner', () => {
     const outputText = findFile(results.get('fr')?.outputFiles ?? [], 'main.js').text;
     expect(outputText).toContain('`Bonjour "${name}\\` with \\${injected} and \\\\backslash!`');
   });
+
+  it('correctly inlines when files have varying sizes across multiple workers', async () => {
+    // Create a large dominant bundle (> 120 KB) and a small chunk (< 10 KB)
+    const largePadding = '/* padding */ console.log(1);\n'.repeat(4000);
+    const largeSource = `${GREETING_SOURCE}\n${largePadding}`;
+    const smallSource = 'console.log($localize`:@@farewell:Goodbye`);';
+
+    const largeFile = browserFile('main.js', largeSource);
+    const smallFile = browserFile('chunk.js', smallSource);
+
+    inliner = new I18nInliner(
+      { missingTranslation: 'error', outputFiles: [largeFile, smallFile] },
+      2,
+    );
+
+    const results = await inliner.inlineAll([
+      {
+        locale: 'fr',
+        translation: {
+          greeting: translationFor('Bonjour'),
+          farewell: translationFor('Au revoir'),
+        },
+      },
+      {
+        locale: 'de',
+        translation: {
+          greeting: translationFor('Guten Tag'),
+          farewell: translationFor('Auf Wiedersehen'),
+        },
+      },
+      {
+        locale: 'es',
+        translation: {
+          greeting: translationFor('Hola'),
+          farewell: translationFor('Adios'),
+        },
+      },
+    ]);
+
+    expect(results.size).toBe(3);
+
+    const frFiles = results.get('fr')?.outputFiles ?? [];
+    expect(findFile(frFiles, 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(frFiles, 'chunk.js').text).toContain('"Au revoir"');
+
+    const deFiles = results.get('de')?.outputFiles ?? [];
+    expect(findFile(deFiles, 'main.js').text).toContain('"Guten Tag"');
+    expect(findFile(deFiles, 'chunk.js').text).toContain('"Auf Wiedersehen"');
+
+    const esFiles = results.get('es')?.outputFiles ?? [];
+    expect(findFile(esFiles, 'main.js').text).toContain('"Hola"');
+    expect(findFile(esFiles, 'chunk.js').text).toContain('"Adios"');
+  });
 });
