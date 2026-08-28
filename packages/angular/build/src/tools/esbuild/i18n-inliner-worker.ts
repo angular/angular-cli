@@ -80,6 +80,12 @@ interface InlineFileBatchRequest {
    * not present in this list will be evicted from the Worker's memory cache.
    */
   activeLocales?: string[];
+
+  /**
+   * The current inlining generation counter. When a request with a new generation is received,
+   * all long-term worker caches are cleared.
+   */
+  generation?: number;
 }
 
 /**
@@ -131,6 +137,11 @@ const fileDataCache = new Map<string, Promise<CachedFileData>>();
 const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsedTranslation>>>();
 
 /**
+ * The current inlining generation for this worker.
+ */
+let currentGeneration: number | undefined;
+
+/**
  * Retrieves the file data for a filename, loading and extracting localization metadata.
  * If `cache` is true, the result is cached in `fileDataCache` across requests in this Worker.
  * If `cache` is false (ephemeral), the result is not retained in `fileDataCache`, allowing it
@@ -144,6 +155,10 @@ const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsed
 function loadFileData(filename: string, codeBlob: Blob, cache = true): Promise<CachedFileData> {
   const existing = fileDataCache.get(filename);
   if (existing) {
+    if (!cache) {
+      fileDataCache.delete(filename);
+    }
+
     return existing;
   }
 
@@ -207,6 +222,12 @@ function loadTranslation(
 export async function inlineFileBatch(
   request: InlineFileBatchRequest,
 ): Promise<InlineFileBatchResult> {
+  if (request.generation !== undefined && request.generation !== currentGeneration) {
+    currentGeneration = request.generation;
+    fileDataCache.clear();
+    deserializedTranslations.clear();
+  }
+
   if (request.activeLocales) {
     const activeSet = new Set(request.activeLocales);
     for (const locale of deserializedTranslations.keys()) {

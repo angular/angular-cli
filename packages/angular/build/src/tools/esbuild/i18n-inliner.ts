@@ -152,6 +152,7 @@ export class I18nInliner {
   #cacheStore: PersistentCacheStore | undefined;
   #transformedFileCache: Cache<TransformedFileResult> | undefined;
   #translationCache: Cache<Uint8Array> | undefined;
+  #generation = 0;
   readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
   readonly #unmodifiedFiles: Array<BuildOutputFile>;
 
@@ -229,6 +230,7 @@ export class I18nInliner {
   ): Promise<Map<string, LocaleInlineResult>> {
     await this.initCache();
 
+    const generation = ++this.#generation;
     const { missingTranslation, localizeVersion } = this.options;
     const localeList = Array.from(locales);
 
@@ -356,6 +358,7 @@ export class I18nInliner {
           fileResultsByLocale,
           activeLocales,
           isLastWindow,
+          generation,
         );
       }
     }
@@ -422,6 +425,7 @@ export class I18nInliner {
     fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
     activeLocales?: string[],
     isLastWindow = true,
+    generation?: number,
   ): Promise<void> {
     const workerCount = this.#workerPool.maxThreads || 1;
     const targetTaskCount = Math.max(uncachedByFile.size, workerCount * 2);
@@ -451,6 +455,7 @@ export class I18nInliner {
               locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
               ephemeral,
               activeLocales,
+              generation,
             },
             { name: 'inlineFileBatch' },
           )) as

@@ -823,4 +823,34 @@ describe('I18nInliner', () => {
       ]),
     ).toBeRejectedWithError(/Duplicate locale provided to inliner: fr/);
   });
+
+  it('correctly transforms files across multiple inlineAll runs on the same inliner instance', async () => {
+    const localeInliner = new I18nInliner(
+      {
+        missingTranslation: 'warning',
+        outputFiles: [browserFile('main.js', GREETING_SOURCE)],
+      },
+      2,
+    );
+
+    try {
+      // First generation
+      const results1 = await localeInliner.inlineAll([
+        { locale: 'fr', translation: { greeting: translationFor('Bonjour') } },
+      ]);
+      expect(findFile(results1.get('fr')?.outputFiles ?? [], 'main.js').text).toContain(
+        '"Bonjour"',
+      );
+
+      // Second generation (e.g. watch mode rebuild with updated translation)
+      const results2 = await localeInliner.inlineAll([
+        { locale: 'fr', translation: { greeting: translationFor('Salut') } },
+        { locale: 'de', translation: { greeting: translationFor('Hallo') } },
+      ]);
+      expect(findFile(results2.get('fr')?.outputFiles ?? [], 'main.js').text).toContain('"Salut"');
+      expect(findFile(results2.get('de')?.outputFiles ?? [], 'main.js').text).toContain('"Hallo"');
+    } finally {
+      await localeInliner.close();
+    }
+  });
 });
