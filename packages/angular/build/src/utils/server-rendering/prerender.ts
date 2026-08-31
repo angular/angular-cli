@@ -10,7 +10,10 @@ import { readFile } from 'node:fs/promises';
 import { extname, posix } from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
 import { OutputMode } from '../../builders/application/schema';
-import { BuildOutputAsset } from '../../tools/esbuild/bundler-execution-result';
+import {
+  BuildOutputAsset,
+  PrerenderedRoutesRecord,
+} from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { assertIsError } from '../error';
 import { toPosixPath } from '../path';
@@ -65,6 +68,7 @@ export async function prerenderPages(
   output: PrerenderOutput;
   warnings: string[];
   errors: string[];
+  prerenderedRoutes: PrerenderedRoutesRecord;
   serializableRouteTreeNode: SerializableRouteTreeNode;
 }> {
   const rawOutputFiles: Record<string, string> = {};
@@ -167,6 +171,7 @@ export async function prerenderPages(
       errors,
       warnings,
       output: {},
+      prerenderedRoutes: {},
       serializableRouteTreeNode,
     };
   }
@@ -200,10 +205,22 @@ export async function prerenderPages(
 
   errors.push(...renderingErrors);
 
+  const prerenderedRoutes: PrerenderedRoutesRecord = {};
+  const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
+
+  for (const metadata of serializableRouteTreeNodeForPrerender) {
+    const outPath = getRouteOutPath(metadata.route, baseHrefPathnameWithLeadingSlash);
+
+    if (output[outPath]) {
+      prerenderedRoutes[metadata.route] = { headers: metadata.headers };
+    }
+  }
+
   return {
     errors,
     warnings,
     output,
+    prerenderedRoutes,
     serializableRouteTreeNode,
   };
 }
@@ -227,22 +244,15 @@ async function renderPages(
 
   const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
   const appShellRouteWithoutBaseHref = appShellRoute
-    ? addTrailingSlash(appShellRoute).startsWith(baseHrefPathnameWithLeadingSlash)
-      ? addLeadingSlash(appShellRoute.slice(baseHrefPathnameWithLeadingSlash.length))
-      : addLeadingSlash(appShellRoute)
+    ? addLeadingSlash(getRouteWithoutBaseHref(appShellRoute, baseHrefPathnameWithLeadingSlash))
     : undefined;
 
   const routesToRender: { route: string; outPath: string; isAppShell: boolean }[] = [];
 
   for (const { route, redirectTo } of serializableRouteTreeNode) {
     // Remove the base href from the file output path.
-    const routeWithoutBaseHref = addTrailingSlash(route).startsWith(
-      baseHrefPathnameWithLeadingSlash,
-    )
-      ? addLeadingSlash(route.slice(baseHrefPathnameWithLeadingSlash.length))
-      : route;
-
-    const outPath = stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));
+    const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathnameWithLeadingSlash);
+    const outPath = getRouteOutPath(route, baseHrefPathnameWithLeadingSlash);
 
     if (typeof redirectTo === 'string') {
       output[outPath] = { content: generateRedirectStaticPage(redirectTo), appShellRoute: false };
@@ -305,20 +315,20 @@ async function renderPages(
       const renderBatchPromise: Promise<RenderResult> = renderWorker.run(urls);
       const batchResultPromise = renderBatchPromise
         .then((results) => {
-          for (const { url, content, error } of results) {
-            if (error) {
-              errors.push(`An error occurred while prerendering route '${url}'.\n\n${error}`);
+          for (const result of results) {
+            if ('error' in result) {
+              errors.push(
+                `An error occurred while prerendering route '${result.url}'.\n\n${result.error}`,
+              );
               continue;
             }
 
-            if (content !== null) {
-              const routeInfo = routeOutPathMap.get(url);
-              if (routeInfo) {
-                output[routeInfo.outPath] = {
-                  content,
-                  appShellRoute: routeInfo.isAppShell,
-                };
-              }
+            const routeInfo = routeOutPathMap.get(result.url);
+            if (routeInfo) {
+              output[routeInfo.outPath] = {
+                content: result.content,
+                appShellRoute: routeInfo.isAppShell,
+              };
             }
           }
         })
@@ -438,4 +448,16 @@ async function getAllRoutes(
   } finally {
     void renderWorker.destroy();
   }
+}
+
+function getRouteWithoutBaseHref(route: string, baseHrefPathname: string): string {
+  return addTrailingSlash(route).startsWith(baseHrefPathname)
+    ? addLeadingSlash(route.slice(baseHrefPathname.length))
+    : route;
+}
+
+function getRouteOutPath(route: string, baseHrefPathname: string): string {
+  const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathname);
+
+  return stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));
 }
