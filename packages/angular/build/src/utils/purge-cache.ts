@@ -19,25 +19,41 @@ export async function purgeStaleBuildCache(context: BuilderContext): Promise<voi
   }
 
   const metadata = await context.getProjectMetadata(projectName);
-  const { basePath, path, enabled } = normalizeCacheOptions(metadata, context.workspaceRoot);
+  const { basePath, path, localBasePath, localPath, enabled } = normalizeCacheOptions(
+    metadata,
+    context.workspaceRoot,
+  );
 
   if (!enabled) {
     return;
   }
 
-  let baseEntries;
-  try {
-    baseEntries = await readdir(basePath, { withFileTypes: true });
-  } catch {
-    // No purging possible if base path does not exist or cannot otherwise be accessed
-    return;
+  const basePaths = new Set([basePath]);
+  if (localBasePath) {
+    basePaths.add(localBasePath);
   }
 
-  const entriesToDelete = baseEntries
-    .filter((d) => d.isDirectory())
-    .map((d) => join(basePath, d.name))
-    .filter((cachePath) => cachePath !== path)
-    .map((stalePath) => rm(stalePath, { force: true, recursive: true, maxRetries: 3 }));
+  for (const base of basePaths) {
+    let baseEntries;
+    try {
+      baseEntries = await readdir(base, { withFileTypes: true });
+    } catch {
+      // No purging possible if base path does not exist or cannot otherwise be accessed
+      continue;
+    }
 
-  await Promise.allSettled(entriesToDelete);
+    const currentPath = base === localBasePath ? localPath : path;
+    if (!currentPath) {
+      // Avoid purging if current path is unavailable to prevent deleting the active cache
+      continue;
+    }
+
+    const entriesToDelete = baseEntries
+      .filter((d) => d.isDirectory())
+      .map((d) => join(base, d.name))
+      .filter((cachePath) => cachePath !== currentPath)
+      .map((stalePath) => rm(stalePath, { force: true, recursive: true, maxRetries: 3 }));
+
+    await Promise.allSettled(entriesToDelete);
+  }
 }
