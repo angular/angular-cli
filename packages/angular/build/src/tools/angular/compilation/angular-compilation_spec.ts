@@ -14,7 +14,6 @@ import {
   AngularCompilation,
   AngularCompilationResult,
   DiagnosticModes,
-  NoopCompilation,
   createAngularCompilation,
 } from './index';
 
@@ -57,44 +56,6 @@ describe('AngularCompilation', () => {
 
     const diagnostics = await compilation.diagnoseFiles();
     expect(diagnostics).toEqual({});
-  });
-
-  describe('NoopCompilation', () => {
-    it('initializes with empty referencedFiles and compiler options', async () => {
-      const compilation = new NoopCompilation();
-      const mockHostOptions = {} as AngularHostOptions;
-      const result = await compilation.initialize('tsconfig.json', mockHostOptions);
-
-      expect(result.referencedFiles).toEqual([]);
-      expect(result.compilerOptions).toBeDefined();
-    });
-
-    it('initializes with CompilerOptionOverrides object', async () => {
-      const compilation = new NoopCompilation();
-      const mockHostOptions = {} as AngularHostOptions;
-      const result = await compilation.initialize('tsconfig.json', mockHostOptions, {
-        sourcemap: true,
-        enableHmr: true,
-      });
-
-      expect(result.referencedFiles).toEqual([]);
-      expect(result.compilerOptions.inlineSources).toBe(true);
-      expect(result.compilerOptions.inlineSourceMap).toBe(true);
-      expect(result.compilerOptions['_enableHmr']).toBe(true);
-    });
-
-    it('throws when calling emitAffectedFiles', () => {
-      const compilation = new NoopCompilation();
-      expect(() => compilation.emitAffectedFiles()).toThrowError(
-        'Not available when using noop compilation.',
-      );
-    });
-
-    it('returns empty diagnostics from diagnoseFiles', async () => {
-      const compilation = new NoopCompilation();
-      const diagnostics = await compilation.diagnoseFiles();
-      expect(diagnostics).toEqual({});
-    });
   });
 
   describe('TypeScriptCompilation', () => {

@@ -8,7 +8,10 @@
 
 import { BuilderContext } from '@angular-devkit/architect';
 import { createAngularCompilation } from '../../tools/angular/compilation';
-import { AngularCompilationContext } from '../../tools/esbuild/angular/compilation-state';
+import {
+  AngularCompilationContext,
+  PrimaryCompilationContext,
+} from '../../tools/esbuild/angular/compilation-state';
 import { SourceFileCache } from '../../tools/esbuild/angular/source-file-cache';
 import { generateBudgetStats } from '../../tools/esbuild/budget-stats';
 import { BundleContextResult, BundlerContext } from '../../tools/esbuild/bundler-context';
@@ -125,7 +128,7 @@ export async function executeBuild(
         !!options.jit,
         !options.serverEntryPoint,
       );
-      angularCompilationContext = new AngularCompilationContext(angularCompilation);
+      angularCompilationContext = new PrimaryCompilationContext(angularCompilation);
       bundlerContexts = setupBundlerContexts(
         options,
         target,

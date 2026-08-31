@@ -6,24 +6,46 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { type AngularCompilation, NoopCompilation } from '../../angular/compilation';
+import type { CompilerOptions } from '@angular/compiler-cli';
+import type { AngularCompilation } from '../../angular/compilation';
 
-export class AngularCompilationContext {
-  #compilation: AngularCompilation;
+export abstract class AngularCompilationContext {
+  abstract readonly compilation?: AngularCompilation;
+  abstract isPrimary(): this is PrimaryCompilationContext;
+  abstract readonly waitUntilReady: Promise<boolean>;
+  abstract getCompilerOptions(): Promise<CompilerOptions>;
+  abstract dispose(): Promise<void>;
+
+  createSecondaryContext(): AngularCompilationContext {
+    return new SecondaryCompilationContext(this);
+  }
+}
+
+export class PrimaryCompilationContext extends AngularCompilationContext {
+  readonly #compilation: AngularCompilation;
   #pendingCompilation = true;
   #resolveCompilationReady: ((value: boolean) => void) | undefined;
   #compilationReadyPromise: Promise<boolean> | undefined;
   #hasErrors = true;
 
+  #compilerOptions: CompilerOptions | undefined;
+  #resolveCompilerOptions: ((options: CompilerOptions) => void) | undefined;
+  #compilerOptionsPromise: Promise<CompilerOptions> | undefined;
+
   constructor(compilation: AngularCompilation) {
+    super();
     this.#compilation = compilation;
   }
 
-  get compilation(): AngularCompilation {
+  override isPrimary(): this is PrimaryCompilationContext {
+    return true;
+  }
+
+  override get compilation(): AngularCompilation {
     return this.#compilation;
   }
 
-  get waitUntilReady(): Promise<boolean> {
+  override get waitUntilReady(): Promise<boolean> {
     if (!this.#pendingCompilation) {
       return Promise.resolve(this.#hasErrors);
     }
@@ -35,20 +57,51 @@ export class AngularCompilationContext {
     return this.#compilationReadyPromise;
   }
 
+  override getCompilerOptions(): Promise<CompilerOptions> {
+    if (this.#compilerOptions) {
+      return Promise.resolve(this.#compilerOptions);
+    }
+
+    if (!this.#pendingCompilation) {
+      return Promise.resolve({});
+    }
+
+    this.#compilerOptionsPromise ??= new Promise((resolve) => {
+      this.#resolveCompilerOptions = resolve;
+    });
+
+    return this.#compilerOptionsPromise;
+  }
+
+  setCompilerOptions(options: CompilerOptions): void {
+    this.#compilerOptions = options;
+    this.#resolveCompilerOptions?.(options);
+    this.#resolveCompilerOptions = undefined;
+    this.#compilerOptionsPromise = undefined;
+  }
+
   markAsReady(hasErrors: boolean): void {
     this.#hasErrors = hasErrors;
     this.#resolveCompilationReady?.(hasErrors);
+    this.#resolveCompilationReady = undefined;
     this.#compilationReadyPromise = undefined;
     this.#pendingCompilation = false;
+
+    if (this.#resolveCompilerOptions) {
+      this.#resolveCompilerOptions(this.#compilerOptions ?? {});
+      this.#resolveCompilerOptions = undefined;
+      this.#compilerOptionsPromise = undefined;
+    }
   }
 
   markAsInProgress(): void {
     this.#pendingCompilation = true;
+    this.#compilerOptions = undefined;
   }
 
   #disposal: Promise<void> | undefined;
 
-  dispose(): Promise<void> {
+  override dispose(): Promise<void> {
     // Reuse any in progress disposal to ensure all callers can await completion
     return (this.#disposal ??= this.#close());
   }
@@ -61,27 +114,27 @@ export class AngularCompilationContext {
       // Suppress closure errors to avoid unhandled rejections during teardown.
     }
   }
-
-  createSecondaryContext(): AngularCompilationContext {
-    return new SecondaryCompilationContext(this);
-  }
 }
 
-class SecondaryCompilationContext extends AngularCompilationContext {
-  constructor(private primaryContext: AngularCompilationContext) {
-    super(new NoopCompilation());
+export class SecondaryCompilationContext extends AngularCompilationContext {
+  constructor(private readonly primaryContext?: AngularCompilationContext) {
+    super();
+  }
+
+  override isPrimary(): this is PrimaryCompilationContext {
+    return false;
+  }
+
+  override get compilation(): undefined {
+    return undefined;
   }
 
   override get waitUntilReady(): Promise<boolean> {
-    return this.primaryContext.waitUntilReady;
+    return this.primaryContext?.waitUntilReady ?? Promise.resolve(false);
   }
 
-  override markAsReady(hasErrors: boolean): void {
-    // No-op: secondary contexts do not control compilation state
-  }
-
-  override markAsInProgress(): void {
-    // No-op: secondary contexts do not control compilation state
+  override getCompilerOptions(): Promise<CompilerOptions> {
+    return this.primaryContext?.getCompilerOptions() ?? Promise.resolve({});
   }
 
   override async dispose(): Promise<void> {

@@ -13,7 +13,8 @@
  * their existence may change in any future version.
  */
 
-import { NoopCompilation, createAngularCompilation } from './tools/angular/compilation';
+import { createAngularCompilation } from './tools/angular/compilation';
+import { SecondaryCompilationContext } from './tools/esbuild/angular/compilation-state';
 import {
   CompilerPluginOptions,
   createCompilerPlugin as internalCreateCompilerPlugin,
@@ -52,7 +53,7 @@ export function createCompilerPlugin(
   return internalCreateCompilerPlugin(
     pluginOptions,
     pluginOptions.noopTypeScriptCompilation
-      ? new NoopCompilation()
+      ? new SecondaryCompilationContext()
       : () => createAngularCompilation(!!pluginOptions.jit, !!pluginOptions.browserOnlyBuild),
     new ComponentStylesheetBundler(
       styleOptions,
