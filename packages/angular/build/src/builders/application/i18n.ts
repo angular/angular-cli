@@ -44,11 +44,10 @@ export async function inlineI18n(
 }> {
   const { i18nOptions, baseHref, cacheOptions } = options;
 
-  // Create the multi-threaded inliner with common options and the files generated from the build.
+  // Create the multi-threaded inliner with common options.
   const inliner = new I18nInliner(
     {
       missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
-      outputFiles: executionResult.outputFiles,
       persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
       localizeVersion: i18nOptions.localizeVersion,
     },
@@ -92,7 +91,7 @@ export async function inlineI18n(
       };
     });
 
-    const inlinedLocales = await inliner.inlineAll(localesToInline);
+    const inlinedLocales = await inliner.inlineAll(executionResult.outputFiles, localesToInline);
 
     for (const locale of i18nOptions.inlineLocales) {
       const localeInlineResult = inlinedLocales.get(locale);
