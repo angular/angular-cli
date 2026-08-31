@@ -7,7 +7,7 @@
  */
 
 import remapping, { type DecodedSourceMap, type EncodedSourceMap } from '@ampproject/remapping';
-import { type PluginItem, transformAsync } from '@babel/core';
+import type { PluginItem } from '@babel/core';
 import { createRequire } from 'node:module';
 import { workerData } from 'node:worker_threads';
 import Piscina from 'piscina';
@@ -41,6 +41,16 @@ const {
   advancedOptimizations = false,
   jit = false,
 } = (workerData || {}) as Partial<JavaScriptTransformerOptions>;
+
+let babelLinkerDeps:
+  | Promise<
+      [
+        typeof import('@angular/compiler-cli/linker/babel'),
+        typeof import('@angular/compiler-cli'),
+        typeof import('@babel/core'),
+      ]
+    >
+  | undefined;
 
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
@@ -170,8 +180,13 @@ async function transformJavaScriptImpl(
   }
 
   if (shouldLink && useBabelLinker) {
-    const { createEs2015LinkerPlugin } = await import('@angular/compiler-cli/linker/babel');
-    const { ConsoleLogger, LogLevel } = await import('@angular/compiler-cli');
+    babelLinkerDeps ??= Promise.all([
+      import('@angular/compiler-cli/linker/babel'),
+      import('@angular/compiler-cli'),
+      import('@babel/core'),
+    ]);
+    const [{ createEs2015LinkerPlugin }, { ConsoleLogger, LogLevel }, { transformAsync }] =
+      await babelLinkerDeps;
 
     const result = await transformAsync(code, {
       filename,
