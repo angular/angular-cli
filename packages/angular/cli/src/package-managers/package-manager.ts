@@ -724,8 +724,15 @@ export class PackageManager {
       }
     }
 
+    // To prevent Yarn modern from traversing up the directory tree and failing because the temporary
+    // directory is not part of the project's workspace, write an empty `yarn.lock` to act as a project boundary.
+    if (this.name === 'yarn') {
+      await this.host.writeFile(join(workingDirectory, 'yarn.lock'), '');
+    }
+
     // Copy configuration files if the package manager requires it (e.g., bun, yarn).
     if (this.descriptor.copyConfigFromProject) {
+      let copiedYarnConfig = false;
       for (const configFile of this.descriptor.configFiles) {
         try {
           const configPath = join(this.cwd, configFile);
@@ -734,9 +741,19 @@ export class PackageManager {
             content = sanitizeYarnRc(content);
           }
           await this.host.writeFile(join(workingDirectory, configFile), content);
+          if (this.name === 'yarn') {
+            copiedYarnConfig = true;
+          }
         } catch {
           // Ignore missing config files.
         }
+      }
+
+      if (this.name === 'yarn' && !copiedYarnConfig) {
+        await this.host.writeFile(
+          join(workingDirectory, '.yarnrc.yml'),
+          'nodeLinker: node-modules\n',
+        );
       }
     }
 

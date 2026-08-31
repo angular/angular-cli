@@ -192,6 +192,10 @@ describe('PackageManager', () => {
         '/tmp/project/node_modules/angular-cli-tmp-packages-abc/pnpm-workspace.yaml',
         '',
       );
+      expect(writeFileSpy).not.toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/yarn.lock',
+        '',
+      );
     });
 
     it('should copy and sanitize .yarnrc.yml when package manager is yarn and it exists', async () => {
@@ -245,8 +249,51 @@ describe('PackageManager', () => {
       ].join('\n');
 
       expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/yarn.lock',
+        '',
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
         '/tmp/project/node_modules/angular-cli-tmp-packages-abc/.yarnrc.yml',
         expectedYarnRcContent,
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
+        JSON.stringify({ packageManager: 'yarn@4.4.1' }, null, 2),
+      );
+    });
+
+    it('should write empty yarn.lock and default .yarnrc.yml when package manager is yarn and config does not exist', async () => {
+      const yarnDescriptor = SUPPORTED_PACKAGE_MANAGERS['yarn'];
+      const testHost = new MockHost({
+        '/tmp/project/node_modules': true,
+      });
+      const pm = new PackageManager(testHost, '/tmp/project', yarnDescriptor);
+
+      const createTempDirectorySpy = spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
+
+      spyOn(testHost, 'readFile').and.callFake(async (filePath) => {
+        if (filePath.replace(/\\/g, '/').endsWith('package.json')) {
+          return JSON.stringify({ packageManager: 'yarn@4.4.1' });
+        }
+        throw new Error(`ENOENT: no such file or directory, open '${filePath}'`);
+      });
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '4.4.1', stderr: '' });
+
+      const { workingDirectory } = await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(workingDirectory).toBe('/tmp/project/node_modules/angular-cli-tmp-packages-abc');
+      expect(createTempDirectorySpy).toHaveBeenCalledWith('/tmp/project/node_modules');
+
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/yarn.lock',
+        '',
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc/.yarnrc.yml',
+        'nodeLinker: node-modules\n',
       );
       expect(writeFileSpy).toHaveBeenCalledWith(
         '/tmp/project/node_modules/angular-cli-tmp-packages-abc/package.json',
