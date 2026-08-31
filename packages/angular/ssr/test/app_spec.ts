@@ -22,58 +22,59 @@ import { setAngularAppTestingManifest } from './testing-utils';
 describe('AngularServerApp', () => {
   let app: AngularServerApp;
 
-  beforeAll(() => {
-    @Component({
-      selector: 'app-home',
-      template: `Home works`,
-    })
-    class HomeComponent {
-      constructor() {
-        if (inject(ActivatedRoute).snapshot.data['destroyApp']) {
-          inject(PlatformRef).destroy();
-        }
+  @Component({
+    selector: 'app-home',
+    template: `Home works`,
+  })
+  class HomeComponent {
+    constructor() {
+      if (inject(ActivatedRoute).snapshot.data['destroyApp']) {
+        inject(PlatformRef).destroy();
       }
     }
+  }
 
-    @Component({
-      selector: 'app-redirect',
-    })
-    class RedirectComponent {
-      constructor() {
-        const responseInit = inject(RESPONSE_INIT);
-        if (responseInit) {
-          responseInit.status = 308;
-          const headers = responseInit.headers;
-          if (headers) {
-            (headers as Headers).set('X-Redirect-Header', 'custom-value');
-          }
+  @Component({
+    selector: 'app-redirect',
+  })
+  class RedirectComponent {
+    constructor() {
+      const responseInit = inject(RESPONSE_INIT);
+      if (responseInit) {
+        responseInit.status = 308;
+        const headers = responseInit.headers;
+        if (headers) {
+          (headers as Headers).set('X-Redirect-Header', 'custom-value');
         }
-
-        void inject(Router).navigate([], {
-          queryParams: { filter: 'test' },
-        });
       }
+
+      void inject(Router).navigate([], {
+        queryParams: { filter: 'test' },
+      });
+    }
+  }
+
+  const queryParamAdderGuard: CanActivateFn = (_route, state) => {
+    const urlTree = inject(Router).parseUrl(state.url);
+
+    if (urlTree.queryParamMap.has('filter')) {
+      return true;
     }
 
-    const queryParamAdderGuard: CanActivateFn = (_route, state) => {
-      const urlTree = inject(Router).parseUrl(state.url);
-
-      if (urlTree.queryParamMap.has('filter')) {
-        return true;
-      }
-
-      urlTree.queryParams = {
-        filter: 'test',
-      };
-
-      return urlTree;
+    urlTree.queryParams = {
+      filter: 'test',
     };
 
+    return urlTree;
+  };
+
+  function setupManifest(): void {
     setAngularAppTestingManifest(
       [
         { path: 'home', component: HomeComponent },
         { path: 'home-csr', component: HomeComponent },
         { path: 'home-ssg', component: HomeComponent },
+        { path: 'home-ssg-non-ascii/دليل', component: HomeComponent },
         { path: 'page-with-headers', component: HomeComponent },
         { path: 'page-with-status', component: HomeComponent },
         { path: 'page-destroy-app', component: HomeComponent, data: { destroyApp: true } },
@@ -104,6 +105,10 @@ describe('AngularServerApp', () => {
           headers: {
             'X-Some-Header': 'value',
           },
+        },
+        {
+          path: 'home-ssg-non-ascii/دليل',
+          renderMode: RenderMode.Prerender,
         },
         {
           path: 'page-with-status',
@@ -140,6 +145,21 @@ describe('AngularServerApp', () => {
           size: 28,
           hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
         },
+        'home-ssg-non-ascii/دليل/index.html': {
+          text: async () =>
+            `<html>
+              <head>
+                <title>SSG non-ascii page</title>
+                <base href="/" />
+              </head>
+              <body>
+                <app-root>Home SSG non-ascii works</app-root>
+              </body>
+            </html>
+          `,
+          size: 38,
+          hash: 'a1b2c3d4e5f6',
+        },
       },
       undefined,
       undefined,
@@ -152,6 +172,10 @@ describe('AngularServerApp', () => {
     );
 
     app = new AngularServerApp();
+  }
+
+  beforeAll(() => {
+    setupManifest();
   });
 
   describe('handle', () => {
@@ -280,6 +304,77 @@ describe('AngularServerApp', () => {
       it(`should correctly serve the content for the requested prerendered page when the URL ends with 'index.html'`, async () => {
         const response = await app.handle(new Request('http://localhost/home-ssg/index.html'));
         expect(await response?.text()).toContain('Home SSG works');
+      });
+
+      it('should correctly serve prerendered page with non-ASCII path', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/home-ssg-non-ascii/%D8%AF%D9%84%D9%8A%D9%84'),
+        );
+        expect(await response?.text()).toContain('Home SSG non-ascii works');
+      });
+
+      it(`should correctly serve prerendered page with non-ASCII path when the URL ends with 'index.html'`, async () => {
+        const response = await app.handle(
+          new Request('http://localhost/home-ssg-non-ascii/%D8%AF%D9%84%D9%8A%D9%84/index.html'),
+        );
+        expect(await response?.text()).toContain('Home SSG non-ascii works');
+      });
+
+      it('should correctly serve prerendered page when requested with decoded non-ASCII characters', async () => {
+        const response = await app.handle(new Request('http://localhost/home-ssg-non-ascii/دليل'));
+        expect(await response?.text()).toContain('Home SSG non-ascii works');
+      });
+
+      it('should correctly serve prerendered page with non-ASCII path when baseHref is configured', async () => {
+        setAngularAppTestingManifest(
+          [{ path: 'home-ssg-non-ascii/دليل', component: HomeComponent }],
+          [
+            {
+              path: 'home-ssg-non-ascii/دليل',
+              renderMode: RenderMode.Prerender,
+            },
+          ],
+          '/ar/',
+          {
+            'home-ssg-non-ascii/دليل/index.html': {
+              text: async () => '<html><body>SSG with baseHref works</body></html>',
+              size: 47,
+              hash: '123456',
+            },
+          },
+        );
+
+        const customApp = new AngularServerApp();
+        const response = await customApp.handle(
+          new Request('http://localhost/ar/home-ssg-non-ascii/%D8%AF%D9%84%D9%8A%D9%84'),
+        );
+        expect(await response?.text()).toContain('SSG with baseHref works');
+      });
+
+      it('should correctly serve prerendered page when baseHref contains non-ASCII characters', async () => {
+        setAngularAppTestingManifest(
+          [{ path: 'page', component: HomeComponent }],
+          [
+            {
+              path: 'page',
+              renderMode: RenderMode.Prerender,
+            },
+          ],
+          '/دليل/',
+          {
+            'page/index.html': {
+              text: async () => '<html><body>SSG with non-ASCII baseHref works</body></html>',
+              size: 57,
+              hash: 'abcdef',
+            },
+          },
+        );
+
+        const customApp = new AngularServerApp();
+        const response = await customApp.handle(
+          new Request('http://localhost/%D8%AF%D9%84%D9%8A%D9%84/page'),
+        );
+        expect(await response?.text()).toContain('SSG with non-ASCII baseHref works');
       });
 
       it('should return configured headers for pages with specific header settings', async () => {

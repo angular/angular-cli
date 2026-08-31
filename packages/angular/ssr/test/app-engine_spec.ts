@@ -54,11 +54,13 @@ function createEntryPoint(locale: string) {
     setAngularAppTestingManifest(
       [
         { path: 'ssg', component: SSGComponent },
+        { path: 'ssg-non-ascii/دليل', component: SSGComponent },
         { path: 'ssr', component: SSRComponent },
         { path: '', component: HomeComponent },
       ],
       [
         { path: 'ssg', renderMode: RenderMode.Prerender },
+        { path: 'ssg-non-ascii/دليل', renderMode: RenderMode.Prerender },
         { path: '**', renderMode: RenderMode.Server },
       ],
       '/' + locale,
@@ -73,6 +75,20 @@ function createEntryPoint(locale: string) {
             </head>
             <body>
               SSG works ${locale.toUpperCase()}
+            </body>
+          </html>
+        `,
+        },
+        'ssg-non-ascii/دليل/index.html': {
+          size: 35,
+          hash: 'a1b2c3d4e5f6',
+          text: async () => `<html>
+            <head>
+              <title>SSG non-ascii page</title>
+              <base href="/${locale}" />
+            </head>
+            <body>
+              SSG non-ascii works ${locale.toUpperCase()}
             </body>
           </html>
         `,
@@ -145,6 +161,15 @@ describe('AngularAppEngine', () => {
         const request = new Request('https://example.com/it/ssg/index.html');
         const response = await appEngine.handle(request);
         expect(await response?.text()).toContain('SSG works IT');
+      });
+
+      it('should return a served prerendered page for non-ASCII routes with correct locale', async () => {
+        const request = new Request(
+          'https://example.com/it/ssg-non-ascii/%D8%AF%D9%84%D9%8A%D9%84',
+        );
+        const response = await appEngine.handle(request);
+        expect(await response?.text()).toContain('SSG non-ascii works IT');
+        expect(response?.headers?.get('Content-Language')).toBe('it');
       });
 
       it('should return null for requests to unknown pages in a locale', async () => {
