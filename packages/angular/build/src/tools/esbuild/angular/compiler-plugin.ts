@@ -23,12 +23,12 @@ import * as path from 'node:path';
 import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { calculateHash, initializeHash } from '../../../utils/hash';
 import { AngularHostOptions } from '../../angular/angular-host';
-import { AngularCompilation, DiagnosticModes, NoopCompilation } from '../../angular/compilation';
+import { AngularCompilation, DiagnosticModes } from '../../angular/compilation';
 import { type PersistentCacheStore, createPersistentCacheStore } from '../cache';
 import { JavaScriptTransformer } from '../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
-import { AngularCompilationContext } from './compilation-state';
+import { AngularCompilationContext, PrimaryCompilationContext } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
@@ -117,12 +117,12 @@ export function createCompilerPlugin(
       const angularCompilationContext =
         compilationContextOrCompilation instanceof AngularCompilationContext
           ? compilationContextOrCompilation
-          : new AngularCompilationContext(
+          : new PrimaryCompilationContext(
               typeof compilationContextOrCompilation === 'function'
                 ? await compilationContextOrCompilation()
                 : compilationContextOrCompilation,
             );
-      const compilation: AngularCompilation = angularCompilationContext.compilation;
+      const compilation: AngularCompilation | undefined = angularCompilationContext.compilation;
 
       // The in-memory cache of TypeScript file outputs will be used during the build in `onLoad` callbacks for TS files.
       // A string value indicates direct TS/NG output and a Uint8Array indicates fully transformed code.
@@ -150,11 +150,22 @@ export function createCompilerPlugin(
       // eslint-disable-next-line max-lines-per-function
       build.onStart(async () => {
         await initializeHash();
-        angularCompilationContext.markAsInProgress();
 
         const result: OnStartResult = {
           warnings: setupWarnings,
         };
+
+        if (!angularCompilationContext.isPrimary()) {
+          hasCompilationErrors = await angularCompilationContext.waitUntilReady;
+          const compilerOptions = await angularCompilationContext.getCompilerOptions();
+          shouldTsIgnoreJs = !compilerOptions.allowJs;
+          useTypeScriptTranspilation = !!compilerOptions['_useTypeScriptTranspilation'];
+
+          return result;
+        }
+
+        angularCompilationContext.markAsInProgress();
+        const compilation = angularCompilationContext.compilation;
 
         // Reset debug performance tracking
         resetCumulativeDurations();
@@ -163,10 +174,7 @@ export function createCompilerPlugin(
         // Angular compiler which does not have direct knowledge of transitive resource
         // dependencies or web worker processing.
         let modifiedFiles;
-        if (
-          !(compilation instanceof NoopCompilation) &&
-          pluginOptions.sourceFileCache?.modifiedFiles.size
-        ) {
+        if (pluginOptions.sourceFileCache?.modifiedFiles.size) {
           // TODO: Differentiate between changed input files and stale output files
           modifiedFiles = referencedFileTracker.update(pluginOptions.sourceFileCache.modifiedFiles);
           pluginOptions.sourceFileCache.invalidate(modifiedFiles);
@@ -320,6 +328,7 @@ export function createCompilerPlugin(
           if (initializationResult.warnings?.length) {
             setupWarnings?.push(...initializationResult.warnings);
           }
+          angularCompilationContext.setCompilerOptions(initializationResult.compilerOptions);
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
           useTypeScriptTranspilation =
             !!initializationResult.compilerOptions['_useTypeScriptTranspilation'];
@@ -345,12 +354,7 @@ export function createCompilerPlugin(
 
           // Initialization failure prevents further compilation steps
           hasCompilationErrors = true;
-
-          return result;
-        }
-
-        if (compilation instanceof NoopCompilation) {
-          hasCompilationErrors = await angularCompilationContext.waitUntilReady;
+          angularCompilationContext.markAsReady(true);
 
           return result;
         }
@@ -444,7 +448,7 @@ export function createCompilerPlugin(
         let contents = typeScriptFileCache.get(request);
         let directContents: string | undefined;
 
-        if (contents === undefined && compilation.transformFile) {
+        if (contents === undefined && compilation?.transformFile) {
           try {
             directContents = await readFile(request, 'utf-8');
             const transformResult = await compilation.transformFile(request, directContents);
@@ -607,7 +611,9 @@ export function createCompilerPlugin(
 
       build.onEnd((result) => {
         // Ensure other compilations are unblocked if the main compilation throws during start
-        angularCompilationContext.markAsReady(hasCompilationErrors);
+        if (angularCompilationContext.isPrimary()) {
+          angularCompilationContext.markAsReady(hasCompilationErrors);
+        }
 
         for (const { outputFiles, metafile } of additionalResults.values()) {
           // Add any additional output files to the main output files
