@@ -455,12 +455,19 @@ export class AngularServerApp {
    */
   private buildServerAssetPathFromRequest(request: Request): string {
     let { pathname: assetPath } = new URL(request.url);
+    try {
+      assetPath = decodeURIComponent(assetPath);
+    } catch {
+      // In case of malformed URI component, keep assetPath as is.
+    }
+
     if (!assetPath.endsWith('/index.html')) {
       // Append "index.html" to build the default asset path.
       assetPath = joinUrlParts(assetPath, 'index.html');
     }
 
     const { baseHref } = this.manifest;
+
     // Check if the asset path starts with the base href and the base href is not (`/` or ``).
     if (baseHref.length > 1 && assetPath.startsWith(baseHref)) {
       // Remove the base href from the start of the asset path to align with server-asset expectations.
