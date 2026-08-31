@@ -99,7 +99,6 @@ async function serializeTranslation(
  */
 export interface I18nInlinerOptions {
   missingTranslation: 'error' | 'warning' | 'ignore';
-  outputFiles: BuildOutputFile[];
   persistentCachePath?: string;
   localizeVersion?: string;
 }
@@ -165,19 +164,36 @@ export class I18nInliner {
   #transformedFileCache: Cache<TransformedFileResult> | undefined;
   #translationCache: Cache<Uint8Array> | undefined;
   #generation = 0;
-  readonly #localizeFiles: ReadonlyMap<string, BuildOutputFile>;
-  readonly #unmodifiedFiles: Array<BuildOutputFile>;
 
   constructor(
     private readonly options: I18nInlinerOptions,
     maxThreads?: number,
   ) {
-    this.#unmodifiedFiles = [];
-    const { outputFiles, missingTranslation } = options;
-    const files = new Map<string, BuildOutputFile>();
+    const { missingTranslation } = options;
 
-    const pendingMaps = [];
-    for (const file of outputFiles) {
+    this.#workerPool = new WorkerPool({
+      filename: require.resolve('./i18n-inliner-worker'),
+      maxThreads,
+      // Extract options to ensure only the named options are serialized and sent to the worker
+      workerData: {
+        missingTranslation,
+      },
+    });
+  }
+
+  #partitionFiles(files: Iterable<BuildOutputFile>): {
+    filenames: string[];
+    localizeFiles: Map<string, BuildOutputFile>;
+    localizeMaps: Map<string, BuildOutputFile>;
+    unmodifiedFiles: BuildOutputFile[];
+  } {
+    const filenames: string[] = [];
+    const localizeFiles = new Map<string, BuildOutputFile>();
+    const localizeMaps = new Map<string, BuildOutputFile>();
+    const unmodifiedFiles: BuildOutputFile[] = [];
+
+    const pendingMaps: BuildOutputFile[] = [];
+    for (const file of files) {
       if (file.type === BuildOutputFileType.Root || file.type === BuildOutputFileType.ServerRoot) {
         // Skip also the server entry-point.
         // Skip stats and similar files.
@@ -193,7 +209,8 @@ export class I18nInliner {
         const hasLocalize = contentBuffer.includes(LOCALIZE_KEYWORD);
 
         if (hasLocalize) {
-          files.set(file.path, file);
+          localizeFiles.set(file.path, file);
+          filenames.push(file.path);
 
           continue;
         }
@@ -204,28 +221,20 @@ export class I18nInliner {
         continue;
       }
 
-      this.#unmodifiedFiles.push(file);
+      unmodifiedFiles.push(file);
     }
 
     // Check if any pending map files should be processed by checking if the parent JS file is present
     for (const file of pendingMaps) {
-      if (files.has(file.path.slice(0, -4))) {
-        files.set(file.path, file);
+      const jsPath = file.path.slice(0, -4);
+      if (localizeFiles.has(jsPath)) {
+        localizeMaps.set(jsPath, file);
       } else {
-        this.#unmodifiedFiles.push(file);
+        unmodifiedFiles.push(file);
       }
     }
 
-    this.#localizeFiles = files;
-
-    this.#workerPool = new WorkerPool({
-      filename: require.resolve('./i18n-inliner-worker'),
-      maxThreads,
-      // Extract options to ensure only the named options are serialized and sent to the worker
-      workerData: {
-        missingTranslation,
-      },
-    });
+    return { filenames, localizeFiles, localizeMaps, unmodifiedFiles };
   }
 
   /**
@@ -234,10 +243,12 @@ export class I18nInliner {
    * An adaptive 2D task-partitioning algorithm distributes (files x locales) work units
    * across all worker threads while caching AST metadata and sourcemaps in worker memory.
    *
+   * @param files The build output files to transform.
    * @param locales The locales and translations to inline.
    * @returns A map of locale names to their inlined output files and diagnostics.
    */
   async inlineAll(
+    files: Iterable<BuildOutputFile>,
     locales: Iterable<LocaleInlineOptions>,
   ): Promise<Map<string, LocaleInlineResult>> {
     await this.initCache();
@@ -250,15 +261,13 @@ export class I18nInliner {
       return new Map();
     }
 
+    const { filenames, localizeFiles, localizeMaps, unmodifiedFiles } = this.#partitionFiles(files);
+
     const fileResultsByLocale = new Map<string, Map<string, TransformedFileResult>>();
     for (const { locale } of localeList) {
       assert(!fileResultsByLocale.has(locale), 'Duplicate locale provided to inliner: ' + locale);
       fileResultsByLocale.set(locale, new Map());
     }
-
-    const filenames = Array.from(this.#localizeFiles.keys()).filter(
-      (name) => !name.endsWith('.map'),
-    );
 
     // Process locales in sliding windows to cap peak worker memory.
     // Ensure the window has at least enough locales to saturate all available workers on high-core machines.
@@ -304,7 +313,7 @@ export class I18nInliner {
         const cacheChecks: Promise<void>[] = [];
 
         for (const filename of filenames) {
-          const file = this.#localizeFiles.get(filename);
+          const file = localizeFiles.get(filename);
           assert(file !== undefined, 'Localize file must exist: ' + filename);
 
           const fileEntriesPromises = windowLocales.map(
@@ -361,6 +370,8 @@ export class I18nInliner {
       // Adaptive 2D Sharding for uncached tasks in this window
       if (uncachedByFile.size > 0) {
         await this.#processUncachedBatches(
+          localizeFiles,
+          localizeMaps,
           uncachedByFile,
           fileResultsByLocale,
           activeLocales,
@@ -381,7 +392,7 @@ export class I18nInliner {
 
       if (fileResults) {
         for (const filename of filenames) {
-          const originalFile = this.#localizeFiles.get(filename);
+          const originalFile = localizeFiles.get(filename);
           assert(originalFile !== undefined, 'Localize file must exist: ' + filename);
 
           const fileResult = fileResults.get(filename);
@@ -396,7 +407,7 @@ export class I18nInliner {
             outputFiles.push(originalFile.clone());
           }
 
-          const originalMap = this.#localizeFiles.get(filename + '.map');
+          const originalMap = localizeMaps.get(filename);
           if (fileResult.map !== undefined) {
             outputFiles.push(createOutputFile(filename + '.map', fileResult.map, type));
           } else if (originalMap !== undefined) {
@@ -414,7 +425,7 @@ export class I18nInliner {
       }
 
       // Include cloned unmodified files for every locale
-      outputFiles.push(...this.#unmodifiedFiles.map((file) => file.clone()));
+      outputFiles.push(...unmodifiedFiles.map((file) => file.clone()));
 
       resultsByLocale.set(locale, {
         outputFiles,
@@ -427,6 +438,8 @@ export class I18nInliner {
   }
 
   async #processUncachedBatches(
+    localizeFiles: Map<string, BuildOutputFile>,
+    localizeMaps: Map<string, BuildOutputFile>,
     uncachedByFile: Map<string, UncachedLocaleEntry[]>,
     fileResultsByLocale: Map<string, Map<string, TransformedFileResult>>,
     activeLocales?: string[],
@@ -438,7 +451,7 @@ export class I18nInliner {
     // Extract file data and identify the heaviest file size in a single pass
     let maxFileSize = 0;
     const sortedFiles = Array.from(uncachedByFile, ([filename, entries]) => {
-      const codeFile = this.#localizeFiles.get(filename);
+      const codeFile = localizeFiles.get(filename);
       assert(codeFile !== undefined, 'Localize file must exist: ' + filename);
       const fileSize = codeFile.contents.byteLength;
       if (fileSize > maxFileSize) {
@@ -456,7 +469,7 @@ export class I18nInliner {
     const workerTasks: Promise<void>[] = [];
 
     for (const { filename, entries, codeFile, fileSize } of sortedFiles) {
-      const mapFile = this.#localizeFiles.get(filename + '.map');
+      const mapFile = localizeMaps.get(filename);
       const codeBlob = new Blob([codeFile.contents]);
       const mapBlob = mapFile ? new Blob([mapFile.contents]) : undefined;
 
@@ -548,20 +561,21 @@ export class I18nInliner {
   }
 
   /**
-   * Performs inlining of translations for the provided locale and translations. The files that
-   * are processed originate from the files passed to the class constructor and filter by presence
-   * of the localize function keyword.
+   * Performs inlining of translations for the provided locale and translations.
+   *
+   * @param files The build output files to transform.
    * @param locale The string representing the locale to inline.
    * @param translation The translation messages to use when inlining.
    * @param translationIntegrity An optional integrity value for the translation messages to use for caching.
    * @returns A promise that resolves to an array of OutputFiles representing a translated result.
    */
   async inlineForLocale(
+    files: Iterable<BuildOutputFile>,
     locale: string,
     translation: Record<string, ɵParsedTranslation> | undefined,
     translationIntegrity?: string,
   ): Promise<LocaleInlineResult> {
-    const results = await this.inlineAll([{ locale, translation, translationIntegrity }]);
+    const results = await this.inlineAll(files, [{ locale, translation, translationIntegrity }]);
     const result = results.get(locale);
     assert(result !== undefined, `Result for locale '${locale}' should be present.`);
 
