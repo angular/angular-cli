@@ -6,14 +6,46 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import ts from 'typescript';
 import { toPosixPath } from '../../../utils/path';
-import { profileAsync } from '../../esbuild/profiling';
+import { profileAsync, profileSync } from '../../esbuild/profiling';
 import { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { convertTypeScriptDiagnostic } from './diagnostics';
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
+  static #angularCompilerCliModule?: typeof ng;
+
+  static async loadCompilerCli(): Promise<typeof ng> {
+    TypeScriptCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
+
+    return TypeScriptCompilation.#angularCompilerCliModule;
+  }
+
+  protected async loadConfiguration(tsconfig: string): Promise<ng.ParsedConfiguration> {
+    const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
+
+    return profileSync('NG_READ_CONFIG', () =>
+      readConfiguration(tsconfig, {
+        // Angular specific configuration defaults and overrides to ensure a functioning compilation.
+        suppressOutputPathCheck: true,
+        outDir: undefined,
+        sourceMap: false,
+        declaration: false,
+        declarationMap: false,
+        allowEmptyCodegenFiles: false,
+        annotationsAs: 'decorators',
+        enableResourceInlining: false,
+        supportTestBed: false,
+        supportJitMode: false,
+        // Disable removing of comments as TS is quite aggressive with these and can
+        // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
+        removeComments: false,
+      }),
+    );
+  }
+
   protected readonly sourceFiles = new Map<string, ts.SourceFile>();
 
   protected invalidateFiles(files: Iterable<string>): void {

@@ -16,10 +16,9 @@ import { createJitResourceTransformer } from '../transformers/jit-resource-trans
 import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import {
-  AngularCompilation,
-  AngularCompilationResult,
+  type AngularCompilationResult,
   DiagnosticModes,
-  EmitFileResult,
+  type EmitFileResult,
 } from './angular-compilation';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
