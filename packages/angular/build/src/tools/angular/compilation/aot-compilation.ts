@@ -22,10 +22,9 @@ import { replaceBootstrap } from '../transformers/jit-bootstrap-transformer';
 import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';
 import { createWorkerTransformer } from '../transformers/web-worker-transformer';
 import {
-  AngularCompilation,
-  AngularCompilationResult,
+  type AngularCompilationResult,
   DiagnosticModes,
-  EmitFileResult,
+  type EmitFileResult,
 } from './angular-compilation';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { collectHmrCandidates } from './hmr-candidates';
@@ -69,7 +68,7 @@ export class AotCompilation extends TypeScriptCompilation {
     compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
-    const { NgtscProgram, OptimizeFor } = await AngularCompilation.loadCompilerCli();
+    const { NgtscProgram, OptimizeFor } = await TypeScriptCompilation.loadCompilerCli();
 
     // Load the compiler configuration and transform as needed
     const {

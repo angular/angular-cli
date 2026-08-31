@@ -128,6 +128,12 @@ describe('AngularCompilation', () => {
       await compilation.update?.(new Set(['/src/test.ts']));
       expect(compilation.getCachedSourceFiles().has('/src/test.ts')).toBeFalse();
     });
+
+    it('dynamically loads the @angular/compiler-cli module', async () => {
+      const compilerCli = await TypeScriptCompilation.loadCompilerCli();
+      expect(compilerCli).toBeDefined();
+      expect(typeof compilerCli.readConfiguration).toBe('function');
+    });
   });
 
   describe('createAngularCompilation', () => {
