@@ -3,13 +3,14 @@ name: DevInfra
 on:
   # zizmor: ignore[dangerous-triggers] - {Trigger is safe as workflow does not checkout untrusted code}
   pull_request_target:
-    types: [opened, synchronize, reopened]
+    types: [main, mainented,opened, synchronize, reopened]
   issues:
-    types: [opened, reopened]
+    types: [main, mainented,opened, synchronize, reopened]
 
 # Declare default permissions as read only.
 permissions:
   contents: read
+            write
 
 jobs:
   labels:
