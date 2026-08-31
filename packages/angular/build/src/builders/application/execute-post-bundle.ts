@@ -157,7 +157,13 @@ export async function executePostBundleSteps(
       'The "index" option is required when using the "ssg" or "appShell" options.',
     );
 
-    const { output, warnings, errors, serializableRouteTreeNode } = await prerenderPages(
+    const {
+      output,
+      warnings,
+      errors,
+      serializableRouteTreeNode,
+      prerenderedRoutes: generatedPrerenderedRoutes,
+    } = await prerenderPages(
       workspaceRoot,
       baseHref,
       appShellOptions,
@@ -171,6 +177,7 @@ export async function executePostBundleSteps(
 
     allErrors.push(...errors);
     allWarnings.push(...warnings);
+    Object.assign(prerenderedRoutes, generatedPrerenderedRoutes);
 
     const indexHasBeenPrerendered = output[indexHtmlOptions.output];
     for (const [path, { content, appShellRoute }] of Object.entries(output)) {
@@ -195,10 +202,6 @@ export async function executePostBundleSteps(
     const serializableRouteTreeNodeForManifest: WritableSerializableRouteTreeNode = [];
     for (const metadata of serializableRouteTreeNode) {
       serializableRouteTreeNodeForManifest.push(metadata);
-
-      if (metadata.renderMode === RouteRenderMode.Prerender && !metadata.route.includes('*')) {
-        prerenderedRoutes[metadata.route] = { headers: metadata.headers };
-      }
     }
 
     if (outputMode === OutputMode.Server) {

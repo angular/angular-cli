@@ -21,11 +21,15 @@ export interface RenderWorkerData extends ESMInMemoryFileLoaderWorkerData {
   hasSsrEntry: boolean;
 }
 
-export interface RenderResultItem {
-  url: string;
-  content: string | null;
-  error?: string;
-}
+export type RenderResultItem =
+  | {
+      url: string;
+      content: string;
+    }
+  | {
+      url: string;
+      error: string;
+    };
 
 export type RenderResult = RenderResultItem[];
 
@@ -74,12 +78,16 @@ async function renderPages(urls: string[]): Promise<RenderResult> {
   for (const currentUrl of urls) {
     try {
       const content = await renderPage(currentUrl, angularServerApp);
+
+      if (content === null) {
+        throw new Error('The content returned was empty.');
+      }
+
       results.push({ url: currentUrl, content });
     } catch (err) {
       assertIsError(err);
       results.push({
         url: currentUrl,
-        content: null,
         error: err.stack ?? err.message ?? err.code ?? `${err}`,
       });
     }
