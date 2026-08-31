@@ -123,6 +123,11 @@ export async function* runEsBuildBuildAction(
         `${toPosixPath(workspaceRoot)}/**/.*/**`,
       ];
 
+      if (cacheOptions.localBasePath && cacheOptions.localBasePath !== cacheOptions.basePath) {
+        const normalizedLocalCacheBase = toPosixPath(cacheOptions.localBasePath);
+        ignored.push(normalizedLocalCacheBase, `${normalizedLocalCacheBase}/**`);
+      }
+
       // Setup a watcher
       const { createWatcher } = await import('../../tools/esbuild/watcher');
       watcher = await createWatcher({
