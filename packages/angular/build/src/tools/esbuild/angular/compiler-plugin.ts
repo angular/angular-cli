@@ -30,6 +30,7 @@ import { LoadResultCache, createCachedLoad } from '../load-result-cache';
 import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { AngularCompilationContext } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
+import { isEsmPackage, rewriteDeferDependencyImports } from './defer-dependency-rewriter';
 import { FileReferenceTracker } from './file-reference-tracker';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 import { rewriteForBazel } from './rewrite-bazel-paths';
@@ -499,6 +500,29 @@ export function createCompilerPlugin(
         } else if (typeof contents === 'string' && (useTypeScriptTranspilation || isJS)) {
           // A string indicates untransformed output from the TS/NG compiler.
           // This step is unneeded when using esbuild transpilation.
+
+          // PoC: if this file has a `@defer`-generated import like
+          // `import('some-lib').then(m => m.SomeComponent)`, rewrite it so
+          // esbuild can drop the rest of `some-lib` from the deferred
+          // chunk. See defer-dependency-rewriter.ts for the details and
+          // what's still missing.
+          //
+          // We do this right here, before the cache write below, so that
+          // on the next incremental build, a cache hit already has the
+          // rewritten code and doesn't need to redo any of this work.
+          //
+          // Known gap: we don't merge our source map with the one
+          // `javascriptTransformer.transformData` creates right below.
+          // That's fine for a proof of concept - we're only swapping out a
+          // string here, nothing actually moves around - but it would need
+          // fixing before this could really be merged.
+          const rewritten = rewriteDeferDependencyImports(contents, request, (specifier) =>
+            isEsmPackage(specifier, path.dirname(request)),
+          );
+          if (rewritten) {
+            contents = rewritten.code;
+          }
+
           const sideEffects = await hasSideEffects(request);
           const instrumentForCoverage = pluginOptions.instrumentForCoverage?.(request);
           contents = await javascriptTransformer.transformData(

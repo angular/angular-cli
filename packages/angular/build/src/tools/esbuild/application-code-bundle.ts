@@ -22,6 +22,7 @@ import {
 import { AngularCompilationContext } from './angular/compilation-state';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
+import { createDeferDependencyPlugin } from './angular/defer-dependency-plugin';
 import { SourceFileCache } from './angular/source-file-cache';
 import { createAngularLocalizeInitWarningPlugin } from './angular-localize-init-warning-plugin';
 import { BundlerOptionsFactory } from './bundler-context';
@@ -90,6 +91,9 @@ export function createBrowserCodeBundleOptions(
         // Component stylesheet bundler
         stylesheetBundler,
       ),
+      // PoC, see defer-dependency-plugin.ts. Only added here, to the main
+      // browser bundle - not to the server/SSR bundle further down.
+      createDeferDependencyPlugin(),
     );
 
     if (options.plugins) {
