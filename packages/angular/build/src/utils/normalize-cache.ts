@@ -21,6 +21,18 @@ export interface NormalizedCachedOptions {
 
   /** Disk cache base path. Example: `/.angular/cache`. */
   basePath: string;
+
+  /**
+   * Workspace-local disk cache path. Example: `/.angular/cache/v12.0.0`.
+   * Always resolves relative to the current workspace root, even within a Git worktree.
+   */
+  localPath?: string;
+
+  /**
+   * Workspace-local disk cache base path. Example: `/.angular/cache`.
+   * Always resolves relative to the current workspace root, even within a Git worktree.
+   */
+  localBasePath?: string;
 }
 
 interface CacheMetadata {
@@ -82,7 +94,7 @@ function getCacheBasePath(workspaceRoot: string, cachePathSetting: string): stri
 
 export function normalizeCacheOptions(
   projectMetadata: unknown,
-  worspaceRoot: string,
+  workspaceRoot: string,
 ): NormalizedCachedOptions {
   const cacheMetadata = hasCacheMetadata(projectMetadata) ? projectMetadata.cli.cache : {};
 
@@ -106,11 +118,14 @@ export function normalizeCacheOptions(
     }
   }
 
-  const cacheBasePath = getCacheBasePath(worspaceRoot, path);
+  const cacheBasePath = getCacheBasePath(workspaceRoot, path);
+  const localCacheBasePath = isAbsolute(path) ? path : resolve(workspaceRoot, path);
 
   return {
     enabled: cacheEnabled,
     basePath: cacheBasePath,
     path: join(cacheBasePath, VERSION),
+    localBasePath: localCacheBasePath,
+    localPath: join(localCacheBasePath, VERSION),
   };
 }

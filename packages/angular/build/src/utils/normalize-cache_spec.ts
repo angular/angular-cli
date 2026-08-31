@@ -29,6 +29,8 @@ describe('normalizeCacheOptions', () => {
     const options = normalizeCacheOptions({}, workspaceRoot);
 
     expect(options.basePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localBasePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(resolve(workspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
   });
 
   it('should resolve cache path relative to main repository root in a git worktree', async () => {
@@ -51,6 +53,58 @@ describe('normalizeCacheOptions', () => {
     const options = normalizeCacheOptions({}, worktreeRoot);
 
     expect(options.basePath).toBe(resolve(mainRepoRoot, '.angular/cache'));
+    expect(options.path).toBe(resolve(mainRepoRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
+    expect(options.localBasePath).toBe(resolve(worktreeRoot, '.angular/cache'));
+    expect(options.localPath).toBe(resolve(worktreeRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
+  });
+
+  it('should resolve local cache path relative to worktree root with custom relative path', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+
+    await mkdir(mainGitDir, { recursive: true });
+
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions(
+      { cli: { cache: { path: 'custom-cache' } } },
+      worktreeRoot,
+    );
+
+    expect(options.basePath).toBe(resolve(mainRepoRoot, 'custom-cache'));
+    expect(options.path).toBe(resolve(mainRepoRoot, 'custom-cache', '0.0.0-PLACEHOLDER'));
+    expect(options.localBasePath).toBe(resolve(worktreeRoot, 'custom-cache'));
+    expect(options.localPath).toBe(resolve(worktreeRoot, 'custom-cache', '0.0.0-PLACEHOLDER'));
+  });
+
+  it('should preserve absolute cache path for both shared and local paths', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+    const absoluteCachePath = join(tempDir, 'absolute-cache');
+
+    await mkdir(mainGitDir, { recursive: true });
+
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions(
+      { cli: { cache: { path: absoluteCachePath } } },
+      worktreeRoot,
+    );
+
+    expect(options.basePath).toBe(absoluteCachePath);
+    expect(options.path).toBe(resolve(absoluteCachePath, '0.0.0-PLACEHOLDER'));
+    expect(options.localBasePath).toBe(absoluteCachePath);
+    expect(options.localPath).toBe(resolve(absoluteCachePath, '0.0.0-PLACEHOLDER'));
   });
 
   it('should resolve cache path relative to workspace root in a git submodule', async () => {
@@ -69,6 +123,8 @@ describe('normalizeCacheOptions', () => {
     const options = normalizeCacheOptions({}, submoduleRoot);
 
     expect(options.basePath).toBe(resolve(submoduleRoot, '.angular/cache'));
+    expect(options.localBasePath).toBe(resolve(submoduleRoot, '.angular/cache'));
+    expect(options.localPath).toBe(resolve(submoduleRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
   });
 
   it('should resolve cache path relative to workspace root when there is no git repository', async () => {
@@ -78,5 +134,7 @@ describe('normalizeCacheOptions', () => {
     const options = normalizeCacheOptions({}, workspaceRoot);
 
     expect(options.basePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localBasePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(resolve(workspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
   });
 });
