@@ -186,15 +186,9 @@ export class I18nInliner {
     private readonly options: I18nInlinerOptions,
     maxThreads?: number,
   ) {
-    const { missingTranslation } = options;
-
     this.#workerPool = new WorkerPool({
       filename: require.resolve('./i18n-inliner-worker'),
       maxThreads,
-      // Extract options to ensure only the named options are serialized and sent to the worker
-      workerData: {
-        missingTranslation,
-      },
     });
   }
 
@@ -514,6 +508,7 @@ export class I18nInliner {
             code: codeBlob,
             map: mapBlob,
             locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
+            missingTranslation: this.options.missingTranslation,
             ephemeral,
             activeLocales,
             generation,
@@ -613,6 +608,7 @@ export class I18nInliner {
       code: templateCode,
       filename: templateId,
       locale,
+      missingTranslation: this.options.missingTranslation,
       translation: await serializeTranslation(
         translation,
         translationIntegrity,

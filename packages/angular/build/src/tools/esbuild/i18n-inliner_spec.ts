@@ -144,6 +144,31 @@ describe('I18nInliner', () => {
     expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
   });
 
+  it('errors and retains the original message when missingTranslation is "error"', async () => {
+    const { outputFiles, errors, warnings } = await createInliner({
+      missingTranslation: 'error',
+    }).inlineForLocale([browserFile('main.js', GREETING_SOURCE)], 'fr', {
+      unrelated: translationFor('Sans rapport'),
+    });
+
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toContain('greeting');
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
+  });
+
+  it('ignores missing translations when missingTranslation is "ignore"', async () => {
+    const { outputFiles, errors, warnings } = await createInliner({
+      missingTranslation: 'ignore',
+    }).inlineForLocale([browserFile('main.js', GREETING_SOURCE)], 'fr', {
+      unrelated: translationFor('Sans rapport'),
+    });
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
+  });
+
   it('replaces the locale placeholder with the locale being inlined', async () => {
     // The placeholder is only inlined for files that use `$localize`, which is where the build
     // inserts it, so the message is present alongside it here.
