@@ -219,7 +219,7 @@ export class ComponentStylesheetBundler {
       const filename = secondSemi !== -1 ? entry.slice(secondSemi + 1) : '';
       if (filename && normalizedFiles.has(path.normalize(filename))) {
         this.#inlineContexts.delete(entry);
-        void bundler.dispose();
+        void bundler.dispose().catch(() => {});
       } else {
         bundler.invalidate(normalizedFiles);
       }
@@ -229,8 +229,11 @@ export class ComponentStylesheetBundler {
   }
 
   collectReferencedFiles(): string[] {
-    const files = [];
+    const files: string[] = [];
     for (const context of this.#fileContexts.values()) {
+      files.push(...context.watchFiles);
+    }
+    for (const context of this.#inlineContexts.values()) {
       files.push(...context.watchFiles);
     }
 

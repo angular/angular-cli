@@ -16,8 +16,8 @@ const NOT_FOUND = Symbol('NOT_FOUND');
 
 /**
  * Compares a target key's UTF-8 byte array against a byte sequence in the string pool.
- * Lexicographical byte comparison of UTF-8 sequences matches UTF-16 code-unit string comparison
- * used when encoding the sorted index table.
+ * Lexicographical byte comparison matches the binary sort order used when encoding
+ * the index table in `encodeTranslationToBuffer`.
  */
 function compareBytes(
   target: Uint8Array,
@@ -25,7 +25,7 @@ function compareBytes(
   poolOffset: number,
   keyLen: number,
 ): number {
-  if (poolOffset < 0 || poolOffset + keyLen > pool.length) {
+  if (poolOffset + keyLen > pool.length) {
     return 1;
   }
 
@@ -108,7 +108,7 @@ export class SharedTranslationDictionary<T = ɵParsedTranslation> {
       if (cmp === 0) {
         const valOffset = this.uint32Index[idx + 2];
         const valLen = this.uint32Index[idx + 3];
-        if (valOffset < 0 || valOffset + valLen > this.uint8Pool.length) {
+        if (valOffset + valLen > this.uint8Pool.length) {
           this.lazyCache.set(targetKey, NOT_FOUND);
 
           return undefined;

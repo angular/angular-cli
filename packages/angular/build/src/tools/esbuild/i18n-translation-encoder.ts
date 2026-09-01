@@ -39,7 +39,7 @@ export function encodeTranslationToBuffer<T = ɵParsedTranslation>(
   for (let i = 0; i < entryCount; i++) {
     const [key, val] = entries[i];
     const keyBytes = encoder.encode(key);
-    const valBytes = encoder.encode(JSON.stringify(val));
+    const valBytes = encoder.encode(JSON.stringify(val ?? null));
 
     encodedEntries[i] = { keyBytes, valBytes };
     stringPoolByteSize += keyBytes.byteLength + valBytes.byteLength;

@@ -80,6 +80,7 @@ export class BundlerContext {
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
   #shouldCacheResult: boolean;
   #loadCache?: LoadResultCache;
+  #invalidationEpoch = 0;
   readonly watchFiles = new Set<string>();
 
   constructor(
@@ -128,8 +129,8 @@ export class BundlerContext {
     const externalImportsBrowser = new Set<string>();
     const externalImportsServer = new Set<string>();
 
-    const outputFiles = [];
-    let externalConfiguration;
+    const outputFiles: BuildOutputFile[] = [];
+    let externalConfiguration: Set<string> | undefined;
     for (const result of results) {
       warnings.push(...result.warnings);
       if (result.errors) {
@@ -202,6 +203,7 @@ export class BundlerContext {
       return this.#activeBundlePromise;
     }
 
+    const bundleEpoch = this.#invalidationEpoch;
     const bundlePromise = this.#performBundle().finally(() => {
       if (this.#activeBundlePromise === bundlePromise) {
         this.#activeBundlePromise = undefined;
@@ -210,7 +212,7 @@ export class BundlerContext {
     this.#activeBundlePromise = bundlePromise;
 
     const result = await bundlePromise;
-    if (this.#shouldCacheResult) {
+    if (this.#shouldCacheResult && bundleEpoch === this.#invalidationEpoch) {
       this.#esbuildResult = result;
     }
 
@@ -286,9 +288,10 @@ export class BundlerContext {
         }
 
         if (this.#loadCache) {
-          const cachedLoad = await (this.#loadCache.get(input) ??
-            this.#loadCache.get(input.replace(';', ':')) ??
-            this.#loadCache.get('file:' + normalizedAbsoluteInput));
+          const cachedLoad =
+            (await this.#loadCache.get(input)) ??
+            (await this.#loadCache.get(input.replace(';', ':'))) ??
+            (await this.#loadCache.get('file:' + normalizedAbsoluteInput));
           if (cachedLoad?.watchFiles) {
             for (const file of cachedLoad.watchFiles) {
               if (!isInternalAngularFile(file)) {
@@ -551,6 +554,7 @@ export class BundlerContext {
     }
 
     if (invalid) {
+      this.#invalidationEpoch++;
       this.#esbuildResult = undefined;
     }
 
@@ -582,7 +586,7 @@ function isInternalAngularFile(file: string) {
 
 function isInternalBundlerFile(file: string) {
   // Bundler virtual files such as "<define:???>" or "<runtime>"
-  if (file[0] === '<' && file.at(-1) === '>') {
+  if (file.startsWith('<') && file.endsWith('>')) {
     return true;
   }
 

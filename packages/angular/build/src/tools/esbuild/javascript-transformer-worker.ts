@@ -20,14 +20,22 @@ import {
   removeSourceMappingURL,
 } from '../../utils/source-map';
 import { transform as transformWithOxc } from '../oxc/oxc-transform.js';
-import type { JavaScriptTransformerOptions } from './javascript-transformer';
+import {
+  JavaScriptTransformFlags,
+  type JavaScriptTransformerOptions,
+} from './javascript-transformer';
 
-interface JavaScriptTransformRequest {
+export interface JavaScriptTransformRequest {
   filename: string;
   data: string | Uint8Array;
+  flags?: JavaScriptTransformFlags | number;
   skipLinker?: boolean;
   sideEffects?: boolean;
   instrumentForCoverage?: boolean;
+  sourcemap?: boolean;
+  thirdPartySourcemaps?: boolean;
+  advancedOptimizations?: boolean;
+  jit?: boolean;
 }
 
 interface TransformOptions extends Omit<JavaScriptTransformRequest, 'filename' | 'data'> {
@@ -44,6 +52,10 @@ const {
 
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
+
+function maybeMove<T>(value: T): T {
+  return process.versions.pnp ? value : (Piscina.move(value as never) as T);
+}
 
 async function instrumentCoverage(
   filename: string,
@@ -92,17 +104,47 @@ async function instrumentCoverage(
 export default async function transformJavaScript(
   request: JavaScriptTransformRequest,
 ): Promise<unknown> {
-  const { filename, data, ...options } = request;
+  const { filename, data, flags } = request;
+
+  let reqSourcemap: boolean;
+  let reqThirdPartySourcemaps: boolean;
+  let reqAdvancedOptimizations: boolean;
+  let reqJit: boolean;
+  let reqSkipLinker: boolean;
+  let reqInstrumentForCoverage: boolean;
+  let reqSideEffects: boolean | undefined;
+
+  if (flags !== undefined) {
+    reqSourcemap = (flags & JavaScriptTransformFlags.Sourcemap) !== 0;
+    reqThirdPartySourcemaps = (flags & JavaScriptTransformFlags.ThirdPartySourcemaps) !== 0;
+    reqAdvancedOptimizations = (flags & JavaScriptTransformFlags.AdvancedOptimizations) !== 0;
+    reqJit = (flags & JavaScriptTransformFlags.Jit) !== 0;
+    reqSkipLinker = (flags & JavaScriptTransformFlags.SkipLinker) !== 0;
+    reqInstrumentForCoverage = (flags & JavaScriptTransformFlags.InstrumentForCoverage) !== 0;
+    reqSideEffects =
+      (flags & JavaScriptTransformFlags.SideEffectsSet) !== 0
+        ? (flags & JavaScriptTransformFlags.SideEffectsValue) !== 0
+        : undefined;
+  } else {
+    reqSourcemap = request.sourcemap ?? sourcemap;
+    reqThirdPartySourcemaps = request.thirdPartySourcemaps ?? thirdPartySourcemaps;
+    reqAdvancedOptimizations = request.advancedOptimizations ?? advancedOptimizations;
+    reqJit = request.jit ?? jit;
+    reqSkipLinker = request.skipLinker ?? false;
+    reqInstrumentForCoverage = request.instrumentForCoverage ?? false;
+    reqSideEffects = request.sideEffects;
+  }
 
   const useInputSourcemap =
-    sourcemap && (!!thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+    reqSourcemap && (!!reqThirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   let textData: string;
   let inputSourceMap: EncodedSourceMap | undefined;
   let isAlreadyStripped = false;
+  let trailing: ReturnType<typeof findTrailingSourceMapComment> = null;
 
   if (typeof data !== 'string') {
-    const trailing = findTrailingSourceMapComment(data);
+    trailing = findTrailingSourceMapComment(data);
     if (trailing === null) {
       // 0 comments: fast path, no sourcemap to load or strip
       textData = textDecoder.decode(data);
@@ -136,18 +178,25 @@ export default async function transformJavaScript(
   }
 
   const transformedData = await transformJavaScriptImpl(filename, textData, {
-    ...options,
+    skipLinker: reqSkipLinker,
+    sideEffects: reqSideEffects,
+    instrumentForCoverage: reqInstrumentForCoverage,
+    sourcemap: reqSourcemap,
+    thirdPartySourcemaps: reqThirdPartySourcemaps,
+    advancedOptimizations: reqAdvancedOptimizations,
+    jit: reqJit,
     inputSourceMap,
     isAlreadyStripped,
   });
 
-  // If no transformations modified the code, return the original untouched data buffer via `move`.
-  // This preserves any original trailing sourcemap comment and avoids re-encoding.
-  if (transformedData === textData && typeof data !== 'string') {
-    return Piscina.move(data);
+  // If no transformations modified the code, return the original untouched data buffer via `move`
+  // only if no sourcemap comment needed to be stripped (i.e. comment was absent or sourcemaps are preserved).
+  const canReturnOriginal = trailing === null || useInputSourcemap;
+  if (transformedData === textData && typeof data !== 'string' && canReturnOriginal) {
+    return maybeMove(data);
   }
 
-  return Piscina.move(textEncoder.encode(transformedData));
+  return maybeMove(textEncoder.encode(transformedData));
 }
 
 async function transformJavaScriptImpl(
@@ -156,8 +205,13 @@ async function transformJavaScriptImpl(
   options: TransformOptions,
 ): Promise<string> {
   const shouldLink = !options.skipLinker;
+  const optSourcemap = !!options.sourcemap;
+  const optThirdPartySourcemaps = !!options.thirdPartySourcemaps;
+  const optAdvancedOptimizations = !!options.advancedOptimizations;
+  const optJit = !!options.jit;
+
   const useInputSourcemap =
-    sourcemap && (!!thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
+    optSourcemap && (!!optThirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
 
   let code = data;
   const maps: (DecodedSourceMap | EncodedSourceMap)[] = [];
@@ -191,7 +245,7 @@ async function transformJavaScriptImpl(
             relative: (_from: string, to: string) => to,
           } as never,
           logger: new ConsoleLogger(LogLevel.info),
-          linkerJitMode: jit,
+          linkerJitMode: optJit,
           // This is a workaround until https://github.com/angular/angular/issues/42769 is fixed.
           sourceMapping: false,
         }) as PluginItem,
@@ -206,7 +260,7 @@ async function transformJavaScriptImpl(
 
   // Run Oxc linking and/or advanced optimizations in a single unified AST traversal pass
   const oxcLink = shouldLink && !useBabelLinker;
-  if (oxcLink || advancedOptimizations) {
+  if (oxcLink || optAdvancedOptimizations) {
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
@@ -214,8 +268,8 @@ async function transformJavaScriptImpl(
 
     const result = transformWithOxc(filename, code, {
       link: oxcLink,
-      jit,
-      advancedOptimizations,
+      jit: optJit,
+      advancedOptimizations: optAdvancedOptimizations,
       sourcemap: useInputSourcemap,
       sideEffects: options.sideEffects,
       topLevelSafeMode,

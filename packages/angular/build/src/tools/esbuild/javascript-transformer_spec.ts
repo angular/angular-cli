@@ -374,4 +374,36 @@ describe('JavaScriptTransformer sourcemaps', () => {
 
     expect(text).not.toContain('i0.ɵɵngDeclareDirective');
   });
+
+  it('should strip sourcemaps from Uint8Array when worker runs with sourcemap: false', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+        advancedOptimizations: true,
+      },
+      1,
+    );
+
+    const inputBuffer = Buffer.from('var a = 1;\n//# sourceMappingURL=foo.js.map', 'utf-8');
+    const result = await transformer.transformData('src/app/foo.js', inputBuffer, true);
+    const text = Buffer.from(result).toString('utf-8');
+
+    expect(text).toBe('var a = 1;\n');
+    expect(text).not.toContain('sourceMappingURL');
+  });
+
+  it('should reject tasks after transformer is closed', async () => {
+    transformer = new JavaScriptTransformer(
+      {
+        sourcemap: false,
+      },
+      1,
+    );
+
+    await transformer.close();
+
+    await expectAsync(
+      transformer.transformData('src/app/foo.js', 'console.log(1);', true),
+    ).toBeRejectedWithError('JavaScriptTransformer closed.');
+  });
 });
