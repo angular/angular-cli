@@ -38,12 +38,12 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const inputMap = {
       version: 3,
       sources: ['src/app.ts'],
-      sourcesContent: ['const x = new SomeClass();'],
+      sourcesContent: ['export class MyClass { static ɵprov = 42; }'],
       mappings: 'AAAA',
       names: [],
     };
     const base64Map = Buffer.from(JSON.stringify(inputMap)).toString('base64');
-    const input = `var x = new SomeClass();\n//# sourceMappingURL=data:application/json;base64,${base64Map}`;
+    const input = `export class MyClass { static ɵprov = 42; }\n//# sourceMappingURL=data:application/json;base64,${base64Map}`;
 
     const result = await transformer.transformData('src/app.js', input, true);
     const text = Buffer.from(result).toString('utf-8');
@@ -157,7 +157,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
       1,
     );
 
-    const input = 'var x = new SomeClass();';
+    const input = 'export class MyClass { static ɵprov = 42; }';
     const result = await transformer.transformData('src/app.js', input, true);
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
@@ -249,7 +249,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
       1,
     );
 
-    const inputBuffer = Buffer.from('var x = new SomeClass();', 'utf-8');
+    const inputBuffer = Buffer.from('export class MyClass { static ɵprov = 42; }', 'utf-8');
     const result = await transformer.transformData('src/app.js', inputBuffer, true);
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
@@ -373,5 +373,144 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const text = Buffer.from(result).toString('utf-8');
 
     expect(text).not.toContain('i0.ɵɵngDeclareDirective');
+  });
+
+  describe('advanced optimizations fast-path pre-filter', () => {
+    it('should bypass worker and return input buffer directly when no candidate tokens are present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputBuffer = Buffer.from(
+        'function add(a, b) { return a + b; }\nconst result = add(1, 2);',
+        'utf-8',
+      );
+      const result = await transformer.transformData('src/math.js', inputBuffer, true);
+
+      expect(result).toBe(inputBuffer);
+    });
+
+    it('should bypass worker for standard classes without static properties', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputBuffer = Buffer.from(
+        `export class UserService {
+          constructor(http) { this.http = http; }
+          getUser(id) { return this.http.get('/users/' + id); }
+        }`,
+        'utf-8',
+      );
+      const result = await transformer.transformData('src/user.service.js', inputBuffer, true);
+
+      expect(result).toBe(inputBuffer);
+    });
+
+    it('should bypass worker for default exports without static properties or Angular metadata', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputBuffer = Buffer.from(
+        `export default class UserService {
+          constructor(http) { this.http = http; }
+          getUser(id) { return this.http.get('/users/' + id); }
+        }`,
+        'utf-8',
+      );
+      const result = await transformer.transformData('src/user.service.js', inputBuffer, true);
+
+      expect(result).toBe(inputBuffer);
+    });
+
+    it('should bypass worker for classes with static members when no Angular metadata is present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputBuffer = Buffer.from('export class MyComponent { static prop = 42; }', 'utf-8');
+      const result = await transformer.transformData('src/component.js', inputBuffer, true);
+
+      expect(result).toBe(inputBuffer);
+    });
+
+    it('should dispatch to worker when Angular tokens are present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const input = 'export class MyService { static ɵprov = true; }';
+      const result = await transformer.transformData('src/service.js', input, true);
+      const text = Buffer.from(result).toString('utf-8');
+
+      expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
+    });
+
+    it('should dispatch to worker when decorator tokens are present and sideEffects is false', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputBuffer = Buffer.from('const MyClass = __decorate([], class {});', 'utf-8');
+      const result = await transformer.transformData('src/class.js', inputBuffer, true, false);
+
+      expect(result).not.toBe(inputBuffer);
+    });
+
+    it('should bypass worker and return converted buffer when no candidate tokens are present in string input', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputString = 'function multiply(a, b) { return a * b; }';
+      const result = await transformer.transformData('src/math.js', inputString, true);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe(inputString);
+    });
+
+    it('should dispatch to worker when candidate tokens are present in string input', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      const inputString = 'export class MyService { static ɵprov = true; }';
+      const result = await transformer.transformData('src/service.js', inputString, true);
+      const text = Buffer.from(result).toString('utf-8');
+
+      expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
+    });
   });
 });

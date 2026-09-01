@@ -16,6 +16,76 @@ import { Cache } from './cache';
 const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
 const LINKER_DECLARATION_PREFIX_BYTES = Buffer.from(LINKER_DECLARATION_PREFIX, 'utf-8');
 
+const ADVANCED_OPTIMIZATION_TOKENS = [
+  'ɵ',
+  'InjectionToken',
+  'INJECTOR_KEY',
+  'ctorParameters',
+  'decorators',
+  'propDecorators',
+] as const;
+
+const ADVANCED_OPTIMIZATION_TOKEN_BYTES = ADVANCED_OPTIMIZATION_TOKENS.map((token) =>
+  Buffer.from(token, 'utf-8'),
+);
+
+const DECORATOR_TOKENS = ['__decorate', '__esDecorate'] as const;
+const DECORATOR_TOKEN_BYTES = DECORATOR_TOKENS.map((token) => Buffer.from(token, 'utf-8'));
+
+const ADVANCED_OPTIMIZATION_REGEX = new RegExp(ADVANCED_OPTIMIZATION_TOKENS.join('|'));
+const ADVANCED_OPTIMIZATION_WITH_DECORATORS_REGEX = new RegExp(
+  [...ADVANCED_OPTIMIZATION_TOKENS, ...DECORATOR_TOKENS].join('|'),
+);
+
+/**
+ * Determines whether JavaScript code contains potential candidate constructs for advanced optimizations.
+ * When false, advanced optimizations can be bypassed without worker dispatch or AST parsing.
+ *
+ * @param filename The full path to the file.
+ * @param data The data (string or Buffer) of the file.
+ * @param sideEffects If false, indicates the file is considered side-effect free.
+ * @returns True if the code may contain constructs that advanced optimizations can mutate.
+ */
+function hasAdvancedOptimizationCandidates(
+  filename: string,
+  data: string | Uint8Array,
+  sideEffects?: boolean,
+): boolean {
+  // Side-effect-free @angular/ packages undergo top-level pure function annotations
+  if (sideEffects === false && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename)) {
+    return true;
+  }
+
+  if (typeof data === 'string') {
+    const regex =
+      sideEffects === false
+        ? ADVANCED_OPTIMIZATION_WITH_DECORATORS_REGEX
+        : ADVANCED_OPTIMIZATION_REGEX;
+
+    return regex.test(data);
+  }
+
+  const dataBuffer = Buffer.isBuffer(data)
+    ? data
+    : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
+
+  for (const tokenBytes of ADVANCED_OPTIMIZATION_TOKEN_BYTES) {
+    if (dataBuffer.includes(tokenBytes)) {
+      return true;
+    }
+  }
+
+  if (sideEffects === false) {
+    for (const tokenBytes of DECORATOR_TOKEN_BYTES) {
+      if (dataBuffer.includes(tokenBytes)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 /**
  * Determines whether JavaScript code requires Angular linker processing.
  *
@@ -220,10 +290,13 @@ export class JavaScriptTransformer {
     instrumentForCoverage?: boolean,
   ): Promise<Uint8Array> {
     const shouldLink = !skipLinker && requiresLinking(filename, data);
+    const shouldOptimize =
+      this.#commonOptions.advancedOptimizations &&
+      hasAdvancedOptimizationCandidates(filename, data, sideEffects);
 
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
-    if (!shouldLink && !this.#commonOptions.advancedOptimizations && !instrumentForCoverage) {
+    if (!shouldLink && !shouldOptimize && !instrumentForCoverage) {
       const keepSourcemap =
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
