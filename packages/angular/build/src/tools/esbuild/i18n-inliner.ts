@@ -14,7 +14,24 @@ import { calculateHash, createContentHash, initializeHash } from '../../utils/ha
 import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { type Cache, type PersistentCacheStore, createPersistentCacheStore } from './cache';
+import type {
+  InlineCodeRequest,
+  InlineCodeResult,
+  InlineFileBatchRequest,
+  InlineFileBatchResult,
+} from './i18n-inliner-worker';
 import { encodeTranslationToBuffer } from './i18n-translation-encoder';
+
+interface WorkerTaskMap {
+  inlineFileBatch: {
+    request: InlineFileBatchRequest;
+    result: InlineFileBatchResult;
+  };
+  inlineCode: {
+    request: InlineCodeRequest;
+    result: InlineCodeResult;
+  };
+}
 
 /**
  * A keyword used to indicate if a JavaScript file may require inlining of translations.
@@ -492,28 +509,15 @@ export class I18nInliner {
       for (let i = 0; i < entries.length; i += localesPerBatch) {
         const batchEntries = entries.slice(i, i + localesPerBatch);
         const task = (async () => {
-          const batchResult = (await this.#workerPool.run(
-            {
-              filename,
-              code: codeBlob,
-              map: mapBlob,
-              locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
-              ephemeral,
-              activeLocales,
-              generation,
-            },
-            { name: 'inlineFileBatch' },
-          )) as
-            | {
-                file: string;
-                unmodified: true;
-                messages: { type: 'error' | 'warning'; message: string }[];
-              }
-            | {
-                file: string;
-                unmodified?: false;
-                results: Array<TransformedFileResult & { locale: string }>;
-              };
+          const batchResult = await this.#runWorkerTask('inlineFileBatch', {
+            filename,
+            code: codeBlob,
+            map: mapBlob,
+            locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
+            ephemeral,
+            activeLocales,
+            generation,
+          });
 
           if (batchResult.unmodified) {
             const unmodifiedResult: TransformedFileResult = {
@@ -535,19 +539,18 @@ export class I18nInliner {
             for (const res of batchResult.results) {
               const matchingEntry = batchEntries.find((e) => e.locale === res.locale);
               const cacheKey = matchingEntry?.cacheKey;
+              const fileResult: TransformedFileResult = {
+                file: filename,
+                code: res.code,
+                map: res.map,
+                messages: res.messages,
+              };
 
               if (this.#transformedFileCache && cacheKey) {
-                cachePromises.push(
-                  this.#transformedFileCache.put(cacheKey, {
-                    file: filename,
-                    code: res.code,
-                    map: res.map,
-                    messages: res.messages,
-                  }),
-                );
+                cachePromises.push(this.#transformedFileCache.put(cacheKey, fileResult));
               }
 
-              fileResultsByLocale.get(res.locale)?.set(filename, res);
+              fileResultsByLocale.get(res.locale)?.set(filename, fileResult);
             }
             await Promise.allSettled(cachePromises);
           }
@@ -558,6 +561,13 @@ export class I18nInliner {
     }
 
     await Promise.all(workerTasks);
+  }
+
+  #runWorkerTask<T extends keyof WorkerTaskMap>(
+    name: T,
+    request: WorkerTaskMap[T]['request'],
+  ): Promise<WorkerTaskMap[T]['result']> {
+    return this.#workerPool.run(request, { name }) as Promise<WorkerTaskMap[T]['result']>;
   }
 
   /**
@@ -599,19 +609,16 @@ export class I18nInliner {
       };
     }
 
-    const { output, messages } = await this.#workerPool.run(
-      {
-        code: templateCode,
-        filename: templateId,
-        locale,
-        translation: await serializeTranslation(
-          translation,
-          translationIntegrity,
-          this.#translationCache,
-        ),
-      },
-      { name: 'inlineCode' },
-    );
+    const { output, messages } = await this.#runWorkerTask('inlineCode', {
+      code: templateCode,
+      filename: templateId,
+      locale,
+      translation: await serializeTranslation(
+        translation,
+        translationIntegrity,
+        this.#translationCache,
+      ),
+    });
 
     const errors: string[] = [];
     const warnings: string[] = [];

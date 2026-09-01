@@ -21,7 +21,7 @@ import { createSharedTranslationProxy } from './i18n-translation-reader';
 /**
  * The options passed to the inliner for each code request
  */
-interface InlineCodeRequest {
+export interface InlineCodeRequest {
   /**
    * The code that should be processed.
    */
@@ -46,9 +46,17 @@ interface InlineCodeRequest {
 }
 
 /**
+ * The response returned from a code request.
+ */
+export interface InlineCodeResult {
+  output: string;
+  messages: { type: 'error' | 'warning'; message: string }[];
+}
+
+/**
  * The options passed to the inliner for a batch file request
  */
-interface InlineFileBatchRequest {
+export interface InlineFileBatchRequest {
   /**
    * The filename that should be processed.
    */
@@ -91,7 +99,7 @@ interface InlineFileBatchRequest {
 /**
  * The result for a single locale within a batch file request.
  */
-interface InlineLocaleResult {
+export interface InlineLocaleResult {
   locale: string;
   code?: string;
   map?: string;
@@ -101,7 +109,7 @@ interface InlineLocaleResult {
 /**
  * The response returned from a batch file request.
  */
-type InlineFileBatchResult =
+export type InlineFileBatchResult =
   | {
       file: string;
       unmodified: true;
@@ -292,7 +300,7 @@ export async function inlineFileBatch(
  * @param request An InlineRequest object representing the options for inlining
  * @returns An object containing the inlined code.
  */
-export async function inlineCode(request: InlineCodeRequest) {
+export async function inlineCode(request: InlineCodeRequest): Promise<InlineCodeResult> {
   const metadata = extractLocalizeMetadata(request.filename, request.code);
   const result = await inlineLocalize(
     request.code,
