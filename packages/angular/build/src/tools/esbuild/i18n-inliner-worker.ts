@@ -12,7 +12,6 @@ import type { Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
 import assert from 'node:assert';
 import { deserialize } from 'node:v8';
-import { workerData } from 'node:worker_threads';
 import { parseSync } from 'oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
 import { loadLocaleData } from './i18n-locale-plugin';
@@ -43,6 +42,11 @@ export interface InlineCodeRequest {
    * the Worker by reference instead of being copied into it for every request.
    */
   translation?: Blob | SharedArrayBuffer;
+
+  /**
+   * How to handle missing translations.
+   */
+  missingTranslation?: 'error' | 'warning' | 'ignore';
 }
 
 /**
@@ -76,6 +80,11 @@ export interface InlineFileBatchRequest {
    * The locale specifiers and optional translations to use during the inlining process of the file.
    */
   locales: ReadonlyMap<string, Blob | SharedArrayBuffer | undefined>;
+
+  /**
+   * How to handle missing translations.
+   */
+  missingTranslation?: 'error' | 'warning' | 'ignore';
 
   /**
    * Whether the file data should be treated as ephemeral and not cached long-term in the Worker.
@@ -120,11 +129,6 @@ export type InlineFileBatchResult =
       unmodified?: false;
       results: InlineLocaleResult[];
     };
-
-// Extract common options used for inline requests from the Worker context
-const { missingTranslation } = (workerData || {}) as {
-  missingTranslation: 'error' | 'warning' | 'ignore';
-};
 
 /**
  * Cached file data including code and extracted localization metadata.
@@ -276,6 +280,7 @@ export async function inlineFileBatch(
         locale,
         await loadTranslation(locale, translation),
         request.filename,
+        request.missingTranslation,
       );
 
       return {
@@ -309,6 +314,7 @@ export async function inlineCode(request: InlineCodeRequest): Promise<InlineCode
     request.locale,
     await loadTranslation(request.locale, request.translation),
     request.filename,
+    request.missingTranslation,
   );
 
   return {
@@ -448,6 +454,7 @@ function escapeTemplatePart(part: string): string {
  * @param locale The target locale identifier.
  * @param translation The translation messages dictionary, or undefined for untranslated locale.
  * @param filename The name of the file being transformed.
+ * @param missingTranslation How to handle missing translations.
  * @returns The transformed code, optional remapped source map, and diagnostics.
  */
 async function inlineLocalize(
@@ -457,6 +464,7 @@ async function inlineLocalize(
   locale: string,
   translation: Record<string, ɵParsedTranslation> | undefined,
   filename: string,
+  missingTranslation: 'error' | 'warning' | 'ignore' = 'warning',
 ) {
   const magicString = new MagicString(code);
   const { Diagnostics, translate } = await loadLocalizeTools();
