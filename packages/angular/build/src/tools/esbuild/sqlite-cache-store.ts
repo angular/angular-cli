@@ -46,6 +46,9 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       this.#db.exec(
         'CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value BLOB, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
       );
+      this.#db.exec(
+        'CREATE INDEX IF NOT EXISTS idx_cache_accessed ON cache (last_accessed DESC, key DESC);',
+      );
 
       this.#getStmt = this.#db.prepare('SELECT value FROM cache WHERE key = ?');
       this.#hasStmt = this.#db.prepare('SELECT 1 FROM cache WHERE key = ?');
