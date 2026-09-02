@@ -35,7 +35,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/browser/index.html')
         .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+          `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
         );
       harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
@@ -53,7 +53,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/browser/index.html')
         .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+          `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
         );
       harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
@@ -71,7 +71,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/browser/index.html')
         .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+          `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
         );
       harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });
@@ -130,7 +130,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness
         .expectFile('dist/browser/index.html')
         .content.toContain(
-          `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+          `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
         );
       harness.expectFile('dist/browser/index.html').content.toContain(`body{color:#000}`);
     });

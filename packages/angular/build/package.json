@@ -24,7 +24,7 @@
     "@inquirer/confirm": "6.2.0",
     "@parcel/watcher": "2.6.0",
     "@vitejs/plugin-basic-ssl": "2.3.0",
-    "beasties": "0.4.3",
+    "beasties": "0.5.1",
     "browserslist": "^4.26.0",
     "chokidar": "5.0.0",
     "esbuild": "0.28.2",

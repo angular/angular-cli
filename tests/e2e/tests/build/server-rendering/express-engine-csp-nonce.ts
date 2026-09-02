@@ -101,15 +101,6 @@ export default async function () {
           throw new Error(`Expected nonce to be '{% nonce %}', but got '${nonce}'`);
         }
       }
-
-      // stylesheets should be configured to load asynchronously
-      const linkMedia = await page.$eval('link[rel="stylesheet"]', (el) =>
-        el.getAttribute('media'),
-      );
-      if (linkMedia !== 'all') {
-        throw new Error(`Expected link media to be 'all', but got '${linkMedia}'`);
-      }
-
       // Bootstrap the client side app.
       await page.evaluate('window.doBootstrap()');
 

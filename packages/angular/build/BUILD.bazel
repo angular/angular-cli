@@ -159,6 +159,7 @@ ts_project(
 jasmine_test(
     name = "test",
     data = [":unit_test_lib"],
+    shard_count = 4,
 )
 
 ts_project(

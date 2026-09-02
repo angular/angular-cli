@@ -13,6 +13,7 @@ import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { workerData } from 'node:worker_threads';
+import { InlineCriticalCssProcessor } from '../../utils/inline-critical-css';
 
 export interface RenderOptions {
   indexFile: string;
@@ -122,16 +123,13 @@ async function render({
   }
 
   if (inlineCriticalCss) {
-    const { InlineCriticalCssProcessor } = await import('@angular/build/private');
-
     const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      deployUrl: deployUrl,
+      deployUrl,
+      outputPath,
       minify: minifyCss,
     });
 
-    const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
-      outputPath,
-    });
+    const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html);
     result.errors = errors;
     result.warnings = warnings;
     html = content;

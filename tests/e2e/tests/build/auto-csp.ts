@@ -88,7 +88,7 @@ export default async function () {
   await expectFileToMatch('dist/test-project/browser/index.html', CSP_META_TAG);
 
   // Make sure if contains the critical CSS inlining CSP code.
-  await expectFileToMatch('dist/test-project/browser/index.html', 'ngCspMedia');
+  await expectFileToMatch('dist/test-project/browser/index.html', 'data-beasties-media');
 
   // Make sure that our e2e tests run to confirm that our angular project runs.
   const port = await spawnServer();

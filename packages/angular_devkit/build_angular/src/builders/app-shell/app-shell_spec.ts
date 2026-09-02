@@ -169,7 +169,7 @@ describe('AppShell Builder', () => {
     expect(content).toContain('app-shell works!');
     expect(content).toContain('p{color:#000}');
     expect(content).toMatch(
-      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" onload="this.media='all'">/,
+      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" data-beasties-media="all">/,
     );
   });
 
@@ -195,7 +195,7 @@ describe('AppShell Builder', () => {
     expect(content).toContain('<app-root ngcspnonce="{% nonce %}"');
     expect(content).toContain('<script nonce="{% nonce %}">');
     expect(content).toMatch(
-      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" ngCspMedia="all">/,
+      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" data-beasties-media="all">/,
     );
   });
 });

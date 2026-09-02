@@ -141,7 +141,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       indexFileContent.toContain('app-shell works!');
       indexFileContent.toContain('p{color:#000}');
       indexFileContent.toContain(
-        `<link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">`,
+        `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
       );
     });
 
@@ -170,7 +170,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       indexFileContent.toContain('app-shell works!');
       indexFileContent.toContain('p{color:#000}');
       indexFileContent.toContain(
-        `<link rel="stylesheet" href="styles.css" media="print" ngCspMedia="all">`,
+        `<link rel="stylesheet" href="styles.css" media="print" data-beasties-media="all">`,
       );
       indexFileContent.toContain('<style nonce="{% nonce %}">p{color:#000}');
       indexFileContent.toContain('<style nonce="{% nonce %}" ng-app-id="ng">');
