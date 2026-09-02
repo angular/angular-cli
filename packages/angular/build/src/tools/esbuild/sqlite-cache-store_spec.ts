@@ -187,6 +187,20 @@ describe('SqliteCacheStore', () => {
     checkStore.close();
   });
 
+  it('should not prune items when total database size is within maxPayloadSize on close', async () => {
+    store.close();
+
+    const sizeStore = new SqliteCacheStore(cachePath, 1024 * 1024);
+    await sizeStore.set('k1', 'value1');
+    await sizeStore.set('k2', 'value2');
+    sizeStore.close();
+
+    const checkStore = new SqliteCacheStore(cachePath);
+    expect(checkStore.has('k1')).toBeTrue();
+    expect(checkStore.has('k2')).toBeTrue();
+    checkStore.close();
+  });
+
   it('should create an index on last_accessed and key', async () => {
     // Trigger db initialization
     await store.set('test-key', 'test-value');
