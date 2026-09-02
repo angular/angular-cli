@@ -146,22 +146,45 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
         // Flush any pending access updates in one transaction before pruning
         this.#flushAccessUpdates();
 
-        // 1. Delete items older than N days
-        this.#db
-          .prepare("DELETE FROM cache WHERE last_accessed < unixepoch('now', ?);")
-          .run(`-${this.ttlDays} days`);
+        this.#db.exec('BEGIN IMMEDIATE TRANSACTION;');
+        try {
+          // 1. Delete items older than N days
+          this.#db
+            .prepare("DELETE FROM cache WHERE last_accessed < unixepoch('now', ?);")
+            .run(`-${this.ttlDays} days`);
 
-        // 2. Prune oldest items if payload exceeds maxPayloadSize
-        const pruneStmt = this.#db.prepare(`
-          DELETE FROM cache WHERE key IN (
-            SELECT key FROM (
-              SELECT key, 
-                     sum(length(key) + length(value)) OVER (ORDER BY last_accessed DESC, key DESC) as running_size
-              FROM cache
-            ) WHERE running_size > ?
-          );
-        `);
-        pruneStmt.run(this.maxPayloadSize);
+          // 2. Prune oldest items if payload exceeds maxPayloadSize
+          // Skip the expensive window aggregate query if total database size is below maxPayloadSize
+          const sizeResult = this.#db
+            .prepare(
+              'SELECT (page_count - freelist_count) * page_size AS total_size ' +
+                'FROM pragma_page_count(), pragma_freelist_count(), pragma_page_size();',
+            )
+            .get() as { total_size?: number } | undefined;
+
+          if ((sizeResult?.total_size ?? 0) > this.maxPayloadSize) {
+            this.#db
+              .prepare(
+                `DELETE FROM cache WHERE key IN (
+                  SELECT key FROM (
+                    SELECT key,
+                           sum(length(key) + length(value)) OVER (ORDER BY last_accessed DESC, key DESC) as running_size
+                    FROM cache
+                  ) WHERE running_size > ?
+                );`,
+              )
+              .run(this.maxPayloadSize);
+          }
+
+          this.#db.exec('COMMIT;');
+        } catch (error) {
+          try {
+            this.#db.exec('ROLLBACK;');
+          } catch {
+            // Ignore rollback errors if transaction was not active
+          }
+          throw error;
+        }
       } catch {
         // Pruning errors should not block build success
       } finally {
@@ -176,7 +199,11 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
         this.#setStmt = undefined;
         this.#updateAccessedStmt = undefined;
 
-        this.#db.close();
+        try {
+          this.#db.close();
+        } catch {
+          // Failure to close should not block build success
+        }
         this.#db = undefined;
       }
     }
