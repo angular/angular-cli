@@ -7,7 +7,6 @@
  */
 
 import type * as ng from '@angular/compiler-cli';
-import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
 import ts from 'typescript';
 import { profileSync } from '../../esbuild/profiling';
@@ -20,7 +19,7 @@ import {
   DiagnosticModes,
   type EmitFileResult,
 } from './angular-compilation';
-import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
+import type { CompilerOptionOverrides } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
 
 class JitCompilationState {
@@ -51,17 +50,11 @@ export class JitCompilation extends TypeScriptCompilation {
 
     // Load the compiler configuration and transform as needed
     const {
-      options: originalCompilerOptions,
+      compilerOptions,
       rootNames,
       errors: configurationDiagnostics,
-    } = await this.loadConfiguration(tsconfig);
-
-    const { compilerOptions, warnings } = transformCompilerOptions(
-      ts,
-      originalCompilerOptions,
-      compilerOptionOverrides,
-      tsconfig,
-    );
+      warnings,
+    } = await this.loadConfiguration(tsconfig, compilerOptionOverrides);
 
     if (hostOptions.modifiedFiles) {
       this.invalidateFiles(hostOptions.modifiedFiles);

@@ -12,7 +12,15 @@ import ts from 'typescript';
 import { toPosixPath } from '../../../utils/path';
 import { profileAsync, profileSync } from '../../esbuild/profiling';
 import { AngularCompilation, DiagnosticModes } from './angular-compilation';
+import { type CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { convertTypeScriptDiagnostic } from './diagnostics';
+
+export interface TransformedConfiguration {
+  compilerOptions: ng.CompilerOptions;
+  rootNames: string[];
+  errors: ts.Diagnostic[];
+  warnings: PartialMessage[];
+}
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
@@ -23,10 +31,17 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     return TypeScriptCompilation.#angularCompilerCliModule;
   }
 
-  protected async loadConfiguration(tsconfig: string): Promise<ng.ParsedConfiguration> {
+  protected async loadConfiguration(
+    tsconfig: string,
+    compilerOptionOverrides?: CompilerOptionOverrides,
+  ): Promise<TransformedConfiguration> {
     const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
-    return profileSync('NG_READ_CONFIG', () =>
+    const {
+      options: originalCompilerOptions,
+      rootNames,
+      errors,
+    } = profileSync('NG_READ_CONFIG', () =>
       readConfiguration(tsconfig, {
         // Angular specific configuration defaults and overrides to ensure a functioning compilation.
         suppressOutputPathCheck: true,
@@ -44,6 +59,20 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
         removeComments: false,
       }),
     );
+
+    const { compilerOptions, warnings } = transformCompilerOptions(
+      ts,
+      originalCompilerOptions,
+      compilerOptionOverrides,
+      tsconfig,
+    );
+
+    return {
+      compilerOptions,
+      rootNames,
+      errors,
+      warnings,
+    };
   }
 
   protected readonly sourceFiles = new Map<string, ts.SourceFile>();
