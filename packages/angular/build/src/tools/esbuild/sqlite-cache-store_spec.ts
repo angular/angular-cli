@@ -187,6 +187,25 @@ describe('SqliteCacheStore', () => {
     checkStore.close();
   });
 
+  it('should create an index on last_accessed and key', async () => {
+    // Trigger db initialization
+    await store.set('test-key', 'test-value');
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    try {
+      const indexRows = directDb
+        .prepare(
+          "SELECT name FROM sqlite_master WHERE type = 'index' AND tbl_name = 'cache' AND name = 'idx_cache_accessed'",
+        )
+        .all();
+      expect(indexRows.length).toBe(1);
+    } finally {
+      directDb.close();
+    }
+  });
+
   describe('NG_BUILD_CACHE_STORE env variable option', () => {
     it('should force SQLite when NG_BUILD_CACHE_STORE=sqlite', () => {
       const code = `
