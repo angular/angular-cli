@@ -106,6 +106,7 @@ export async function generateIndexHtml(
     crossOrigin: crossOrigin,
     deployUrl: buildOptions.publicPath,
     postTransform: indexHtmlOptions.transformer,
+    outputPath: virtualOutputPath,
     generateDedicatedSSRContent: !!(
       buildOptions.ssrOptions ||
       buildOptions.prerenderOptions ||
@@ -120,7 +121,6 @@ export async function generateIndexHtml(
   return indexHtmlGenerator.process({
     baseHref,
     lang,
-    outputPath: virtualOutputPath,
     files: [...initialFiles]
       .filter(([, file]) => !file.serverFile)
       .map(([file, record]) => ({

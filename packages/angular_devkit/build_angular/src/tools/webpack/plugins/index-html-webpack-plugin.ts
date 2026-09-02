@@ -18,8 +18,7 @@ import { assertIsError } from '../../../utils/error';
 import { addError, addWarning } from '../../../utils/webpack-diagnostics';
 
 export interface IndexHtmlWebpackPluginOptions
-  extends IndexHtmlGeneratorOptions,
-    Omit<IndexHtmlGeneratorProcessOptions, 'files'> {}
+  extends IndexHtmlGeneratorOptions, Omit<IndexHtmlGeneratorProcessOptions, 'files'> {}
 
 const PLUGIN_NAME = 'index-html-webpack-plugin';
 export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
@@ -32,8 +31,11 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
     throw new Error('compilation is undefined.');
   }
 
-  constructor(override readonly options: IndexHtmlWebpackPluginOptions) {
-    super(options);
+  constructor(readonly pluginOptions: IndexHtmlWebpackPluginOptions) {
+    super({
+      ...pluginOptions,
+      outputPath: dirname(pluginOptions.outputPath),
+    });
   }
 
   apply(compiler: Compiler) {
@@ -73,12 +75,11 @@ export class IndexHtmlWebpackPlugin extends IndexHtmlGenerator {
           errors,
         } = await this.process({
           files,
-          outputPath: dirname(this.options.outputPath),
-          baseHref: this.options.baseHref,
-          lang: this.options.lang,
+          baseHref: this.pluginOptions.baseHref,
+          lang: this.pluginOptions.lang,
         });
 
-        assets[this.options.outputPath] = new sources.RawSource(content);
+        assets[this.pluginOptions.outputPath] = new sources.RawSource(content);
 
         warnings.forEach((msg) => addWarning(this.compilation, msg));
         errors.forEach((msg) => addError(this.compilation, msg));

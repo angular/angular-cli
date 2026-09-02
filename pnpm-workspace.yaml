@@ -24,6 +24,8 @@ minimumReleaseAgeExclude:
   - '@ngtools/webpack'
   - '@schematics/*'
   - 'ng-packagr'
+  # TODO(alanagius): remove before merging this.
+  - 'beasties'
 overrides:
   '@angular/build': workspace:*
 packageExtensions:

@@ -19,6 +19,7 @@ import * as path from 'node:path';
 import Piscina from 'piscina';
 import { normalizeOptimization } from '../../utils';
 import { assertIsError } from '../../utils/error';
+import { InlineCriticalCssProcessor } from '../../utils/inline-critical-css';
 import { Spinner } from '../../utils/spinner';
 import { BrowserBuilderOutput } from '../browser';
 import { Schema as BrowserBuilderSchema } from '../browser/schema';
@@ -58,14 +59,6 @@ async function _renderUniversal(
   const projectRoot = path.join(root, (projectMetadata.root as string | undefined) ?? '');
 
   const { styles } = normalizeOptimization(browserOptions.optimization);
-  let inlineCriticalCssProcessor;
-  if (styles.inlineCritical) {
-    const { InlineCriticalCssProcessor } = await import('@angular/build/private');
-    inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-      minify: styles.minify,
-      deployUrl: browserOptions.deployUrl,
-    });
-  }
 
   const renderWorker = new Piscina({
     filename: require.resolve('./render-worker'),
@@ -98,10 +91,14 @@ async function _renderUniversal(
         ? path.join(root, options.outputIndexPath)
         : browserIndexOutputPath;
 
-      if (inlineCriticalCssProcessor) {
-        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html, {
+      if (styles.inlineCritical) {
+        const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
+          minify: styles.minify,
           outputPath,
+          deployUrl: browserOptions.deployUrl,
         });
+
+        const { content, warnings, errors } = await inlineCriticalCssProcessor.process(html);
         html = content;
 
         if (warnings.length || errors.length) {
