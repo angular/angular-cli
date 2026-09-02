@@ -32,6 +32,18 @@ import { VERSION } from '../../utilities/version';
 
 class CommandError extends Error {}
 
+export const SHELL_METACHARACTERS = /[&|;$`()]/;
+
+export function validateRegistry(registry: string): void {
+  if (!URL.canParse(registry)) {
+    throw new CommandModuleError('Option --registry must be a valid URL.');
+  }
+
+  if (SHELL_METACHARACTERS.test(registry)) {
+    throw new CommandModuleError('Option --registry contains invalid characters.');
+  }
+}
+
 interface AddCommandArgs extends SchematicsCommandArgs {
   collection: string;
   verbose?: boolean;
@@ -132,7 +144,9 @@ export default class AddCommandModule
           return true;
         }
 
-        if (typeof registry === 'string' && URL.canParse(registry)) {
+        if (typeof registry === 'string') {
+          validateRegistry(registry);
+
           return true;
         }
 

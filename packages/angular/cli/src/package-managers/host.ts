@@ -158,7 +158,10 @@ export const NodeJS_HOST: Host = {
         env,
       } satisfies SpawnOptions;
       const childProcess = isWin32
-        ? spawn(`${command} ${args.join(' ')}`, spawnOptions)
+        ? spawn(
+            `${command} ${args.map((a) => `"${String(a).replace(/"/g, '\\"')}"`).join(' ')}`,
+            spawnOptions,
+          )
         : spawn(command, args, spawnOptions);
 
       let stdout = '';
