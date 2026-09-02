@@ -128,6 +128,7 @@ ts_project(
         ":node_modules/ansi-colors",
         ":node_modules/autoprefixer",
         ":node_modules/babel-loader",
+        ":node_modules/beasties",
         ":node_modules/browser-sync",
         ":node_modules/browserslist",
         ":node_modules/copy-webpack-plugin",

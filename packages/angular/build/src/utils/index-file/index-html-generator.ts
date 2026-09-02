@@ -13,7 +13,7 @@ import { NormalizedOptimizationOptions } from '../normalize-optimization';
 import { addEventDispatchContract } from './add-event-dispatch-contract';
 import { CrossOriginValue, Entrypoint, FileInfo, augmentIndexHtml } from './augment-index-html';
 import { autoCsp } from './auto-csp';
-import { InlineCriticalCssProcessor } from './inline-critical-css';
+import { inlineCriticalCss } from './inline-critical-css';
 import { InlineFontsProcessor } from './inline-fonts';
 import { addNgcmAttribute } from './ngcm-attribute';
 import { addNonce } from './nonce';
@@ -28,7 +28,6 @@ export type HintMode = 'prefetch' | 'preload' | 'modulepreload' | 'preconnect' |
 export interface IndexHtmlGeneratorProcessOptions {
   lang: string | undefined;
   baseHref: string | undefined;
-  outputPath: string;
   files: FileInfo[];
   hints?: { url: string; mode: HintMode; as?: string }[];
 }
@@ -49,6 +48,7 @@ export interface IndexHtmlGeneratorOptions {
   imageDomains?: string[];
   generateDedicatedSSRContent?: boolean;
   autoCsp?: AutoCspOptions;
+  outputPath: string;
 
   /**
    * Integrity metadata for module URLs not directly referenced in the index
@@ -89,7 +89,7 @@ export class IndexHtmlGenerator {
 
     // CSR plugins
     if (options?.optimization?.styles?.inlineCritical) {
-      this.csrPlugins.push(inlineCriticalCssPlugin(this, !!options.autoCsp));
+      this.csrPlugins.push(inlineCriticalCssPlugin(this));
     }
 
     this.csrPlugins.push(addNoncePlugin());
@@ -182,10 +182,11 @@ function augmentIndexHtmlPlugin(generator: IndexHtmlGenerator): IndexHtmlGenerat
     entrypoints,
     imageDomains,
     chunksIntegrity,
+    outputPath,
   } = generator.options;
 
-  return async (html, options) => {
-    const { lang, baseHref, outputPath = '', files, hints } = options;
+  return (html, options) => {
+    const { lang, baseHref, files, hints } = options;
 
     return augmentIndexHtml({
       html,
@@ -209,22 +210,15 @@ function inlineFontsPlugin({ options }: IndexHtmlGenerator): IndexHtmlGeneratorP
     minify: options.optimization?.styles.minify,
   });
 
-  return async (html) => inlineFontsProcessor.process(html);
+  return (html) => inlineFontsProcessor.process(html);
 }
 
-function inlineCriticalCssPlugin(
-  generator: IndexHtmlGenerator,
-  autoCsp: boolean,
-): IndexHtmlGeneratorPlugin {
-  const inlineCriticalCssProcessor = new InlineCriticalCssProcessor({
-    minify: generator.options.optimization?.styles.minify,
-    deployUrl: generator.options.deployUrl,
-    readAsset: (filePath) => generator.readAsset(filePath),
-    autoCsp,
-  });
+function inlineCriticalCssPlugin(generator: IndexHtmlGenerator): IndexHtmlGeneratorPlugin {
+  const { outputPath, deployUrl, optimization } = generator.options;
+  const { minify = false } = optimization?.styles ?? {};
 
-  return async (html, options) =>
-    inlineCriticalCssProcessor.process(html, { outputPath: options.outputPath });
+  return (html) =>
+    inlineCriticalCss(html, outputPath, deployUrl, minify, (path) => generator.readAsset(path));
 }
 
 function addNoncePlugin(): IndexHtmlGeneratorPlugin {

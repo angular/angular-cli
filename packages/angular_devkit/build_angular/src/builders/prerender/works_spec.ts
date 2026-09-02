@@ -219,11 +219,11 @@ describe('Prerender Builder', () => {
     );
 
     expect(content).toMatch(
-      /<style>p{color:#000}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" onload="this\.media='all'">/,
+      /<style>p{color:#000}<\/style><link rel="stylesheet" href="styles\.\w+\.css" media="print" data-beasties-media="all">/,
     );
 
     // Validate that beasties does not process already critical css inlined stylesheets.
-    expect(content).not.toContain(`onload="this.media='print'">`);
+    expect(content).not.toContain(`data-beasties-media="print"`);
     expect(content).not.toContain(`media="print"></noscript>`);
   });
 });

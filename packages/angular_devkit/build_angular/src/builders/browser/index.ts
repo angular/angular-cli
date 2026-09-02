@@ -303,21 +303,25 @@ export function buildWebpackBrowser(
                     styles: options.styles ?? [],
                   });
 
-                  const indexHtmlGenerator = new IndexHtmlGenerator({
-                    cache: cacheOptions,
-                    indexPath: path.join(context.workspaceRoot, getIndexInputFile(options.index)),
-                    entrypoints,
-                    deployUrl: options.deployUrl,
-                    sri: options.subresourceIntegrity,
-                    optimization: normalizedOptimization,
-                    crossOrigin: options.crossOrigin,
-                    postTransform: transforms.indexHtml,
-                    imageDomains: Array.from(imageDomains),
-                  });
-
                   let hasErrors = false;
                   for (const [locale, outputPath] of outputPaths.entries()) {
                     try {
+                      const indexHtmlGenerator = new IndexHtmlGenerator({
+                        cache: cacheOptions,
+                        indexPath: path.join(
+                          context.workspaceRoot,
+                          getIndexInputFile(options.index),
+                        ),
+                        entrypoints,
+                        outputPath,
+                        deployUrl: options.deployUrl,
+                        sri: options.subresourceIntegrity,
+                        optimization: normalizedOptimization,
+                        crossOrigin: options.crossOrigin,
+                        postTransform: transforms.indexHtml,
+                        imageDomains: Array.from(imageDomains),
+                      });
+
                       const {
                         csrContent: content,
                         warnings,
@@ -326,7 +330,6 @@ export function buildWebpackBrowser(
                         baseHref: getLocaleBaseHref(i18n, locale) ?? options.baseHref,
                         // i18nLocale is used when Ivy is disabled
                         lang: locale || undefined,
-                        outputPath,
                         files: mapEmittedFilesToFileInfo(emittedFiles),
                       });
 
