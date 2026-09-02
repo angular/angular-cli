@@ -1,0 +1,9 @@
+/**
+ * This tsconfig is used only for the IDEs.
+ */
+{
+  "extends": "../../../tsconfig-build-esm.json",
+  "compilerOptions": {
+    "types": ["node", "jasmine"]
+  }
+}

@@ -22,6 +22,7 @@
     "save": "dependencies"
   },
   "dependencies": {
+    "beasties": "0.5.1",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
@@ -43,8 +44,7 @@
     "@angular/platform-browser": "22.2.0-next.4",
     "@angular/platform-server": "22.2.0-next.4",
     "@angular/router": "22.2.0-next.4",
-    "@schematics/angular": "workspace:*",
-    "beasties": "0.5.1"
+    "@schematics/angular": "workspace:*"
   },
   "sideEffects": false,
   "schematics": "./schematics/collection.json"

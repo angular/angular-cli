@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
+import { type CompactPlan, compileSheet, encodePlan } from 'beasties/compiler';
 import { destroyAngularServerApp } from '../src/app';
 import { ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRendering, withRoutes } from '../src/routes/route-config';
@@ -27,20 +28,22 @@ import { ServerRoute, provideServerRendering, withRoutes } from '../src/routes/r
 class AppComponent {}
 
 /**
- * Configures the Angular application for testing by setting up the Angular app manifest,
- * configuring server-side rendering, and bootstrapping the application with the provided routes.
- * This function generates a basic HTML template with a base href and sets up the necessary
- * Angular components and providers for testing purposes.
+ * Configures the Angular application for testing by resetting any existing server application,
+ * setting up the Angular app manifest, and bootstrapping the application with the provided routes.
+ * This function generates default HTML templates (`index.server.html` and `index.csr.html`) with a base href
+ * and sets up the necessary Angular components and providers for testing purposes.
  *
  * @param routes - An array of route definitions to be used by the Angular Router.
- * @param serverRoutes - An array of server route definitions for server-side rendering.
- * @param baseHref - An optional base href to be used in the HTML template.
- * @param additionalServerAssets - A record of additional server assets to include,
+ * @param serverRoutes - An array of server route definitions for server rendering.
+ * @param baseHref - An optional base href to be used in the HTML templates. Defaults to `'/'`.
+ * @param additionalServerAssets - An optional record of additional server assets to include,
  *                                  where the keys are asset paths and the values are asset details.
  * @param locale - An optional locale to configure for the application during testing.
- * @param rootComponent - The root Angular component to bootstrap the application.
+ * @param rootComponent - An optional root Angular component to bootstrap the application. Defaults to `AppComponent`.
  * @param extraProviders - An optional array of additional providers that should be available to the
  *                         root component and all its children.
+ * @param inlineCriticalCss - An optional record of stylesheet paths to CSS content to be compiled into critical CSS plans.
+ * @param nonce - An optional Content Security Policy (CSP) nonce to be used for inlined critical CSS.
  */
 export function setAngularAppTestingManifest(
   routes: Routes,
@@ -50,15 +53,26 @@ export function setAngularAppTestingManifest(
   locale?: string,
   rootComponent: Type<unknown> = AppComponent,
   extraProviders: Array<Provider | EnvironmentProviders> = [],
+  inlineCriticalCss?: Record<string, string>,
+  nonce?: string,
 ): void {
   destroyAngularServerApp();
 
+  let criticalCssPlans: CompactPlan[] | undefined;
+  if (inlineCriticalCss) {
+    criticalCssPlans = Object.entries(inlineCriticalCss).map(([href, css]) => {
+      const sheet = compileSheet(css, { href });
+
+      return encodePlan(sheet);
+    });
+  }
+
   setAngularAppManifest({
-    inlineCriticalCss: false,
+    criticalCssPlans,
+    nonce,
     baseHref,
     locale,
     assets: {
-      ...additionalServerAssets,
       'index.server.html': {
         size: 25,
         hash: 'f799132d0a09e0fef93c68a12e443527700eb59e6f67fcb7854c3a60ff082fde',
@@ -88,6 +102,7 @@ export function setAngularAppTestingManifest(
         </html>
       `,
       },
+      ...additionalServerAssets,
     },
     bootstrap: async () => (context) => {
       return bootstrapApplication(

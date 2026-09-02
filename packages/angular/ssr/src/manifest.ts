@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type { CompactPlan } from 'beasties/runtime';
 import type { SerializableRouteTreeNode } from './routes/route-tree';
 import { AngularBootstrap } from './utils/ng';
 
@@ -106,10 +107,14 @@ export interface AngularAppManifest {
   readonly bootstrap: () => Promise<AngularBootstrap>;
 
   /**
-   * Indicates whether critical CSS should be inlined into the HTML.
-   * If set to `true`, critical CSS will be inlined for faster page rendering.
+   * Pre-compiled critical CSS plans generated at build time.
    */
-  readonly inlineCriticalCss?: boolean;
+  readonly criticalCssPlans?: readonly CompactPlan[];
+
+  /**
+   * Content Security Policy (CSP) nonce to be used for inlined critical CSS.
+   */
+  readonly nonce?: string;
 
   /**
    * The route tree representation for the routing configuration of the application.

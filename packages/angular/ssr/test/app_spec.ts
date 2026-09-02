@@ -500,6 +500,68 @@ describe('AngularServerApp', () => {
           expect(response?.status).toBe(302);
         });
       });
+
+      describe('Critical CSS inlining', () => {
+        afterEach(() => {
+          setupManifest();
+        });
+
+        it('should inline critical CSS when inlineCriticalCss is provided', async () => {
+          setAngularAppTestingManifest(
+            [{ path: 'home', component: HomeComponent }],
+            [{ path: 'home', renderMode: RenderMode.Server }],
+            '/',
+            {
+              'index.server.html': {
+                size: 100,
+                hash: '123',
+                text: async () =>
+                  `<html><head><link rel="stylesheet" href="styles.css"></head><body><app-root></app-root></body></html>`,
+              },
+            },
+            undefined,
+            undefined,
+            undefined,
+            { 'styles.css': 'app-home{color:blue}' },
+          );
+
+          const customApp = new AngularServerApp();
+          const response = await customApp.handle(new Request('http://localhost/home'));
+          const html = await response?.text();
+
+          expect(html).toContain('<style>app-home{color:blue}</style>');
+          expect(html).toContain('data-beasties-media="all"');
+          expect(html).toContain("document.querySelectorAll('link[data-beasties-media]')");
+        });
+
+        it('should apply CSP nonce to inlined style and script tags when nonce is configured', async () => {
+          setAngularAppTestingManifest(
+            [{ path: 'home', component: HomeComponent }],
+            [{ path: 'home', renderMode: RenderMode.Server }],
+            '/',
+            {
+              'index.server.html': {
+                size: 100,
+                hash: '123',
+                text: async () =>
+                  `<html><head><link rel="stylesheet" href="styles.css"></head><body><app-root></app-root></body></html>`,
+              },
+            },
+            undefined,
+            undefined,
+            undefined,
+            { 'styles.css': 'app-home{color:blue}' },
+            '{% nonce %}',
+          );
+
+          const customApp = new AngularServerApp();
+          const response = await customApp.handle(new Request('http://localhost/home'));
+          const html = await response?.text();
+
+          expect(html).toContain('<style nonce="{% nonce %}">app-home{color:blue}</style>');
+          expect(html).toContain('<script nonce="{% nonce %}">document.querySelectorAll');
+        });
+      });
     });
   });
 });

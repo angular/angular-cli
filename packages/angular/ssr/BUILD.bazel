@@ -22,19 +22,16 @@ ts_project(
         "--lib",
         "dom.iterable,dom,es2022",
     ],
-    data = [
-        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
-    ],
     source_map = True,
     tsconfig = "//:build-tsconfig-esm",
     deps = [
+        ":node_modules/beasties",
         "//:node_modules/@angular/common",
         "//:node_modules/@angular/core",
         "//:node_modules/@angular/platform-browser",
         "//:node_modules/@angular/platform-server",
         "//:node_modules/@angular/router",
         "//:node_modules/tslib",
-        "//packages/angular/ssr/third_party/beasties:beasties_dts",
     ],
 )
 
@@ -42,23 +39,13 @@ ng_package(
     name = "npm_package",
     srcs = [
         ":package.json",
-        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
     externals = [
         "@angular/ssr",
         "@angular/ssr/node",
-        "../../third_party/beasties",
     ],
-    extra_substitutions = {
-        # Needed for ssr.d.ts file
-        "\\./third_party/beasties": "../third_party/beasties",
-        # Needed for the FESM file.
-        "\\./(.+)/packages/angular/ssr/third_party/beasties": "../third_party/beasties/index.js",
-    },
     nested_packages = [
         "//packages/angular/ssr/schematics:pkg",
-        # Included directly as the generated types reference the types file in this location.
-        "//packages/angular/ssr/third_party/beasties:beasties_dts",
     ],
     package = "@angular/ssr",
     readme_md = ":README.md",

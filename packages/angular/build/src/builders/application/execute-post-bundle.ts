@@ -123,7 +123,7 @@ export async function executePostBundleSteps(
   // Create server manifest
   const initialFilesPaths = new Set(initialFiles.keys());
   if (serverEntryPoint && (outputMode || prerenderOptions || appShellOptions || ssrOptions)) {
-    const { manifestContent, serverAssetsChunks } = generateAngularServerAppManifest(
+    const { manifestContent, serverAssetsChunks } = await generateAngularServerAppManifest(
       additionalHtmlOutputFiles,
       outputFiles,
       optimizationOptions.styles.inlineCritical ?? false,
@@ -209,7 +209,7 @@ export async function executePostBundleSteps(
       const manifest = additionalOutputFiles.find((f) => f.path === SERVER_APP_MANIFEST_FILENAME);
       assert(manifest, `${SERVER_APP_MANIFEST_FILENAME} was not found in output files.`);
 
-      const { manifestContent, serverAssetsChunks } = generateAngularServerAppManifest(
+      const { manifestContent, serverAssetsChunks } = await generateAngularServerAppManifest(
         additionalHtmlOutputFiles,
         outputFiles,
         optimizationOptions.styles.inlineCritical ?? false,
