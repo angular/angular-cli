@@ -108,24 +108,28 @@ export const allowMinify = debugOptimize.minify;
  */
 export const useRolldownChunks = parseTristate(process.env['NG_BUILD_CHUNKS_ROLLDOWN']) ?? true;
 
-/**
- * Some environments, like CircleCI which use Docker report a number of CPUs by the host and not the count of available.
- * This cause `Error: Call retries were exceeded` errors when trying to use them.
- *
- * @see https://github.com/nodejs/node/issues/28762
- * @see https://github.com/webpack-contrib/terser-webpack-plugin/issues/143
- * @see https://ithub.com/angular/angular-cli/issues/16860#issuecomment-588828079
- *
- */
 const maxWorkersVariable = process.env['NG_BUILD_MAX_WORKERS'];
+
+let customMaxWorkers: number | undefined;
+if (isPresent(maxWorkersVariable)) {
+  const parsed = +maxWorkersVariable;
+  if (Number.isInteger(parsed) && parsed >= 1) {
+    customMaxWorkers = parsed;
+  }
+}
+
+/**
+ * Whether the maximum number of workers was explicitly configured via the
+ * `NG_BUILD_MAX_WORKERS` environment variable.
+ */
+export const hasCustomMaxWorkers = customMaxWorkers !== undefined;
 
 /**
  * The maximum number of workers to use for parallel processing.
  * This can be controlled by the `NG_BUILD_MAX_WORKERS` environment variable.
+ * When not set, defaults to available parallelism minus one to ensure the main thread is not starved.
  */
-export const maxWorkers = isPresent(maxWorkersVariable)
-  ? +maxWorkersVariable
-  : Math.min(4, Math.max(availableParallelism() - 1, 1));
+export const maxWorkers = customMaxWorkers ?? Math.max(availableParallelism() - 1, 1);
 
 /**
  * When `NG_BUILD_PARALLEL_TS` is set to `0` or `false`, parallel TypeScript compilation is disabled.

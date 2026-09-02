@@ -20,7 +20,11 @@ import type {
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
-import { maxWorkers, useTypeChecking } from '../../../utils/environment-options';
+import {
+  hasCustomMaxWorkers,
+  maxWorkers,
+  useTypeChecking,
+} from '../../../utils/environment-options';
 import { calculateHash, initializeHash } from '../../../utils/hash';
 import { AngularHostOptions } from '../../angular/angular-host';
 import { AngularCompilation, DiagnosticModes } from '../../angular/compilation';
@@ -97,6 +101,10 @@ export function createCompilerPlugin(
           });
         }
       }
+      // During bundling, esbuild runs its own multi-threaded Go process across all available cores.
+      // Unless explicitly configured via NG_BUILD_MAX_WORKERS, cap transformation concurrency to at
+      // most 4 to prevent CPU contention during bundling.
+      const maxTransformWorkers = hasCustomMaxWorkers ? maxWorkers : Math.min(4, maxWorkers);
       const javascriptTransformer = new JavaScriptTransformer(
         {
           sourcemap: !!pluginOptions.sourcemap,
@@ -104,7 +112,7 @@ export function createCompilerPlugin(
           advancedOptimizations: pluginOptions.advancedOptimizations,
           jit: pluginOptions.jit || pluginOptions.includeTestMetadata,
         },
-        maxWorkers,
+        maxTransformWorkers,
         cacheStore?.createCache('jstransformer'),
       );
 
