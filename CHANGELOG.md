@@ -1,3 +1,21 @@
+<a name="21.2.23"></a>
+
+# 21.2.23 (2026-09-02)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                              | Type | Description          |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------- |
+| [d3aaa48ef](https://github.com/angular/angular-cli/commit/d3aaa48ef35b80c3297ee3050cd239f84d051899) | fix  | update less to 4.9.0 |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [645e41a47](https://github.com/angular/angular-cli/commit/645e41a47d21b7651837a4250de99af0509626e2) | fix  | ensure public directory containment in CommonEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.22"></a>
 
 # 21.2.22 (2026-08-26)
