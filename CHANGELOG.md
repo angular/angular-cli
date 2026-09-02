@@ -1,3 +1,37 @@
+<a name="22.2.0-next.6"></a>
+
+# 22.2.0-next.6 (2026-09-02)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [b37c93329](https://github.com/angular/angular-cli/commit/b37c933299dac37e394d9f4fe0d019052db427a9) | fix  | isolate temporary package installations from parent Yarn workspace |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [4b8c62a8f](https://github.com/angular/angular-cli/commit/4b8c62a8f1a1d312ef2e1e0df6b7642bf1db5c5f) | fix  | add splitting option to unit-test builder                     |
+| [51565d4bc](https://github.com/angular/angular-cli/commit/51565d4bcbd4667c23c607d878f08301afc4c5e3) | fix  | enable code splitting for vitest browser tests                |
+| [5b850fdfc](https://github.com/angular/angular-cli/commit/5b850fdfc7534d33db7ab4a7f1e32e143462eec7) | fix  | fail build and exclude routes when prerendering fails         |
+| [dfa7f03a9](https://github.com/angular/angular-cli/commit/dfa7f03a93b5b24b949aea354bc40f0a91e9582d) | fix  | keep dev-server Vite cache worktree-local                     |
+| [135662d9a](https://github.com/angular/angular-cli/commit/135662d9a1de85b42292b26b547160eaca71e5da) | fix  | preserve binary values in the SQLite cache store              |
+| [701bde481](https://github.com/angular/angular-cli/commit/701bde4818439de0e49c99d57dc749b0dd22c4dd) | fix  | preserve duplicate bundle filenames across output file types  |
+| [6ee559ca9](https://github.com/angular/angular-cli/commit/6ee559ca9d209fb4c53de2aaf9918d10e5f062a1) | perf | bypass worker dispatch for files without transform candidates |
+| [2b85529e8](https://github.com/angular/angular-cli/commit/2b85529e8290c8c916539b5a0336b4efdb68578c) | perf | use iterative post-order AST traversal for OXC transforms     |
+| [ecbcd87b8](https://github.com/angular/angular-cli/commit/ecbcd87b8857225e4df3df7896b3236d63553f23) | perf | use native sass-embedded compiler daemon                      |
+| [ce83ac0e8](https://github.com/angular/angular-cli/commit/ce83ac0e82981efd9408e07a35315e3cef9e1a36) | perf | use size-weighted task heuristics in i18n inliner             |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [4fa81d403](https://github.com/angular/angular-cli/commit/4fa81d403c93a7480301e58630203cb028aebc69) | fix  | decode pathname when constructing server asset path |
+| [bb72145f9](https://github.com/angular/angular-cli/commit/bb72145f9ab45aee29f523236b3a25cd0813a841) | fix  | ensure public directory containment in CommonEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.7"></a>
 
 # 22.1.7 (2026-09-02)
