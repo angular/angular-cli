@@ -8,7 +8,7 @@
 
 import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
-import { transformCompilerOptions } from './compiler-options';
+import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
 import {
   AngularCompilation,
@@ -90,6 +90,10 @@ describe('AngularCompilation', () => {
       public getCachedSourceFiles(): Map<string, ts.SourceFile> {
         return this.sourceFiles;
       }
+
+      public async testLoadConfiguration(tsconfig: string, overrides?: CompilerOptionOverrides) {
+        return this.loadConfiguration(tsconfig, overrides);
+      }
     }
 
     it('collects and converts diagnostics categorized by error and warning', async () => {
@@ -133,6 +137,32 @@ describe('AngularCompilation', () => {
       const compilerCli = await TypeScriptCompilation.loadCompilerCli();
       expect(compilerCli).toBeDefined();
       expect(typeof compilerCli.readConfiguration).toBe('function');
+    });
+
+    it('loads configuration and applies compiler option transformations', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const mockReadConfig = jasmine.createSpy('readConfiguration').and.returnValue({
+        options: { target: ts.ScriptTarget.ES2020 },
+        rootNames: ['/src/main.ts'],
+        errors: [],
+      });
+      spyOn(TypeScriptCompilation, 'loadCompilerCli').and.resolveTo({
+        readConfiguration: mockReadConfig,
+      } as unknown as typeof import('@angular/compiler-cli'));
+
+      const result = await compilation.testLoadConfiguration('tsconfig.json', { sourcemap: true });
+
+      expect(mockReadConfig).toHaveBeenCalledWith(
+        'tsconfig.json',
+        jasmine.objectContaining({
+          suppressOutputPathCheck: true,
+          outDir: undefined,
+        }),
+      );
+      expect(result.rootNames).toEqual(['/src/main.ts']);
+      expect(result.compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(result.compilerOptions.inlineSources).toBe(true);
+      expect(result.warnings.length).toBeGreaterThan(0);
     });
   });
 
