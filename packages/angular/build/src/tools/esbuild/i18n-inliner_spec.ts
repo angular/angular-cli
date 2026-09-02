@@ -12,6 +12,7 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { initializeHash } from '../../utils/hash';
+import { WorkerPool } from '../../utils/worker-pool';
 import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
 import { createPersistentCacheStore } from './cache';
 import { I18nInliner, type I18nInlinerOptions } from './i18n-inliner';
@@ -63,8 +64,8 @@ describe('I18nInliner', () => {
 
   // A single thread is used throughout so that every file of every locale is inlined by the same
   // Worker. Any translation state that a Worker retains between requests is then observable.
-  function createInliner(options?: Partial<I18nInlinerOptions>, maxThreads = 1): I18nInliner {
-    inliner = new I18nInliner({ missingTranslation: 'warning', ...options }, maxThreads);
+  function createInliner(options?: Partial<I18nInlinerOptions>, maxConcurrency = 1): I18nInliner {
+    inliner = new I18nInliner({ missingTranslation: 'warning', maxConcurrency, ...options });
 
     return inliner;
   }
@@ -341,12 +342,10 @@ describe('I18nInliner', () => {
       browserFile('chunk2.js', GREETING_SOURCE),
       browserFile('chunk3.js', GREETING_SOURCE),
     ];
-    inliner = new I18nInliner(
-      {
-        missingTranslation: 'warning',
-      },
-      4,
-    );
+    inliner = new I18nInliner({
+      missingTranslation: 'warning',
+      maxConcurrency: 4,
+    });
 
     const { outputFiles, errors, warnings } = await inliner.inlineForLocale(files, 'fr', {
       greeting: translationFor('Bonjour'),
@@ -423,13 +422,11 @@ describe('I18nInliner', () => {
   });
 
   it('inlines the translations of a locale when localizeVersion is configured in options', async () => {
-    inliner = new I18nInliner(
-      {
-        missingTranslation: 'warning',
-        localizeVersion: '20.2.0',
-      },
-      1,
-    );
+    inliner = new I18nInliner({
+      missingTranslation: 'warning',
+      localizeVersion: '20.2.0',
+      maxConcurrency: 1,
+    });
 
     const { outputFiles, errors, warnings } = await inliner.inlineForLocale(
       [browserFile('main.js', GREETING_SOURCE)],
@@ -543,13 +540,11 @@ describe('I18nInliner', () => {
         browserFile('main.js', GREETING_SOURCE),
         browserFile('other.js', 'export const answer = 42;\n'),
       ];
-      const initialInliner = new I18nInliner(
-        {
-          missingTranslation: 'warning',
-          persistentCachePath: cacheDir,
-        },
-        2,
-      );
+      const initialInliner = new I18nInliner({
+        missingTranslation: 'warning',
+        persistentCachePath: cacheDir,
+        maxConcurrency: 2,
+      });
 
       // Pre-populate cache for 'fr'
       await initialInliner.inlineForLocale(
@@ -561,13 +556,11 @@ describe('I18nInliner', () => {
       await initialInliner.close();
 
       // Create new inliner with same cache path, inlining cached 'fr' alongside uncached 'de' and 'es'
-      inliner = new I18nInliner(
-        {
-          missingTranslation: 'warning',
-          persistentCachePath: cacheDir,
-        },
-        2,
-      );
+      inliner = new I18nInliner({
+        missingTranslation: 'warning',
+        persistentCachePath: cacheDir,
+        maxConcurrency: 2,
+      });
 
       const results = await inliner.inlineAll(files, [
         {
@@ -618,12 +611,10 @@ describe('I18nInliner', () => {
     }));
 
     const files = [browserFile('main.js', GREETING_SOURCE)];
-    inliner = new I18nInliner(
-      {
-        missingTranslation: 'warning',
-      },
-      2,
-    );
+    inliner = new I18nInliner({
+      missingTranslation: 'warning',
+      maxConcurrency: 2,
+    });
 
     const results = await inliner.inlineAll(files, locales);
 
@@ -882,12 +873,10 @@ describe('I18nInliner', () => {
   });
 
   it('correctly transforms files across multiple inlineAll runs on the same inliner instance', async () => {
-    const localeInliner = new I18nInliner(
-      {
-        missingTranslation: 'warning',
-      },
-      2,
-    );
+    const localeInliner = new I18nInliner({
+      missingTranslation: 'warning',
+      maxConcurrency: 2,
+    });
 
     try {
       const files1 = [browserFile('main.js', GREETING_SOURCE)];
@@ -942,7 +931,7 @@ describe('I18nInliner', () => {
     const smallFile = browserFile('chunk.js', smallSource);
     const files = [largeFile, smallFile];
 
-    inliner = new I18nInliner({ missingTranslation: 'error' }, 2);
+    inliner = new I18nInliner({ missingTranslation: 'error', maxConcurrency: 2 });
 
     const results = await inliner.inlineAll(files, [
       {
@@ -981,5 +970,126 @@ describe('I18nInliner', () => {
     const esFiles = results.get('es')?.outputFiles ?? [];
     expect(findFile(esFiles, 'main.js').text).toContain('"Hola"');
     expect(findFile(esFiles, 'chunk.js').text).toContain('"Adios"');
+  });
+
+  it('respects maxConcurrency when processing multiple locales and files', async () => {
+    const files = [
+      browserFile('main.js', GREETING_SOURCE),
+      browserFile('chunk.js', 'console.log($localize`:@@farewell:Goodbye`);'),
+    ];
+
+    inliner = new I18nInliner({
+      missingTranslation: 'error',
+      maxConcurrency: 1,
+    });
+
+    const results = await inliner.inlineAll(files, [
+      {
+        locale: 'fr',
+        translation: {
+          greeting: translationFor('Bonjour'),
+          farewell: translationFor('Au revoir'),
+        },
+      },
+      {
+        locale: 'de',
+        translation: {
+          greeting: translationFor('Guten Tag'),
+          farewell: translationFor('Auf Wiedersehen'),
+        },
+      },
+    ]);
+
+    expect(results.size).toBe(2);
+    expect(findFile(results.get('fr')?.outputFiles ?? [], 'main.js').text).toContain('"Bonjour"');
+    expect(findFile(results.get('de')?.outputFiles ?? [], 'chunk.js').text).toContain(
+      '"Auf Wiedersehen"',
+    );
+  });
+
+  describe('maxConcurrency validation', () => {
+    it('throws when maxConcurrency is less than 1', () => {
+      expect(
+        () =>
+          new I18nInliner({
+            missingTranslation: 'warning',
+            maxConcurrency: 0,
+          }),
+      ).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+
+      expect(
+        () =>
+          new I18nInliner({
+            missingTranslation: 'warning',
+            maxConcurrency: -1,
+          }),
+      ).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+    });
+
+    it('throws when maxConcurrency is not an integer', () => {
+      expect(
+        () =>
+          new I18nInliner({
+            missingTranslation: 'warning',
+            maxConcurrency: 1.5,
+          }),
+      ).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+
+      expect(
+        () =>
+          new I18nInliner({
+            missingTranslation: 'warning',
+            maxConcurrency: NaN,
+          }),
+      ).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+
+      expect(
+        () =>
+          new I18nInliner({
+            missingTranslation: 'warning',
+            maxConcurrency: Infinity,
+          }),
+      ).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+    });
+
+    it('defaults to worker pool concurrency when maxConcurrency is omitted', async () => {
+      const maxThreadsSpy = spyOnProperty(
+        WorkerPool.prototype,
+        'maxThreads',
+        'get',
+      ).and.callThrough();
+
+      inliner = new I18nInliner({
+        missingTranslation: 'warning',
+      });
+
+      const files = [browserFile('main.js', GREETING_SOURCE)];
+      const results = await inliner.inlineAll(files, [
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+        },
+      ]);
+
+      expect(results.size).toBe(1);
+      expect(findFile(results.get('fr')?.outputFiles ?? [], 'main.js').text).toContain('"Bonjour"');
+      expect(maxThreadsSpy).toHaveBeenCalled();
+      expect(maxThreadsSpy.calls.mostRecent().returnValue).toBeGreaterThanOrEqual(1);
+    });
   });
 });

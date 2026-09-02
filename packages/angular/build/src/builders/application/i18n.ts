@@ -45,14 +45,12 @@ export async function inlineI18n(
   const { i18nOptions, baseHref, cacheOptions } = options;
 
   // Create the multi-threaded inliner with common options.
-  const inliner = new I18nInliner(
-    {
-      missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
-      persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
-      localizeVersion: i18nOptions.localizeVersion,
-    },
-    maxWorkers,
-  );
+  const inliner = new I18nInliner({
+    missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
+    maxConcurrency: maxWorkers,
+    persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
+    localizeVersion: i18nOptions.localizeVersion,
+  });
 
   const inlineResult: {
     errors: string[];

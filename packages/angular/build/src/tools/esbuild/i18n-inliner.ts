@@ -121,6 +121,12 @@ async function serializeTranslation(
  */
 export interface I18nInlinerOptions {
   missingTranslation: 'error' | 'warning' | 'ignore';
+
+  /**
+   * The maximum number of concurrent translation inlining operations.
+   * When omitted, concurrency defaults to the available worker pool threads.
+   */
+  maxConcurrency?: number;
   persistentCachePath?: string;
   localizeVersion?: string;
 }
@@ -187,12 +193,23 @@ export class I18nInliner {
   #translationCache: Cache<Uint8Array> | undefined;
   #generation = 0;
 
-  constructor(
-    private readonly options: I18nInlinerOptions,
-    maxThreads?: number,
-  ) {
+  get #maxConcurrency(): number {
+    return this.options.maxConcurrency ?? (this.#workerPool.maxThreads || 1);
+  }
+
+  constructor(private readonly options: I18nInlinerOptions) {
+    if (
+      options.maxConcurrency !== undefined &&
+      (!Number.isInteger(options.maxConcurrency) || options.maxConcurrency < 1)
+    ) {
+      throw new RangeError('options.maxConcurrency must be an integer greater than or equal to 1.');
+    }
+
+    // Piscina uses object spread against default options internally. Only define
+    // maxThreads when specified to avoid overwriting Piscina's default thread count
+    // with undefined.
     this.#workerPool = new WorkerPool({
-      maxThreads,
+      ...(options.maxConcurrency !== undefined && { maxThreads: options.maxConcurrency }),
     });
   }
 
@@ -286,7 +303,7 @@ export class I18nInliner {
 
     // Process locales in sliding windows to cap peak worker memory.
     // Ensure the window has at least enough locales to saturate all available workers on high-core machines.
-    const windowSize = Math.max(DEFAULT_LOCALE_WINDOW_SIZE, this.#workerPool.maxThreads || 1);
+    const windowSize = Math.max(DEFAULT_LOCALE_WINDOW_SIZE, this.#maxConcurrency);
     for (let i = 0; i < localeList.length; i += windowSize) {
       const windowLocales = localeList.slice(i, i + windowSize);
       const activeLocales = windowLocales.map((item) => item.locale);
@@ -461,7 +478,7 @@ export class I18nInliner {
     isLastWindow = true,
     generation?: number,
   ): Promise<void> {
-    const workerCount = this.#workerPool.maxThreads || 1;
+    const workerCount = this.#maxConcurrency;
 
     // Extract file data and identify the heaviest file size in a single pass
     let maxFileSize = 0;
