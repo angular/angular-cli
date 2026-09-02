@@ -22,8 +22,8 @@ describe('registry validation', () => {
 
     it('should not match safe URL characters', () => {
       expect(SHELL_METACHARACTERS.test('https://registry.example.com')).toBe(false);
-      expect(SHELL_METACHARACTERS.test('http://registry.example.com/path')).toBe(false);
-      expect(SHELL_METACHARACTERS.test('https://registry.example.com:8080')).toBe(false);
+      expect(SHELL_METACHARACTERS.test('http://registry.example.com:8080')).toBe(false);
+      expect(SHELL_METACHARACTERS.test('https://registry.example.com/path')).toBe(false);
     });
   });
 
@@ -58,30 +58,6 @@ describe('registry validation', () => {
     it('should reject invalid URLs', () => {
       expect(() => validateRegistry('not-a-url')).toThrow(
         'Option --registry must be a valid URL.',
-      );
-    });
-  });
-
-  describe('Windows shell quoting', () => {
-    it('should wrap args in double quotes', () => {
-      const command = 'npm';
-      const args = ['--registry', 'https://registry.example.com'];
-      const result = `${command} ${args
-        .map((a) => `"${String(a).replace(/"/g, '\\"')}"`)
-        .join(' ')}`;
-      expect(result).toBe(
-        'npm "--registry" "https://registry.example.com"',
-      );
-    });
-
-    it('should escape inner double quotes', () => {
-      const command = 'npm';
-      const args = ['--registry', 'https://example.com?key="value"'];
-      const result = `${command} ${args
-        .map((a) => `"${String(a).replace(/"/g, '\\"')}"`)
-        .join(' ')}`;
-      expect(result).toBe(
-        'npm "--registry" "https://example.com?key=\\"value\\""',
       );
     });
   });
