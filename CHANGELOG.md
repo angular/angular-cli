@@ -1,3 +1,32 @@
+<a name="22.1.7"></a>
+
+# 22.1.7 (2026-09-02)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
+| [e9db85c0f](https://github.com/angular/angular-cli/commit/e9db85c0f5ef0aa0c67d2b8d90b872307af39822) | fix  | isolate temporary package installations from parent Yarn workspace |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                           |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
+| [1c9b1af61](https://github.com/angular/angular-cli/commit/1c9b1af61115764e0be55f5a1ed9a9967c191a74) | fix  | add splitting option to unit-test builder             |
+| [4b861f458](https://github.com/angular/angular-cli/commit/4b861f458c8c789a5276f7b591bebd28e2080444) | fix  | enable code splitting for vitest browser tests        |
+| [f1fd82381](https://github.com/angular/angular-cli/commit/f1fd823814b5e3620838beb423d5f33600c2e546) | fix  | fail build and exclude routes when prerendering fails |
+| [a84906fe3](https://github.com/angular/angular-cli/commit/a84906fe393e8c2dee978c02631af20e93627df1) | fix  | keep dev-server Vite cache worktree-local             |
+| [fcf883ef1](https://github.com/angular/angular-cli/commit/fcf883ef166dc2e34d86007c0fcdfad1d0434c86) | fix  | preserve binary values in the SQLite cache store      |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                         |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
+| [baf1ca189](https://github.com/angular/angular-cli/commit/baf1ca189dcf1ab0e55ac853c80f892dbd1864e4) | fix  | decode pathname when constructing server asset path |
+| [70748ca8e](https://github.com/angular/angular-cli/commit/70748ca8e76fe4b42798719410336119d943e755) | fix  | ensure public directory containment in CommonEngine |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.6"></a>
 
 # 22.1.6 (2026-08-26)
