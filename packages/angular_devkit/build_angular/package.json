@@ -65,7 +65,7 @@
   "devDependencies": {
     "@angular/ssr": "workspace:*",
     "browser-sync": "3.0.4",
-    "ng-packagr": "22.2.0-next.4",
+    "ng-packagr": "22.2.0-next.5",
     "sass": "1.103.1",
     "undici": "8.10.0"
   },
