@@ -32,7 +32,7 @@ import { VERSION } from '../../utilities/version';
 
 class CommandError extends Error {}
 
-export const SHELL_METACHARACTERS = /[&|;$`()]/;
+export const SHELL_METACHARACTERS = /[&|;$`()<>'"\n\r]/;
 
 export function validateRegistry(registry: string): void {
   if (!URL.canParse(registry)) {

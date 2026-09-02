@@ -107,7 +107,6 @@ export interface Host {
  */
 export const NodeJS_HOST: Host = {
   stat,
-  requiresQuoting: platform() === 'win32',
   mkdir,
   readFile: (path: string) => readFile(path, { encoding: 'utf8' }),
   copyFile: (src, dest) => copyFile(src, dest, constants.COPYFILE_FICLONE),

@@ -15,9 +15,15 @@ describe('registry validation', () => {
       expect(SHELL_METACHARACTERS.test('|')).toBe(true);
       expect(SHELL_METACHARACTERS.test(';')).toBe(true);
       expect(SHELL_METACHARACTERS.test('$')).toBe(true);
-      expect(SHELL_METACHARACTERS.test('`')).toBe(true);
+      expect(SHELL_METACHARACTERS.test(String.fromCharCode(96))).toBe(true);
       expect(SHELL_METACHARACTERS.test('(')).toBe(true);
       expect(SHELL_METACHARACTERS.test(')')).toBe(true);
+      expect(SHELL_METACHARACTERS.test('<')).toBe(true);
+      expect(SHELL_METACHARACTERS.test('>')).toBe(true);
+      expect(SHELL_METACHARACTERS.test('"')).toBe(true);
+      expect(SHELL_METACHARACTERS.test("'")).toBe(true);
+      expect(SHELL_METACHARACTERS.test('\n')).toBe(true);
+      expect(SHELL_METACHARACTERS.test('\r')).toBe(true);
     });
 
     it('should not match safe URL characters', () => {
@@ -45,6 +51,9 @@ describe('registry validation', () => {
         'Option --registry contains invalid characters.',
       );
       expect(() => validateRegistry('https://example.com(cmd)')).toThrow(
+        'Option --registry contains invalid characters.',
+      );
+      expect(() => validateRegistry('https://example.com?q=">whoami')).toThrow(
         'Option --registry contains invalid characters.',
       );
     });
