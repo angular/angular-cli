@@ -8,6 +8,7 @@
 
 import type { ɵParsedTranslation } from '@angular/localize';
 import assert from 'node:assert';
+import { createRequire } from 'node:module';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
 import { calculateHash, createContentHash, initializeHash } from '../../utils/hash';
@@ -21,6 +22,10 @@ import type {
   InlineFileBatchResult,
 } from './i18n-inliner-worker';
 import { encodeTranslationToBuffer } from './i18n-translation-encoder';
+
+// TODO: Convert to import.meta usage during ESM transition
+const localRequire = createRequire(__filename);
+const INLINER_WORKER_PATH = localRequire.resolve('./i18n-inliner-worker');
 
 interface WorkerTaskMap {
   inlineFileBatch: {
@@ -187,7 +192,6 @@ export class I18nInliner {
     maxThreads?: number,
   ) {
     this.#workerPool = new WorkerPool({
-      filename: require.resolve('./i18n-inliner-worker'),
       maxThreads,
     });
   }
@@ -562,7 +566,10 @@ export class I18nInliner {
     name: T,
     request: WorkerTaskMap[T]['request'],
   ): Promise<WorkerTaskMap[T]['result']> {
-    return this.#workerPool.run(request, { name }) as Promise<WorkerTaskMap[T]['result']>;
+    return this.#workerPool.run(request, {
+      filename: INLINER_WORKER_PATH,
+      name,
+    }) as Promise<WorkerTaskMap[T]['result']>;
   }
 
   /**
