@@ -21,5 +21,6 @@ ts_project(
         "//:node_modules/@angular/platform-server",
         "//:node_modules/@types/node",
         "//packages/angular/ssr",
+        "//packages/angular/ssr:node_modules/beasties",
     ],
 )

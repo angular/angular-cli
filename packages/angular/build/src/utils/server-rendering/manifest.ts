@@ -9,12 +9,17 @@
 import type { Metafile } from 'esbuild';
 import { Buffer } from 'node:buffer';
 import { extname } from 'node:path';
-import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
+import {
+  INDEX_HTML_SERVER,
+  NormalizedApplicationBuildOptions,
+} from '../../builders/application/options';
 import {
   type BuildOutputFile,
   BuildOutputFileType,
   createOutputFile,
 } from '../../tools/esbuild/bundler-files';
+import { findNonce } from '../index-file/nonce';
+import { joinUrlParts } from '../url';
 
 export const SERVER_APP_MANIFEST_FILENAME = 'angular-app-manifest.mjs';
 export const SERVER_APP_ENGINE_MANIFEST_FILENAME = 'angular-app-engine-manifest.mjs';
@@ -32,11 +37,6 @@ export const SERVER_GENERATED_EXTERNALS = new Set([
   './' + SERVER_APP_MANIFEST_FILENAME,
   './' + SERVER_APP_ENGINE_MANIFEST_FILENAME,
 ]);
-
-interface FilesMapping {
-  path: string;
-  dynamicImport: boolean;
-}
 
 const MAIN_SERVER_OUTPUT_FILENAME = 'main.server.mjs';
 
@@ -143,7 +143,7 @@ export default {
  * - `manifestContent`: A string of the SSR manifest content.
  * - `serverAssetsChunks`: An array of build output files containing the generated assets for the server.
  */
-export function generateAngularServerAppManifest(
+export async function generateAngularServerAppManifest(
   additionalHtmlOutputFiles: Map<string, BuildOutputFile>,
   outputFiles: BuildOutputFile[],
   inlineCriticalCss: boolean,
@@ -153,16 +153,23 @@ export function generateAngularServerAppManifest(
   initialFiles: Set<string>,
   metafile: Metafile,
   publicPath: string | undefined,
-): {
+): Promise<{
   manifestContent: string;
   serverAssetsChunks: BuildOutputFile[];
-} {
+}> {
   const serverAssetsChunks: BuildOutputFile[] = [];
   const serverAssets: Record<string, string> = {};
+  const criticalCssPlans: unknown[] = [];
+  let nonce: string | undefined;
+
+  // TODO(alanagius): This is done here as we do not use module resolution bundler/node16
+  const { compileSheet, encodePlan } = (await import(
+    'beasties/compiler' as string
+  )) as typeof import('beasties/compiler', { with: { 'resolution-mode': 'import' } });
 
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
-    if (extension === '.html' || (inlineCriticalCss && extension === '.css')) {
+    if (extension === '.html') {
       const jsChunkFilePath = `assets-chunks/${file.path.replace(/[./]/g, '_')}.mjs`;
       const escapedContent = escapeUnsafeChars(file.text);
 
@@ -185,7 +192,17 @@ export function generateAngularServerAppManifest(
 
       serverAssets[file.path] =
         `{size: ${size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
+    } else if (inlineCriticalCss && extension === '.css') {
+      const sheet = compileSheet(file.text, {
+        href: joinUrlParts(publicPath ?? '', file.path),
+      });
+      criticalCssPlans.push(encodePlan(sheet));
     }
+  }
+
+  const indexHtml = additionalHtmlOutputFiles.get(INDEX_HTML_SERVER)?.text;
+  if (indexHtml) {
+    nonce = (await findNonce(indexHtml)) ?? undefined;
   }
 
   // When routes have been extracted, mappings are no longer needed, as preloads will be included in the metadata.
@@ -196,9 +213,10 @@ export function generateAngularServerAppManifest(
   const manifestContent = `
 export default {
   bootstrap: () => import('./main.server.mjs').then(m => m.default),
-  inlineCriticalCss: ${inlineCriticalCss},
   baseHref: '${baseHref}',
-  locale: ${JSON.stringify(locale)},
+${criticalCssPlans.length ? `  criticalCssPlans: ${JSON.stringify(criticalCssPlans)},\n` : ''}${
+    nonce ? `  nonce: ${JSON.stringify(nonce)},\n` : ''
+  }  locale: ${JSON.stringify(locale)},
   routes: ${JSON.stringify(routes, undefined, 2)},
   entryPointToBrowserMapping: ${JSON.stringify(entryPointToBrowserMapping, undefined, 2)},
   assets: {

@@ -42,7 +42,7 @@ export async function addNonce(html: string): Promise<string> {
 }
 
 /** Finds the Angular nonce in an HTML string. */
-async function findNonce(html: string): Promise<string | null> {
+export async function findNonce(html: string): Promise<string | null> {
   // Inexpensive check to avoid parsing the HTML when we're sure there's no nonce.
   if (!NONCE_ATTR_PATTERN.test(html)) {
     return null;

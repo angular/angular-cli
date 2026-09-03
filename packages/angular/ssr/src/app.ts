@@ -14,15 +14,13 @@ import {
   StaticProvider,
   ɵresetCompiledComponents,
 } from '@angular/core';
+import { createProcessor } from 'beasties/runtime';
 import { ServerAssets } from './assets';
 import { Hooks } from './hooks';
 import { getAngularAppManifest } from './manifest';
 import { RenderMode } from './routes/route-config';
 import { RouteTreeNodeMetadata } from './routes/route-tree';
 import { ServerRouter } from './routes/router';
-import { sha256 } from './utils/crypto';
-import { InlineCriticalCssProcessor } from './utils/inline-critical-css';
-import { LRUCache } from './utils/lru-cache';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
@@ -38,12 +36,6 @@ const WELL_KNOWN_NON_ANGULAR_URLS: ReadonlySet<string> = new Set<string>([
   '/favicon.ico',
   '/.well-known/appspecific/com.chrome.devtools.json',
 ]);
-
-/**
- * Maximum number of critical CSS entries the cache can store.
- * This value determines the capacity of the LRU (Least Recently Used) cache, which stores critical CSS for pages.
- */
-const MAX_INLINE_CSS_CACHE_ENTRIES = 50;
 
 /**
  * A mapping of `RenderMode` enum values to corresponding string representations.
@@ -114,14 +106,6 @@ export class AngularServerApp {
   constructor(private readonly options: Readonly<AngularServerAppOptions> = {}) {
     this.allowStaticRouteRender = this.options.allowStaticRouteRender ?? false;
     this.hooks = options.hooks ?? new Hooks();
-
-    if (this.manifest.inlineCriticalCss) {
-      this.inlineCriticalCssProcessor = new InlineCriticalCssProcessor((path: string) => {
-        const fileName = path.split('/').pop() ?? path;
-
-        return this.assets.getServerAsset(fileName).text();
-      });
-    }
   }
 
   /**
@@ -142,7 +126,7 @@ export class AngularServerApp {
   /**
    * The `inlineCriticalCssProcessor` is responsible for handling critical CSS inlining.
    */
-  private inlineCriticalCssProcessor: InlineCriticalCssProcessor | undefined;
+  private inlineCriticalCssProcessor?: (html: string) => string;
 
   /**
    * The bootstrap mechanism for the server application.
@@ -150,20 +134,9 @@ export class AngularServerApp {
   private boostrap: AngularBootstrap | undefined;
 
   /**
-   * Decorder used to convert a string to a Uint8Array.
+   * Encoder used to convert a string to a Uint8Array.
    */
-  private readonly textDecoder = new TextEncoder();
-
-  /**
-   * A cache that stores critical CSS to avoid re-processing for every request, improving performance.
-   * This cache uses a Least Recently Used (LRU) eviction policy.
-   *
-   * @see {@link MAX_INLINE_CSS_CACHE_ENTRIES} for the maximum number of entries this cache can hold.
-   */
-  private readonly criticalCssLRUCache = new LRUCache<
-    string,
-    { shaOfContentPreInlinedCss: string; contentWithCriticialCSS: Uint8Array<ArrayBufferLike> }
-  >(MAX_INLINE_CSS_CACHE_ENTRIES);
+  private readonly textEncoder = new TextEncoder();
 
   /**
    * Handles an incoming HTTP request by serving prerendered content, performing server-side rendering,
@@ -358,7 +331,7 @@ export class AngularServerApp {
 
     if (renderMode === RenderMode.Prerender) {
       const renderedHtml = await result.content();
-      const finalHtml = await this.inlineCriticalCss(renderedHtml, url);
+      const finalHtml = this.inlineCriticalCss(renderedHtml);
 
       return new Response(finalHtml, responseInit);
     }
@@ -367,9 +340,9 @@ export class AngularServerApp {
     const stream = new ReadableStream({
       start: async (controller) => {
         try {
-          const renderedHtml = await result.content();
-          const finalHtml = await this.inlineCriticalCssWithCache(renderedHtml, url);
-          controller.enqueue(finalHtml);
+          let renderedHtml = await result.content();
+          renderedHtml = this.inlineCriticalCss(renderedHtml);
+          controller.enqueue(this.textEncoder.encode(renderedHtml));
           controller.close();
         } catch (error) {
           result.destroy();
@@ -388,59 +361,35 @@ export class AngularServerApp {
    * Inlines critical CSS into the given HTML content.
    *
    * @param html The HTML content to process.
-   * @param url The URL associated with the request, for logging purposes.
-   * @returns A promise that resolves to the HTML with inlined critical CSS.
+   * @returns The HTML with inlined critical CSS.
    */
-  private async inlineCriticalCss(html: string, url: URL): Promise<string> {
-    const { inlineCriticalCssProcessor } = this;
-
-    if (!inlineCriticalCssProcessor) {
+  private inlineCriticalCss(html: string): string {
+    const { criticalCssPlans, nonce } = this.manifest;
+    if (!criticalCssPlans?.length) {
       return html;
     }
 
     try {
-      return await inlineCriticalCssProcessor.process(html);
+      this.inlineCriticalCssProcessor ??= createProcessor([...criticalCssPlans], {
+        preload: 'media-script',
+        nonce,
+        preloadFonts: true,
+        inlineFonts: true,
+        noscriptFallback: true,
+        cache: true,
+        logger: {
+          // eslint-disable-next-line no-console
+          warn: console.warn,
+        },
+      }).process;
+
+      return this.inlineCriticalCssProcessor(html);
     } catch (error) {
       // eslint-disable-next-line no-console
-      console.error(`An error occurred while inlining critical CSS for: ${url}.`, error);
+      console.error('An error occurred while inlining critical CSS.', error);
 
       return html;
     }
-  }
-
-  /**
-   * Inlines critical CSS into the given HTML content.
-   * This method uses a cache to avoid reprocessing the same HTML content multiple times.
-   *
-   * @param html The HTML content to process.
-   * @param url The URL associated with the request, for logging purposes.
-   * @returns A promise that resolves to the HTML with inlined critical CSS.
-   */
-  private async inlineCriticalCssWithCache(
-    html: string,
-    url: URL,
-  ): Promise<Uint8Array<ArrayBufferLike>> {
-    const { inlineCriticalCssProcessor, criticalCssLRUCache, textDecoder } = this;
-
-    if (!inlineCriticalCssProcessor) {
-      return textDecoder.encode(html);
-    }
-
-    const cacheKey = url.toString();
-    const cached = criticalCssLRUCache.get(cacheKey);
-    const shaOfContentPreInlinedCss = await sha256(html);
-    if (cached?.shaOfContentPreInlinedCss === shaOfContentPreInlinedCss) {
-      return cached.contentWithCriticialCSS;
-    }
-
-    const processedHtml = await this.inlineCriticalCss(html, url);
-    const finalHtml = textDecoder.encode(processedHtml);
-    criticalCssLRUCache.put(cacheKey, {
-      shaOfContentPreInlinedCss,
-      contentWithCriticialCSS: finalHtml,
-    });
-
-    return finalHtml;
   }
 
   /**

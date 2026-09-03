@@ -9,6 +9,7 @@
     "module": "esnext",
     "target": "es2022",
     "lib": ["es2022"],
+    "moduleResolution": "bundler",
     // don't auto-discover @types/node, it results in a ///<reference in the .d.ts output
     "types": [],
     "sourceMap": true,

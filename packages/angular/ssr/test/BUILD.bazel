@@ -16,6 +16,7 @@ ts_project(
         "//:node_modules/@angular/router",
         "//:node_modules/@types/node",
         "//packages/angular/ssr",
+        "//packages/angular/ssr:node_modules/beasties",
     ],
 )
 
@@ -23,7 +24,6 @@ spec_bundle(
     name = "esm_tests_bundled",
     deps = [
         ":unit_test_lib",
-        "//packages/angular/ssr/third_party/beasties:beasties_bundled",
     ],
 )
 
