@@ -35,8 +35,9 @@ export default async function () {
     process.env['NPM_CONFIG_legacy_peer_deps'] = 'true';
   }
 
-  // Allow github tarballs consumption.
+  // Allow github tarballs and git dependencies consumption.
   process.env['NPM_CONFIG_allow_remote'] = 'all';
+  process.env['NPM_CONFIG_allow_git'] = 'true';
 
   // Configure the registry and prefix used within the test sandbox via rc files
   await writeFile(npmrc, `registry=${npmRegistry}\nprefix=${npmModulesPrefix}`);
