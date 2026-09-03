@@ -833,9 +833,16 @@ importers:
       jsonc-parser:
         specifier: 3.3.1
         version: 3.3.1
+      oxc-parser:
+        specifier: 0.147.0
+        version: 0.147.0
       typescript:
         specifier: 6.0.3
         version: 6.0.3
+    devDependencies:
+      '@oxc-project/types':
+        specifier: 0.147.0
+        version: 0.147.0
 
   tests:
     devDependencies:

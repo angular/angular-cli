@@ -98,4 +98,64 @@ describe(`Migration to add trustProxyHeaders to server.ts`, () => {
     const content = newTree.readText('/server.ts');
     expect(content).toBe(originalContent);
   });
+
+  it(`should not add trustProxyHeaders if it already exists as a string literal`, async () => {
+    const originalContent =
+      `import { AngularAppEngine } from '@angular/ssr';\n` +
+      `const angularApp = new AngularAppEngine({\n  'trustProxyHeaders': true\n});`;
+    tree.create('/server.ts', originalContent);
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/server.ts');
+    expect(content).toBe(originalContent);
+  });
+
+  it(`should not add trustProxyHeaders if it already exists as a shorthand property`, async () => {
+    const originalContent =
+      `import { AngularAppEngine } from '@angular/ssr';\n` +
+      `const trustProxyHeaders = true;\n` +
+      `const angularApp = new AngularAppEngine({\n  trustProxyHeaders\n});`;
+    tree.create('/server.ts', originalContent);
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/server.ts');
+    expect(content).toBe(originalContent);
+  });
+
+  it(`should add trustProxyHeaders to AngularAppEngine without parentheses`, async () => {
+    tree.create(
+      '/server.ts',
+      `import { AngularAppEngine } from '@angular/ssr';\nconst angularApp = new AngularAppEngine;`,
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/server.ts');
+    expect(content).toContain(`const angularApp = new AngularAppEngine({`);
+    expect(content).toContain(TODO_COMMENT);
+    expect(content).toContain(`trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],\n})`);
+  });
+
+  it(`should add trustProxyHeaders when a computed property with variable name trustProxyHeaders exists`, async () => {
+    tree.create(
+      '/server.ts',
+      `import { AngularAppEngine } from '@angular/ssr';\n` +
+        `const trustProxyHeaders = 'customHeader';\n` +
+        `const angularApp = new AngularAppEngine({\n  [trustProxyHeaders]: true\n});`,
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/server.ts');
+    expect(content).toContain(TODO_COMMENT);
+    expect(content).toContain(`trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],`);
+    expect(content).toContain(`[trustProxyHeaders]: true`);
+  });
+
+  it(`should skip files with parse errors without throwing`, async () => {
+    const malformedContent = `import { AngularAppEngine } from '@angular/ssr';\nconst angularApp = new AngularAppEngine(;`;
+    tree.create('/server.ts', malformedContent);
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/server.ts');
+    expect(content).toBe(malformedContent);
+  });
 });

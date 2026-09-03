@@ -20,6 +20,10 @@
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
     "jsonc-parser": "3.3.1",
+    "oxc-parser": "0.147.0",
     "typescript": "6.0.3"
+  },
+  "devDependencies": {
+    "@oxc-project/types": "0.147.0"
   }
 }
