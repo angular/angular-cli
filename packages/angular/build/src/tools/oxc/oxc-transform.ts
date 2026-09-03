@@ -599,7 +599,7 @@ export function transform(filename: string, code: string, options: OxcTransformO
           source.appendRight(classNode.start, `let ${classIdName} = /*#__PURE__*/ (() => {\n`);
           source.appendLeft(lastStatement.end, `\nreturn ${classIdName};\n})();`);
         } else if (isVariableClass) {
-          // Wrap class inside init: `/*#__PURE__*/ (() => { let ClassName = class ClassName {}; return ClassName; })()`
+          // 2. Wrap class inside init: `(() => { let ClassName = class ClassName {}; return ClassName; })()`
           source.appendRight(classNode.start, `/*#__PURE__*/ (() => {\nlet ${classIdName} = `);
           const terminator = activeWrapPaths.length === 0 ? ';' : '';
           const iifeClosing = activeWrapPaths.length === 0 ? '})()' : '})();';
