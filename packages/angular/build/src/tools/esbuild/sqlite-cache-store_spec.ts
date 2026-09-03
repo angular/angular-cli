@@ -224,6 +224,194 @@ describe('SqliteCacheStore', () => {
     expect(row.last_accessed).toBeGreaterThan(pastTimestamp);
   });
 
+  it('should selectively compress entries that exceed the 32KB threshold', async () => {
+    const largeContent =
+      'export const testFunction = () => { console.log("hello world"); };\n'.repeat(1000);
+    await store.set('large-key', largeContent);
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const row = directDb
+      .prepare('SELECT value, format FROM cache WHERE key = ?')
+      .get('large-key') as {
+      value: Uint8Array;
+      format: number;
+    };
+    directDb.close();
+
+    // Verify format flag is 1 (CacheFormat.V8Compressed) and compressed size is drastically smaller
+    expect(row.format).toBe(1);
+    expect(row.value.byteLength).toBeLessThan(largeContent.length / 5);
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('large-key');
+      expect(result).toBe(largeContent);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should not compress entries below the 32KB threshold', async () => {
+    const smallContent = 'export const small = true;';
+    await store.set('small-key', smallContent);
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const row = directDb
+      .prepare('SELECT value, format FROM cache WHERE key = ?')
+      .get('small-key') as {
+      value: Uint8Array;
+      format: number;
+    };
+    directDb.close();
+
+    // Verify format flag is 0 (CacheFormat.V8)
+    expect(row.format).toBe(0);
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('small-key');
+      expect(result).toBe(smallContent);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should not compress entries exceeding the 32KB threshold if compression does not reduce size', async () => {
+    const { randomBytes } = await import('node:crypto');
+    // High-entropy random bytes cannot be compressed by DEFLATE
+    const incompressibleData = new Uint8Array(randomBytes(48 * 1024));
+    await store.set('incompressible-key', incompressibleData);
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const row = directDb
+      .prepare('SELECT value, format FROM cache WHERE key = ?')
+      .get('incompressible-key') as {
+      value: Uint8Array;
+      format: number;
+    };
+    directDb.close();
+
+    // Verify entry is stored uncompressed as raw binary (format 2 = CacheFormat.RawBinary)
+    expect(row.format).toBe(2);
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('incompressible-key');
+      expect(result).toEqual(incompressibleData);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should store raw Uint8Array directly with zero serialization', async () => {
+    const binaryData = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8]);
+    await store.set('binary-key', binaryData);
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const row = directDb
+      .prepare('SELECT value, format FROM cache WHERE key = ?')
+      .get('binary-key') as {
+      value: Uint8Array;
+      format: number;
+    };
+    directDb.close();
+
+    // Verify format is 2 (CacheFormat.RawBinary) and value is the exact raw bytes
+    expect(row.format).toBe(2);
+    expect(row.value).toEqual(binaryData);
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('binary-key');
+      expect(result).toEqual(binaryData);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should selectively compress large Uint8Array entries', async () => {
+    const largeBinary = new Uint8Array(Buffer.from('export const x = 1;\n'.repeat(2000)));
+    await store.set('large-binary-key', largeBinary);
+    store.close();
+
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const row = directDb
+      .prepare('SELECT value, format FROM cache WHERE key = ?')
+      .get('large-binary-key') as {
+      value: Uint8Array;
+      format: number;
+    };
+    directDb.close();
+
+    // Verify format is 3 (CacheFormat.RawBinaryCompressed)
+    expect(row.format).toBe(3);
+    expect(row.value.byteLength).toBeLessThan(largeBinary.byteLength / 5);
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('large-binary-key');
+      expect(result).toEqual(largeBinary);
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should seamlessly read legacy entries from databases created without a format column', async () => {
+    const { serialize } = await import('node:v8');
+    const { DatabaseSync } = await import('node:sqlite');
+
+    // Create a legacy database without a format column
+    const directDb = new DatabaseSync(cachePath);
+    directDb.exec(
+      'CREATE TABLE cache (key TEXT PRIMARY KEY, value BLOB, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
+    );
+    const legacyPayload = serialize('legacy-content');
+    directDb
+      .prepare('INSERT INTO cache (key, value, last_accessed) VALUES (?, ?, unixepoch())')
+      .run('legacy-key', legacyPayload);
+    directDb.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      const result = await reopenedStore.get('legacy-key');
+      expect(result).toBe('legacy-content');
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should treat a corrupted compressed payload as a cache miss', async () => {
+    // Initialize database
+    await store.set('init-key', 'init-val');
+    store.close();
+
+    // Insert an entry with format = 1 (V8Compressed) followed by garbage
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    directDb
+      .prepare(
+        'INSERT INTO cache (key, value, format, last_accessed) VALUES (?, ?, 1, unixepoch())',
+      )
+      .run('corrupt-compressed-key', new Uint8Array([0xde, 0xad, 0xbe, 0xef]));
+    directDb.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      expect(await reopenedStore.get('corrupt-compressed-key')).toBeUndefined();
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
   it('should treat a non-binary payload as a cache miss', async () => {
     await store.set('text-key', 'value');
     store.close();
