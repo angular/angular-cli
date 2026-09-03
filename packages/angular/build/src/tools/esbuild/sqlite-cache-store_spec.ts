@@ -93,6 +93,137 @@ describe('SqliteCacheStore', () => {
     }
   });
 
+  it('should automatically recover from a corrupted database file', async () => {
+    // Write corrupted header data to the database file
+    await fs.writeFile(cachePath, 'CORRUPTED_DATABASE_FILE_CONTENTS');
+
+    // The store should detect corruption, reset the database files, and operate normally
+    await store.set('recover-key', 'recovered-value');
+    const result = await store.get('recover-key');
+    expect(result).toBe('recovered-value');
+  });
+
+  it('should automatically recover from a corrupted B-tree page', async () => {
+    // Initialize valid database
+    await store.set('initial-key', 'initial-val');
+    store.close();
+
+    // Overwrite page data with garbage
+    const handle = await fs.open(cachePath, 'r+');
+    await handle.write(Buffer.alloc(200, 0xff), 0, 200, 100);
+    await handle.close();
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      await reopenedStore.set('new-key', 'new-val');
+      expect(await reopenedStore.get('new-key')).toBe('new-val');
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should gracefully degrade when database path is permanently unwritable', async () => {
+    // A regular file in place of a directory path ensures unwritability across all platforms (ENOTDIR)
+    const blockingFile = join(tempDir, 'blocking-file');
+    await fs.writeFile(blockingFile, 'cannot-be-a-directory');
+
+    const unwritableStore = new SqliteCacheStore(join(blockingFile, 'cannot-create.db'));
+    try {
+      expect(unwritableStore.has('any-key')).toBeFalse();
+      expect(await unwritableStore.get('any-key')).toBeUndefined();
+      await unwritableStore.set('any-key', 'any-val');
+      expect(await unwritableStore.get('any-key')).toBeUndefined();
+      expect(unwritableStore.has('any-key')).toBeFalse();
+    } finally {
+      unwritableStore.close();
+    }
+  });
+
+  it('should automatically recover from a corrupted journal file', async () => {
+    await store.set('key-before', 'val-before');
+    store.close();
+
+    // Create a corrupt rollback journal file
+    await fs.writeFile(cachePath + '-journal', 'CORRUPTED_JOURNAL_FILE');
+
+    const reopenedStore = new SqliteCacheStore(cachePath);
+    try {
+      await reopenedStore.set('new-key', 'new-val');
+      expect(await reopenedStore.get('new-key')).toBe('new-val');
+    } finally {
+      reopenedStore.close();
+    }
+  });
+
+  it('should not delete database files when database is locked by another process', async () => {
+    await store.set('persist-key', 'persist-val');
+    store.close();
+
+    // Open direct connection with an exclusive transaction holding a write lock
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    directDb.exec('BEGIN EXCLUSIVE TRANSACTION;');
+
+    // Use a tiny busyTimeoutMs so the test fails fast instead of waiting 5s
+    const lockedStore = new SqliteCacheStore(cachePath, undefined, undefined, 10);
+    try {
+      expect(lockedStore.has('persist-key')).toBeFalse();
+      expect(await lockedStore.get('persist-key')).toBeUndefined();
+    } finally {
+      lockedStore.close();
+      directDb.exec('COMMIT;');
+      directDb.close();
+    }
+
+    // Verify the original database file and its data were not deleted
+    const verifyStore = new SqliteCacheStore(cachePath);
+    try {
+      expect(await verifyStore.get('persist-key')).toBe('persist-val');
+    } finally {
+      verifyStore.close();
+    }
+  });
+
+  it('should safely fall back to default timeout if invalid busyTimeoutMs is provided', async () => {
+    // Pass NaN as busyTimeoutMs
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const invalidStore = new SqliteCacheStore(cachePath, undefined, undefined, NaN as any);
+    try {
+      await invalidStore.set('valid-key', 'valid-value');
+      expect(await invalidStore.get('valid-key')).toBe('valid-value');
+    } finally {
+      invalidStore.close();
+    }
+  });
+
+  it('should flush pending access updates on close', async () => {
+    await store.set('flush-key', 'flush-val');
+
+    // Manually backdate the entry's last_accessed timestamp to simulate elapsed time
+    const { DatabaseSync } = await import('node:sqlite');
+    const directDb = new DatabaseSync(cachePath);
+    const pastTimestamp = Math.floor(Date.now() / 1000) - 3600;
+    directDb
+      .prepare('UPDATE cache SET last_accessed = ? WHERE key = ?')
+      .run(pastTimestamp, 'flush-key');
+    directDb.close();
+
+    // Access the key via store.get() to queue an access update
+    await store.get('flush-key');
+
+    // Immediately close the store before the debounced 500ms timeout fires
+    store.close();
+
+    // Verify the timestamp in SQLite was updated upon close
+    const checkDb = new DatabaseSync(cachePath);
+    const row = checkDb
+      .prepare('SELECT last_accessed FROM cache WHERE key = ?')
+      .get('flush-key') as { last_accessed: number };
+    checkDb.close();
+
+    expect(row.last_accessed).toBeGreaterThan(pastTimestamp);
+  });
+
   it('should treat a non-binary payload as a cache miss', async () => {
     await store.set('text-key', 'value');
     store.close();
