@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { DatabaseSync, StatementSync } from 'node:sqlite';
 import { deserialize, serialize } from 'node:v8';
 import { Cache, PersistentCacheStore } from './cache';
@@ -35,7 +37,19 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
 
   #ensureDb(): DatabaseSync {
     if (!this.#db) {
-      this.#db = new DatabaseSync(this.cachePath);
+      if (this.cachePath === ':memory:') {
+        this.#db = new DatabaseSync(this.cachePath);
+      } else {
+        // Optimistically attempt to open the database file first to avoid directory creation
+        // syscalls on warm builds where the parent directory already exists.
+        try {
+          this.#db = new DatabaseSync(this.cachePath);
+        } catch {
+          mkdirSync(dirname(this.cachePath), { recursive: true });
+          this.#db = new DatabaseSync(this.cachePath);
+        }
+      }
+
       // Optimize SQLite for cache usage
       this.#db.exec('PRAGMA auto_vacuum = FULL;');
       this.#db.exec('PRAGMA journal_mode = WAL;');

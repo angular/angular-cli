@@ -220,6 +220,31 @@ describe('SqliteCacheStore', () => {
     }
   });
 
+  it('should create parent directories if they do not exist', async () => {
+    const nestedDir = join(tempDir, 'nested', 'deeply', 'cache');
+    const nestedCachePath = join(nestedDir, 'nested-cache.db');
+    const nestedStore = new SqliteCacheStore(nestedCachePath);
+
+    try {
+      await nestedStore.set('nested-key', 'nested-value');
+      const result = await nestedStore.get('nested-key');
+      expect(result).toBe('nested-value');
+    } finally {
+      nestedStore.close();
+    }
+  });
+
+  it('should support in-memory databases', async () => {
+    const memoryStore = new SqliteCacheStore(':memory:');
+    try {
+      await memoryStore.set('mem-key', 'mem-value');
+      const result = await memoryStore.get('mem-key');
+      expect(result).toBe('mem-value');
+    } finally {
+      memoryStore.close();
+    }
+  });
+
   describe('NG_BUILD_CACHE_STORE env variable option', () => {
     it('should force SQLite when NG_BUILD_CACHE_STORE=sqlite', () => {
       const code = `
