@@ -15,17 +15,17 @@
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",
     "@angular-devkit/schematics": "workspace:0.0.0-PLACEHOLDER",
-    "@inquirer/prompts": "8.6.0",
-    "@listr2/prompt-adapter-inquirer": "4.2.6",
+    "@inquirer/prompts": "8.7.0",
+    "@listr2/prompt-adapter-inquirer": "4.2.7",
     "@modelcontextprotocol/server": "2.0.0",
     "@schematics/angular": "workspace:0.0.0-PLACEHOLDER",
     "jsonc-parser": "3.3.1",
-    "listr2": "11.0.1",
+    "listr2": "11.1.0",
     "npm-package-arg": "14.0.0",
     "parse5-html-rewriting-stream": "8.0.1",
     "semver": "7.8.5",
     "yargs": "18.1.0",
-    "zod": "4.4.3"
+    "zod": "4.5.4"
   },
   "ng-update": {
     "migrations": "@schematics/angular/migrations/migration-collection.json",
