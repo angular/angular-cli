@@ -1092,4 +1092,78 @@ describe('I18nInliner', () => {
       expect(maxThreadsSpy.calls.mostRecent().returnValue).toBeGreaterThanOrEqual(1);
     });
   });
+
+  describe('supplied workerPool', () => {
+    let externalPool: WorkerPool | undefined;
+
+    afterEach(async () => {
+      await externalPool?.destroy();
+      externalPool = undefined;
+    });
+
+    it('uses the supplied workerPool to execute transformation tasks', async () => {
+      externalPool = new WorkerPool({ maxThreads: 1 });
+      const runSpy = spyOn(externalPool, 'run').and.callThrough();
+
+      inliner = new I18nInliner({ missingTranslation: 'warning' }, externalPool);
+
+      const files = [browserFile('main.js', GREETING_SOURCE)];
+      const results = await inliner.inlineAll(files, [
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+        },
+      ]);
+
+      expect(results.size).toBe(1);
+      expect(findFile(results.get('fr')?.outputFiles ?? [], 'main.js').text).toContain('"Bonjour"');
+      expect(runSpy).toHaveBeenCalled();
+    });
+
+    it('does not destroy the supplied workerPool on close()', async () => {
+      externalPool = new WorkerPool({ maxThreads: 1 });
+      const destroySpy = spyOn(externalPool, 'destroy').and.callThrough();
+
+      inliner = new I18nInliner({ missingTranslation: 'warning' }, externalPool);
+      await inliner.close();
+
+      expect(destroySpy).not.toHaveBeenCalled();
+    });
+
+    it('destroys internally created workerPool on close()', async () => {
+      const destroySpy = spyOn(WorkerPool.prototype, 'destroy').and.callThrough();
+
+      inliner = new I18nInliner({ missingTranslation: 'warning', maxConcurrency: 1 });
+      await inliner.close();
+
+      expect(destroySpy).toHaveBeenCalled();
+    });
+
+    it('supports multiple sequential inlining passes with the same supplied workerPool', async () => {
+      externalPool = new WorkerPool({ maxThreads: 1 });
+
+      inliner = new I18nInliner({ missingTranslation: 'warning' }, externalPool);
+
+      const files1 = [browserFile('main.js', GREETING_SOURCE)];
+      const results1 = await inliner.inlineAll(files1, [
+        {
+          locale: 'fr',
+          translation: { greeting: translationFor('Bonjour') },
+        },
+      ]);
+      expect(findFile(results1.get('fr')?.outputFiles ?? [], 'main.js').text).toContain(
+        '"Bonjour"',
+      );
+
+      // Second inlining pass on the same pool
+      const files2 = [browserFile('main.js', GREETING_SOURCE)];
+      const results2 = await inliner.inlineAll(files2, [
+        {
+          locale: 'es',
+          translation: { greeting: translationFor('Hola') },
+        },
+      ]);
+      expect(findFile(results2.get('es')?.outputFiles ?? [], 'main.js').text).toContain('"Hola"');
+    });
+  });
 });
