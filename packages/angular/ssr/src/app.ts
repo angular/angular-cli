@@ -369,20 +369,27 @@ export class AngularServerApp {
       return html;
     }
 
-    this.inlineCriticalCssProcessor ??= createProcessor([...criticalCssPlans], {
-      preload: 'media-script',
-      nonce,
-      preloadFonts: true,
-      inlineFonts: true,
-      noscriptFallback: true,
-      cache: true,
-      logger: {
-        // eslint-disable-next-line no-console
-        warn: console.warn,
-      },
-    }).process;
+    try {
+      this.inlineCriticalCssProcessor ??= createProcessor([...criticalCssPlans], {
+        preload: 'media-script',
+        nonce,
+        preloadFonts: true,
+        inlineFonts: true,
+        noscriptFallback: true,
+        cache: true,
+        logger: {
+          // eslint-disable-next-line no-console
+          warn: console.warn,
+        },
+      }).process;
 
-    return this.inlineCriticalCssProcessor(html);
+      return this.inlineCriticalCssProcessor(html);
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('An error occurred while inlining critical CSS.', error);
+
+      return html;
+    }
   }
 
   /**

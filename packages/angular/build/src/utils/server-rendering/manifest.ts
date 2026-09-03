@@ -18,6 +18,7 @@ import {
   BuildOutputFileType,
   createOutputFile,
 } from '../../tools/esbuild/bundler-files';
+import { findNonce } from '../index-file/nonce';
 import { joinUrlParts } from '../url';
 
 export const SERVER_APP_MANIFEST_FILENAME = 'angular-app-manifest.mjs';
@@ -201,7 +202,7 @@ export async function generateAngularServerAppManifest(
 
   const indexHtml = additionalHtmlOutputFiles.get(INDEX_HTML_SERVER)?.text;
   if (indexHtml) {
-    nonce = findNonce(indexHtml);
+    nonce = (await findNonce(indexHtml)) ?? undefined;
   }
 
   // When routes have been extracted, mappings are no longer needed, as preloads will be included in the metadata.
@@ -262,13 +263,4 @@ function generateLazyLoadedFilesMappings(
   }
 
   return entryPointToBundles;
-}
-
-/**
- * Finds the Angular nonce attribute value in an HTML string.
- */
-function findNonce(html: string): string | undefined {
-  const match = /<[a-zA-Z0-9-]+[^>]*?\sngcspnonce=(?:"([^"]*)"|'([^']*)'|(\S+))/i.exec(html);
-
-  return match ? (match[1] ?? match[2] ?? match[3]) : undefined;
 }
