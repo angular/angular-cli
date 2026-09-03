@@ -101,7 +101,9 @@ ts_project(
     deps = [
         ":node_modules/@angular-devkit/core",
         ":node_modules/@angular-devkit/schematics",
+        ":node_modules/@oxc-project/types",
         ":node_modules/jsonc-parser",
+        ":node_modules/oxc-parser",
         ":node_modules/typescript",
         "//:node_modules/@types/node",
     ],

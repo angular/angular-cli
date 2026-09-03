@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Rule } from '@angular-devkit/schematics';
-import ts from 'typescript';
+import type { Rule } from '@angular-devkit/schematics';
+import { Visitor, parseSync } from 'oxc-parser';
 import { allTargetOptions, allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
 
 const TODO_COMMENT =
@@ -45,52 +45,65 @@ export default function (): Rule {
         continue;
       }
 
-      const sourceFile = ts.createSourceFile(path, content, ts.ScriptTarget.Latest, true);
+      const parseResult = parseSync(path, content, {
+        sourceType: 'module',
+      });
+
+      if (parseResult.errors.length > 0) {
+        continue;
+      }
+
       const recorder = tree.beginUpdate(path);
 
-      function visit(node: ts.Node) {
-        if (
-          ts.isNewExpression(node) &&
-          ts.isIdentifier(node.expression) &&
-          (node.expression.text === 'AngularNodeAppEngine' ||
-            node.expression.text === 'AngularAppEngine')
-        ) {
-          // Check arguments
-          if (!node.arguments || node.arguments.length === 0) {
-            // Case 1: No arguments passed
-            const insertPos = node.end - 1; // right before )
-            recorder.insertRight(
-              insertPos,
-              `{\n  ${TODO_COMMENT}\n  ` +
-                `trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],\n}`,
-            );
-          } else if (node.arguments.length > 0) {
-            const firstArg = node.arguments[0];
-            if (ts.isObjectLiteralExpression(firstArg)) {
-              // Check if trustProxyHeaders is already present
-              const hasTrustProxyHeaders = firstArg.properties.some(
-                (prop: ts.ObjectLiteralElementLike) =>
-                  ts.isPropertyAssignment(prop) &&
-                  (ts.isIdentifier(prop.name) || ts.isStringLiteral(prop.name)) &&
-                  prop.name.text === 'trustProxyHeaders',
+      const visitor = new Visitor({
+        NewExpression(node) {
+          if (
+            node.callee.type === 'Identifier' &&
+            (node.callee.name === 'AngularNodeAppEngine' || node.callee.name === 'AngularAppEngine')
+          ) {
+            // Check arguments
+            if (!node.arguments || node.arguments.length === 0) {
+              // Case 1: No arguments passed
+              const hasParens = content[node.end - 1] === ')';
+              const insertPos = hasParens ? node.end - 1 : node.end;
+              recorder.insertRight(
+                insertPos,
+                hasParens
+                  ? `{\n  ${TODO_COMMENT}\n  ` +
+                      `trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],\n}`
+                  : `({\n  ${TODO_COMMENT}\n  ` +
+                      `trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],\n})`,
               );
-
-              if (!hasTrustProxyHeaders) {
-                // Insert right after the opening brace
-                const insertPos = firstArg.getStart() + 1;
-                recorder.insertRight(
-                  insertPos,
-                  `\n  ${TODO_COMMENT}\n  ` +
-                    `trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],`,
+            } else if (node.arguments.length > 0) {
+              const firstArg = node.arguments[0];
+              if (firstArg.type === 'ObjectExpression') {
+                // Check if trustProxyHeaders is already present
+                const hasTrustProxyHeaders = firstArg.properties.some(
+                  (prop) =>
+                    prop.type === 'Property' &&
+                    ((!prop.computed &&
+                      prop.key.type === 'Identifier' &&
+                      prop.key.name === 'trustProxyHeaders') ||
+                      (prop.key.type === 'Literal' && prop.key.value === 'trustProxyHeaders')),
                 );
+
+                if (!hasTrustProxyHeaders) {
+                  // Insert right after the opening brace
+                  const insertPos = firstArg.start + 1;
+                  recorder.insertRight(
+                    insertPos,
+                    `\n  ${TODO_COMMENT}\n  ` +
+                      `trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],`,
+                  );
+                }
               }
             }
           }
-        }
-        ts.forEachChild(node, visit);
-      }
+        },
+      });
 
-      visit(sourceFile);
+      visitor.visit(parseResult.program);
+
       tree.commitUpdate(recorder);
     }
   };
