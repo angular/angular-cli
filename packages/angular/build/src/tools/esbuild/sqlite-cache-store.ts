@@ -6,11 +6,34 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, rmSync } from 'node:fs';
 import { dirname } from 'node:path';
 import { DatabaseSync, StatementSync } from 'node:sqlite';
 import { deserialize, serialize } from 'node:v8';
 import { Cache, PersistentCacheStore } from './cache';
+
+/**
+ * Common SQLite primary result codes.
+ * @see https://www.sqlite.org/rescode.html
+ */
+const enum SqliteResultCode {
+  Busy = 5,
+  Locked = 6,
+}
+
+interface SqliteError extends Error {
+  code?: string;
+  errcode?: number;
+  errstr?: string;
+}
+
+function isSqliteError(error: unknown): error is SqliteError {
+  return (
+    error instanceof Error &&
+    ('errcode' in error ||
+      ('code' in error && (error as { code: unknown }).code === 'ERR_SQLITE_ERROR'))
+  );
+}
 
 /**
  * A persistent cache store backed by SQLite.
@@ -22,56 +45,114 @@ import { Cache, PersistentCacheStore } from './cache';
  */
 export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   #db: DatabaseSync | undefined;
+  #disabled = false;
   #getStmt: StatementSync | undefined;
   #hasStmt: StatementSync | undefined;
   #setStmt: StatementSync | undefined;
   #updateAccessedStmt: StatementSync | undefined;
   readonly #pendingAccessedKeys = new Set<string>();
   #flushTimeout: NodeJS.Timeout | undefined;
+  readonly #busyTimeoutMs: number;
 
   constructor(
     readonly cachePath: string,
     private readonly maxPayloadSize = 1024 * 1024 * 1024,
     private readonly ttlDays = 14,
-  ) {}
+    busyTimeoutMs = 5000,
+  ) {
+    this.#busyTimeoutMs =
+      Number.isSafeInteger(busyTimeoutMs) && busyTimeoutMs >= 0 ? busyTimeoutMs : 5000;
+  }
 
-  #ensureDb(): DatabaseSync {
-    if (!this.#db) {
+  #openDatabase(): DatabaseSync {
+    let db: DatabaseSync | undefined;
+    try {
       if (this.cachePath === ':memory:') {
-        this.#db = new DatabaseSync(this.cachePath);
+        db = new DatabaseSync(this.cachePath);
       } else {
         // Optimistically attempt to open the database file first to avoid directory creation
         // syscalls on warm builds where the parent directory already exists.
         try {
-          this.#db = new DatabaseSync(this.cachePath);
+          db = new DatabaseSync(this.cachePath);
         } catch {
           mkdirSync(dirname(this.cachePath), { recursive: true });
-          this.#db = new DatabaseSync(this.cachePath);
+          db = new DatabaseSync(this.cachePath);
         }
       }
 
       // Optimize SQLite for cache usage
-      this.#db.exec('PRAGMA auto_vacuum = FULL;');
-      this.#db.exec('PRAGMA journal_mode = WAL;');
-      this.#db.exec('PRAGMA synchronous = NORMAL;');
-      this.#db.exec('PRAGMA busy_timeout = 5000;');
-      this.#db.exec('PRAGMA temp_store = MEMORY;');
-      this.#db.exec('PRAGMA mmap_size = 268435456;');
-      this.#db.exec(
+      db.exec(`PRAGMA busy_timeout = ${this.#busyTimeoutMs};`);
+      db.exec('PRAGMA auto_vacuum = FULL;');
+      db.exec('PRAGMA journal_mode = WAL;');
+      db.exec('PRAGMA synchronous = NORMAL;');
+      db.exec('PRAGMA temp_store = MEMORY;');
+      db.exec('PRAGMA mmap_size = 268435456;');
+      db.exec(
         'CREATE TABLE IF NOT EXISTS cache (key TEXT PRIMARY KEY, value BLOB, last_accessed INTEGER NOT NULL) WITHOUT ROWID;',
       );
-      this.#db.exec(
+      db.exec(
         'CREATE INDEX IF NOT EXISTS idx_cache_accessed ON cache (last_accessed DESC, key DESC);',
       );
 
-      this.#getStmt = this.#db.prepare('SELECT value FROM cache WHERE key = ?');
-      this.#hasStmt = this.#db.prepare('SELECT 1 FROM cache WHERE key = ?');
-      this.#setStmt = this.#db.prepare(
+      this.#getStmt = db.prepare('SELECT value FROM cache WHERE key = ?');
+      this.#hasStmt = db.prepare('SELECT 1 FROM cache WHERE key = ?');
+      this.#setStmt = db.prepare(
         'INSERT OR REPLACE INTO cache (key, value, last_accessed) VALUES (?, ?, unixepoch())',
       );
-      this.#updateAccessedStmt = this.#db.prepare(
+      this.#updateAccessedStmt = db.prepare(
         'UPDATE cache SET last_accessed = unixepoch() WHERE key = ?',
       );
+
+      this.#db = db;
+
+      return db;
+    } catch (error) {
+      try {
+        db?.close();
+      } catch {
+        // Ignore close error on corrupted handle
+      }
+      this.#getStmt = undefined;
+      this.#hasStmt = undefined;
+      this.#setStmt = undefined;
+      this.#updateAccessedStmt = undefined;
+      throw error;
+    }
+  }
+
+  #ensureDb(): DatabaseSync | undefined {
+    if (this.#disabled) {
+      return undefined;
+    }
+
+    if (!this.#db) {
+      try {
+        return this.#openDatabase();
+      } catch (error) {
+        // If the database is locked by another active process,
+        // do not attempt to delete the database files as that could corrupt the active process's database.
+        const isBusy =
+          isSqliteError(error) &&
+          (error.errcode === SqliteResultCode.Busy || error.errcode === SqliteResultCode.Locked);
+
+        // Attempt to recover from database corruption by deleting the corrupted files and recreating
+        if (!isBusy && this.cachePath !== ':memory:') {
+          try {
+            rmSync(this.cachePath, { force: true });
+            rmSync(this.cachePath + '-wal', { force: true });
+            rmSync(this.cachePath + '-shm', { force: true });
+            rmSync(this.cachePath + '-journal', { force: true });
+
+            return this.#openDatabase();
+          } catch {
+            // If recovery fails (e.g. read-only filesystem or permission denied), disable caching
+          }
+        }
+
+        this.#disabled = true;
+
+        return undefined;
+      }
     }
 
     return this.#db;
@@ -94,19 +175,21 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       this.#flushTimeout = undefined;
     }
 
-    if (!this.#db || this.#pendingAccessedKeys.size === 0 || !this.#updateAccessedStmt) {
+    if (this.#pendingAccessedKeys.size === 0) {
       return;
     }
 
     try {
-      this.#db.exec('BEGIN IMMEDIATE TRANSACTION;');
-      for (const key of this.#pendingAccessedKeys) {
-        this.#updateAccessedStmt.run(key);
+      if (this.#db && this.#updateAccessedStmt) {
+        this.#db.exec('BEGIN IMMEDIATE TRANSACTION;');
+        for (const key of this.#pendingAccessedKeys) {
+          this.#updateAccessedStmt.run(key);
+        }
+        this.#db.exec('COMMIT;');
       }
-      this.#db.exec('COMMIT;');
     } catch {
       try {
-        this.#db.exec('ROLLBACK;');
+        this.#db?.exec('ROLLBACK;');
       } catch {
         // Ignore rollback errors if transaction was not active
       }
@@ -117,35 +200,55 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async get(key: string): Promise<any> {
-    this.#ensureDb();
-    // SQLite column types are dynamic, so the stored value is only known at runtime.
-    const row = this.#getStmt?.get(key) as { value: unknown } | undefined;
+    if (!this.#ensureDb()) {
+      return undefined;
+    }
 
-    if (row) {
-      this.#queueAccessUpdate(key);
+    try {
+      // SQLite column types are dynamic, so the stored value is only known at runtime.
+      const row = this.#getStmt?.get(key) as { value: unknown } | undefined;
 
-      if (row.value instanceof Uint8Array) {
-        try {
-          return deserialize(row.value);
-        } catch {
-          // Treat corrupt or unparseable cached payloads as a cache miss.
+      if (row) {
+        this.#queueAccessUpdate(key);
+
+        if (row.value instanceof Uint8Array) {
+          try {
+            return deserialize(row.value);
+          } catch {
+            // Treat corrupt or unparseable cached payloads as a cache miss.
+          }
         }
       }
+    } catch {
+      // Treat query errors (e.g. disk read failures) as a cache miss.
     }
 
     return undefined;
   }
 
   has(key: string): boolean {
-    this.#ensureDb();
+    if (!this.#ensureDb()) {
+      return false;
+    }
 
-    return !!this.#hasStmt?.get(key);
+    try {
+      return !!this.#hasStmt?.get(key);
+    } catch {
+      return false;
+    }
   }
 
   async set(key: string, value: unknown): Promise<this> {
-    this.#ensureDb();
-    this.#pendingAccessedKeys.delete(key);
-    this.#setStmt?.run(key, serialize(value));
+    if (!this.#ensureDb()) {
+      return this;
+    }
+
+    try {
+      this.#pendingAccessedKeys.delete(key);
+      this.#setStmt?.run(key, serialize(value));
+    } catch {
+      // Writing to cache is non-fatal and should not fail the build.
+    }
 
     return this;
   }
@@ -155,11 +258,10 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   }
 
   close(): void {
+    this.#flushAccessUpdates();
+
     if (this.#db) {
       try {
-        // Flush any pending access updates in one transaction before pruning
-        this.#flushAccessUpdates();
-
         this.#db.exec('BEGIN IMMEDIATE TRANSACTION;');
         try {
           // 1. Delete items older than N days
@@ -202,12 +304,6 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
       } catch {
         // Pruning errors should not block build success
       } finally {
-        if (this.#flushTimeout) {
-          clearTimeout(this.#flushTimeout);
-          this.#flushTimeout = undefined;
-        }
-        this.#pendingAccessedKeys.clear();
-
         this.#getStmt = undefined;
         this.#hasStmt = undefined;
         this.#setStmt = undefined;
@@ -221,5 +317,7 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
         this.#db = undefined;
       }
     }
+
+    this.#disabled = false;
   }
 }
