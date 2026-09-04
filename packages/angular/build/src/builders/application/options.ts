@@ -384,6 +384,8 @@ export async function normalizeOptions(
         ? INDEX_HTML_CSR
         : indexBaseName;
 
+    const preloadInitialDefault = !options.serviceWorker;
+
     indexHtmlOptions = {
       input: indexInput,
       output: indexOutput,
@@ -395,8 +397,11 @@ export async function normalizeOptions(
         // [name, esm]
       ] as [string, boolean][],
       transformer: extensions?.indexHtmlTransformer,
-      // Preload initial defaults to true
-      preloadInitial: typeof options.index !== 'object' || (options.index.preloadInitial ?? true),
+      // Preload initial defaults to false when using a service worker, true otherwise
+      preloadInitial:
+        typeof options.index === 'object'
+          ? (options.index?.preloadInitial ?? preloadInitialDefault)
+          : preloadInitialDefault,
     };
   }
 
