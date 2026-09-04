@@ -22,7 +22,7 @@ import {
 } from '../utility/dependency';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
-import { getWorkspace } from '../utility/workspace';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as VitestBrowserOptions } from './schema';
 
@@ -89,8 +89,33 @@ export default function (options: VitestBrowserOptions): Rule {
       }
     };
 
+    // Determine the default browser based on the provider package
+    let defaultBrowser: string;
+    if (packageName === '@vitest/browser-webdriverio') {
+      defaultBrowser = 'chrome';
+    } else {
+      // Playwright and preview both use 'chromium' as the default
+      defaultBrowser = 'chromium';
+    }
+
+    // Update angular.json to add the browsers option to the test target
+    const updateAngularJsonRule = updateWorkspace((workspace) => {
+      const project = workspace.projects.get(options.project);
+      if (project) {
+        const testTarget = project.targets.get('test');
+        if (testTarget) {
+          testTarget.options ??= {};
+          const existingBrowsers = testTarget.options['browsers'] as string[] | undefined;
+          if (!existingBrowsers?.length) {
+            testTarget.options['browsers'] = [defaultBrowser];
+          }
+        }
+      }
+    });
+
     return chain([
       updateTsConfigRule,
+      updateAngularJsonRule,
       ...dependencies.map((name) =>
         addDependency(name, latestVersions[name], {
           type: DependencyType.Dev,
@@ -101,8 +126,7 @@ export default function (options: VitestBrowserOptions): Rule {
       (_, context) => {
         context.logger.info(
           'Vitest browser testing support has been added. ' +
-            "To run tests in a browser, add a 'browsers' field to the 'test' target in 'angular.json', " +
-            "or use the '--browsers' command line option.",
+            `The test target has been configured with '${defaultBrowser}' as the default browser.`,
         );
       },
     ]);
