@@ -41,7 +41,10 @@ export default async function () {
 
   // Configure the registry and prefix used within the test sandbox via rc files
   await writeFile(npmrc, `registry=${npmRegistry}\nprefix=${npmModulesPrefix}`);
-  await writeFile(yarnrc, `registry ${npmRegistry}\nprefix ${yarnModulesPrefix}`);
+  await writeFile(
+    yarnrc,
+    `registry ${npmRegistry}\nprefix ${yarnModulesPrefix}\nnetwork-timeout 15000\nprefer-offline true\n`,
+  );
 
   await mkdir(npmModulesPrefix);
   await mkdir(yarnModulesPrefix);
