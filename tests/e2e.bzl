@@ -32,7 +32,6 @@ ESBUILD_TESTS = [
     "tests/basic/**",
     "tests/build/**",
     "tests/commands/add/**",
-    "tests/commands/e2e/**",
     "tests/commands/serve/ssr-http-requests-assets.js",
     "tests/i18n/**",
     "tests/vite/**",
