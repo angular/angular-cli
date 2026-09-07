@@ -23,6 +23,19 @@ export async function applyVitestBuilder(options?: {
   const { dependencies: latestVersion } = JSON.parse(await readFile(latestVersionsPath, 'utf-8'));
 
   await updateJsonFile('package.json', (json) => {
+    [
+      'karma',
+      'karma-chrome-launcher',
+      'karma-coverage',
+      'karma-jasmine',
+      'karma-jasmine-html-reporter',
+      'jasmine-core',
+      '@types/jasmine',
+      'istanbul-lib-instrument',
+    ].forEach((dep) => {
+      delete json.devDependencies[dep];
+    });
+
     json.devDependencies['vitest'] = latestVersion['vitest'];
     json.devDependencies['jsdom'] = latestVersion['jsdom'];
 
