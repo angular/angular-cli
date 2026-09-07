@@ -53,6 +53,7 @@
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
     "@oxc-project/types": "0.149.0",
+    "@vitest/coverage-v8": "5.0.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "30.0.1",
     "less": "4.9.1",
@@ -60,7 +61,7 @@
     "postcss": "8.5.28",
     "rollup": "4.63.1",
     "rxjs": "7.8.2",
-    "vitest": "4.1.11"
+    "vitest": "5.0.0"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
@@ -80,7 +81,7 @@
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "tslib": "^2.3.0",
     "typescript": ">=6.0 <6.1",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8 || ^5.0.0"
   },
   "peerDependenciesMeta": {
     "@angular/core": {
