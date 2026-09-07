@@ -16,7 +16,6 @@ import type {
   ResolvedConfig,
   UserWorkspaceConfig,
   Vite,
-  VitestPlugin,
   VitestPluginContext,
 } from 'vitest/node';
 import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
@@ -31,8 +30,6 @@ interface ExistingRawSourceMap {
   sourcesContent?: string[];
   mappings?: string;
 }
-
-type VitestPlugins = Awaited<ReturnType<typeof VitestPlugin>>;
 
 interface PluginOptions {
   workspaceRoot: string;
@@ -151,7 +148,7 @@ function getBrowsersToCheck(
 
 export async function createVitestConfigPlugin(
   options: VitestConfigPluginOptions,
-): Promise<VitestPlugins[0]> {
+): Promise<Vite.Plugin> {
   const {
     include,
     browser,
@@ -313,7 +310,7 @@ async function loadResultFile(file: ResultFile): Promise<string> {
   return readFile(file.inputPath, 'utf-8');
 }
 
-export function createVitestPlugins(pluginOptions: PluginOptions): VitestPlugins {
+export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
   const { workspaceRoot, buildResultFiles, testFileToEntryPoint } = pluginOptions;
   const isWindows = platform() === 'win32';
   let vitestConfig: ResolvedConfig;
