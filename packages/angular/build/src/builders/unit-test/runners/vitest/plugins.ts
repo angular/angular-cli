@@ -245,6 +245,7 @@ export async function createVitestConfigPlugin(
       const projectResolver = createProjectResolver(projectSourceRoot);
 
       const projectDefaults: Vite.UserConfig & UserWorkspaceConfig = {
+        extends: false,
         test: {
           setupFiles,
           globals: true,
@@ -265,6 +266,7 @@ export async function createVitestConfigPlugin(
 
       const { optimizeDeps, resolve } = config;
       const projectOverrides: Vite.UserConfig & UserWorkspaceConfig = {
+        extends: false,
         test: {
           name: projectName,
           include,
