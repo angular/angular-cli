@@ -16,28 +16,11 @@ import {
 
 describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
   describe('Behavior: "Vitest shared chunk initialization"', () => {
-    // Regression test for https://github.com/angular/angular-cli/issues/33728.
-    //
-    // Without `disableCodeSplitting`, esbuild hoists a module imported by more than one spec
-    // entry point into a shared chunk behind a lazy `__esm` initializer, and a class-field
-    // initializer in another chunk reads the exported value as `undefined` under the jsdom
-    // runner. All four trigger conditions are required and encoded below:
-    //   1. two spec entry points import the shared module (so it lands in a shared chunk);
-    //   2. a component in one entry reads the export during class-field initialization;
-    //   3. that component's spec file contains an `async` test callback (no `await` needed);
-    //   4. zone.js is in the polyfills (the `setupApplicationTarget` default), which downlevels
-    //      async and makes esbuild emit the spec entry CommonJS-wrapped.
-    //
-    // NOTE: the failure this guards against is sensitive to inert content — adding a top-level
-    // side effect (even a `console.log`) to the shared or importing module below defused it
-    // during reduction. Mirror https://github.com/jonmarozick/ng-shared-chunk-repro when
-    // modifying these fixtures.
     it('should provide shared-module exports to class-field initializers in async specs', async () => {
       setupApplicationTarget(harness);
 
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        splitting: false,
       });
 
       // Keep the default project's spec deterministic; a third spec entry that does not touch
