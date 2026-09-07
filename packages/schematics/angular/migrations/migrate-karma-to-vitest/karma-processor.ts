@@ -163,7 +163,7 @@ export async function processKarmaConfig(
       context.logger.warn(
         `Project "${projectName}" uses a custom Karma configuration file "${karmaConfig}". ` +
           `Tests have been migrated to use Vitest, but you may need to manually migrate custom settings ` +
-          `from this Karma config to a Vitest config (e.g. "vitest-base.config.ts") ` +
+          `from this Karma config to a Vitest config (e.g. "vitest-base.config.mts") ` +
           `and set the "runnerConfig" option to true.`,
       );
       manualMigrationFiles.push(karmaConfig);

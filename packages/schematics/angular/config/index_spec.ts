@@ -194,9 +194,9 @@ describe('Config Schematic', () => {
       applicationTree.overwrite('angular.json', JSON.stringify(angularJson));
     });
 
-    it('should create a vitest-base.config.ts file', async () => {
+    it('should create a vitest-base.config.mts file', async () => {
       const tree = await runConfigSchematic(ConfigType.Vitest);
-      expect(tree.exists('projects/foo/vitest-base.config.ts')).toBeTrue();
+      expect(tree.exists('projects/foo/vitest-base.config.mts')).toBeTrue();
     });
 
     it(`should set 'runnerConfig' in test builder`, async () => {

@@ -44,7 +44,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should search for a config file when `true`', async () => {
-        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.mts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: true,
@@ -57,7 +57,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should ignore config file when `false`', async () => {
-        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.mts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: false,
@@ -70,7 +70,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       });
 
       it('should ignore config file by default', async () => {
-        harness.writeFile('vitest-base.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.mts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
         });
@@ -94,11 +94,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         harness.expectFile('vitest-results.xml').toExist();
       });
 
-      it('should find and use a `vitest-base.config.js` in the workspace root', async () => {
+      it('should find and use a `vitest-base.config.mjs` in the workspace root', async () => {
         // This file should be ignored because the new logic looks for `vitest-base.config.*`.
-        harness.writeFile('vitest.config.mts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
         // The workspace root is the directory containing the project root in the test harness.
-        harness.writeFile('vitest-base.config.js', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest-base.config.mjs', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: true,

@@ -57,7 +57,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
     it('should override isolate from the Vitest config file when set to false', async () => {
       harness.writeFile(
-        'vitest-base.config.ts',
+        'vitest-base.config.mts',
         `
           import { defineConfig } from 'vitest/config';
 

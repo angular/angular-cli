@@ -10,9 +10,9 @@ export default async function (): Promise<void> {
 
   await ng('generate', 'component', 'my-comp');
 
-  // Create vitest-base.config.ts
+  // Create vitest-base.config.mts
   await writeFile(
-    'vitest-base.config.ts',
+    'vitest-base.config.mts',
     `
       import { defineConfig } from 'vitest/config';
       import { playwright } from '@vitest/browser-playwright';
