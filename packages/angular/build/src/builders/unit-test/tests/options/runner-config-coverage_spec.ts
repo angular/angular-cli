@@ -23,7 +23,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     describe('Vitest Runner', () => {
       it('should preserve thresholds from Vitest config when not overridden by CLI', async () => {
         harness.writeFile(
-          'vitest-base.config.ts',
+          'vitest-base.config.mts',
           `
           import { defineConfig } from 'vitest/config';
           export default defineConfig({
@@ -52,7 +52,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       it('should override Vitest config thresholds with CLI thresholds', async () => {
         harness.writeFile(
-          'vitest-base.config.ts',
+          'vitest-base.config.mts',
           `
           import { defineConfig } from 'vitest/config';
           export default defineConfig({
@@ -84,7 +84,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       it('should merge partial CLI thresholds with Vitest config thresholds', async () => {
         harness.writeFile(
-          'vitest-base.config.ts',
+          'vitest-base.config.mts',
           `
           import { defineConfig } from 'vitest/config';
           export default defineConfig({
