@@ -47,7 +47,7 @@ export async function applyVitestBuilder(options?: {
     }
   });
 
-  await installWorkspacePackages({ force: true });
+  await installWorkspacePackages();
 
   await updateJsonFile('angular.json', (json) => {
     const projects = Object.values(json['projects']);
