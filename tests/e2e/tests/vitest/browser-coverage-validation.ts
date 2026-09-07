@@ -2,17 +2,14 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { applyVitestBuilder } from '../../utils/vitest';
 import { execAndCaptureError } from '../../utils/process';
-import { installPackage } from '../../utils/packages';
 import { writeFile } from '../../utils/fs';
 import { stripVTControlCharacters } from 'node:util';
 import { unlink } from 'node:fs/promises';
 
 export default async function (): Promise<void> {
-  await applyVitestBuilder();
-
-  // Install necessary packages to pass the browser provider check
-  await installPackage('playwright@1');
-  await installPackage('@vitest/browser-playwright@4');
+  await applyVitestBuilder({
+    playwright: true,
+  });
 
   // === Case 1: Browser configured via CLI option ===
   const error1 = await execAndCaptureError('ng', [
@@ -29,24 +26,29 @@ export default async function (): Promise<void> {
     'Expected validation error for missing coverage packages.',
   );
 
-  await installPackage('@vitest/coverage-v8@4');
+  await applyVitestBuilder({
+    playwright: true,
+    coverageV8: true,
+  });
 
-  const configPath = 'vitest.config.ts';
+  const configPath = 'vitest.config.mts';
   const absoluteConfigPath = path.resolve(configPath);
 
   try {
-    // === Case 2: Browser configured via vitest.config.ts (name) ===
+    // === Case 2: Browser configured via vitest.config.mts (name) ===
     await writeFile(
       configPath,
       `
       import { defineConfig } from 'vitest/config';
+      import { playwright } from '@vitest/browser-playwright';
+
       export default defineConfig({
         test: {
           coverage: { provider: 'v8' },
           browser: {
             enabled: true,
             name: 'firefox',
-            provider: 'playwright',
+            provider: playwright(),
           },
         },
       });
@@ -66,17 +68,19 @@ export default async function (): Promise<void> {
       'Expected validation error for unsupported browser with coverage (config name).',
     );
 
-    // === Case 3: Browser configured via vitest.config.ts (instances) ===
+    // === Case 3: Browser configured via vitest.config.mts (instances) ===
     await writeFile(
       configPath,
       `
       import { defineConfig } from 'vitest/config';
+      import { playwright } from '@vitest/browser-playwright';
+
       export default defineConfig({
         test: {
           coverage: { provider: 'v8' },
           browser: {
             enabled: true,
-            provider: 'playwright',
+            provider: playwright(),
             instances: [{ browser: 'firefox' }],
           } as any,
         },

@@ -116,6 +116,7 @@ const testGlob = (process.env.TESTBRIDGE_TEST_ONLY ?? argv.glob).replace(/\.ts$/
 const e2eRoot = path.join(__dirname, 'e2e');
 const allSetups = glob.sync(`setup/**/*.js`, { cwd: e2eRoot }).sort();
 const allInitializers = glob.sync(`initialize/**/*.js`, { cwd: e2eRoot }).sort();
+const isWindows = process.platform === 'win32';
 
 const allTests = glob
   .sync(testGlob, { cwd: e2eRoot, ignore: argv.ignore })
@@ -137,6 +138,14 @@ const allTests = glob
       (fileName.startsWith('yarn-') && argv['package-manager'] !== 'yarn') ||
       (fileName.startsWith('npm-') && argv['package-manager'] !== 'npm')
     ) {
+      return false;
+    }
+
+    if (isWindows) {
+      if (fileName.startsWith('unix-')) {
+        return false;
+      }
+    } else if (fileName.startsWith('windows-')) {
       return false;
     }
 

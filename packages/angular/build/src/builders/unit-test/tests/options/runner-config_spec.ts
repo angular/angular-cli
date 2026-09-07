@@ -31,10 +31,10 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
     describe('Vitest Runner', () => {
       it('should use a specified config file path', async () => {
-        harness.writeFile('custom-vitest.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('custom-vitest.config.mts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
-          runnerConfig: 'custom-vitest.config.ts',
+          runnerConfig: 'custom-vitest.config.mts',
         });
 
         const { result } = await harness.executeOnce();
@@ -96,7 +96,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       it('should find and use a `vitest-base.config.js` in the workspace root', async () => {
         // This file should be ignored because the new logic looks for `vitest-base.config.*`.
-        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest.config.mts', VITEST_CONFIG_CONTENT);
         // The workspace root is the directory containing the project root in the test harness.
         harness.writeFile('vitest-base.config.js', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
@@ -113,7 +113,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       it('should fallback to in-memory config when no base config is found', async () => {
         // This file should be ignored because the new logic looks for `vitest-base.config.*`
         // and when `runnerConfig` is true, it should not fall back to the default search.
-        harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+        harness.writeFile('vitest.config.mts', VITEST_CONFIG_CONTENT);
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           runnerConfig: true,

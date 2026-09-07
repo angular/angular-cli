@@ -1,12 +1,13 @@
 import assert from 'node:assert';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
-import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 
 export default async function () {
-  await applyVitestBuilder();
+  await applyVitestBuilder({
+    playwright: true,
+  });
 
   const artifactCount = 500;
   // A new project starts with 1 test file (app.spec.ts)
@@ -21,10 +22,6 @@ export default async function () {
   // Run tests in default (JSDOM) mode
   const { stdout: jsdomStdout } = await ng('test', '--no-watch');
   assert.match(jsdomStdout, expectedMessage, `Expected ${totalTests} tests to pass in JSDOM mode.`);
-
-  // Setup for browser mode
-  await installPackage('playwright@1');
-  await installPackage('@vitest/browser-playwright@4');
 
   // Run tests in browser mode
   const { stdout: browserStdout } = await ng(

@@ -1,13 +1,12 @@
 import { writeFile } from '../../utils/fs';
-import { installPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
 
 export default async function () {
-  await applyVitestBuilder();
-  await installPackage('playwright@1');
-  await installPackage('@vitest/browser-playwright@4');
+  await applyVitestBuilder({
+    playwright: true,
+  });
 
   // Add a custom decorator to trigger tslib usage
   await writeFile(
