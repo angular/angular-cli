@@ -10,8 +10,9 @@ export async function applyVitestBuilder(options?: {
   coverageIstanbul?: boolean;
   playwright?: boolean;
   webdriver?: boolean;
+  skipInstall?: boolean;
 }): Promise<void> {
-  const { coverageV8, coverageIstanbul, playwright, webdriver } = options ?? {};
+  const { coverageV8, coverageIstanbul, playwright, webdriver, skipInstall } = options ?? {};
 
   const schematicsAngular = createRequire(process.cwd() + '/').resolve(
     '@schematics/angular/package.json',
@@ -47,7 +48,9 @@ export async function applyVitestBuilder(options?: {
     }
   });
 
-  await installWorkspacePackages();
+  if (!skipInstall) {
+    await installWorkspacePackages();
+  }
 
   await updateJsonFile('angular.json', (json) => {
     const projects = Object.values(json['projects']);
