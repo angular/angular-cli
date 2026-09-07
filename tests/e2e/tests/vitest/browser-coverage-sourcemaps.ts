@@ -1,14 +1,13 @@
 import assert from 'node:assert/strict';
 import { applyVitestBuilder } from '../../utils/vitest';
 import { ng } from '../../utils/process';
-import { installPackage } from '../../utils/packages';
 import { expectFileToExist, readFile } from '../../utils/fs';
 
 export default async function (): Promise<void> {
-  await applyVitestBuilder();
-  await installPackage('playwright@1');
-  await installPackage('@vitest/browser-playwright@4');
-  await installPackage('@vitest/coverage-v8@4');
+  await applyVitestBuilder({
+    playwright: true,
+    coverageV8: true,
+  });
 
   // Run tests with coverage in browser mode.
   // We use the default passing tests generated for the project.

@@ -1,13 +1,14 @@
 import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
-import { installPackage } from '../../utils/packages';
 import { updateJsonFile } from '../../utils/project';
 import { readFile } from '../../utils/fs';
 
 export default async function () {
-  await applyVitestBuilder();
-  await installPackage('@vitest/coverage-v8@4');
+  await applyVitestBuilder({
+    coverageV8: true,
+    playwright: true,
+  });
 
   // Add coverage and threshold configuration to ensure coverage is calculated.
   // Use the 'json' reporter to get a machine-readable output for assertions.
@@ -43,10 +44,6 @@ export default async function () {
     const found = jsdomSummaryKeys.some((key) => key.endsWith(file));
     assert.ok(found, `Expected ${file} to be in the JSDOM coverage report.`);
   }
-
-  // Setup for browser mode
-  await installPackage('playwright@1');
-  await installPackage('@vitest/browser-playwright@4');
 
   // Run tests in browser mode with coverage
   const { stdout: browserStdout } = await ng(

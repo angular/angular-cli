@@ -1,16 +1,15 @@
 import { ng } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import assert from 'node:assert';
-import { installPackage } from '../../utils/packages';
 import { expectFileToExist, readFile } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function (): Promise<void> {
-  await applyVitestBuilder();
-
   // Install ONLY Istanbul coverage package.
   // This will trigger the auto-detection logic to use Istanbul even for Node tests.
-  await installPackage('@vitest/coverage-istanbul@4');
+  await applyVitestBuilder({
+    coverageIstanbul: true,
+  });
 
   // Use the 'json' reporter to get a machine-readable output for assertions.
   await updateJsonFile('angular.json', (json) => {

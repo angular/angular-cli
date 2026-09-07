@@ -32,10 +32,10 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should use custom reporters defined in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
-      harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+      harness.writeFile('vitest.config.mts', VITEST_CONFIG_CONTENT);
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
@@ -45,11 +45,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should use custom reporters and outputFile defined as an object in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -71,12 +71,12 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should preserve custom coverage options (e.g. clean: false) from runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
         coverage: true,
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -102,11 +102,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should override reporters defined in runnerConfig file when CLI option is present', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
         reporters: ['default'],
       });
 
-      harness.writeFile('vitest.config.ts', VITEST_CONFIG_CONTENT);
+      harness.writeFile('vitest.config.mts', VITEST_CONFIG_CONTENT);
 
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
@@ -117,12 +117,12 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should use custom reportsDirectory defined in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
         coverage: true,
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -144,11 +144,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         coverage: true,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -167,11 +167,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should enable coverage when set in runnerConfig file without builder option', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -192,11 +192,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should exclude test files based on runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
               import { defineConfig } from 'vitest/config';
               export default defineConfig({
@@ -240,12 +240,12 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         coverage: true,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
         coverageExclude: ['src/app/cli-excluded.ts'],
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -292,11 +292,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should allow overriding globals to false via runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -325,11 +325,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should initialize environment even when globals are disabled in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -357,11 +357,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should fail when a DOM-dependent test is run in a node environment', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -379,11 +379,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should warn and ignore "test.projects" option from runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -411,11 +411,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should warn and ignore "test.include" option from runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -444,11 +444,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
         watch: false,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -476,11 +476,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should warn about performance when "test.exclude" option is in runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -508,11 +508,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it(`should append "test.setupFiles" (string) from runnerConfig to the CLI's setup`, async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -542,11 +542,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it(`should append "test.setupFiles" (array) from runnerConfig to the CLI's setup`, async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
@@ -578,11 +578,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
     it('should merge and apply custom Vite plugins from runnerConfig file', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
-        runnerConfig: 'vitest.config.ts',
+        runnerConfig: 'vitest.config.mts',
       });
 
       harness.writeFile(
-        'vitest.config.ts',
+        'vitest.config.mts',
         `
         import { defineConfig } from 'vitest/config';
         export default defineConfig({
