@@ -37,6 +37,7 @@ import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';
 import { setupJitPluginCallbacks } from './jit-plugin-callbacks';
 import { rewriteForBazel } from './rewrite-bazel-paths';
+import { createSideEffectsResolver } from './side-effects-resolver';
 import { SourceFileCache } from './source-file-cache';
 
 export interface CompilerPluginOptions {
@@ -115,6 +116,8 @@ export function createCompilerPlugin(
         maxTransformWorkers,
         cacheStore?.createCache('jstransformer'),
       );
+
+      const hasSideEffects = createSideEffectsResolver(build, pluginOptions.advancedOptimizations);
 
       // Setup defines based on the values used by the Angular compiler-cli
       build.initialOptions.define ??= {};
@@ -647,22 +650,6 @@ export function createCompilerPlugin(
         void javascriptTransformer.close();
         void cacheStore?.close();
       });
-
-      /**
-       * Checks if the file has side-effects when `advancedOptimizations` is enabled.
-       */
-      async function hasSideEffects(path: string): Promise<boolean | undefined> {
-        if (!pluginOptions.advancedOptimizations) {
-          return undefined;
-        }
-
-        const { sideEffects } = await build.resolve(path, {
-          kind: 'import-statement',
-          resolveDir: build.initialOptions.absWorkingDir ?? '',
-        });
-
-        return sideEffects;
-      }
     },
   };
 }
