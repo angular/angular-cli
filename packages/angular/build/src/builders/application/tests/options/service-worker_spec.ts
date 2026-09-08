@@ -89,6 +89,42 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(JSON.parse(config)).toEqual(jasmine.objectContaining({ index: '/index.csr.html' }));
     });
 
+    it('should not generate initial modulepreload hints by default when service worker is enabled', async () => {
+      // Setup an initial chunk usage for JS
+      await harness.writeFile('src/a.ts', 'console.log("TEST");');
+      await harness.writeFile('src/b.ts', 'import "./a";');
+      await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        serviceWorker: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('dist/browser/index.html').content.not.toContain('modulepreload');
+    });
+
+    it('should generate initial modulepreload hints when preloadInitial is explicitly true and service worker is enabled', async () => {
+      // Setup an initial chunk usage for JS
+      await harness.writeFile('src/a.ts', 'console.log("TEST");');
+      await harness.writeFile('src/b.ts', 'import "./a";');
+      await harness.writeFile('src/main.ts', 'import "./a";\n(() => import("./b"))();');
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        serviceWorker: true,
+        index: {
+          input: 'src/index.html',
+          preloadInitial: true,
+        },
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('dist/browser/index.html').content.toContain('modulepreload');
+    });
+
     it('should write JS-imported CSS chunk to browser dist when SSR is enabled', async () => {
       await harness.modifyFile('src/tsconfig.app.json', (content) => {
         const tsConfig = JSON.parse(content);
