@@ -141,6 +141,12 @@ class WatcherQueue {
   private currentChangedFiles: ChangedFiles | undefined;
   private isClosed = false;
   private timeoutId: NodeJS.Timeout | undefined;
+  private firstChangeTime: number | undefined;
+
+  constructor(
+    private readonly debounceMs = 100,
+    private readonly maxWaitMs = 250,
+  ) {}
 
   addChange(type: 'added' | 'modified' | 'removed', file: string): void {
     if (this.isClosed) {
@@ -167,16 +173,25 @@ class WatcherQueue {
   }
 
   private scheduleFlush(): void {
+    const now = Date.now();
+    const firstChangeTime = (this.firstChangeTime ??= now);
+
     if (this.timeoutId) {
       clearTimeout(this.timeoutId);
     }
+
+    const elapsed = now - firstChangeTime;
+    const remainingMaxWait = Math.max(0, this.maxWaitMs - elapsed);
+    const delay = Math.min(this.debounceMs, remainingMaxWait);
+
     this.timeoutId = setTimeout(() => {
       this.timeoutId = undefined;
       this.flush();
-    }, 250);
+    }, delay);
   }
 
   private flush(): void {
+    this.firstChangeTime = undefined;
     if (
       this.currentChangedFiles &&
       this.currentChangedFiles.all.length > 0 &&
@@ -224,6 +239,7 @@ class WatcherQueue {
       clearTimeout(this.timeoutId);
       this.timeoutId = undefined;
     }
+    this.firstChangeTime = undefined;
 
     this.isClosed = true;
     this.currentChangedFiles = undefined;
