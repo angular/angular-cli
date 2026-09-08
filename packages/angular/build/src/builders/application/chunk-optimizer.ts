@@ -113,9 +113,6 @@ function bundleOutputToEsbuildMetafile(
           continue;
         }
 
-        // Read the rendered length once per module. The value is a lazy getter on the bundler's
-        // rendered module object that transfers the entire module code from native memory on each
-        // access, which is prohibitively expensive when repeated for every input of a large chunk.
         const { renderedLength } = renderedModule;
 
         for (const [originalInputPath, originalInputInfo] of Object.entries(
