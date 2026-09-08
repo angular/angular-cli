@@ -16,12 +16,16 @@ import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin
 
 let sassService: SassCompiler | undefined;
 let sassServicePromise: Promise<SassCompiler> | undefined;
+let resolutionCache: MemoryCache<URL | null> | undefined;
+let packageRootCache: MemoryCache<string | null> | undefined;
 
 function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
 }
 
 export function shutdownSassWorkerPool(): void {
+  resolutionCache = undefined;
+  packageRootCache = undefined;
   if (sassService) {
     void sassService.close();
     sassService = undefined;
@@ -91,14 +95,15 @@ async function compileString(
     }
   }
 
-  // Cache is currently local to individual compile requests.
-  // Caching follows Sass behavior where a given url will always resolve to the same value
-  // regardless of its importer's path.
+  // Caching follows Sass behavior where a given package url will always resolve to the same value
+  // regardless of its importer's path. Relative paths are qualified with the containing URL.
   // A null value indicates that the cached resolution attempt failed to find a location and
   // later stage resolution should be attempted. This avoids potentially expensive repeat
   // failing resolution attempts.
-  const resolutionCache = new MemoryCache<URL | null>();
-  const packageRootCache = new MemoryCache<string | null>();
+  resolutionCache ??= new MemoryCache<URL | null>();
+  packageRootCache ??= new MemoryCache<string | null>();
+  const currentResolutionCache = resolutionCache;
+  const currentPackageRootCache = packageRootCache;
   const warnings: PartialMessage[] = [];
   const { silenceDeprecations, futureDeprecations, fatalDeprecations } = options.sass ?? {};
 
@@ -116,8 +121,12 @@ async function compileString(
       quietDeps: true,
       importers: [
         {
-          findFileUrl: (url, options) =>
-            resolutionCache.getOrCreate(url, async () => {
+          findFileUrl: (url, options) => {
+            const cacheKey = url.startsWith('pkg:')
+              ? url
+              : `${options.containingUrl?.href ?? ''}:${url}`;
+
+            return currentResolutionCache.getOrCreate(cacheKey, async () => {
               const result = await resolveUrl(url, options);
               if (result.path) {
                 return pathToFileURL(result.path);
@@ -128,12 +137,15 @@ async function compileString(
 
               // Caching package root locations is particularly beneficial for `@material/*` packages
               // which extensively use deep imports.
-              const packageRoot = await packageRootCache.getOrCreate(packageName, async () => {
-                // Use the required presence of a package root `package.json` file to resolve the location
-                const packageResult = await resolveUrl(packageName + '/package.json', options);
+              const packageRoot = await currentPackageRootCache.getOrCreate(
+                packageName,
+                async () => {
+                  // Use the required presence of a package root `package.json` file to resolve the location
+                  const packageResult = await resolveUrl(packageName + '/package.json', options);
 
-                return packageResult.path ? dirname(packageResult.path) : null;
-              });
+                  return packageResult.path ? dirname(packageResult.path) : null;
+                },
+              );
 
               // Package not found could be because of an error or the specifier is intended to be found
               // via a later stage of the resolution process (`loadPaths`, etc.).
@@ -145,7 +157,8 @@ async function compileString(
 
               // Not found
               return null;
-            }),
+            });
+          },
         },
       ],
       logger: {
