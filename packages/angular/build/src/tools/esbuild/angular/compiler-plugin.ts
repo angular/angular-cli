@@ -75,6 +75,7 @@ export function createCompilerPlugin(
     // eslint-disable-next-line max-lines-per-function
     async setup(build: PluginBuild): Promise<void> {
       let setupWarnings: PartialMessage[] | undefined = [];
+      let diagnosticsPromise: ReturnType<AngularCompilation['diagnoseFiles']> | undefined;
       const preserveSymlinks = build.initialOptions.preserveSymlinks;
 
       // Initialize a worker pool for JavaScript transformations.
@@ -157,6 +158,7 @@ export function createCompilerPlugin(
 
       // eslint-disable-next-line max-lines-per-function
       build.onStart(async () => {
+        hasCompilationErrors = true;
         await initializeHash();
 
         const result: OnStartResult = {
@@ -402,15 +404,21 @@ export function createCompilerPlugin(
           }
         }
 
-        const diagnostics = await compilation.diagnoseFiles(
-          useTypeChecking ? DiagnosticModes.All : DiagnosticModes.All & ~DiagnosticModes.Semantic,
-        );
-        if (diagnostics.errors?.length) {
-          (result.errors ??= []).push(...diagnostics.errors);
-        }
-        if (diagnostics.warnings?.length) {
-          (result.warnings ??= []).push(...diagnostics.warnings);
-        }
+        const diagnosticModes = useTypeChecking
+          ? DiagnosticModes.All
+          : DiagnosticModes.All & ~DiagnosticModes.Semantic;
+        diagnosticsPromise = compilation.diagnoseFiles(diagnosticModes).catch((error) => ({
+          errors: [
+            {
+              text: 'Angular compilation diagnostics failed.',
+              notes: [
+                {
+                  text: error instanceof Error ? (error.stack ?? error.message) : String(error),
+                },
+              ],
+            },
+          ],
+        }));
 
         // Add errors from failed additional results.
         // This must be done after emit to capture latest web worker results.
@@ -617,7 +625,7 @@ export function createCompilerPlugin(
         );
       }
 
-      build.onEnd((result) => {
+      build.onEnd(async (result) => {
         // Ensure other compilations are unblocked if the main compilation throws during start
         if (angularCompilationContext.isPrimary()) {
           angularCompilationContext.markAsReady(hasCompilationErrors);
@@ -640,6 +648,20 @@ export function createCompilerPlugin(
         }
 
         logCumulativeDurations();
+
+        if (diagnosticsPromise) {
+          try {
+            const diagnostics = await diagnosticsPromise;
+            const errors = diagnostics.errors?.length ? diagnostics.errors : undefined;
+            const warnings = diagnostics.warnings?.length ? diagnostics.warnings : undefined;
+
+            if (errors || warnings) {
+              return { errors, warnings };
+            }
+          } finally {
+            diagnosticsPromise = undefined;
+          }
+        }
       });
 
       build.onDispose(() => {
