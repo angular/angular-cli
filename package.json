@@ -14,11 +14,11 @@
     "admin": "node --no-warnings=ExperimentalWarning --experimental-transform-types ./scripts/devkit-admin.mts",
     "bazel": "bazelisk",
     "test": "bazel test //packages/...",
-    "build": "pnpm -s admin build",
+    "build": "pnpm --silent admin build",
     "build-schema": "bazel build //... --build_tag_filters schema --symlink_prefix dist-schema/",
     "lint": "eslint --cache --max-warnings=0",
-    "templates": "pnpm -s admin templates",
-    "validate": "pnpm -s admin validate",
+    "templates": "pnpm --silent admin templates",
+    "validate": "pnpm --silent admin validate",
     "postinstall": "husky",
     "ts-circular-deps": "ng-dev ts-circular-deps --config ./scripts/circular-deps-test.conf.mjs",
     "check-tooling-setup": "tsc --project .ng-dev/tsconfig.json",
@@ -28,12 +28,12 @@
     "type": "git",
     "url": "git+https://github.com/angular/angular-cli.git"
   },
-  "packageManager": "pnpm@11.25.0",
+  "packageManager": "pnpm@12.3.4",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0",
     "npm": "Please use pnpm instead of NPM to install dependencies",
     "yarn": "Please use pnpm instead of Yarn to install dependencies",
-    "pnpm": "11.25.0"
+    "pnpm": "12.3.4"
   },
   "author": "Angular Authors",
   "license": "MIT",

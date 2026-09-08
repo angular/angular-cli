@@ -13,7 +13,7 @@ import { dirname, join, relative, resolve } from 'node:path';
 
 const __dirname = import.meta.dirname;
 const baseDir = resolve(`${__dirname}/..`);
-const bazelCmd = process.env.BAZEL ?? `pnpm -s bazel`;
+const bazelCmd = process.env.BAZEL ?? `pnpm --silent bazel`;
 const distRoot = join(baseDir, '/dist');
 
 type BuildMode = 'local' | 'snapshot' | 'release';
