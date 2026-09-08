@@ -71,20 +71,13 @@ export interface CachedLoadResultEntry {
 }
 
 /**
- * Calculates a unique cache key by updating the hash incrementally.
- * This prevents implicit string coercion of large binary content buffers.
+ * Calculates a unique cache key from the global configuration hash and path.
  */
-function calculateCacheKey(
-  globalConfigHash: string,
-  path: string,
-  content: string | Uint8Array,
-): string {
+function calculateCacheKey(globalConfigHash: string, path: string): string {
   const hasher = createContentHash();
   hasher.update(globalConfigHash);
   hasher.update('\0');
   hasher.update(path);
-  hasher.update('\0');
-  hasher.update(content);
 
   return hasher.digest();
 }
@@ -154,7 +147,6 @@ async function validateAndHealCacheEntry(
   store: PersistentCacheStore<CachedLoadResultEntry>,
   cacheKey: string,
   cached: CachedLoadResultEntry,
-  targetFilePath?: string,
 ): Promise<boolean> {
   if (!watchFilesMetadata) {
     return false;
@@ -176,19 +168,7 @@ async function validateAndHealCacheEntry(
         return true;
       }
 
-      // 2. Target File Path: content hash was already verified by cacheKey lookup, heal metadata if mtime changed
-      if (targetFilePath && filePath === targetFilePath) {
-        watchFilesMetadata[filePath] = {
-          ...expected,
-          mtimeMs: stats.mtimeMs,
-          size: stats.size,
-        };
-        healed = true;
-
-        return true;
-      }
-
-      // 3. Slow Path for dependencies: content hash fallback
+      // 2. Slow Path: content hash fallback
       const currentContent = await readFile(filePath);
       const currentHash = calculateHash(currentContent);
       if (currentHash === expected.hash) {
@@ -280,17 +260,7 @@ export class PersistentLoadResultCache implements LoadResultCache {
     }
 
     // 2. Check L2 Persistent Disk Cache
-    let content: string | Uint8Array = '';
-    const filePath = extractDiskFilePath(path);
-    if (filePath) {
-      try {
-        content = await readFile(filePath);
-      } catch {
-        return undefined;
-      }
-    }
-
-    const cacheKey = calculateCacheKey(this.globalConfigHash, path, content);
+    const cacheKey = calculateCacheKey(this.globalConfigHash, path);
     const cached = await this.persistentStore.get(cacheKey);
 
     if (
@@ -300,7 +270,6 @@ export class PersistentLoadResultCache implements LoadResultCache {
         this.persistentStore,
         cacheKey,
         cached,
-        filePath,
       ))
     ) {
       const result: OnLoadResult = {
@@ -340,17 +309,17 @@ export class PersistentLoadResultCache implements LoadResultCache {
         }
       }
 
-      const cacheKey = calculateCacheKey(this.globalConfigHash, path, content);
+      const cacheKey = calculateCacheKey(this.globalConfigHash, path);
 
       // Reuse the target file's pre-read content buffer to avoid redundant disk reads (readFile)
       // during dependency watch file metadata computation.
       const knownContents = filePath
         ? new Map<string, string | Uint8Array>([[filePath, content]])
         : undefined;
-      const watchFilesMetadata = await computeMetadataForWatchFiles(
-        result.watchFiles ?? [],
-        knownContents,
+      const allWatchFiles = Array.from(
+        new Set(filePath ? [filePath, ...(result.watchFiles ?? [])] : result.watchFiles),
       );
+      const watchFilesMetadata = await computeMetadataForWatchFiles(allWatchFiles, knownContents);
 
       await this.persistentStore.put(cacheKey, {
         contents: result.contents,
