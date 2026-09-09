@@ -145,7 +145,7 @@ class WatcherQueue {
 
   constructor(
     private readonly debounceMs = 100,
-    private readonly maxWaitMs = 250,
+    private readonly maxWaitMs = 500,
   ) {}
 
   addChange(type: 'added' | 'modified' | 'removed', file: string): void {
@@ -527,7 +527,16 @@ async function createChokidarWatcher(
 ): Promise<BuildWatcher> {
   const chokidar = chokidarModule ?? (await import('chokidar'));
   const watchedFiles = new Set<string>();
-  const queue = new WatcherQueue();
+
+  let queue: WatcherQueue;
+  if (options?.polling) {
+    const pollingInterval = options.interval ?? 100;
+    const debounceMs = Math.min(250, Math.max(100, Math.ceil(pollingInterval * 1.5)));
+    const maxWaitMs = Math.max(500, debounceMs * 3);
+    queue = new WatcherQueue(debounceMs, maxWaitMs);
+  } else {
+    queue = new WatcherQueue();
+  }
 
   const rootDir = options?.cwd ?? process.cwd();
   const isCaseSensitive = isFileSystemCaseSensitive(rootDir);
