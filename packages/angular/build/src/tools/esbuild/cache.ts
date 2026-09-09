@@ -52,6 +52,39 @@ export interface PersistentCacheStore<V = any> extends CacheStore<V> {
 }
 
 /**
+ * A backing data store wrapper that namespaces all keys using length-prefix framing.
+ * Prevents key collisions between namespaces regardless of characters (such as colons)
+ * in the namespace or key.
+ */
+export class NamespacedCacheStore<V> implements CacheStore<V> {
+  readonly #prefix: string;
+
+  constructor(
+    private readonly store: CacheStore<V>,
+    readonly namespace: string,
+  ) {
+    this.#prefix = `${namespace.length}:${namespace}:`;
+  }
+
+  get(key: string): V | undefined | Promise<V | undefined> {
+    return this.store.get(this.#prefix + key);
+  }
+
+  has(key: string): boolean | Promise<boolean> {
+    return this.store.has(this.#prefix + key);
+  }
+
+  set(key: string, value: V): this | Promise<this> {
+    const result = this.store.set(this.#prefix + key, value);
+    if (result instanceof Promise) {
+      return result.then(() => this);
+    }
+
+    return this;
+  }
+}
+
+/**
  * A cache object that allows accessing and storing key/value pairs in
  * an underlying CacheStore. This class is the primary method for consumers
  * to use a cache.
@@ -64,10 +97,7 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
   // Count the number of active, pending getOrCreate operations per key to avoid memory leaks.
   readonly #pendingGets = new Map<string, number>();
 
-  constructor(
-    protected readonly store: S,
-    readonly namespace?: string,
-  ) {}
+  constructor(protected readonly store: S) {}
 
   #incrementWrite(key: string) {
     // Only track write counts if there is a pending getOrCreate operation active for the key.
@@ -75,19 +105,6 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
     if (this.#pendingGets.has(key)) {
       this.#writeCounts.set(key, (this.#writeCounts.get(key) || 0) + 1);
     }
-  }
-
-  /**
-   * Prefixes a key with the cache namespace if present.
-   * @param key A key string to prefix.
-   * @returns A prefixed key if a namespace is present. Otherwise the provided key.
-   */
-  protected withNamespace(key: string): string {
-    if (this.namespace) {
-      return `${this.namespace}:${key}`;
-    }
-
-    return key;
   }
 
   /**
@@ -99,27 +116,25 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
    * @returns A value associated with the provided key.
    */
   async getOrCreate(key: string, creator: () => V | Promise<V>): Promise<V> {
-    const namespacedKey = this.withNamespace(key);
-
     // 1. If another call is already running the creator for this key, share its promise.
-    let activeRequest = this.#requests.get(namespacedKey);
+    let activeRequest = this.#requests.get(key);
     if (activeRequest !== undefined) {
       return activeRequest;
     }
 
     // Increment pending gets count to enable write-tracking for this key.
-    const currentPending = this.#pendingGets.get(namespacedKey) || 0;
-    this.#pendingGets.set(namespacedKey, currentPending + 1);
+    const currentPending = this.#pendingGets.get(key) || 0;
+    this.#pendingGets.set(key, currentPending + 1);
 
     try {
-      const startWriteCount = this.#writeCounts.get(namespacedKey) || 0;
+      const startWriteCount = this.#writeCounts.get(key) || 0;
 
       // 2. Query the backing store. Since store.get can be async, we yield to the event loop.
-      const value = await this.store.get(namespacedKey);
+      const value = await this.store.get(key);
 
       // If a write (e.g. put) occurred during the store.get await gap, we must abort
       // the current execution and restart to ensure we return the newly written value.
-      if ((this.#writeCounts.get(namespacedKey) || 0) !== startWriteCount) {
+      if ((this.#writeCounts.get(key) || 0) !== startWriteCount) {
         return this.getOrCreate(key, creator);
       }
 
@@ -129,7 +144,7 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
 
       // 3. Recheck active request after the await gap in case another concurrent call
       // initiated a creator during the store.get wait.
-      activeRequest = this.#requests.get(namespacedKey);
+      activeRequest = this.#requests.get(key);
       if (activeRequest !== undefined) {
         return activeRequest;
       }
@@ -139,34 +154,34 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
         async (newValue) => {
           // Ensure this request is still the active one before writing back to the store
           // (prevents overwriting newer data if put() was called before resolution).
-          if (this.#requests.get(namespacedKey) === activeRequest) {
-            this.#incrementWrite(namespacedKey);
-            await this.store.set(namespacedKey, newValue);
-            this.#requests.delete(namespacedKey);
+          if (this.#requests.get(key) === activeRequest) {
+            this.#incrementWrite(key);
+            await this.store.set(key, newValue);
+            this.#requests.delete(key);
           }
 
           return newValue;
         },
         (error) => {
           // Clean up the active request if the creator fails.
-          if (this.#requests.get(namespacedKey) === activeRequest) {
-            this.#requests.delete(namespacedKey);
+          if (this.#requests.get(key) === activeRequest) {
+            this.#requests.delete(key);
           }
           throw error;
         },
       );
 
-      this.#requests.set(namespacedKey, activeRequest);
+      this.#requests.set(key, activeRequest);
 
       return activeRequest;
     } finally {
       // Clean up write counts and pending gets once all concurrent gets for this key finish.
-      const current = this.#pendingGets.get(namespacedKey) || 0;
+      const current = this.#pendingGets.get(key) || 0;
       if (current <= 1) {
-        this.#pendingGets.delete(namespacedKey);
-        this.#writeCounts.delete(namespacedKey);
+        this.#pendingGets.delete(key);
+        this.#writeCounts.delete(key);
       } else {
-        this.#pendingGets.set(namespacedKey, current - 1);
+        this.#pendingGets.set(key, current - 1);
       }
     }
   }
@@ -177,7 +192,7 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
    * @returns A value associated with the provided key if present. Otherwise, `undefined`.
    */
   async get(key: string): Promise<V | undefined> {
-    const value = await this.store.get(this.withNamespace(key));
+    const value = await this.store.get(key);
 
     return value;
   }
@@ -189,19 +204,18 @@ export class Cache<V, S extends CacheStore<V> = CacheStore<V>> {
    * @param value A value to put in the cache.
    */
   async put(key: string, value: V): Promise<void> {
-    const namespacedKey = this.withNamespace(key);
-    this.#requests.delete(namespacedKey);
-    this.#incrementWrite(namespacedKey);
-    await this.store.set(namespacedKey, value);
+    this.#requests.delete(key);
+    this.#incrementWrite(key);
+    await this.store.set(key, value);
   }
 
   /**
-   * Clears internal state for a specific namespaced key (requests, write counts, and pending gets).
+   * Clears internal state for a specific key (requests, write counts, and pending gets).
    */
-  protected deleteInternal(namespacedKey: string): void {
-    this.#requests.delete(namespacedKey);
-    this.#writeCounts.delete(namespacedKey);
-    this.#pendingGets.delete(namespacedKey);
+  protected deleteInternal(key: string): void {
+    this.#requests.delete(key);
+    this.#writeCounts.delete(key);
+    this.#pendingGets.delete(key);
   }
 
   /**
@@ -228,10 +242,9 @@ export class MemoryCache<V> extends Cache<V, Map<string, V>> {
    * @returns True if an element in the Map existed and has been removed, or false if the element does not exist.
    */
   delete(key: string): boolean {
-    const namespacedKey = this.withNamespace(key);
-    this.deleteInternal(namespacedKey);
+    this.deleteInternal(key);
 
-    return this.store.delete(namespacedKey);
+    return this.store.delete(key);
   }
 
   /**
