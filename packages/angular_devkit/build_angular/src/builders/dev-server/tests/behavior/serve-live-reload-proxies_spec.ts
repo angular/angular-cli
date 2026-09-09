@@ -101,10 +101,31 @@ async function createProxy(target: string, secure: boolean, ws = true): Promise<
     },
   }).listen(proxyPort);
 
+  server.on('error', () => {
+    // Ignore proxy connection errors that occur when the browser reloads or disconnects.
+  });
+
   return {
     server,
     url: `${secure ? 'https' : 'http'}://localhost:${proxyPort}`,
   };
+}
+
+async function waitForAppLiveReload(page: Page): Promise<void> {
+  const startTime = Date.now();
+  while (Date.now() - startTime < 30_000) {
+    try {
+      const text = await page.evaluate(() => document.querySelector('p')?.innerText);
+      if (text === 'app-live-reload') {
+        return;
+      }
+    } catch {
+      // Ignore execution context destruction errors during page navigation.
+    }
+    await setTimeoutPromise(100);
+  }
+
+  throw new Error('Timed out waiting for page to reload with updated text.');
 }
 
 async function goToPageAndWaitForWS(page: Page, url: string): Promise<void> {
@@ -203,8 +224,7 @@ describeServeBuilder(
             async ({ result }) => {
               expect(result?.success).toBeTrue();
 
-              // Wait for page to reload.
-              await setTimeoutPromise(500);
+              await waitForAppLiveReload(page);
 
               const innerText = await page.evaluate(() => document.querySelector('p').innerText);
               expect(innerText).toBe('app-live-reload');
@@ -238,8 +258,7 @@ describeServeBuilder(
                 async ({ result }) => {
                   expect(result?.success).toBeTrue();
 
-                  // Wait for page to reload.
-                  await setTimeoutPromise(500);
+                  await waitForAppLiveReload(page);
 
                   const innerText = await page.evaluate(
                     () => document.querySelector('p').innerText,
@@ -281,8 +300,7 @@ describeServeBuilder(
                 async ({ result }) => {
                   expect(result?.success).toBeTrue();
 
-                  // Wait for page to reload.
-                  await setTimeoutPromise(500);
+                  await waitForAppLiveReload(page);
 
                   const innerText = await page.evaluate(
                     () => document.querySelector('p').innerText,
