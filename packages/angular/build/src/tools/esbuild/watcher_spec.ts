@@ -11,6 +11,7 @@ import * as os from 'node:os';
 import * as path from 'node:path';
 import { setTimeout } from 'node:timers/promises';
 import {
+  type BuildWatcher,
   ChangedFiles,
   createWatcher,
   getDirectoryPath,
@@ -481,6 +482,43 @@ describe('Watcher', () => {
       expect(emitted.some((f: string) => f.includes('bundle.js'))).toBeFalse();
 
       await watcher.close();
+    }, 10000);
+
+    it('should detect changes behind a directory symlink when followSymlinks is true', async () => {
+      const externalDir = fs.realpathSync(
+        fs.mkdtempSync(path.join(os.tmpdir(), 'watcher-external-')),
+      );
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const symlinkDir = path.join(tempDir, 'symlinked-lib');
+        fs.symlinkSync(externalDir, symlinkDir, 'junction');
+
+        const symlinkedFile = path.join(symlinkDir, 'index.ts');
+
+        watcher = await createWatcher({
+          followSymlinks: true,
+          cwd: tempDir,
+        });
+
+        watcher.add(symlinkedFile);
+        await setTimeout(150);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('index.ts'))).toBeTrue();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
     }, 10000);
   });
 });

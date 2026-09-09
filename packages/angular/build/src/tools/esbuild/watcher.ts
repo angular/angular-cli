@@ -252,7 +252,7 @@ class WatcherQueue {
 }
 
 export async function createWatcher(options?: WatcherOptions): Promise<BuildWatcher> {
-  if (options?.polling) {
+  if (options?.polling || options?.followSymlinks) {
     return createChokidarWatcher(options);
   }
 
