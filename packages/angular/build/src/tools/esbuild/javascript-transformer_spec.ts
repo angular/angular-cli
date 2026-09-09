@@ -45,7 +45,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const base64Map = Buffer.from(JSON.stringify(inputMap)).toString('base64');
     const input = `export class MyClass { static ɵprov = 42; }\n//# sourceMappingURL=data:application/json;base64,${base64Map}`;
 
-    const result = await transformer.transformData('src/app.js', input, true);
+    const result = await transformer.transformData('src/app.js', input, { skipLinker: true });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -86,11 +86,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
       //# sourceMappingURL=data:application/json;base64,${base64Map}
     `;
 
-    const result = await transformer.transformData(
-      'node_modules/my-lib/directive.js',
-      input,
-      false,
-    );
+    const result = await transformer.transformData('node_modules/my-lib/directive.js', input, {
+      skipLinker: false,
+    });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -133,11 +131,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
       //# sourceMappingURL=data:application/json;base64,${base64Map}
     `;
 
-    const result = await transformer.transformData(
-      'node_modules/my-lib/component.js',
-      input,
-      false,
-    );
+    const result = await transformer.transformData('node_modules/my-lib/component.js', input, {
+      skipLinker: false,
+    });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -158,7 +154,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
     );
 
     const input = 'export class MyClass { static ɵprov = 42; }';
-    const result = await transformer.transformData('src/app.js', input, true);
+    const result = await transformer.transformData('src/app.js', input, { skipLinker: true });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -187,13 +183,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const base64Map = Buffer.from(JSON.stringify(inputMap)).toString('base64');
     const input = `export function add(a, b) { return a + b; }\n//# sourceMappingURL=data:application/json;base64,${base64Map}`;
 
-    const result = await transformer.transformData(
-      'src/counter.js',
-      input,
-      true,
-      undefined,
-      true /* instrumentForCoverage */,
-    );
+    const result = await transformer.transformData('src/counter.js', input, {
+      skipLinker: true,
+      instrumentForCoverage: true,
+    });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -223,13 +216,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const base64Map = Buffer.from(JSON.stringify(inputMap)).toString('base64');
     const input = `var x = new SomeClass();\n//# sourceMappingURL=data:application/json;base64,${base64Map}`;
 
-    const result = await transformer.transformData(
-      'src/app.js',
-      input,
-      true,
-      undefined,
-      true /* instrumentForCoverage */,
-    );
+    const result = await transformer.transformData('src/app.js', input, {
+      skipLinker: true,
+      instrumentForCoverage: true,
+    });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -250,7 +240,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
     );
 
     const inputBuffer = Buffer.from('export class MyClass { static ɵprov = 42; }', 'utf-8');
-    const result = await transformer.transformData('src/app.js', inputBuffer, true);
+    const result = await transformer.transformData('src/app.js', inputBuffer, { skipLinker: true });
     const text = Buffer.from(result).toString('utf-8');
     const map = extractSourcemap(text);
 
@@ -272,7 +262,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
       'console.log("hello");\n//# sourceMappingURL=app.js.map',
       'utf-8',
     );
-    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, true);
+    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, {
+      skipLinker: true,
+    });
     const text = Buffer.from(result).toString('utf-8');
 
     expect(text).toBe('console.log("hello");\n');
@@ -287,7 +279,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
     );
 
     const inputBuffer = Buffer.from('console.log("hello");\nconst x = 1;', 'utf-8');
-    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, true);
+    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, {
+      skipLinker: true,
+    });
 
     expect(result).toBe(inputBuffer);
   });
@@ -301,11 +295,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
     );
 
     const inputBuffer = Buffer.from('console.log("no linking required");\nconst x = 1;', 'utf-8');
-    const result = await transformer.transformData(
-      'node_modules/my-lib/lib.js',
-      inputBuffer,
-      false, // skipLinker: false
-    );
+    const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, {
+      skipLinker: false,
+    });
 
     expect(result).toBe(inputBuffer);
   });
@@ -322,7 +314,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const result = await transformer.transformData(
       'node_modules/@angular/core/fesm2022/core.mjs',
       inputBuffer,
-      false,
+      { skipLinker: false },
     );
 
     expect(result).toBe(inputBuffer);
@@ -339,7 +331,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const inputBuffer = Buffer.from('export const ɵɵngDeclareDirective = () => {};', 'utf-8');
 
     for (const ext of ['.ts', '.tsx', '.mts', '.cts']) {
-      const result = await transformer.transformData(`src/app/directive${ext}`, inputBuffer, false);
+      const result = await transformer.transformData(`src/app/directive${ext}`, inputBuffer, {
+        skipLinker: false,
+      });
 
       expect(result).toBe(inputBuffer);
     }
@@ -368,7 +362,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
     const result = await transformer.transformData(
       'node_modules/@angular/compiler-cli/test.js',
       input,
-      false,
+      { skipLinker: false },
     );
     const text = Buffer.from(result).toString('utf-8');
 
@@ -389,7 +383,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
         'function add(a, b) { return a + b; }\nconst result = add(1, 2);',
         'utf-8',
       );
-      const result = await transformer.transformData('src/math.js', inputBuffer, true);
+      const result = await transformer.transformData('src/math.js', inputBuffer, {
+        skipLinker: true,
+      });
 
       expect(result).toBe(inputBuffer);
     });
@@ -410,7 +406,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
         }`,
         'utf-8',
       );
-      const result = await transformer.transformData('src/user.service.js', inputBuffer, true);
+      const result = await transformer.transformData('src/user.service.js', inputBuffer, {
+        skipLinker: true,
+      });
 
       expect(result).toBe(inputBuffer);
     });
@@ -431,7 +429,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
         }`,
         'utf-8',
       );
-      const result = await transformer.transformData('src/user.service.js', inputBuffer, true);
+      const result = await transformer.transformData('src/user.service.js', inputBuffer, {
+        skipLinker: true,
+      });
 
       expect(result).toBe(inputBuffer);
     });
@@ -446,7 +446,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
       );
 
       const inputBuffer = Buffer.from('export class MyComponent { static prop = 42; }', 'utf-8');
-      const result = await transformer.transformData('src/component.js', inputBuffer, true);
+      const result = await transformer.transformData('src/component.js', inputBuffer, {
+        skipLinker: true,
+      });
 
       expect(result).toBe(inputBuffer);
     });
@@ -461,7 +463,7 @@ describe('JavaScriptTransformer sourcemaps', () => {
       );
 
       const input = 'export class MyService { static ɵprov = true; }';
-      const result = await transformer.transformData('src/service.js', input, true);
+      const result = await transformer.transformData('src/service.js', input, { skipLinker: true });
       const text = Buffer.from(result).toString('utf-8');
 
       expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
@@ -477,7 +479,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
       );
 
       const inputBuffer = Buffer.from('const MyClass = __decorate([], class {});', 'utf-8');
-      const result = await transformer.transformData('src/class.js', inputBuffer, true, false);
+      const result = await transformer.transformData('src/class.js', inputBuffer, {
+        skipLinker: true,
+        sideEffects: async () => false,
+      });
 
       expect(result).not.toBe(inputBuffer);
     });
@@ -492,7 +497,9 @@ describe('JavaScriptTransformer sourcemaps', () => {
       );
 
       const inputString = 'function multiply(a, b) { return a * b; }';
-      const result = await transformer.transformData('src/math.js', inputString, true);
+      const result = await transformer.transformData('src/math.js', inputString, {
+        skipLinker: true,
+      });
 
       expect(Buffer.from(result).toString('utf-8')).toBe(inputString);
     });
@@ -507,10 +514,168 @@ describe('JavaScriptTransformer sourcemaps', () => {
       );
 
       const inputString = 'export class MyService { static ɵprov = true; }';
-      const result = await transformer.transformData('src/service.js', inputString, true);
+      const result = await transformer.transformData('src/service.js', inputString, {
+        skipLinker: true,
+      });
       const text = Buffer.from(result).toString('utf-8');
 
       expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
+    });
+
+    it('should not query sideEffects when no candidate tokens are present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queried = false;
+      const inputBuffer = Buffer.from('function add(a, b) { return a + b; }', 'utf-8');
+      await transformer.transformData('src/math.js', inputBuffer, {
+        skipLinker: true,
+        sideEffects: async () => {
+          queried = true;
+
+          return false;
+        },
+      });
+
+      expect(queried).toBeFalse();
+    });
+
+    it('should not query sideEffects when primary tokens are present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queried = false;
+      const input = 'export class MyService { static ɵprov = true; }';
+      await transformer.transformData('src/service.js', input, {
+        skipLinker: true,
+        sideEffects: async () => {
+          queried = true;
+
+          return false;
+        },
+      });
+
+      expect(queried).toBeFalse();
+    });
+
+    it('should query sideEffects for @angular/ packages and dispatch to worker when sideEffects is false', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queryCount = 0;
+      const inputBuffer = Buffer.from('export const foo = someCall();', 'utf-8');
+      const result = await transformer.transformData(
+        '/node_modules/@angular/core/fesm2022/index.mjs',
+        inputBuffer,
+        {
+          skipLinker: true,
+          sideEffects: async () => {
+            queryCount++;
+
+            return false;
+          },
+        },
+      );
+
+      expect(queryCount).toBe(1);
+      expect(result).not.toBe(inputBuffer);
+    });
+
+    it('should query sideEffects for decorator tokens and evaluate at most once', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queryCount = 0;
+      const inputBuffer = Buffer.from('const MyClass = __decorate([], class {});', 'utf-8');
+      const result = await transformer.transformData('src/class.js', inputBuffer, {
+        skipLinker: true,
+        sideEffects: async () => {
+          queryCount++;
+
+          return false;
+        },
+      });
+
+      expect(queryCount).toBe(1);
+      expect(result).not.toBe(inputBuffer);
+    });
+
+    it('should query sideEffects and wrap decorators when both primary and decorator tokens are present', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queryCount = 0;
+      const input = `
+        let MyService = class MyService { static ɵprov = true; };
+        MyService = __decorate([], MyService);
+      `;
+      const result = await transformer.transformData('src/service.js', input, {
+        skipLinker: true,
+        sideEffects: async () => {
+          queryCount++;
+
+          return false;
+        },
+      });
+
+      expect(queryCount).toBe(1);
+      const text = Buffer.from(result).toString('utf-8');
+      expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
+      expect(text).toContain('__decorate');
+    });
+
+    it('should query sideEffects when both primary and decorator tokens are present in Buffer', async () => {
+      transformer = new JavaScriptTransformer(
+        {
+          sourcemap: false,
+          advancedOptimizations: true,
+        },
+        1,
+      );
+
+      let queryCount = 0;
+      const inputBuffer = Buffer.from(
+        'let MyService = class MyService { static ɵprov = true; };\nMyService = __decorate([], MyService);',
+        'utf-8',
+      );
+      const result = await transformer.transformData('src/service.js', inputBuffer, {
+        skipLinker: true,
+        sideEffects: async () => {
+          queryCount++;
+
+          return false;
+        },
+      });
+
+      expect(queryCount).toBe(1);
+      const text = Buffer.from(result).toString('utf-8');
+      expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
+      expect(text).toContain('__decorate');
     });
   });
 });

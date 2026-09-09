@@ -526,15 +526,11 @@ export function createCompilerPlugin(
         } else if (typeof contents === 'string' && (useTypeScriptTranspilation || isJS)) {
           // A string indicates untransformed output from the TS/NG compiler.
           // This step is unneeded when using esbuild transpilation.
-          const sideEffects = await hasSideEffects(request);
-          const instrumentForCoverage = pluginOptions.instrumentForCoverage?.(request);
-          contents = await javascriptTransformer.transformData(
-            request,
-            contents,
-            true /* skipLinker */,
-            sideEffects,
-            instrumentForCoverage,
-          );
+          contents = await javascriptTransformer.transformData(request, contents, {
+            skipLinker: true,
+            sideEffects: () => hasSideEffects(request),
+            instrumentForCoverage: pluginOptions.instrumentForCoverage?.(request),
+          });
 
           // Store as the returned Uint8Array to allow caching the fully transformed code
           typeScriptFileCache.set(request, contents);
@@ -573,12 +569,10 @@ export function createCompilerPlugin(
           return profileAsync(
             'NG_EMIT_JS*',
             async () => {
-              const sideEffects = await hasSideEffects(request);
-              const contents = await javascriptTransformer.transformFile(
-                request,
-                pluginOptions.jit,
-                sideEffects,
-              );
+              const contents = await javascriptTransformer.transformFile(request, {
+                skipLinker: pluginOptions.jit,
+                sideEffects: () => hasSideEffects(request),
+              });
 
               return {
                 contents,
