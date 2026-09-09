@@ -402,23 +402,23 @@ export function createCompilerPlugin(
               ],
             });
           }
-        }
 
-        const diagnosticModes = useTypeChecking
-          ? DiagnosticModes.All
-          : DiagnosticModes.All & ~DiagnosticModes.Semantic;
-        diagnosticsPromise = compilation.diagnoseFiles(diagnosticModes).catch((error) => ({
-          errors: [
-            {
-              text: 'Angular compilation diagnostics failed.',
-              notes: [
-                {
-                  text: error instanceof Error ? (error.stack ?? error.message) : String(error),
-                },
-              ],
-            },
-          ],
-        }));
+          const diagnosticModes = useTypeChecking
+            ? DiagnosticModes.All
+            : DiagnosticModes.All & ~DiagnosticModes.Semantic;
+          diagnosticsPromise = compilation.diagnoseFiles(diagnosticModes).catch((error) => ({
+            errors: [
+              {
+                text: 'Angular compilation diagnostics failed.',
+                notes: [
+                  {
+                    text: error instanceof Error ? (error.stack ?? error.message) : String(error),
+                  },
+                ],
+              },
+            ],
+          }));
+        }
 
         // Add errors from failed additional results.
         // This must be done after emit to capture latest web worker results.
