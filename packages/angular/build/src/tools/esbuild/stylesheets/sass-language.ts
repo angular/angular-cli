@@ -146,8 +146,9 @@ async function compileString(
 
               // Caching package root locations is particularly beneficial for `@material/*` packages
               // which extensively use deep imports.
+              const packageRootKey = `${options.containingUrl?.href ?? ''}:${packageName}`;
               const packageRoot = await currentPackageRootCache.getOrCreate(
-                packageName,
+                packageRootKey,
                 async () => {
                   // Use the required presence of a package root `package.json` file to resolve the location
                   const packageResult = await resolveUrl(packageName + '/package.json', options);
