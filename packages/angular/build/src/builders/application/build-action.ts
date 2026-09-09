@@ -15,7 +15,10 @@ import {
   RebuildState,
 } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
-import { shutdownSassWorkerPool } from '../../tools/esbuild/stylesheets/sass-language';
+import {
+  resetSassWorkerPoolCaches,
+  shutdownSassWorkerPool,
+} from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { shouldWatchRoot } from '../../utils/environment-options';
@@ -209,6 +212,8 @@ export async function* runEsBuildBuildAction(
 
       // Clear removed files from current watch files
       changes.removed.forEach((removedPath) => currentWatchFiles.delete(removedPath));
+
+      resetSassWorkerPoolCaches();
 
       const rebuildState = result.createRebuildState(changes);
       result = await withProgress('Changes detected. Rebuilding...', () => action(rebuildState));

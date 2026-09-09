@@ -23,9 +23,18 @@ function isSassException(error: unknown): error is Exception {
   return !!error && typeof error === 'object' && 'sassMessage' in error;
 }
 
+export function resetSassWorkerPoolCaches(): void {
+  resolutionCache?.clear();
+  packageRootCache?.clear();
+  if (sassService) {
+    sassService.clearCache();
+  } else if (sassServicePromise) {
+    void sassServicePromise.then((service) => service.clearCache());
+  }
+}
+
 export function shutdownSassWorkerPool(): void {
-  resolutionCache = undefined;
-  packageRootCache = undefined;
+  resetSassWorkerPoolCaches();
   if (sassService) {
     void sassService.close();
     sassService = undefined;

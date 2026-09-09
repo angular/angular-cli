@@ -70,6 +70,9 @@ export async function getStylesConfig(wco: WebpackConfigOptions): Promise<Config
 
   extraPlugins.push({
     apply(compiler) {
+      compiler.hooks.thisCompilation.tap('sass-service', () => {
+        sassImplementation.clearCache();
+      });
       compiler.hooks.shutdown.tap('sass-service', () => {
         void sassImplementation.close();
       });
