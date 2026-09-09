@@ -60,7 +60,7 @@
     "postcss": "8.5.26",
     "rollup": "4.63.1",
     "rxjs": "7.8.2",
-    "vitest": "4.1.11"
+    "vitest": "5.0.0"
   },
   "peerDependencies": {
     "@angular/compiler": "0.0.0-ANGULAR-FW-PEER-DEP",
@@ -80,7 +80,7 @@
     "tailwindcss": "^2.0.0 || ^3.0.0 || ^4.0.0",
     "tslib": "^2.3.0",
     "typescript": ">=6.0 <6.1",
-    "vitest": "^4.0.8"
+    "vitest": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "@angular/core": {
