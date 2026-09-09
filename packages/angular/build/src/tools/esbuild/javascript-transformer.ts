@@ -33,9 +33,7 @@ const DECORATOR_TOKENS = ['__decorate', '__esDecorate'] as const;
 const DECORATOR_TOKEN_BYTES = DECORATOR_TOKENS.map((token) => Buffer.from(token, 'utf-8'));
 
 const ADVANCED_OPTIMIZATION_REGEX = new RegExp(ADVANCED_OPTIMIZATION_TOKENS.join('|'));
-const ADVANCED_OPTIMIZATION_WITH_DECORATORS_REGEX = new RegExp(
-  [...ADVANCED_OPTIMIZATION_TOKENS, ...DECORATOR_TOKENS].join('|'),
-);
+const DECORATOR_REGEX = new RegExp(DECORATOR_TOKENS.join('|'));
 
 /**
  * Determines whether JavaScript code contains potential candidate constructs for advanced optimizations.
@@ -43,43 +41,44 @@ const ADVANCED_OPTIMIZATION_WITH_DECORATORS_REGEX = new RegExp(
  *
  * @param filename The full path to the file.
  * @param data The data (string or Buffer) of the file.
- * @param sideEffects If false, indicates the file is considered side-effect free.
+ * @param sideEffects An optional lazy resolver callback that returns whether the file is considered side-effect free.
  * @returns True if the code may contain constructs that advanced optimizations can mutate.
  */
-function hasAdvancedOptimizationCandidates(
+async function hasAdvancedOptimizationCandidates(
   filename: string,
   data: string | Uint8Array,
-  sideEffects?: boolean,
-): boolean {
+  sideEffects?: () => Promise<boolean | undefined>,
+): Promise<boolean> {
   // Side-effect-free @angular/ packages undergo top-level pure function annotations
-  if (sideEffects === false && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename)) {
+  if (/[\\/]node_modules[\\/]@angular[\\/]/.test(filename) && (await sideEffects?.()) === false) {
     return true;
   }
 
   if (typeof data === 'string') {
-    const regex =
-      sideEffects === false
-        ? ADVANCED_OPTIMIZATION_WITH_DECORATORS_REGEX
-        : ADVANCED_OPTIMIZATION_REGEX;
+    const hasDecorators = DECORATOR_REGEX.test(data);
+    if (hasDecorators && (await sideEffects?.()) === false) {
+      return true;
+    }
 
-    return regex.test(data);
+    return ADVANCED_OPTIMIZATION_REGEX.test(data);
   }
 
   const dataBuffer = Buffer.isBuffer(data)
     ? data
     : Buffer.from(data.buffer, data.byteOffset, data.byteLength);
 
-  for (const tokenBytes of ADVANCED_OPTIMIZATION_TOKEN_BYTES) {
+  for (const tokenBytes of DECORATOR_TOKEN_BYTES) {
     if (dataBuffer.includes(tokenBytes)) {
-      return true;
+      if ((await sideEffects?.()) === false) {
+        return true;
+      }
+      break;
     }
   }
 
-  if (sideEffects === false) {
-    for (const tokenBytes of DECORATOR_TOKEN_BYTES) {
-      if (dataBuffer.includes(tokenBytes)) {
-        return true;
-      }
+  for (const tokenBytes of ADVANCED_OPTIMIZATION_TOKEN_BYTES) {
+    if (dataBuffer.includes(tokenBytes)) {
+      return true;
     }
   }
 
@@ -119,6 +118,23 @@ export interface JavaScriptTransformerOptions {
   thirdPartySourcemaps?: boolean;
   advancedOptimizations?: boolean;
   jit?: boolean;
+}
+
+/**
+ * Transformation options for an individual file or data transform request.
+ */
+export interface TransformOptions {
+  /** If true, bypass all Angular linker processing; if false, attempt linking. */
+  skipLinker?: boolean;
+
+  /**
+   * An optional lazy resolver callback that returns whether the file has side-effects.
+   * If it resolves to false, top-level pure function annotations and decorator wrapping may be applied.
+   */
+  sideEffects?: () => Promise<boolean | undefined>;
+
+  /** If true, instrument the code for test coverage. */
+  instrumentForCoverage?: boolean;
 }
 
 /**
@@ -220,56 +236,14 @@ export class JavaScriptTransformer {
    * Performs JavaScript transformations on a file from the filesystem.
    * If no transformations are required, the data for the original file will be returned.
    * @param filename The full path to the file.
-   * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
-   * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
+   * @param options Transformation options specific to this file.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
-  async transformFile(
-    filename: string,
-    skipLinker?: boolean,
-    sideEffects?: boolean,
-    instrumentForCoverage?: boolean,
-  ): Promise<Uint8Array> {
+  async transformFile(filename: string, options?: TransformOptions): Promise<Uint8Array> {
     return this.#runWithThrottle(async () => {
       const data = await readFile(filename);
 
-      let cacheKey: string | undefined;
-      if (this.cache) {
-        // Create a cache key from the file data and options that effect the output.
-        // NOTE: If additional options are added, this may need to be updated.
-        const hasher = createContentHash();
-        hasher.update(`${!!skipLinker}--${!!sideEffects}`);
-        hasher.update(data);
-        hasher.update(this.#fileCacheKeyBase);
-        cacheKey = hasher.digest();
-
-        try {
-          const cached = await this.cache.get(cacheKey);
-          if (cached !== undefined) {
-            return cached;
-          }
-        } catch {
-          // Failure to get the value should not fail the transform
-        }
-      }
-
-      const result = await this.transformData(
-        filename,
-        data,
-        !!skipLinker,
-        sideEffects,
-        instrumentForCoverage,
-      );
-
-      if (this.cache && cacheKey) {
-        try {
-          await this.cache.put(cacheKey, result);
-        } catch {
-          // Failure to store the value in the cache should not fail the transform
-        }
-      }
-
-      return result;
+      return this.transformData(filename, data, options);
     });
   }
 
@@ -278,25 +252,36 @@ export class JavaScriptTransformer {
    * to exist on the filesystem.
    * @param filename The full path of the file represented by the data.
    * @param data The data of the file that should be transformed.
-   * @param skipLinker If true, bypass all Angular linker processing; if false, attempt linking.
-   * @param sideEffects If false, and `advancedOptimizations` is enabled tslib decorators are wrapped.
+   * @param options Transformation options specific to this file data.
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
   async transformData(
     filename: string,
     data: string | Uint8Array,
-    skipLinker: boolean,
-    sideEffects?: boolean,
-    instrumentForCoverage?: boolean,
+    options?: TransformOptions,
   ): Promise<Uint8Array> {
-    const shouldLink = !skipLinker && requiresLinking(filename, data);
+    let resolvedSideEffects: boolean | undefined;
+    let sideEffectsQueried = false;
+
+    const sideEffectsGetter = options?.sideEffects
+      ? async () => {
+          if (!sideEffectsQueried) {
+            sideEffectsQueried = true;
+            resolvedSideEffects = await options.sideEffects?.();
+          }
+
+          return resolvedSideEffects;
+        }
+      : undefined;
+
+    const shouldLink = !options?.skipLinker && requiresLinking(filename, data);
     const shouldOptimize =
       this.#commonOptions.advancedOptimizations &&
-      hasAdvancedOptimizationCandidates(filename, data, sideEffects);
+      (await hasAdvancedOptimizationCandidates(filename, data, sideEffectsGetter));
 
     // Perform a quick test to determine if the data needs any transformations.
     // This allows directly returning the data without the worker communication overhead.
-    if (!shouldLink && !shouldOptimize && !instrumentForCoverage) {
+    if (!shouldLink && !shouldOptimize && !options?.instrumentForCoverage) {
       const keepSourcemap =
         this.#commonOptions.sourcemap &&
         (!!this.#commonOptions.thirdPartySourcemaps || !/[\\/]node_modules[\\/]/.test(filename));
@@ -306,6 +291,28 @@ export class JavaScriptTransformer {
       }
 
       return keepSourcemap ? data : removeSourceMappingURL(data);
+    }
+
+    let cacheKey: string | undefined;
+    if (this.cache) {
+      // Create a cache key from the file data and options that affect the output.
+      // NOTE: If additional options are added, this may need to be updated.
+      const hasher = createContentHash();
+      hasher.update(
+        `${!options?.skipLinker}--${resolvedSideEffects === false}--${!!options?.instrumentForCoverage}`,
+      );
+      hasher.update(data);
+      hasher.update(this.#fileCacheKeyBase);
+      cacheKey = hasher.digest();
+
+      try {
+        const cached = await this.cache.get(cacheKey);
+        if (cached !== undefined) {
+          return cached;
+        }
+      } catch {
+        // Failure to get the value should not fail the transform
+      }
     }
 
     // Only standalone (non-pooled) ArrayBuffers can be transferred across worker threads.
@@ -319,18 +326,28 @@ export class JavaScriptTransformer {
       data.byteLength === data.buffer.byteLength &&
       !process.versions.pnp;
 
-    return this.#ensureWorkerPool().run(
+    const result = (await this.#ensureWorkerPool().run(
       {
         filename,
         data,
         skipLinker: !shouldLink,
-        sideEffects,
-        instrumentForCoverage,
+        sideEffects: resolvedSideEffects,
+        instrumentForCoverage: options?.instrumentForCoverage,
       },
       {
         transferList: isTransferable ? [data.buffer] : undefined,
       },
-    );
+    )) as Uint8Array;
+
+    if (this.cache && cacheKey) {
+      try {
+        await this.cache.put(cacheKey, result);
+      } catch {
+        // Failure to store the value in the cache should not fail the transform
+      }
+    }
+
+    return result;
   }
 
   /**
