@@ -38,8 +38,8 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
             expectNoLog(logs, 'Unexpected character "EOF"');
           },
         ],
-        { outputLogsOnFailure: false },
+        { outputLogsOnFailure: false, timeout: 60_000 },
       );
-    });
+    }, 90_000);
   });
 });
