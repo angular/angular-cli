@@ -7,7 +7,7 @@
  */
 
 import { RootDatabase, open } from 'lmdb';
-import { Cache, PersistentCacheStore } from './cache';
+import { Cache, NamespacedCacheStore, PersistentCacheStore } from './cache';
 
 export class LmdbCacheStore implements PersistentCacheStore<unknown> {
   readonly #cacheFileUrl;
@@ -46,7 +46,7 @@ export class LmdbCacheStore implements PersistentCacheStore<unknown> {
   }
 
   createCache<V = unknown>(namespace: string): Cache<V> {
-    return new Cache(this, namespace);
+    return new Cache<V>(new NamespacedCacheStore<V>(this, namespace));
   }
 
   async close() {

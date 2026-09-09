@@ -12,7 +12,7 @@ import { DatabaseSync, StatementSync } from 'node:sqlite';
 import { promisify } from 'node:util';
 import { deserialize, serialize } from 'node:v8';
 import { deflateRaw, inflateRawSync } from 'node:zlib';
-import { Cache, PersistentCacheStore } from './cache';
+import { Cache, NamespacedCacheStore, PersistentCacheStore } from './cache';
 
 const deflateRawAsync = promisify(deflateRaw);
 
@@ -315,7 +315,7 @@ export class SqliteCacheStore implements PersistentCacheStore<unknown> {
   }
 
   createCache<V = unknown>(namespace: string): Cache<V> {
-    return new Cache(this, namespace);
+    return new Cache<V>(new NamespacedCacheStore<V>(this, namespace));
   }
 
   close(): void {

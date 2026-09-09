@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { MemoryCache } from './cache';
+import { Cache, CacheStore, MemoryCache, NamespacedCacheStore } from './cache';
 
 describe('MemoryCache', () => {
   let cache: MemoryCache<string>;
@@ -157,5 +157,111 @@ describe('MemoryCache', () => {
 
   it('should return false when deleting a non-existent key', () => {
     expect(cache.delete('non-existent')).toBeFalse();
+  });
+
+  it('should return unencoded keys in entries() and allow deletion', async () => {
+    await cache.put('component/style.scss', 'content');
+
+    const entries = Array.from(cache.entries());
+    expect(entries).toEqual([['component/style.scss', 'content']]);
+
+    expect(cache.delete(entries[0][0])).toBeTrue();
+    expect(await cache.get('component/style.scss')).toBeUndefined();
+  });
+});
+
+describe('NamespacedCacheStore', () => {
+  class TestStore implements CacheStore<string> {
+    readonly map = new Map<string, string>();
+
+    get(key: string): string | undefined {
+      return this.map.get(key);
+    }
+
+    has(key: string): boolean {
+      return this.map.has(key);
+    }
+
+    set(key: string, value: string): this {
+      this.map.set(key, value);
+
+      return this;
+    }
+  }
+
+  let store: TestStore;
+
+  beforeEach(() => {
+    store = new TestStore();
+  });
+
+  it('should encode namespaced keys with <length>:<namespace>:<key>', async () => {
+    const namespacedStore = new NamespacedCacheStore(store, 'test-ns');
+    const cache = new Cache<string>(namespacedStore);
+    await cache.put('my-key', 'my-val');
+
+    expect(store.map.has('7:test-ns:my-key')).toBeTrue();
+    expect(await cache.get('my-key')).toBe('my-val');
+  });
+
+  it('should prevent collisions between namespaces containing colons', async () => {
+    const cacheA = new Cache<string>(new NamespacedCacheStore(store, 'a'));
+    const cacheB = new Cache<string>(new NamespacedCacheStore(store, 'a:b'));
+
+    await cacheA.put('b:c', 'val-a');
+    await cacheB.put('c', 'val-b');
+
+    expect(await cacheA.get('b:c')).toBe('val-a');
+    expect(await cacheB.get('c')).toBe('val-b');
+    expect(store.map.get('1:a:b:c')).toBe('val-a');
+    expect(store.map.get('3:a:b:c')).toBe('val-b');
+  });
+
+  it('should encode empty string namespace as 0::<key>', async () => {
+    const namespacedStore = new NamespacedCacheStore(store, '');
+    const cache = new Cache<string>(namespacedStore);
+    await cache.put('key', 'val');
+
+    expect(store.map.has('0::key')).toBeTrue();
+    expect(await cache.get('key')).toBe('val');
+  });
+
+  it('should forward get, has, and set calls with the namespaced prefix', async () => {
+    const namespacedStore = new NamespacedCacheStore(store, 'custom');
+    await namespacedStore.set('hello', 'world');
+
+    expect(store.map.has('6:custom:hello')).toBeTrue();
+    expect(await namespacedStore.has('hello')).toBeTrue();
+    expect(await namespacedStore.get('hello')).toBe('world');
+  });
+
+  it('should return this when the underlying store set is asynchronous', async () => {
+    class AsyncStore implements CacheStore<string> {
+      readonly map = new Map<string, string>();
+
+      get(key: string): Promise<string | undefined> {
+        return Promise.resolve(this.map.get(key));
+      }
+
+      has(key: string): Promise<boolean> {
+        return Promise.resolve(this.map.has(key));
+      }
+
+      async set(key: string, value: string): Promise<this> {
+        this.map.set(key, value);
+
+        return this;
+      }
+    }
+
+    const asyncStore = new AsyncStore();
+    const namespacedStore = new NamespacedCacheStore(asyncStore, 'async-ns');
+    const setPromise = namespacedStore.set('foo', 'bar');
+
+    expect(setPromise instanceof Promise).toBeTrue();
+    expect(await setPromise).toBe(namespacedStore);
+    expect(asyncStore.map.get('8:async-ns:foo')).toBe('bar');
+    expect(await namespacedStore.get('foo')).toBe('bar');
+    expect(await namespacedStore.has('foo')).toBeTrue();
   });
 });
