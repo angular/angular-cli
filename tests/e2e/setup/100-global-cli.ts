@@ -3,7 +3,7 @@ import { getActivePackageManager } from '../utils/packages';
 import { globalNpm } from '../utils/process';
 
 const PACKAGE_MANAGER_VERSION = {
-  'npm': '10.8.1',
+  'npm': '11.19.1',
   'yarn': '1.22.22',
   'pnpm': '10.17.1',
   'bun': '1.3.2',
