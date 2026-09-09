@@ -108,4 +108,12 @@ describe('discover', () => {
     const result = await discover(host, '/project');
     expect(result).toBe('bun');
   });
+
+  it('should discover the aube lockfile', async () => {
+    const host = new MockHost({
+      '/project': ['aube-lock.yaml'],
+    });
+    const result = await discover(host, '/project');
+    expect(result).toBe('aube');
+  });
 });

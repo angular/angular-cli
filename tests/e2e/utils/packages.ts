@@ -1,5 +1,5 @@
 import { getGlobalVariable } from './env';
-import { ProcessOutput, silentBun, silentNpm, silentPnpm, silentYarn } from './process';
+import { ProcessOutput, silentAube, silentBun, silentNpm, silentPnpm, silentYarn } from './process';
 
 export interface PkgInfo {
   readonly name: string;
@@ -7,7 +7,7 @@ export interface PkgInfo {
   readonly path: string;
 }
 
-export function getActivePackageManager(): 'npm' | 'yarn' | 'bun' | 'pnpm' {
+export function getActivePackageManager(): 'npm' | 'yarn' | 'bun' | 'pnpm' | 'aube' {
   return getGlobalVariable('package-manager');
 }
 
@@ -29,6 +29,9 @@ export async function installWorkspacePackages(options?: { force?: boolean }): P
     case 'bun':
       await silentBun('install');
       break;
+    case 'aube':
+      await silentAube('install');
+      break;
   }
 }
 
@@ -43,6 +46,8 @@ export function installPackage(specifier: string, registry?: string): Promise<Pr
       return silentBun('add', specifier, ...registryOption);
     case 'pnpm':
       return silentPnpm('add', specifier, ...registryOption);
+    case 'aube':
+      return silentAube('add', specifier, ...registryOption);
   }
 }
 
@@ -60,6 +65,9 @@ export async function uninstallPackage(name: string): Promise<void> {
         break;
       case 'pnpm':
         await silentPnpm('remove', name);
+        break;
+      case 'aube':
+        await silentAube('remove', name);
         break;
     }
   } catch (e) {

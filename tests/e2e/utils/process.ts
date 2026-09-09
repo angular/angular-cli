@@ -411,6 +411,10 @@ export function silentBun(...args: string[]) {
   return _exec({ silent: true }, 'bun', args);
 }
 
+export function silentAube(...args: string[]) {
+  return _exec({ silent: true }, 'aube', args);
+}
+
 export function globalNpm(args: string[], env?: NodeJS.ProcessEnv) {
   if (!process.env.LEGACY_CLI_RUNNER) {
     throw new Error(

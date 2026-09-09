@@ -281,6 +281,31 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     },
     isNotFound: isKnownNotFound,
   },
+  aube: {
+    binary: 'aube',
+    lockfiles: ['aube-lock.yaml'],
+    addCommand: 'add',
+    installCommand: ['install'],
+    forceFlag: '--force',
+    saveExactFlag: '--save-exact',
+    saveTildeFlag: '--save-tilde',
+    saveDevFlag: '--save-dev',
+    noLockfileFlag: '', // Aube does not have a flag for this.
+    ignoreScriptsFlag: '--ignore-scripts',
+    configFiles: ['.npmrc'],
+    getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
+    versionCommand: ['--version'],
+    listDependenciesCommand: ['list', '--depth=0', '--json'],
+    getManifestCommand: ['view', '--json'],
+    viewCommandFieldArgFormatter: (fields) => [...fields],
+    outputParsers: {
+      listDependencies: parseNpmLikeDependencies,
+      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryMetadata: parseNpmLikeMetadata,
+      getError: parseNpmLikeError,
+    },
+    isNotFound: isKnownNotFound,
+  },
   bun: {
     binary: 'bun',
     lockfiles: ['bun.lockb', 'bun.lock'],
@@ -347,6 +372,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
 export const PACKAGE_MANAGER_PRECEDENCE: readonly PackageManagerName[] = [
   'pnpm',
   'yarn',
+  'aube',
   'bun',
   'npm',
 ];
