@@ -22,7 +22,7 @@
     "save": "dependencies"
   },
   "dependencies": {
-    "beasties": "0.5.3",
+    "beasties": "0.5.4",
     "tslib": "^2.3.0"
   },
   "peerDependencies": {
