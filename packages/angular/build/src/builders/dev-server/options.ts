@@ -13,7 +13,12 @@ import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { ApplicationBuilderOptions } from '../application';
 import { Schema as DevServerOptions } from './schema';
 
-export type NormalizedDevServerOptions = Awaited<ReturnType<typeof normalizeOptions>>;
+export type NormalizedDevServerOptions = Omit<
+  Awaited<ReturnType<typeof normalizeOptions>>,
+  'strictPort'
+> & {
+  strictPort?: boolean;
+};
 
 /**
  * Normalize the user provided options by creating full paths for all path based options
@@ -122,6 +127,7 @@ export async function normalizeOptions(
     buildTarget,
     host: host ?? 'localhost',
     port,
+    strictPort: port !== 0,
     poll,
     open,
     verbose,
