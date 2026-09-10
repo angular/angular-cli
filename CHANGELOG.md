@@ -1,3 +1,17 @@
+<a name="22.1.8"></a>
+
+# 22.1.8 (2026-09-10)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [a6e30fa378](https://github.com/angular/angular-cli/commit/a6e30fa378ef5f03b26cd2fcafff6bff2c47da80) | fix  | disable strictPort when port 0 is used in dev-server                                                                         |
+| [35a5d4aa49](https://github.com/angular/angular-cli/commit/35a5d4aa49011f83f58cdd30c3ae24a55bf0651c) | perf | avoid full JSON parsing when updating sourcemap ignore list                                                                  |
+| [48cc43cbf2](https://github.com/angular/angular-cli/commit/48cc43cbf204c887b344b773045b5460265eaa14) | perf | read rendered module length once per module in chunk optimizer ([#34045](https://github.com/angular/angular-cli/pull/34045)) |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0-next.6"></a>
 
 # 22.2.0-next.6 (2026-09-02)
