@@ -1,3 +1,15 @@
+<a name="21.2.24"></a>
+
+# 21.2.24 (2026-09-10)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description             |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [dbaadc2f6e](https://github.com/angular/angular-cli/commit/dbaadc2f6e73b611e292b3337066fd5b3b631397) | fix  | update undici to 7.29.1 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.23"></a>
 
 # 21.2.23 (2026-09-02)
