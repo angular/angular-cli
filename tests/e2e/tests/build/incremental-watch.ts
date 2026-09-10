@@ -7,17 +7,17 @@ import { execAndWaitForOutputToMatch, waitForAnyProcessOutputToMatch } from '../
 
 const buildReadyRegEx = /Application bundle generation complete\./;
 
-async function getOutputFiles(
+async function getOutputChunks(
   dir: string,
-  predicate: (files: string[]) => boolean,
+  predicate: (chunks: string[]) => boolean,
   timeout = 10_000,
 ): Promise<string[]> {
   const start = Date.now();
   while (Date.now() - start < timeout) {
     try {
-      const files = await readdir(dir);
-      if (predicate(files)) {
-        return files;
+      const chunks = (await readdir(dir)).filter((file) => file.endsWith('.js'));
+      if (predicate(chunks)) {
+        return chunks;
       }
     } catch (err: any) {
       if (err?.code !== 'ENOENT') {
@@ -27,10 +27,10 @@ async function getOutputFiles(
     await setTimeout(50);
   }
 
-  const files = await readdir(dir);
-  assert(predicate(files), `Condition not met for files in ${dir}: ${JSON.stringify(files)}`);
+  const chunks = (await readdir(dir)).filter((file) => file.endsWith('.js'));
+  assert(predicate(chunks), `Condition not met for chunks in ${dir}: ${JSON.stringify(chunks)}`);
 
-  return files;
+  return chunks;
 }
 
 export default async function () {
@@ -46,9 +46,9 @@ export default async function () {
     ['build', '--watch', '--configuration=development'],
     buildReadyRegEx,
   );
-  const initialOutputFiles = await getOutputFiles(
+  const initialOutputChunks = await getOutputChunks(
     'dist/test-project/browser',
-    (files) => files.length > 0,
+    (chunks) => chunks.length > 0,
   );
 
   const originalMain = await readFile('src/main.ts');
@@ -66,12 +66,12 @@ export default async function () {
     ),
     appendToFile('src/main.ts', `\nimport('./a').then((m) => m.sayHi());`),
   ]);
-  const intermediateOutputFiles = await getOutputFiles(
+  const intermediateOutputChunks = await getOutputChunks(
     'dist/test-project/browser',
-    (files) => files.length > initialOutputFiles.length,
+    (chunks) => chunks.length > initialOutputChunks.length,
   );
   assert(
-    initialOutputFiles.length < intermediateOutputFiles.length,
+    initialOutputChunks.length < intermediateOutputChunks.length,
     'Additional chunks should be present',
   );
 
@@ -80,13 +80,13 @@ export default async function () {
     waitForAnyProcessOutputToMatch(buildReadyRegEx),
     writeFile('src/main.ts', originalMain),
   ]);
-  const finalOutputFiles = await getOutputFiles(
+  const finalOutputChunks = await getOutputChunks(
     'dist/test-project/browser',
-    (files) => files.length === initialOutputFiles.length,
+    (chunks) => chunks.length === initialOutputChunks.length,
   );
   assert.equal(
-    initialOutputFiles.length,
-    finalOutputFiles.length,
+    initialOutputChunks.length,
+    finalOutputChunks.length,
     'Final chunk count should be equal to initial chunk count.',
   );
 }
