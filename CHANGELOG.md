@@ -1,3 +1,15 @@
+<a name="20.3.37"></a>
+
+# 20.3.37 (2026-09-10)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description             |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------- |
+| [c37642011e](https://github.com/angular/angular-cli/commit/c37642011e6d8f7656a2bbc61feb79cae7d353c4) | fix  | update undici to 7.29.1 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.36"></a>
 
 # 20.3.36 (2026-09-02)
