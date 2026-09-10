@@ -33,7 +33,7 @@ const releaseTargetTag = 'release-package';
 const projectDir = join(import.meta.dirname, '../');
 
 /** Command that runs Bazel. */
-const bazelCmd = process.env.BAZEL || `pnpm -s bazel`;
+const bazelCmd = process.env.BAZEL || `pnpm --silent bazel`;
 
 /** Command that queries Bazel for all release package targets. */
 const queryPackagesCmd =
