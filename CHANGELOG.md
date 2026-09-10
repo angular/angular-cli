@@ -1,3 +1,43 @@
+<a name="22.2.0-next.7"></a>
+
+# 22.2.0-next.7 (2026-09-10)
+
+## Deprecations
+
+### @angular/build
+
+- The `splitting` option in the unit-test builder is deprecated as it is no longer needed with Vitest 5.
+
+  Disabling code splitting is no longer necessary with Vitest 5, as the issue where shared-module exports were uninitialized in class-field initializers under JSDOM has been resolved.
+
+### @angular/build
+
+| Commit                                                                                               | Type     | Description                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [fe2f180fd0](https://github.com/angular/angular-cli/commit/fe2f180fd0c2fa02706353ca6a034d235feb6c59) | fix      | add automatic corruption recovery in SQLite cache store                                                                      |
+| [675f1f5274](https://github.com/angular/angular-cli/commit/675f1f5274ff853f153832f7adc69273fa63f0cd) | fix      | avoid pure comment pattern in oxc transform                                                                                  |
+| [d396324b4e](https://github.com/angular/angular-cli/commit/d396324b4eb3b16640526a64365d953642bc7ca1) | fix      | default preloadInitial to false when serviceWorker is enabled                                                                |
+| [8504cfffcf](https://github.com/angular/angular-cli/commit/8504cfffcfb943fcd8fda62507e4b236e4bf429a) | fix      | disable root config extension for inline test project                                                                        |
+| [5d21812aae](https://github.com/angular/angular-cli/commit/5d21812aaedc57cbd9378a99d9747f80c413cdc3) | fix      | disable strictPort when port 0 is used in dev-server                                                                         |
+| [54d712f579](https://github.com/angular/angular-cli/commit/54d712f57904d2f612eec27a0507ea298b40915e) | fix      | ensure parent directory exists in SQLite cache store                                                                         |
+| [b423bc39cd](https://github.com/angular/angular-cli/commit/b423bc39cd59c73ae79402c6cccdc0ecf1d7aaa1) | fix      | use chokidar watcher when followSymlinks is enabled                                                                          |
+| [5a0d226b7c](https://github.com/angular/angular-cli/commit/5a0d226b7ccb945edd234fa0c839994f4876e2ee) | perf     | avoid full JSON parsing when updating sourcemap ignore list                                                                  |
+| [482f6d8aab](https://github.com/angular/angular-cli/commit/482f6d8aab289fbd6dc5f9aecdcf7b8e1b6cac4f) | perf     | decouple diagnostic type checking from build start                                                                           |
+| [f1afa603b4](https://github.com/angular/angular-cli/commit/f1afa603b48566e45dfb8d95930375a71f0bfa0b) | perf     | read rendered module length once per module in chunk optimizer ([#34045](https://github.com/angular/angular-cli/pull/34045)) |
+| [0ba4d8e29c](https://github.com/angular/angular-cli/commit/0ba4d8e29c0fb9abe6b07432edfab9e39066ca29) | perf     | reduce watcher debounce latency for faster incremental rebuilds                                                              |
+| [4d11a1334f](https://github.com/angular/angular-cli/commit/4d11a1334ff5fabfe5338cc3de5ce4f45f6afa5f) | perf     | selectively compress large entries in SQLite cache store                                                                     |
+| [0a137f98d0](https://github.com/angular/angular-cli/commit/0a137f98d035f3dbd9a5daf1b6999246f73610c8) | perf     | share sass directory and resolution caches across stylesheets                                                                |
+| [d11a663e77](https://github.com/angular/angular-cli/commit/d11a663e77dad3dc9dbb6336e782f23b8a6f595c) | perf     | verify cache metadata before reading file and eliminate sqlite read-locks                                                    |
+| [66bd6bd1ea](https://github.com/angular/angular-cli/commit/66bd6bd1eab41484ed5db38f5545e80de4090b34) | refactor | deprecate splitting option in unit-test builder                                                                              |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                  |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [23e3d44a7f](https://github.com/angular/angular-cli/commit/23e3d44a7f051cd3bb67700b8d8407f73b7aa7f3) | perf | pre-compile critical CSS plans at build time |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.24"></a>
 
 # 21.2.24 (2026-09-10)
