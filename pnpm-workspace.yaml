@@ -60,3 +60,6 @@ allowBuilds:
   puppeteer: false
   utf-8-validate: false
   webdriver-manager: true
+
+# Workaround as the default 'install' causes problems during `pnpm ng-dev pr merge` as the lockfile is updated.
+verifyDepsBeforeRun: warn
