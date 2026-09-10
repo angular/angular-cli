@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { execAndCaptureError, silentExec } from '../../utils/process';
+import { ng, silentExec } from '../../utils/process';
 import { applyVitestBuilder } from '../../utils/vitest';
 import { stripVTControlCharacters } from 'node:util';
 
@@ -34,11 +34,8 @@ export default async function (): Promise<void> {
     assert(fs.existsSync('angular.json'), 'angular.json should exist on the subst drive');
 
     // 3. Run `ng test`.
-    // We expect this to fail with NG0203 in the subst environment due to dual-package hazards
-    // (Angular loading from both X: and D:) within bazel. However, the failure proves that the
-    // test file was discovered and loaded.
-    const error = await execAndCaptureError('ng', ['test', '--watch=false']);
-    const output = stripVTControlCharacters(error.message);
+    const { stdout } = await ng('test', '--watch=false');
+    const output = stripVTControlCharacters(stdout);
 
     // 4. Verify that Vitest found the test file and identified the tests within it.
     assert.match(
