@@ -255,7 +255,7 @@ export class JavaScriptTransformer {
     return this.#runWithThrottle(async () => {
       const data = await readFile(filename);
 
-      return this.transformData(filename, data, options);
+      return this.#transform(filename, data, options);
     });
   }
 
@@ -268,6 +268,14 @@ export class JavaScriptTransformer {
    * @returns A promise that resolves to a UTF-8 encoded Uint8Array containing the result.
    */
   async transformData(
+    filename: string,
+    data: string | Uint8Array,
+    options?: TransformOptions,
+  ): Promise<Uint8Array> {
+    return this.#runWithThrottle(() => this.#transform(filename, data, options));
+  }
+
+  async #transform(
     filename: string,
     data: string | Uint8Array,
     options?: TransformOptions,
