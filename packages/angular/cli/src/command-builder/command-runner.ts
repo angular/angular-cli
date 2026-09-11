@@ -102,10 +102,16 @@ export async function runCommand(args: string[], logger: logging.Logger): Promis
     addCommandModuleToYargs(CommandModule, context);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
   if (jsonHelp) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const usageInstance = (localYargs as any).getInternalMethods().getUsageInstance();
     usageInstance.help = () => jsonHelpUsage(localYargs);
+  } else if (!help) {
+    // Yargs eagerly caches and formats the full command help (including table wrapping
+    // and Unicode string-width calculations via cliui) whenever a subcommand executes,
+    // in case the command fails. Because showHelpOnFail is disabled, this formatted text
+    // is never used. Skipping this work avoids non-trivial synchronous overhead during startup.
+    usageInstance.cacheHelpMessage = () => {};
   }
 
   // Add default command to support version option when no subcommand is specified
