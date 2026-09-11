@@ -20,6 +20,53 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       setupApplicationTarget(harness);
     });
 
+    it('should re-run tests when a non-spec file changes', async () => {
+      // Set up a component with a testable value and a spec that checks it
+      harness.writeFiles({
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+          @Component({ selector: 'app-root', template: '' })
+          export class AppComponent {
+            title = 'hello';
+          }`,
+        'src/app/app.component.spec.ts': `
+          import { describe, expect, test } from 'vitest';
+          import { AppComponent } from './app.component';
+          describe('AppComponent', () => {
+            test('should have correct title', () => {
+              const app = new AppComponent();
+              expect(app.title).toBe('hello');
+            });
+          });`,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        // 1. Initial run should succeed
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+
+          // 2. Modify only the non-spec component file (change the title value)
+          harness.writeFiles({
+            'src/app/app.component.ts': `
+              import { Component } from '@angular/core';
+              @Component({ selector: 'app-root', template: '' })
+              export class AppComponent {
+                title = 'changed';
+              }`,
+          });
+        },
+        // 3. Test should re-run and fail because the title changed
+        ({ result }) => {
+          expect(result?.success).toBeFalse();
+        },
+      ]);
+    });
+
     it('should run tests when a compilation error is fixed and a test failure is introduced simultaneously', async () => {
       harness.useTarget('test', {
         ...BASE_OPTIONS,
