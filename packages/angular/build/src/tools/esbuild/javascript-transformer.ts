@@ -229,6 +229,7 @@ export class JavaScriptTransformer {
       filename: require.resolve('./javascript-transformer-worker'),
       workerData: this.#commonOptions,
       ...(this.options.maxConcurrency !== undefined && {
+        minThreads: this.options.maxConcurrency,
         maxThreads: this.options.maxConcurrency,
       }),
     };
