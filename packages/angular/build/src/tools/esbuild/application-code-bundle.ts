@@ -141,8 +141,8 @@ export function createBrowserPolyfillBundleOptions(
     buildOptions.plugins ??= [];
     const pluginOptions = createCompilerPluginOptions(
       options,
-
       sourceFileCache,
+      sourceFileCache.loadResultCache,
     );
     buildOptions.plugins.push(
       createCompilerPlugin(
@@ -501,7 +501,7 @@ export function createSsrEntryCodeBundleOptions(
             // The below is needed to avoid
             // `Import "default" will always be undefined because there is no matching export` warning when no default is present.
             `const defaultExportName = 'default';`,
-            `export default server[defaultExportName]`,
+            `export default server[defaultExportName];`,
 
             // Add @angular/ssr exports
             `export { AngularAppEngine } from '@angular/ssr';`,
@@ -764,7 +764,7 @@ function getEsBuildCommonPolyfillsOptions(
 }
 
 function entryFileToWorkspaceRelative(workspaceRoot: string, entryFile: string): string {
-  return './' + toPosixPath(relative(workspaceRoot, entryFile).replace(/.[mc]?ts$/, ''));
+  return './' + toPosixPath(relative(workspaceRoot, entryFile).replace(/\.[mc]?ts$/, ''));
 }
 
 /**
