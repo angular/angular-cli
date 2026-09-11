@@ -112,8 +112,8 @@ export function createCompilerPlugin(
           thirdPartySourcemaps: pluginOptions.thirdPartySourcemaps,
           advancedOptimizations: pluginOptions.advancedOptimizations,
           jit: pluginOptions.jit || pluginOptions.includeTestMetadata,
+          maxConcurrency: maxTransformWorkers,
         },
-        maxTransformWorkers,
         cacheStore?.createCache('jstransformer'),
       );
 

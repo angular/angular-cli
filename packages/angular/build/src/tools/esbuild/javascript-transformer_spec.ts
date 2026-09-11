@@ -27,13 +27,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
   }
 
   it('should remap correctly when only advanced optimizations are applied', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        advancedOptimizations: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      advancedOptimizations: true,
+      maxConcurrency: 1,
+    });
 
     const inputMap = {
       version: 3,
@@ -57,13 +55,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should remap correctly when only linking is applied', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        thirdPartySourcemaps: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      thirdPartySourcemaps: true,
+      maxConcurrency: 1,
+    });
 
     const inputMap = {
       version: 3,
@@ -100,14 +96,12 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should defer and chain remapping when both linking and advanced optimizations are applied', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        thirdPartySourcemaps: true,
-        advancedOptimizations: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      thirdPartySourcemaps: true,
+      advancedOptimizations: true,
+      maxConcurrency: 1,
+    });
 
     const inputMap = {
       version: 3,
@@ -145,13 +139,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should produce a valid sourcemap when no input sourcemap is present', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        advancedOptimizations: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      advancedOptimizations: true,
+      maxConcurrency: 1,
+    });
 
     const input = 'export class MyClass { static ɵprov = 42; }';
     const result = await transformer.transformData('src/app.js', input, { skipLinker: true });
@@ -166,12 +158,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should remap correctly when coverage instrumentation is applied with an input sourcemap', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      maxConcurrency: 1,
+    });
 
     const inputMap = {
       version: 3,
@@ -198,13 +188,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should defer and chain remapping when coverage instrumentation and advanced optimizations are applied', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        advancedOptimizations: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      advancedOptimizations: true,
+      maxConcurrency: 1,
+    });
 
     const inputMap = {
       version: 3,
@@ -231,13 +219,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should accept a Uint8Array input in transformData', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: true,
-        advancedOptimizations: true,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: true,
+      advancedOptimizations: true,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from('export class MyClass { static ɵprov = 42; }', 'utf-8');
     const result = await transformer.transformData('src/app.js', inputBuffer, { skipLinker: true });
@@ -251,12 +237,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should strip trailing sourcemap comments from Uint8Array input on fast-path', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from(
       'console.log("hello");\n//# sourceMappingURL=app.js.map',
@@ -271,12 +255,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should return Uint8Array input untouched on fast-path when no sourcemap comment is present', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from('console.log("hello");\nconst x = 1;', 'utf-8');
     const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, {
@@ -287,12 +269,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should return Uint8Array untouched when skipLinker is false but file contains no linker declarations', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from('console.log("no linking required");\nconst x = 1;', 'utf-8');
     const result = await transformer.transformData('node_modules/my-lib/lib.js', inputBuffer, {
@@ -303,12 +283,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should bypass worker and skip linking for @angular/core and @angular/compiler paths', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from('export const ɵɵngDeclareDirective = () => {};', 'utf-8');
     const result = await transformer.transformData(
@@ -321,12 +299,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should bypass worker and skip linking for TypeScript file extensions (.ts, .tsx, .mts, .cts)', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const inputBuffer = Buffer.from('export const ɵɵngDeclareDirective = () => {};', 'utf-8');
 
@@ -340,12 +316,10 @@ describe('JavaScriptTransformer sourcemaps', () => {
   });
 
   it('should not exclude packages with similar prefixes such as @angular/compiler-cli', async () => {
-    transformer = new JavaScriptTransformer(
-      {
-        sourcemap: false,
-      },
-      1,
-    );
+    transformer = new JavaScriptTransformer({
+      sourcemap: false,
+      maxConcurrency: 1,
+    });
 
     const input = `
       import * as i0 from "@angular/core";
@@ -371,13 +345,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
 
   describe('advanced optimizations fast-path pre-filter', () => {
     it('should bypass worker and return input buffer directly when no candidate tokens are present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputBuffer = Buffer.from(
         'function add(a, b) { return a + b; }\nconst result = add(1, 2);',
@@ -391,13 +363,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should bypass worker for standard classes without static properties', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputBuffer = Buffer.from(
         `export class UserService {
@@ -414,13 +384,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should bypass worker for default exports without static properties or Angular metadata', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputBuffer = Buffer.from(
         `export default class UserService {
@@ -437,13 +405,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should bypass worker for classes with static members when no Angular metadata is present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputBuffer = Buffer.from('export class MyComponent { static prop = 42; }', 'utf-8');
       const result = await transformer.transformData('src/component.js', inputBuffer, {
@@ -454,13 +420,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should dispatch to worker when Angular tokens are present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const input = 'export class MyService { static ɵprov = true; }';
       const result = await transformer.transformData('src/service.js', input, { skipLinker: true });
@@ -470,13 +434,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should dispatch to worker when decorator tokens are present and sideEffects is false', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputBuffer = Buffer.from('const MyClass = __decorate([], class {});', 'utf-8');
       const result = await transformer.transformData('src/class.js', inputBuffer, {
@@ -488,13 +450,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should bypass worker and return converted buffer when no candidate tokens are present in string input', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputString = 'function multiply(a, b) { return a * b; }';
       const result = await transformer.transformData('src/math.js', inputString, {
@@ -505,13 +465,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should dispatch to worker when candidate tokens are present in string input', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       const inputString = 'export class MyService { static ɵprov = true; }';
       const result = await transformer.transformData('src/service.js', inputString, {
@@ -523,13 +481,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should not query sideEffects when no candidate tokens are present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queried = false;
       const inputBuffer = Buffer.from('function add(a, b) { return a + b; }', 'utf-8');
@@ -546,13 +502,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should not query sideEffects when primary tokens are present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queried = false;
       const input = 'export class MyService { static ɵprov = true; }';
@@ -569,13 +523,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should query sideEffects for @angular/ packages and dispatch to worker when sideEffects is false', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queryCount = 0;
       const inputBuffer = Buffer.from('export const foo = someCall();', 'utf-8');
@@ -597,13 +549,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should query sideEffects for decorator tokens and evaluate at most once', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queryCount = 0;
       const inputBuffer = Buffer.from('const MyClass = __decorate([], class {});', 'utf-8');
@@ -621,13 +571,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should query sideEffects and wrap decorators when both primary and decorator tokens are present', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queryCount = 0;
       const input = `
@@ -650,13 +598,11 @@ describe('JavaScriptTransformer sourcemaps', () => {
     });
 
     it('should query sideEffects when both primary and decorator tokens are present in Buffer', async () => {
-      transformer = new JavaScriptTransformer(
-        {
-          sourcemap: false,
-          advancedOptimizations: true,
-        },
-        1,
-      );
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        advancedOptimizations: true,
+        maxConcurrency: 1,
+      });
 
       let queryCount = 0;
       const inputBuffer = Buffer.from(
@@ -676,6 +622,41 @@ describe('JavaScriptTransformer sourcemaps', () => {
       const text = Buffer.from(result).toString('utf-8');
       expect(text).toContain('let MyService = /*#__PURE__*/ (() => {');
       expect(text).toContain('__decorate');
+    });
+  });
+
+  describe('maxConcurrency', () => {
+    it('should throw RangeError if maxConcurrency is less than 1', () => {
+      expect(() => {
+        new JavaScriptTransformer({ sourcemap: false, maxConcurrency: 0 });
+      }).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+
+      expect(() => {
+        new JavaScriptTransformer({ sourcemap: false, maxConcurrency: -1 });
+      }).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+    });
+
+    it('should throw RangeError if maxConcurrency is not an integer', () => {
+      expect(() => {
+        new JavaScriptTransformer({ sourcemap: false, maxConcurrency: 1.5 });
+      }).toThrowError(
+        RangeError,
+        'options.maxConcurrency must be an integer greater than or equal to 1.',
+      );
+    });
+
+    it('should allow omitting maxConcurrency', async () => {
+      transformer = new JavaScriptTransformer({ sourcemap: false });
+      const result = await transformer.transformData('src/app.js', 'const x = 1;', {
+        skipLinker: true,
+      });
+      expect(result).toBeDefined();
     });
   });
 });

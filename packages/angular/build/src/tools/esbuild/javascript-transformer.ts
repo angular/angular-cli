@@ -118,6 +118,12 @@ export interface JavaScriptTransformerOptions {
   thirdPartySourcemaps?: boolean;
   advancedOptimizations?: boolean;
   jit?: boolean;
+
+  /**
+   * The maximum number of concurrent transformation operations.
+   * When omitted, concurrency defaults to the available worker pool threads.
+   */
+  maxConcurrency?: number;
 }
 
 /**
@@ -146,7 +152,7 @@ export interface TransformOptions {
  */
 export class JavaScriptTransformer {
   #workerPool: WorkerPool | undefined;
-  #commonOptions: Required<JavaScriptTransformerOptions>;
+  #commonOptions: Required<Omit<JavaScriptTransformerOptions, 'maxConcurrency'>>;
   #fileCacheKeyBase: Uint8Array;
 
   /** Queue of pending transformation tasks waiting for an active concurrency slot. */
@@ -155,16 +161,21 @@ export class JavaScriptTransformer {
   /** Current count of actively executing transformation tasks. */
   #activeTasks = 0;
 
-  /** Maximum number of transformation tasks allowed to execute concurrently. */
-  #maxConcurrent: number;
+  get #maxConcurrency(): number {
+    return this.options.maxConcurrency ?? (this.#workerPool?.maxThreads || 1);
+  }
 
   constructor(
-    options: JavaScriptTransformerOptions,
-    readonly maxThreads: number,
+    private readonly options: JavaScriptTransformerOptions,
     private readonly cache?: Cache<Uint8Array>,
   ) {
-    // Maintain 2 active tasks per worker thread to keep transformation pipelines fully saturated
-    this.#maxConcurrent = Math.max(1, maxThreads * 2);
+    if (
+      options.maxConcurrency !== undefined &&
+      (!Number.isInteger(options.maxConcurrency) || options.maxConcurrency < 1)
+    ) {
+      throw new RangeError('options.maxConcurrency must be an integer greater than or equal to 1.');
+    }
+
     // Extract options to ensure only the named options are serialized and sent to the worker
     const {
       sourcemap,
@@ -189,7 +200,7 @@ export class JavaScriptTransformer {
    * @returns A promise resolving to the transformation result.
    */
   async #runWithThrottle<T>(action: () => Promise<T>): Promise<T> {
-    if (this.#activeTasks >= this.#maxConcurrent) {
+    if (this.#activeTasks >= this.#maxConcurrency) {
       await new Promise<void>((resolve, reject) => {
         this.#pendingTasks.push({ resolve, reject });
       });
@@ -216,9 +227,10 @@ export class JavaScriptTransformer {
 
     const workerPoolOptions: WorkerPoolOptions = {
       filename: require.resolve('./javascript-transformer-worker'),
-      maxThreads: this.maxThreads,
-      minThreads: this.maxThreads,
       workerData: this.#commonOptions,
+      ...(this.options.maxConcurrency !== undefined && {
+        maxThreads: this.options.maxConcurrency,
+      }),
     };
 
     // Prevent passing SSR `--import` (loader-hooks) from parent to child worker.
