@@ -187,7 +187,8 @@ interface UncachedLocaleEntry {
  */
 export class I18nInliner {
   #cacheInitFailed = false;
-  #workerPool: WorkerPool;
+  readonly #workerPool: WorkerPool;
+  readonly #ownsWorkerPool: boolean;
   #cacheStore: PersistentCacheStore | undefined;
   #transformedFileCache: Cache<TransformedFileResult> | undefined;
   #translationCache: Cache<Uint8Array> | undefined;
@@ -197,7 +198,10 @@ export class I18nInliner {
     return this.options.maxConcurrency ?? (this.#workerPool.maxThreads || 1);
   }
 
-  constructor(private readonly options: I18nInlinerOptions) {
+  constructor(
+    private readonly options: I18nInlinerOptions,
+    workerPool?: WorkerPool,
+  ) {
     if (
       options.maxConcurrency !== undefined &&
       (!Number.isInteger(options.maxConcurrency) || options.maxConcurrency < 1)
@@ -205,12 +209,15 @@ export class I18nInliner {
       throw new RangeError('options.maxConcurrency must be an integer greater than or equal to 1.');
     }
 
+    this.#ownsWorkerPool = !workerPool;
     // Piscina uses object spread against default options internally. Only define
     // maxThreads when specified to avoid overwriting Piscina's default thread count
     // with undefined.
-    this.#workerPool = new WorkerPool({
-      ...(options.maxConcurrency !== undefined && { maxThreads: options.maxConcurrency }),
-    });
+    this.#workerPool =
+      workerPool ??
+      new WorkerPool({
+        ...(options.maxConcurrency !== undefined && { maxThreads: options.maxConcurrency }),
+      });
   }
 
   #partitionFiles(files: Iterable<BuildOutputFile>): {
@@ -662,7 +669,10 @@ export class I18nInliner {
    * @returns A void promise that resolves when closing is complete.
    */
   async close(): Promise<void> {
-    await Promise.allSettled([this.#cacheStore?.close(), this.#workerPool.destroy()]);
+    await Promise.allSettled([
+      this.#cacheStore?.close(),
+      this.#ownsWorkerPool ? this.#workerPool.destroy() : undefined,
+    ]);
   }
 
   /**

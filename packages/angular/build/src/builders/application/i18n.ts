@@ -21,6 +21,7 @@ import { maxWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
 import { createProjectResolver } from '../../utils/resolve-project';
+import type { WorkerPool } from '../../utils/worker-pool';
 import { executePostBundleSteps } from './execute-post-bundle';
 import { NormalizedApplicationBuildOptions, getLocaleBaseHref } from './options';
 
@@ -31,12 +32,14 @@ import { NormalizedApplicationBuildOptions, getLocaleBaseHref } from './options'
  * @param options The normalized application builder options used to create the build.
  * @param executionResult The result of an executed build.
  * @param initialFiles A map containing initial file information for the executed build.
+ * @param workerPool An optional worker pool to use for running transformation tasks.
  */
 export async function inlineI18n(
   metafile: Metafile,
   options: NormalizedApplicationBuildOptions,
   executionResult: ExecutionResult,
   initialFiles: Map<string, InitialFileRecord>,
+  workerPool?: WorkerPool,
 ): Promise<{
   errors: string[];
   warnings: string[];
@@ -45,12 +48,15 @@ export async function inlineI18n(
   const { i18nOptions, baseHref, cacheOptions } = options;
 
   // Create the multi-threaded inliner with common options.
-  const inliner = new I18nInliner({
-    missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
-    maxConcurrency: maxWorkers,
-    persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
-    localizeVersion: i18nOptions.localizeVersion,
-  });
+  const inliner = new I18nInliner(
+    {
+      missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
+      maxConcurrency: maxWorkers,
+      persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
+      localizeVersion: i18nOptions.localizeVersion,
+    },
+    workerPool,
+  );
 
   const inlineResult: {
     errors: string[];
