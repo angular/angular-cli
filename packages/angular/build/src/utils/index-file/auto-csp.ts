@@ -270,8 +270,10 @@ function createLoaderScript(srcList: SrcScriptTag[], enableTrustedTypes = false)
     .map((s) => {
       // URI encoding means value can't escape string, JS, or HTML context.
       const srcAttr = encodeURI(s.src).replaceAll("'", "\\'");
-      // Can only be 'module' or a JS MIME type or an empty string.
-      const typeAttr = s.type ? "'" + s.type + "'" : "''";
+      // 'module', a JS MIME type, or an empty string. A JS MIME type may carry
+      // parameters after a ';', which isJavascriptMimeType() does not constrain,
+      // so encode this the same way as integrity and crossOrigin below.
+      const typeAttr = JSON.stringify(s.type ?? '').replaceAll('<', '\\u003c');
       const asyncAttr = !!s.async;
       const deferAttr = !!s.defer;
       const integrityAttr = JSON.stringify(s.integrity ?? null).replaceAll('<', '\\u003c');

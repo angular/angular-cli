@@ -58,7 +58,7 @@ describe('auto-csp', () => {
     const csps = getCsps(result);
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
-    expect(result).toContain(`const scripts = [['./main.js', '', false, false, null, null]];`);
+    expect(result).toContain(`const scripts = [['./main.js', "", false, false, null, null]];`);
   });
 
   it('should rewrite a single source script in place', async () => {
@@ -78,7 +78,7 @@ describe('auto-csp', () => {
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     // Our loader script appears after the HTML text content.
     expect(result).toMatch(
-      /Some text<\/div>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\]\];/,
+      /Some text<\/div>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', "", false, false, null, null\]\];/,
     );
   });
 
@@ -103,7 +103,7 @@ describe('auto-csp', () => {
     expect(csps[0]).toMatch(CSP_TWO_HASHES_REGEX);
     expect(result).toContain(
       // eslint-disable-next-line max-len
-      `const scripts = [['./main1.js', '', false, false, null, null],['./main2.js', '', true, false, null, null],['./main3.js', 'module', true, true, null, null]];`,
+      `const scripts = [['./main1.js', "", false, false, null, null],['./main2.js', "", true, false, null, null],['./main3.js', "module", true, true, null, null]];`,
     );
     // Head loader script is in the head.
     expect(result).toContain(`</script></head>`);
@@ -166,12 +166,12 @@ describe('auto-csp', () => {
     // Loader script for main.js and main2.js appear after 'foo' and before 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('foo'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', '', false, false, null, null\],\['.\/main2.js', '', false, false, null, null\]\];[\s\S]*console.log\('bar'\);/,
+      /console.log\('foo'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main.js', "", false, false, null, null\],\['.\/main2.js', "", false, false, null, null\]\];[\s\S]*console.log\('bar'\);/,
     );
     // Loader script for main3.js and main4.js appear after 'bar'.
     expect(result).toMatch(
       // eslint-disable-next-line max-len
-      /console.log\('bar'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main3.js', '', false, false, null, null\],\['.\/main4.js', '', false, false, null, null\]\];/,
+      /console.log\('bar'\);<\/script>\s*<script>\(\(\) => {\s*const scripts = \[\['.\/main3.js', "", false, false, null, null\],\['.\/main4.js', "", false, false, null, null\]\];/,
     );
     // Exactly 4 scripts should be left.
     expect(Array.from(result.matchAll(/<script>/gi)).length).toEqual(4);
@@ -238,7 +238,7 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', 'module', false, false, "sha384-xyz123", "anonymous"]];`,
+      `const scripts = [['./main.js', "module", false, false, "sha384-xyz123", "anonymous"]];`,
     );
   });
 
@@ -258,7 +258,7 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', '', false, false, "sha384-xyz123", null]];`,
+      `const scripts = [['./main.js', "", false, false, "sha384-xyz123", null]];`,
     );
   });
 
@@ -278,7 +278,45 @@ describe('auto-csp', () => {
     expect(csps).toHaveSize(1);
     expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
     expect(result).toContain(
-      `const scripts = [['./main.js', '', false, false, null, "anonymous"]];`,
+      `const scripts = [['./main.js', "", false, false, null, "anonymous"]];`,
     );
+  });
+
+  it('should encode a script type that carries MIME parameters', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script src="./main.js" type="text/javascript;']];var x=1;var junk=[['a','b"></script>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    // The type stays inside its string literal.
+    expect(result).toContain(
+      `const scripts = [['./main.js', "text/javascript;']];var x=1;var junk=[['a','b", false, false, null, null]];`,
+    );
+  });
+
+  it('should encode a script type that contains a closing script tag', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <script src="./main.js" type="text/javascript;</script><script>x</script>"></script>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    // Only the loader element is emitted.
+    expect(Array.from(result.matchAll(/<script/gi)).length).toEqual(1);
   });
 });
