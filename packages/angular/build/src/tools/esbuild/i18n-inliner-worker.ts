@@ -10,7 +10,6 @@ import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproje
 import type { ɵParsedTranslation } from '@angular/localize';
 import type { Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
-import assert from 'node:assert';
 import { deserialize } from 'node:v8';
 import { parseSync } from 'oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
@@ -43,18 +42,17 @@ export interface InlineCodeRequest {
    */
   translation?: Blob | SharedArrayBuffer;
 
+  translationKey?: string;
+
   /**
    * How to handle missing translations.
    */
   missingTranslation?: 'error' | 'warning' | 'ignore';
 }
 
-/**
- * The response returned from a code request.
- */
-export interface InlineCodeResult {
-  output: string;
-  messages: { type: 'error' | 'warning'; message: string }[];
+export interface InlineFileBatchLocaleEntry {
+  translation?: Blob | SharedArrayBuffer;
+  translationKey?: string;
 }
 
 /**
@@ -79,7 +77,7 @@ export interface InlineFileBatchRequest {
   /**
    * The locale specifiers and optional translations to use during the inlining process of the file.
    */
-  locales: ReadonlyMap<string, Blob | SharedArrayBuffer | undefined>;
+  locales: ReadonlyMap<string, InlineFileBatchLocaleEntry | Blob | SharedArrayBuffer | undefined>;
 
   /**
    * How to handle missing translations.
@@ -103,6 +101,38 @@ export interface InlineFileBatchRequest {
    * all long-term worker caches are cleared.
    */
   generation?: number;
+
+  /**
+   * Optional file contents Blob when dispatched via the shared worker pool.
+   */
+  fileBlob?: Blob;
+
+  /**
+   * Optional cache key uniquely identifying the file content and AST metadata.
+   */
+  fileKey?: string;
+
+  /**
+   * Optional sourcemap Blob for the file when dispatched via the shared worker pool.
+   */
+  mapBlob?: Blob;
+}
+
+export interface InlineDiagnosticMessage {
+  type: 'error' | 'warning';
+  message: string;
+}
+
+export interface InlineFileResult {
+  file: string;
+  code: string;
+  map?: string;
+  messages: InlineDiagnosticMessage[];
+}
+
+export interface InlineCodeResult {
+  output: string;
+  messages: InlineDiagnosticMessage[];
 }
 
 /**
@@ -112,7 +142,7 @@ export interface InlineLocaleResult {
   locale: string;
   code?: string;
   map?: string;
-  messages: { type: 'error' | 'warning'; message: string }[];
+  messages: InlineDiagnosticMessage[];
 }
 
 /**
@@ -131,6 +161,17 @@ export type InlineFileBatchResult =
     };
 
 /**
+ * Maximum number of AST metadata structures cached in memory per worker isolate.
+ * Bounding capacity prevents unbounded memory growth across watch rebuilds.
+ */
+const MAX_CACHED_FILES = 256;
+
+/**
+ * Maximum number of deserialized translation dictionaries cached in memory per worker isolate.
+ */
+const MAX_CACHED_TRANSLATIONS = 32;
+
+/**
  * Cached file data including code and extracted localization metadata.
  */
 interface CachedFileData {
@@ -139,12 +180,12 @@ interface CachedFileData {
 }
 
 /**
- * Cache of file data promises keyed by filename.
+ * Cache of file data promises keyed by `${filename}\0${hash}` or filename.
  */
 const fileDataCache = new Map<string, Promise<CachedFileData>>();
 
 /**
- * Cache of deserialized translation messages keyed by locale.
+ * Deserialized translation message dictionary cache keyed by `${locale}\0${translationKey}` or locale.
  */
 const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsedTranslation>>>();
 
@@ -154,72 +195,106 @@ const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsed
 let currentGeneration: number | undefined;
 
 /**
- * Retrieves the file data for a filename, loading and extracting localization metadata.
- * If `cache` is true, the result is cached in `fileDataCache` across requests in this Worker.
- * If `cache` is false (ephemeral), the result is not retained in `fileDataCache`, allowing it
- * to be garbage-collected once the batch request finishes.
+ * Retrieves the code and extracted localization metadata for a file.
+ * Caches the metadata promise in memory to avoid reparsing the AST across locales.
+ * If `cache` is false (ephemeral), the result is not retained in `fileDataCache`,
+ * allowing it to be garbage-collected once the batch request finishes.
  *
- * @param filename The name of the file to load.
+ * @param filename The name of the file.
  * @param codeBlob The source code file as a Blob.
+ * @param fileKey Optional cache key uniquely identifying the file content.
  * @param cache Whether to cache the loaded file data in the Worker's long-term cache.
- * @returns The cached or newly extracted code and localization metadata.
+ * @returns The cached file data.
  */
-function loadFileData(filename: string, codeBlob: Blob, cache = true): Promise<CachedFileData> {
-  const existing = fileDataCache.get(filename);
-  if (existing) {
-    if (!cache) {
-      fileDataCache.delete(filename);
-    }
+function getFileData(
+  filename: string,
+  codeBlob: Blob,
+  fileKey?: string,
+  cache = true,
+): Promise<CachedFileData> {
+  const cacheKey = fileKey ?? filename;
+  let dataPromise = fileDataCache.get(cacheKey);
+  if (!dataPromise) {
+    dataPromise = (async () => {
+      const code = await codeBlob.text();
 
-    return existing;
-  }
-
-  const fileDataPromise = (async () => {
-    const code = await codeBlob.text();
-    const metadata = extractLocalizeMetadata(filename, code);
-
-    return { code, metadata };
-  })();
-
-  if (cache) {
-    fileDataPromise.catch(() => {
-      fileDataCache.delete(filename);
+      return {
+        code,
+        metadata: extractLocalizeMetadata(filename, code),
+      };
+    })().catch((error) => {
+      if (fileDataCache.get(cacheKey) === dataPromise) {
+        fileDataCache.delete(cacheKey);
+      }
+      throw error;
     });
-    fileDataCache.set(filename, fileDataPromise);
+
+    if (cache) {
+      if (fileDataCache.size >= MAX_CACHED_FILES) {
+        const oldestKey = fileDataCache.keys().next().value;
+        if (oldestKey !== undefined) {
+          fileDataCache.delete(oldestKey);
+        }
+      }
+
+      fileDataCache.set(cacheKey, dataPromise);
+    }
+  } else if (cache) {
+    fileDataCache.delete(cacheKey);
+    fileDataCache.set(cacheKey, dataPromise);
+  } else {
+    fileDataCache.delete(cacheKey);
   }
 
-  return fileDataPromise;
+  return dataPromise;
 }
 
 /**
  * Deserializes or wraps the translation messages for a locale, reusing the result for any
- * subsequent request that targets the same locale.
- * @param locale The locale identifier.
- * @param translation Optional serialized translation messages (SharedArrayBuffer or Blob).
- * @returns The translation messages, or undefined if the locale has no translations.
+ * subsequent request that targets the same locale and translation payload.
+ *
+ * @param request The translation request object containing locale, translation payload, and optional key.
+ * @param explicitTranslation Optional fallback translation payload if request is a string.
  */
 function loadTranslation(
   locale: string,
   translation?: Blob | SharedArrayBuffer,
+  translationKey?: string,
 ): Promise<Record<string, ɵParsedTranslation>> | undefined {
   if (!translation) {
     return undefined;
   }
 
-  let messagesPromise = deserializedTranslations.get(locale);
+  const cacheKey = translationKey ? `${locale}\0${translationKey}` : undefined;
+  let messagesPromise = cacheKey ? deserializedTranslations.get(cacheKey) : undefined;
   if (!messagesPromise) {
     if (translation instanceof Blob) {
       messagesPromise = translation
         .arrayBuffer()
         .then((buffer) => deserialize(new Uint8Array(buffer)) as Record<string, ɵParsedTranslation>)
         .catch((error) => {
-          deserializedTranslations.delete(locale);
+          if (cacheKey && deserializedTranslations.get(cacheKey) === messagesPromise) {
+            deserializedTranslations.delete(cacheKey);
+          }
           throw error;
         });
     } else {
       messagesPromise = Promise.resolve(createSharedTranslationProxy(translation));
     }
-    deserializedTranslations.set(locale, messagesPromise);
+
+    if (cacheKey) {
+      if (deserializedTranslations.size >= MAX_CACHED_TRANSLATIONS) {
+        const oldestKey = deserializedTranslations.keys().next().value;
+        if (oldestKey !== undefined) {
+          deserializedTranslations.delete(oldestKey);
+        }
+      }
+
+      deserializedTranslations.set(cacheKey, messagesPromise);
+    }
+  } else if (cacheKey) {
+    deserializedTranslations.delete(cacheKey);
+    deserializedTranslations.set(cacheKey, messagesPromise);
   }
 
   return messagesPromise;
@@ -242,14 +317,25 @@ export async function inlineFileBatch(
 
   if (request.activeLocales) {
     const activeSet = new Set(request.activeLocales);
-    for (const locale of deserializedTranslations.keys()) {
-      if (!activeSet.has(locale)) {
-        deserializedTranslations.delete(locale);
+    for (const key of deserializedTranslations.keys()) {
+      const keyLocale = key.includes('\0') ? key.split('\0', 1)[0] : key;
+      if (!activeSet.has(keyLocale)) {
+        deserializedTranslations.delete(key);
       }
     }
   }
 
-  const { code, metadata } = await loadFileData(request.filename, request.code, !request.ephemeral);
+  const codeBlob = request.code ?? request.fileBlob;
+  if (!codeBlob) {
+    throw new Error(`File content not provided for: ${request.filename}`);
+  }
+
+  const { code, metadata } = await getFileData(
+    request.filename,
+    codeBlob,
+    request.fileKey,
+    !request.ephemeral,
+  );
 
   // Fast path: file has no $localize call sites or locale insert sites
   if (metadata.callSites.length === 0 && metadata.localeInsertSites.length === 0) {
@@ -265,20 +351,31 @@ export async function inlineFileBatch(
 
   // Parse the sourcemap once for the entire batch if provided.
   // It will naturally be garbage-collected after this batch action returns.
+  const rawMapBlob = request.map ?? request.mapBlob;
   let map: SourceMapInput | undefined;
-  if (request.map) {
-    const rawMap = await request.map.text();
+  let rawMap: string | undefined;
+  if (rawMapBlob) {
+    rawMap = await rawMapBlob.text();
     map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
   }
 
   const results = await Promise.all(
-    Array.from(request.locales, async ([locale, translation]) => {
+    Array.from(request.locales, async ([locale, entry]) => {
+      const translation =
+        entry && typeof entry === 'object' && 'translation' in entry
+          ? entry.translation
+          : (entry as Blob | SharedArrayBuffer | undefined);
+      const translationKey =
+        entry && typeof entry === 'object' && 'translationKey' in entry
+          ? entry.translationKey
+          : undefined;
+
       const result = await inlineLocalize(
         code,
         map,
         metadata,
         locale,
-        await loadTranslation(locale, translation),
+        await loadTranslation(locale, translation, translationKey),
         request.filename,
         request.missingTranslation,
       );
@@ -302,7 +399,7 @@ export async function inlineFileBatch(
  * Inlines the provided locale and translation into JavaScript code that contains `$localize` usage.
  * This function is a secondary entry primarily for use with component HMR update modules.
  *
- * @param request An InlineRequest object representing the options for inlining
+ * @param request An InlineCodeRequest object representing the options for inlining
  * @returns An object containing the inlined code.
  */
 export async function inlineCode(request: InlineCodeRequest): Promise<InlineCodeResult> {
@@ -312,7 +409,7 @@ export async function inlineCode(request: InlineCodeRequest): Promise<InlineCode
     undefined,
     metadata,
     request.locale,
-    await loadTranslation(request.locale, request.translation),
+    await loadTranslation(request.locale, request.translation, request.translationKey),
     request.filename,
     request.missingTranslation,
   );
@@ -534,7 +631,7 @@ async function inlineLocalize(
   }
 
   const outputCode = magicString.toString();
-  let outputMap;
+  let outputMap: string | undefined;
   if (map) {
     // A decoded map is generated here rather than an encoded one because remapping decodes its
     // inputs. Encoding the mappings only for remapping to immediately decode them again doubles
@@ -544,12 +641,14 @@ async function inlineLocalize(
       includeContent: true,
       hires: 'boundary',
     });
-    outputMap = remapping([{ ...rawMap, version: 3 } satisfies DecodedSourceMap, map], () => null);
+    outputMap = JSON.stringify(
+      remapping([{ ...rawMap, version: 3 } satisfies DecodedSourceMap, map], () => null),
+    );
   }
 
   return {
     code: outputCode,
-    map: outputMap && JSON.stringify(outputMap),
+    map: outputMap,
     diagnostics,
   };
 }
