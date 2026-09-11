@@ -8,6 +8,9 @@
 
 import { Path, getSystemPath, normalize, schema, virtualFs } from '@angular-devkit/core';
 import { NodeJsSyncHost } from '@angular-devkit/core/node';
+import { realpathSync } from 'node:fs';
+import { basename, dirname, isAbsolute, relative, resolve as resolveSystemPath, sep } from 'node:path';
+import { Observable } from 'rxjs';
 import { workflow } from '../../src';
 import { BuiltinTaskExecutor } from '../../tasks/node';
 import { FileSystemEngine } from '../description';
@@ -29,6 +32,83 @@ export interface NodeWorkflowOptions {
 }
 
 /**
+ * Resolves the real path of a system path, walking up to the first existing ancestor if the path or
+ * its descendants do not exist, and preserving the non-existent trailing segments. This keeps the
+ * containment check working for not-yet-created files and for a workspace root that does not exist
+ * yet (e.g. during `ng new`), where `realpathSync` would otherwise throw `ENOENT`.
+ */
+function resolveRealPath(systemPath: string): string {
+  let current = resolveSystemPath(systemPath);
+  const segments: string[] = [];
+  for (;;) {
+    try {
+      const real = realpathSync(current);
+
+      return resolveSystemPath(real, ...segments.reverse());
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
+        throw e;
+      }
+      const parent = dirname(current);
+      if (parent === current) {
+        throw e;
+      }
+      segments.push(basename(current));
+      current = parent;
+    }
+  }
+}
+
+/**
+ * A {@link virtualFs.ScopedHost} that additionally rejects any write/delete/rename whose real
+ * (symlink-resolved) location escapes the workspace root.
+ *
+ * The lexical containment of `ScopedHost` (and the schematics `Tree`, which rejects `..`) does not
+ * resolve symlinks, so a workspace that contains a symlinked directory could otherwise route a
+ * schematic/migration write to a file outside the workspace. This mirrors the realpath-based root
+ * restriction already used by the MCP host (`createRootRestrictedHost`).
+ */
+class WorkspaceRootHost<T extends object> extends virtualFs.ScopedHost<T> {
+  private readonly _systemRoot: string;
+
+  constructor(delegate: virtualFs.Host<T>, root: Path) {
+    super(delegate, root);
+    this._systemRoot = resolveRealPath(getSystemPath(root));
+  }
+
+  private _assertWithinRoot(path: Path): void {
+    const real = resolveRealPath(getSystemPath(this._resolve(path)));
+
+    const rel = relative(this._systemRoot, real);
+    if (rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel)) {
+      throw new Error(
+        `Schematic attempted to access a path outside of the workspace root: ` +
+          getSystemPath(this._resolve(path)),
+      );
+    }
+  }
+
+  override write(path: Path, content: virtualFs.FileBuffer): Observable<void> {
+    this._assertWithinRoot(path);
+
+    return super.write(path, content);
+  }
+
+  override delete(path: Path): Observable<void> {
+    this._assertWithinRoot(path);
+
+    return super.delete(path);
+  }
+
+  override rename(from: Path, to: Path): Observable<void> {
+    this._assertWithinRoot(from);
+    this._assertWithinRoot(to);
+
+    return super.rename(from, to);
+  }
+}
+
+/**
  * A workflow specifically for Node tools.
  */
 export class NodeWorkflow extends workflow.BaseWorkflow {
@@ -41,7 +121,7 @@ export class NodeWorkflow extends workflow.BaseWorkflow {
     let root;
     if (typeof hostOrRoot === 'string') {
       root = normalize(hostOrRoot);
-      host = new virtualFs.ScopedHost(new NodeJsSyncHost(), root);
+      host = new WorkspaceRootHost(new NodeJsSyncHost(), root);
     } else {
       host = hostOrRoot;
       root = options.root;
