@@ -77,7 +77,7 @@ export default async function () {
       path: 'ssg/:id',
       renderMode: RenderMode.Prerender,
       headers: { 'x-custom': 'ssg-with-params' },
-      getPrerenderParams: async() => [{id: 'one'}, {id: 'two'}],
+      getPrerenderParams: async() => [{id: 'one'}, {id: 'two'}, {id: "customer's-choice"}],
     },
     {
       path: 'ssr',
@@ -115,6 +115,7 @@ export default async function () {
     'ssg/index.html': 'ssg works!',
     'ssg/one/index.html': 'ssg-with-params works!',
     'ssg/two/index.html': 'ssg-with-params works!',
+    "ssg/customer's-choice/index.html": 'ssg-with-params works!',
   };
 
   for (const [filePath, fileMatch] of Object.entries(expects)) {
