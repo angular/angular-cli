@@ -18,5 +18,4 @@ export default class ServeCommandModule
   command = 'serve [project]';
   aliases = RootCommands['serve'].aliases;
   describe = 'Builds and serves your application, rebuilding on file changes.';
-  longDescriptionPath?: string | undefined;
 }

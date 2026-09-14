@@ -38,7 +38,6 @@ export default class GenerateCommandModule
   command = 'generate';
   aliases = RootCommands['generate'].aliases;
   describe = 'Generates and/or modifies files based on a schematic.';
-  longDescriptionPath?: string | undefined;
 
   override async builder(argv: Argv): Promise<Argv<GenerateCommandArgs>> {
     let localYargs = (await super.builder(argv)).command({

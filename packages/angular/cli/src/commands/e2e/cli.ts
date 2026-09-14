@@ -42,5 +42,4 @@ export default class E2eCommandModule
   command = 'e2e [project]';
   aliases = RootCommands['e2e'].aliases;
   describe = 'Builds and serves an Angular application, then runs end-to-end tests.';
-  longDescriptionPath?: string;
 }

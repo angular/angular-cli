@@ -21,7 +21,6 @@ import { getCacheConfig } from '../utilities';
 export class CacheInfoCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'info';
   describe = 'Prints persistent disk cache configuration and statistics in the console.';
-  longDescriptionPath?: string | undefined;
   override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {

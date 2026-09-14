@@ -17,7 +17,6 @@ export default class AwesomeCommandModule
   command = 'make-this-awesome';
   describe = false as const;
   deprecated = false;
-  longDescriptionPath?: string | undefined;
 
   builder(localYargs: Argv): Argv {
     return localYargs;

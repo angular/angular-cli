@@ -8,7 +8,6 @@
 
 import { JsonValue } from '@angular-devkit/core';
 import { randomUUID } from 'node:crypto';
-import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -18,6 +17,9 @@ import {
 } from '../../command-builder/command-module';
 import { getWorkspaceRaw, validateWorkspace } from '../../utilities/config';
 import { JSONFile, parseJson } from '../../utilities/json-file';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
+import longDescription from './long-description.md';
 
 interface ConfigCommandArgs {
   'json-path'?: string;
@@ -32,7 +34,7 @@ export default class ConfigCommandModule
   command = 'config [json-path] [value]';
   describe =
     'Retrieves or sets Angular configuration values in the angular.json file for the workspace.';
-  longDescriptionPath = join(__dirname, 'long-description.md');
+  override longDescription = longDescription;
 
   builder(localYargs: Argv): Argv<ConfigCommandArgs> {
     return localYargs
