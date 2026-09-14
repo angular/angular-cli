@@ -7,8 +7,6 @@
  */
 
 import { schema } from '@angular-devkit/core';
-import { readFileSync } from 'node:fs';
-import { join, posix, relative } from 'node:path';
 import type { ArgumentsCamelCase, Argv, CommandModule as YargsCommandModule } from 'yargs';
 import { Parser as yargsParser } from 'yargs/helpers';
 import { getAnalyticsUserId } from '../analytics/analytics';
@@ -20,6 +18,7 @@ import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
 import { CommandContext, CommandScope, Options, OtherOptions } from './definitions';
 import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
+import '../utilities/markdown-loader';
 
 export { CommandScope };
 export type { CommandContext, Options, OtherOptions };
@@ -31,8 +30,11 @@ export interface CommandModuleImplementation<T extends {} = {}> extends Omit<
   /** Scope in which the command can be executed in. */
   scope: CommandScope;
 
-  /** Path used to load the long description for the command in JSON help text. */
-  longDescriptionPath?: string;
+  /** Long description for the command in JSON help text. */
+  longDescription?: string;
+
+  /** Relative path to the long description file for the command in JSON help text. */
+  longDescriptionRelativePath?: string;
 
   /** Object declaring the options the command accepts, or a function accepting and returning a yargs instance. */
   builder(argv: Argv): Promise<Argv<T>> | Argv<T>;
@@ -50,7 +52,8 @@ export interface FullDescribe {
 export abstract class CommandModule<T extends {} = {}> implements CommandModuleImplementation<T> {
   abstract readonly command: string;
   abstract readonly describe: string | false;
-  abstract readonly longDescriptionPath?: string;
+  readonly longDescription?: string;
+  readonly longDescriptionRelativePath?: string;
   protected readonly shouldReportAnalytics: boolean = true;
   readonly scope: CommandScope = CommandScope.Both;
 
@@ -68,23 +71,22 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
    * `false` will result in a hidden command.
    */
   public get fullDescribe(): FullDescribe | false {
-    return this.describe === false
-      ? false
-      : {
-          describe: this.describe,
-          ...(this.longDescriptionPath
-            ? {
-                longDescriptionRelativePath: relative(
-                  join(__dirname, '../../../../'),
-                  this.longDescriptionPath,
-                ).replace(/\\/g, posix.sep),
-                longDescription: readFileSync(this.longDescriptionPath, 'utf8').replace(
-                  /\r\n/g,
-                  '\n',
-                ),
-              }
-            : {}),
-        };
+    if (this.describe === false) {
+      return false;
+    }
+
+    const description: FullDescribe = {
+      describe: this.describe,
+    };
+
+    if (this.longDescription) {
+      description.longDescription = this.longDescription.replace(/\r\n/g, '\n');
+      description.longDescriptionRelativePath =
+        this.longDescriptionRelativePath ??
+        `@angular/cli/src/commands/${this.commandName}/long-description.md`;
+    }
+
+    return description;
   }
 
   protected get commandName(): string {

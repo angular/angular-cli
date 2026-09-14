@@ -19,7 +19,6 @@ export default class ExtractI18nCommandModule
   multiTarget = false;
   command = 'extract-i18n [project]';
   describe = 'Extracts i18n messages from source code.';
-  longDescriptionPath?: string | undefined;
 
   override async findDefaultBuilderName(
     project: workspaces.ProjectDefinition,

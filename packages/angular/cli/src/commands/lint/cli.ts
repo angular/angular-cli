@@ -6,10 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join } from 'node:path';
 import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
+import longDescription from './long-description.md';
 
 export default class LintCommandModule
   extends ArchitectCommandModule
@@ -24,6 +26,6 @@ export default class LintCommandModule
 
   multiTarget = true;
   command = 'lint [project]';
-  longDescriptionPath = join(__dirname, 'long-description.md');
+  override longDescription = longDescription;
   describe = 'Runs linting tools on Angular application code in a given project folder.';
 }

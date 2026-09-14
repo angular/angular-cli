@@ -29,6 +29,9 @@ import { NgAddSaveDependency, PackageManifest, PackageMetadata } from '../../pac
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
+import longDescription from './long-description.md';
 
 class CommandError extends Error {}
 
@@ -100,7 +103,7 @@ export default class AddCommandModule
 {
   command = 'add <collection>';
   describe = 'Adds support for an external library to your project.';
-  longDescriptionPath = join(__dirname, 'long-description.md');
+  override longDescription = longDescription;
   protected override allowPrivateSchematics = true;
   private readonly schematicName = 'ng-add';
   private rootRequire = createRequire(this.context.root + '/');
