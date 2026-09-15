@@ -37,14 +37,39 @@ function getScriptAttributeValue(tag: StartTag, attrName: string): string | unde
 }
 
 /**
+ * All MIME types associated with JavaScript according to the HTML specification:
+ * https://html.spec.whatwg.org/multipage/scripting.html#javascript-mime-type
+ */
+const JAVASCRIPT_MIME_TYPES = new Set([
+  'application/ecmascript',
+  'application/javascript',
+  'application/x-ecmascript',
+  'application/x-javascript',
+  'text/ecmascript',
+  'text/javascript',
+  'text/javascript1.0',
+  'text/javascript1.1',
+  'text/javascript1.2',
+  'text/javascript1.3',
+  'text/javascript1.4',
+  'text/javascript1.5',
+  'text/jscript',
+  'text/livescript',
+  'text/x-ecmascript',
+  'text/x-javascript',
+]);
+
+/**
  * Checks whether a particular string is a MIME type associated with JavaScript, according to
- * https://developer.mozilla.org/en-US/docs/Web/HTTP/MIME_types#textjavascript
+ * https://html.spec.whatwg.org/multipage/scripting.html#javascript-mime-type
  *
  * @param mimeType a string that may be a MIME type
  * @returns whether the string is a MIME type that is associated with JavaScript
  */
-function isJavascriptMimeType(mimeType: string): boolean {
-  return mimeType.split(';')[0] === 'text/javascript';
+export function isJavascriptMimeType(mimeType: string): boolean {
+  const [essence] = mimeType.split(';', 1);
+
+  return JAVASCRIPT_MIME_TYPES.has(essence.trim().toLowerCase());
 }
 
 /**
@@ -54,7 +79,11 @@ function isJavascriptMimeType(mimeType: string): boolean {
  * @returns whether to add the script tag to the dynamically loaded script tag
  */
 function shouldDynamicallyLoadScriptTagBasedOnType(scriptType: string | undefined): boolean {
-  return !scriptType || scriptType === 'module' || isJavascriptMimeType(scriptType);
+  if (!scriptType) {
+    return true;
+  }
+
+  return scriptType.trim().toLowerCase() === 'module' || isJavascriptMimeType(scriptType);
 }
 
 /**
