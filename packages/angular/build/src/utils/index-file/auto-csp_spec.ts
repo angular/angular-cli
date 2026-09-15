@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { autoCsp, hashTextContent } from './auto-csp';
+import { autoCsp, hashTextContent, isJavascriptMimeType } from './auto-csp';
 
 // Utility function to grab the meta tag CSPs from the HTML response.
 const getCsps = (html: string) => {
@@ -280,5 +280,122 @@ describe('auto-csp', () => {
     expect(result).toContain(
       `const scripts = [['./main.js', '', false, false, null, "anonymous"]];`,
     );
+  });
+
+  it('should rewrite scripts with application/javascript type', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head></head>
+        <body>
+          <script src="./main.js" type="application/javascript"></script>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', 'application/javascript', false, false, null, null]];`,
+    );
+  });
+
+  it('should rewrite scripts with case-insensitive type and parameters with whitespace', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head></head>
+        <body>
+          <script src="./main.js" type="Text/JavaScript ; charset=utf-8"></script>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', 'Text/JavaScript ; charset=utf-8', false, false, null, null]];`,
+    );
+  });
+
+  it('should rewrite scripts with case-insensitive module type', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head></head>
+        <body>
+          <script src="./main.js" type="Module"></script>
+        </body>
+      </html>
+    `);
+
+    const csps = getCsps(result);
+    expect(csps).toHaveSize(1);
+    expect(csps[0]).toMatch(CSP_SINGLE_HASH_REGEX);
+    expect(result).toContain(
+      `const scripts = [['./main.js', 'Module', false, false, null, null]];`,
+    );
+  });
+
+  it('should not rewrite non-JavaScript script tags', async () => {
+    const result = await autoCsp(`
+      <html>
+        <head></head>
+        <body>
+          <script src="./data.json" type="application/json"></script>
+        </body>
+      </html>
+    `);
+
+    // No dynamic loader script is emitted because application/json is not JavaScript.
+    expect(result).toContain('<script src="./data.json" type="application/json"></script>');
+    expect(result).not.toContain('const scripts =');
+  });
+
+  describe('isJavascriptMimeType', () => {
+    it('should identify standard JavaScript MIME types', () => {
+      expect(isJavascriptMimeType('text/javascript')).toBeTrue();
+      expect(isJavascriptMimeType('application/javascript')).toBeTrue();
+      expect(isJavascriptMimeType('application/x-javascript')).toBeTrue();
+      expect(isJavascriptMimeType('text/ecmascript')).toBeTrue();
+      expect(isJavascriptMimeType('application/ecmascript')).toBeTrue();
+      expect(isJavascriptMimeType('text/jscript')).toBeTrue();
+      expect(isJavascriptMimeType('text/livescript')).toBeTrue();
+      expect(isJavascriptMimeType('text/x-ecmascript')).toBeTrue();
+      expect(isJavascriptMimeType('text/x-javascript')).toBeTrue();
+      expect(isJavascriptMimeType('text/javascript1.5')).toBeTrue();
+    });
+
+    it('should ignore parameters when matching MIME type', () => {
+      expect(isJavascriptMimeType('text/javascript; charset=utf-8')).toBeTrue();
+      expect(isJavascriptMimeType('application/javascript;version=1.8')).toBeTrue();
+    });
+
+    it('should handle leading, trailing, and parameter whitespace', () => {
+      expect(isJavascriptMimeType('  text/javascript  ')).toBeTrue();
+      expect(isJavascriptMimeType('text/javascript ; charset=utf-8')).toBeTrue();
+      expect(isJavascriptMimeType(' application/javascript ; version=1.0 ')).toBeTrue();
+    });
+
+    it('should be case-insensitive', () => {
+      expect(isJavascriptMimeType('Text/JavaScript')).toBeTrue();
+      expect(isJavascriptMimeType('APPLICATION/JAVASCRIPT')).toBeTrue();
+      expect(isJavascriptMimeType('text/JAVASCRIPT; charset=UTF-8')).toBeTrue();
+    });
+
+    it('should reject non-JavaScript MIME types', () => {
+      expect(isJavascriptMimeType('application/json')).toBeFalse();
+      expect(isJavascriptMimeType('text/html')).toBeFalse();
+      expect(isJavascriptMimeType('text/css')).toBeFalse();
+      expect(isJavascriptMimeType('image/svg+xml')).toBeFalse();
+      expect(isJavascriptMimeType('importmap')).toBeFalse();
+      expect(isJavascriptMimeType('module')).toBeFalse();
+      expect(isJavascriptMimeType('')).toBeFalse();
+    });
+
+    it('should reject invalid MIME types with whitespace inside the essence', () => {
+      expect(isJavascriptMimeType('text / javascript')).toBeFalse();
+      expect(isJavascriptMimeType('application / javascript')).toBeFalse();
+      expect(isJavascriptMimeType('text/java script')).toBeFalse();
+    });
   });
 });
