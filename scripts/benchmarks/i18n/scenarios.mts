@@ -13,9 +13,10 @@ import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import os from 'node:os';
 import path from 'node:path';
+import { pathToFileURL } from 'node:url';
 
-import type { BuildOutputFile } from '../../../dist/@angular/build/src/tools/esbuild/bundler-files.d.ts';
-import type { LocaleInlineOptions } from '../../../dist/@angular/build/src/tools/esbuild/i18n-inliner.d.ts';
+import type { BuildOutputFile } from '../../../packages/angular/build/src/tools/esbuild/bundler-files.js';
+import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js';
 import { generateSyntheticBundle, generateTranslations, initializeFixtures } from './fixtures.mts';
 import type { BenchmarkScenario } from './harness.mts';
 
@@ -25,7 +26,7 @@ const requireFromBuild = createRequire(
 
 const { I18nInliner } = requireFromBuild(
   '../../../dist/@angular/build/src/tools/esbuild/i18n-inliner.js',
-) as typeof import('../../../dist/@angular/build/src/tools/esbuild/i18n-inliner.d.ts');
+) as typeof import('../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js');
 
 export interface ScenarioFactoryOptions {
   concurrency?: number;
@@ -123,6 +124,15 @@ function calculateInputSizeBytes(files: BuildOutputFile[]): number {
     return f.path.endsWith('.js') ? total + f.size : total;
   }, 0);
 }
+
+/**
+ * Note on Worker Pool Lifecycle:
+ * Each scenario's run() method instantiates and closes an I18nInliner per iteration.
+ * This is designed as a macro benchmark to reflect the cold-start behavior of single-shot
+ * CLI build invocations (including worker thread pool initialization, task dispatch,
+ * inlining transformations, and thread pool shutdown). Warmup iterations warm up the
+ * main-thread V8 isolate and runtime paths, while worker threads are initialized per iteration.
+ */
 
 /**
  * 1. Standard App Scenario:
@@ -350,15 +360,28 @@ export function createPersistentCacheWarmScenario(
 
       // Prime the persistent cache out-of-process so cold worker thread allocations
       // do not inflate this process's RSS metrics.
+      const scenariosUrl = pathToFileURL(path.resolve(import.meta.dirname, './scenarios.mts')).href;
       const primerCode =
-        `import { primeCache } from ${JSON.stringify(path.resolve(import.meta.dirname, './scenarios.mts'))};\n` +
+        `import { primeCache } from ${JSON.stringify(scenariosUrl)};\n` +
         `await primeCache(${JSON.stringify(cacheDir)}, ${options.concurrency ?? 'undefined'});\n`;
 
-      spawnSync(
+      const primerProc = spawnSync(
         process.execPath,
-        ['--no-warnings=ExperimentalWarning', '--experimental-transform-types', '-e', primerCode],
+        [
+          '--no-warnings=ExperimentalWarning',
+          '--experimental-transform-types',
+          '--input-type=module',
+          '-e',
+          primerCode,
+        ],
         { stdio: 'inherit' },
       );
+
+      if (primerProc.status !== 0 || primerProc.error) {
+        throw new Error(
+          `Failed to prime cache for persistent-cache-warm scenario: ${primerProc.error?.message ?? primerProc.status}`,
+        );
+      }
     },
 
     async run() {
@@ -384,11 +407,60 @@ export function createPersistentCacheWarmScenario(
   };
 }
 
+/**
+ * 6. Large Enterprise (10k translations) Scenario:
+ * 1 main bundle (3 MB) + 100 chunks (50 KB), 32 locales, 10,000 translations, sourcemaps ON.
+ * Maximum scale stress test for binary translation tables, memory retention, and multi-locale windows.
+ */
+export function createLargeEnterpriseScenario(
+  options: ScenarioFactoryOptions = {},
+): BenchmarkScenario {
+  let workload: GeneratedWorkload | undefined;
+
+  return {
+    name: 'large-enterprise-10k',
+    description:
+      'Large Enterprise (10k msgs): 1 main (3 MB) + 100 chunks (50 KB), 32 locales, 10,000 translations',
+    get inputSizeBytes() {
+      return workload?.totalInputSizeBytes ?? 0;
+    },
+    get localeCount() {
+      return DEFAULT_LOCALES_32.length;
+    },
+    async setup() {
+      await initializeFixtures();
+      const files = createBundleSet(3 * 1024 * 1024, 100, 50 * 1024, 10000, true);
+      const locales = generateTranslations(DEFAULT_LOCALES_32, 10000);
+
+      workload = {
+        files,
+        locales,
+        totalInputSizeBytes: calculateInputSizeBytes(files),
+      };
+    },
+    async run() {
+      if (!workload) {
+        return;
+      }
+      const inliner = new I18nInliner({
+        missingTranslation: 'warning',
+        maxConcurrency: options.concurrency,
+      });
+      try {
+        await inliner.inlineAll(workload.files, workload.locales);
+      } finally {
+        await inliner.close();
+      }
+    },
+  };
+}
+
 export function getAllScenarios(options: ScenarioFactoryOptions = {}): BenchmarkScenario[] {
   return [
     createStandardAppScenario(options),
     createStandardAppNoMapsScenario(options),
     createEnterpriseScenario(options),
+    createLargeEnterpriseScenario(options),
     createMonolithicScenario(options),
     createPersistentCacheWarmScenario(options),
   ];

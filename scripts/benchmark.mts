@@ -7,6 +7,7 @@
  */
 
 import fs from 'node:fs';
+import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
 
 function checkBuildStatus(logger: Console): boolean {
@@ -44,6 +45,8 @@ export default async function (
     concurrency?: string | number;
     build?: boolean;
     json?: boolean;
+    inProcess?: boolean;
+    'in-process'?: boolean;
     saveBaseline?: string;
     'save-baseline'?: string;
     compareBaseline?: string;
@@ -72,6 +75,7 @@ Options:
   --iterations=<n>           Number of measured iterations (default: 5)
   --warmup=<n>               Number of warmup iterations (default: 2)
   --concurrency=<n>          Override worker thread pool concurrency
+  --in-process               Run all scenarios in a single process (useful for debugging)
   --build                    Automatically build packages before benchmarking
   --json                     Output results in machine-readable JSON
   --save-baseline=<file>     Save run results to a baseline JSON file
@@ -99,14 +103,45 @@ Options:
     return 1;
   }
 
+  const rawSaveBaseline = options.saveBaseline ?? options['save-baseline'];
+  const rawCompareBaseline = options.compareBaseline ?? options['compare-baseline'];
+
+  const iterations = options.iterations !== undefined ? Number(options.iterations) : undefined;
+  const warmup = options.warmup !== undefined ? Number(options.warmup) : undefined;
+  const concurrency = options.concurrency !== undefined ? Number(options.concurrency) : undefined;
+
+  if (iterations !== undefined && (!Number.isInteger(iterations) || iterations < 1)) {
+    // eslint-disable-next-line no-console
+    console.error('Error: --iterations must be a positive integer.');
+
+    return 1;
+  }
+
+  if (warmup !== undefined && (!Number.isInteger(warmup) || warmup < 0)) {
+    // eslint-disable-next-line no-console
+    console.error('Error: --warmup must be a non-negative integer.');
+
+    return 1;
+  }
+
+  if (concurrency !== undefined && (!Number.isInteger(concurrency) || concurrency < 1)) {
+    // eslint-disable-next-line no-console
+    console.error('Error: --concurrency must be a positive integer.');
+
+    return 1;
+  }
+
   const cliOptions: BenchmarkCliOptions = {
     scenario: options.scenario,
-    iterations: options.iterations !== undefined ? Number(options.iterations) : undefined,
-    warmup: options.warmup !== undefined ? Number(options.warmup) : undefined,
-    concurrency: options.concurrency !== undefined ? Number(options.concurrency) : undefined,
+    iterations,
+    warmup,
+    concurrency,
     json: Boolean(options.json),
-    saveBaseline: options.saveBaseline ?? options['save-baseline'],
-    compareBaseline: options.compareBaseline ?? options['compare-baseline'],
+    inProcess: Boolean(options.inProcess ?? options['in-process']),
+    saveBaseline: rawSaveBaseline ? path.resolve(_cwd, String(rawSaveBaseline)) : undefined,
+    compareBaseline: rawCompareBaseline
+      ? path.resolve(_cwd, String(rawCompareBaseline))
+      : undefined,
   };
 
   const { exitCode } = await runI18nBenchmarks(cliOptions);

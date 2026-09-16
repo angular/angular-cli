@@ -82,9 +82,12 @@ export async function runI18nBenchmarks(
       }
 
       const proc = spawnSync(process.execPath, args, { encoding: 'utf-8' });
-      if (proc.status !== 0) {
+      if (proc.status !== 0 || proc.error) {
         // eslint-disable-next-line no-console
-        console.error(`Error running scenario ${scenario.name}:\n${proc.stderr || proc.stdout}`);
+        console.error(
+          `Error running scenario ${scenario.name}:\n` +
+            (proc.error?.message ?? (proc.stderr || proc.stdout)),
+        );
 
         return { results, exitCode: 1 };
       }
