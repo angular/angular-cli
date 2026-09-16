@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { VERSION as versionString } from '#version';
+
 // Same structure as used in framework packages
 class Version {
   readonly major: string;
@@ -20,4 +22,4 @@ class Version {
   }
 }
 
-export const VERSION = new Version('0.0.0-PLACEHOLDER');
+export const VERSION = new Version(versionString);

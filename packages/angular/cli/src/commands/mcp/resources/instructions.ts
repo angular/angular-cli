@@ -7,8 +7,7 @@
  */
 
 import type { McpServer } from '@modelcontextprotocol/server';
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import bestPracticesText from './best-practices.md';
 
 export function registerInstructionsResource(server: McpServer): void {
   server.registerResource(
@@ -23,10 +22,8 @@ export function registerInstructionsResource(server: McpServer): void {
         ' typed forms, modern control flow syntax, and other current conventions.',
       mimeType: 'text/markdown',
     },
-    async () => {
-      const text = await readFile(join(__dirname, 'best-practices.md'), 'utf-8');
-
-      return { contents: [{ uri: 'instructions://best-practices', text }] };
-    },
+    async () => ({
+      contents: [{ uri: 'instructions://best-practices', text: bestPracticesText }],
+    }),
   );
 }

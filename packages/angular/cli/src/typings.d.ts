@@ -6,7 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-declare module '*/long-description.md' {
+declare module '*.md' {
   const content: string;
   export default content;
+}
+
+declare module '#version' {
+  export const VERSION: string;
+  export const SUPPORTED_NODE_VERSIONS: string;
+  export const supportedNodeVersions: string[];
+  export function isNodeVersionSupported(): boolean;
 }

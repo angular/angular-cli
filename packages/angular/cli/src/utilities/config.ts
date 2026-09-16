@@ -11,7 +11,7 @@ import { existsSync, promises as fs } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { PackageManager } from '../../lib/config/workspace-schema';
-import { findUp, findUpSync } from './find-up';
+import { findUp } from './find-up';
 import { JSONFile, readAndParseJson } from './json-file';
 
 function isJsonObject(value: json.JsonValue | undefined): value is json.JsonObject {
@@ -47,7 +47,14 @@ function createWorkspaceHost(): workspaces.WorkspaceHost {
   };
 }
 
-export const workspaceSchemaPath = path.join(__dirname, '../../lib/config/schema.json');
+const currentDirectory = import.meta.dirname;
+
+// In bundled ESM output, files are located in `lib/` directly adjacent to `config/schema.json`
+// whereas in unbundled development/tests, `config.js` is in `src/utilities/`.
+const bundledSchemaPath = path.join(currentDirectory, 'config/schema.json');
+export const workspaceSchemaPath = existsSync(bundledSchemaPath)
+  ? bundledSchemaPath
+  : path.join(currentDirectory, '../../lib/config/schema.json');
 
 const configNames = ['angular.json', '.angular.json'];
 const globalFileName = '.angular-config.json';
@@ -76,7 +83,7 @@ async function projectFilePath(projectPath?: string): Promise<string | null> {
   return (
     (projectPath && (await findUp(configNames, projectPath))) ||
     (await findUp(configNames, process.cwd())) ||
-    (await findUp(configNames, __dirname))
+    (await findUp(configNames, currentDirectory))
   );
 }
 

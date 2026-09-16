@@ -7,7 +7,7 @@
  */
 
 import { logging } from '@angular-devkit/core';
-import type { Argv, CamelCaseKey } from 'yargs';
+import type { Argv, CamelCaseKey } from 'yargs' with { 'resolution-mode': 'require' };
 import type { PackageManager } from '../package-managers/package-manager';
 import { AngularWorkspace } from '../utilities/config';
 

@@ -7,6 +7,7 @@
  */
 
 import { JsonObject, schema } from '@angular-devkit/core';
+import type { Argv } from 'yargs';
 import yargs from 'yargs';
 
 import { Option, addSchemaOptionsToCommand, parseJsonSchemaToOptions } from './json-schema';
@@ -20,7 +21,7 @@ describe('parseJsonSchemaToOptions', () => {
       return localYargs.parseAsync(args);
     };
 
-    let localYargs: yargs.Argv<unknown>;
+    let localYargs: Argv<unknown>;
     let options: Option[];
 
     beforeAll(async () => {

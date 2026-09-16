@@ -420,10 +420,10 @@ export abstract class SchematicsCommandModule
     return workspace
       ? // Workspace
         collectionName === DEFAULT_SCHEMATICS_COLLECTION
-        ? // Favor __dirname for @schematics/angular to use the build-in version
-          [__dirname, process.cwd(), root]
-        : [process.cwd(), root, __dirname]
+        ? // Favor import.meta.dirname for @schematics/angular to use the build-in version
+          [import.meta.dirname, process.cwd(), root]
+        : [process.cwd(), root, import.meta.dirname]
       : // Global
-        [__dirname, process.cwd()];
+        [import.meta.dirname, process.cwd()];
   }
 }
