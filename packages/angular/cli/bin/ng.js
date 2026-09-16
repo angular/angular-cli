@@ -12,7 +12,7 @@
 'use strict';
 
 const path = require('path');
-const nodeUtils = require('../src/utilities/node-version');
+const nodeUtils = require('./version');
 
 // Error if the external CLI appears to be used inside a google3 context.
 if (process.cwd().split(path.sep).includes('google3')) {

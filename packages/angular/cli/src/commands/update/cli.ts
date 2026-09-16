@@ -62,7 +62,7 @@ class CommandError extends Error {}
 export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs> {
   override scope = CommandScope.In;
   protected override shouldReportAnalytics = false;
-  private readonly resolvePaths = [__dirname, this.context.root];
+  private readonly resolvePaths = [import.meta.dirname, this.context.root];
 
   command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.dev/.';
@@ -239,7 +239,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
     const workflow = new NodeWorkflow(this.context.root, {
       packageManager: packageManager.name,
       packageManagerForce: await shouldForcePackageManager(packageManager, logger, options.verbose),
-      // __dirname -> favor @schematics/update from this package
+      // import.meta.dirname -> favor @schematics/update from this package
       // Otherwise, use packages from the active workspace (migrations)
       resolvePaths: this.resolvePaths,
       schemaValidation: true,

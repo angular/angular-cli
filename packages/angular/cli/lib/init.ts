@@ -9,6 +9,7 @@
 import { readFile } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import * as path from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { SemVer, major } from 'semver';
 import { disableVersionCheck } from '../src/utilities/environment-options';
 import { VERSION } from '../src/utilities/version';
@@ -71,7 +72,7 @@ let forceExit = false;
     // version of ng-cli you have installed in a local package.json
     const cwdRequire = createRequire(process.cwd() + '/');
     const projectLocalCli = cwdRequire.resolve('@angular/cli');
-    cli = await import(projectLocalCli);
+    cli = await import(pathToFileURL(projectLocalCli).href);
 
     const globalVersion = new SemVer(VERSION.full);
 
@@ -150,7 +151,11 @@ let forceExit = false;
     cli = await import('./cli');
   }
 
-  if ('default' in cli) {
+  // Support both ESM and CommonJS local CLI packages. When importing older CommonJS
+  // packages with an `__esModule` default export, Node.js wraps the exports in an ESM
+  // namespace requiring the default export to be unwrapped multiple times.
+  let depth = 0;
+  while (typeof cli === 'object' && cli !== null && 'default' in cli && depth++ < 3) {
     cli = cli['default'];
   }
 

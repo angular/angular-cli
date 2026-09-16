@@ -18,7 +18,6 @@ import { AngularWorkspace } from '../utilities/config';
 import { memoize } from '../utilities/memoize';
 import { CommandContext, CommandScope, Options, OtherOptions } from './definitions';
 import { Option, addSchemaOptionsToCommand } from './utilities/json-schema';
-import '../utilities/markdown-loader';
 
 export { CommandScope };
 export type { CommandContext, Options, OtherOptions };

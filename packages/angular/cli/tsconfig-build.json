@@ -1,0 +1,9 @@
+{
+  "extends": "../../../tsconfig-build.json",
+  "compilerOptions": {
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "types": ["node"]
+  }
+}
