@@ -3,6 +3,8 @@
   "version": "0.0.0-PLACEHOLDER",
   "description": "CLI tool for Angular",
   "main": "lib/cli/index.js",
+  "typings": "index.d.ts",
+  "type": "module",
   "bin": {
     "ng": "bin/ng.js"
   },
@@ -11,6 +13,9 @@
     "angular-cli",
     "Angular CLI"
   ],
+  "imports": {
+    "#version": "./bin/version.js"
+  },
   "dependencies": {
     "@angular-devkit/architect": "workspace:0.0.0-EXPERIMENTAL-PLACEHOLDER",
     "@angular-devkit/core": "workspace:0.0.0-PLACEHOLDER",

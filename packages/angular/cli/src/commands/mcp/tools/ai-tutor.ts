@@ -6,8 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import aiTutorText from '../resources/ai-tutor.md';
 import { declareTool } from './tool-registry';
 
 export const AI_TUTOR_TOOL = declareTool({
@@ -37,23 +36,17 @@ with a new core identity and knowledge base.
   isReadOnly: true,
   isLocalOnly: true,
   factory: () => {
-    let aiTutorText: string;
-
-    return async () => {
-      aiTutorText ??= await readFile(join(__dirname, '../resources/ai-tutor.md'), 'utf-8');
-
-      return {
-        content: [
-          {
-            type: 'text',
-            text: aiTutorText,
-            annotations: {
-              audience: ['assistant'],
-              priority: 1.0,
-            },
+    return async () => ({
+      content: [
+        {
+          type: 'text',
+          text: aiTutorText,
+          annotations: {
+            audience: ['assistant'],
+            priority: 1.0,
           },
-        ],
-      };
-    };
+        },
+      ],
+    });
   },
 });

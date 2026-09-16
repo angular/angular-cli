@@ -3,6 +3,8 @@
 # Use of this source code is governed by an MIT-style license that can be
 # found in the LICENSE file at https://angular.dev/license
 
+load("@aspect_rules_esbuild//esbuild:defs.bzl", "esbuild")
+load("@aspect_rules_ts//ts:defs.bzl", "ts_config")
 load("@npm//:defs.bzl", "npm_link_all_packages")
 load("//tools:defaults.bzl", "jasmine_test", "npm_package", "ts_project")
 load("//tools:ng_cli_schema_generator.bzl", "cli_json_schema")
@@ -13,6 +15,24 @@ licenses(["notice"])
 package(default_visibility = ["//visibility:public"])
 
 npm_link_all_packages()
+
+ts_config(
+    name = "tsconfig-build",
+    src = "tsconfig-build.json",
+    deps = [
+        "//:build-tsconfig",
+    ],
+)
+
+ts_config(
+    name = "tsconfig-test",
+    src = "tsconfig-test.json",
+    deps = [
+        ":tsconfig-build",
+        "//:node_modules/@types/jasmine",
+        "//:node_modules/@types/node",
+    ],
+)
 
 genrule(
     name = "angular_best_practices",
@@ -25,18 +45,18 @@ genrule(
     """,
 )
 
-RUNTIME_ASSETS = glob(
+PACKAGE_ASSETS = glob(
     include = [
         "bin/**/*",
-        "src/**/*.md",
     ],
     exclude = [
         "lib/config/workspace-schema.json",
     ],
 ) + [
     "//packages/angular/cli:lib/config/schema.json",
-    ":angular_best_practices",
 ]
+
+RUNTIME_ASSETS = PACKAGE_ASSETS + glob(["src/**/*.md"]) + [":angular_best_practices"]
 
 ts_project(
     name = "angular-cli",
@@ -54,6 +74,7 @@ ts_project(
         "//packages/angular/cli:lib/config/workspace-schema.ts",
     ],
     data = RUNTIME_ASSETS,
+    tsconfig = ":tsconfig-build",
     deps = [
         ":node_modules/@angular-devkit/architect",
         ":node_modules/@angular-devkit/core",
@@ -75,6 +96,30 @@ ts_project(
         "//:node_modules/semver",
         "//:node_modules/typescript",
     ],
+)
+
+esbuild(
+    name = "bundled_cli",
+    srcs = [
+        ":angular-cli",
+        ":angular_best_practices",
+    ] + glob(["src/**/*.md"]),
+    config = {
+        "packages": "external",
+        "loader": {
+            ".md": "text",
+        },
+    },
+    entry_points = [
+        "lib/cli/index.js",
+        "lib/init.js",
+    ],
+    format = "esm",
+    output_dir = True,
+    platform = "node",
+    sourcemap = False,
+    splitting = True,
+    target = "node22",
 )
 
 CLI_SCHEMA_DATA = [
@@ -109,6 +154,7 @@ ts_project(
             "node_modules/**",
         ],
     ),
+    tsconfig = ":tsconfig-test",
     deps = [
         ":angular-cli",
         ":node_modules/@angular-devkit/core",
@@ -124,7 +170,14 @@ ts_project(
 
 jasmine_test(
     name = "test",
-    data = [":angular-cli_test_lib"],
+    data = [
+        "package.json",
+        "test-esm-loader.mjs",
+        ":angular-cli_test_lib",
+    ],
+    node_options = [
+        "--import=./test-esm-loader.mjs",
+    ],
 )
 
 genrule(
@@ -144,14 +197,17 @@ npm_package(
         "//packages/angular_devkit/schematics:package.json",
         "//packages/schematics/angular:package.json",
     ],
+    replace_prefixes = {
+        "bundled_cli/": "lib/",
+    },
     stamp_files = [
-        "src/utilities/version.js",
-        "src/utilities/node-version.js",
+        "bin/version.js",
     ],
     tags = ["release-package"],
-    deps = RUNTIME_ASSETS + [
+    deps = PACKAGE_ASSETS + [
         ":README.md",
-        ":angular-cli",
+        ":bundled_cli",
+        ":index.d.ts",
         ":license",
     ],
 )
