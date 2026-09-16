@@ -13,8 +13,8 @@ import { createRequire } from 'node:module';
 
 import path from 'node:path';
 
-import type { BuildOutputFile } from '../../../dist/@angular/build/src/tools/esbuild/bundler-files.d.ts';
-import type { LocaleInlineOptions } from '../../../dist/@angular/build/src/tools/esbuild/i18n-inliner.d.ts';
+import type { BuildOutputFile } from '../../../packages/angular/build/src/tools/esbuild/bundler-files.js';
+import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js';
 
 // Setup module paths to resolve dependencies from packages/angular/build
 const requireFromBuild = createRequire(
