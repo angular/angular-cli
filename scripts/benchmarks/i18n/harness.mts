@@ -63,9 +63,9 @@ export async function runScenario(
   const warmup = options.warmup ?? 2;
   const iterations = options.iterations ?? 5;
 
-  await scenario.setup?.();
-
   try {
+    await scenario.setup?.();
+
     // Warmup phase
     for (let w = 0; w < warmup; w++) {
       // Force GC if available between warmups
@@ -106,10 +106,10 @@ export async function runScenario(
       if (rssDelta > maxRssDeltaBytes) {
         maxRssDeltaBytes = rssDelta;
       }
-      finalHeap = memAfter.heapUsed;
 
       // Force GC immediately after iteration to clean main thread isolate
       global.gc?.();
+      finalHeap = process.memoryUsage().heapUsed;
     }
 
     // Sort ascending for percentile computation

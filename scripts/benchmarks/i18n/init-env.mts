@@ -17,7 +17,9 @@ const buildNodeModules = path.resolve(
 
 const currentPath = process.env.NODE_PATH ?? '';
 if (!currentPath.includes(buildNodeModules)) {
-  process.env.NODE_PATH = currentPath ? `${buildNodeModules}:${currentPath}` : buildNodeModules;
+  process.env.NODE_PATH = currentPath
+    ? `${buildNodeModules}${path.delimiter}${currentPath}`
+    : buildNodeModules;
   // Initialize internal search paths for Node CommonJS loader
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (Module as any)._initPaths?.();
