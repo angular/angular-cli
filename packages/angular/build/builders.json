@@ -28,7 +28,7 @@
     "unit-test": {
       "implementation": "./src/builders/unit-test",
       "schema": "./src/builders/unit-test/schema.json",
-      "description": "[EXPERIMENTAL] Run application unit tests."
+      "description": "Run application unit tests."
     }
   }
 }
