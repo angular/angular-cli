@@ -1,3 +1,24 @@
+<a name="22.2.0-rc.0"></a>
+
+# 22.2.0-rc.0 (2026-09-16)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                       |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [6e7f809a7d](https://github.com/angular/angular-cli/commit/6e7f809a7d66e4b8d260a1c00297812412a926f1) | perf | skip eager yargs help message formatting during command execution |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [978351af71](https://github.com/angular/angular-cli/commit/978351af71889d4786a18fec9e193eb5b16af7dd) | fix  | include inline component stylesheets in referenced watch files             |
+| [72dc9677cf](https://github.com/angular/angular-cli/commit/72dc9677cf743243d6cb22d2b81782022f71356e) | fix  | pass load cache to compiler plugin and escape extension regex in polyfills |
+| [31c045639e](https://github.com/angular/angular-cli/commit/31c045639e8bfd114cbd552d83cc70a968fe7f81) | fix  | prevent stale bundler caching and correctly resolve load cache             |
+| [d97c8857c1](https://github.com/angular/angular-cli/commit/d97c8857c18da02fcc6c69a0ea652cc706c5c9b6) | perf | key Sass package resolutions without containing URL qualification          |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0-next.7"></a>
 
 # 22.2.0-next.7 (2026-09-10)
