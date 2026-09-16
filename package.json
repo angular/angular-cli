@@ -15,6 +15,7 @@
     "bazel": "bazelisk",
     "test": "bazel test //packages/...",
     "build": "pnpm --silent admin build",
+    "benchmark": "node --no-warnings=ExperimentalWarning --experimental-transform-types --expose-gc ./scripts/devkit-admin.mts benchmark",
     "build-schema": "bazel build //... --build_tag_filters schema --symlink_prefix dist-schema/",
     "lint": "eslint --cache --max-warnings=0",
     "templates": "pnpm --silent admin templates",
