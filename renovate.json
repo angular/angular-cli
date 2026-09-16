@@ -1,6 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "baseBranchPatterns": ["main", "22.1.x"],
+  "baseBranchPatterns": ["main", "22.2.x"],
   "extends": ["github>angular/dev-infra//renovate-presets/default.json5"],
   "ignorePaths": ["tests/e2e/assets/**", "tests/schematics/update/packages/**"],
   "packageRules": [
