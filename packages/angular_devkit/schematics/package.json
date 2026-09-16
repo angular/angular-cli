@@ -4,6 +4,26 @@
   "description": "Angular Schematics - Library",
   "main": "src/index.js",
   "typings": "src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.d.ts",
+      "default": "./src/index.js"
+    },
+    "./tasks": {
+      "types": "./tasks/index.d.ts",
+      "default": "./tasks/index.js"
+    },
+    "./testing": {
+      "types": "./testing/index.d.ts",
+      "default": "./testing/index.js"
+    },
+    "./tools": {
+      "types": "./tools/index.d.ts",
+      "default": "./tools/index.js"
+    },
+    "./collection-schema.json": "./collection-schema.json",
+    "./package.json": "./package.json"
+  },
   "keywords": [
     "blueprints",
     "scaffolding",

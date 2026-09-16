@@ -125,5 +125,8 @@ api_golden_test_npm_package(
     ],
     golden_dir = "goldens/public-api/angular_devkit/architect",
     npm_package = "packages/angular_devkit/architect/npm_package",
+    types = {
+        "//:node_modules/@types/node": "node",
+    },
 )
 # @external_end
