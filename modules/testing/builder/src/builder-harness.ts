@@ -111,7 +111,7 @@ export class BuilderHarness<T> {
     }
   }
 
-  private resolvePath(path: string): string {
+  resolvePath(path: string): string {
     return join(getSystemPath(this.host.root()), path);
   }
 

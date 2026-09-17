@@ -7,7 +7,8 @@
  */
 
 import { readFile, readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { createRequire } from 'node:module';
+import { join, relative } from 'node:path';
 
 export interface PostcssConfiguration {
   plugins: [name: string, options?: object | string][];
@@ -60,6 +61,35 @@ export function findTailwindConfiguration(
   searchDirectories: SearchDirectory[],
 ): string | undefined {
   return findFile(searchDirectories, tailwindConfigFiles);
+}
+
+export async function getTailwindConfig(
+  searchDirectories: SearchDirectory[],
+  workspaceRoot: string,
+  logger?: { warn(message: string): void },
+): Promise<{ file: string; package: string } | undefined> {
+  const tailwindConfigurationPath = findTailwindConfiguration(searchDirectories);
+  if (!tailwindConfigurationPath) {
+    return undefined;
+  }
+
+  // Create a node resolver from the configuration file
+  const resolver = createRequire(tailwindConfigurationPath);
+  try {
+    return {
+      file: tailwindConfigurationPath,
+      package: resolver.resolve('tailwindcss'),
+    };
+  } catch {
+    const relativeTailwindConfigPath = relative(workspaceRoot, tailwindConfigurationPath);
+    logger?.warn(
+      `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
+        ` but the 'tailwindcss' package is not installed.` +
+        ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
+    );
+  }
+
+  return undefined;
 }
 
 async function readPostcssConfiguration(
