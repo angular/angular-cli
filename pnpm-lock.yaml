@@ -208,8 +208,8 @@ importers:
         specifier: 22.2.0-rc.0
         version: 22.2.0-rc.0(25ddf4063a130bbf19862bd16a6ab5d4)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#f166178ac5c37cd3aadab7b8cb7212f34d71b2a6
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f166178ac5c37cd3aadab7b8cb7212f34d71b2a6
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#f5de34cabca7e005dc8102d3abb026d01a7a881a
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f5de34cabca7e005dc8102d3abb026d01a7a881a
       '@angular/platform-browser':
         specifier: 22.2.0-rc.0
         version: 22.2.0-rc.0(@angular/animations@22.2.0-rc.0(@angular/core@22.2.0-rc.0(@angular/compiler@22.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.2.0-rc.0(@angular/core@22.2.0-rc.0(@angular/compiler@22.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.0-rc.0(@angular/compiler@22.2.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))
@@ -1103,9 +1103,9 @@ packages:
       '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f166178ac5c37cd3aadab7b8cb7212f34d71b2a6':
-    resolution: {gitHosted: true, integrity: sha512-5NrBeSt7Q//Qrxhy1OVNDNuGiZLdFOaIPMLtCgjypDsJc214fEI4xRKqN7zIpAQfMlZDoIFMh7vodM/uB9oq3A==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f166178ac5c37cd3aadab7b8cb7212f34d71b2a6}
-    version: 0.0.0-cde7ad16c16f5c7dbd57b62e8b930443813484ec
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f5de34cabca7e005dc8102d3abb026d01a7a881a':
+    resolution: {gitHosted: true, integrity: sha512-JEXOlRtQ50aV/E2C+PeGKYCmGHWOi6G70kiS0tTjKGAn+qrYTRQQzFSm4YB2VVYnL16s3jg8oAIwZ4pl/t9WgQ==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f5de34cabca7e005dc8102d3abb026d01a7a881a}
+    version: 0.0.0-71e60c68d9d483b0d763b8e6ed4dd9deb8da3b1a
     hasBin: true
 
   '@angular/platform-browser@22.2.0-rc.0':
@@ -3264,26 +3264,6 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
-
-  '@pnpm/crypto.hash@1000.2.2':
-    resolution: {integrity: sha512-W8pLZvXWLlGG5p0Z2nCvtBhlM6uuTcbAbsS15wlGS31jBBJKJW2udLoFeM7qfWPo7E2PqRPGxca7APpVYAjJhw==}
-    engines: {node: '>=18.12'}
-
-  '@pnpm/crypto.polyfill@1000.1.0':
-    resolution: {integrity: sha512-tNe7a6U4rCpxLMBaR0SIYTdjxGdL0Vwb3G1zY8++sPtHSvy7qd54u8CIB0Z+Y6t5tc9pNYMYCMwhE/wdSY7ltg==}
-    engines: {node: '>=18.12'}
-
-  '@pnpm/dependency-path@1001.1.10':
-    resolution: {integrity: sha512-PNImtV2SmNTDpLi4HdN86tJPmsOeIxm4VhmxgBVsMrJPEBfkNEWFcflR3wU6XVn/26g9qWdvlNHaawtCjeB93Q==}
-    engines: {node: '>=18.12'}
-
-  '@pnpm/graceful-fs@1000.1.0':
-    resolution: {integrity: sha512-EsMX4slK0qJN2AR0/AYohY5m0HQNYGMNe+jhN74O994zp22/WbX+PbkIKyw3UQn39yQm2+z6SgwklDxbeapsmQ==}
-    engines: {node: '>=18.12'}
-
-  '@pnpm/types@1001.3.0':
-    resolution: {integrity: sha512-NLTXheat/u7OEGg5M5vF6Z85zx8uKUZE0+whtX/sbFV2XL48RdnOWGPTKYuVVkv8M+launaLUTgGEXNs/ess2w==}
-    engines: {node: '>=18.12'}
 
   '@protobufjs/aspromise@1.1.2':
     resolution: {integrity: sha512-j+gKExEuLmKwvz3OgROXtrJ2UG2x8Ch2YZUxahh+s1F2HZ+wAceUNLkvy6zKCPVRkU++ZWQrdxsUeQXmcg4uoQ==}
@@ -7941,10 +7921,6 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  ssri@10.0.5:
-    resolution: {integrity: sha512-bSf16tAFkGeRlUNDjXu8FzaMQt6g2HZJrun7mtMbIPOddxt3GLMSz5VWUWcqTJUPfLEaDIepGxv+bYQW49596A==}
-    engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
-
   stack-trace@0.0.10:
     resolution: {integrity: sha512-KGzahc7puUKkzyMt+IqAep+TVNbKP+k2Lmwhub39m1AsTSkaDutx56aDCo+HLDzf/D26BIHTJWNiTG1KAJiQCg==}
 
@@ -8893,7 +8869,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f166178ac5c37cd3aadab7b8cb7212f34d71b2a6':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/f5de34cabca7e005dc8102d3abb026d01a7a881a':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 3.1.2(conventional-commits-filter@6.0.1)(conventional-commits-parser@7.1.2)
@@ -8911,7 +8887,6 @@ snapshots:
       '@octokit/request-error': 7.1.2
       '@octokit/rest': 22.0.1
       '@octokit/types': 17.0.0
-      '@pnpm/dependency-path': 1001.1.10
       '@types/cli-progress': 3.11.6
       '@types/ejs': 3.1.5
       '@types/events': 3.0.3
@@ -11286,26 +11261,6 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
-
-  '@pnpm/crypto.hash@1000.2.2':
-    dependencies:
-      '@pnpm/crypto.polyfill': 1000.1.0
-      '@pnpm/graceful-fs': 1000.1.0
-      ssri: 10.0.5
-
-  '@pnpm/crypto.polyfill@1000.1.0': {}
-
-  '@pnpm/dependency-path@1001.1.10':
-    dependencies:
-      '@pnpm/crypto.hash': 1000.2.2
-      '@pnpm/types': 1001.3.0
-      semver: 7.8.5
-
-  '@pnpm/graceful-fs@1000.1.0':
-    dependencies:
-      graceful-fs: 4.2.11
-
-  '@pnpm/types@1001.3.0': {}
 
   '@protobufjs/aspromise@1.1.2': {}
 
@@ -16451,10 +16406,6 @@ snapshots:
       jsbn: 0.1.1
       safer-buffer: 2.1.2
       tweetnacl: 0.14.5
-
-  ssri@10.0.5:
-    dependencies:
-      minipass: 7.1.3
 
   stack-trace@0.0.10: {}
 
