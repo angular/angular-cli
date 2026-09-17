@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModuleImplementation,
@@ -20,9 +21,6 @@ import {
 } from '../../command-builder/schematics-command-module';
 import { VERSION } from '../../utilities/version';
 import { RootCommands } from '../command-config';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 
 interface NewCommandArgs extends SchematicsCommandArgs {
   collection?: string;
@@ -39,7 +37,7 @@ export default class NewCommandModule
   command = 'new [name]';
   aliases = RootCommands['new'].aliases;
   describe = 'Creates a new Angular workspace.';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   override async builder(argv: Argv): Promise<Argv<NewCommandArgs>> {
     const localYargs = (await super.builder(argv)).option('collection', {

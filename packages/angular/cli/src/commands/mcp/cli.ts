@@ -35,6 +35,7 @@ For more information and documentation, visit: https://angular.dev/ai/mcp
 export default class McpCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'mcp';
   describe = false as const;
+  longDescriptionPath = undefined;
 
   builder(localYargs: Argv): Argv {
     return localYargs

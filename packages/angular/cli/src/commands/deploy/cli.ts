@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { MissingTargetChoice } from '../../command-builder/architect-base-command-module';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 
 export default class DeployCommandModule
   extends ArchitectCommandModule
@@ -39,7 +37,7 @@ export default class DeployCommandModule
 
   multiTarget = false;
   command = 'deploy [project]';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
   describe =
     'Invokes the deploy builder for a specified project or for the default project in the workspace.';
 }

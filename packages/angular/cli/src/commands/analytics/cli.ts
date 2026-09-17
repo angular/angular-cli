@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import {
   CommandModule,
@@ -17,9 +18,6 @@ import {
   demandCommandFailureMessage,
 } from '../../command-builder/utilities/command';
 import { AnalyticsInfoCommandModule } from './info/cli';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 import {
   AnalyticsDisableModule,
   AnalyticsEnableModule,
@@ -32,7 +30,7 @@ export default class AnalyticsCommandModule
 {
   command = 'analytics';
   describe = 'Configures the gathering of Angular CLI usage metrics.';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv {
     const subcommands = [
