@@ -61,19 +61,24 @@ export class SchemaValidationException extends BaseException {
     }
 
     const messages = errors.map((err) => {
-      let message = `Data path ${JSON.stringify(err.instancePath)} ${err.message}`;
-      if (err.params) {
-        switch (err.keyword) {
-          case 'additionalProperties':
-            message += `(${err.params.additionalProperty})`;
-            break;
+      if (err.keyword === 'additionalProperties') {
+        const unknown = err.params?.additionalProperty;
+        // `parentSchema` is the schema that rejected the property, which ajv only attaches when
+        // the validator was created with `verbose: true`. A schema that declares no `properties`
+        // of its own, such as one using only `patternProperties`, has no options to offer.
+        const known = Object.keys(err.parentSchema?.properties ?? {});
 
-          case 'enum':
-            message += `. Allowed values are: ${(err.params.allowedValues as string[] | undefined)
-              ?.map((v) => `"${v}"`)
-              .join(', ')}`;
-            break;
-        }
+        return (
+          `Unknown option "${unknown}"${err.instancePath ? ` at "${err.instancePath}"` : ''}.` +
+          (known.length ? ` Valid options are: ${known.join(', ')}.` : '')
+        );
+      }
+
+      let message = `Data path ${JSON.stringify(err.instancePath)} ${err.message}`;
+      if (err.keyword === 'enum' && err.params) {
+        message += `. Allowed values are: ${(err.params.allowedValues as string[] | undefined)
+          ?.map((v) => `"${v}"`)
+          .join(', ')}`;
       }
 
       return message + '.';
@@ -106,6 +111,8 @@ export class CoreSchemaRegistry implements SchemaRegistry {
       strict: false,
       loadSchema: (uri: string) => this._fetch(uri),
       passContext: true,
+      // Needed to list the valid options of the object an unknown option was found in.
+      verbose: true,
     });
 
     ajvAddFormats(this._ajv);
