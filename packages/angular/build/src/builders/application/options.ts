@@ -9,7 +9,6 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import type { Plugin } from 'esbuild';
 import { access, constants, readFile } from 'node:fs/promises';
-import { createRequire } from 'node:module';
 import path from 'node:path';
 import { normalizeAssetPatterns, normalizeOptimization, normalizeSourceMaps } from '../../utils';
 import { supportColor } from '../../utils/color';
@@ -19,9 +18,8 @@ import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator'
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { canonicalizePath } from '../../utils/path';
 import {
-  SearchDirectory,
-  findTailwindConfiguration,
   generateSearchDirectories,
+  getTailwindConfig,
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
 import { getProjectRootPaths, normalizeDirectoryPath } from '../../utils/project-metadata';
@@ -280,7 +278,7 @@ export async function normalizeOptions(
   // Skip tailwind configuration if postcss is customized
   const tailwindConfiguration = postcssConfiguration
     ? undefined
-    : await getTailwindConfig(searchDirectories, workspaceRoot, context);
+    : await getTailwindConfig(searchDirectories, workspaceRoot, context.logger);
 
   let serverEntryPoint: string | undefined;
   if (typeof options.server === 'string') {
@@ -536,36 +534,6 @@ export async function normalizeOptions(
     customConditions: options.conditions,
     frameworkVersion: await findFrameworkVersion(projectRoot),
   };
-}
-
-async function getTailwindConfig(
-  searchDirectories: SearchDirectory[],
-  workspaceRoot: string,
-  context: BuilderContext,
-): Promise<{ file: string; package: string } | undefined> {
-  const tailwindConfigurationPath = findTailwindConfiguration(searchDirectories);
-
-  if (!tailwindConfigurationPath) {
-    return undefined;
-  }
-
-  // Create a node resolver from the configuration file
-  const resolver = createRequire(tailwindConfigurationPath);
-  try {
-    return {
-      file: tailwindConfigurationPath,
-      package: resolver.resolve('tailwindcss'),
-    };
-  } catch {
-    const relativeTailwindConfigPath = path.relative(workspaceRoot, tailwindConfigurationPath);
-    context.logger.warn(
-      `Tailwind CSS configuration file found (${relativeTailwindConfigPath})` +
-        ` but the 'tailwindcss' package is not installed.` +
-        ` To enable Tailwind CSS, please install the 'tailwindcss' package.`,
-    );
-  }
-
-  return undefined;
 }
 
 /**

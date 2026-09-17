@@ -31,6 +31,7 @@ import type { Loader, OnLoadResult, PartialMessage } from 'esbuild';
 import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mapConcurrent, runConcurrent } from '../../utils/concurrency';
 import { calculateHash, createContentHash } from '../../utils/hash';
 import type { Cache as PersistentCacheStore } from './cache';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
@@ -115,29 +116,6 @@ export function extractDiskFilePath(path: string): string | undefined {
 const MAX_CONCURRENT_READS = 16;
 
 /**
- * Maps an array asynchronously with a sliding worker pool to maintain full concurrency saturation.
- */
-async function mapConcurrent<T, R>(
-  items: T[],
-  limit: number,
-  fn: (item: T) => Promise<R>,
-): Promise<R[]> {
-  const results: R[] = new Array(items.length);
-  let index = 0;
-
-  const workers = Array.from({ length: Math.min(limit, items.length) }, async () => {
-    while (index < items.length) {
-      const i = index++;
-      results[i] = await fn(items[i]);
-    }
-  });
-
-  await Promise.all(workers);
-
-  return results;
-}
-
-/**
  * Validates that all imported watch files exist on disk and their contents match.
  * Performs a fast-path metadata check (mtime + size) first, falling back to content hashing.
  * Heals/updates the cached metadata on disk if the content hash was valid but the metadata changed.
@@ -214,7 +192,7 @@ async function computeMetadataForWatchFiles(
 ): Promise<Record<string, CachedDependencyMetadata>> {
   const watchFilesMetadata: Record<string, CachedDependencyMetadata> = {};
 
-  await mapConcurrent(watchFiles, MAX_CONCURRENT_READS, async (filePath) => {
+  await runConcurrent(watchFiles, MAX_CONCURRENT_READS, async (filePath) => {
     try {
       const knownContent = knownContents?.get(filePath);
       const [content, stats] = await Promise.all([

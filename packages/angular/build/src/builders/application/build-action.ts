@@ -7,8 +7,6 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
-import { existsSync } from 'node:fs';
-import path from 'node:path';
 import {
   BuildOutputAsset,
   ExecutionResult,
@@ -21,10 +19,8 @@ import {
 } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { ChangedFiles } from '../../tools/esbuild/watcher';
-import { shouldWatchRoot } from '../../utils/environment-options';
 import { initializeHash } from '../../utils/hash';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
-import { toPosixPath } from '../../utils/path';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
 import {
   ComponentUpdateResult,
@@ -34,20 +30,6 @@ import {
   ResultKind,
   ResultMessage,
 } from './results';
-
-// Watch workspace for package manager changes
-const packageWatchFiles = [
-  // manifest can affect module resolution
-  'package.json',
-  // npm lock file
-  'package-lock.json',
-  // pnpm lock file
-  'pnpm-lock.yaml',
-  // yarn lock file including Yarn PnP manifest files (https://yarnpkg.com/advanced/pnp-spec/)
-  'yarn.lock',
-  '.pnp.cjs',
-  '.pnp.data.json',
-];
 
 // eslint-disable-next-line max-lines-per-function
 export async function* runEsBuildBuildAction(
@@ -115,55 +97,18 @@ export async function* runEsBuildBuildAction(
         logger.info('Watch mode enabled. Watching for file changes...');
       }
 
-      const normalizedOutputBase = toPosixPath(outputOptions.base);
-      const normalizedCacheBase = toPosixPath(cacheOptions.basePath);
-      const ignored: string[] = [
-        // Ignore the output and cache paths to avoid infinite rebuild cycles
-        normalizedOutputBase,
-        `${normalizedOutputBase}/**`,
-        normalizedCacheBase,
-        `${normalizedCacheBase}/**`,
-        `${toPosixPath(workspaceRoot)}/**/.*/**`,
-      ];
-
-      if (cacheOptions.localBasePath && cacheOptions.localBasePath !== cacheOptions.basePath) {
-        const normalizedLocalCacheBase = toPosixPath(cacheOptions.localBasePath);
-        ignored.push(normalizedLocalCacheBase, `${normalizedLocalCacheBase}/**`);
-      }
-
       // Setup a watcher
-      const { createWatcher } = await import('../../tools/esbuild/watcher');
-      watcher = await createWatcher({
-        polling: typeof poll === 'number',
-        interval: poll,
-        followSymlinks: preserveSymlinks,
-        ignored,
-        cwd: workspaceRoot,
+      const { setupWatcher } = await import('../../tools/esbuild/watcher');
+      watcher = await setupWatcher({
+        workspaceRoot,
+        projectRoot,
+        outputPath: outputOptions.base,
+        cacheOptions,
+        poll,
+        preserveSymlinks,
+        signal: options.signal,
+        watchFiles: result.watchFiles,
       });
-
-      // Setup abort support
-      options.signal?.addEventListener('abort', () => void watcher?.close());
-
-      // Watch the entire project root if 'NG_BUILD_WATCH_ROOT' environment variable is set
-      if (shouldWatchRoot) {
-        if (!preserveSymlinks) {
-          // Ignore all node modules directories to avoid excessive file watchers.
-          // Package changes are handled below by watching manifest and lock files.
-          // NOTE: this is not enable when preserveSymlinks is true as this would break `npm link` usages.
-          ignored.push('**/node_modules/**');
-
-          watcher.add(
-            packageWatchFiles
-              .map((file) => path.join(workspaceRoot, file))
-              .filter((file) => existsSync(file)),
-          );
-        }
-
-        watcher.add(projectRoot);
-      }
-
-      // Watch locations provided by the initial build result
-      watcher.add(result.watchFiles);
     }
 
     // Output the first build results after setting up the watcher to ensure that any code executed

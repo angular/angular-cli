@@ -16,6 +16,7 @@ import {
   createWatcher,
   getDirectoryPath,
   isPathInside,
+  setupWatcher,
   toPosixPathNormalized,
 } from './watcher';
 
@@ -114,6 +115,56 @@ describe('Watcher', () => {
         modified: ['/src/main.ts'],
         removed: [],
       });
+    });
+  });
+
+  describe('setupWatcher', () => {
+    let tempDir: string;
+
+    beforeEach(() => {
+      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'setup-watcher-spec-')));
+    });
+
+    afterEach(() => {
+      if (fs.existsSync(tempDir)) {
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should setup watcher with watchFiles and close on abort signal', async () => {
+      const abortController = new AbortController();
+      const testFile = path.join(tempDir, 'main.ts');
+      const watcher = await setupWatcher({
+        workspaceRoot: tempDir,
+        projectRoot: tempDir,
+        outputPath: path.join(tempDir, 'dist'),
+        cacheOptions: { basePath: path.join(tempDir, '.cache') },
+        watchFiles: [testFile],
+        signal: abortController.signal,
+      });
+
+      expect(watcher).toBeDefined();
+
+      const closeSpy = spyOn(watcher, 'close').and.callThrough();
+      abortController.abort();
+
+      expect(closeSpy).toHaveBeenCalled();
+      await watcher.close();
+    });
+
+    it('should remove abort listener when watcher is closed', async () => {
+      const abortController = new AbortController();
+      const removeSpy = spyOn(abortController.signal, 'removeEventListener').and.callThrough();
+      const watcher = await setupWatcher({
+        workspaceRoot: tempDir,
+        projectRoot: tempDir,
+        outputPath: path.join(tempDir, 'dist'),
+        cacheOptions: { basePath: path.join(tempDir, '.cache') },
+        signal: abortController.signal,
+      });
+
+      await watcher.close();
+      expect(removeSpy).toHaveBeenCalledWith('abort', jasmine.any(Function));
     });
   });
 

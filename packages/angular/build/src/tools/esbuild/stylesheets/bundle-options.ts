@@ -22,6 +22,7 @@ export interface BundleStylesheetOptions {
   workspaceRoot: string;
   optimization: boolean;
   inlineFonts: boolean;
+  dataurl?: boolean;
   preserveSymlinks?: boolean;
   sourcemap: boolean | 'external' | 'inline' | 'linked';
   sourcesContent?: boolean;
@@ -62,7 +63,7 @@ export function createStylesheetBundleOptions(
     pluginFactory.create(SassStylesheetLanguage),
     pluginFactory.create(LessStylesheetLanguage),
     pluginFactory.create(CssStylesheetLanguage),
-    createCssResourcePlugin(cache),
+    createCssResourcePlugin(cache, options.dataurl),
   ];
 
   if (options.inlineFonts) {
