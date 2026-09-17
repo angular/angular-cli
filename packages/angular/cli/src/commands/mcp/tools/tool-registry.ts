@@ -21,7 +21,6 @@ export interface McpToolContext {
   server: McpServer;
   workspace?: AngularWorkspace;
   logger: { warn(text: string): void };
-  exampleDatabasePath?: string;
   devservers: Map<string, Devserver>;
   host: Host;
   roots?: string[];

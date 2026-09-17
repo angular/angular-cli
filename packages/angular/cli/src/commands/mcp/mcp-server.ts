@@ -7,7 +7,7 @@
  */
 
 import { McpServer } from '@modelcontextprotocol/server';
-import { join, normalize, resolve } from 'node:path';
+import { normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AngularWorkspace } from '../../utilities/config';
 import { VERSION } from '../../utilities/version';
@@ -166,7 +166,6 @@ for equivalent actions.
     {
       workspace: options.workspace,
       logger,
-      exampleDatabasePath: join(__dirname, '../../../lib/code-examples.db'),
       devservers: new Map<string, Devserver>(),
       host: restrictedHost,
       roots: resolvedRoots,
