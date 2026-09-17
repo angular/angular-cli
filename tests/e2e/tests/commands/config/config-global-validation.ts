@@ -9,21 +9,15 @@ export default async function () {
   let ngError: Error;
 
   ngError = await expectToFail(() => silentNg('config', 'cli.completion.prompted', 'true'));
-  assert.match(
-    ngError.message,
-    /Data path "\/cli" must NOT have additional properties\(completion\)\./,
-  );
+  assert.match(ngError.message, /Unknown option "completion" at "\/cli"\./);
 
   ngError = await expectToFail(() =>
     silentNg('config', '--global', 'cli.completion.invalid', 'true'),
   );
-  assert.match(
-    ngError.message,
-    /Data path "\/cli\/completion" must NOT have additional properties\(invalid\)\./,
-  );
+  assert.match(ngError.message, /Unknown option "invalid" at "\/cli\/completion"\./);
 
   ngError = await expectToFail(() => silentNg('config', '--global', 'cli.cache.enabled', 'true'));
-  assert.match(ngError.message, /Data path "\/cli" must NOT have additional properties\(cache\)\./);
+  assert.match(ngError.message, /Unknown option "cache" at "\/cli"\./);
 
   ngError = await expectToFail(() => silentNg('config', 'cli.completion.prompted'));
   assert.match(ngError.message, /Value cannot be found\./);
