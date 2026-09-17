@@ -751,8 +751,8 @@ importers:
         specifier: 4.1.3
         version: 4.1.3
       autoprefixer:
-        specifier: 10.6.0
-        version: 10.6.0(postcss@8.5.28)
+        specifier: 10.6.1
+        version: 10.6.1(postcss@8.5.28)
       babel-loader:
         specifier: 10.1.1
         version: 10.1.1(@babel/core@8.0.5)(webpack@5.111.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
@@ -4365,8 +4365,8 @@ packages:
     resolution: {integrity: sha512-kNOjDqAh7px0XWNI+4QbzoiR/nTkHAWNud2uvnJquD1/x5a7EQZMJT0AczqK0Qn67oY/TTQ1LbUKajZpp3I9tQ==}
     engines: {node: '>=8.0.0'}
 
-  autoprefixer@10.6.0:
-    resolution: {integrity: sha512-A26d6qs9kqGgkmImIXMYvXTzqb4Qv7AVgpY1NXzr9Y659J8qHHnLOO/zE8ewIGFMprOolAoRAQYDgNryXIJKBw==}
+  autoprefixer@10.6.1:
+    resolution: {integrity: sha512-cL1Qz6ADZhcEbny/8HPfe99J6HhNoYtpX2LFLIbhgGE7Q1hlQVkYFdetDN7Id3KiQxhDrHwzlHr/YQCnZ8+xSA==}
     engines: {node: ^10 || ^12 || >=14}
     hasBin: true
     peerDependencies:
@@ -12385,7 +12385,7 @@ snapshots:
 
   atomic-sleep@1.0.0: {}
 
-  autoprefixer@10.6.0(postcss@8.5.28):
+  autoprefixer@10.6.1(postcss@8.5.28):
     dependencies:
       browserslist: 4.28.9
       caniuse-lite: 1.0.30001810
