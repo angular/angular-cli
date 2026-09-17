@@ -24,9 +24,6 @@ import type { InstalledPackage, PackageManager, PackageManifest } from '../../pa
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 import {
   UpdatePlan,
   applyUpdatePlan,
@@ -66,7 +63,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
   command = 'update [packages..]';
   describe = 'Updates your workspace and its dependencies. See https://update.angular.dev/.';
-  override longDescription = longDescription;
+  longDescriptionPath = path.join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv<UpdateCommandArgs> {
     return localYargs

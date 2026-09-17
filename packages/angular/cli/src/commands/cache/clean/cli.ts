@@ -18,6 +18,7 @@ import { getCacheConfig } from '../utilities';
 export class CacheCleanModule extends CommandModule implements CommandModuleImplementation {
   command = 'clean';
   describe = 'Deletes persistent disk cache from disk.';
+  longDescriptionPath: string | undefined;
   override scope = CommandScope.In;
 
   builder(localYargs: Argv): Argv {

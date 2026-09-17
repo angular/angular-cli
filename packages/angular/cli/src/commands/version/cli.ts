@@ -37,6 +37,7 @@ export default class VersionCommandModule
   command = 'version';
   aliases = RootCommands['version'].aliases;
   describe = 'Outputs Angular CLI version.';
+  longDescriptionPath?: string | undefined;
 
   /**
    * Builds the command-line options for the `ng version` command.

@@ -6,12 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { ArchitectCommandModule } from '../../command-builder/architect-command-module';
 import { CommandModuleImplementation } from '../../command-builder/command-module';
 import { RootCommands } from '../command-config';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 
 export default class TestCommandModule
   extends ArchitectCommandModule
@@ -21,5 +19,5 @@ export default class TestCommandModule
   command = 'test [project]';
   aliases = RootCommands['test'].aliases;
   describe = 'Runs unit tests in a project.';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 }

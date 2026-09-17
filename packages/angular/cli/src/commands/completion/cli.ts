@@ -6,15 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import { CommandModule, CommandModuleImplementation } from '../../command-builder/command-module';
 import { addCommandModuleToYargs } from '../../command-builder/utilities/command';
 import { colors } from '../../utilities/color';
 import { hasGlobalCliInstall, initializeAutocomplete } from '../../utilities/completion';
 import { assertIsError } from '../../utilities/error';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 
 export default class CompletionCommandModule
   extends CommandModule
@@ -22,7 +20,7 @@ export default class CompletionCommandModule
 {
   command = 'completion';
   describe = 'Set up Angular CLI autocompletion for your terminal.';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   builder(localYargs: Argv): Argv {
     addCommandModuleToYargs(CompletionScriptCommandModule, this.context);
@@ -66,6 +64,7 @@ Appended \`source <(ng completion script)\` to \`${rcFile}\`. Restart your termi
 class CompletionScriptCommandModule extends CommandModule implements CommandModuleImplementation {
   command = 'script';
   describe = 'Generate a bash and zsh real-time type-ahead autocompletion script.';
+  longDescriptionPath = undefined;
 
   builder(localYargs: Argv): Argv {
     return localYargs;

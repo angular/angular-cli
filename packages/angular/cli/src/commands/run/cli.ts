@@ -7,6 +7,7 @@
  */
 
 import { Target } from '@angular-devkit/architect';
+import { join } from 'node:path';
 import { Argv } from 'yargs';
 import { ArchitectBaseCommandModule } from '../../command-builder/architect-base-command-module';
 import {
@@ -16,9 +17,6 @@ import {
   Options,
   OtherOptions,
 } from '../../command-builder/command-module';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
-import longDescription from './long-description.md';
 
 export interface RunCommandArgs {
   target: string;
@@ -33,7 +31,7 @@ export default class RunCommandModule
   command = 'run <target>';
   describe =
     'Runs an Architect target with an optional custom builder configuration defined in your project.';
-  override longDescription = longDescription;
+  longDescriptionPath = join(__dirname, 'long-description.md');
 
   async builder(argv: Argv): Promise<Argv<RunCommandArgs>> {
     const { jsonHelp, getYargsCompletions, help } = this.context.args.options;
