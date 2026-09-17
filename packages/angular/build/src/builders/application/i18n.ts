@@ -17,7 +17,7 @@ import {
 } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-files';
 import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
-import { maxWorkers } from '../../utils/environment-options';
+import { maxInlinerWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
 import { createProjectResolver } from '../../utils/resolve-project';
@@ -51,7 +51,9 @@ export async function inlineI18n(
   const inliner = new I18nInliner(
     {
       missingTranslation: i18nOptions.missingTranslationBehavior ?? 'warning',
-      maxConcurrency: workerPool ? undefined : maxWorkers,
+      maxConcurrency: workerPool
+        ? Math.min(workerPool.maxThreads, maxInlinerWorkers)
+        : maxInlinerWorkers,
       persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
       localizeVersion: i18nOptions.localizeVersion,
     },

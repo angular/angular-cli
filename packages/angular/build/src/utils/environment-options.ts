@@ -142,6 +142,15 @@ export const maxTransformWorkers =
   customMaxWorkers ?? Math.max(1, Math.min(6, Math.floor(availableParallelism() / 4)));
 
 /**
+ * The maximum number of workers to use for i18n translation inlining.
+ * Translation inlining and sourcemap remapping are CPU- and memory-intensive operations.
+ * To prevent thread oversubscription, memory allocator lock contention, and high-core
+ * performance degradation, concurrency is capped at 8 unless overridden by
+ * `NG_BUILD_MAX_WORKERS`.
+ */
+export const maxInlinerWorkers = customMaxWorkers ?? Math.min(8, availableParallelism());
+
+/**
  * When `NG_BUILD_PARALLEL_TS` is set to `0` or `false`, parallel TypeScript compilation is disabled.
  */
 export const useParallelTs = parseTristate(process.env['NG_BUILD_PARALLEL_TS']) !== false;
