@@ -181,3 +181,67 @@ describe('environment options - maxTransformWorkers', () => {
     expect(maxTransformWorkers).toBe(expected);
   });
 });
+
+describe('environment options - maxInlinerWorkers', () => {
+  const originalEnvValue = process.env['NG_BUILD_MAX_WORKERS'];
+
+  function loadEnvironmentOptions(): typeof import('./environment-options') {
+    delete require.cache[require.resolve('./environment-options')];
+
+    return require('./environment-options');
+  }
+
+  afterEach(() => {
+    if (originalEnvValue !== undefined) {
+      process.env['NG_BUILD_MAX_WORKERS'] = originalEnvValue;
+    } else {
+      delete process.env['NG_BUILD_MAX_WORKERS'];
+    }
+    delete require.cache[require.resolve('./environment-options')];
+  });
+
+  it('defaults maxInlinerWorkers to min(8, availableParallelism()) when NG_BUILD_MAX_WORKERS is unset', () => {
+    delete process.env['NG_BUILD_MAX_WORKERS'];
+    const { maxInlinerWorkers } = loadEnvironmentOptions();
+
+    expect(maxInlinerWorkers).toBe(Math.min(8, availableParallelism()));
+  });
+
+  it('uses configured positive integer when NG_BUILD_MAX_WORKERS is set', () => {
+    process.env['NG_BUILD_MAX_WORKERS'] = '4';
+    const { maxInlinerWorkers } = loadEnvironmentOptions();
+
+    expect(maxInlinerWorkers).toBe(4);
+  });
+
+  it('allows maxInlinerWorkers greater than 8 when explicitly configured', () => {
+    process.env['NG_BUILD_MAX_WORKERS'] = '16';
+    const { maxInlinerWorkers } = loadEnvironmentOptions();
+
+    expect(maxInlinerWorkers).toBe(16);
+  });
+
+  it('supports maxInlinerWorkers set to 1', () => {
+    process.env['NG_BUILD_MAX_WORKERS'] = '1';
+    const { maxInlinerWorkers } = loadEnvironmentOptions();
+
+    expect(maxInlinerWorkers).toBe(1);
+  });
+
+  it('falls back to min(8, availableParallelism()) when NG_BUILD_MAX_WORKERS is 0 or negative', () => {
+    process.env['NG_BUILD_MAX_WORKERS'] = '0';
+    const { maxInlinerWorkers: zeroWorkers } = loadEnvironmentOptions();
+    expect(zeroWorkers).toBe(Math.min(8, availableParallelism()));
+
+    process.env['NG_BUILD_MAX_WORKERS'] = '-4';
+    const { maxInlinerWorkers: negativeWorkers } = loadEnvironmentOptions();
+    expect(negativeWorkers).toBe(Math.min(8, availableParallelism()));
+  });
+
+  it('falls back to min(8, availableParallelism()) when NG_BUILD_MAX_WORKERS is invalid', () => {
+    process.env['NG_BUILD_MAX_WORKERS'] = 'invalid';
+    const { maxInlinerWorkers } = loadEnvironmentOptions();
+
+    expect(maxInlinerWorkers).toBe(Math.min(8, availableParallelism()));
+  });
+});
