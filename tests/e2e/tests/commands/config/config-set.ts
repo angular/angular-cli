@@ -6,10 +6,7 @@ export default async function () {
   let ngError: Error;
 
   ngError = await expectToFail(() => silentNg('config', 'cli.warnings.zzzz', 'true'));
-  assert.match(
-    ngError.message,
-    /Data path "\/cli\/warnings" must NOT have additional properties\(zzzz\)\./,
-  );
+  assert.match(ngError.message, /Unknown option "zzzz" at "\/cli\/warnings"\./);
 
   ngError = await expectToFail(() => silentNg('config', 'cli.warnings.zzzz'));
   assert.match(ngError.message, /Value cannot be found\./);

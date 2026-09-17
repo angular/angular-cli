@@ -7,8 +7,10 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { JsonValue } from '../utils';
 import { SchemaFormat } from './interface';
 import { CoreSchemaRegistry, SchemaValidationException } from './registry';
+import { JsonSchema } from './schema';
 import { addUndefinedDefaults } from './transforms';
 
 describe('CoreSchemaRegistry', () => {
@@ -339,5 +341,94 @@ describe('CoreSchemaRegistry', () => {
     expect(deprecatedMessages[0]).toBe('Option "foo" is deprecated: Use bar instead.');
     expect(deprecatedMessages[1]).toBe('Option "bar" is deprecated.');
     expect(result.success).toBe(true, result.errors);
+  });
+
+  describe('error messages', () => {
+    async function messagesFor(schema: JsonSchema, data: JsonValue): Promise<string[]> {
+      const registry = new CoreSchemaRegistry();
+      const validator = await registry.compile(schema);
+      const result = await validator(data);
+      expect(result.success).toBe(false);
+
+      return SchemaValidationException.createMessages(result.errors);
+    }
+
+    it('names an unknown option and the options that are valid there', async () => {
+      const messages = await messagesFor(
+        {
+          properties: { version: { type: 'number' }, projects: { type: 'object' } },
+          additionalProperties: false,
+        },
+        { allowedCommonJsDependencies: [] },
+      );
+
+      expect(messages).toEqual([
+        'Unknown option "allowedCommonJsDependencies". Valid options are: version, projects.',
+      ]);
+    });
+
+    it('points at the object an unknown option was found in', async () => {
+      const messages = await messagesFor(
+        {
+          properties: {
+            cli: {
+              type: 'object',
+              properties: { cache: { type: 'object' }, packageManager: { type: 'string' } },
+              additionalProperties: false,
+            },
+          },
+        },
+        { cli: { completion: true } },
+      );
+
+      expect(messages).toEqual([
+        'Unknown option "completion" at "/cli". Valid options are: cache, packageManager.',
+      ]);
+    });
+
+    it('looks through a $ref for the valid options', async () => {
+      const messages = await messagesFor(
+        {
+          $ref: '#/definitions/global',
+          definitions: {
+            global: {
+              type: 'object',
+              properties: { cli: { type: 'object' }, schematics: { type: 'object' } },
+              additionalProperties: false,
+            },
+          },
+        },
+        { version: 1 },
+      );
+
+      expect(messages).toEqual(['Unknown option "version". Valid options are: cli, schematics.']);
+    });
+
+    it('omits the valid options when the schema does not list any', async () => {
+      const messages = await messagesFor(
+        {
+          $ref: '#/definitions/cli',
+          definitions: {
+            cli: {
+              type: 'object',
+              patternProperties: { '^x-': { type: 'string' } },
+              additionalProperties: false,
+            },
+          },
+        },
+        { completion: true },
+      );
+
+      expect(messages).toEqual(['Unknown option "completion".']);
+    });
+
+    it('leaves an error that is not about an unknown option alone', async () => {
+      const messages = await messagesFor(
+        { properties: { outputPath: { type: 'string' } } },
+        { outputPath: 42 },
+      );
+
+      expect(messages).toEqual(['Data path "/outputPath" must be string.']);
+    });
   });
 });
