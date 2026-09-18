@@ -63,9 +63,9 @@ export default async function (args: CreateOptions, cwd: string): Promise<number
 
   try {
     await _exec(
-      'npx',
+      'pnpm',
       [
-        '--yes',
+        'dlx',
         pathToFileURL(newTarballName).toString(),
         'new',
         projectName,
