@@ -110,5 +110,42 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should load Zone and Zone testing support when testing a library using @angular/build:library and zone.js is installed', async () => {
+      harness.withBuilderTarget(
+        'build',
+        async () => ({ success: true }),
+        {
+          tsConfig: 'src/tsconfig.lib.json',
+          entryPoints: {
+            '.': 'src/public-api.ts',
+          },
+        },
+        {
+          builderName: '@angular/build:library',
+        },
+      );
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        include: ['src/app.component.spec.ts'],
+      });
+
+      await harness.writeFile(
+        'src/app.component.spec.ts',
+        `
+        import { describe, it, expect } from 'vitest';
+
+        describe('Library Zone Test', () => {
+          it('should have Zone defined', () => {
+            expect((globalThis as any).Zone).toBeDefined();
+          });
+        });
+      `,
+      );
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });
