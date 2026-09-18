@@ -158,7 +158,10 @@ export async function* runEsBuildBuildAction(
       // Clear removed files from current watch files
       changes.removed.forEach((removedPath) => currentWatchFiles.delete(removedPath));
 
-      resetSassWorkerPoolCaches();
+      const hasSassChanges = changes.all.some((f) => /\.(scss|sass|css)$/i.test(f));
+      if (hasSassChanges) {
+        resetSassWorkerPoolCaches();
+      }
 
       const rebuildState = result.createRebuildState(changes);
       result = await withProgress('Changes detected. Rebuilding...', () => action(rebuildState));
