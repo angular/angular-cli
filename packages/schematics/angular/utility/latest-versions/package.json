@@ -5,7 +5,7 @@
   "dependencies": {
     "@types/express": "^5.0.1",
     "@types/jasmine": "~6.0.0",
-    "@types/node": "^20.17.19",
+    "@types/node": "^22.12.0",
     "browser-sync": "^3.0.0",
     "express": "^5.1.0",
     "istanbul-lib-instrument": "^6.0.3",
