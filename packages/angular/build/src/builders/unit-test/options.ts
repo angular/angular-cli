@@ -145,6 +145,7 @@ export async function normalizeOptions(
     outputFile: options.outputFile,
     browsers: browsers?.length ? browsers : undefined,
     browserViewport: width && height ? { width, height } : undefined,
+    connectOptions: options.connectOptions,
     watch,
     debug: options.debug ?? false,
     ui: process.env['CI'] ? false : ui,

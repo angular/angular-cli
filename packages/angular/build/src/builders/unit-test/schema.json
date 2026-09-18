@@ -37,6 +37,38 @@
       "type": "string",
       "pattern": "^\\d+x\\d+$"
     },
+    "connectOptions": {
+      "type": "object",
+      "description": "Options for connecting to an existing, remote, or preconfigured Playwright browser server. These are passed directly to the Playwright browser provider's `connectOptions`. This only applies when running browser-based tests with the Playwright provider and is useful for running tests against a consistent, shared browser environment (e.g., for stable visual regression testing across different operating systems).",
+      "properties": {
+        "wsEndpoint": {
+          "type": "string",
+          "description": "A browser WebSocket endpoint to connect to.",
+          "minLength": 1
+        },
+        "exposeNetwork": {
+          "type": "string",
+          "description": "A rule to expose the network available on the connecting client to the browser being connected to. For example, `*` exposes all addresses, or a comma-separated list of rules can be provided."
+        },
+        "headers": {
+          "type": "object",
+          "description": "Additional HTTP headers to be sent with the connection request.",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "timeout": {
+          "type": "number",
+          "description": "Maximum time in milliseconds to wait for the connection to be established. Defaults to `0` (no timeout)."
+        },
+        "slowMo": {
+          "type": "number",
+          "description": "Slows down Playwright operations by the specified number of milliseconds."
+        }
+      },
+      "required": ["wsEndpoint"],
+      "additionalProperties": true
+    },
     "include": {
       "type": "array",
       "items": {
