@@ -128,6 +128,34 @@ describe('ServerRouter', () => {
       });
     });
 
+    it('should select the same route the client router will render', () => {
+      // `@angular/router` resolves each of these to `/home`, because `(`, `)`, `;`
+      // and `//` are metacharacters in its URL grammar. Server route matching has to
+      // agree, or the response's headers, status and renderMode are taken from a
+      // different route than the one that renders into the body.
+      const home = {
+        route: '/home',
+        renderMode: RenderMode.Server,
+      };
+
+      for (const pathname of ['/home)', '/home(', '/home;', '/(home)']) {
+        expect(router.match(new URL(`http://localhost${pathname}`)))
+          .withContext(pathname)
+          .toEqual(home);
+      }
+
+      // An interior `//` ends the path for the client router, so `/user/123//x`
+      // renders the `/user/:id` route and must match its server config too.
+      expect(router.match(new URL('http://localhost/user/123//x'))).toEqual({
+        route: '/user/*',
+        renderMode: RenderMode.Server,
+      });
+    });
+
+    it('should not invent a match for an unknown route', () => {
+      expect(router.match(new URL('http://localhost/nope'))).toBeUndefined();
+    });
+
     it('should handle encoded params', () => {
       const encodedUserMetadata = router.match(
         new URL('http://localhost/user/Bob%20%2F%20Roberts'),
