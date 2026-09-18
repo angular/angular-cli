@@ -665,13 +665,13 @@ async function createChokidarWatcher(
     interval: options?.interval,
   });
 
+  const initTime = Date.now();
+
   // Wait for the watcher to complete its initial filesystem scan before returning.
   // With `ignoreInitial: true`, any file visited during the initial scan is treated as the initial baseline
   // and will not emit 'add' or 'change' events. Awaiting 'ready' ensures that rapid file modifications
   // made right after watcher setup (e.g. in rebuild tests) are not swallowed as initial files.
   await once(watcher, 'ready');
-
-  const initTime = Date.now();
 
   const handleEvent = (type: 'added' | 'modified' | 'removed', rawPath: string) => {
     const posixPath = toPosixPathNormalized(rawPath);
