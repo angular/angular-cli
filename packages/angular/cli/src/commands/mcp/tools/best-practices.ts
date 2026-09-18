@@ -17,9 +17,12 @@
 
 import { readFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { z } from 'zod';
 import { VERSION } from '../../../utilities/version';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
+import bundledBestPractices from '../resources/best-practices.md';
 import { isAllowedWorkspacePath } from '../workspace-utils';
 import { type McpToolContext, declareTool } from './tool-registry';
 
@@ -58,15 +61,6 @@ that must be followed for any task involving the creation, analysis, or modifica
   isLocalOnly: true,
   factory: createBestPracticesHandler,
 });
-
-/**
- * Retrieves the content of the generic best practices guide that is bundled with the CLI.
- * This serves as a fallback when a version-specific guide cannot be found.
- * @returns A promise that resolves to the string content of the bundled markdown file.
- */
-async function getBundledBestPractices(): Promise<string> {
-  return readFile(join(__dirname, '../resources/best-practices.md'), 'utf-8');
-}
 
 /**
  * Attempts to find and read a version-specific best practices guide from the user's installed
@@ -200,8 +194,6 @@ async function getVersionSpecificBestPractices(
  * @returns An async function that serves as the tool's executor.
  */
 function createBestPracticesHandler({ logger, server }: McpToolContext) {
-  let bundledBestPractices: Promise<string>;
-
   return async (input: BestPracticesInput) => {
     let content: string | undefined;
     let source: string | undefined;
@@ -221,7 +213,7 @@ function createBestPracticesHandler({ logger, server }: McpToolContext) {
 
     // If the version-specific guide was not found for any reason, fall back to the bundled version.
     if (content === undefined) {
-      content = await (bundledBestPractices ??= getBundledBestPractices());
+      content = bundledBestPractices;
       source = `bundled (CLI v${VERSION.full})`;
     }
 

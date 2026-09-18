@@ -73,7 +73,7 @@ export class SchematicEngineHost extends NodeModulesEngineHost {
     // Mimic behavior of ExportStringRef class used in default behavior
     const fullPath = path[0] === '.' ? resolve(parentPath ?? process.cwd(), path) : path;
 
-    const referenceRequire = createRequire(__filename);
+    const referenceRequire = createRequire(import.meta.url);
     const schematicFile = referenceRequire.resolve(fullPath, { paths: [parentPath] });
 
     if (shouldWrapSchematic(schematicFile, collectionDescription?.encapsulation)) {
@@ -139,7 +139,7 @@ function wrap(
   moduleCache: Map<string, unknown>,
   exportName?: string,
 ): () => unknown {
-  const hostRequire = createRequire(__filename);
+  const hostRequire = createRequire(import.meta.url);
   const schematicRequire = createRequire(schematicFile);
 
   const customRequire = function (id: string) {

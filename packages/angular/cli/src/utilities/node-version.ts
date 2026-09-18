@@ -11,45 +11,13 @@
  * @important This file must not import any other modules.
  */
 
-/**
- * The supported Node.js version for the Angular CLI.
- */
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: #version is a subpath import mapped to bin/version.js
+import { SUPPORTED_NODE_VERSIONS, supportedNodeVersions } from '#version';
 
-const SUPPORTED_NODE_VERSIONS = '0.0.0-ENGINES-NODE';
-
-/**
- * The supported Node.js versions.
- */
-export const supportedNodeVersions = SUPPORTED_NODE_VERSIONS.replace(/[\^~<>=]/g, '')
-  .split('||')
-  .map((v) => v.trim());
-
-/**
- * Checks if the current Node.js version is supported.
- * @returns `true` if the current Node.js version is supported, `false` otherwise.
- */
-export function isNodeVersionSupported(): boolean {
-  if (SUPPORTED_NODE_VERSIONS.charAt(0) === '0') {
-    // Unlike `pkg_npm`, `ts_library` which is used to run unit tests does not support substitutions.
-    return true;
-  }
-
-  const [processMajor, processMinor, processPatch] = process.versions.node
-    .split('.', 3)
-    .map((part) => Number(part));
-
-  for (const version of supportedNodeVersions) {
-    const [major, minor, patch] = version.split('.', 3).map((part) => Number(part));
-    if (
-      (major === processMajor && processMinor === minor && processPatch >= patch) ||
-      (major === processMajor && processMinor > minor)
-    ) {
-      return true;
-    }
-  }
-
-  return false;
-}
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore strict-deps: #version is a subpath import mapped to bin/version.js
+export { SUPPORTED_NODE_VERSIONS, supportedNodeVersions, isNodeVersionSupported } from '#version';
 
 /**
  * Checks if the current Node.js version is the minimum supported version.
