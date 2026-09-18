@@ -9,7 +9,7 @@
 import { NodeWorkflow } from '@angular-devkit/schematics/tools';
 import { Listr } from 'listr2';
 import { existsSync, promises as fs } from 'node:fs';
-import { createRequire } from 'node:module';
+import { Module, createRequire } from 'node:module';
 import * as path from 'node:path';
 import npa from 'npm-package-arg';
 import { Argv } from 'yargs';
@@ -607,8 +607,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
       await tasks.run();
       // Clear Node's module resolution path cache to prevent stale lookups
       // when resolving migration package paths.
-      const Module = require('node:module');
-      if (Module && Module._pathCache) {
+      if ('_pathCache' in Module) {
         Module._pathCache = Object.create(null);
       }
     } catch (e) {
