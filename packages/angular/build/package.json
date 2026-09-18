@@ -38,6 +38,7 @@
     "picomatch": "4.0.7",
     "piscina": "5.3.2",
     "rolldown": "1.2.11",
+    "rolldown-plugin-dts": "0.28.5",
     "sass": "1.105.0",
     "sass-embedded": "1.105.0",
     "semver": "7.8.5",

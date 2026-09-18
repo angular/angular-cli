@@ -16,3 +16,4 @@ export {
 } from './angular-compilation';
 export type { CompilerOptionOverrides } from './compiler-options';
 export { createAngularCompilation, type AngularCompilationMode } from './factory';
+export { LibraryCompilation, type LibraryCompilationOptions } from './library-compilation';
