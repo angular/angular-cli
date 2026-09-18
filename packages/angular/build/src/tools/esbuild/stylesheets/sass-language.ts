@@ -9,7 +9,7 @@
 import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass-embedded';
+import type { CompileResult, Exception, Syntax } from 'sass-embedded';
 import { MemoryCache } from '../../../utils/cache';
 import type { SassCompiler } from '../../sass/sass-service';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
@@ -50,12 +50,7 @@ export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
   fileFilter: /\.s[ac]ss$/,
   process(data, file, format, options, build) {
     const syntax = format === 'sass' ? 'indented' : 'scss';
-    const resolveUrl = async (url: string, options: CanonicalizeContext) => {
-      let resolveDir = build.initialOptions.absWorkingDir;
-      if (options.containingUrl) {
-        resolveDir = dirname(fileURLToPath(options.containingUrl));
-      }
-
+    const resolveUrl = async (url: string, resolveDir: string | undefined) => {
       const path = url.startsWith('pkg:') ? url.slice(4) : url;
       const result = await build.resolve(path, {
         kind: 'import-rule',
@@ -65,7 +60,14 @@ export const SassStylesheetLanguage = Object.freeze<StylesheetLanguage>({
       return result;
     };
 
-    return compileString(data, file, syntax, options, resolveUrl);
+    return compileString(
+      data,
+      file,
+      syntax,
+      options,
+      resolveUrl,
+      build.initialOptions.absWorkingDir,
+    );
   },
 });
 
@@ -97,12 +99,35 @@ function parsePackageName(url: string): { packageName: string; readonly pathSegm
   };
 }
 
+/**
+ * Returns the scope that qualifies the cached package resolutions of a stylesheet. A stylesheet
+ * within `node_modules` uses the root of its enclosing package, since every file of a package
+ * resolves its dependencies against the same `node_modules` directories. All other stylesheets use
+ * the working directory, allowing component stylesheets to share package resolutions.
+ */
+export function getPackageScope(
+  containingPath: string | undefined,
+  workingDirectory: string | undefined,
+): string {
+  // The directory segments of the stylesheet, excluding the file name
+  const segments = containingPath?.split(/[\\/]/).slice(0, -1) ?? [];
+  const index = segments.lastIndexOf('node_modules');
+  if (index === -1) {
+    return workingDirectory ?? '';
+  }
+
+  const packageNameLength = segments[index + 1]?.[0] === '@' ? 2 : 1;
+
+  return segments.slice(0, index + 1 + packageNameLength).join('/');
+}
+
 async function compileString(
   data: string,
   filePath: string,
   syntax: Syntax,
   options: StylesheetPluginOptions,
-  resolveUrl: (url: string, options: CanonicalizeContext) => Promise<ResolveResult>,
+  resolveUrl: (url: string, resolveDir: string | undefined) => Promise<ResolveResult>,
+  workingDirectory: string | undefined,
 ): Promise<OnLoadResult> {
   // Lazily load Sass when a Sass file is found
   if (sassService === undefined) {
@@ -119,7 +144,8 @@ async function compileString(
   }
 
   // Caching follows Sass behavior where a given package url will always resolve to the same value
-  // regardless of its importer's path. Relative paths are qualified with the containing URL.
+  // regardless of its importer's path, except for importers within `node_modules`, which are
+  // scoped to their enclosing package. Relative paths are qualified with the containing URL.
   // A null value indicates that the cached resolution attempt failed to find a location and
   // later stage resolution should be attempted. This avoids potentially expensive repeat
   // failing resolution attempts.
@@ -145,11 +171,19 @@ async function compileString(
       importers: [
         {
           findFileUrl: (url, options) => {
+            const containingPath =
+              options.containingUrl?.protocol === 'file:'
+                ? fileURLToPath(options.containingUrl)
+                : undefined;
+            const resolveDir = containingPath ? dirname(containingPath) : workingDirectory;
             const isPackage = isPackageUrl(url);
-            const cacheKey = isPackage ? url : `${options.containingUrl?.href ?? ''}:${url}`;
+            const scope = getPackageScope(containingPath, workingDirectory);
+            const cacheKey = isPackage
+              ? `${scope}:${url}`
+              : `${options.containingUrl?.href ?? ''}:${url}`;
 
             return currentResolutionCache.getOrCreate(cacheKey, async () => {
-              const result = await resolveUrl(url, options);
+              const result = await resolveUrl(url, resolveDir);
               if (result.path) {
                 return pathToFileURL(result.path);
               }
@@ -164,10 +198,10 @@ async function compileString(
               // Caching package root locations is particularly beneficial for `@material/*` packages
               // which extensively use deep imports.
               const packageRoot = await currentPackageRootCache.getOrCreate(
-                packageName,
+                `${scope}:${packageName}`,
                 async () => {
                   // Use the required presence of a package root `package.json` file to resolve the location
-                  const packageResult = await resolveUrl(packageName + '/package.json', options);
+                  const packageResult = await resolveUrl(packageName + '/package.json', resolveDir);
 
                   return packageResult.path ? dirname(packageResult.path) : null;
                 },
