@@ -6,7 +6,7 @@
   "properties": {
     "entryPoints": {
       "type": "object",
-      "description": "Map of package entry points. The '.' key represents the primary entry point; other keys define secondary subpath entry points.",
+      "description": "Map of package entry points. The '.' key represents the primary entry point; other keys define secondary subpath entry points. A key and its entry file path can each contain one '*' (e.g. './*': 'projects/lib/*/public-api.ts') to add an entry point for every matching file, as with subpath patterns in package.json 'exports'. Patterns are expanded when the build starts.",
       "required": ["."],
       "additionalProperties": {
         "oneOf": [

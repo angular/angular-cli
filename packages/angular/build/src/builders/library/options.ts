@@ -9,6 +9,7 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { escapePath, glob } from 'tinyglobby';
 import type { StylesheetPluginsass } from '../../tools/esbuild/stylesheets/stylesheet-plugin-factory';
 import { normalizeAssetPatterns } from '../../utils';
 import { supportColor } from '../../utils/color';
@@ -154,7 +155,7 @@ export async function normalizeLibraryOptions(
     throw new Error(`The package.json at '${packageJsonPath}' must contain a 'name'.`);
   }
 
-  const entryPoints = normalizeEntryPoints(
+  const entryPoints = await normalizeEntryPoints(
     rawEntryPoints,
     workspaceRoot,
     resolvedTsConfigPath,
@@ -303,6 +304,12 @@ function normalizeEntryPoint(
 /**
  * Normalizes all entry points for the library project.
  *
+ * A key and its entry file path can each contain a single '*', the same as subpath patterns
+ * in package.json `exports`. The '*' in the path matches any non-empty string, including '/',
+ * and adds an entry point for every matching file, with the matched value substituted into
+ * the key. Explicit entry points take precedence over pattern matches with the same name or
+ * the same entry file.
+ *
  * @param rawEntryPoints The raw entryPoints dictionary from schema options.
  * @param workspaceRoot The workspace root directory.
  * @param defaultTsConfigPath The default tsConfig path for the project.
@@ -310,24 +317,18 @@ function normalizeEntryPoint(
  * @param packageName The root package name (e.g. `@my/lib`).
  * @returns A Map of normalized entry points keyed by name.
  */
-function normalizeEntryPoints(
+async function normalizeEntryPoints(
   rawEntryPoints: LibraryBuilderOptions['entryPoints'],
   workspaceRoot: string,
   defaultTsConfigPath: string,
   projectName: string,
   packageName: string,
-): Map<string, NormalizedEntryPoint> {
+): Promise<Map<string, NormalizedEntryPoint>> {
   const entryPoints = new Map<string, NormalizedEntryPoint>();
+  const patterns: [string, LibraryBuilderOptions['entryPoints'][string]][] = [];
   let hasPrimary = false;
 
-  for (const [key, value] of Object.entries(rawEntryPoints)) {
-    const entryPoint = normalizeEntryPoint(
-      key,
-      value,
-      workspaceRoot,
-      defaultTsConfigPath,
-      packageName,
-    );
+  const addEntryPoint = (key: string, entryPoint: NormalizedEntryPoint) => {
     if (entryPoints.has(entryPoint.name)) {
       throw new Error(
         `Duplicate entry point detected: '${key}' resolves to the same name ('${entryPoint.name}') as an existing entry point.`,
@@ -336,6 +337,44 @@ function normalizeEntryPoints(
     entryPoints.set(entryPoint.name, entryPoint);
     if (entryPoint.isPrimary) {
       hasPrimary = true;
+    }
+  };
+
+  for (const [key, value] of Object.entries(rawEntryPoints)) {
+    const entryFile = typeof value === 'string' ? value : value.entryPoint;
+    if (key.includes('*') || entryFile.includes('*')) {
+      patterns.push([key, value]);
+      continue;
+    }
+
+    addEntryPoint(
+      key,
+      normalizeEntryPoint(key, value, workspaceRoot, defaultTsConfigPath, packageName),
+    );
+  }
+
+  const explicitNames = new Set(entryPoints.keys());
+  const explicitFiles = new Set(Array.from(entryPoints.values(), (e) => e.entryFilePath));
+
+  for (const [key, value] of patterns) {
+    const entryFile = typeof value === 'string' ? value : value.entryPoint;
+    for (const [matchedKey, matchedFile] of await expandEntryPointPattern(
+      key,
+      entryFile,
+      workspaceRoot,
+    )) {
+      const entryPoint = normalizeEntryPoint(
+        matchedKey,
+        typeof value === 'string' ? matchedFile : { ...value, entryPoint: matchedFile },
+        workspaceRoot,
+        defaultTsConfigPath,
+        packageName,
+      );
+      if (explicitNames.has(entryPoint.name) || explicitFiles.has(entryPoint.entryFilePath)) {
+        continue;
+      }
+
+      addEntryPoint(matchedKey, entryPoint);
     }
   }
 
@@ -346,4 +385,60 @@ function normalizeEntryPoints(
   }
 
   return entryPoints;
+}
+
+/**
+ * Expands an entry point pattern into the key and entry file of every matching file,
+ * sorted by key.
+ *
+ * @param key The entry point key containing a single '*'.
+ * @param entryFile The entry file path containing a single '*'.
+ * @param workspaceRoot The workspace root directory.
+ * @returns The expanded keys and absolute entry file paths.
+ */
+async function expandEntryPointPattern(
+  key: string,
+  entryFile: string,
+  workspaceRoot: string,
+): Promise<[string, string][]> {
+  if (key.split('*').length !== 2 || entryFile.split('*').length !== 2) {
+    throw new Error(
+      `Invalid entry point pattern '${key}': the key and the entry file path must each contain exactly one '*'.`,
+    );
+  }
+
+  const pattern = toPosixPath(path.resolve(workspaceRoot, entryFile));
+  const starIndex = pattern.indexOf('*');
+  const prefix = pattern.slice(0, starIndex);
+  const suffix = pattern.slice(starIndex + 1);
+  const baseDir = prefix.slice(0, prefix.lastIndexOf('/') + 1);
+
+  const files = await glob(`**/*${escapePath(suffix.slice(suffix.lastIndexOf('/') + 1))}`, {
+    cwd: baseDir,
+    ignore: ['**/node_modules/**'],
+  });
+
+  const [keyPrefix, keySuffix] = key.split('*');
+  const matches: [string, string][] = [];
+  for (const file of files) {
+    const filePath = baseDir + file;
+    if (
+      filePath.length <= prefix.length + suffix.length ||
+      !filePath.startsWith(prefix) ||
+      !filePath.endsWith(suffix) ||
+      !/\.m?ts$/.test(filePath) ||
+      /\.d\.m?ts$/.test(filePath)
+    ) {
+      continue;
+    }
+
+    const match = filePath.slice(prefix.length, filePath.length - suffix.length);
+    matches.push([keyPrefix + match + keySuffix, filePath]);
+  }
+
+  if (matches.length === 0) {
+    throw new Error(`Entry point pattern '${key}' did not match any files: '${entryFile}'.`);
+  }
+
+  return matches.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
 }
