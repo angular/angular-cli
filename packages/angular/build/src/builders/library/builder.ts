@@ -12,22 +12,22 @@ import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import type ts from 'typescript';
-import { logCumulativeDurations } from '../../tools/esbuild/profiling';
 import {
   resetSassWorkerPoolCaches,
   shutdownSassWorkerPool,
 } from '../../tools/esbuild/stylesheets/sass-language';
 import { transformSupportedBrowsersToTargets } from '../../tools/esbuild/target';
 import { withNoProgress, withSpinner } from '../../tools/esbuild/utils';
-import type { BuildWatcher } from '../../tools/esbuild/watcher';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
 import { maxWorkers } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 import { initializeHash } from '../../utils/hash';
 import { toPosixPath } from '../../utils/path';
+import { logCumulativeDurations } from '../../utils/profiling';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { assertCompatibleAngularVersion } from '../../utils/version';
+import type { BuildWatcher } from '../../utils/watcher';
 import { WorkerPool } from '../../utils/worker-pool';
 import {
   type NormalizedLibraryOptions,
@@ -156,7 +156,7 @@ export async function* executeLibraryBuilder(
         logger.info('Watch mode enabled. Watching for file changes...');
       }
 
-      const { setupWatcher } = await import('../../tools/esbuild/watcher');
+      const { setupWatcher } = await import('../../utils/watcher');
       watcher = await setupWatcher({
         workspaceRoot,
         projectRoot,

@@ -145,7 +145,7 @@ export async function compileEntryPoint(
     compilationInstance.updateLibraryOptions({ upstreamDtsPaths, upstreamDtsFiles });
   }
 
-  let stylesheetReferencedFiles: string[] = [];
+  const stylesheetReferencedFiles: string[] = [];
   const stylesheetWarnings: PartialMessage[] = [];
   const hostOptions: AngularHostOptions = {
     modifiedFiles,
@@ -166,7 +166,7 @@ export async function compileEntryPoint(
       }
 
       if (bundleReferencedFiles?.size) {
-        stylesheetReferencedFiles = [...bundleReferencedFiles];
+        stylesheetReferencedFiles.push(...bundleReferencedFiles);
       }
 
       if (bundleErrors?.length) {
@@ -208,7 +208,9 @@ export async function compileEntryPoint(
       kind: 'warning',
       color: colors,
     });
-    formattedWarnings = [...(formattedWarnings ?? []), ...formattedStyleWarnings];
+
+    formattedWarnings ??= [];
+    formattedWarnings.push(...formattedStyleWarnings);
   }
 
   const emittedFiles = compilationInstance.emitAffectedFiles();
