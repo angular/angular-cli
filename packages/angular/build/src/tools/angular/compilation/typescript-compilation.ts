@@ -75,7 +75,9 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     };
   }
 
-  protected readonly sourceFiles = new Map<string, ts.SourceFile>();
+  constructor(protected readonly sourceFiles: Map<string, ts.SourceFile> = new Map()) {
+    super();
+  }
 
   protected invalidateFiles(files: Iterable<string>): void {
     for (const file of files) {

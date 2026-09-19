@@ -403,6 +403,7 @@
                   "not": {
                     "enum": [
                       "@angular/build:application",
+                      "@angular/build:library",
                       "@angular/build:dev-server",
                       "@angular/build:extract-i18n",
                       "@angular/build:karma",
@@ -480,6 +481,28 @@
                   "type": "object",
                   "additionalProperties": {
                     "$ref": "../../../../angular/build/src/builders/application/schema.json"
+                  }
+                }
+              }
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "builder": {
+                  "const": "@angular/build:library"
+                },
+                "defaultConfiguration": {
+                  "type": "string",
+                  "description": "A default named configuration to use when a target configuration is not provided."
+                },
+                "options": {
+                  "$ref": "../../../../angular/build/src/builders/library/schema.json"
+                },
+                "configurations": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "../../../../angular/build/src/builders/library/schema.json"
                   }
                 }
               }

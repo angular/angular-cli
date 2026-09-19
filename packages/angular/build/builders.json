@@ -20,6 +20,11 @@
       "schema": "./src/builders/karma/schema.json",
       "description": "Run Karma unit tests."
     },
+    "library": {
+      "implementation": "./src/builders/library/index",
+      "schema": "./src/builders/library/schema.json",
+      "description": "Build an Angular library package conforming to the Angular Package Format (APF)."
+    },
     "ng-packagr": {
       "implementation": "./src/builders/ng-packagr/index",
       "schema": "./src/builders/ng-packagr/schema.json",
