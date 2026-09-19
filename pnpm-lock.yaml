@@ -534,6 +534,9 @@ importers:
       rolldown:
         specifier: 1.2.8
         version: 1.2.8
+      rolldown-plugin-dts:
+        specifier: 0.28.5
+        version: 0.28.5(rolldown@1.2.8)(typescript@6.0.3)
       sass:
         specifier: 1.104.1
         version: 1.104.1
