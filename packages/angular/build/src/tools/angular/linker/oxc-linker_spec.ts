@@ -76,4 +76,27 @@ describe('oxc-linker', () => {
     expect(result.map?.version).toBe(3);
     expect(result.map?.sources).toContain('test.js');
   });
+
+  it('should link ɵɵngDeclareClassMetadataAsync with parenthesized resolveMetadata return', () => {
+    const input = `
+      import * as i0 from "@angular/core";
+      export class DeferredFixture {}
+      i0.ɵɵngDeclareClassMetadataAsync({
+        minVersion: "18.0.0",
+        version: "22.1.7",
+        ngImport: i0,
+        type: DeferredFixture,
+        resolveDeferredDeps: () => [],
+        resolveMetadata: () => ({
+          decorators: [],
+          ctorParameters: null,
+          propDecorators: null,
+        }),
+      });
+    `;
+
+    const result = transform('test.js', input, { link: true, advancedOptimizations: false });
+    expect(result.code).toContain('ɵsetClassMetadataAsync');
+    expect(result.code).not.toContain('ɵɵngDeclareClassMetadataAsync');
+  });
 });

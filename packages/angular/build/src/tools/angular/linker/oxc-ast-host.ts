@@ -26,11 +26,20 @@ function isNode(node: unknown): node is Node {
   return typeof node === 'object' && node !== null && 'type' in node;
 }
 
+function unwrapParentheses(node: unknown): unknown {
+  while (isNode(node) && node.type === 'ParenthesizedExpression') {
+    node = node.expression;
+  }
+
+  return node;
+}
+
 /**
  * An implementation of `AstHost` that queries information from `oxc-parser` AST nodes.
  */
 export class OxcAstHost implements AstHost<unknown> {
   getSymbolName(node: unknown): string | null {
+    node = unwrapParentheses(node);
     if (!isNode(node)) {
       return null;
     }
@@ -47,10 +56,13 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   isStringLiteral(node: unknown): node is StringLiteral {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'Literal' && typeof node.value === 'string';
   }
 
   parseStringLiteral(str: unknown): string {
+    str = unwrapParentheses(str);
     if (!this.isStringLiteral(str)) {
       throw new FatalLinkerError(str as object, 'Unsupported syntax, expected a string literal.');
     }
@@ -59,10 +71,13 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   isNumericLiteral(node: unknown): node is NumericLiteral {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'Literal' && typeof node.value === 'number';
   }
 
   parseNumericLiteral(num: unknown): number {
+    num = unwrapParentheses(num);
     if (!this.isNumericLiteral(num)) {
       throw new FatalLinkerError(num as object, 'Unsupported syntax, expected a numeric literal.');
     }
@@ -71,6 +86,7 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   isBooleanLiteral(node: unknown): node is BooleanLiteral | UnaryExpression {
+    node = unwrapParentheses(node);
     if (!isNode(node)) {
       return false;
     }
@@ -81,6 +97,7 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   parseBooleanLiteral(bool: unknown): boolean {
+    bool = unwrapParentheses(bool);
     if (isNode(bool)) {
       if (bool.type === 'Literal' && typeof bool.value === 'boolean') {
         return bool.value;
@@ -94,14 +111,19 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   isNull(node: unknown): node is NullLiteral {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'Literal' && node.value === null;
   }
 
   isArrayLiteral(node: unknown): node is ArrayExpression {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'ArrayExpression';
   }
 
   parseArrayLiteral(array: unknown): unknown[] {
+    array = unwrapParentheses(array);
     if (!this.isArrayLiteral(array)) {
       throw new FatalLinkerError(array as object, 'Unsupported syntax, expected an array literal.');
     }
@@ -115,23 +137,27 @@ export class OxcAstHost implements AstHost<unknown> {
           'Unsupported syntax, element in array not to be empty.',
         );
       }
-      if (element.type === 'SpreadElement') {
+      const unwrappedElement = unwrapParentheses(element);
+      if (isNode(unwrappedElement) && unwrappedElement.type === 'SpreadElement') {
         throw new FatalLinkerError(
-          element as object,
+          unwrappedElement as object,
           'Unsupported syntax, element in array not to use spread syntax.',
         );
       }
-      result.push(element);
+      result.push(unwrappedElement);
     }
 
     return result;
   }
 
   isObjectLiteral(node: unknown): node is ObjectExpression {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'ObjectExpression';
   }
 
   parseObjectLiteral(obj: unknown): Map<string, unknown> {
+    obj = unwrapParentheses(obj);
     if (!this.isObjectLiteral(obj)) {
       throw new FatalLinkerError(obj as object, 'Unsupported syntax, expected an object literal.');
     }
@@ -146,7 +172,13 @@ export class OxcAstHost implements AstHost<unknown> {
         );
       }
 
-      const keyNode = property.key;
+      const keyNode = unwrapParentheses(property.key);
+      if (!isNode(keyNode)) {
+        throw new FatalLinkerError(
+          property.key as object,
+          'Unsupported syntax, expected a property name.',
+        );
+      }
 
       let key: string;
       if (keyNode.type === 'Identifier') {
@@ -162,13 +194,14 @@ export class OxcAstHost implements AstHost<unknown> {
         );
       }
 
-      result.set(key, property.value);
+      result.set(key, unwrapParentheses(property.value));
     }
 
     return result;
   }
 
   isFunctionExpression(node: unknown): node is FunctionNode | ArrowFunctionExpression {
+    node = unwrapParentheses(node);
     if (!isNode(node)) {
       return false;
     }
@@ -181,6 +214,7 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   parseReturnValue(fn: unknown): unknown {
+    fn = unwrapParentheses(fn);
     if (!this.isFunctionExpression(fn)) {
       throw new FatalLinkerError(fn as object, 'Unsupported syntax, expected a function.');
     }
@@ -191,7 +225,7 @@ export class OxcAstHost implements AstHost<unknown> {
     }
 
     if (body.type !== 'BlockStatement') {
-      return body;
+      return unwrapParentheses(body);
     }
 
     const statements = body.body;
@@ -217,10 +251,11 @@ export class OxcAstHost implements AstHost<unknown> {
       );
     }
 
-    return stmt.argument;
+    return unwrapParentheses(stmt.argument);
   }
 
   parseParameters(fn: unknown): unknown[] {
+    fn = unwrapParentheses(fn);
     if (!this.isFunctionExpression(fn)) {
       throw new FatalLinkerError(fn as object, 'Unsupported syntax, expected a function.');
     }
@@ -229,18 +264,22 @@ export class OxcAstHost implements AstHost<unknown> {
   }
 
   isCallExpression(node: unknown): node is CallExpression {
+    node = unwrapParentheses(node);
+
     return isNode(node) && node.type === 'CallExpression';
   }
 
   parseCallee(call: unknown): unknown {
+    call = unwrapParentheses(call);
     if (!this.isCallExpression(call)) {
       throw new FatalLinkerError(call as object, 'Unsupported syntax, expected a call expression.');
     }
 
-    return call.callee;
+    return unwrapParentheses(call.callee);
   }
 
   parseArguments(call: unknown): unknown[] {
+    call = unwrapParentheses(call);
     if (!this.isCallExpression(call)) {
       throw new FatalLinkerError(call as object, 'Unsupported syntax, expected a call expression.');
     }
@@ -248,19 +287,21 @@ export class OxcAstHost implements AstHost<unknown> {
     const result: unknown[] = [];
 
     for (const arg of call.arguments) {
-      if (arg.type === 'SpreadElement') {
+      const unwrappedArg = unwrapParentheses(arg);
+      if (isNode(unwrappedArg) && unwrappedArg.type === 'SpreadElement') {
         throw new FatalLinkerError(
-          arg as object,
+          unwrappedArg as object,
           'Unsupported syntax, argument not to use spread syntax.',
         );
       }
-      result.push(arg);
+      result.push(unwrappedArg);
     }
 
     return result;
   }
 
   getRange(node: unknown): Range {
+    node = unwrapParentheses(node);
     if (!isNode(node) || typeof node.start !== 'number' || typeof node.end !== 'number') {
       throw new FatalLinkerError(
         node as object,
