@@ -16,8 +16,6 @@ import {
   Options,
   OtherOptions,
 } from '../../command-builder/command-module';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 
 export interface RunCommandArgs {

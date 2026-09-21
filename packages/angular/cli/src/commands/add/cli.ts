@@ -29,8 +29,6 @@ import { NgAddSaveDependency, PackageManifest, PackageMetadata } from '../../pac
 import { assertIsError } from '../../utilities/error';
 import { isTTY } from '../../utilities/tty';
 import { VERSION } from '../../utilities/version';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 
 class CommandError extends Error {}

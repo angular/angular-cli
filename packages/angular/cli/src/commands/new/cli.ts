@@ -20,8 +20,6 @@ import {
 } from '../../command-builder/schematics-command-module';
 import { VERSION } from '../../utilities/version';
 import { RootCommands } from '../command-config';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 
 interface NewCommandArgs extends SchematicsCommandArgs {

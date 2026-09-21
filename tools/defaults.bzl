@@ -18,6 +18,10 @@ def ts_project(
     if tsconfig == None:
         tsconfig = "//:test-tsconfig" if testonly else "//:build-tsconfig"
 
+    package_json = kwargs.pop("package_json", None)
+    if not package_json and native.glob(["package.json"], allow_empty = True):
+        package_json = "package.json"
+
     _ts_project(
         name = name,
         testonly = testonly,
@@ -32,6 +36,8 @@ def ts_project(
     strict_deps_test(
         name = "%s_strict_deps_test" % name,
         srcs = kwargs.get("srcs", []),
+        data = kwargs.get("data", []),
+        package_json = package_json,
         tsconfig = tsconfig,
         deps = deps,
     )
