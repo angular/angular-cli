@@ -11,7 +11,7 @@ import assert from 'node:assert';
 import path from 'node:path';
 import ts from 'typescript';
 import { toPosixPath } from '../../../utils/path';
-import { profileAsync, profileSync } from '../../esbuild/profiling';
+import { profileAsync, profileSync } from '../../../utils/profiling';
 import {
   type AngularCompilerHost,
   type AngularHostOptions,
