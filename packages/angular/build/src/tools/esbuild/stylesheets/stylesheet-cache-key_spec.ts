@@ -70,5 +70,20 @@ describe('Stylesheet Global Config Hash', () => {
       );
       expect(hash1).not.toBe(hash2);
     });
+
+    it('should produce different hashes when dataurl changes', () => {
+      const hash1 = calculateGlobalStylesheetConfigHash(baseOptions, '1.0.0');
+      const hash2 = calculateGlobalStylesheetConfigHash({ ...baseOptions, dataurl: true }, '1.0.0');
+      expect(hash1).not.toBe(hash2);
+    });
+
+    it('should produce the same hash when dataurl is undefined or false', () => {
+      const hash1 = calculateGlobalStylesheetConfigHash(baseOptions, '1.0.0');
+      const hash2 = calculateGlobalStylesheetConfigHash(
+        { ...baseOptions, dataurl: false },
+        '1.0.0',
+      );
+      expect(hash1).toBe(hash2);
+    });
   });
 });
