@@ -18,9 +18,9 @@ import {
   shutdownSassWorkerPool,
 } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
-import { ChangedFiles } from '../../tools/esbuild/watcher';
 import { initializeHash } from '../../utils/hash';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
+import { ChangedFiles } from '../../utils/watcher';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
 import {
   ComponentUpdateResult,
@@ -88,7 +88,7 @@ export async function* runEsBuildBuildAction(
     }
   }
 
-  let watcher: import('../../tools/esbuild/watcher').BuildWatcher | undefined;
+  let watcher: import('../../utils/watcher').BuildWatcher | undefined;
   let watchLoopStarted = false;
   try {
     // Setup watcher if watch mode enabled
@@ -98,7 +98,7 @@ export async function* runEsBuildBuildAction(
       }
 
       // Setup a watcher
-      const { setupWatcher } = await import('../../tools/esbuild/watcher');
+      const { setupWatcher } = await import('../../utils/watcher');
       watcher = await setupWatcher({
         workspaceRoot,
         projectRoot,

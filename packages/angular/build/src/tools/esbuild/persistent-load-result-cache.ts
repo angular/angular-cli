@@ -31,9 +31,9 @@ import type { Loader, OnLoadResult, PartialMessage } from 'esbuild';
 import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Cache as PersistentCacheStore } from '../../utils/cache';
 import { mapConcurrent, runConcurrent } from '../../utils/concurrency';
 import { calculateHash, createContentHash } from '../../utils/hash';
-import type { Cache as PersistentCacheStore } from './cache';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 
 /**

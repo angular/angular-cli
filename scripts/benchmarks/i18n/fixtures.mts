@@ -14,7 +14,7 @@ import { createRequire } from 'node:module';
 import path from 'node:path';
 
 import type { BuildOutputFile } from '../../../packages/angular/build/src/tools/esbuild/bundler-files.js';
-import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js';
+import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/i18n/i18n-inliner.js';
 
 // Setup module paths to resolve dependencies from packages/angular/build
 const requireFromBuild = createRequire(

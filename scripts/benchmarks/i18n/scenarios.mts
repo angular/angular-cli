@@ -16,7 +16,7 @@ import path from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 import type { BuildOutputFile } from '../../../packages/angular/build/src/tools/esbuild/bundler-files.js';
-import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js';
+import type { LocaleInlineOptions } from '../../../packages/angular/build/src/tools/i18n/i18n-inliner.js';
 import { generateSyntheticBundle, generateTranslations, initializeFixtures } from './fixtures.mts';
 import type { BenchmarkScenario } from './harness.mts';
 
@@ -25,8 +25,8 @@ const requireFromBuild = createRequire(
 );
 
 const { I18nInliner } = requireFromBuild(
-  '../../../dist/@angular/build/src/tools/esbuild/i18n-inliner.js',
-) as typeof import('../../../packages/angular/build/src/tools/esbuild/i18n-inliner.js');
+  '../../../dist/@angular/build/src/tools/i18n/i18n-inliner.js',
+) as typeof import('../../../packages/angular/build/src/tools/i18n/i18n-inliner.js');
 
 export interface ScenarioFactoryOptions {
   concurrency?: number;

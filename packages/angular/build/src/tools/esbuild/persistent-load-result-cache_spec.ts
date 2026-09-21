@@ -10,8 +10,8 @@ import type { OnLoadResult } from 'esbuild';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import type { Cache as PersistentCacheStore } from '../../utils/cache';
 import { initializeHash } from '../../utils/hash';
-import type { Cache as PersistentCacheStore } from './cache';
 import {
   type CachedLoadResultEntry,
   PersistentLoadResultCache,

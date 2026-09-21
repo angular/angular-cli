@@ -10,8 +10,8 @@ import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'e
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { CanonicalizeContext, CompileResult, Exception, Syntax } from 'sass-embedded';
+import { MemoryCache } from '../../../utils/cache';
 import type { SassCompiler } from '../../sass/sass-service';
-import { MemoryCache } from '../cache';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
 
 let sassService: SassCompiler | undefined;

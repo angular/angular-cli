@@ -11,10 +11,18 @@ import assert from 'node:assert';
 import { createRequire } from 'node:module';
 import { extname, join } from 'node:path';
 import { serialize } from 'node:v8';
+import {
+  type Cache,
+  type PersistentCacheStore,
+  createPersistentCacheStore,
+} from '../../utils/cache';
 import { calculateHash, createContentHash, initializeHash } from '../../utils/hash';
 import { WorkerPool } from '../../utils/worker-pool';
-import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
-import { type Cache, type PersistentCacheStore, createPersistentCacheStore } from './cache';
+import {
+  type BuildOutputFile,
+  BuildOutputFileType,
+  createOutputFile,
+} from '../esbuild/bundler-files';
 import type {
   InlineCodeRequest,
   InlineCodeResult,

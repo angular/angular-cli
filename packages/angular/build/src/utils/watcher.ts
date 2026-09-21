@@ -12,8 +12,8 @@ import { once } from 'node:events';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import picomatch from 'picomatch';
-import { shouldWatchRoot } from '../../utils/environment-options';
-import { toPosixPath } from '../../utils/path';
+import { shouldWatchRoot } from './environment-options';
+import { toPosixPath } from './path';
 
 export class ChangedFiles {
   readonly added = new Set<string>();

@@ -11,10 +11,14 @@ import { transform } from 'esbuild';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { createPersistentCacheStore } from '../../utils/cache';
 import { initializeHash } from '../../utils/hash';
 import { WorkerPool } from '../../utils/worker-pool';
-import { type BuildOutputFile, BuildOutputFileType, createOutputFile } from './bundler-files';
-import { createPersistentCacheStore } from './cache';
+import {
+  type BuildOutputFile,
+  BuildOutputFileType,
+  createOutputFile,
+} from '../esbuild/bundler-files';
 import { I18nInliner, type I18nInlinerOptions } from './i18n-inliner';
 
 /**

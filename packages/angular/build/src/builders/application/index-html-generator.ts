@@ -9,9 +9,13 @@
 import assert from 'node:assert';
 import { createHash } from 'node:crypto';
 import path from 'node:path';
-import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
+import {
+  BuildOutputFile,
+  BuildOutputFileType,
+  InitialFileRecord,
+} from '../../tools/esbuild/bundler-files';
 import { IndexHtmlGenerator } from '../../utils/index-file/index-html-generator';
-import { BuildOutputFile, BuildOutputFileType, InitialFileRecord } from './bundler-files';
+import { NormalizedApplicationBuildOptions } from './options';
 
 /**
  * The maximum number of module preload link elements that should be added for

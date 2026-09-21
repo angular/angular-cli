@@ -10,7 +10,7 @@ import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import ts from 'typescript';
 import { toPosixPath } from '../../../utils/path';
-import { profileAsync, profileSync } from '../../esbuild/profiling';
+import { profileAsync, profileSync } from '../../../utils/profiling';
 import { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { type CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { convertTypeScriptDiagnostic } from './diagnostics';
