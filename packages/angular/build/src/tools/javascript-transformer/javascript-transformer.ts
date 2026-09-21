@@ -7,11 +7,11 @@
  */
 
 import { readFile } from 'node:fs/promises';
+import { Cache } from '../../utils/cache';
 import { createContentHash } from '../../utils/hash';
 import { IMPORT_EXEC_ARGV } from '../../utils/server-rendering/esm-in-memory-loader/utils';
 import { removeSourceMappingURL } from '../../utils/source-map';
 import { WorkerPool, WorkerPoolOptions } from '../../utils/worker-pool';
-import { Cache } from './cache';
 
 const LINKER_DECLARATION_PREFIX = 'ɵɵngDeclare';
 const LINKER_DECLARATION_PREFIX_BYTES = Buffer.from(LINKER_DECLARATION_PREFIX, 'utf-8');

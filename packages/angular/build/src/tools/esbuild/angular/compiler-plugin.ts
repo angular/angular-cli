@@ -20,14 +20,18 @@ import type {
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import * as path from 'node:path';
+import { type PersistentCacheStore, createPersistentCacheStore } from '../../../utils/cache';
 import { maxTransformWorkers, useTypeChecking } from '../../../utils/environment-options';
 import { calculateHash, initializeHash } from '../../../utils/hash';
+import {
+  logCumulativeDurations,
+  profileAsync,
+  resetCumulativeDurations,
+} from '../../../utils/profiling';
 import { AngularHostOptions } from '../../angular/angular-host';
 import { AngularCompilation, DiagnosticModes } from '../../angular/compilation';
-import { type PersistentCacheStore, createPersistentCacheStore } from '../cache';
-import { JavaScriptTransformer } from '../javascript-transformer';
+import { JavaScriptTransformer } from '../../javascript-transformer';
 import { LoadResultCache, createCachedLoad } from '../load-result-cache';
-import { logCumulativeDurations, profileAsync, resetCumulativeDurations } from '../profiling';
 import { AngularCompilationContext, PrimaryCompilationContext } from './compilation-state';
 import { ComponentStylesheetBundler } from './component-stylesheets';
 import { FileReferenceTracker } from './file-reference-tracker';

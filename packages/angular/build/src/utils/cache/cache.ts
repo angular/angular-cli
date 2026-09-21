@@ -11,8 +11,8 @@
  * Provides infrastructure for common caching functionality within the build system.
  */
 
-import { persistentCacheStoreSetting } from '../../utils/environment-options';
-import { assertIsError } from '../../utils/error';
+import { persistentCacheStoreSetting } from '../environment-options';
+import { assertIsError } from '../error';
 
 /**
  * A backing data store for one or more Cache instances.

@@ -8,7 +8,7 @@
 
 export { type BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 export { createRxjsEsmResolutionPlugin } from '../../tools/esbuild/rxjs-esm-resolution-plugin';
-export { JavaScriptTransformer } from '../../tools/esbuild/javascript-transformer';
+export { JavaScriptTransformer } from '../../tools/javascript-transformer';
 export { getFeatureSupport, isZonelessApp } from '../../tools/esbuild/utils';
 export { type IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
 export { purgeStaleBuildCache } from '../../utils/purge-cache';

@@ -11,8 +11,8 @@ import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
 
 function checkBuildStatus(logger: Console): boolean {
-  const distFile = 'dist/@angular/build/src/tools/esbuild/i18n-inliner.js';
-  const srcFile = 'packages/angular/build/src/tools/esbuild/i18n-inliner.ts';
+  const distFile = 'dist/@angular/build/src/tools/i18n/i18n-inliner.js';
+  const srcFile = 'packages/angular/build/src/tools/i18n/i18n-inliner.ts';
 
   if (!fs.existsSync(distFile)) {
     logger.error(

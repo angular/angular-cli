@@ -8,7 +8,7 @@
 
 import type { Message, PartialMessage } from 'esbuild';
 import { normalize } from 'node:path';
-import type { ChangedFiles } from '../../tools/esbuild/watcher';
+import type { ChangedFiles } from '../../utils/watcher';
 import type { ComponentStylesheetBundler } from './angular/component-stylesheets';
 import type { SourceFileCache } from './angular/source-file-cache';
 import type { BundlerContext } from './bundler-context';

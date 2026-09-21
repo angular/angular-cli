@@ -9,8 +9,8 @@
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
 import { MessageChannel } from 'node:worker_threads';
+import { mergeCumulativeDurations } from '../../../utils/profiling';
 import { WorkerPool } from '../../../utils/worker-pool';
-import { mergeCumulativeDurations } from '../../esbuild/profiling';
 import type { AngularHostOptions } from '../angular-host';
 import {
   AngularCompilation,

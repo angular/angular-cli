@@ -20,7 +20,6 @@ import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { checkCommonJSModules } from '../../tools/esbuild/commonjs-checker';
 import { LOCALE_DATA_BASE_MODULE } from '../../tools/esbuild/i18n-locale-plugin';
 import { extractLicenses } from '../../tools/esbuild/license-extractor';
-import { profileAsync } from '../../tools/esbuild/profiling';
 import { transformSupportedBrowsersToTargets } from '../../tools/esbuild/target';
 import {
   calculateEstimatedTransferSizes,
@@ -29,6 +28,7 @@ import {
 } from '../../tools/esbuild/utils';
 import { BudgetCalculatorResult, checkBudgets } from '../../utils/bundle-calculator';
 import { optimizeChunksThreshold } from '../../utils/environment-options';
+import { profileAsync } from '../../utils/profiling';
 import { resolveAssets } from '../../utils/resolve-assets';
 import {
   SERVER_APP_ENGINE_MANIFEST_FILENAME,
