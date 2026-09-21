@@ -34,11 +34,13 @@ describe('OxcAstHost', () => {
     it('should return the name of an identifier', () => {
       const expr = parseExpression('foo');
       expect(host.getSymbolName(expr)).toBe('foo');
+      expect(host.getSymbolName(parseExpression('(foo)'))).toBe('foo');
     });
 
     it('should return the property name of a member expression', () => {
       const expr = parseExpression('foo.bar');
       expect(host.getSymbolName(expr)).toBe('bar');
+      expect(host.getSymbolName(parseExpression('(foo.bar)'))).toBe('bar');
     });
 
     it('should return null for non-identifier or computed member expressions', () => {
@@ -53,6 +55,10 @@ describe('OxcAstHost', () => {
       const expr = parseExpression('"hello"');
       expect(host.isStringLiteral(expr)).toBe(true);
       expect(host.parseStringLiteral(expr)).toBe('hello');
+
+      const parenthesized = parseExpression('("hello")');
+      expect(host.isStringLiteral(parenthesized)).toBe(true);
+      expect(host.parseStringLiteral(parenthesized)).toBe('hello');
     });
 
     it('should throw when parsing non-string literals', () => {
@@ -67,6 +73,10 @@ describe('OxcAstHost', () => {
       const expr = parseExpression('123');
       expect(host.isNumericLiteral(expr)).toBe(true);
       expect(host.parseNumericLiteral(expr)).toBe(123);
+
+      const parenthesized = parseExpression('(123)');
+      expect(host.isNumericLiteral(parenthesized)).toBe(true);
+      expect(host.parseNumericLiteral(parenthesized)).toBe(123);
     });
 
     it('should throw when parsing non-numeric literals', () => {
@@ -84,6 +94,10 @@ describe('OxcAstHost', () => {
       expect(host.parseBooleanLiteral(trueExpr)).toBe(true);
       expect(host.isBooleanLiteral(falseExpr)).toBe(true);
       expect(host.parseBooleanLiteral(falseExpr)).toBe(false);
+
+      const parenthesizedTrue = parseExpression('(true)');
+      expect(host.isBooleanLiteral(parenthesizedTrue)).toBe(true);
+      expect(host.parseBooleanLiteral(parenthesizedTrue)).toBe(true);
     });
 
     it('should recognize and parse minified boolean literals (!0 and !1)', () => {
@@ -93,6 +107,10 @@ describe('OxcAstHost', () => {
       expect(host.parseBooleanLiteral(trueExpr)).toBe(true);
       expect(host.isBooleanLiteral(falseExpr)).toBe(true);
       expect(host.parseBooleanLiteral(falseExpr)).toBe(false);
+
+      const parenthesizedMinified = parseExpression('(!0)');
+      expect(host.isBooleanLiteral(parenthesizedMinified)).toBe(true);
+      expect(host.parseBooleanLiteral(parenthesizedMinified)).toBe(true);
     });
 
     it('should return false for invalid boolean expressions', () => {
@@ -106,6 +124,18 @@ describe('OxcAstHost', () => {
       const expr = parseExpression('[1, "a", true]');
       expect(host.isArrayLiteral(expr)).toBe(true);
       expect(host.parseArrayLiteral(expr).length).toBe(3);
+
+      const parenthesized = parseExpression('([1, "a", true])');
+      expect(host.isArrayLiteral(parenthesized)).toBe(true);
+      expect(host.parseArrayLiteral(parenthesized).length).toBe(3);
+    });
+
+    it('should unwrap parenthesized elements in array literals', () => {
+      const expr = parseExpression('[(1), ("a")]');
+      const elements = host.parseArrayLiteral(expr);
+      expect(elements.length).toBe(2);
+      expect(host.isNumericLiteral(elements[0])).toBe(true);
+      expect(host.isStringLiteral(elements[1])).toBe(true);
     });
 
     it('should throw when array contains empty elements or spread syntax', () => {
@@ -113,6 +143,9 @@ describe('OxcAstHost', () => {
         FatalLinkerError,
       );
       expect(() => host.parseArrayLiteral(parseExpression('[1, ...a]'))).toThrowError(
+        FatalLinkerError,
+      );
+      expect(() => host.parseArrayLiteral(parseExpression('[1, ...(a)]'))).toThrowError(
         FatalLinkerError,
       );
     });
@@ -128,6 +161,16 @@ describe('OxcAstHost', () => {
       expect(map.has('a')).toBe(true);
       expect(map.has('b')).toBe(true);
       expect(map.has('3')).toBe(true);
+    });
+
+    it('should recognize and parse parenthesized object literals', () => {
+      const expr = parseExpression('({ a: (1), b: ("c") })');
+      expect(host.isObjectLiteral(expr)).toBe(true);
+
+      const map = host.parseObjectLiteral(expr);
+      expect(map.size).toBe(2);
+      expect(host.isNumericLiteral(map.get('a'))).toBe(true);
+      expect(host.isStringLiteral(map.get('b'))).toBe(true);
     });
 
     it('should throw when object literal contains spread or non-property assignments', () => {
@@ -147,12 +190,35 @@ describe('OxcAstHost', () => {
       expect(host.isNumericLiteral(returnValue)).toBe(true);
     });
 
+    it('should parse parenthesized arrow functions and concise bodies returning parenthesized object literals', () => {
+      const expr = parseExpression('() => ({ a: 1 })');
+      expect(host.isFunctionExpression(expr)).toBe(true);
+
+      const returnValue = host.parseReturnValue(expr);
+      expect(host.isObjectLiteral(returnValue)).toBe(true);
+      const map = host.parseObjectLiteral(returnValue);
+      expect(map.has('a')).toBe(true);
+
+      const wrappedArrow = parseExpression('((a) => (42))');
+      expect(host.isFunctionExpression(wrappedArrow)).toBe(true);
+      expect(host.parseParameters(wrappedArrow).length).toBe(1);
+      expect(host.isNumericLiteral(host.parseReturnValue(wrappedArrow))).toBe(true);
+    });
+
     it('should parse return value from function with block statement containing single return', () => {
       const stmt = parseStatement('function foo(a) { return "hello"; }');
       expect(host.isFunctionExpression(stmt)).toBe(true);
 
       const returnValue = host.parseReturnValue(stmt);
       expect(host.isStringLiteral(returnValue)).toBe(true);
+    });
+
+    it('should parse return value from function returning parenthesized expression', () => {
+      const stmt = parseStatement('function foo() { return ({ a: 1 }); }');
+      expect(host.isFunctionExpression(stmt)).toBe(true);
+
+      const returnValue = host.parseReturnValue(stmt);
+      expect(host.isObjectLiteral(returnValue)).toBe(true);
     });
 
     it('should throw when function body has multiple statements or no return', () => {
@@ -171,6 +237,14 @@ describe('OxcAstHost', () => {
       expect(host.isCallExpression(expr)).toBe(true);
       expect(host.getSymbolName(host.parseCallee(expr))).toBe('foo');
       expect(host.parseArguments(expr).length).toBe(2);
+
+      const parenthesized = parseExpression('((foo)((1), ("a")))');
+      expect(host.isCallExpression(parenthesized)).toBe(true);
+      expect(host.getSymbolName(host.parseCallee(parenthesized))).toBe('foo');
+      const args = host.parseArguments(parenthesized);
+      expect(args.length).toBe(2);
+      expect(host.isNumericLiteral(args[0])).toBe(true);
+      expect(host.isStringLiteral(args[1])).toBe(true);
     });
 
     it('should throw when call expression arguments contain spread syntax', () => {
