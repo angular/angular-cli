@@ -8,10 +8,10 @@
 
 import assert from 'node:assert';
 import path from 'node:path';
+import { MemoryCache } from '../../../utils/cache';
 import { createContentHash } from '../../../utils/hash';
 import { BundleContextResult, BundlerContext } from '../bundler-context';
 import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
-import { MemoryCache } from '../cache';
 import { MemoryLoadResultCache } from '../load-result-cache';
 import {
   BundleStylesheetOptions,

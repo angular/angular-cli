@@ -9,7 +9,7 @@
 import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
 import ts from 'typescript';
-import { profileSync } from '../../esbuild/profiling';
+import { profileSync } from '../../../utils/profiling';
 import { AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { createJitResourceTransformer } from '../transformers/jit-resource-transformer';
 import { lazyRoutesTransformer } from '../transformers/lazy-routes-transformer';

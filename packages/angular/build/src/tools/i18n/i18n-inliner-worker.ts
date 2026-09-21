@@ -8,14 +8,12 @@
 
 import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
 import type { ɵParsedTranslation } from '@angular/localize';
-import type { Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
-import assert from 'node:assert';
 import { deserialize } from 'node:v8';
 import { parseSync } from 'oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
-import { loadLocaleData } from './i18n-locale-plugin';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
+import { loadLocaleData } from './locale-data';
 
 /**
  * The options passed to the inliner for each code request

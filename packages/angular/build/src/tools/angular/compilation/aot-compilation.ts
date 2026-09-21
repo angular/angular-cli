@@ -11,7 +11,7 @@ import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
 import { useTypeChecking } from '../../../utils/environment-options';
-import { profileAsync, profileSync } from '../../esbuild/profiling';
+import { profileAsync, profileSync } from '../../../utils/profiling';
 import {
   AngularHostOptions,
   createAngularCompilerHost,

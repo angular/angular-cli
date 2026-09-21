@@ -11,7 +11,7 @@ import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { initializeHash } from '../../../utils/hash';
-import { getAndClearCumulativeDurations } from '../../esbuild/profiling';
+import { getAndClearCumulativeDurations } from '../../../utils/profiling';
 import type {
   AngularCompilation,
   AngularCompilationResult,

@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { debugPerformance } from '../../utils/environment-options';
+import { debugPerformance } from './environment-options';
 
 let cumulativeDurations: Map<string, number[]> | undefined;
 

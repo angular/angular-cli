@@ -18,18 +18,15 @@ import {
   type InitialFileRecord,
   createOutputFile,
 } from '../../tools/esbuild/bundler-files';
-import { generateIndexHtml } from '../../tools/esbuild/index-html-generator';
 import { maxWorkers } from '../../utils/environment-options';
 import {
   SERVER_APP_MANIFEST_FILENAME,
   generateAngularServerAppManifest,
 } from '../../utils/server-rendering/manifest';
-import {
-  RouteRenderMode,
-  WritableSerializableRouteTreeNode,
-} from '../../utils/server-rendering/models';
+import { WritableSerializableRouteTreeNode } from '../../utils/server-rendering/models';
 import { prerenderPages } from '../../utils/server-rendering/prerender';
 import { augmentAppWithServiceWorkerEsbuild } from '../../utils/service-worker';
+import { generateIndexHtml } from './index-html-generator';
 import { injectDebugIds } from './inject-debug-ids';
 import { INDEX_HTML_CSR, INDEX_HTML_SERVER, NormalizedApplicationBuildOptions } from './options';
 import { OutputMode } from './schema';

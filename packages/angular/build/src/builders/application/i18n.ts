@@ -16,7 +16,7 @@ import {
   PrerenderedRoutesRecord,
 } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-files';
-import { I18nInliner } from '../../tools/esbuild/i18n-inliner';
+import { I18nInliner } from '../../tools/i18n';
 import { maxInlinerWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
