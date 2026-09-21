@@ -12,8 +12,6 @@ import { addCommandModuleToYargs } from '../../command-builder/utilities/command
 import { colors } from '../../utilities/color';
 import { hasGlobalCliInstall, initializeAutocomplete } from '../../utilities/completion';
 import { assertIsError } from '../../utilities/error';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 
 export default class CompletionCommandModule

@@ -17,8 +17,6 @@ import {
 } from '../../command-builder/command-module';
 import { getWorkspaceRaw, validateWorkspace } from '../../utilities/config';
 import { JSONFile, parseJson } from '../../utilities/json-file';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 
 interface ConfigCommandArgs {

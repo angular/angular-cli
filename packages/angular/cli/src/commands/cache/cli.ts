@@ -19,8 +19,6 @@ import {
 } from '../../command-builder/utilities/command';
 import { CacheCleanModule } from './clean/cli';
 import { CacheInfoCommandModule } from './info/cli';
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore strict-deps: Markdown files are asset dependencies bundled/loaded at runtime
 import longDescription from './long-description.md';
 import { CacheDisableModule, CacheEnableModule } from './settings/cli';
 
