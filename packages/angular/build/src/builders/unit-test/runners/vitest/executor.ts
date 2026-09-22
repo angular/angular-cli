@@ -333,6 +333,7 @@ export class VitestExecutor implements TestExecutor {
       projectName,
       buildResultFiles: this.buildResultFiles,
       testFileToEntryPoint: this.testFileToEntryPoint,
+      setupFiles: testSetupFiles,
     });
 
     const debugOptions = debug
