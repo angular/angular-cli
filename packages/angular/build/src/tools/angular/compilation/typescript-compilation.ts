@@ -9,7 +9,7 @@
 import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import ts from 'typescript';
-import { toPosixPath } from '../../../utils/path';
+import { canonicalizePath, toPosixPath } from '../../../utils/path';
 import { profileAsync, profileSync } from '../../../utils/profiling';
 import { AngularCompilation, DiagnosticModes } from './angular-compilation';
 import { type CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
@@ -39,7 +39,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
 
     const {
       options: originalCompilerOptions,
-      rootNames,
+      rootNames: originalRootNames,
       errors,
     } = profileSync('NG_READ_CONFIG', () =>
       readConfiguration(tsconfig, {
@@ -59,6 +59,19 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
         removeComments: false,
       }),
     );
+
+    let rootNames = originalRootNames;
+    if (compilerOptionOverrides?.rootFiles?.length) {
+      const rootFilesSet = new Set(
+        compilerOptionOverrides.rootFiles.map((file) => canonicalizePath(toPosixPath(file))),
+      );
+      for (const file of originalRootNames) {
+        if (/\.d\.[cm]?ts$/i.test(file)) {
+          rootFilesSet.add(canonicalizePath(toPosixPath(file)));
+        }
+      }
+      rootNames = [...rootFilesSet];
+    }
 
     const { compilerOptions, warnings } = transformCompilerOptions(
       ts,

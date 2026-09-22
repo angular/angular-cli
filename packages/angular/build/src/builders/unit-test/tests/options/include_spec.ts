@@ -83,5 +83,32 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         expect(result?.success).toBeTrue();
       });
     });
+
+    it('should ignore TypeScript compilation errors in non-included test files', async () => {
+      await harness.writeFiles({
+        'src/app/services/test.service.spec.ts': `
+          describe('TestService', () => {
+            it('should succeed', () => {
+              expect(true).toBe(true);
+            });
+          });`,
+        'src/app/broken.service.spec.ts': `
+          // This test has a TypeScript type error that would fail compilation if compiled
+          const invalidNumber: number = 'not a number';
+          describe('BrokenService', () => {
+            it('should fail compilation', () => {
+              expect(invalidNumber).toBe(1);
+            });
+          });`,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        include: ['src/app/services/test.service.spec.ts'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });

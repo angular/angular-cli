@@ -61,6 +61,7 @@ export interface CompilerPluginOptions {
   externalRuntimeStyles?: boolean;
   instrumentForCoverage?: (request: string) => boolean;
   templateUpdates?: Map<string, string>;
+  rootFiles?: string[];
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -329,17 +330,21 @@ export function createCompilerPlugin(
               instrumentForCoverage: !!pluginOptions.instrumentForCoverage,
               includeTestMetadata: !!pluginOptions.includeTestMetadata,
               customConditions: build.initialOptions.conditions,
+              rootFiles: pluginOptions.rootFiles,
             },
           );
+
           if (initializationResult.warnings?.length) {
             setupWarnings?.push(...initializationResult.warnings);
           }
+
           angularCompilationContext.setCompilerOptions(initializationResult.compilerOptions);
           shouldTsIgnoreJs = !initializationResult.compilerOptions.allowJs;
           useTypeScriptTranspilation =
             !!initializationResult.compilerOptions['_useTypeScriptTranspilation'];
           referencedFiles = initializationResult.referencedFiles;
           externalStylesheets = initializationResult.externalStylesheets;
+
           if (initializationResult.templateUpdates) {
             // Propagate any template updates
             initializationResult.templateUpdates.forEach((value, key) =>
