@@ -632,7 +632,12 @@ export async function getRoutesFromAngularRouterConfig(
   const platformRef = platformServer([
     {
       provide: INITIAL_CONFIG,
-      useValue: { document, url: `${protocol}//${host}/` },
+      useValue: {
+        document,
+        url: `${protocol}//${host}/`,
+        // The app engine, build, or dev server owns the URL policy for route extraction.
+        allowedHosts: ['*'],
+      },
     },
     {
       // An Angular Console Provider that does not print a set of predefined logs.

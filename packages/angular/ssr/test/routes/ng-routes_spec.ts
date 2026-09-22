@@ -11,7 +11,14 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, InjectionToken, Injector, inject } from '@angular/core';
+import {
+  Component,
+  InjectionToken,
+  Injector,
+  inject,
+  provideEnvironmentInitializer,
+} from '@angular/core';
+import { INITIAL_CONFIG } from '@angular/platform-server';
 import {
   Route,
   Routes,
@@ -30,6 +37,30 @@ describe('extractRoutesAndCreateRouteTree', () => {
     template: `dummy works`,
   })
   class DummyComponent {}
+
+  it('marks internal platform URLs as already validated', async () => {
+    let trustedHosts: readonly string[] | undefined;
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      '/',
+      {},
+      undefined,
+      undefined,
+      [
+        provideEnvironmentInitializer(() => {
+          trustedHosts = (inject(INITIAL_CONFIG) as { allowedHosts?: readonly string[] })
+            .allowedHosts;
+        }),
+      ],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree({
+      url: new URL('http://example.com/home'),
+    });
+    expect(errors).toHaveSize(0);
+    expect(trustedHosts).toEqual(['*']);
+  });
 
   it('should extract routes and create a route tree', async () => {
     setAngularAppTestingManifest(

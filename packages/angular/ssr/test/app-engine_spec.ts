@@ -12,6 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { Component, REQUEST, inject } from '@angular/core';
+import { INITIAL_CONFIG } from '@angular/platform-server';
 import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app';
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
@@ -290,9 +291,13 @@ describe('AngularAppEngine', () => {
     beforeAll(() => {
       @Component({
         selector: 'app-home',
-        template: `Home works`,
+        template: `Home works {{ trustedHosts }}`,
       })
-      class HomeComponent {}
+      class HomeComponent {
+        protected readonly trustedHosts = (
+          inject(INITIAL_CONFIG) as { allowedHosts?: readonly string[] }
+        ).allowedHosts?.join(',');
+      }
 
       setAngularAppEngineManifest({
         allowedHosts: ['example.com'],
@@ -332,6 +337,12 @@ describe('AngularAppEngine', () => {
       const request = new Request('https://example.com/home');
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
+    });
+
+    it('marks internal platform URLs as already validated', async () => {
+      const request = new Request('https://example.com/home');
+      const response = await appEngine.handle(request);
+      expect(await response?.text()).toContain('Home works *');
     });
 
     it('should correctly render the content when the URL ends with "index.html"', async () => {

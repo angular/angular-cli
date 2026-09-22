@@ -74,6 +74,8 @@ export async function renderAngular(
       useValue: {
         url: urlToRender.href,
         document: html,
+        // The app engine validates requests before constructing this internal platform.
+        allowedHosts: ['*'],
       },
     },
     {
