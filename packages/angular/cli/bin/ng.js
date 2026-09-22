@@ -43,20 +43,19 @@ if (rawCommandName === '--get-yargs-completions' || rawCommandName === 'completi
 // This node version check ensures that extremely old versions of node are not used.
 // These may not support ES2015 features such as const/let/async/await/etc.
 // These would then crash with a hard to diagnose error message.
-const [major] = process.versions.node.split('.', 1).map((part) => Number(part));
-
-if (major === 23 || major === 25) {
-  // Allow new odd numbered releases with a warning.
+if (nodeUtils.isNodeVersionSupported()) {
+  require('./bootstrap');
+} else if (nodeUtils.isNodeVersionRunnable()) {
   console.warn(
     'Node.js version ' +
       process.version +
       ' detected.\n' +
-      'Prior to version 27, odd numbered Node.js versions will not enter LTS status and should not be used for production.' +
-      ' For more information, please see https://nodejs.org/en/about/previous-releases/.',
+      'The Angular CLI has not been officially tested on this Node.js version and it is not supported for production use.\n' +
+      'For more information, please see https://nodejs.org/en/about/previous-releases/.',
   );
 
   require('./bootstrap');
-} else if (!nodeUtils.isNodeVersionSupported()) {
+} else {
   // Error and exit if less than the supported versions.
   console.error(
     'Node.js version ' +
@@ -69,6 +68,4 @@ if (major === 23 || major === 25) {
   );
 
   process.exitCode = 3;
-} else {
-  require('./bootstrap');
 }
