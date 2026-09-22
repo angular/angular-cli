@@ -37,6 +37,7 @@ interface PluginOptions {
   projectName: string;
   buildResultFiles: ReadonlyMap<string, ResultFile>;
   testFileToEntryPoint: ReadonlyMap<string, string>;
+  setupFiles: readonly string[];
 }
 
 type VitestCoverageOption = Exclude<InlineConfig['coverage'], undefined>;
@@ -313,8 +314,13 @@ async function loadResultFile(file: ResultFile): Promise<string> {
 }
 
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
-  const { workspaceRoot, buildResultFiles, testFileToEntryPoint } = pluginOptions;
+  const { workspaceRoot, buildResultFiles, testFileToEntryPoint, setupFiles } = pluginOptions;
   const isWindows = platform() === 'win32';
+  const setupFileSet = new Set(
+    setupFiles.map((file) =>
+      toPosixPath(path.isAbsolute(file) ? file : path.join(workspaceRoot, file)),
+    ),
+  );
   let vitestConfig: ResolvedConfig;
 
   return [
@@ -387,7 +393,11 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
         if (entryPoint) {
           outputPath = entryPoint + '.js';
 
-          if (vitestConfig?.coverage?.enabled) {
+          // Setup files must not be wrapped in a virtual import stub because Vitest only invalidates
+          // the setup file itself between test files; wrapping it would cause the underlying bundle
+          // to be cached, preventing per-test hooks from running on subsequent test files.
+          const isSetupFile = setupFileSet.has(id);
+          if (vitestConfig?.coverage?.enabled && !isSetupFile) {
             // To support coverage exclusion of the actual test file, the virtual
             // test entry point only references the built and bundled intermediate file.
             // If vitest supported an "excludeOnlyAfterRemap" option, this could be removed completely.

@@ -54,5 +54,68 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should run setup file hooks for each spec file when coverage is enabled', async () => {
+      await harness.writeFiles({
+        'custom-vitest.config.mts': `
+          import { defineConfig } from 'vitest/config';
+
+          export default defineConfig({
+            test: {
+              fileParallelism: false,
+            },
+          });
+        `,
+        'src/setup.ts': `
+          import { afterEach, beforeEach, expect } from 'vitest';
+          const global = globalThis as typeof globalThis & {
+            setupHookCalls?: string[];
+          };
+          const setupHookCalls = (global.setupHookCalls ??= []);
+          beforeEach(() => {
+            const testName = expect.getState().currentTestName ?? '';
+            setupHookCalls.push('beforeEach:' + testName);
+          });
+          afterEach(() => {
+            const testName = expect.getState().currentTestName ?? '';
+            setupHookCalls.push('afterEach:' + testName);
+          });
+        `,
+        'src/app/app.component.spec.ts': `
+          import { expect, it } from 'vitest';
+          it('runs setup hooks for first test in app.component.spec', () => {
+            const global = globalThis as typeof globalThis & { setupHookCalls?: string[] };
+            expect(global.setupHookCalls).toContain('beforeEach:runs setup hooks for first test in app.component.spec');
+          });
+          it('runs setup hooks for second test in app.component.spec', () => {
+            const global = globalThis as typeof globalThis & { setupHookCalls?: string[] };
+            expect(global.setupHookCalls).toContain('beforeEach:runs setup hooks for second test in app.component.spec');
+            expect(global.setupHookCalls).toContain('afterEach:runs setup hooks for first test in app.component.spec');
+          });
+        `,
+        'src/app/second.spec.ts': `
+          import { expect, it } from 'vitest';
+          it('runs setup hooks for first test in second.spec', () => {
+            const global = globalThis as typeof globalThis & { setupHookCalls?: string[] };
+            expect(global.setupHookCalls).toContain('beforeEach:runs setup hooks for first test in second.spec');
+          });
+          it('runs setup hooks for second test in second.spec', () => {
+            const global = globalThis as typeof globalThis & { setupHookCalls?: string[] };
+            expect(global.setupHookCalls).toContain('beforeEach:runs setup hooks for second test in second.spec');
+            expect(global.setupHookCalls).toContain('afterEach:runs setup hooks for first test in second.spec');
+          });
+        `,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        coverage: true,
+        runnerConfig: 'custom-vitest.config.mts',
+        setupFiles: ['src/setup.ts'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });
