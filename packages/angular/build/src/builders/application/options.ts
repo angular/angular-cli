@@ -138,6 +138,11 @@ interface InternalOptions {
    * there. Used exclusively for tests and shouldn't be used for other kinds of builds.
    */
   disableCodeSplitting?: boolean;
+
+  /**
+   * An array of files to restrict the TypeScript compilation root names to.
+   */
+  rootFiles?: string[];
 }
 
 /** Full set of options for `application` builder. */
@@ -447,6 +452,7 @@ export async function normalizeOptions(
     verbose,
     watch,
     progress = true,
+    rootFiles,
     externalPackages,
     namedChunks,
     budgets,
@@ -494,6 +500,7 @@ export async function normalizeOptions(
     workspaceRoot,
     entryPoints,
     disableCodeSplitting,
+    rootFiles: rootFiles?.map((file: string) => path.resolve(workspaceRoot, file)),
     optimizationOptions,
     outputOptions,
     outExtension,

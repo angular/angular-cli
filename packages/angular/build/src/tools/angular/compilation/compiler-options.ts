@@ -20,6 +20,7 @@ export interface CompilerOptionOverrides {
   instrumentForCoverage?: boolean;
   includeTestMetadata?: boolean;
   customConditions?: string[];
+  rootFiles?: string[];
 }
 
 export function transformCompilerOptions(

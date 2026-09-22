@@ -198,7 +198,15 @@ export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
 ): Promise<RunnerOptions> {
-  const { workspaceRoot, projectSourceRoot, include, exclude = [], watch, providersFile } = options;
+  const {
+    workspaceRoot,
+    projectSourceRoot,
+    include,
+    exclude = [],
+    watch,
+    providersFile,
+    setupFiles,
+  } = options;
 
   // Find test files
   const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
@@ -217,8 +225,15 @@ export async function getVitestBuildOptions(
     removeTestExtension: true,
   });
 
-  if (options.setupFiles?.length) {
-    const setupEntryPoints = getTestEntrypoints(options.setupFiles, {
+  const rootFiles = [...testFiles];
+  if (providersFile) {
+    rootFiles.push(providersFile);
+  }
+
+  if (setupFiles?.length) {
+    rootFiles.push(...setupFiles);
+
+    const setupEntryPoints = getTestEntrypoints(setupFiles, {
       projectSourceRoot,
       workspaceRoot,
       removeTestExtension: false,
@@ -258,6 +273,7 @@ export async function getVitestBuildOptions(
     optimization: false,
     namedChunks: false,
     entryPoints,
+    rootFiles,
     // Vitest's Node-based module loading emulation (vite-node) is not fully spec compliant and lacks
     // live ESM bindings across chunk boundaries. This can cause uninitialized exports or break mocking.
     // Disabling code splitting avoids shared chunks, but increases build and coverage memory/time.
