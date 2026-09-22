@@ -13,22 +13,32 @@
 
 import { SUPPORTED_NODE_VERSIONS, supportedNodeVersions } from '#version';
 
-export { SUPPORTED_NODE_VERSIONS, supportedNodeVersions, isNodeVersionSupported } from '#version';
+export {
+  SUPPORTED_NODE_VERSIONS,
+  supportedNodeVersions,
+  isNodeVersionSupported,
+  isNodeVersionRunnable,
+} from '#version';
 
 /**
  * Checks if the current Node.js version is the minimum supported version.
+ * @param currentVersion Optional Node.js version string to check. Defaults to `process.versions.node`.
+ * @param supportedVersions Optional supported versions array. Defaults to `supportedNodeVersions`.
  * @returns `true` if the current Node.js version is the minimum supported version, `false` otherwise.
  */
-export function isNodeVersionMinSupported(): boolean {
-  if (SUPPORTED_NODE_VERSIONS.charAt(0) === '0') {
+export function isNodeVersionMinSupported(
+  currentVersion = process.versions.node,
+  supportedVersions = supportedNodeVersions,
+): boolean {
+  if (SUPPORTED_NODE_VERSIONS.charAt(0) === '0' && currentVersion === process.versions.node) {
     // Unlike `pkg_npm`, `ts_library` which is used to run unit tests does not support substitutions.
     return true;
   }
 
-  const [processMajor, processMinor, processPatch] = process.versions.node
+  const [processMajor, processMinor, processPatch] = currentVersion
     .split('.', 3)
     .map((part) => Number(part));
-  const [major, minor, patch] = supportedNodeVersions[0].split('.', 3).map((part) => Number(part));
+  const [major, minor, patch] = supportedVersions[0].split('.', 3).map((part) => Number(part));
 
   return (
     processMajor > major ||

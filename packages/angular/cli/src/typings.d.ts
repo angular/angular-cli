@@ -15,5 +15,12 @@ declare module '#version' {
   export const VERSION: string;
   export const SUPPORTED_NODE_VERSIONS: string;
   export const supportedNodeVersions: string[];
-  export function isNodeVersionSupported(): boolean;
+  export function isNodeVersionSupported(
+    currentVersion?: string,
+    supportedVersions?: string[],
+  ): boolean;
+  export function isNodeVersionRunnable(
+    currentVersion?: string,
+    supportedVersions?: string[],
+  ): boolean;
 }
