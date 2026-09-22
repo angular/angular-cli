@@ -92,7 +92,7 @@
     },
     "compilationMode": {
       "type": "string",
-      "description": "Angular compilation mode. Use 'partial' when publishing to npm (APF requirement). Use 'full' only for private, internal monorepo packages that are never published.",
+      "description": "Angular compilation mode. Use 'partial' when publishing to npm (APF requirement). Use 'full' only during development or for private, internal monorepo packages that are never published.",
       "enum": ["partial", "full"],
       "default": "partial"
     },
