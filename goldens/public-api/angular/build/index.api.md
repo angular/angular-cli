@@ -236,6 +236,7 @@ export type UnitTestBuilderOptions = {
     isolate?: boolean;
     listTests?: boolean;
     outputFile?: string;
+    polyfills?: string[];
     progress?: boolean;
     providersFile?: string;
     quiet?: boolean;

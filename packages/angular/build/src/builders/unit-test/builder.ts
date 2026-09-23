@@ -323,6 +323,9 @@ export async function* execute(
     const applicationBuildOptions = {
       ...buildTargetOptions,
       ...runnerBuildOptions,
+      ...(normalizedOptions.polyfills !== undefined
+        ? { polyfills: normalizedOptions.polyfills }
+        : {}),
       watch: normalizedOptions.watch,
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
       quiet: normalizedOptions.quiet,
