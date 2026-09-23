@@ -278,6 +278,9 @@ export async function getVitestBuildOptions(
     // live ESM bindings across chunk boundaries. This can cause uninitialized exports or break mocking.
     // Disabling code splitting avoids shared chunks, but increases build and coverage memory/time.
     disableCodeSplitting: !options.splitting,
+    // The generated TestBed initializer can import 'zone.js/testing' behind a top-level await.
+    // The test bundle is loaded by the test runner, not by the browsers the project targets.
+    supportTopLevelAwait: true,
     // Enable support for vitest browser prebundling. Excludes can be controlled with a runnerConfig
     // and the `optimizeDeps.exclude` option.
     externalPackages: true,

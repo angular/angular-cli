@@ -140,6 +140,23 @@ interface InternalOptions {
   disableCodeSplitting?: boolean;
 
   /**
+   * Marks top-level await as supported by the browser code bundle regardless of the browsers the
+   * project targets.
+   *
+   * The test bundle contains a generated TestBed initializer that imports `zone.js/testing` behind
+   * a top-level await so that the import is skipped when Zone.js is not loaded. esbuild rejects the
+   * syntax outright when the project's Browserslist configuration resolves to a browser released
+   * before top-level await was available, so the build fails before the guard can run.
+   *
+   * That configuration describes the browsers an application is deployed to. A test bundle is only
+   * ever loaded by the test runner's module runner or by a browser the runner launches, and every
+   * browser Angular supports has had top-level await since 2021.
+   *
+   * Used exclusively for tests and shouldn't be used for other kinds of builds.
+   */
+  supportTopLevelAwait?: boolean;
+
+  /**
    * An array of files to restrict the TypeScript compilation root names to.
    */
   rootFiles?: string[];
@@ -463,6 +480,7 @@ export async function normalizeOptions(
     externalRuntimeStyles,
     instrumentForCoverage,
     disableCodeSplitting,
+    supportTopLevelAwait,
   } = options;
 
   // Return all the normalized options
@@ -500,6 +518,7 @@ export async function normalizeOptions(
     workspaceRoot,
     entryPoints,
     disableCodeSplitting,
+    supportTopLevelAwait,
     rootFiles: rootFiles?.map((file: string) => path.resolve(workspaceRoot, file)),
     optimizationOptions,
     outputOptions,

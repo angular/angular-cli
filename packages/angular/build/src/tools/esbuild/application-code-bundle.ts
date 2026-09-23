@@ -67,7 +67,7 @@ export function createBrowserCodeBundleOptions(
       entryNames: outputNames.bundles,
       entryPoints,
       target,
-      supported: getFeatureSupport(zoneless),
+      supported: getFeatureSupport(zoneless, options.supportTopLevelAwait),
     };
 
     if (options.disableCodeSplitting) {

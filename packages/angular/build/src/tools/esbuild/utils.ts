@@ -194,10 +194,17 @@ export async function withNoProgress<T>(text: string, action: () => T | Promise<
  * Generates a syntax feature object map for Angular applications.
  * A full set of feature names can be found here: https://esbuild.github.io/api/#supported
  * @param nativeAsyncAwait Indicate whether to support native async/await.
+ * @param topLevelAwait Indicate whether to support top-level await regardless of the target.
  * @returns An object that can be used with the esbuild build `supported` option.
  */
-export function getFeatureSupport(nativeAsyncAwait: boolean): BuildOptions['supported'] {
+export function getFeatureSupport(
+  nativeAsyncAwait: boolean,
+  topLevelAwait = false,
+): BuildOptions['supported'] {
   return {
+    // Top-level await has no downleveled form, so esbuild rejects it outright for a target without
+    // it. Only enabled for bundles that are not deployed to the browsers a project targets.
+    ...(topLevelAwait ? { 'top-level-await': true } : {}),
     // Native async/await is not supported with Zone.js. Disabling support here will cause
     // esbuild to downlevel async/await, async generators, and for await...of to a Zone.js supported form.
     'async-await': nativeAsyncAwait,
