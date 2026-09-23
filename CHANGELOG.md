@@ -1,27 +1,6 @@
-<a name="22.2.0-rc.0"></a>
+<a name="22.2.0"></a>
 
-# 22.2.0-rc.0 (2026-09-16)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                                       |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [6e7f809a7d](https://github.com/angular/angular-cli/commit/6e7f809a7d66e4b8d260a1c00297812412a926f1) | perf | skip eager yargs help message formatting during command execution |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                                |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
-| [978351af71](https://github.com/angular/angular-cli/commit/978351af71889d4786a18fec9e193eb5b16af7dd) | fix  | include inline component stylesheets in referenced watch files             |
-| [72dc9677cf](https://github.com/angular/angular-cli/commit/72dc9677cf743243d6cb22d2b81782022f71356e) | fix  | pass load cache to compiler plugin and escape extension regex in polyfills |
-| [31c045639e](https://github.com/angular/angular-cli/commit/31c045639e8bfd114cbd552d83cc70a968fe7f81) | fix  | prevent stale bundler caching and correctly resolve load cache             |
-| [d97c8857c1](https://github.com/angular/angular-cli/commit/d97c8857c18da02fcc6c69a0ea652cc706c5c9b6) | perf | key Sass package resolutions without containing URL qualification          |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.7"></a>
-
-# 22.2.0-next.7 (2026-09-10)
+# 22.2.0 (2026-09-23)
 
 ## Deprecations
 
@@ -31,31 +10,63 @@
 
   Disabling code splitting is no longer necessary with Vitest 5, as the issue where shared-module exports were uninitialized in class-field initializers under JSDOM has been resolved.
 
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                       |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [41555dfb3](https://github.com/angular/angular-cli/commit/41555dfb3b71d08cdfe2853bf2cbeca5b6942f67) | feat | add `--root` command line option to `mcp` command                 |
+| [6e7f809a7](https://github.com/angular/angular-cli/commit/6e7f809a7d66e4b8d260a1c00297812412a926f1) | perf | skip eager yargs help message formatting during command execution |
+
 ### @angular/build
 
-| Commit                                                                                               | Type     | Description                                                                                                                  |
-| ---------------------------------------------------------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| [fe2f180fd0](https://github.com/angular/angular-cli/commit/fe2f180fd0c2fa02706353ca6a034d235feb6c59) | fix      | add automatic corruption recovery in SQLite cache store                                                                      |
-| [675f1f5274](https://github.com/angular/angular-cli/commit/675f1f5274ff853f153832f7adc69273fa63f0cd) | fix      | avoid pure comment pattern in oxc transform                                                                                  |
-| [d396324b4e](https://github.com/angular/angular-cli/commit/d396324b4eb3b16640526a64365d953642bc7ca1) | fix      | default preloadInitial to false when serviceWorker is enabled                                                                |
-| [8504cfffcf](https://github.com/angular/angular-cli/commit/8504cfffcfb943fcd8fda62507e4b236e4bf429a) | fix      | disable root config extension for inline test project                                                                        |
-| [5d21812aae](https://github.com/angular/angular-cli/commit/5d21812aaedc57cbd9378a99d9747f80c413cdc3) | fix      | disable strictPort when port 0 is used in dev-server                                                                         |
-| [54d712f579](https://github.com/angular/angular-cli/commit/54d712f57904d2f612eec27a0507ea298b40915e) | fix      | ensure parent directory exists in SQLite cache store                                                                         |
-| [b423bc39cd](https://github.com/angular/angular-cli/commit/b423bc39cd59c73ae79402c6cccdc0ecf1d7aaa1) | fix      | use chokidar watcher when followSymlinks is enabled                                                                          |
-| [5a0d226b7c](https://github.com/angular/angular-cli/commit/5a0d226b7ccb945edd234fa0c839994f4876e2ee) | perf     | avoid full JSON parsing when updating sourcemap ignore list                                                                  |
-| [482f6d8aab](https://github.com/angular/angular-cli/commit/482f6d8aab289fbd6dc5f9aecdcf7b8e1b6cac4f) | perf     | decouple diagnostic type checking from build start                                                                           |
-| [f1afa603b4](https://github.com/angular/angular-cli/commit/f1afa603b48566e45dfb8d95930375a71f0bfa0b) | perf     | read rendered module length once per module in chunk optimizer ([#34045](https://github.com/angular/angular-cli/pull/34045)) |
-| [0ba4d8e29c](https://github.com/angular/angular-cli/commit/0ba4d8e29c0fb9abe6b07432edfab9e39066ca29) | perf     | reduce watcher debounce latency for faster incremental rebuilds                                                              |
-| [4d11a1334f](https://github.com/angular/angular-cli/commit/4d11a1334ff5fabfe5338cc3de5ce4f45f6afa5f) | perf     | selectively compress large entries in SQLite cache store                                                                     |
-| [0a137f98d0](https://github.com/angular/angular-cli/commit/0a137f98d035f3dbd9a5daf1b6999246f73610c8) | perf     | share sass directory and resolution caches across stylesheets                                                                |
-| [d11a663e77](https://github.com/angular/angular-cli/commit/d11a663e77dad3dc9dbb6336e782f23b8a6f595c) | perf     | verify cache metadata before reading file and eliminate sqlite read-locks                                                    |
-| [66bd6bd1ea](https://github.com/angular/angular-cli/commit/66bd6bd1eab41484ed5db38f5545e80de4090b34) | refactor | deprecate splitting option in unit-test builder                                                                              |
+| Commit                                                                                              | Type     | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------------------------- |
+| [ad8271320](https://github.com/angular/angular-cli/commit/ad8271320f67c2b1502e446f1e3cb0a05444d04f) | feat     | migrate Angular Linker to oxc-parser and magic-string                            |
+| [175273931](https://github.com/angular/angular-cli/commit/175273931ebb0cf08bf62dd1694dbde5ff5229b6) | feat     | Support splitting browser and server stats jsonfiles for easier consumption      |
+| [fe2f180fd](https://github.com/angular/angular-cli/commit/fe2f180fd0c2fa02706353ca6a034d235feb6c59) | fix      | add automatic corruption recovery in SQLite cache store                          |
+| [675f1f527](https://github.com/angular/angular-cli/commit/675f1f5274ff853f153832f7adc69273fa63f0cd) | fix      | avoid pure comment pattern in oxc transform                                      |
+| [d396324b4](https://github.com/angular/angular-cli/commit/d396324b4eb3b16640526a64365d953642bc7ca1) | fix      | default preloadInitial to false when serviceWorker is enabled                    |
+| [7e5510e46](https://github.com/angular/angular-cli/commit/7e5510e464eb423d8757ae6f058f73fc17249d81) | fix      | disable linker internal source mapping in OXC linker                             |
+| [8504cfffc](https://github.com/angular/angular-cli/commit/8504cfffcfb943fcd8fda62507e4b236e4bf429a) | fix      | disable root config extension for inline test project                            |
+| [ee3041325](https://github.com/angular/angular-cli/commit/ee3041325cd2400c26e239e64e14a0e314ab6031) | fix      | ensure chokidar watcher is ready before returning                                |
+| [54d712f57](https://github.com/angular/angular-cli/commit/54d712f57904d2f612eec27a0507ea298b40915e) | fix      | ensure parent directory exists in SQLite cache store                             |
+| [80acd6236](https://github.com/angular/angular-cli/commit/80acd6236eac6b1b07543583717e94cbd1de1180) | fix      | execute setup file hooks for each spec file when coverage is enabled             |
+| [978351af7](https://github.com/angular/angular-cli/commit/978351af71889d4786a18fec9e193eb5b16af7dd) | fix      | include inline component stylesheets in referenced watch files                   |
+| [f47f77f5f](https://github.com/angular/angular-cli/commit/f47f77f5f6db5cda1493652f813c98c26f172ea9) | fix      | only compile included test files in unit-test builder                            |
+| [72dc9677c](https://github.com/angular/angular-cli/commit/72dc9677cf743243d6cb22d2b81782022f71356e) | fix      | pass load cache to compiler plugin and escape extension regex in polyfills       |
+| [701bde481](https://github.com/angular/angular-cli/commit/701bde4818439de0e49c99d57dc749b0dd22c4dd) | fix      | preserve duplicate bundle filenames across output file types                     |
+| [e4111ae81](https://github.com/angular/angular-cli/commit/e4111ae8180f3cd5800f248c23010844aa1730ad) | fix      | prevent memory leaks in parallel compilation and caches                          |
+| [31c045639](https://github.com/angular/angular-cli/commit/31c045639e8bfd114cbd552d83cc70a968fe7f81) | fix      | prevent stale bundler caching and correctly resolve load cache                   |
+| [bad31421c](https://github.com/angular/angular-cli/commit/bad31421cbf23339d4fbd389a91d198df405697d) | fix      | prevent syntax corruption in linker and oxc transform                            |
+| [0d9851600](https://github.com/angular/angular-cli/commit/0d9851600ca618ccabfc3143a9c552a5448d6eec) | fix      | recursively ignore output and cache paths in watch mode                          |
+| [040bc21ec](https://github.com/angular/angular-cli/commit/040bc21ec3d4fa1bdfa8513206f463d89e20d9a1) | fix      | scope Sass package resolution caching for stylesheets in node_modules            |
+| [1fc273279](https://github.com/angular/angular-cli/commit/1fc2732795069ad521645b06a94e5df3a55c3d9c) | fix      | support parenthesized expressions in oxc linker                                  |
+| [b423bc39c](https://github.com/angular/angular-cli/commit/b423bc39cd59c73ae79402c6cccdc0ecf1d7aaa1) | fix      | use chokidar watcher when followSymlinks is enabled                              |
+| [87551ad5c](https://github.com/angular/angular-cli/commit/87551ad5c53f90cbdc68fdb5e47007b9436c7f75) | perf     | avoid encoding intermediate source maps before remapping                         |
+| [6ee559ca9](https://github.com/angular/angular-cli/commit/6ee559ca9d209fb4c53de2aaf9918d10e5f062a1) | perf     | bypass worker dispatch for files without transform candidates                    |
+| [0589edd9c](https://github.com/angular/angular-cli/commit/0589edd9cdc493ecf34a160cc7b8491618b59f72) | perf     | consolidate component stylesheet bundling with shared load result cache          |
+| [482f6d8aa](https://github.com/angular/angular-cli/commit/482f6d8aab289fbd6dc5f9aecdcf7b8e1b6cac4f) | perf     | decouple diagnostic type checking from build start                               |
+| [a877aa7eb](https://github.com/angular/angular-cli/commit/a877aa7ebdbf919d6bc17e6ec0920ca702db0db4) | perf     | implement SharedArrayBuffer translation dictionaries for zero-copy worker access |
+| [f1cc95943](https://github.com/angular/angular-cli/commit/f1cc959439d8ca11a45d693520c34dd94e0b6548) | perf     | implement sliding-window batching and worker translation eviction                |
+| [d97c8857c](https://github.com/angular/angular-cli/commit/d97c8857c18da02fcc6c69a0ea652cc706c5c9b6) | perf     | key Sass package resolutions without containing URL qualification                |
+| [5cd20e141](https://github.com/angular/angular-cli/commit/5cd20e141ad176c87e4002da2d4ee3755f97cd3e) | perf     | only reset Sass worker pool caches when stylesheet files change                  |
+| [1c00edce0](https://github.com/angular/angular-cli/commit/1c00edce02bdd0201546417d71518f78bfb89d34) | perf     | optimize sourcemap stripping and loading with buffer fast path                   |
+| [0ba4d8e29](https://github.com/angular/angular-cli/commit/0ba4d8e29c0fb9abe6b07432edfab9e39066ca29) | perf     | reduce watcher debounce latency for faster incremental rebuilds                  |
+| [a6ef9cfbe](https://github.com/angular/angular-cli/commit/a6ef9cfbeace725d58c0f7f65640ef6de9b39c33) | perf     | replace watchpack with @parcel/watcher and chokidar                              |
+| [4d11a1334](https://github.com/angular/angular-cli/commit/4d11a1334ff5fabfe5338cc3de5ce4f45f6afa5f) | perf     | selectively compress large entries in SQLite cache store                         |
+| [0a137f98d](https://github.com/angular/angular-cli/commit/0a137f98d035f3dbd9a5daf1b6999246f73610c8) | perf     | share sass directory and resolution caches across stylesheets                    |
+| [f4dad31cc](https://github.com/angular/angular-cli/commit/f4dad31cce41bc3e8ed8767256d9e50a712c3a72) | perf     | unify Oxc linking and optimization AST traversal passes                          |
+| [2b85529e8](https://github.com/angular/angular-cli/commit/2b85529e8290c8c916539b5a0336b4efdb68578c) | perf     | use iterative post-order AST traversal for OXC transforms                        |
+| [ecbcd87b8](https://github.com/angular/angular-cli/commit/ecbcd87b8857225e4df3df7896b3236d63553f23) | perf     | use native sass-embedded compiler daemon                                         |
+| [ce83ac0e8](https://github.com/angular/angular-cli/commit/ce83ac0e82981efd9408e07a35315e3cef9e1a36) | perf     | use size-weighted task heuristics in i18n inliner                                |
+| [d11a663e7](https://github.com/angular/angular-cli/commit/d11a663e77dad3dc9dbb6336e782f23b8a6f595c) | perf     | verify cache metadata before reading file and eliminate sqlite read-locks        |
+| [66bd6bd1e](https://github.com/angular/angular-cli/commit/66bd6bd1eab41484ed5db38f5545e80de4090b34) | refactor | deprecate splitting option in unit-test builder                                  |
 
 ### @angular/ssr
 
-| Commit                                                                                               | Type | Description                                  |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
-| [23e3d44a7f](https://github.com/angular/angular-cli/commit/23e3d44a7f051cd3bb67700b8d8407f73b7aa7f3) | perf | pre-compile critical CSS plans at build time |
+| Commit                                                                                              | Type | Description                                  |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------- |
+| [23e3d44a7](https://github.com/angular/angular-cli/commit/23e3d44a7f051cd3bb67700b8d8407f73b7aa7f3) | perf | pre-compile critical CSS plans at build time |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -94,40 +105,6 @@
 | [a6e30fa378](https://github.com/angular/angular-cli/commit/a6e30fa378ef5f03b26cd2fcafff6bff2c47da80) | fix  | disable strictPort when port 0 is used in dev-server                                                                         |
 | [35a5d4aa49](https://github.com/angular/angular-cli/commit/35a5d4aa49011f83f58cdd30c3ae24a55bf0651c) | perf | avoid full JSON parsing when updating sourcemap ignore list                                                                  |
 | [48cc43cbf2](https://github.com/angular/angular-cli/commit/48cc43cbf204c887b344b773045b5460265eaa14) | perf | read rendered module length once per module in chunk optimizer ([#34045](https://github.com/angular/angular-cli/pull/34045)) |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.6"></a>
-
-# 22.2.0-next.6 (2026-09-02)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
-| [b37c93329](https://github.com/angular/angular-cli/commit/b37c933299dac37e394d9f4fe0d019052db427a9) | fix  | isolate temporary package installations from parent Yarn workspace |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
-| [4b8c62a8f](https://github.com/angular/angular-cli/commit/4b8c62a8f1a1d312ef2e1e0df6b7642bf1db5c5f) | fix  | add splitting option to unit-test builder                     |
-| [51565d4bc](https://github.com/angular/angular-cli/commit/51565d4bcbd4667c23c607d878f08301afc4c5e3) | fix  | enable code splitting for vitest browser tests                |
-| [5b850fdfc](https://github.com/angular/angular-cli/commit/5b850fdfc7534d33db7ab4a7f1e32e143462eec7) | fix  | fail build and exclude routes when prerendering fails         |
-| [dfa7f03a9](https://github.com/angular/angular-cli/commit/dfa7f03a93b5b24b949aea354bc40f0a91e9582d) | fix  | keep dev-server Vite cache worktree-local                     |
-| [135662d9a](https://github.com/angular/angular-cli/commit/135662d9a1de85b42292b26b547160eaca71e5da) | fix  | preserve binary values in the SQLite cache store              |
-| [701bde481](https://github.com/angular/angular-cli/commit/701bde4818439de0e49c99d57dc749b0dd22c4dd) | fix  | preserve duplicate bundle filenames across output file types  |
-| [6ee559ca9](https://github.com/angular/angular-cli/commit/6ee559ca9d209fb4c53de2aaf9918d10e5f062a1) | perf | bypass worker dispatch for files without transform candidates |
-| [2b85529e8](https://github.com/angular/angular-cli/commit/2b85529e8290c8c916539b5a0336b4efdb68578c) | perf | use iterative post-order AST traversal for OXC transforms     |
-| [ecbcd87b8](https://github.com/angular/angular-cli/commit/ecbcd87b8857225e4df3df7896b3236d63553f23) | perf | use native sass-embedded compiler daemon                      |
-| [ce83ac0e8](https://github.com/angular/angular-cli/commit/ce83ac0e82981efd9408e07a35315e3cef9e1a36) | perf | use size-weighted task heuristics in i18n inliner             |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                         |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------- |
-| [4fa81d403](https://github.com/angular/angular-cli/commit/4fa81d403c93a7480301e58630203cb028aebc69) | fix  | decode pathname when constructing server asset path |
-| [bb72145f9](https://github.com/angular/angular-cli/commit/bb72145f9ab45aee29f523236b3a25cd0813a841) | fix  | ensure public directory containment in CommonEngine |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -196,30 +173,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="22.2.0-next.5"></a>
-
-# 22.2.0-next.5 (2026-08-26)
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                                      |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------- |
-| [4d0be683b7](https://github.com/angular/angular-cli/commit/4d0be683b780a9a1629dc8f9cddad49153bddabf) | fix  | ignore side-effect annotations in unit test builds                               |
-| [e4111ae818](https://github.com/angular/angular-cli/commit/e4111ae8180f3cd5800f248c23010844aa1730ad) | fix  | prevent memory leaks in parallel compilation and caches                          |
-| [62999cabf4](https://github.com/angular/angular-cli/commit/62999cabf4d65cf1060598150a77494e147fcc2a) | perf | batch prerender routes and share in-memory server bundles                        |
-| [0589edd9cd](https://github.com/angular/angular-cli/commit/0589edd9cdc493ecf34a160cc7b8491618b59f72) | perf | consolidate component stylesheet bundling with shared load result cache          |
-| [a877aa7ebd](https://github.com/angular/angular-cli/commit/a877aa7ebdbf919d6bc17e6ec0920ca702db0db4) | perf | implement SharedArrayBuffer translation dictionaries for zero-copy worker access |
-| [f1cc959439](https://github.com/angular/angular-cli/commit/f1cc959439d8ca11a45d693520c34dd94e0b6548) | perf | implement sliding-window batching and worker translation eviction                |
-| [f4dad31cce](https://github.com/angular/angular-cli/commit/f4dad31cce41bc3e8ed8767256d9e50a712c3a72) | perf | unify Oxc linking and optimization AST traversal passes                          |
-
-### @angular/ssr
-
-| Commit                                                                                               | Type | Description                                           |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [f8576e3c8b](https://github.com/angular/angular-cli/commit/f8576e3c8bfe3490b1b0b85832b489593a4e43ac) | fix  | abort web request signal when node request is aborted |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="22.1.6"></a>
 
 # 22.1.6 (2026-08-26)
@@ -263,36 +216,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="22.2.0-next.4"></a>
-
-# 22.2.0-next.4 (2026-08-19)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                      |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
-| [34e1e0bb5](https://github.com/angular/angular-cli/commit/34e1e0bb5d5ccf374f51a1b241158f6f2ea0dd42) | fix  | enforce MCP roots in get_best_practices tool                     |
-| [2b060630c](https://github.com/angular/angular-cli/commit/2b060630c66ce688b7ecbe51d282955869e5d4b0) | fix  | handle errors from isAllowedWorkspacePath in best-practices tool |
-| [24fd8fce2](https://github.com/angular/angular-cli/commit/24fd8fce2a3ff035acdc5f3e036eb4ba21f71a76) | fix  | throw on out-of-roots workspace in best-practices tool           |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                  |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
-| [ce1b60f89](https://github.com/angular/angular-cli/commit/ce1b60f89699c3a76496a0489e5f2b9e4fe62429) | fix  | transform fail() to expect.fail() in refactor-jasmine-vitest |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                 |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------- |
-| [175273931](https://github.com/angular/angular-cli/commit/175273931ebb0cf08bf62dd1694dbde5ff5229b6) | feat | Support splitting browser and server stats jsonfiles for easier consumption |
-| [1ee0beca7](https://github.com/angular/angular-cli/commit/1ee0beca7b243cc4c06eb42b25d216d7b256b097) | fix  | correct misleading error message for top-level await                        |
-| [0ffe2d27f](https://github.com/angular/angular-cli/commit/0ffe2d27f256a5755809fa4788e4adb97c65b806) | fix  | disable code splitting for unit test builds                                 |
-| [50994d76e](https://github.com/angular/angular-cli/commit/50994d76e59a4b632f1782c51cd60f80c9cd50fb) | fix  | preserve integrity and crossorigin in autoCsp loader                        |
-| [d6fd24320](https://github.com/angular/angular-cli/commit/d6fd243207ad1c3e242b8592698afa986320cc6c) | perf | traverse AST with iterative post-order walker in i18n inliner               |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="22.1.5"></a>
 
 # 22.1.5 (2026-08-19)
@@ -319,54 +242,6 @@
 | [b4679998c](https://github.com/angular/angular-cli/commit/b4679998c205b6cce01d40fad24c4ee7954aa48d) | fix  | disable code splitting for unit test builds                   |
 | [ff1d3565e](https://github.com/angular/angular-cli/commit/ff1d3565e87749a8347c3be98cd4a7ebccb69fc0) | fix  | preserve integrity and crossorigin in autoCsp loader          |
 | [1fc1fb05c](https://github.com/angular/angular-cli/commit/1fc1fb05cfe2c69ee7b9345b582d3c2177b923fd) | perf | traverse AST with iterative post-order walker in i18n inliner |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.3"></a>
-
-# 22.2.0-next.3 (2026-08-13)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                                                                                           |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| [7106676e6](https://github.com/angular/angular-cli/commit/7106676e64ee234641b1b3cbd88fc058703d4d3e) | fix  | disable searching current directory for bare executable names on Windows                                                              |
-| [ecf8c0822](https://github.com/angular/angular-cli/commit/ecf8c0822e5d56b44a0be4be8fccb41373135d3e) | fix  | serialize configuration as a single argv token in run_target strategies ([#33657](https://github.com/angular/angular-cli/pull/33657)) |
-| [2e4dd90c3](https://github.com/angular/angular-cli/commit/2e4dd90c3ae898bf36af42f699c7b7d560bfc66a) | perf | avoid eager module loading during global bootstrap                                                                                    |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                             |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------- |
-| [1161e6c99](https://github.com/angular/angular-cli/commit/1161e6c99992c884e2e0ce9fc295b0e60b2ae1df) | fix  | generate CLAUDE.md for Claude Code instead of AGENTS.md |
-| [c536ae364](https://github.com/angular/angular-cli/commit/c536ae364975dd0088fd8717464c723a4dcb74e3) | fix  | import UrlSegment instead of subPath in guard generator |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [04b532772](https://github.com/angular/angular-cli/commit/04b532772f6347d341b182135dee1758616a69d6) | fix  | count statically imported chunks in the initial total             |
-| [2274babb6](https://github.com/angular/angular-cli/commit/2274babb662b8da2189f1ae9faaa528838052c32) | fix  | normalize setupFiles paths to POSIX for vitest runner             |
-| [199a864df](https://github.com/angular/angular-cli/commit/199a864df97fc8c20b8d4e1fc8b891c61140671a) | fix  | prevent syntax corruption for Crockford-style enum IIFE           |
-| [0d9851600](https://github.com/angular/angular-cli/commit/0d9851600ca618ccabfc3143a9c552a5448d6eec) | fix  | recursively ignore output and cache paths in watch mode           |
-| [3eba6f726](https://github.com/angular/angular-cli/commit/3eba6f7269f3b0f8556510d0b668e978ea686c88) | fix  | return direct file contents for non-Angular TypeScript files      |
-| [3c7ac1518](https://github.com/angular/angular-cli/commit/3c7ac1518b062f14409b4d3c6c3e65c956424ad9) | fix  | return only lowest version per target engine                      |
-| [3e9fed9a6](https://github.com/angular/angular-cli/commit/3e9fed9a6a1d24f30812ca29ca621d9d9a14496f) | fix  | set target for Rolldown dependency prebundling in Vite dev server |
-| [87551ad5c](https://github.com/angular/angular-cli/commit/87551ad5c53f90cbdc68fdb5e47007b9436c7f75) | perf | avoid encoding intermediate source maps before remapping          |
-| [194be2088](https://github.com/angular/angular-cli/commit/194be2088587918ed7b47ed606ea587a7116608a) | perf | avoid encoding the inline source map before remapping             |
-| [a55a6b78e](https://github.com/angular/angular-cli/commit/a55a6b78e89debb9c93c83375c54f6716bc26c65) | perf | batch last_accessed updates in sqlite cache store                 |
-| [33b305416](https://github.com/angular/angular-cli/commit/33b3054169929dc98f93a758a90da5d26cf522f7) | perf | hash the i18n inline cache key options once per locale            |
-| [1c00edce0](https://github.com/angular/angular-cli/commit/1c00edce02bdd0201546417d71518f78bfb89d34) | perf | optimize sourcemap stripping and loading with buffer fast path    |
-| [b6269a816](https://github.com/angular/angular-cli/commit/b6269a8169046a78281808dcf92054140912a77d) | perf | optimize template string size calculation in server manifest      |
-| [a6ef9cfbe](https://github.com/angular/angular-cli/commit/a6ef9cfbeace725d58c0f7f65640ef6de9b39c33) | perf | replace watchpack with @parcel/watcher and chokidar               |
-| [596847f89](https://github.com/angular/angular-cli/commit/596847f89913684a84465d004aa3d6c7e1a40b06) | perf | share i18n translations with the inliner workers by reference     |
-| [19c91e48d](https://github.com/angular/angular-cli/commit/19c91e48d4b8a95a76dfe4bffd105130b416843d) | perf | use Map for chunk asset size lookups in budget calculator         |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
-| [6a3446770](https://github.com/angular/angular-cli/commit/6a3446770a8fbfecc7265eb2a6d764e2f1614b3a) | fix  | destroy platform when response stream is cancelled |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -448,54 +323,6 @@
 | Commit                                                                                              | Type | Description           |
 | --------------------------------------------------------------------------------------------------- | ---- | --------------------- |
 | [f348efe8b](https://github.com/angular/angular-cli/commit/f348efe8b6d9c9d7014afb331eecda0a9478ba0a) | fix  | bump undici to 7.29.0 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.2"></a>
-
-# 22.2.0-next.2 (2026-08-05)
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                           |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------- |
-| [7e5510e464](https://github.com/angular/angular-cli/commit/7e5510e464eb423d8757ae6f058f73fc17249d81) | fix  | disable linker internal source mapping in OXC linker  |
-| [bad31421cb](https://github.com/angular/angular-cli/commit/bad31421cbf23339d4fbd389a91d198df405697d) | fix  | prevent syntax corruption in linker and oxc transform |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.1"></a>
-
-# 22.2.0-next.1 (2026-08-05)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                                                                                                                   |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| [41555dfb3b](https://github.com/angular/angular-cli/commit/41555dfb3b71d08cdfe2853bf2cbeca5b6942f67) | feat | add `--root` command line option to `mcp` command                                                                                             |
-| [035b9d5c9b](https://github.com/angular/angular-cli/commit/035b9d5c9bca624b98e14480f599481f294b49f3) | fix  | add packages with built-in schematics to devDependencies only                                                                                 |
-| [0ae5690c35](https://github.com/angular/angular-cli/commit/0ae5690c35b9af00f60d4851f1bab4ba5ec8eb19) | fix  | always install package during ng add to inspect manifest on disk for schematics ([#33718](https://github.com/angular/angular-cli/pull/33718)) |
-| [44ff584b33](https://github.com/angular/angular-cli/commit/44ff584b33830aa839c08feb205f014e4e7b5dca) | fix  | correctly report available package updates during bare ng update                                                                              |
-| [1d4f9ebbe9](https://github.com/angular/angular-cli/commit/1d4f9ebbe993a5eb8b23929a3fc55b506597e5aa) | fix  | discover migrations from installed packages when omitted by registry metadata ([#33718](https://github.com/angular/angular-cli/pull/33718))   |
-| [25034f97ad](https://github.com/angular/angular-cli/commit/25034f97ad1b9a12f4080f646a0e2705425f9726) | fix  | normalize Windows drive-letter casing for process.cwd                                                                                         |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                                                                   |
-| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------- |
-| [ad8271320f](https://github.com/angular/angular-cli/commit/ad8271320f67c2b1502e446f1e3cb0a05444d04f) | feat | migrate Angular Linker to oxc-parser and magic-string                                                         |
-| [4fb12292c2](https://github.com/angular/angular-cli/commit/4fb12292c21498c59836f7c80e4f824bb7751cac) | fix  | prevent build process hang on unhandled error ([#33715](https://github.com/angular/angular-cli/pull/33715))   |
-| [abd8ec9f3e](https://github.com/angular/angular-cli/commit/abd8ec9f3e11f1410fcb87d0d9d60f56016912fe) | fix  | prevent IIFE wrapper interleaving for adjacent classes in minified files                                      |
-| [bcadbbef20](https://github.com/angular/angular-cli/commit/bcadbbef2054e897b9d22c1456883fc68f0383c0) | fix  | retain watch files on error in load result cache                                                              |
-| [e1c7193dce](https://github.com/angular/angular-cli/commit/e1c7193dcee1c7f2feb07fdf24a6e0656f29cfaf) | fix  | support case-insensitive and alternative license file names                                                   |
-| [f4a0f846e7](https://github.com/angular/angular-cli/commit/f4a0f846e7d14b5ff58c91d04461ef4a027c56b8) | perf | release build resources early in non-watch mode ([#33715](https://github.com/angular/angular-cli/pull/33715)) |
-
-### @angular/ssr
-
-| Commit                                                                                               | Type | Description                                                |
-| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [b74eef889f](https://github.com/angular/angular-cli/commit/b74eef889f9c8812dcbe116400663fa3d68d6b4f) | fix  | settle writeResponseToNodeResponse when client disconnects |
-| [33169801c6](https://github.com/angular/angular-cli/commit/33169801c6ed7fc7c7dca2c04008e5d405374983) | perf | avoid buffering request body when sanitizing headers       |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -599,24 +426,6 @@
 | Commit                                                                                               | Type | Description                                                     |
 | ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
 | [db24220fb8](https://github.com/angular/angular-cli/commit/db24220fb8efb5c9416e375a468672ff69d0659d) | fix  | rewrite paths from sandboxed execroots when running under Bazel |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.2.0-next.0"></a>
-
-# 22.2.0-next.0 (2026-07-30)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                     |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------- |
-| [e148a8df93](https://github.com/angular/angular-cli/commit/e148a8df93b309dcd51698b4ce4f9343560edd8e) | fix  | support npm 12 metadata array and error formats |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [6469b5f1f5](https://github.com/angular/angular-cli/commit/6469b5f1f5946415f49000f26bddd88b5647ac3d) | fix  | rewrite paths from sandboxed execroots when running under Bazel |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
