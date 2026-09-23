@@ -1,3 +1,27 @@
+<a name="22.1.9"></a>
+
+# 22.1.9 (2026-09-23)
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                      |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------ |
+| [b94dabdb7](https://github.com/angular/angular-cli/commit/b94dabdb744ff1fe72b79bfbda5f5c8749c58f71) | fix  | update @types/node to a version vitest 5 accepts |
+
+### @angular-devkit/core
+
+| Commit                                                                                              | Type | Description                                          |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [5aaad0a13](https://github.com/angular/angular-cli/commit/5aaad0a13a3dc65b07347dde313ac9ae2aa013ac) | fix  | name the unknown option in a schema validation error |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                               |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [bfec8bac4](https://github.com/angular/angular-cli/commit/bfec8bac4d6185efa768b4387ed9e8926979954f) | fix  | support standard JavaScript MIME types and case insensitivity in auto-CSP |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.1.8"></a>
 
 # 22.1.8 (2026-09-10)
