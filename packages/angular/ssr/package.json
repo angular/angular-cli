@@ -38,12 +38,12 @@
   },
   "devDependencies": {
     "@angular-devkit/schematics": "workspace:*",
-    "@angular/common": "22.2.0-rc.0",
-    "@angular/compiler": "22.2.0-rc.0",
-    "@angular/core": "22.2.0-rc.0",
-    "@angular/platform-browser": "22.2.0-rc.0",
-    "@angular/platform-server": "22.2.0-rc.0",
-    "@angular/router": "22.2.0-rc.0",
+    "@angular/common": "22.2.0",
+    "@angular/compiler": "22.2.0",
+    "@angular/core": "22.2.0",
+    "@angular/platform-browser": "22.2.0",
+    "@angular/platform-server": "22.2.0",
+    "@angular/router": "22.2.0",
     "@schematics/angular": "workspace:*"
   },
   "sideEffects": false,
