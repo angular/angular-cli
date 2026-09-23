@@ -76,7 +76,7 @@ export class KarmaExecutor implements TestExecutor {
     const karmaOptions: KarmaBuilderOptions = {
       karmaConfig,
       tsConfig: unitTestOptions.tsConfig ?? buildTargetOptions.tsConfig,
-      polyfills: injectTestingPolyfills(buildTargetOptions.polyfills),
+      polyfills: injectTestingPolyfills(unitTestOptions.polyfills ?? buildTargetOptions.polyfills),
       assets: buildTargetOptions.assets,
       scripts: buildTargetOptions.scripts,
       styles: buildTargetOptions.styles,

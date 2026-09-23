@@ -77,6 +77,7 @@ export async function normalizeOptions(
     runnerConfig,
     isolate,
     splitting = true,
+    polyfills,
   } = options;
 
   if (ui && runner !== Runner.Vitest) {
@@ -158,6 +159,7 @@ export async function normalizeOptions(
     dumpVirtualFiles: options.dumpVirtualFiles,
     listTests: options.listTests,
     preserveSymlinks,
+    polyfills,
     runnerConfig:
       typeof runnerConfig === 'string'
         ? runnerConfig.length === 0

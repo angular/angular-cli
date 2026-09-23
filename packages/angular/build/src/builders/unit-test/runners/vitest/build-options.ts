@@ -178,7 +178,7 @@ function getZoneTestingStrategy(
       return 'dynamic-zone';
     }
 
-    return 'dynamic';
+    return 'none';
   } catch {
     return 'none';
   }
@@ -256,6 +256,7 @@ export async function getVitestBuildOptions(
 
   const buildOptions: Partial<ApplicationBuilderInternalOptions> = {
     ...baseBuildOptions,
+    ...(options.polyfills !== undefined ? { polyfills: options.polyfills } : {}),
     watch,
     incrementalResults: watch,
     index: false,
