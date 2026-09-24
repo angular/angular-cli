@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import * as fs from 'node:fs/promises';
+import * as path from 'node:path';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -407,6 +410,79 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         );
 
         harness.expectFile('dist/browser/test.svg').toNotExist();
+      });
+    });
+
+    describe('symlinks and monorepo external assets', () => {
+      let externalDir: string;
+
+      beforeEach(async () => {
+        const baseTmpDir = process.env['TEST_TMPDIR'];
+        assert(baseTmpDir, 'TEST_TMPDIR must be set');
+        externalDir = await fs.mkdtemp(path.join(baseTmpDir, 'angular-cli-asset-test-'));
+        await fs.mkdir(path.join(externalDir, 'nested'), { recursive: true });
+        await fs.writeFile(path.join(externalDir, 'shared-root.txt'), 'shared root asset');
+        await fs.writeFile(
+          path.join(externalDir, 'nested', 'shared-nested.txt'),
+          'shared nested asset',
+        );
+      });
+
+      afterEach(async () => {
+        await fs.rm(externalDir, { recursive: true, force: true });
+      });
+
+      it('copies assets from a symlinked directory pointing outside the workspace root', async () => {
+        const symlinkPath = harness.resolvePath('src/shared-assets');
+        await fs.symlink(externalDir, symlinkPath, 'junction');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'src/shared-assets', output: 'assets' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/assets/shared-root.txt').content.toBe('shared root asset');
+        harness
+          .expectFile('dist/browser/assets/nested/shared-nested.txt')
+          .content.toBe('shared nested asset');
+      });
+
+      it('copies assets from a symlinked directory outside workspace root with followSymlinks: true', async () => {
+        const symlinkPath = harness.resolvePath('src/shared-assets');
+        await fs.symlink(externalDir, symlinkPath, 'junction');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [
+            { glob: '**/*', input: 'src/shared-assets', output: 'assets', followSymlinks: true },
+          ],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/assets/shared-root.txt').content.toBe('shared root asset');
+        harness
+          .expectFile('dist/browser/assets/nested/shared-nested.txt')
+          .content.toBe('shared nested asset');
+      });
+
+      it('copies a symlinked file pointing outside the workspace root', async () => {
+        const symlinkPath = harness.resolvePath('src/external-file.txt');
+        await fs.symlink(path.join(externalDir, 'shared-root.txt'), symlinkPath, 'file');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: ['src/external-file.txt'],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/external-file.txt').content.toBe('shared root asset');
       });
     });
   });
