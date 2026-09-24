@@ -65,7 +65,7 @@ the reruns of tests that have been marked as `flaky`.
 The `.bazelrc` includes a config for running tests with remote debugging enabled:
 
 ```sh
-pnpm bazel test --config=debug //packages/angular/cli:angular-cli_test
+pnpm bazel test --config=debug //packages/angular/cli:test
 # Also disable reruns of failing tests that were marked as flaky:
-pnpm bazel test --config=debug --config=no-sharding //packages/angular/cli:angular-cli_test
+pnpm bazel test --config=debug --config=no-sharding //packages/angular/cli:test
 ```
