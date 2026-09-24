@@ -49,6 +49,9 @@ export interface WatcherOptions {
   cwd?: string;
 }
 
+const NODE_MODULES = 'node_modules';
+const NODE_MODULES_SEGMENT = `/${NODE_MODULES}/`;
+
 // Watch workspace for package manager changes
 const packageWatchFiles = [
   // manifest can affect module resolution
@@ -109,7 +112,7 @@ export async function setupWatcher(options: SetupWatcherOptions): Promise<BuildW
     // Ignore all node modules directories to avoid excessive file watchers.
     // Package changes are handled below by watching manifest and lock files.
     // NOTE: this is not enabled when preserveSymlinks is true as this would break `npm link` usages.
-    ignored.push('**/node_modules/**');
+    ignored.push(`**/${NODE_MODULES}/**`);
   }
 
   const watcher = await createWatcher({
@@ -386,6 +389,36 @@ export function isPathInside(file: string, dir: string): boolean {
   return file.startsWith(dirWithSlash);
 }
 
+/**
+ * Extracts the package directory inside node_modules for a given POSIX path.
+ *
+ * Input Expectations:
+ * - `posixPath` must be a normalized POSIX-style path (using forward slashes '/').
+ */
+export function extractNodeModulesPackageDir(posixPath: string): string | undefined {
+  const index = posixPath.lastIndexOf(NODE_MODULES_SEGMENT);
+  if (index === -1) {
+    return undefined;
+  }
+
+  const nodeModulesPath = posixPath.slice(0, index + NODE_MODULES_SEGMENT.length - 1);
+  const remainder = posixPath.slice(index + NODE_MODULES_SEGMENT.length);
+  const segments = remainder.split('/');
+  if (segments.length === 0 || !segments[0]) {
+    return undefined;
+  }
+
+  if (segments[0].startsWith('@')) {
+    if (segments.length < 2 || !segments[1]) {
+      return undefined;
+    }
+
+    return `${nodeModulesPath}/${segments[0]}/${segments[1]}`;
+  }
+
+  return `${nodeModulesPath}/${segments[0]}`;
+}
+
 class ParcelExternalManager {
   private readonly extraSubscriptions = new Map<string, ParcelWatcher.AsyncSubscription>();
   private readonly pendingSubscriptions = new Map<
@@ -625,6 +658,94 @@ async function createParcelWatcher(
   return buildWatcher;
 }
 
+/**
+ * Manages selective node_modules watching for Chokidar.
+ *
+ * During Chokidar's initial scan, the allowed packages set is empty, causing Chokidar to prune the entire
+ * node_modules directory immediately and avoid blocking the 'ready' event for minutes.
+ * Packages are dynamically allowed and watched at the package root level as files are added via `watcher.add`.
+ * Tracking files per package allows reference-counting so that package directories are unwatched when no
+ * longer needed.
+ */
+class ChokidarNodeModulesManager {
+  private readonly allowedPackages = new Map<string, Set<string>>();
+
+  constructor(private readonly isCaseSensitive: boolean) {}
+
+  registerPackage(
+    posixPath: string,
+    lookupKey: string,
+  ): { isPackage: boolean; newPkgDir?: string } {
+    const packageDir = extractNodeModulesPackageDir(posixPath);
+    if (!packageDir) {
+      return { isPackage: false };
+    }
+
+    const packageKey = toLookupKey(packageDir, this.isCaseSensitive);
+    let watchedInPkg = this.allowedPackages.get(packageKey);
+    if (!watchedInPkg) {
+      watchedInPkg = new Set();
+      this.allowedPackages.set(packageKey, watchedInPkg);
+      watchedInPkg.add(lookupKey);
+
+      return { isPackage: true, newPkgDir: packageDir };
+    }
+
+    watchedInPkg.add(lookupKey);
+
+    return { isPackage: true };
+  }
+
+  removePackageFile(
+    posixPath: string,
+    lookupKey: string,
+  ): { isPackage: boolean; unwatchPkgDir?: string } {
+    const packageDir = extractNodeModulesPackageDir(posixPath);
+    if (!packageDir) {
+      return { isPackage: false };
+    }
+
+    const packageKey = toLookupKey(packageDir, this.isCaseSensitive);
+    const watchedInPkg = this.allowedPackages.get(packageKey);
+    if (watchedInPkg) {
+      watchedInPkg.delete(lookupKey);
+      if (watchedInPkg.size === 0) {
+        this.allowedPackages.delete(packageKey);
+
+        return { isPackage: true, unwatchPkgDir: packageDir };
+      }
+    }
+
+    return { isPackage: true };
+  }
+
+  isIgnored(filePath: string): boolean {
+    // Fast path: avoid expensive normalization for non-node_modules files
+    if (!filePath.includes(NODE_MODULES)) {
+      return false;
+    }
+
+    const posixPath = toPosixPathNormalized(filePath);
+    const lookupKey = toLookupKey(posixPath, this.isCaseSensitive);
+
+    if (!`${lookupKey}/`.includes(NODE_MODULES_SEGMENT)) {
+      return false;
+    }
+
+    if (this.allowedPackages.has(lookupKey)) {
+      return false;
+    }
+
+    for (const pkg of this.allowedPackages.keys()) {
+      if (isPathInside(lookupKey, pkg)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+}
+
 async function createChokidarWatcher(
   options?: WatcherOptions,
   chokidarModule?: typeof Chokidar,
@@ -647,15 +768,25 @@ async function createChokidarWatcher(
   const rootDirPosix = toPosixPathNormalized(rootDir);
   const rootDirLookupKey = toLookupKey(rootDirPosix, isCaseSensitive);
 
-  const ignored = options?.ignored?.map((pattern) => {
-    if (/[*?[\]{}()]/.test(pattern)) {
-      const isMatch = picomatch(pattern, { dot: true });
+  const nodeModulesManager = new ChokidarNodeModulesManager(isCaseSensitive);
 
-      return (filePath: string) => isMatch(toPosixPathNormalized(filePath));
-    }
+  // Strip static node_modules ignore patterns (e.g. `**/node_modules/**` from setupWatcher).
+  // If left in place, picomatch would unconditionally ignore all node_modules files and override
+  // our dynamic package allowlist above.
+  const customIgnored =
+    options?.ignored
+      ?.filter((pattern) => !pattern.includes(NODE_MODULES))
+      .map((pattern) => {
+        if (/[*?[\]{}()]/.test(pattern)) {
+          const isMatch = picomatch(pattern, { dot: true });
 
-    return { path: toPosixPathNormalized(pattern), recursive: true };
-  });
+          return (filePath: string) => isMatch(toPosixPathNormalized(filePath));
+        }
+
+        return { path: toPosixPathNormalized(pattern), recursive: true };
+      }) ?? [];
+
+  const ignored = [...customIgnored, (filePath: string) => nodeModulesManager.isIgnored(filePath)];
 
   const watcher = chokidar.watch(rootDir, {
     ignoreInitial: true,
@@ -714,7 +845,17 @@ async function createChokidarWatcher(
         const lookupKey = toLookupKey(posixPath, isCaseSensitive);
         if (!watchedFiles.has(lookupKey)) {
           watchedFiles.add(lookupKey);
-          if (!isPathInside(lookupKey, rootDirLookupKey) && lookupKey !== rootDirLookupKey) {
+
+          // For files inside node_modules, register their package directory. Only newly encountered
+          // package directories need to be added to Chokidar.
+          const { isPackage, newPkgDir } = nodeModulesManager.registerPackage(posixPath, lookupKey);
+          if (newPkgDir) {
+            newPaths.push(newPkgDir);
+          } else if (
+            !isPackage &&
+            !isPathInside(lookupKey, rootDirLookupKey) &&
+            lookupKey !== rootDirLookupKey
+          ) {
             newPaths.push(posixPath);
           }
         }
@@ -732,7 +873,19 @@ async function createChokidarWatcher(
         const lookupKey = toLookupKey(posixPath, isCaseSensitive);
         if (watchedFiles.has(lookupKey)) {
           watchedFiles.delete(lookupKey);
-          if (!isPathInside(lookupKey, rootDirLookupKey) && lookupKey !== rootDirLookupKey) {
+
+          // When the last watched file in a package is removed, unwatch the package directory.
+          const { isPackage, unwatchPkgDir } = nodeModulesManager.removePackageFile(
+            posixPath,
+            lookupKey,
+          );
+          if (unwatchPkgDir) {
+            removePaths.push(unwatchPkgDir);
+          } else if (
+            !isPackage &&
+            !isPathInside(lookupKey, rootDirLookupKey) &&
+            lookupKey !== rootDirLookupKey
+          ) {
             removePaths.push(posixPath);
           }
         }

@@ -6,14 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import * as fs from 'node:fs';
-import * as os from 'node:os';
 import * as path from 'node:path';
 import { setTimeout } from 'node:timers/promises';
 import {
   type BuildWatcher,
   ChangedFiles,
   createWatcher,
+  extractNodeModulesPackageDir,
   getDirectoryPath,
   isPathInside,
   setupWatcher,
@@ -21,6 +22,9 @@ import {
 } from './watcher';
 
 describe('Watcher', () => {
+  const TMP_DIR = process.env['TEST_TMPDIR'];
+  assert(TMP_DIR, 'TEST_TMPDIR must be set');
+
   describe('toPosixPathNormalized', () => {
     it('should strip trailing slashes for standard directories', () => {
       expect(toPosixPathNormalized('/src/app/')).toBe('/src/app');
@@ -54,6 +58,30 @@ describe('Watcher', () => {
 
     it('should return dot for relative paths without slash', () => {
       expect(getDirectoryPath('main.ts')).toBe('.');
+    });
+  });
+
+  describe('extractNodeModulesPackageDir', () => {
+    it('should extract unscoped package directory', () => {
+      expect(extractNodeModulesPackageDir('/project/node_modules/my-lib/index.js')).toBe(
+        '/project/node_modules/my-lib',
+      );
+    });
+
+    it('should extract scoped package directory', () => {
+      expect(
+        extractNodeModulesPackageDir('/project/node_modules/@my-scope/my-lib/src/index.js'),
+      ).toBe('/project/node_modules/@my-scope/my-lib');
+    });
+
+    it('should handle package directory path directly', () => {
+      expect(extractNodeModulesPackageDir('/project/node_modules/my-lib')).toBe(
+        '/project/node_modules/my-lib',
+      );
+    });
+
+    it('should return undefined for paths outside node_modules', () => {
+      expect(extractNodeModulesPackageDir('/project/src/main.ts')).toBeUndefined();
     });
   });
 
@@ -122,7 +150,7 @@ describe('Watcher', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'setup-watcher-spec-')));
+      tempDir = fs.mkdtempSync(path.join(TMP_DIR, 'setup-watcher-spec-'));
     });
 
     afterEach(() => {
@@ -166,13 +194,53 @@ describe('Watcher', () => {
       await watcher.close();
       expect(removeSpy).toHaveBeenCalledWith('abort', jasmine.any(Function));
     });
+
+    it('should setup watcher with preserveSymlinks: true and detect changes in linked package in node_modules', async () => {
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'setup-watcher-npm-link-'));
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const nodeModulesDir = path.join(tempDir, 'node_modules');
+        fs.mkdirSync(nodeModulesDir);
+
+        const linkedPkgDir = path.join(nodeModulesDir, 'linked-pkg');
+        fs.symlinkSync(externalDir, linkedPkgDir, 'junction');
+        const linkedFile = path.join(linkedPkgDir, 'index.ts');
+
+        const watcher = await setupWatcher({
+          workspaceRoot: tempDir,
+          projectRoot: tempDir,
+          outputPath: path.join(tempDir, 'dist'),
+          cacheOptions: { basePath: path.join(tempDir, '.cache') },
+          preserveSymlinks: true,
+          watchFiles: [linkedFile],
+        });
+
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('linked-pkg'))).toBeTrue();
+
+        await watcher.close();
+      } finally {
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
+    }, 10000);
   });
 
   describe('createWatcher', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'watcher-spec-')));
+      tempDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-spec-'));
     });
 
     afterEach(() => {
@@ -279,7 +347,7 @@ describe('Watcher', () => {
     }, 10000);
 
     it('should support watching paths outside cwd', async () => {
-      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-watcher-spec-'));
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'external-watcher-spec-'));
       const externalFile = path.join(externalDir, 'external.txt');
       fs.writeFileSync(externalFile, 'initial');
 
@@ -305,7 +373,7 @@ describe('Watcher', () => {
     }, 10000);
 
     it('should handle adding multiple external files in the same directory concurrently', async () => {
-      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-watcher-spec-'));
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'external-watcher-spec-'));
       const file1 = path.join(externalDir, 'file1.txt');
       const file2 = path.join(externalDir, 'file2.txt');
       fs.writeFileSync(file1, 'initial1');
@@ -335,7 +403,7 @@ describe('Watcher', () => {
     }, 10000);
 
     it('should clean up external subscriptions when all external files in a directory are removed', async () => {
-      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-watcher-spec-'));
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'external-watcher-spec-'));
       const file1 = path.join(externalDir, 'file1.txt');
       const file2 = path.join(externalDir, 'file2.txt');
       fs.writeFileSync(file1, 'initial1');
@@ -358,7 +426,7 @@ describe('Watcher', () => {
     });
 
     it('should handle nested external directories without creating duplicate subscriptions', async () => {
-      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-watcher-spec-'));
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'external-watcher-spec-'));
       const subDir = path.join(externalDir, 'sub');
       fs.mkdirSync(subDir);
       const parentFile = path.join(externalDir, 'parent.txt');
@@ -389,7 +457,7 @@ describe('Watcher', () => {
     }, 10000);
 
     it('should subscribe to subsumed external child directory when parent external subscription is removed', async () => {
-      const externalDir = fs.mkdtempSync(path.join(os.tmpdir(), 'external-watcher-spec-'));
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'external-watcher-spec-'));
       const subDir = path.join(externalDir, 'sub');
       fs.mkdirSync(subDir);
       const parentFile = path.join(externalDir, 'parent.txt');
@@ -536,9 +604,7 @@ describe('Watcher', () => {
     }, 10000);
 
     it('should detect changes behind a directory symlink when followSymlinks is true', async () => {
-      const externalDir = fs.realpathSync(
-        fs.mkdtempSync(path.join(os.tmpdir(), 'watcher-external-')),
-      );
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-external-'));
       let watcher: BuildWatcher | undefined;
 
       try {
@@ -556,7 +622,7 @@ describe('Watcher', () => {
         });
 
         watcher.add(symlinkedFile);
-        await setTimeout(150);
+        await setTimeout(250);
 
         const iterator = watcher[Symbol.asyncIterator]();
         const nextPromise = iterator.next();
@@ -566,6 +632,198 @@ describe('Watcher', () => {
         const result = await nextPromise;
         expect(result.done).toBeFalsy();
         expect(result.value?.all.some((f: string) => f.includes('index.ts'))).toBeTrue();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
+    }, 10000);
+
+    it('should detect changes in linked package in node_modules while ignoring unimported packages', async () => {
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-npm-link-'));
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const nodeModulesDir = path.join(tempDir, 'node_modules');
+        fs.mkdirSync(nodeModulesDir);
+
+        // Unimported package that should be ignored
+        const unimportedPkgDir = path.join(nodeModulesDir, 'unimported-pkg');
+        fs.mkdirSync(unimportedPkgDir);
+        const unimportedFile = path.join(unimportedPkgDir, 'dep.ts');
+        fs.writeFileSync(unimportedFile, 'export const dep = 1;');
+
+        // Linked package in node_modules
+        const linkedPkgDir = path.join(nodeModulesDir, 'linked-pkg');
+        fs.symlinkSync(externalDir, linkedPkgDir, 'junction');
+        const linkedFile = path.join(linkedPkgDir, 'index.ts');
+
+        watcher = await createWatcher({
+          followSymlinks: true,
+          cwd: tempDir,
+        });
+
+        watcher.add(linkedFile);
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        // Modify both the linked file and the unimported file
+        fs.writeFileSync(unimportedFile, 'export const dep = 2;');
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        const changed = result.value?.all ?? [];
+        expect(changed.some((f: string) => f.includes('linked-pkg'))).toBeTrue();
+        expect(changed.some((f: string) => f.includes('unimported-pkg'))).toBeFalse();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
+    }, 10000);
+
+    it('should detect changes in scoped linked package in node_modules', async () => {
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-scoped-npm-link-'));
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const nodeModulesDir = path.join(tempDir, 'node_modules');
+        const scopeDir = path.join(nodeModulesDir, '@my-scope');
+        fs.mkdirSync(scopeDir, { recursive: true });
+
+        // Unimported package in scope
+        const unimportedScopedDir = path.join(scopeDir, 'unimported-scoped');
+        fs.mkdirSync(unimportedScopedDir);
+        const unimportedFile = path.join(unimportedScopedDir, 'dep.ts');
+        fs.writeFileSync(unimportedFile, 'export const dep = 1;');
+
+        // Linked scoped package in node_modules
+        const linkedPkgDir = path.join(scopeDir, 'linked-pkg');
+        fs.symlinkSync(externalDir, linkedPkgDir, 'junction');
+        const linkedFile = path.join(linkedPkgDir, 'index.ts');
+
+        watcher = await createWatcher({
+          followSymlinks: true,
+          cwd: tempDir,
+        });
+
+        watcher.add(linkedFile);
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        fs.writeFileSync(unimportedFile, 'export const dep = 2;');
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        const changed = result.value?.all ?? [];
+        expect(changed.some((f: string) => f.includes('linked-pkg'))).toBeTrue();
+        expect(changed.some((f: string) => f.includes('unimported-scoped'))).toBeFalse();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
+    }, 10000);
+
+    it('should detect changes in linked package added dynamically via watcher.add', async () => {
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-dynamic-npm-link-'));
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const nodeModulesDir = path.join(tempDir, 'node_modules');
+        fs.mkdirSync(nodeModulesDir);
+
+        const linkedPkgDir = path.join(nodeModulesDir, 'linked-pkg');
+        fs.symlinkSync(externalDir, linkedPkgDir, 'junction');
+        const linkedFile = path.join(linkedPkgDir, 'index.ts');
+
+        // Initially create watcher with no watchFiles
+        watcher = await createWatcher({
+          followSymlinks: true,
+          cwd: tempDir,
+        });
+
+        // Add linked file dynamically after watcher creation
+        watcher.add(linkedFile);
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('linked-pkg'))).toBeTrue();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalDir, { recursive: true, force: true });
+      }
+    }, 10000);
+
+    it('should unwatch linked package directory when all its files are removed via watcher.remove', async () => {
+      const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-remove-npm-link-'));
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const externalTargetFile = path.join(externalDir, 'index.ts');
+        fs.writeFileSync(externalTargetFile, 'export const a = 1;');
+
+        const nodeModulesDir = path.join(tempDir, 'node_modules');
+        fs.mkdirSync(nodeModulesDir);
+
+        const linkedPkgDir = path.join(nodeModulesDir, 'linked-pkg');
+        fs.symlinkSync(externalDir, linkedPkgDir, 'junction');
+        const linkedFile = path.join(linkedPkgDir, 'index.ts');
+
+        const regularFile = path.join(tempDir, 'main.ts');
+        fs.writeFileSync(regularFile, 'export const main = 1;');
+
+        watcher = await createWatcher({
+          followSymlinks: true,
+          cwd: tempDir,
+        });
+
+        watcher.add([linkedFile, regularFile]);
+        // Allow a brief moment for Chokidar to register the new watch paths
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+
+        // Verify changes in the linked package are detected initially
+        let nextPromise = iterator.next();
+        fs.writeFileSync(externalTargetFile, 'export const a = 2;');
+        let result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('linked-pkg'))).toBeTrue();
+
+        // Remove the linked file from the watcher
+        watcher.remove(linkedFile);
+        // Allow a brief moment for Chokidar to asynchronously complete unwatching the package directory
+        await setTimeout(250);
+
+        // Modify both the removed linked file and the regular file
+        nextPromise = iterator.next();
+        fs.writeFileSync(externalTargetFile, 'export const a = 3;');
+        fs.writeFileSync(regularFile, 'export const main = 2;');
+
+        result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        const changed = result.value?.all ?? [];
+        expect(changed.some((f: string) => f.includes('main.ts'))).toBeTrue();
+        expect(changed.some((f: string) => f.includes('linked-pkg'))).toBeFalse();
       } finally {
         await watcher?.close();
         fs.rmSync(externalDir, { recursive: true, force: true });
