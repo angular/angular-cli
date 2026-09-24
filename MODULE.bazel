@@ -131,8 +131,8 @@ use_repo(
 pnpm = use_extension("@aspect_rules_js//npm:extensions.bzl", "pnpm")
 pnpm.pnpm(
     name = "pnpm",
-    pnpm_version = "12.3.4",
-    pnpm_version_integrity = "sha512-lhqkH7B32joEpEHZ+OFevAyW2o73ELLrZ7+e58sGEOq9SPH9hfUc/+c4RnhfoPh8VqOocqHYk/hEZ0G1zORUVw==",
+    pnpm_version = "12.6.0",
+    pnpm_version_integrity = "sha512-PvaPlRyxEawgS0paFvCy3fDaVqluBBPoHYVdnwtV75JnFHCQKOHNAMQFwsX7e56OxNxGd3yAXQNzwvL/AP0g7A==",
 )
 use_repo(pnpm, "pnpm")
 
