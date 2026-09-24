@@ -63,6 +63,7 @@ export interface TestRunner {
   getBuildOptions(
     options: NormalizedUnitTestBuilderOptions,
     baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
+    logger: BuilderContext['logger'],
   ): RunnerOptions | Promise<RunnerOptions>;
 
   /**

@@ -11,12 +11,13 @@
  * Provides Vitest-specific build options and virtual file contents for Angular unit testing.
  */
 
+import type { BuilderContext } from '@angular-devkit/architect';
 import path from 'node:path';
 import { toPosixPath } from '../../../../utils/path';
 import { createProjectResolver } from '../../../../utils/resolve-project';
 import type { ApplicationBuilderInternalOptions } from '../../../application/options';
 import { OutputHashing } from '../../../application/schema';
-import { NormalizedUnitTestBuilderOptions } from '../../options';
+import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '../../options';
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
@@ -26,14 +27,12 @@ import { RunnerOptions } from '../api';
  * @param providersFile Optional path to a file that exports default providers.
  * @param projectSourceRoot The root directory of the project source.
  * @param teardown Whether to configure TestBed to destroy after each test.
- * @param zoneTestingStrategy How zone.js should be loaded during initialization.
  * @returns The string content of the virtual initialization file.
  */
 function createTestBedInitVirtualFile(
   providersFile: string | undefined,
   projectSourceRoot: string,
   teardown: boolean,
-  zoneTestingStrategy: 'none' | 'static' | 'dynamic' | 'dynamic-zone',
   hasLocalize: boolean,
 ): string {
   let providersImport = 'const providers = [];';
@@ -42,21 +41,6 @@ function createTestBedInitVirtualFile(
     const { dir, name } = path.parse(relativePath);
     const importPath = toPosixPath(path.join(dir, name));
     providersImport = `import providers from './${importPath}';`;
-  }
-
-  let zoneTestingSnippet = '';
-  if (zoneTestingStrategy === 'static') {
-    zoneTestingSnippet = `import 'zone.js/testing';`;
-  } else if (zoneTestingStrategy === 'dynamic') {
-    zoneTestingSnippet = `if (typeof Zone !== 'undefined') {
-      // 'zone.js/testing' is used to initialize the ZoneJS testing environment.
-      // It must be imported dynamically to avoid a static dependency on 'zone.js'.
-      await import('zone.js/testing');
-    }`;
-  } else if (zoneTestingStrategy === 'dynamic-zone') {
-    zoneTestingSnippet = `
-      await import('zone.js');
-      await import('zone.js/testing');`;
   }
 
   // The DynamicDOMTestComponentRenderer is used to avoid stale document references
@@ -71,8 +55,6 @@ function createTestBedInitVirtualFile(
     import { ɵgetDOM } from '@angular/common';
     import { afterEach, beforeEach } from 'vitest';
     ${providersImport}
-
-    ${zoneTestingSnippet}
 
     // The beforeEach and afterEach hooks are registered outside the globalThis guard.
     // This ensures that the hooks are always applied, even in non-isolated browser environments.
@@ -150,37 +132,37 @@ function adjustOutputHashing(hashing?: OutputHashing): OutputHashing {
 }
 
 /**
- * Resolves the Zone.js testing strategy by inspecting polyfills and resolving zone.js package.
+ * Injects Zone.js and Zone.js testing polyfills into the build options based on the
+ * project configuration and `polyfills` option.
  *
- * @param buildOptions The partial application builder options.
+ * @param polyfills The configured polyfills from the test or build target.
  * @param projectSourceRoot The root directory of the project source.
- * @returns The resolved zone testing strategy ('none', 'static', 'dynamic', 'dynamic-zone').
+ * @param logger The logger instance for reporting deprecation warnings.
+ * @returns An array of polyfill specifiers to use for testing.
  */
-function getZoneTestingStrategy(
-  buildOptions: Partial<ApplicationBuilderInternalOptions>,
+function injectZoneJsTestingPolyfills(
+  polyfills: string[] | undefined,
   projectSourceRoot: string,
-): 'none' | 'static' | 'dynamic' | 'dynamic-zone' {
-  if (buildOptions.polyfills?.includes('zone.js/testing')) {
-    return 'none';
+  logger: BuilderContext['logger'],
+): string[] {
+  if (polyfills) {
+    return injectTestingPolyfills(polyfills);
   }
 
-  if (buildOptions.polyfills?.includes('zone.js')) {
-    return 'static';
-  }
-
+  // If polyfills is undefined (e.g. library build target), attempt to load zone.js if installed.
   try {
     const projectResolve = createProjectResolver(projectSourceRoot);
     projectResolve('zone.js');
 
-    // If polyfills is undefined (e.g. library build target), load zone.js dynamically.
-    // If polyfills is defined but doesn't include zone.js (e.g. zoneless application), do NOT load zone.js.
-    if (buildOptions.polyfills === undefined) {
-      return 'dynamic-zone';
-    }
+    logger.warn(
+      'Zone.js polyfills are being automatically injected because "zone.js" was detected in the project dependencies. ' +
+        'This behavior is deprecated. If your project is zoneless, set the "polyfills" option to an empty array ("[]") in the ' +
+        'test configuration. Otherwise, explicitly add "zone.js" to the "polyfills" option.',
+    );
 
-    return 'none';
+    return ['zone.js', 'zone.js/testing'];
   } catch {
-    return 'none';
+    return [];
   }
 }
 
@@ -192,16 +174,19 @@ function getZoneTestingStrategy(
  *
  * @param options The normalized unit test builder options.
  * @param baseBuildOptions The base build config to derive testing config from.
+ * @param logger The logger instance for reporting deprecation warnings.
  * @returns An async RunnerOptions configuration.
  */
 export async function getVitestBuildOptions(
   options: NormalizedUnitTestBuilderOptions,
   baseBuildOptions: Partial<ApplicationBuilderInternalOptions>,
+  logger: BuilderContext['logger'],
 ): Promise<RunnerOptions> {
   const {
     workspaceRoot,
     projectSourceRoot,
     include,
+    polyfills,
     exclude = [],
     watch,
     providersFile,
@@ -256,7 +241,11 @@ export async function getVitestBuildOptions(
 
   const buildOptions: Partial<ApplicationBuilderInternalOptions> = {
     ...baseBuildOptions,
-    ...(options.polyfills !== undefined ? { polyfills: options.polyfills } : {}),
+    polyfills: injectZoneJsTestingPolyfills(
+      polyfills ?? baseBuildOptions.polyfills,
+      projectSourceRoot,
+      logger,
+    ),
     watch,
     incrementalResults: watch,
     index: false,
@@ -285,9 +274,6 @@ export async function getVitestBuildOptions(
     externalDependencies,
   };
 
-  // Inject the zone.js testing polyfill if Zone.js is installed.
-  const zoneTestingStrategy = getZoneTestingStrategy(buildOptions, projectSourceRoot);
-
   let hasLocalize = false;
   try {
     const projectResolve = createProjectResolver(projectSourceRoot);
@@ -299,7 +285,6 @@ export async function getVitestBuildOptions(
     providersFile,
     projectSourceRoot,
     !options.debug,
-    zoneTestingStrategy,
     hasLocalize,
   );
 

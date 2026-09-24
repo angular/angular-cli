@@ -295,7 +295,7 @@ export async function* execute(
       buildOptions: runnerBuildOptions,
       virtualFiles,
       testEntryPointMappings,
-    } = await runner.getBuildOptions(normalizedOptions, buildTargetOptions));
+    } = await runner.getBuildOptions(normalizedOptions, buildTargetOptions, context.logger));
   } catch (e) {
     assertIsError(e);
     context.logger.error(
@@ -323,9 +323,7 @@ export async function* execute(
     const applicationBuildOptions = {
       ...buildTargetOptions,
       ...runnerBuildOptions,
-      ...(normalizedOptions.polyfills !== undefined
-        ? { polyfills: normalizedOptions.polyfills }
-        : {}),
+      polyfills: runnerBuildOptions.polyfills ?? normalizedOptions.polyfills,
       watch: normalizedOptions.watch,
       progress: normalizedOptions.buildProgress ?? buildTargetOptions.progress,
       quiet: normalizedOptions.quiet,

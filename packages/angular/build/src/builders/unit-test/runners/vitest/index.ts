@@ -9,7 +9,6 @@
 import assert from 'node:assert';
 import type { TestRunner } from '../api';
 import { DependencyChecker } from '../dependency-checker';
-import { normalizeBrowserName } from './browser-provider';
 import { getVitestBuildOptions } from './build-options';
 import { VitestExecutor } from './executor';
 
@@ -60,8 +59,8 @@ const VitestTestRunner: TestRunner = {
     checker.report();
   },
 
-  getBuildOptions(options, baseBuildOptions) {
-    return getVitestBuildOptions(options, baseBuildOptions);
+  getBuildOptions(options, baseBuildOptions, logger) {
+    return getVitestBuildOptions(options, baseBuildOptions, logger);
   },
 
   async createExecutor(context, options, testEntryPointMappings) {
