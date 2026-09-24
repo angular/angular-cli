@@ -86,7 +86,6 @@ describe('generatePackageManifests', () => {
       displayName: packageName,
       bundleName: primaryBundleName,
       entryFilePath: join(tempDir, 'src/public-api.ts'),
-      tsConfigPath: join(tempDir, 'tsconfig.lib.json'),
       isPrimary: true,
     });
 
@@ -98,7 +97,6 @@ describe('generatePackageManifests', () => {
         displayName: `${packageName}/testing`,
         bundleName: secondaryBundleName,
         entryFilePath: join(tempDir, 'testing/src/public-api.ts'),
-        tsConfigPath: join(tempDir, 'tsconfig.lib.json'),
         isPrimary: false,
       });
     }

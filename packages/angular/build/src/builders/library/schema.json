@@ -4,22 +4,6 @@
   "description": "Library builder target options for Build Architect. Builds an Angular library package conforming to the Angular Package Format (APF).",
   "type": "object",
   "properties": {
-    "entryPoints": {
-      "type": "object",
-      "description": "Map of package entry points. The '.' key represents the primary entry point; other keys define secondary subpath entry points.",
-      "required": ["."],
-      "additionalProperties": {
-        "oneOf": [
-          {
-            "type": "string",
-            "description": "Path to the entry file (e.g. 'projects/my-lib/src/public-api.ts')."
-          },
-          {
-            "$ref": "#/definitions/entryPoint"
-          }
-        ]
-      }
-    },
     "tsConfig": {
       "type": "string",
       "description": "The full path for the TypeScript configuration file, relative to the current workspace root."
@@ -139,23 +123,8 @@
     }
   },
   "additionalProperties": false,
-  "required": ["tsConfig", "entryPoints"],
+  "required": ["tsConfig"],
   "definitions": {
-    "entryPoint": {
-      "type": "object",
-      "properties": {
-        "entryPoint": {
-          "type": "string",
-          "description": "Path to the entry file."
-        },
-        "tsConfig": {
-          "type": "string",
-          "description": "Optional TypeScript configuration file specific to this entry point."
-        }
-      },
-      "required": ["entryPoint"],
-      "additionalProperties": false
-    },
     "assetPattern": {
       "oneOf": [
         {

@@ -106,13 +106,19 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         `,
       });
 
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './shared': './shared/src/public-api.ts',
+          './feature': './feature/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-          'shared': 'projects/lib/shared/src/public-api.ts',
-          'feature': 'projects/lib/feature/src/public-api.ts',
-        },
         watch: true,
       });
 
@@ -297,12 +303,18 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         'projects/lib/secondary/src/public-api.ts': `export const MSG = 'initial secondary';`,
       });
 
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './secondary': './secondary/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-          'secondary': 'projects/lib/secondary/src/public-api.ts',
-        },
         watch: true,
       });
 

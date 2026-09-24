@@ -105,6 +105,7 @@ export async function compileEntryPointInWorker(
   modifiedFiles?: string[],
 ): Promise<CompilationOutput> {
   const workerOptions: CompileWorkerOptions = {
+    tsConfigPath: options.tsConfigPath,
     compilationMode: options.compilationMode,
     declarationMap: options.declarationMap,
     packageName: options.packageName,

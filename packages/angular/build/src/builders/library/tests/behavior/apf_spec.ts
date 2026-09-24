@@ -21,12 +21,18 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         'projects/lib/secondary/src/public-api.ts': 'export const SECONDARY_VALUE = 42;\n',
       });
 
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './secondary': './secondary/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
       harness.useTarget('build', {
         ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-          'secondary': 'projects/lib/secondary/src/public-api.ts',
-        },
         assets: [
           'projects/lib/README.md',
           'projects/lib/LICENSE',

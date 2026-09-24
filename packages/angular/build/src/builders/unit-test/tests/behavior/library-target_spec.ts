@@ -17,9 +17,6 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         async () => ({ success: true }),
         {
           tsConfig: 'src/tsconfig.lib.json',
-          entryPoints: {
-            '.': 'src/public-api.ts',
-          },
           inlineStyleLanguage: 'scss',
           stylePreprocessorOptions: {
             includePaths: ['src/styles'],

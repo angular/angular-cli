@@ -17,6 +17,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         JSON.stringify({
           name: 'my-lib',
           version: '1.0.0',
+          exports: {
+            '.': './src/public-api.ts',
+          },
           scripts: {
             postinstall: 'echo postinstall',
           },
@@ -40,6 +43,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         JSON.stringify({
           name: 'my-lib',
           version: '1.0.0',
+          exports: {
+            '.': './src/public-api.ts',
+          },
           scripts: {
             postinstall: 'echo postinstall',
           },

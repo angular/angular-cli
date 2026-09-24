@@ -52,15 +52,17 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         'projects/lib/sub-module/src/public-api.ts': `export const SUB_MODULE_CONSTANT = 'sub-module';\n`,
       });
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-          'shared': 'projects/lib/shared/src/public-api.ts',
-          'feature-a': 'projects/lib/feature-a/src/public-api.ts',
-          'feature-b': 'projects/lib/feature-b/src/public-api.ts',
-          'sub-module': 'projects/lib/sub-module/src/public-api.ts',
-        },
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './shared': './shared/src/public-api.ts',
+          './feature-a': './feature-a/src/public-api.ts',
+          './feature-b': './feature-b/src/public-api.ts',
+          './sub-module': './sub-module/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result } = await harness.executeOnce();
@@ -129,13 +131,15 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         `,
       });
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-          'ep-one': 'projects/lib/ep-one/src/public-api.ts',
-          'ep-two': 'projects/lib/ep-two/src/public-api.ts',
-        },
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './ep-one': './ep-one/src/public-api.ts',
+          './ep-two': './ep-two/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result } = await harness.executeOnce();

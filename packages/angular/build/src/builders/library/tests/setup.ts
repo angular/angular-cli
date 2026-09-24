@@ -21,9 +21,6 @@ export const LIBRARY_BUILDER_INFO = Object.freeze({
 });
 
 export const BASE_OPTIONS = Object.freeze<Schema>({
-  entryPoints: {
-    '.': 'projects/lib/src/public-api.ts',
-  },
   tsConfig: 'projects/lib/tsconfig.lib.json',
   outputPath: 'dist/lib',
   poll: 100,
@@ -69,6 +66,14 @@ export function describeLibraryBuilder(
       harness.useTarget('build', BASE_OPTIONS);
 
       await libHost.initialize().toPromise();
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
     });
 
     afterEach(() => libHost.restore().toPromise());

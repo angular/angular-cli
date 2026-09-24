@@ -41,9 +41,6 @@ export interface NormalizedEntryPoint {
   /** Absolute path to entry file. */
   entryFilePath: string;
 
-  /** Absolute path to tsConfig file for this entry point. */
-  tsConfigPath: string;
-
   /** Is this the primary entry point ('.')? */
   isPrimary: boolean;
 }
@@ -57,7 +54,7 @@ export interface PackageJsonData {
   typings?: string;
   types?: string;
   sideEffects?: boolean | string[];
-  exports?: Record<string, unknown>;
+  exports?: string | Record<string, unknown>;
   scripts?: Record<string, string>;
   workspaces?: unknown;
   dependencies?: Record<string, string>;
@@ -119,7 +116,6 @@ export async function normalizeLibraryOptions(
 
   const {
     tsConfig,
-    entryPoints: rawEntryPoints,
     assets: rawAssets,
     stylePreprocessorOptions,
     inlineStyleLanguage = 'css',
@@ -155,10 +151,9 @@ export async function normalizeLibraryOptions(
   }
 
   const entryPoints = normalizeEntryPoints(
-    rawEntryPoints,
-    workspaceRoot,
-    resolvedTsConfigPath,
-    projectName,
+    packageJson.exports,
+    projectRoot,
+    packageJsonPath,
     packageName,
   );
 
@@ -241,18 +236,16 @@ export async function normalizeLibraryOptions(
 /**
  * Normalizes a single entry point specification.
  *
- * @param key The entry point key from configuration (e.g. '.' or './testing').
- * @param value The entry point file path string or object with entryPoint and tsConfig.
- * @param workspaceRoot The workspace root directory.
- * @param defaultTsConfigPath The default tsConfig path for the project.
+ * @param key The entry point key from package.json exports (e.g. '.' or './testing').
+ * @param targetPath The relative file path string from exports.
+ * @param projectRoot The library project root directory.
  * @param packageName The root package name (e.g. `@my/lib`).
  * @returns The normalized entry point descriptor.
  */
 function normalizeEntryPoint(
   key: string,
-  value: LibraryBuilderOptions['entryPoints'][string],
-  workspaceRoot: string,
-  defaultTsConfigPath: string,
+  targetPath: string,
+  projectRoot: string,
   packageName: string,
 ): NormalizedEntryPoint {
   const posixKey = toPosixPath(key).replace(/\/+$/, '');
@@ -265,7 +258,7 @@ function normalizeEntryPoint(
 
   if (name !== '.' && (path.posix.isAbsolute(name) || name.includes('..'))) {
     throw new Error(
-      `Invalid entry point key '${key}'. Entry point keys must be relative subpaths without '..' (e.g. './testing' or 'testing').`,
+      `Invalid entry point key '${key}'. Entry point keys must be relative subpaths without '..' (e.g. './testing').`,
     );
   }
 
@@ -273,10 +266,7 @@ function normalizeEntryPoint(
   const displayName = isPrimary ? packageName : `${packageName}/${name}`;
   const bundleName = getEntryPointBundleName(packageName, name, isPrimary);
 
-  const entryFilePath = path.resolve(
-    workspaceRoot,
-    typeof value === 'string' ? value : value.entryPoint,
-  );
+  const entryFilePath = path.resolve(projectRoot, targetPath);
 
   if (!/\.(?:ts|mts)$/.test(entryFilePath) || /\.d\.(?:ts|mts)$/.test(entryFilePath)) {
     throw new Error(
@@ -284,50 +274,79 @@ function normalizeEntryPoint(
     );
   }
 
-  const tsConfigPath =
-    typeof value !== 'string' && value.tsConfig
-      ? path.resolve(workspaceRoot, value.tsConfig)
-      : defaultTsConfigPath;
-
   return {
     subpath,
     name,
     displayName,
     bundleName,
     entryFilePath,
-    tsConfigPath,
     isPrimary,
   };
 }
 
 /**
- * Normalizes all entry points for the library project.
+ * Normalizes all entry points from the library's `package.json` `exports` field.
  *
- * @param rawEntryPoints The raw entryPoints dictionary from schema options.
- * @param workspaceRoot The workspace root directory.
- * @param defaultTsConfigPath The default tsConfig path for the project.
- * @param projectName The project name used in error reporting.
+ * @param rawExports The `exports` field from `package.json`.
+ * @param projectRoot The library project root directory.
+ * @param packageJsonPath Path to `package.json` for error reporting.
  * @param packageName The root package name (e.g. `@my/lib`).
  * @returns A Map of normalized entry points keyed by name.
  */
 function normalizeEntryPoints(
-  rawEntryPoints: LibraryBuilderOptions['entryPoints'],
-  workspaceRoot: string,
-  defaultTsConfigPath: string,
-  projectName: string,
+  rawExports: PackageJsonData['exports'],
+  projectRoot: string,
+  packageJsonPath: string,
   packageName: string,
 ): Map<string, NormalizedEntryPoint> {
+  if (!rawExports || (typeof rawExports !== 'string' && typeof rawExports !== 'object')) {
+    throw new Error(
+      `The 'package.json' at '${packageJsonPath}' must contain an 'exports' field defining the primary entry point ('.').`,
+    );
+  }
+
+  const exportsRecord = typeof rawExports === 'string' ? { '.': rawExports } : rawExports;
+
   const entryPoints = new Map<string, NormalizedEntryPoint>();
   let hasPrimary = false;
 
-  for (const [key, value] of Object.entries(rawEntryPoints)) {
-    const entryPoint = normalizeEntryPoint(
-      key,
-      value,
-      workspaceRoot,
-      defaultTsConfigPath,
-      packageName,
-    );
+  for (const [key, value] of Object.entries(exportsRecord)) {
+    let target: string | undefined;
+    if (typeof value === 'string') {
+      target = value;
+    } else if (
+      typeof value === 'object' &&
+      value !== null &&
+      !Array.isArray(value) &&
+      typeof (value as Record<string, unknown>)['default'] === 'string'
+    ) {
+      target = (value as Record<string, unknown>)['default'] as string;
+    }
+
+    const posixKey = toPosixPath(key).replace(/\/+$/, '');
+    const isPrimary = posixKey === '.' || posixKey === '';
+
+    if (!target) {
+      if (isPrimary) {
+        throw new Error(
+          `The primary entry point '.' in '${packageJsonPath}' must specify a string path ` +
+            `or a 'default' condition pointing to a TypeScript file.`,
+        );
+      }
+      // Non-JS/TS conditional export (e.g., sass/style-only subpath); preserve in package.json without compiling.
+      continue;
+    }
+
+    if (!isPrimary) {
+      const isTsSource = /\.(?:ts|mts)$/.test(target) && !/\.d\.(?:ts|mts)$/.test(target);
+      const isInvalidCodeEntry = /\.(?:d\.[cm]?ts|cts|tsx|jsx)$/.test(target);
+      if (!isTsSource && !isInvalidCodeEntry) {
+        // Static asset, stylesheet, or package.json export; preserve in package.json without compiling.
+        continue;
+      }
+    }
+
+    const entryPoint = normalizeEntryPoint(key, target, projectRoot, packageName);
     if (entryPoints.has(entryPoint.name)) {
       throw new Error(
         `Duplicate entry point detected: '${key}' resolves to the same name ('${entryPoint.name}') as an existing entry point.`,
@@ -341,7 +360,7 @@ function normalizeEntryPoints(
 
   if (!hasPrimary) {
     throw new Error(
-      `The 'entryPoints' option in project '${projectName}' must contain a primary entry point with key '.'.`,
+      `The 'exports' field in '${packageJsonPath}' must contain a primary entry point with key '.'.`,
     );
   }
 

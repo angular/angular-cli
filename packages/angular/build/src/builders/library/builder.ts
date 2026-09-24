@@ -148,7 +148,6 @@ export async function* executeLibraryBuilder(
 
     for (const { entryPoint } of graph.nodes.values()) {
       allWatchedFiles.add(entryPoint.entryFilePath);
-      allWatchedFiles.add(entryPoint.tsConfigPath);
     }
 
     if (isWatchMode) {

@@ -10,13 +10,18 @@ import { executeLibraryBuilder } from '../../builder';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
-  describe('Option: "entryPoints"', () => {
+  describe('Package.json "exports" entry points', () => {
     it('should succeed when entry point is a .ts file', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.ts',
-        },
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
+
+    it('should succeed when exports is a string shorthand', async () => {
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = './src/public-api.ts';
+
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result } = await harness.executeOnce();
@@ -27,12 +32,13 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       await harness.writeFiles({
         'projects/lib/src/public-api.mts': 'export const VALUE = 42;\n',
       });
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.mts',
+        };
 
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.mts',
-        },
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result } = await harness.executeOnce();
@@ -40,11 +46,13 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
     });
 
     it('should fail when entry point is not a .ts or .mts file', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.cts',
-        },
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.cts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result, error } = await harness.executeOnce({
@@ -57,11 +65,13 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
     });
 
     it('should fail when entry point is a declaration file', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        entryPoints: {
-          '.': 'projects/lib/src/public-api.d.ts',
-        },
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.d.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
       });
 
       const { result, error } = await harness.executeOnce({

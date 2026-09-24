@@ -82,6 +82,7 @@ export interface StylesheetBundlerAdapter {
 
 export type CompileEntryPointOptions = Pick<
   NormalizedLibraryOptions,
+  | 'tsConfigPath'
   | 'compilationMode'
   | 'declarationMap'
   | 'packageName'
@@ -113,8 +114,9 @@ export async function compileEntryPoint(
   upstreamDtsFiles?: Map<string, string>,
   sourceFileCache?: Map<string, ts.SourceFile>,
 ): Promise<CompilationResult> {
-  const { entryFilePath, tsConfigPath, bundleName } = entryPoint;
+  const { entryFilePath, bundleName } = entryPoint;
   const {
+    tsConfigPath,
     compilationMode,
     declarationMap,
     cacheOptions,

@@ -156,20 +156,18 @@ export class EntryPointGraph {
   private cachedNodeMeta?: Array<{
     node: EntryPointNode;
     entryFile: string;
-    tsConfig: string;
     dirWithSep: string;
   }>;
 
   private getNodeMeta() {
     this.cachedNodeMeta ??= Array.from(this.nodes.values())
       .map((node) => {
-        const { entryFilePath, tsConfigPath } = node.entryPoint;
+        const { entryFilePath } = node.entryPoint;
         const nodeDir = toPosixPath(path.dirname(entryFilePath));
 
         return {
           node,
           entryFile: toPosixPath(entryFilePath),
-          tsConfig: toPosixPath(tsConfigPath),
           dirWithSep: nodeDir.endsWith('/') ? nodeDir : `${nodeDir}/`,
         };
       })
@@ -191,8 +189,8 @@ export class EntryPointGraph {
     for (const file of changedFiles) {
       let matched = false;
 
-      for (const { node, entryFile, tsConfig } of nodeMeta) {
-        if (file === entryFile || file === tsConfig || node.referencedFiles.has(file)) {
+      for (const { node, entryFile } of nodeMeta) {
+        if (file === entryFile || node.referencedFiles.has(file)) {
           node.isDirty = true;
           hasChanges = true;
           matched = true;
@@ -329,7 +327,7 @@ export async function buildEntryPointGraph(
       for (const dep of dependencies) {
         if (!graph.nodes.has(dep)) {
           throw new Error(
-            `Entry point '${dep}' imported by '${entryPoint.name}' does not exist in 'entryPoints'.`,
+            `Entry point '${dep}' imported by '${entryPoint.name}' does not exist in 'package.json' exports.`,
           );
         }
 
