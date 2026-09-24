@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -407,6 +409,132 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         );
 
         harness.expectFile('dist/browser/test.svg').toNotExist();
+      });
+    });
+
+    describe('symbolic links', () => {
+      let outsideDirectory: string;
+
+      beforeEach(() => {
+        // The target has to stay inside the Bazel sandbox. Bazel patches Node's file system
+        // module so that a link leaving the sandbox is reported as a regular file, which
+        // would hide the link from the builder under test. A sibling of the workspace root
+        // is outside of the workspace while remaining inside the sandbox.
+        outsideDirectory = fs.mkdtempSync(
+          path.join(path.dirname(harness.resolvePath('.')), 'outside-workspace-'),
+        );
+        fs.writeFileSync(path.join(outsideDirectory, 'secret.txt'), 'secret');
+      });
+
+      afterEach(() => {
+        fs.rmSync(outsideDirectory, { recursive: true, force: true });
+      });
+
+      it('does not copy files behind a directory link by default', async () => {
+        await harness.writeFile('public/favicon.ico', 'icon');
+        fs.symlinkSync(outsideDirectory, harness.resolvePath('public/docs'), 'junction');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'public', output: '.' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+
+        harness.expectFile('dist/browser/favicon.ico').toExist();
+        harness.expectFile('dist/browser/docs/secret.txt').toNotExist();
+      });
+
+      it('does not copy a file link by default', async () => {
+        await harness.writeFile('public/favicon.ico', 'icon');
+        fs.symlinkSync(
+          path.join(outsideDirectory, 'secret.txt'),
+          harness.resolvePath('public/notes.txt'),
+        );
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'public', output: '.' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+
+        harness.expectFile('dist/browser/favicon.ico').toExist();
+        harness.expectFile('dist/browser/notes.txt').toNotExist();
+      });
+
+      it('copies files behind a directory link within the workspace root when enabled', async () => {
+        await harness.writeFile('public/favicon.ico', 'icon');
+        await harness.writeFile('shared/logo.svg', '<svg></svg>');
+        fs.symlinkSync(
+          harness.resolvePath('shared'),
+          harness.resolvePath('public/branding'),
+          'junction',
+        );
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'public', output: '.', followSymlinks: true }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+
+        harness.expectFile('dist/browser/branding/logo.svg').content.toBe('<svg></svg>');
+      });
+
+      it('fails if asset input option is a link outside workspace root', async () => {
+        fs.symlinkSync(outsideDirectory, harness.resolvePath('public'), 'junction');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'public', output: '.' }],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toContain('asset path must be within the workspace root');
+
+        harness.expectFile('dist/browser/secret.txt').toNotExist();
+      });
+
+      it('fails if a glob rooted in a directory link resolves outside workspace root', async () => {
+        await harness.writeFile('public/favicon.ico', 'icon');
+        fs.symlinkSync(outsideDirectory, harness.resolvePath('public/docs'), 'junction');
+
+        // A static directory prefix makes the globber start its walk inside the link, which
+        // is read through even though links are not followed.
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: 'docs/**/*', input: 'public', output: '.' }],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toContain('asset path must be within the workspace root');
+
+        harness.expectFile('dist/browser/docs/secret.txt').toNotExist();
+      });
+
+      it('fails if a followed link resolves outside workspace root', async () => {
+        await harness.writeFile('public/favicon.ico', 'icon');
+        fs.symlinkSync(outsideDirectory, harness.resolvePath('public/docs'), 'junction');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'public', output: '.', followSymlinks: true }],
+        });
+
+        const { error } = await harness.executeOnce({ outputLogsOnException: false });
+
+        expect(error?.message).toContain('asset path must be within the workspace root');
+
+        harness.expectFile('dist/browser/docs/secret.txt').toNotExist();
       });
     });
   });

@@ -447,7 +447,7 @@
             "followSymlinks": {
               "type": "boolean",
               "default": false,
-              "description": "Allow glob patterns to follow symlink directories. This allows subdirectories of the symlink to be searched."
+              "description": "Allow glob patterns to follow symlink directories. This allows subdirectories of the symlink to be searched. Symlinks that resolve outside of the workspace root are not allowed."
             },
             "glob": {
               "type": "string",

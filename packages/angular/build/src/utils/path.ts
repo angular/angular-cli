@@ -6,7 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { isAbsolute, posix, relative, resolve } from 'node:path';
+import { realpath } from 'node:fs/promises';
+import { isAbsolute, normalize, posix, relative, resolve } from 'node:path';
 import { platform } from 'node:process';
 
 const WINDOWS_PATH_SEPERATOR_REGEXP = /\\/g;
@@ -49,6 +50,37 @@ export function isSubDirectory(parent: string, child: string): boolean {
   const relativePath = toPosixPath(relative(resolvedParent, resolvedChild));
 
   return relativePath !== '..' && !relativePath.startsWith('../') && !isAbsolute(relativePath);
+}
+
+/**
+ * Determines if a path points into an installed dependency, that is, if it goes through a
+ * `node_modules` directory.
+ *
+ * A package manager links dependencies to wherever it stores them, which for a pnpm or npm
+ * workspace is the repository root rather than the workspace being built. Those links are
+ * created by the tool, so a path that asks for one is allowed to resolve outside of the
+ * workspace root, while a path into the project's own sources is not.
+ *
+ * @param pathString - The path to check, as it was configured.
+ * @returns `true` if the path goes through a `node_modules` directory, `false` otherwise.
+ */
+export function isDependencyPath(pathString: string): boolean {
+  return toPosixPath(normalize(pathString)).split(posix.sep).includes('node_modules');
+}
+
+/**
+ * Resolves a path to its real location on disk, following any symbolic links.
+ *
+ * @param pathString - The file path to resolve.
+ * @returns The canonicalized real path, or `undefined` when the path cannot be resolved,
+ * for instance because it does not exist.
+ */
+export async function resolveRealPath(pathString: string): Promise<string | undefined> {
+  try {
+    return canonicalizePath(await realpath(pathString));
+  } catch {
+    return undefined;
+  }
 }
 
 /**

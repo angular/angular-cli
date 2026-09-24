@@ -105,18 +105,19 @@ export async function i18nInlineEmittedFiles(
       }
     }
 
-    // Copy any non-processed files into the output locations
+    // Copy any non-processed files into the output locations. The already built directory is
+    // the root, so that its own contents are what the copy is allowed to read.
     await copyAssets(
       [
         {
           glob: '**/*',
-          input: emittedPath,
+          input: '.',
           output: '',
           ignore: [...processedFiles].map((f) => path.relative(emittedPath, f)),
         },
       ],
       outputPaths,
-      '',
+      emittedPath,
     );
   } catch (err) {
     assertIsError(err);
