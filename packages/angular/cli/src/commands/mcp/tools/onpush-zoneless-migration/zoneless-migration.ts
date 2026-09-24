@@ -194,11 +194,13 @@ async function categorizeFile(
   if (testBedSpecifier) {
     componentTestFiles.add(sourceFile);
   } else if (componentSpecifier) {
-    if (
-      !/changeDetectionStrategy:\s*ChangeDetectionStrategy\.(?:OnPush|Default|Eager)/.test(content)
-    ) {
+    if (!/changeDetection\s*:\s*ChangeDetectionStrategy\.(?:OnPush|Default|Eager)/.test(content)) {
       filesWithComponents.add(sourceFile);
     } else {
+      // The component is already migrated, but it can still use NgZone APIs that block zoneless.
+      if (zoneSpecifier) {
+        zoneFiles.add(sourceFile);
+      }
       sendDebugMessage(
         `Component file already has change detection strategy: ${sourceFile.fileName}. Skipping migration.`,
         extras,
