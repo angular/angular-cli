@@ -7,9 +7,9 @@ To get started locally, follow these instructions:
 1. If you haven't done it already, [make a fork of this repo](https://github.com/angular/angular-cli/fork).
 2. If you are on Windows, see [the extra steps needed for contributing on Windows](#windows)
 3. Clone to your local computer using `git`.
-4. Make sure that you have Node `v20.19.0` or higher installed. See instructions [here](https://nodejs.org/en/download/).
+4. Make sure that you have Node `v22.22.3` or higher installed (see `engines` in `package.json`). See instructions [here](https://nodejs.org/en/download/).
 5. Install `pnpm`.
-   - You can install pnpm by running `npm i -g pnpm@9`.
+   - You can install pnpm by running `npm i -g pnpm@12`.
    - See detailed instructions [here](https://pnpm.io/installation).
 6. Run `pnpm install` from the root of your clone of this project to install dependencies.
 
@@ -78,7 +78,7 @@ There are two different test suites which can be run locally:
 ### Unit tests
 
 - Run all tests: `pnpm bazel test //packages/...`
-- Run a subset of the tests, use the full Bazel target example: `pnpm bazel test //packages/schematics/angular:angular_test`
+- Run a subset of the tests, use the full Bazel target example: `pnpm bazel test //packages/schematics/angular:test`
 - For a complete list of test targets use the following Bazel query: `pnpm bazel query "tests(//packages/...)"`
 
 When debugging a specific test, change `describe()` or `it()` to `fdescribe()`
@@ -166,7 +166,7 @@ You can use the Chrome Devtools to process it. To do so:
 
 Adding a package to this repository means running two separate commands:
 
-1. `schematics devkit:package PACKAGE_NAME`. This will update the `.monorepo` file, and create the
+1. `schematics devkit:package PACKAGE_NAME`. This will update the `.monorepo.json` file, and create the
    base files for the new package (package.json, src/index, etc).
 1. `pnpm admin templates`. This will update the README and all other template files that might
    have changed when adding a new package.
