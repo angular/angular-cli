@@ -43,6 +43,7 @@ export class JitCompilation extends TypeScriptCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType: 'application' | 'library' = 'application',
   ): Promise<AngularCompilationResult> {
     // Dynamically load the Angular compiler CLI package
     const { constructorParametersDownlevelTransform } =
@@ -54,7 +55,7 @@ export class JitCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
       warnings,
-    } = await this.loadConfiguration(tsconfig, compilerOptionOverrides);
+    } = await this.loadConfiguration(tsconfig, compilerOptionOverrides, buildType);
 
     if (hostOptions.modifiedFiles) {
       this.invalidateFiles(hostOptions.modifiedFiles);

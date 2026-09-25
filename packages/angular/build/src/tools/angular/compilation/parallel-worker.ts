@@ -27,6 +27,7 @@ export interface InitRequest {
   tsconfig: string;
   fileReplacements?: Record<string, string>;
   compilerOptionOverrides?: CompilerOptionOverrides;
+  buildType?: 'application' | 'library';
   stylesheetPort: MessagePort;
   webWorkerPort: MessagePort;
   webWorkerSignal: Int32Array;
@@ -111,6 +112,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
         },
       },
       request.compilerOptionOverrides,
+      request.buildType,
     );
 
     success = true;
@@ -123,6 +125,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
       // TODO: Expand? `allowJs`, `isolatedModules`, `sourceMap`, `inlineSourceMap` are the only fields needed currently.
       compilerOptions: {
         allowJs: compilerOptions.allowJs,
+        declarationMap: compilerOptions.declarationMap,
         isolatedModules: compilerOptions.isolatedModules,
         sourceMap: compilerOptions.sourceMap,
         inlineSourceMap: compilerOptions.inlineSourceMap,
