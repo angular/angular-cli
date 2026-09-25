@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import fs from 'node:fs/promises';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -407,6 +408,44 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         );
 
         harness.expectFile('dist/browser/test.svg').toNotExist();
+      });
+
+      it('does not follow symlink directories by default', async () => {
+        await harness.writeFile('target/test.txt', 'symlink-content');
+        await fs.symlink(
+          harness.resolvePath('target'),
+          harness.resolvePath('src/symlink-dir'),
+          'junction',
+        );
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'src' }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/symlink-dir/test.txt').toNotExist();
+      });
+
+      it('follows symlink directories when followSymlinks is true', async () => {
+        await harness.writeFile('target/test.txt', 'symlink-content');
+        await fs.symlink(
+          harness.resolvePath('target'),
+          harness.resolvePath('src/symlink-dir'),
+          'junction',
+        );
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: '**/*', input: 'src', followSymlinks: true }],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/symlink-dir/test.txt').content.toBe('symlink-content');
       });
     });
   });
