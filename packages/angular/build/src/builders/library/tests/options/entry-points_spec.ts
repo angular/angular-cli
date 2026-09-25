@@ -7,7 +7,7 @@
  */
 
 import { executeLibraryBuilder } from '../../builder';
-import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
+import { LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
   describe('Package.json "exports" entry points', () => {

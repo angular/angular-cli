@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { statSync } from 'node:fs';
 import path from 'node:path';
 import picomatch from 'picomatch';
 import { toPosixPath } from '../../../utils/path';
@@ -33,22 +34,44 @@ export async function collectAssetsToEmit(
     return [];
   }
 
-  const hasModifiedFiles = !!modifiedFiles?.size;
+  if (modifiedFiles) {
+    if (modifiedFiles.size === 0) {
+      return [];
+    }
 
-  if (hasModifiedFiles && !checkAssetChanges(assets, workspaceRoot, modifiedFiles)) {
-    return [];
+    const matchers = createAssetMatchers(assets, workspaceRoot);
+    const filesToEmit: DiskOutputFile[] = [];
+
+    for (const file of modifiedFiles) {
+      const resolvedFile = path.isAbsolute(file) ? file : path.resolve(workspaceRoot, file);
+      const posixFile = toPosixPath(resolvedFile);
+
+      for (const { asset, posixInputPrefix, isMatch } of matchers) {
+        if (!posixFile.startsWith(posixInputPrefix)) {
+          continue;
+        }
+
+        const relative = posixFile.slice(posixInputPrefix.length);
+        if (!isMatch(relative)) {
+          continue;
+        }
+
+        if (statSync(resolvedFile, { throwIfNoEntry: false })?.isFile()) {
+          filesToEmit.push(createDiskOutputFile(resolvedFile, path.join(asset.output, relative)));
+          allWatchedFiles.add(posixFile);
+        }
+      }
+    }
+
+    return filesToEmit;
   }
 
   const resolvedAssets = await resolveAssets(assets, workspaceRoot);
   const filesToEmit: DiskOutputFile[] = [];
 
   for (const { source, destination } of resolvedAssets) {
-    if (hasModifiedFiles && !modifiedFiles.has(toPosixPath(source))) {
-      continue;
-    }
-
     filesToEmit.push(createDiskOutputFile(source, destination));
-    allWatchedFiles.add(source);
+    allWatchedFiles.add(toPosixPath(source));
   }
 
   return filesToEmit;
@@ -71,16 +94,7 @@ export function checkAssetChanges(
     return false;
   }
 
-  const matchers = assets.map((asset) => {
-    const absInput = path.resolve(workspaceRoot, asset.input);
-    const posixInput = toPosixPath(absInput).replace(/\/+$/, '');
-    const isMatch = picomatch(asset.glob, {
-      dot: true,
-      ignore: [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])],
-    });
-
-    return { posixInputPrefix: `${posixInput}/`, isMatch };
-  });
+  const matchers = createAssetMatchers(assets, workspaceRoot);
 
   for (const file of changedFiles) {
     const resolvedFile = path.isAbsolute(file) ? file : path.resolve(workspaceRoot, file);
@@ -97,4 +111,17 @@ export function checkAssetChanges(
   }
 
   return false;
+}
+
+function createAssetMatchers(assets: NormalizedLibraryOptions['assets'], workspaceRoot: string) {
+  return assets.map((asset) => {
+    const absInput = path.resolve(workspaceRoot, asset.input);
+    const posixInput = toPosixPath(absInput).replace(/\/+$/, '');
+    const isMatch = picomatch(asset.glob, {
+      dot: true,
+      ignore: [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])],
+    });
+
+    return { asset, posixInputPrefix: `${posixInput}/`, isMatch };
+  });
 }

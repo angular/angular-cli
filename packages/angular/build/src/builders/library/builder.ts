@@ -8,10 +8,7 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
-import assert from 'node:assert';
 import fs from 'node:fs/promises';
-import { createRequire } from 'node:module';
-import type ts from 'typescript';
 import {
   resetSassWorkerPoolCaches,
   shutdownSassWorkerPool,
@@ -19,7 +16,6 @@ import {
 import { transformSupportedBrowsersToTargets } from '../../tools/esbuild/target';
 import { withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
-import { maxWorkers } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
 import { initializeHash } from '../../utils/hash';
 import { toPosixPath } from '../../utils/path';
@@ -28,13 +24,12 @@ import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import type { BuildWatcher } from '../../utils/watcher';
-import { WorkerPool } from '../../utils/worker-pool';
 import {
   type NormalizedLibraryOptions,
   type PackageJsonData,
   normalizeLibraryOptions,
 } from './options';
-import type { EntryPointGraph, EntryPointNode } from './pipeline/entry-point-graph';
+import type { SingleBuildState } from './pipeline/build-action';
 import type { createComponentStylesheetBundlerForLibrary } from './pipeline/stylesheet-bundler';
 import type { Schema as LibraryBuilderOptions } from './schema';
 
@@ -95,33 +90,16 @@ export async function* executeLibraryBuilder(
 
   // Dynamically lazy-loaded to prevent importing dependencies at the top level.
   const [
-    { buildAction },
-    { buildEntryPointGraph },
+    { buildAction, createSingleBuildState, hasModifiedWatchedFile },
     { createComponentStylesheetBundlerForLibrary },
   ] = await Promise.all([
     import('./pipeline/build-action'),
-    import('./pipeline/entry-point-graph'),
     import('./pipeline/stylesheet-bundler'),
   ]);
 
-  let graph: EntryPointGraph;
-  let batches: EntryPointNode[][];
-
-  try {
-    const { packageName, entryPoints } = normalizedOptions;
-    graph = await buildEntryPointGraph(entryPoints.values(), packageName, outputPath);
-    batches = graph.topologicalSortBatches();
-  } catch (error) {
-    assertIsError(error);
-    yield { success: false, error: error.message };
-
-    return;
-  }
-
   let stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary> | undefined;
-  let compilerWorkerPool: WorkerPool | undefined;
   let watcher: BuildWatcher | undefined;
-  const sourceFileCache = new Map<string, ts.SourceFile>();
+  const buildState = createSingleBuildState();
 
   try {
     const browsers = getSupportedBrowsers(projectRoot, logger);
@@ -132,22 +110,14 @@ export async function* executeLibraryBuilder(
       target,
     );
 
-    if (!isWatchMode) {
-      // TODO: Convert to import.meta usage during ESM transition
-      const localRequire = createRequire(__filename);
-
-      compilerWorkerPool = new WorkerPool({
-        maxThreads: maxWorkers,
-        idleTimeout: 4_000,
-        filename: localRequire.resolve('./pipeline/compiler-worker'),
-      });
-    }
-
     // Track all referenced files for watch mode
-    const allWatchedFiles = new Set<string>([tsConfigPath, packageJsonPath]);
+    const allWatchedFiles = new Set<string>([
+      toPosixPath(tsConfigPath),
+      toPosixPath(packageJsonPath),
+    ]);
 
-    for (const { entryPoint } of graph.nodes.values()) {
-      allWatchedFiles.add(entryPoint.entryFilePath);
+    for (const entryPoint of normalizedOptions.entryPoints.values()) {
+      allWatchedFiles.add(toPosixPath(entryPoint.entryFilePath));
     }
 
     if (isWatchMode) {
@@ -171,44 +141,21 @@ export async function* executeLibraryBuilder(
     }
 
     // Execute initial build
-    const startTime = process.hrtime.bigint();
-    try {
-      await withProgress('Building...', () => {
-        assert(stylesheetBundler);
-
-        return buildAction({
-          options: normalizedOptions,
-          graph,
-          batches,
-          stylesheetBundler,
-          allWatchedFiles,
-          isWatchMode,
-          context,
-          compilerWorkerPool,
-          target,
-          signal,
-          sourceFileCache,
-        });
-      });
-
-      logBuildResult(logger, startTime, true);
-      logCumulativeDurations();
-
-      watcher?.add(Array.from(allWatchedFiles));
-
-      yield { success: true };
-    } catch (error) {
-      assertIsError(error);
-      logBuildResult(logger, startTime, false);
-
-      watcher?.add(Array.from(allWatchedFiles));
-
-      yield { success: false, error: error.message };
-
-      if (!isWatchMode) {
-        return;
-      }
-    }
+    const initialResult = await executeBuild(
+      'Building...',
+      {
+        options: normalizedOptions,
+        stylesheetBundler,
+        allWatchedFiles,
+        isWatchMode,
+        context,
+        buildState,
+      },
+      withProgress,
+      watcher,
+      buildAction,
+    );
+    yield initialResult;
 
     if (!isWatchMode || !watcher) {
       return;
@@ -217,15 +164,14 @@ export async function* executeLibraryBuilder(
     yield* runWatchLoop(
       watcher,
       normalizedOptions,
-      graph,
-      batches,
       stylesheetBundler,
       allWatchedFiles,
       context,
       withProgress,
-      target,
+      buildState,
+      buildAction,
+      hasModifiedWatchedFile,
       signal,
-      sourceFileCache,
     );
   } finally {
     logCumulativeDurations();
@@ -234,48 +180,58 @@ export async function* executeLibraryBuilder(
     await Promise.allSettled([
       watcher?.close(),
       stylesheetBundler?.dispose(),
-      compilerWorkerPool?.destroy(),
+      buildState.singleProgramCache?.compilationInstance.close?.(),
     ]);
+  }
+}
+
+async function executeBuild(
+  message: string,
+  actionContext: import('./pipeline/build-action').BuildActionContext,
+  withProgress: typeof withSpinner,
+  watcher: BuildWatcher | undefined,
+  buildAction: typeof import('./pipeline/build-action').buildAction,
+): Promise<BuilderOutput> {
+  const startTime = process.hrtime.bigint();
+  const { context, allWatchedFiles, isWatchMode } = actionContext;
+
+  try {
+    await withProgress(message, () => buildAction(actionContext));
+    logBuildResult(context.logger, startTime, true);
+    if (isWatchMode) {
+      logCumulativeDurations();
+    }
+
+    return { success: true };
+  } catch (error) {
+    assertIsError(error);
+    logBuildResult(context.logger, startTime, false);
+
+    return { success: false, error: error.message };
+  } finally {
+    watcher?.add(Array.from(allWatchedFiles));
   }
 }
 
 /**
  * Runs the watch loop, rebuilding the library as watched files are modified.
- *
- * @param watcher The build watcher instance.
- * @param options The normalized library options.
- * @param graph The entry points dependency graph.
- * @param batches The topologically sorted entry point batches.
- * @param stylesheetBundler The component stylesheet bundler instance.
- * @param allWatchedFiles Set of all watched file paths.
- * @param context The architect builder context.
- * @param withProgress Function to wrap build actions with progress reporting.
- * @param target The esbuild target environments derived from browserslist.
- * @param signal Optional abort signal to cancel the watch loop.
- * @param sourceFileCache Optional shared cache of TypeScript source files across entry points.
- * @returns An async generator yielding builder outputs.
  */
 async function* runWatchLoop(
   watcher: BuildWatcher,
   options: NormalizedLibraryOptions,
-  graph: EntryPointGraph,
-  batches: EntryPointNode[][],
   stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary>,
   allWatchedFiles: Set<string>,
   context: BuilderContext,
   withProgress: typeof withSpinner,
-  target: string[],
+  buildState: SingleBuildState,
+  buildAction: typeof import('./pipeline/build-action').buildAction,
+  hasModifiedWatchedFile: typeof import('./pipeline/build-action').hasModifiedWatchedFile,
   signal?: AbortSignal,
-  sourceFileCache?: Map<string, ts.SourceFile>,
 ): AsyncIterableIterator<BuilderOutput> {
-  // Dynamically lazy-loaded to prevent importing dependencies at the top level.
-  const [{ buildAction }, { checkAssetChanges }] = await Promise.all([
-    import('./pipeline/build-action'),
-    import('./pipeline/assets'),
-  ]);
+  const { checkAssetChanges } = await import('./pipeline/assets');
 
-  const { logger } = context;
   const { workspaceRoot, packageJsonPath, assets, clearScreen } = options;
+  const posixPackageJsonPath = toPosixPath(packageJsonPath);
 
   for await (const changes of watcher) {
     if (signal?.aborted) {
@@ -287,17 +243,34 @@ async function* runWatchLoop(
       console.clear();
     }
 
-    const changedFiles = new Set(changes.all.map(toPosixPath));
+    const changedFiles = new Set<string>();
+    let hasStyleChanges = false;
+    let hasSassChanges = false;
+    for (const file of changes.all) {
+      const posixFile = toPosixPath(file);
+      changedFiles.add(posixFile);
+      if (/\.(?:scss|sass)$/i.test(posixFile)) {
+        hasStyleChanges = true;
+        hasSassChanges = true;
+      } else if (/\.(?:less|css)$/i.test(posixFile)) {
+        hasStyleChanges = true;
+      }
+    }
 
-    if (sourceFileCache) {
-      for (const file of changedFiles) {
-        sourceFileCache.delete(file);
+    if (hasStyleChanges) {
+      if (hasSassChanges) {
+        resetSassWorkerPoolCaches();
+      }
+      const invalidatedStyles = stylesheetBundler.invalidate(changedFiles);
+      if (invalidatedStyles) {
+        for (const styleFile of invalidatedStyles) {
+          changedFiles.add(toPosixPath(styleFile));
+        }
       }
     }
 
     // Check if package.json was modified
     let hasPackageJsonChanges = false;
-    const posixPackageJsonPath = toPosixPath(packageJsonPath);
     if (changedFiles.has(posixPackageJsonPath)) {
       try {
         const packageJson = await loadPackageJson(packageJsonPath);
@@ -305,6 +278,8 @@ async function* runWatchLoop(
         hasPackageJsonChanges = true;
       } catch (error) {
         assertIsError(error);
+        await buildState.singleProgramCache?.compilationInstance.update?.(changedFiles);
+        buildState.hasEmittedManifests = false;
         yield {
           success: false,
           error: `Failed to reload 'package.json': ${error.message}`,
@@ -313,98 +288,57 @@ async function* runWatchLoop(
       }
     }
 
-    const hasNodeChanges = graph.markAffectedNodes(changedFiles);
+    const hasSourceChanges =
+      !buildState.singleProgramCache ||
+      Boolean(buildState.hasCompilationError) ||
+      hasModifiedWatchedFile(changedFiles, allWatchedFiles, posixPackageJsonPath);
 
     if (
-      !hasNodeChanges &&
+      !hasSourceChanges &&
       !hasPackageJsonChanges &&
       !checkAssetChanges(assets, workspaceRoot, changedFiles)
     ) {
       continue;
     }
 
-    const hasSassChanges = changes.all.some((f) => /\.(scss|sass|css)$/i.test(f));
-    if (hasSassChanges) {
-      resetSassWorkerPoolCaches();
-    }
-
-    stylesheetBundler.invalidate(changedFiles);
-
-    const startTime = process.hrtime.bigint();
-
-    try {
-      await withProgress('Changes detected. Rebuilding...', () =>
-        buildAction({
-          options,
-          graph,
-          batches,
-          stylesheetBundler,
-          allWatchedFiles,
-          isWatchMode: true,
-          context,
-          modifiedFiles: changedFiles,
-          target,
-          signal,
-          sourceFileCache,
-        }),
-      );
-
-      logBuildResult(logger, startTime, true);
-      watcher.add(Array.from(allWatchedFiles));
-
-      yield { success: true };
-    } catch (error) {
-      assertIsError(error);
-      logBuildResult(logger, startTime, false);
-
-      watcher.add(Array.from(allWatchedFiles));
-
-      yield { success: false, error: error.message };
-    }
+    yield await executeBuild(
+      'Changes detected. Rebuilding...',
+      {
+        options,
+        stylesheetBundler,
+        allWatchedFiles,
+        isWatchMode: true,
+        context,
+        buildState,
+        modifiedFiles: changedFiles,
+      },
+      withProgress,
+      watcher,
+      buildAction,
+    );
   }
 }
 
 /**
- * Loads and validates the package.json file for the library project.
- *
- * @param packageJsonPath Path to the package.json file.
- * @returns The parsed PackageJsonData.
+ * Loads and parses a JSON file from disk.
  */
 async function loadPackageJson(packageJsonPath: string): Promise<PackageJsonData> {
-  let packageJson: PackageJsonData;
-  try {
-    const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
-    packageJson = JSON.parse(packageJsonContent) as PackageJsonData;
-  } catch (error) {
-    assertIsError(error);
-    throw new Error(`Failed to read 'package.json' at '${packageJsonPath}': ${error.message}`, {
-      cause: error,
-    });
-  }
+  const content = await fs.readFile(packageJsonPath, 'utf-8');
 
-  const { name: packageName } = packageJson;
-  if (!packageName) {
-    throw new Error(`The package.json at '${packageJsonPath}' must contain a 'name'.`);
-  }
-
-  return packageJson;
+  return JSON.parse(content) as PackageJsonData;
 }
 
 /**
- * Logs the completion or failure message for a library build iteration.
- *
- * @param logger The builder context logger.
- * @param startTime The high-resolution start time of the build iteration.
- * @param success Whether the build iteration succeeded.
+ * Logs the build completion time and status.
  */
 function logBuildResult(logger: logging.LoggerApi, startTime: bigint, success: boolean): void {
-  const buildDuration = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
-  const status = success ? 'complete' : 'failed';
-  const message = `\nLibrary bundle generation ${status}. [${buildDuration.toFixed(3)} seconds] - ${new Date().toISOString()}\n`;
+  const durationMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
+  const durationSec = (durationMs / 1000).toFixed(2);
 
   if (success) {
-    logger.info(message);
+    logger.info(`Build at: ${new Date().toISOString()} - Time: ${durationMs.toFixed(0)}ms`);
+    logger.info(`Built Angular library in ${durationSec}s.`);
   } else {
-    logger.error(message);
+    logger.error(`Build failed after ${durationSec}s.`);
   }
 }

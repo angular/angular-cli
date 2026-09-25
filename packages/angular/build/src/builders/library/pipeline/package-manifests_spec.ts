@@ -7,25 +7,54 @@
  */
 
 import assert from 'node:assert';
-import { mkdtemp, rm } from 'node:fs/promises';
 import { join } from 'node:path';
-import type { NormalizedLibraryOptions, PackageJsonData } from '../options';
-import { EntryPointGraph } from './entry-point-graph';
+import type { NormalizedEntryPoint, NormalizedLibraryOptions, PackageJsonData } from '../options';
 import { generatePackageManifests } from './package-manifests';
-import { type MemoryOutputFile, getEntryPointBundleName, getFileText } from './utils';
+import { type MemoryOutputFile, getEntryPointBundleName } from './utils';
 
 describe('generatePackageManifests', () => {
-  let tempDir: string;
+  const tempDir = '/workspace/my-lib';
 
   function getRootPackageJson(files: MemoryOutputFile[]): PackageJsonData {
     const file = files.find((f) => f.path === 'package.json');
     assert(file, 'package.json must be present in emitted files');
 
-    return JSON.parse(getFileText(file.contents)) as PackageJsonData;
+    return JSON.parse(String(file.contents)) as PackageJsonData;
+  }
+
+  function createEntryPoints(
+    packageName = 'my-lib',
+    includeSecondary = false,
+  ): Map<string, NormalizedEntryPoint> {
+    const entryPoints = new Map<string, NormalizedEntryPoint>();
+    const primaryBundleName = getEntryPointBundleName(packageName);
+    entryPoints.set('.', {
+      subpath: '.',
+      name: '.',
+      displayName: packageName,
+      bundleName: primaryBundleName,
+      entryFilePath: join(tempDir, 'src/public-api.ts'),
+      isPrimary: true,
+    });
+
+    if (includeSecondary) {
+      const secondaryBundleName = getEntryPointBundleName(packageName, 'testing');
+      entryPoints.set('testing', {
+        subpath: './testing',
+        name: 'testing',
+        displayName: `${packageName}/testing`,
+        bundleName: secondaryBundleName,
+        entryFilePath: join(tempDir, 'testing/src/public-api.ts'),
+        isPrimary: false,
+      });
+    }
+
+    return entryPoints;
   }
 
   function createOptions(
     overrides: Partial<NormalizedLibraryOptions> = {},
+    includeSecondary = false,
   ): NormalizedLibraryOptions {
     const packageName =
       (overrides.packageJson?.name as string | undefined) ?? overrides.packageName ?? 'my-lib';
@@ -41,7 +70,7 @@ describe('generatePackageManifests', () => {
       deleteOutputPath: true,
       packageJsonPath: join(tempDir, 'package.json'),
       tsConfigPath: join(tempDir, 'tsconfig.lib.json'),
-      entryPoints: new Map(),
+      entryPoints: overrides.entryPoints ?? createEntryPoints(packageName, includeSecondary),
       inlineStyleLanguage: 'css',
       styleIncludePaths: [],
       assets: [],
@@ -63,58 +92,7 @@ describe('generatePackageManifests', () => {
     };
   }
 
-  function createGraph(
-    packageNameOrOptions?: NormalizedLibraryOptions | string | boolean,
-    includeSecondary = false,
-  ): EntryPointGraph {
-    let packageName = 'my-lib';
-    let secondary = includeSecondary;
-
-    if (typeof packageNameOrOptions === 'boolean') {
-      secondary = packageNameOrOptions;
-    } else if (typeof packageNameOrOptions === 'string') {
-      packageName = packageNameOrOptions;
-    } else if (packageNameOrOptions && typeof packageNameOrOptions === 'object') {
-      packageName = packageNameOrOptions.packageName;
-    }
-
-    const primaryBundleName = getEntryPointBundleName(packageName, '', true);
-    const graph = new EntryPointGraph();
-    graph.addNode({
-      subpath: '.',
-      name: '.',
-      displayName: packageName,
-      bundleName: primaryBundleName,
-      entryFilePath: join(tempDir, 'src/public-api.ts'),
-      isPrimary: true,
-    });
-
-    if (secondary) {
-      const secondaryBundleName = getEntryPointBundleName(packageName, 'testing', false);
-      graph.addNode({
-        subpath: './testing',
-        name: 'testing',
-        displayName: `${packageName}/testing`,
-        bundleName: secondaryBundleName,
-        entryFilePath: join(tempDir, 'testing/src/public-api.ts'),
-        isPrimary: false,
-      });
-    }
-
-    return graph;
-  }
-
-  beforeEach(async () => {
-    const TMP_DIR = process.env['TEST_TMPDIR'];
-    assert(TMP_DIR, 'TEST_TMPDIR must be set');
-    tempDir = await mkdtemp(join(TMP_DIR, 'pkg-json-spec-'));
-  });
-
-  afterEach(async () => {
-    await rm(tempDir, { recursive: true, force: true });
-  });
-
-  it('should generate a valid APF package.json for an unscoped package', async () => {
+  it('should generate a valid APF package.json for an unscoped package', () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -128,9 +106,8 @@ describe('generatePackageManifests', () => {
         },
       },
     });
-    const graph = createGraph();
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result).toEqual({
@@ -153,16 +130,15 @@ describe('generatePackageManifests', () => {
     });
   });
 
-  it('should sanitize scoped package names in fesm and types paths', async () => {
+  it('should sanitize scoped package names in fesm and types paths', () => {
     const options = createOptions({
       packageJson: {
         name: '@my-scope/my-lib',
         version: '2.1.0',
       },
     });
-    const graph = createGraph(options);
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result).toEqual(
@@ -181,7 +157,7 @@ describe('generatePackageManifests', () => {
     );
   });
 
-  it('should retain scripts when keepLifecycleScripts is true', async () => {
+  it('should retain scripts when keepLifecycleScripts is true', () => {
     const options = createOptions({
       keepLifecycleScripts: true,
       packageJson: {
@@ -192,23 +168,24 @@ describe('generatePackageManifests', () => {
         },
       },
     });
-    const graph = createGraph();
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
     expect(result.scripts).toEqual({ postinstall: 'echo done' });
   });
 
-  it('should configure secondary entry points and create secondary manifests', async () => {
-    const options = createOptions({
-      packageJson: {
-        name: '@my-scope/my-lib',
-        version: '1.0.0',
+  it('should configure secondary entry points and create secondary manifests', () => {
+    const options = createOptions(
+      {
+        packageJson: {
+          name: '@my-scope/my-lib',
+          version: '1.0.0',
+        },
       },
-    });
-    const graph = createGraph(options, true);
+      true,
+    );
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result.exports).toEqual(
@@ -221,7 +198,7 @@ describe('generatePackageManifests', () => {
     );
 
     const secondaryPkgFile = files.find((f) => f.path === 'testing/package.json');
-    const secondaryPkg = JSON.parse(getFileText(secondaryPkgFile?.contents ?? ''));
+    const secondaryPkg = JSON.parse(String(secondaryPkgFile?.contents ?? ''));
     expect(secondaryPkg).toEqual({
       module: '../fesm2022/my-scope-my-lib-testing.mjs',
       typings: '../types/my-scope-my-lib-testing.d.ts',
@@ -232,35 +209,34 @@ describe('generatePackageManifests', () => {
     expect(npmignoreFile?.contents).toContain('/testing/package.json');
   });
 
-  it('should inject watch version when isWatchMode is true', async () => {
+  it('should inject watch version when isWatchMode is true', () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
         version: '1.0.0',
       },
     });
-    const graph = createGraph();
 
-    const files = await generatePackageManifests(options, graph, true);
+    const files = generatePackageManifests(options, true);
     const result = getRootPackageJson(files);
     expect(result.version).toMatch(/^0\.0\.0-watch\+\d+$/);
   });
 
-  it('should throw an error if primary entry point is missing from graph', async () => {
+  it('should throw an error if primary entry point is missing', () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
         version: '1.0.0',
       },
+      entryPoints: new Map(),
     });
-    const graph = new EntryPointGraph(); // No primary node
 
-    await expectAsync(generatePackageManifests(options, graph, false)).toBeRejectedWithError(
-      /Primary entry point '\.' was not found in the graph\./,
+    expect(() => generatePackageManifests(options, false)).toThrowError(
+      /Primary entry point '\.' was not found in entryPoints\./,
     );
   });
 
-  it('should inject prepublishOnly guard script when compilationMode is full', async () => {
+  it('should inject prepublishOnly guard script when compilationMode is full', () => {
     const options = createOptions({
       compilationMode: 'full',
       packageJson: {
@@ -268,16 +244,15 @@ describe('generatePackageManifests', () => {
         version: '1.0.0',
       },
     });
-    const graph = createGraph();
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
     expect(result.scripts?.['prepublishOnly']).toContain(
       'Trying to publish a package that has been compiled in full compilation mode',
     );
   });
 
-  it('should preserve custom user exports in package.json and merge subpath conditions', async () => {
+  it('should preserve custom user exports in package.json and merge subpath conditions', () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -291,9 +266,8 @@ describe('generatePackageManifests', () => {
         },
       },
     });
-    const graph = createGraph();
 
-    const files = await generatePackageManifests(options, graph, false);
+    const files = generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result.exports).toEqual({
@@ -308,20 +282,19 @@ describe('generatePackageManifests', () => {
     });
   });
 
-  it('should default sideEffects to false if not specified, and preserve when set', async () => {
-    const files1 = await generatePackageManifests(
+  it('should default sideEffects to false if not specified, and preserve when set', () => {
+    const files1 = generatePackageManifests(
       createOptions({
         packageJson: {
           name: 'my-lib',
           version: '1.0.0',
         },
       }),
-      createGraph(),
       false,
     );
     expect(getRootPackageJson(files1).sideEffects).toBeFalse();
 
-    const files2 = await generatePackageManifests(
+    const files2 = generatePackageManifests(
       createOptions({
         packageJson: {
           name: 'my-lib',
@@ -329,7 +302,6 @@ describe('generatePackageManifests', () => {
           sideEffects: ['*.css'],
         },
       }),
-      createGraph(),
       false,
     );
     expect(getRootPackageJson(files2).sideEffects).toEqual(['*.css']);

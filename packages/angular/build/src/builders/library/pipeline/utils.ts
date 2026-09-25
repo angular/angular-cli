@@ -6,9 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { TextDecoder } from 'node:util';
-
-let textDecoder: TextDecoder | undefined;
 const IS_DTS_FILE_REGEXP = /\.d\.[cm]?ts$/i;
 const IS_DTS_MAP_FILE_REGEXP = /\.d\.[cm]?ts\.map$/i;
 
@@ -26,15 +23,11 @@ export const TYPES_OUTPUT_DIR = 'types';
  * Computes the base bundle file name for an entry point.
  *
  * @param packageName The package name from package.json.
- * @param entryPointName The entry point subpath name.
- * @param isPrimary Whether this is the primary entry point.
+ * @param entryPointName The entry point subpath name (defaults to '.').
  * @returns The sanitized bundle base name.
  */
-export function getEntryPointBundleName(
-  packageName: string,
-  entryPointName: string,
-  isPrimary: boolean,
-): string {
+export function getEntryPointBundleName(packageName: string, entryPointName = '.'): string {
+  const isPrimary = !entryPointName || entryPointName === '.';
   const pkgName = packageName[0] === '@' ? packageName.slice(1) : packageName;
   const epName = isPrimary ? pkgName : `${pkgName}-${entryPointName}`;
 
@@ -64,7 +57,7 @@ export interface DiskOutputFile {
   source: string;
 
   /** The destination path where the file should be copied. */
-  destination: string;
+  path: string;
 }
 
 /**
@@ -76,14 +69,14 @@ export type OutputFile = MemoryOutputFile | DiskOutputFile;
  * Creates an output file descriptor for an existing file on disk.
  *
  * @param source The path to the source file on disk.
- * @param destination The destination path where the file should be copied.
+ * @param path The destination path where the file should be copied.
  * @returns A {@link DiskOutputFile} descriptor.
  */
-export function createDiskOutputFile(source: string, destination: string): DiskOutputFile {
+export function createDiskOutputFile(source: string, path: string): DiskOutputFile {
   return {
     type: 'disk',
     source,
-    destination,
+    path,
   };
 }
 
@@ -106,19 +99,6 @@ export function createMemoryOutputFile(
         ? contents
         : JSON.stringify(contents, null, 2) + '\n',
   };
-}
-
-/**
- * Gets the text content of a file.
- */
-export function getFileText(contents: string | Uint8Array): string {
-  if (typeof contents === 'string') {
-    return contents;
-  }
-
-  textDecoder ??= new TextDecoder();
-
-  return textDecoder.decode(contents);
 }
 
 /**

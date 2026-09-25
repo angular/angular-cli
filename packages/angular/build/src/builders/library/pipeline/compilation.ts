@@ -8,191 +8,230 @@
 
 import { type PartialMessage, formatMessages } from 'esbuild';
 import { existsSync } from 'node:fs';
-import path from 'node:path';
-import type ts from 'typescript';
-import type { AngularHostOptions } from '../../../tools/angular/angular-host';
-import { LibraryCompilation } from '../../../tools/angular/compilation';
-import { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
+import {
+  type AngularCompilation,
+  createAngularCompilation,
+} from '../../../tools/angular/compilation';
+import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import { useTypeChecking } from '../../../utils/environment-options';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
 import { isDeclarationFile, isDeclarationSourceMapFile } from './utils';
 
-const EMITTED_EXTENSIONS = [
-  '.js',
-  '.js.map',
-  '.mjs',
-  '.mjs.map',
-  '.d.ts',
-  '.d.ts.map',
-  '.d.mts',
-  '.d.mts.map',
-] as const;
+const EMITTED_EXTENSIONS = ['.js', '.mjs', '.cjs', '.d.ts', '.d.mts', '.d.cts'];
 
 /**
- * Cached compilation instance for incremental rebuilds in watch mode.
+ * Cached state for the single unified library compilation.
  */
-export interface CachedProgram {
-  compilationInstance: LibraryCompilation;
-  esmFiles: Map<string, string>;
-  dtsFiles: Map<string, string>;
+export interface SingleProgramCache {
+  readonly compilationInstance: AngularCompilation;
+  readonly esmFiles: Map<string, string>;
+  readonly dtsFiles: Map<string, string>;
+  readonly failedFiles?: ReadonlySet<string>;
 }
 
 /**
- * In-memory compilation output containing emitted JavaScript and declaration files.
+ * Output of the unified library compilation step.
  */
-export interface CompilationOutput {
-  /** Map of emitted JavaScript files and sourcemaps keyed by absolute path. */
-  esmFiles: Map<string, string>;
-
-  /** Map of emitted declaration files and sourcemaps keyed by absolute path. */
-  dtsFiles: Map<string, string>;
-
-  /** Set of all referenced source, template, and stylesheet file paths. */
-  referencedFiles: Set<string>;
-
-  /** Whether declaration sourcemaps are enabled. */
-  dtsSourcemap: boolean;
-
-  /** Formatted compiler warning diagnostics, if any. */
-  warnings?: string[];
-
-  /** Whether any declaration files were added, modified, or removed in this compilation run. */
-  hasDtsChanges: boolean;
-
-  /** Whether any JavaScript or ESM files were added, modified, or removed in this compilation run. */
-  hasEsmChanges: boolean;
+export interface LibraryCompilationOutput {
+  readonly esmFiles: ReadonlyMap<string, string>;
+  readonly dtsFiles: ReadonlyMap<string, string>;
+  readonly changedEsmFiles: ReadonlySet<string>;
+  readonly changedDtsFiles: ReadonlySet<string>;
+  readonly referencedFiles: ReadonlySet<string>;
+  readonly cache: SingleProgramCache;
+  readonly diagnosePromise: Promise<string[]>;
 }
 
 /**
- * Result of compiling an entry point, including compilation output and updated program cache.
+ * Compiles all library entry points in a single TypeScript and Angular compilation pass.
  */
-export interface CompilationResult {
-  compilation: CompilationOutput;
-  cachedProgram?: CachedProgram;
-}
-
-/**
- * Interface representing the stylesheet bundler operations needed during compilation.
- */
-export interface StylesheetBundlerAdapter {
-  bundleFile: ComponentStylesheetBundler['bundleFile'];
-  bundleInline: ComponentStylesheetBundler['bundleInline'];
-}
-
-export type CompileEntryPointOptions = Pick<
-  NormalizedLibraryOptions,
-  | 'tsConfigPath'
-  | 'compilationMode'
-  | 'declarationMap'
-  | 'packageName'
-  | 'cacheOptions'
-  | 'inlineStyleLanguage'
-  | 'preserveSymlinks'
-  | 'colors'
->;
-
-/**
- * Compiles an entry point with the Angular Compiler (Ngtsc) and TypeScript using LibraryCompilation.
- * Emits JavaScript and .d.ts files into in-memory maps.
- *
- * @param entryPoint The normalized entry point to compile.
- * @param options The compilation options for this entry point.
- * @param stylesheetBundler The component stylesheet bundler instance or adapter.
- * @param upstreamDtsPaths Map of upstream entry point names to their emitted .d.ts file paths.
- * @param cachedProgram Cached program from a previous compilation run, if available.
- * @param modifiedFiles Set of modified file paths for incremental rebuilding in watch mode.
- * @returns The compilation result containing in-memory files, referenced file paths, and updated program cache.
- */
-export async function compileEntryPoint(
-  entryPoint: NormalizedEntryPoint,
-  options: CompileEntryPointOptions,
-  stylesheetBundler: StylesheetBundlerAdapter,
-  upstreamDtsPaths: Record<string, string[]>,
-  cachedProgram?: CachedProgram,
+export async function compileLibrary(
+  entryPoints: Iterable<NormalizedEntryPoint>,
+  options: NormalizedLibraryOptions,
+  stylesheetBundler: ComponentStylesheetBundler,
+  cached?: SingleProgramCache,
   modifiedFiles?: Set<string>,
-  upstreamDtsFiles?: Map<string, string>,
-  sourceFileCache?: Map<string, ts.SourceFile>,
-): Promise<CompilationResult> {
-  const { entryFilePath, bundleName } = entryPoint;
-  const {
-    tsConfigPath,
-    compilationMode,
-    declarationMap,
-    cacheOptions,
-    inlineStyleLanguage,
-    preserveSymlinks,
-    colors,
-  } = options;
-  const basePath = path.dirname(entryFilePath);
+): Promise<LibraryCompilationOutput> {
+  const { tsConfigPath, compilationMode, preserveSymlinks, colors, declarationMap } = options;
 
-  const tsBuildInfoFile = cacheOptions.enabled
-    ? path.join(cacheOptions.path, 'tsbuildinfo', `${bundleName}.tsbuildinfo`)
-    : undefined;
-
-  const compilationInstance =
-    cachedProgram?.compilationInstance ??
-    new LibraryCompilation({
-      entryFilePath,
-      compilationMode,
-      declarationMap,
-      upstreamDtsPaths,
-      upstreamDtsFiles,
-      basePath,
-      tsBuildInfoFile,
-      sourceFileCache,
-    });
-
-  if (cachedProgram) {
-    compilationInstance.updateLibraryOptions({ upstreamDtsPaths, upstreamDtsFiles });
+  const entryPathsMap: Record<string, string[]> = {};
+  const rootFiles: string[] = [];
+  for (const ep of entryPoints) {
+    entryPathsMap[ep.displayName] = [ep.entryFilePath];
+    rootFiles.push(ep.entryFilePath);
   }
 
-  const stylesheetReferencedFiles: string[] = [];
-  const stylesheetWarnings: PartialMessage[] = [];
-  const hostOptions: AngularHostOptions = {
-    modifiedFiles,
-    transformStylesheet: async (data: string, containingFile: string, stylesheetFile?: string) => {
-      const result = stylesheetFile
-        ? await stylesheetBundler.bundleFile(stylesheetFile)
-        : await stylesheetBundler.bundleInline(data, containingFile, inlineStyleLanguage);
+  const compilationInstance =
+    cached?.compilationInstance ?? (await createAngularCompilation('aot', false));
 
-      const {
-        contents,
-        referencedFiles: bundleReferencedFiles,
-        errors: bundleErrors,
-        warnings: bundleWarnings,
-      } = result;
-
-      if (bundleWarnings?.length) {
-        stylesheetWarnings.push(...bundleWarnings);
+  try {
+    let effectiveModifiedFiles = modifiedFiles;
+    if (cached?.failedFiles?.size) {
+      stylesheetBundler.invalidate(cached.failedFiles);
+      effectiveModifiedFiles = new Set(modifiedFiles);
+      for (const file of cached.failedFiles) {
+        effectiveModifiedFiles.add(file);
       }
+    }
 
-      if (bundleReferencedFiles?.size) {
-        stylesheetReferencedFiles.push(...bundleReferencedFiles);
+    if (effectiveModifiedFiles && effectiveModifiedFiles.size > 0) {
+      await compilationInstance.update?.(effectiveModifiedFiles);
+    }
+
+    const allReferencedFiles = new Set<string>();
+    const stylesheetWarnings: PartialMessage[] = [];
+    const stylesheetErrors: PartialMessage[] = [];
+    const failedFiles = new Set<string>();
+
+    const hostOptions = {
+      modifiedFiles: effectiveModifiedFiles,
+      async transformStylesheet(
+        data: string,
+        containingFile: string,
+        stylesheetFile?: string,
+      ): Promise<string> {
+        const result = stylesheetFile
+          ? await stylesheetBundler.bundleFile(stylesheetFile)
+          : await stylesheetBundler.bundleInline(data, containingFile);
+
+        result.referencedFiles?.forEach((f) => allReferencedFiles.add(toPosixPath(f)));
+        if (result.warnings.length > 0) {
+          stylesheetWarnings.push(...result.warnings);
+        }
+
+        if (result.errors?.length) {
+          stylesheetErrors.push(...result.errors);
+          failedFiles.add(toPosixPath(containingFile));
+          if (stylesheetFile) {
+            failedFiles.add(toPosixPath(stylesheetFile));
+          }
+
+          return '';
+        }
+
+        return result.contents;
+      },
+      processWebWorker: () => '',
+    };
+
+    const { referencedFiles } = await compilationInstance.initialize(
+      tsConfigPath,
+      hostOptions,
+      {
+        sourcemap: true,
+        preserveSymlinks,
+        rootFiles,
+        declarationMap,
+        compilationMode,
+        paths: entryPathsMap,
+      },
+      'library',
+    );
+
+    const emittedFiles =
+      stylesheetErrors.length === 0 ? await compilationInstance.emitAffectedFiles() : [];
+    const diagnosePromise = runDiagnosticsAndFormat(
+      compilationInstance,
+      stylesheetErrors,
+      stylesheetWarnings,
+      colors,
+    );
+
+    // Prevent unhandled promise rejection if an error occurs before diagnosePromise is awaited.
+    diagnosePromise.catch(() => {});
+
+    const esmFiles = cached?.esmFiles ?? new Map<string, string>();
+    const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
+    const changedEsmFiles = new Set<string>();
+    const changedDtsFiles = new Set<string>();
+
+    for (const ref of referencedFiles) {
+      allReferencedFiles.add(toPosixPath(ref));
+    }
+
+    if (effectiveModifiedFiles) {
+      for (const modifiedFile of effectiveModifiedFiles) {
+        const posixModified = toPosixPath(modifiedFile);
+        if (allReferencedFiles.has(posixModified)) {
+          continue;
+        }
+
+        const basePathWithoutExt = posixModified.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
+        if (basePathWithoutExt === posixModified || existsSync(posixModified)) {
+          continue;
+        }
+
+        for (const ext of EMITTED_EXTENSIONS) {
+          const outputPath = `${basePathWithoutExt}${ext}`;
+          const mapPath = `${outputPath}.map`;
+          if (esmFiles.delete(outputPath)) {
+            changedEsmFiles.add(outputPath);
+          }
+          if (dtsFiles.delete(outputPath)) {
+            changedDtsFiles.add(outputPath);
+          }
+          esmFiles.delete(mapPath);
+          dtsFiles.delete(mapPath);
+        }
       }
+    }
 
-      if (bundleErrors?.length) {
-        const errorMessages = bundleErrors.map((e) => e.text).join('\n');
-        throw new Error(
-          `Failed to bundle stylesheet in '${stylesheetFile ?? containingFile}':\n${errorMessages}`,
-        );
+    for (const { filename, contents } of emittedFiles) {
+      const normalized = toPosixPath(filename);
+      if (normalized.endsWith('.map')) {
+        const isDtsMap = isDeclarationSourceMapFile(normalized);
+        const targetMap = isDtsMap ? dtsFiles : esmFiles;
+        if (targetMap.get(normalized) !== contents) {
+          targetMap.set(normalized, contents);
+          (isDtsMap ? changedDtsFiles : changedEsmFiles).add(normalized.slice(0, -4));
+        }
+      } else if (isDeclarationFile(normalized)) {
+        if (dtsFiles.get(normalized) !== contents) {
+          changedDtsFiles.add(normalized);
+          dtsFiles.set(normalized, contents);
+        }
+      } else if (esmFiles.get(normalized) !== contents) {
+        changedEsmFiles.add(normalized);
+        esmFiles.set(normalized, contents);
       }
+    }
 
-      return contents;
-    },
-    processWebWorker: () => '',
-  };
+    return {
+      esmFiles,
+      dtsFiles,
+      changedEsmFiles,
+      changedDtsFiles,
+      referencedFiles: allReferencedFiles,
+      cache: {
+        compilationInstance,
+        esmFiles,
+        dtsFiles,
+        failedFiles: failedFiles.size > 0 ? failedFiles : undefined,
+      },
+      diagnosePromise,
+    };
+  } catch (error) {
+    if (!cached) {
+      await compilationInstance.close?.();
+    }
+    throw error;
+  }
+}
 
-  const { compilerOptions, referencedFiles } = await compilationInstance.initialize(
-    tsConfigPath,
-    hostOptions,
-    {
-      preserveSymlinks,
-      cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
-    },
-  );
+async function runDiagnosticsAndFormat(
+  compilationInstance: AngularCompilation,
+  stylesheetErrors: PartialMessage[],
+  stylesheetWarnings: PartialMessage[],
+  colors: boolean,
+): Promise<string[]> {
+  if (stylesheetErrors.length > 0) {
+    const formatted = await formatMessages(stylesheetErrors, { kind: 'error', color: colors });
+    throw new Error(`Failed to bundle stylesheet:\n${formatted.join('\n')}`);
+  }
 
-  let formattedWarnings: string[] | undefined;
+  const warningsOut: string[] = [];
+
   if (useTypeChecking) {
     const { errors, warnings } = await compilationInstance.diagnoseFiles();
     if (errors?.length) {
@@ -201,7 +240,8 @@ export async function compileEntryPoint(
     }
 
     if (warnings?.length) {
-      formattedWarnings = await formatMessages(warnings, { kind: 'warning', color: colors });
+      const formatted = await formatMessages(warnings, { kind: 'warning', color: colors });
+      warningsOut.push(...formatted);
     }
   }
 
@@ -210,63 +250,8 @@ export async function compileEntryPoint(
       kind: 'warning',
       color: colors,
     });
-
-    formattedWarnings ??= [];
-    formattedWarnings.push(...formattedStyleWarnings);
+    warningsOut.push(...formattedStyleWarnings);
   }
 
-  const emittedFiles = compilationInstance.emitAffectedFiles();
-  const esmFiles = new Map<string, string>(cachedProgram?.esmFiles);
-  const dtsFiles = new Map<string, string>(cachedProgram?.dtsFiles);
-  let hasDtsChanges = !cachedProgram;
-  let hasEsmChanges = !cachedProgram;
-
-  if (modifiedFiles) {
-    for (const modifiedFile of modifiedFiles) {
-      const posixModified = toPosixPath(modifiedFile);
-      if (existsSync(posixModified)) {
-        continue;
-      }
-
-      const basePathWithoutExt = posixModified.replace(/\.[cm]?[jt]sx?$/, '');
-      for (const ext of EMITTED_EXTENSIONS) {
-        const outputPath = `${basePathWithoutExt}${ext}`;
-
-        if (esmFiles.delete(outputPath)) {
-          hasEsmChanges = true;
-        }
-
-        if (dtsFiles.delete(outputPath)) {
-          hasDtsChanges = true;
-        }
-      }
-    }
-  }
-
-  for (const { filename, contents } of emittedFiles) {
-    const normalized = toPosixPath(filename);
-    const isDts = isDeclarationFile(normalized);
-    const isDtsMap = !isDts && isDeclarationSourceMapFile(normalized);
-
-    if (isDts || isDtsMap) {
-      hasDtsChanges ||= dtsFiles.get(normalized) !== contents;
-      dtsFiles.set(normalized, contents);
-    } else {
-      hasEsmChanges ||= esmFiles.get(normalized) !== contents;
-      esmFiles.set(normalized, contents);
-    }
-  }
-
-  return {
-    compilation: {
-      esmFiles,
-      dtsFiles,
-      referencedFiles: new Set([...referencedFiles, ...stylesheetReferencedFiles]),
-      dtsSourcemap: !!compilerOptions.declarationMap,
-      warnings: formattedWarnings,
-      hasDtsChanges,
-      hasEsmChanges,
-    },
-    cachedProgram: { compilationInstance, esmFiles, dtsFiles },
-  };
+  return warningsOut;
 }

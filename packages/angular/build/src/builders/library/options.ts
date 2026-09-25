@@ -58,6 +58,7 @@ export interface PackageJsonData {
   scripts?: Record<string, string>;
   workspaces?: unknown;
   dependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
   peerDependencies?: Record<string, string>;
   peerDependenciesMeta?: Record<string, { optional?: boolean }>;
   [key: string]: unknown;
@@ -157,7 +158,7 @@ export async function normalizeLibraryOptions(
     packageName,
   );
 
-  const allowedNonPeerDependencies: RegExp[] = [];
+  const allowedNonPeerDependencies: RegExp[] = [/^tslib$/];
   for (const pattern of rawAllowedNonPeerDependencies) {
     try {
       allowedNonPeerDependencies.push(new RegExp(pattern));
@@ -186,10 +187,12 @@ export async function normalizeLibraryOptions(
     });
   }
 
-  const combinedAssets = [...defaultAssets, ...(rawAssets ?? [])];
-  const assets = combinedAssets.length
-    ? normalizeAssetPatterns(combinedAssets, workspaceRoot, projectRoot, projectSourceRoot)
-    : [];
+  const assets = normalizeAssetPatterns(
+    [...defaultAssets, ...(rawAssets ?? [])],
+    workspaceRoot,
+    projectRoot,
+    projectSourceRoot,
+  );
 
   const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
 
@@ -237,6 +240,8 @@ export async function normalizeLibraryOptions(
  * Normalizes a single entry point specification.
  *
  * @param key The entry point key from package.json exports (e.g. '.' or './testing').
+ * @param posixKey Normalized POSIX key without trailing slashes.
+ * @param isPrimary Whether this is the primary entry point.
  * @param targetPath The relative file path string from exports.
  * @param projectRoot The library project root directory.
  * @param packageName The root package name (e.g. `@my/lib`).
@@ -244,12 +249,12 @@ export async function normalizeLibraryOptions(
  */
 function normalizeEntryPoint(
   key: string,
+  posixKey: string,
+  isPrimary: boolean,
   targetPath: string,
   projectRoot: string,
   packageName: string,
 ): NormalizedEntryPoint {
-  const posixKey = toPosixPath(key).replace(/\/+$/, '');
-  const isPrimary = posixKey === '.' || posixKey === '';
   const name = isPrimary
     ? '.'
     : posixKey[0] === '.' && posixKey[1] === '/'
@@ -264,11 +269,11 @@ function normalizeEntryPoint(
 
   const subpath = isPrimary ? '.' : `./${name}`;
   const displayName = isPrimary ? packageName : `${packageName}/${name}`;
-  const bundleName = getEntryPointBundleName(packageName, name, isPrimary);
+  const bundleName = getEntryPointBundleName(packageName, name);
 
   const entryFilePath = path.resolve(projectRoot, targetPath);
 
-  if (!/\.(?:ts|mts)$/.test(entryFilePath) || /\.d\.(?:ts|mts)$/.test(entryFilePath)) {
+  if (!/(?<!\.d)\.(?:ts|mts)$/.test(entryFilePath)) {
     throw new Error(
       `Entry point '${key}' file path must be a TypeScript file ('.ts' or '.mts'): '${entryFilePath}'.`,
     );
@@ -312,6 +317,7 @@ function normalizeEntryPoints(
 
   for (const [key, value] of Object.entries(exportsRecord)) {
     let target: string | undefined;
+
     if (typeof value === 'string') {
       target = value;
     } else if (
@@ -333,26 +339,33 @@ function normalizeEntryPoints(
             `or a 'default' condition pointing to a TypeScript file.`,
         );
       }
+
       // Non-JS/TS conditional export (e.g., sass/style-only subpath); preserve in package.json without compiling.
       continue;
     }
 
-    if (!isPrimary) {
-      const isTsSource = /\.(?:ts|mts)$/.test(target) && !/\.d\.(?:ts|mts)$/.test(target);
-      const isInvalidCodeEntry = /\.(?:d\.[cm]?ts|cts|tsx|jsx)$/.test(target);
-      if (!isTsSource && !isInvalidCodeEntry) {
-        // Static asset, stylesheet, or package.json export; preserve in package.json without compiling.
-        continue;
-      }
+    if (!isPrimary && !/\.m?ts$/.test(target)) {
+      // Static asset, stylesheet, or package.json export; preserve in package.json without compiling.
+      continue;
     }
 
-    const entryPoint = normalizeEntryPoint(key, target, projectRoot, packageName);
+    const entryPoint = normalizeEntryPoint(
+      key,
+      posixKey,
+      isPrimary,
+      target,
+      projectRoot,
+      packageName,
+    );
+
     if (entryPoints.has(entryPoint.name)) {
       throw new Error(
         `Duplicate entry point detected: '${key}' resolves to the same name ('${entryPoint.name}') as an existing entry point.`,
       );
     }
+
     entryPoints.set(entryPoint.name, entryPoint);
+
     if (entryPoint.isPrimary) {
       hasPrimary = true;
     }

@@ -81,7 +81,7 @@
       "default": "partial"
     },
     "allowedNonPeerDependencies": {
-      "description": "A list of package names allowed in the 'dependencies' section of package.json. Values can be regular expression patterns.",
+      "description": "A list of package names allowed in the 'dependencies' and 'optionalDependencies' sections of package.json. Values can be regular expression patterns.",
       "type": "array",
       "items": {
         "type": "string"

@@ -34,6 +34,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
   protected async loadConfiguration(
     tsconfig: string,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType: 'application' | 'library' = 'application',
   ): Promise<TransformedConfiguration> {
     const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
@@ -78,6 +79,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       originalCompilerOptions,
       compilerOptionOverrides,
       tsconfig,
+      buildType,
     );
 
     return {
@@ -88,9 +90,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     };
   }
 
-  constructor(protected readonly sourceFiles: Map<string, ts.SourceFile> = new Map()) {
-    super();
-  }
+  protected readonly sourceFiles = new Map<string, ts.SourceFile>();
 
   protected invalidateFiles(files: Iterable<string>): void {
     for (const file of files) {

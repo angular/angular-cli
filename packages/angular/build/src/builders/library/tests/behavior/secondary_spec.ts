@@ -7,11 +7,11 @@
  */
 
 import { executeLibraryBuilder } from '../../builder';
-import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
+import { LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
   describe('Behavior: "Secondary Entry Points and Intra-Dependencies"', () => {
-    it('should build secondary entry points with intra-dependencies in topological order', async () => {
+    it('should build secondary entry points with intra-library dependencies', async () => {
       await harness.writeFiles({
         'projects/lib/shared/src/public-api.ts': `
         import { Injectable } from '@angular/core';
@@ -117,34 +117,6 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(npmignore).toContain('/feature-a/package.json');
       expect(npmignore).toContain('/feature-b/package.json');
       expect(npmignore).toContain('/sub-module/package.json');
-    });
-
-    it('should throw an error when a circular dependency exists between secondary entry points', async () => {
-      await harness.writeFiles({
-        'projects/lib/ep-one/src/public-api.ts': `
-        import { EpTwoService } from 'lib/ep-two';
-        export const VAL_ONE = 'one';
-        `,
-        'projects/lib/ep-two/src/public-api.ts': `
-        import { VAL_ONE } from 'lib/ep-one';
-        export class EpTwoService {}
-        `,
-      });
-
-      await harness.modifyFile('projects/lib/package.json', (content) => {
-        const pkg = JSON.parse(content);
-        pkg.exports = {
-          '.': './src/public-api.ts',
-          './ep-one': './ep-one/src/public-api.ts',
-          './ep-two': './ep-two/src/public-api.ts',
-        };
-
-        return JSON.stringify(pkg, null, 2);
-      });
-
-      const { result } = await harness.executeOnce();
-      expect(result?.success).toBeFalse();
-      expect(result?.error).toContain('Circular dependency detected');
     });
   });
 });

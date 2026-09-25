@@ -53,6 +53,7 @@ export abstract class AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType?: 'application' | 'library',
   ): Promise<AngularCompilationResult>;
 
   emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>> {

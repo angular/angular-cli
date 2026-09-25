@@ -6,478 +6,405 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import path from 'node:path';
 import {
+  type OutputChunk,
   type OutputOptions,
   type Plugin,
-  type RolldownOptions,
+  type RolldownOutput,
   type RolldownPluginOption,
   rolldown,
 } from 'rolldown';
 import { dts } from 'rolldown-plugin-dts';
-import { calculateHash } from '../../../utils/hash';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
-import type { CompilationOutput } from './compilation';
 import {
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,
   TYPES_OUTPUT_DIR,
   createMemoryOutputFile,
-  getFileText,
-  isDeclarationFile,
 } from './utils';
 
 /**
- * Result of bundling an entry point.
+ * Cached module ID sets for a bundled entry point.
  */
 export interface BundleResult {
-  /** Hash of the declaration file content used for downstream invalidation. */
-  dtsHash: string;
+  /** Exact set of virtual ESM module IDs bundled into this entry point. */
+  esmModuleIds: ReadonlySet<string>;
 
-  /** All current output files for this entry point (chunks, sourcemaps, etc.). */
-  files: MemoryOutputFile[];
-
-  /** Newly generated files that need to be written to disk in this build iteration. */
-  filesToEmit: MemoryOutputFile[];
+  /** Exact set of virtual DTS module IDs bundled into this entry point. */
+  dtsModuleIds: ReadonlySet<string>;
 }
 
-const ESM_EXTENSIONS = ['.js', '.mjs', '/index.js'] as const;
-const DTS_EXTENSIONS = ['.d.ts', '.d.mts', '/index.d.ts'] as const;
+export interface BundleEntryPointsOutput {
+  filesToEmit: MemoryOutputFile[];
+  bundleResults: Map<string, BundleResult>;
+}
+
+export interface BundleEntryPointInput {
+  entryPoint: NormalizedEntryPoint;
+  hasEsmChanges: boolean;
+  hasDtsChanges: boolean;
+  previousBundleResult?: BundleResult;
+}
+
+const ESM_EXTENSIONS = ['.js', '.mjs', '/index.js', '/index.mjs'] as const;
+const DTS_EXTENSIONS = ['.d.ts', '.d.mts', '/index.d.ts', '/index.d.mts'] as const;
+
+export type EntryPointLookup = (filePath: string) => NormalizedEntryPoint | undefined;
+
+interface MultiBundleOutput {
+  filesToEmit: MemoryOutputFile[];
+  moduleIdsByBundle: Map<string, Set<string>>;
+}
 
 /**
- * Bundles the compiled in-memory JavaScript and declaration files for an entry point using Rolldown.
- *
- * @param entryPoint The normalized entry point being bundled.
- * @param compilation The in-memory compilation output containing emitted JavaScript and declaration files.
- * @param options The normalized library builder options.
- * @param previousBundleResult Optional bundle result from a previous compilation run.
- * @returns The bundle result containing file paths and DTS content hash.
+ * Bundles the compiled in-memory JavaScript and declaration files for all dirty entry points
+ * using at most 2 Rolldown instances total (1 for all .mjs bundles, 1 for all .d.ts bundles).
  */
-export async function bundleEntryPoint(
-  entryPoint: NormalizedEntryPoint,
-  compilation: CompilationOutput,
+export async function bundleEntryPoints(
+  items: readonly BundleEntryPointInput[],
+  esmFiles: ReadonlyMap<string, string>,
+  dtsFiles: ReadonlyMap<string, string>,
   options: NormalizedLibraryOptions,
-  previousBundleResult?: BundleResult,
-): Promise<BundleResult> {
-  const { entryFilePath, bundleName } = entryPoint;
-  const { preserveSymlinks } = options;
-  const { esmFiles, dtsFiles, dtsSourcemap, hasDtsChanges, hasEsmChanges } = compilation;
+  findEntryPoint: EntryPointLookup = createEntryDirectoryLookup(options.entryPoints.values()),
+): Promise<BundleEntryPointsOutput> {
+  const bundleResults = new Map<string, BundleResult>();
+  if (items.length === 0) {
+    return { filesToEmit: [], bundleResults };
+  }
 
-  const entryBase = entryFilePath.replace(/\.m?ts$/, '');
-  const jsEntry = entryFilePath.endsWith('.mts') ? `${entryBase}.mjs` : `${entryBase}.js`;
-  const dtsEntry = entryFilePath.endsWith('.mts') ? `${entryBase}.d.mts` : `${entryBase}.d.ts`;
+  const esmEntryPoints: NormalizedEntryPoint[] = [];
+  const dtsEntryPoints: NormalizedEntryPoint[] = [];
 
-  const isExternal = createExternalDependencyPredicate(entryPoint, options);
+  for (const item of items) {
+    if (item.hasEsmChanges || !item.previousBundleResult) {
+      esmEntryPoints.push(item.entryPoint);
+    }
+    if (item.hasDtsChanges || !item.previousBundleResult) {
+      dtsEntryPoints.push(item.entryPoint);
+    }
+  }
 
-  const [esmResult, dtsResult] = await Promise.all([
-    bundleEsm(
-      jsEntry,
-      bundleName,
-      esmFiles,
-      isExternal,
-      preserveSymlinks,
-      hasEsmChanges,
-      previousBundleResult,
-    ),
-    bundleDts(
-      dtsEntry,
-      bundleName,
-      dtsFiles,
-      dtsSourcemap,
-      isExternal,
-      preserveSymlinks,
-      hasDtsChanges,
-      previousBundleResult,
-    ),
+  const [esmOutput, dtsOutput] = await Promise.all([
+    bundleAllEsm(esmEntryPoints, esmFiles, options, findEntryPoint),
+    bundleAllDts(dtsEntryPoints, dtsFiles, options, findEntryPoint),
   ]);
 
+  for (const { entryPoint, previousBundleResult } of items) {
+    const { bundleName, name } = entryPoint;
+    bundleResults.set(name, {
+      esmModuleIds:
+        esmOutput.moduleIdsByBundle.get(bundleName) ??
+        previousBundleResult?.esmModuleIds ??
+        new Set(),
+      dtsModuleIds:
+        dtsOutput.moduleIdsByBundle.get(bundleName) ??
+        previousBundleResult?.dtsModuleIds ??
+        new Set(),
+    });
+  }
+
   return {
-    dtsHash: dtsResult.dtsHash,
-    files: [...esmResult.files, ...dtsResult.files],
-    filesToEmit: [...esmResult.filesToEmit, ...dtsResult.filesToEmit],
+    filesToEmit: [...esmOutput.filesToEmit, ...dtsOutput.filesToEmit],
+    bundleResults,
   };
 }
 
-/**
- * Creates an external dependency predicate that prevents relative imports across entry point boundaries.
- *
- * @param entryPoint The normalized entry point being bundled.
- * @param options The normalized library options.
- * @returns A predicate function for Rolldown.
- */
-function createExternalDependencyPredicate(
-  entryPoint: NormalizedEntryPoint,
-  options: NormalizedLibraryOptions,
-): (moduleId: string, importer?: string) => boolean {
-  const { name: epName } = entryPoint;
-  const { entryPoints } = options;
+export function createEntryDirectoryLookup(
+  entryPoints: Iterable<NormalizedEntryPoint>,
+): EntryPointLookup {
+  const dirs = Array.from(entryPoints, (ep) => {
+    const dir = toPosixPath(path.dirname(ep.entryFilePath));
 
-  const entryPointBases = new Map<string, NormalizedEntryPoint>();
-  const entryPointsByDirLength = Array.from(entryPoints.values())
-    .map((ep) => {
-      const epDir = toPosixPath(path.dirname(ep.entryFilePath));
-      const epEntryBase = toPosixPath(ep.entryFilePath).replace(/\.(?:d\.)?[cm]?[jt]s$/, '');
-      entryPointBases.set(epEntryBase, ep);
+    return {
+      ep,
+      dir,
+      dirSlash: dir.endsWith('/') ? dir : `${dir}/`,
+    };
+  }).sort((a, b) => b.dir.length - a.dir.length);
 
-      return {
-        ep,
-        epDir,
-        epDirSlash: epDir.endsWith('/') ? epDir : `${epDir}/`,
-        epDirLength: epDir.length,
-      };
-    })
-    .sort((a, b) => {
-      if (b.epDirLength !== a.epDirLength) {
-        return b.epDirLength - a.epDirLength;
-      }
+  const cache = new Map<string, NormalizedEntryPoint | undefined>();
 
-      if (a.ep.name === epName) {
-        return -1;
-      }
+  return (filePath: string): NormalizedEntryPoint | undefined => {
+    const posix = toPosixPath(filePath);
+    const cached = cache.get(posix);
+    if (cached !== undefined || cache.has(posix)) {
+      return cached;
+    }
+    const found = dirs.find(({ dir, dirSlash }) => posix === dir || posix.startsWith(dirSlash))?.ep;
+    cache.set(posix, found);
 
-      if (b.ep.name === epName) {
-        return 1;
-      }
+    return found;
+  };
+}
 
-      return 0;
-    });
+function resolveEntryInputMap(
+  entryPoints: readonly NormalizedEntryPoint[],
+  dtsMode: boolean,
+): Record<string, string> {
+  const input: Record<string, string> = {};
+  for (const { bundleName, entryFilePath } of entryPoints) {
+    const posixPath = toPosixPath(entryFilePath);
+    input[bundleName] = dtsMode
+      ? posixPath.replace(/\.([cm]?ts)$/, '.d.$1')
+      : posixPath.replace(/\.([cm]?)ts$/, '.$1js');
+  }
 
-  const predicateCache = new Map<string, boolean>();
+  return input;
+}
 
-  return (moduleId: string, importer?: string): boolean => {
-    if (moduleId[0] === '.' || path.isAbsolute(moduleId)) {
-      if (importer) {
-        const cacheKey = `${importer}\0${moduleId}`;
-        const cached = predicateCache.get(cacheKey);
-        if (cached !== undefined) {
-          return cached;
+function createMemoryFileLoaderPlugin(
+  files: ReadonlyMap<string, string>,
+  extensions: readonly string[],
+  includeMap: boolean,
+  findEntryPoint: EntryPointLookup,
+): Plugin {
+  return {
+    name: 'memory-file-loader',
+    resolveId: {
+      order: 'pre',
+      handler(id, importer) {
+        if (id[0] === '\0') {
+          return undefined;
         }
 
-        const resolved = toPosixPath(path.resolve(path.dirname(importer), moduleId));
-        const resolvedBase = resolved.replace(/\.(?:d\.)?[cm]?[jt]s$/, '');
+        if (!importer) {
+          return files.has(id) ? { id, external: false } : undefined;
+        }
 
-        let owner = entryPointBases.get(resolvedBase);
-        if (!owner) {
-          for (const { ep, epDir, epDirSlash } of entryPointsByDirLength) {
-            if (resolved === epDir || resolved.startsWith(epDirSlash)) {
-              owner = ep;
+        if (id[0] !== '.' && !path.isAbsolute(id)) {
+          return { id, external: true };
+        }
+
+        const posixId = toPosixPath(id);
+        const importerPosix = toPosixPath(importer);
+        const resolved =
+          posixId[0] === '.'
+            ? path.posix.join(path.posix.dirname(importerPosix), posixId)
+            : posixId;
+
+        let resolvedCandidate: string | undefined;
+        if (files.has(resolved)) {
+          resolvedCandidate = resolved;
+        } else {
+          const base = resolved.replace(/\.[cm]?js$/, '');
+          for (const ext of extensions) {
+            const candidate = base + ext;
+            if (files.has(candidate)) {
+              resolvedCandidate = candidate;
               break;
             }
           }
         }
 
-        if (owner && owner.name !== epName) {
+        const importerEp = findEntryPoint(importerPosix);
+        const targetEp = findEntryPoint(resolvedCandidate ?? resolved);
+        if (importerEp && targetEp && importerEp.name !== targetEp.name) {
           throw new Error(
-            `Entry point '${epName}' cannot import '${moduleId}' from sibling entry point directly. ` +
+            `Entry point '${importerEp.name}' cannot import '${id}' from sibling entry point directly. ` +
               `Import using the entry point package name instead.`,
           );
         }
 
-        predicateCache.set(cacheKey, false);
+        if (resolvedCandidate) {
+          return { id: resolvedCandidate, external: false };
+        }
+
+        return { id, external: true };
+      },
+    },
+    load(id) {
+      const code = files.get(id);
+      if (code === undefined) {
+        return null;
       }
 
-      return false;
-    }
-
-    return true;
-  };
-}
-
-/**
- * Creates the Rolldown options shared across ESM and DTS bundling.
- *
- * @param input Entry file path in memory.
- * @param plugins Array of Rolldown plugins.
- * @param isExternal Predicate determining if a module specifier is external.
- * @param preserveSymlinks Whether to preserve symlinks when resolving dependencies.
- * @returns Rolldown options configuration.
- */
-function createRolldownOptions(
-  input: string,
-  plugins: RolldownPluginOption[],
-  isExternal: (moduleId: string, parentId?: string) => boolean,
-  preserveSymlinks: boolean,
-): RolldownOptions {
-  return {
-    context: 'this',
-    input,
-    external: isExternal,
-    plugins,
-    treeshake: false, // APF preserves top-level exports without treeshaking
-    resolve: { symlinks: preserveSymlinks },
-    checks: { circularDependency: false },
-    experimental: {
-      attachDebugInfo: 'none',
+      return {
+        code,
+        map: includeMap ? files.get(`${id}.map`) : undefined,
+      };
     },
   };
 }
 
-interface BundleOutputOptions {
-  dir: string;
-  bundleName: string;
-  extension: 'mjs' | 'd.ts';
-  sourcemap: boolean;
-  comments: OutputOptions['comments'];
-}
-
-/**
- * Executes a Rolldown build and generates the output bundle in memory.
- *
- * @param inputOptions Rolldown input options.
- * @param outputOptions Output configuration for generating the bundle.
- * @returns An object containing the primary output file path, emitted code, and all generated files.
- */
-async function executeBundle(
-  inputOptions: RolldownOptions,
-  outputOptions: BundleOutputOptions,
-): Promise<MemoryOutputFile[]> {
-  const bundle = await rolldown(inputOptions);
-
-  try {
-    const { dir, bundleName, extension, sourcemap, comments } = outputOptions;
-    const { output } = await bundle.generate({
-      format: 'es',
-      dir,
-      entryFileNames: `${bundleName}.${extension}`,
-      chunkFileNames: `${bundleName}-[name]-[hash].${extension}`,
-      sourcemap,
-      hoistTransitiveImports: false,
-      comments,
-    });
-
-    return output.map((item) =>
-      createMemoryOutputFile(
-        path.join(dir, item.fileName),
-        'code' in item ? item.code : item.source,
-      ),
-    );
-  } finally {
-    await bundle.close();
-  }
-}
-
-/**
- * Bundles the compiled in-memory JavaScript into a flattened FESM module.
- *
- * @param jsEntry Absolute path to the JavaScript entry file in memory.
- * @param bundleName Base name of the output bundle.
- * @param esmFiles Map of in-memory JavaScript files and sourcemaps.
- * @param isExternal Predicate determining if a module specifier is external.
- * @param preserveSymlinks Whether to preserve symlinks when resolving dependencies.
- * @param hasChanges Whether the compiled JavaScript files changed in this compilation.
- * @param previousBundleResult Optional bundle result from a previous compilation run.
- * @returns All generated or cached FESM files, and files that need to be emitted to disk.
- */
-async function bundleEsm(
-  jsEntry: string,
-  bundleName: string,
-  esmFiles: Map<string, string>,
-  isExternal: (moduleId: string, parentId?: string) => boolean,
-  preserveSymlinks: boolean,
-  hasChanges: boolean,
-  previousBundleResult?: BundleResult,
-): Promise<{ files: MemoryOutputFile[]; filesToEmit: MemoryOutputFile[] }> {
-  if (!hasChanges && previousBundleResult) {
-    // If compiled JavaScript hasn't changed, skip Rolldown bundling and disk writes.
-    // Preserving previous ESM files maintains a complete file list in BundleResult.files.
-    return {
-      files: previousBundleResult.files.filter((f) => f.path.startsWith(FESM_OUTPUT_DIR)),
-      filesToEmit: [],
-    };
-  }
-
-  const files = await executeBundle(
-    createRolldownOptions(
-      jsEntry,
-      [createMemoryFileLoaderPlugin(esmFiles, false, true)],
-      isExternal,
-      preserveSymlinks,
-    ),
-    {
-      dir: FESM_OUTPUT_DIR,
-      bundleName,
-      extension: 'mjs',
-      sourcemap: true,
-      comments: {
-        legal: true,
-        annotation: true,
-      },
-    },
-  );
-
-  return { files, filesToEmit: files };
-}
-
-/**
- * Bundles compiled in-memory declaration files (.d.ts) into a single declaration file.
- *
- * @param dtsEntry Absolute path to the declaration entry file in memory.
- * @param bundleName Base name of the output bundle.
- * @param dtsFiles Map of in-memory declaration files and sourcemaps.
- * @param dtsSourcemap Whether declaration sourcemaps are enabled.
- * @param isExternal Predicate determining if a module specifier is external.
- * @param preserveSymlinks Whether to preserve symlinks when resolving dependencies.
- * @param hasChanges Whether the compiled declaration files changed in this compilation.
- * @param previousBundleResult Optional bundle result from a previous compilation run.
- * @returns An object containing the content hash, all generated or cached files, and files to emit.
- */
-async function bundleDts(
-  dtsEntry: string,
-  bundleName: string,
-  dtsFiles: Map<string, string>,
-  dtsSourcemap: boolean,
-  isExternal: (moduleId: string, parentId?: string) => boolean,
-  preserveSymlinks: boolean,
-  hasChanges: boolean,
-  previousBundleResult?: BundleResult,
-): Promise<{ dtsHash: string; files: MemoryOutputFile[]; filesToEmit: MemoryOutputFile[] }> {
-  if (!hasChanges && previousBundleResult) {
-    // If declaration files (.d.ts) haven't changed, skip Rolldown DTS bundling and disk writes.
-    // Retaining the previous `dtsHash` signals to the build pipeline that downstream dependents
-    // do not need to be marked dirty or recompiled.
-    // Crucially, `previousDtsFiles` are preserved in `files` so downstream entry points can continue
-    // to resolve this entry point's type declarations in memory via `collectUpstreamDts`.
-    return {
-      dtsHash: previousBundleResult.dtsHash,
-      files: previousBundleResult.files.filter((f) => f.path.startsWith(TYPES_OUTPUT_DIR)),
-      filesToEmit: [],
-    };
-  }
-
-  const files = await executeBundle(
-    createRolldownOptions(
-      dtsEntry,
-      [
-        createMemoryFileLoaderPlugin(dtsFiles, true, dtsSourcemap),
-        dts({
-          dtsInput: true,
-          tsconfig: false,
-          generator: 'oxc',
-          sourcemap: dtsSourcemap,
-        }),
-      ],
-      isExternal,
-      preserveSymlinks,
-    ),
-    {
-      dir: TYPES_OUTPUT_DIR,
-      bundleName,
-      extension: 'd.ts',
-      sourcemap: dtsSourcemap,
-      comments: {
-        legal: true,
-        jsdoc: true,
-      },
-    },
-  );
-
-  // Compute hash from all declaration chunks (excluding sourcemaps) sorted by path for determinism
-  const dtsFilesOnly = files
-    .filter((f) => isDeclarationFile(f.path))
-    .sort((a, b) => a.path.localeCompare(b.path));
-  const dtsHash =
-    dtsFilesOnly.length > 0
-      ? calculateHash(dtsFilesOnly.map(({ contents }) => getFileText(contents)).join('\0'))
-      : '';
-
-  return {
-    dtsHash,
-    files,
-    filesToEmit: files,
-  };
-}
-
-/**
- * Resolves a file specifier against in-memory virtual files.
- *
- * @param id The import specifier or file path.
- * @param importer The path of the importing file, if any.
- * @param files Map of virtual files.
- * @param extensions Array of candidate extensions to search.
- * @returns The resolved virtual file path, or undefined if not found.
- */
-function resolveFile(
-  id: string,
-  importer: string | undefined,
-  files: Map<string, string>,
-  extensions: readonly string[],
+function resolveChunkBundleName(
+  findEntryPoint: EntryPointLookup,
+  moduleIds: readonly string[],
 ): string | undefined {
-  if (importer && id[0] !== '.' && id[0] !== '/' && !path.isAbsolute(id)) {
-    return undefined;
-  }
-
-  const resolved = toPosixPath(
-    importer ? path.resolve(path.dirname(importer), id) : path.resolve(id),
-  );
-  if (files.has(resolved)) {
-    return resolved;
-  }
-
-  const base = resolved.replace(/\.m?js$/, '');
-  for (const extension of extensions) {
-    const candidate = base + extension;
-    if (files.has(candidate)) {
-      return candidate;
+  for (const modId of moduleIds) {
+    const ep = findEntryPoint(modId);
+    if (ep) {
+      return ep.bundleName;
     }
   }
 
   return undefined;
 }
 
-/**
- * Creates a Rolldown plugin to load virtual files from in-memory maps.
- *
- * @param files Map of virtual files and their hashes.
- * @param dtsMode Whether the plugin is operating in declaration file mode.
- * @param includeMap Whether to include sourcemaps when loading virtual files.
- * @returns A Rolldown plugin.
- */
-function createMemoryFileLoaderPlugin(
-  files: Map<string, string>,
-  dtsMode: boolean,
-  includeMap = true,
-): Plugin {
-  const extensions = dtsMode ? DTS_EXTENSIONS : ESM_EXTENSIONS;
-  const resolutionCache = new Map<string, string | undefined>();
+function processRolldownOutput(output: RolldownOutput['output'], dir: string): MultiBundleOutput {
+  const filesToEmit: MemoryOutputFile[] = [];
+  const moduleIdsByBundle = new Map<string, Set<string>>();
+  const chunksByFileName = new Map<string, OutputChunk>();
+  const entryChunks: OutputChunk[] = [];
 
-  return {
-    name: 'memory-file-loader',
-    resolveId: (id, importer) => {
-      const cacheKey = importer ? `${importer}\0${id}` : id;
-      if (resolutionCache.has(cacheKey)) {
-        return resolutionCache.get(cacheKey);
+  for (const item of output) {
+    filesToEmit.push(
+      createMemoryOutputFile(
+        path.posix.join(dir, item.fileName),
+        item.type === 'chunk' ? item.code : item.source,
+      ),
+    );
+
+    if (item.type === 'chunk') {
+      chunksByFileName.set(item.fileName, item);
+      if (item.isEntry) {
+        entryChunks.push(item);
+      }
+    }
+  }
+
+  for (const entryChunk of entryChunks) {
+    const modSet = new Set<string>();
+    moduleIdsByBundle.set(entryChunk.name, modSet);
+
+    const visited = new Set<OutputChunk>();
+    const queue: OutputChunk[] = [entryChunk];
+
+    while (queue.length) {
+      const chunk = queue.pop();
+      if (!chunk) {
+        break;
       }
 
-      const resolved = resolveFile(id, importer, files, extensions);
-      resolutionCache.set(cacheKey, resolved);
+      if (visited.has(chunk)) {
+        continue;
+      }
 
-      return resolved;
-    },
-    load: (id) => {
-      const normalizedId = toPosixPath(id);
-      let file = files.get(normalizedId);
-      let fileKey = normalizedId;
+      visited.add(chunk);
 
-      if (file === undefined) {
-        const dtsMatch = /\.d\.m?ts$/.exec(normalizedId);
-        const ext = dtsMatch ? dtsMatch[0] : path.extname(normalizedId);
-        const base = ext.length > 0 ? normalizedId.slice(0, -ext.length) : normalizedId;
-        const fallback = dtsMode ? `${base}.d.ts` : `${base}.js`;
-        file = files.get(fallback);
-        if (file !== undefined) {
-          fileKey = fallback;
+      for (const modId of chunk.moduleIds) {
+        if (modId[0] !== '\0') {
+          modSet.add(toPosixPath(modId));
         }
       }
 
-      if (file === undefined) {
-        return null;
+      for (const depFile of [...chunk.imports, ...chunk.dynamicImports]) {
+        const depChunk = chunksByFileName.get(depFile);
+        if (depChunk && !visited.has(depChunk)) {
+          queue.push(depChunk);
+        }
       }
+    }
+  }
 
-      return {
-        code: file,
-        map: includeMap ? files.get(`${fileKey}.map`) : undefined,
-      };
+  return { filesToEmit, moduleIdsByBundle };
+}
+
+async function executeMultiBundle(
+  input: Record<string, string>,
+  plugins: RolldownPluginOption[],
+  preserveSymlinks: boolean,
+  extension: 'mjs' | 'd.ts',
+  sourcemap: boolean,
+  findEntryPoint: EntryPointLookup,
+): Promise<MultiBundleOutput> {
+  const isDts = extension === 'd.ts';
+  const dir = isDts ? TYPES_OUTPUT_DIR : FESM_OUTPUT_DIR;
+  const comments: OutputOptions['comments'] = isDts ? false : { legal: true, annotation: true };
+  const bundle = await rolldown({
+    context: 'this',
+    input,
+    plugins,
+    treeshake: false,
+    resolve: { symlinks: preserveSymlinks },
+    checks: { circularDependency: false },
+    experimental: {
+      attachDebugInfo: 'none',
     },
-  };
+  });
+
+  try {
+    const { output } = await bundle.generate({
+      format: 'es',
+      dir,
+      entryFileNames: `[name].${extension}`,
+      chunkFileNames: (chunk) => {
+        const bundleName = resolveChunkBundleName(findEntryPoint, chunk.moduleIds);
+        const prefix = bundleName ? `${bundleName}-` : '';
+
+        return `${prefix}[name]-[hash].${extension}`;
+      },
+      sourcemap,
+      hoistTransitiveImports: false,
+      comments,
+    });
+
+    return processRolldownOutput(output, dir);
+  } finally {
+    await bundle.close();
+  }
+}
+
+async function bundleAllEsm(
+  entryPoints: readonly NormalizedEntryPoint[],
+  esmFiles: ReadonlyMap<string, string>,
+  options: NormalizedLibraryOptions,
+  findEntryPoint: EntryPointLookup,
+): Promise<MultiBundleOutput> {
+  if (entryPoints.length === 0) {
+    return { filesToEmit: [], moduleIdsByBundle: new Map() };
+  }
+
+  return executeMultiBundle(
+    resolveEntryInputMap(entryPoints, false),
+    [createMemoryFileLoaderPlugin(esmFiles, ESM_EXTENSIONS, true, findEntryPoint)],
+    options.preserveSymlinks,
+    'mjs',
+    true,
+    findEntryPoint,
+  );
+}
+
+async function bundleAllDts(
+  entryPoints: readonly NormalizedEntryPoint[],
+  dtsFiles: ReadonlyMap<string, string>,
+  options: NormalizedLibraryOptions,
+  findEntryPoint: EntryPointLookup,
+): Promise<MultiBundleOutput> {
+  if (entryPoints.length === 0) {
+    return { filesToEmit: [], moduleIdsByBundle: new Map() };
+  }
+
+  const dtsSourcemap = options.declarationMap;
+  // Filter out `rolldown-plugin-dts:resolver` because all `.d.ts` files are already emitted
+  // in-memory by the Angular/TypeScript compilation and resolved via `createMemoryFileLoaderPlugin`.
+  // The default `rolldown-plugin-dts:resolver` plugin performs filesystem resolution (`oxc-resolver`)
+  // and calls `this.load()` on on-disk `.ts` source files, which is unnecessary and causes a
+  // significant performance regression across multi-entry builds.
+  const rawDtsPlugins = dts({
+    dtsInput: true,
+    tsconfig: false,
+    sourcemap: dtsSourcemap,
+  });
+  const dtsPlugins = rawDtsPlugins.filter(
+    (plugin) => plugin.name !== 'rolldown-plugin-dts:resolver',
+  );
+  assert(
+    dtsPlugins.length < rawDtsPlugins.length,
+    'Expected "rolldown-plugin-dts:resolver" plugin to be present in rolldown-plugin-dts.',
+  );
+
+  return executeMultiBundle(
+    resolveEntryInputMap(entryPoints, true),
+    [
+      createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap, findEntryPoint),
+      ...dtsPlugins,
+    ],
+    options.preserveSymlinks,
+    'd.ts',
+    dtsSourcemap,
+    findEntryPoint,
+  );
 }

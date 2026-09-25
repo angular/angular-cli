@@ -8,7 +8,6 @@
 
 import path from 'node:path';
 import type { NormalizedLibraryOptions, PackageJsonData } from '../options';
-import type { EntryPointGraph } from './entry-point-graph';
 import {
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,
@@ -20,15 +19,13 @@ import {
  * Generates the APF package.json and secondary entry point package.json manifests.
  *
  * @param options The normalized library options.
- * @param graph The entry points dependency graph.
  * @param isWatchMode Whether the builder is running in watch mode.
  * @returns An array of memory output files containing generated package manifests and .npmignore.
  */
-export async function generatePackageManifests(
+export function generatePackageManifests(
   options: NormalizedLibraryOptions,
-  graph: EntryPointGraph,
   isWatchMode: boolean,
-): Promise<MemoryOutputFile[]> {
+): MemoryOutputFile[] {
   const { packageJson: rawPackageJson, keepLifecycleScripts, compilationMode } = options;
 
   const {
@@ -42,16 +39,18 @@ export async function generatePackageManifests(
   } = rawPackageJson;
 
   const exportsMap: Record<string, unknown> = {
-    ...(typeof userExports === 'object' && userExports !== null ? userExports : {}),
+    ...(typeof userExports === 'object' && userExports !== null && !Array.isArray(userExports)
+      ? userExports
+      : {}),
     './package.json': { default: './package.json' },
   };
 
-  const primaryNode = graph.nodes.get('.');
-  if (!primaryNode) {
-    throw new Error(`Primary entry point '.' was not found in the graph.`);
+  const primaryEntryPoint = options.entryPoints.get('.');
+  if (!primaryEntryPoint) {
+    throw new Error(`Primary entry point '.' was not found in entryPoints.`);
   }
 
-  const primaryName = primaryNode.entryPoint.bundleName;
+  const primaryName = primaryEntryPoint.bundleName;
 
   // Configure primary entry point
   const primaryFesm = `./${FESM_OUTPUT_DIR}/${primaryName}.mjs`;
@@ -96,7 +95,7 @@ export async function generatePackageManifests(
   const nestedPackageJsonDirs: string[] = [];
   const filesToEmit: MemoryOutputFile[] = [];
 
-  for (const { entryPoint } of graph.nodes.values()) {
+  for (const entryPoint of options.entryPoints.values()) {
     if (entryPoint.isPrimary) {
       continue;
     }
@@ -126,7 +125,7 @@ export async function generatePackageManifests(
     );
   }
 
-  // Write or append to .npmignore to prevent publishing nested secondary package.json files
+  // Write .npmignore to prevent publishing nested secondary package.json files
   if (nestedPackageJsonDirs.length > 0) {
     const entryPointsJsonPaths = nestedPackageJsonDirs.map((d) => `/${d}/package.json`);
 
@@ -153,7 +152,9 @@ function createExportConditions(
   fesmPath: string,
 ): Record<string, unknown> {
   const existing =
-    typeof existingConditions === 'object' && existingConditions !== null
+    typeof existingConditions === 'object' &&
+    existingConditions !== null &&
+    !Array.isArray(existingConditions)
       ? (existingConditions as Record<string, unknown>)
       : {};
 

@@ -7,319 +7,275 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import fs from 'node:fs/promises';
+import { constants, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
-import type ts from 'typescript';
 import { emitFilesToDisk } from '../../../tools/esbuild/utils';
-import { runConcurrent } from '../../../utils/concurrency';
-import { maxWorkers } from '../../../utils/environment-options';
 import { toPosixPath } from '../../../utils/path';
-import type { WorkerPool } from '../../../utils/worker-pool';
-import type { NormalizedLibraryOptions, PackageJsonData } from '../options';
+import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
 import { collectAssetsToEmit } from './assets';
-import { type BundleResult, bundleEntryPoint } from './bundler';
-import { type CompilationOutput, compileEntryPoint } from './compilation';
-import { compileEntryPointInWorker } from './compiler-worker';
-import { type EntryPointGraph, type EntryPointNode } from './entry-point-graph';
+import {
+  type BundleEntryPointInput,
+  type BundleResult,
+  type EntryPointLookup,
+  bundleEntryPoints,
+  createEntryDirectoryLookup,
+} from './bundler';
+import { type SingleProgramCache, compileLibrary } from './compilation';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
-import { type OutputFile, getFileText, isDeclarationFile } from './utils';
+import type { OutputFile } from './utils';
 
 /**
- * Context object containing all dependencies and state required to execute a build action.
+ * State preserved across incremental builds in watch mode.
  */
-export interface BuildActionContext {
-  options: NormalizedLibraryOptions;
-  graph: EntryPointGraph;
-  batches: EntryPointNode[][];
-  stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary>;
-  allWatchedFiles: Set<string>;
-  isWatchMode: boolean;
-  context: BuilderContext;
-  compilerWorkerPool?: WorkerPool;
-  modifiedFiles?: Set<string>;
-  signal?: AbortSignal;
-  target: string[];
-  sourceFileCache?: Map<string, ts.SourceFile>;
+export interface SingleBuildState {
+  singleProgramCache?: SingleProgramCache;
+  previousBundleResults: Map<string, BundleResult>;
+  pendingChangedEsmFiles: Set<string>;
+  pendingChangedDtsFiles: Set<string>;
+  hasCompilationError?: boolean;
+  hasEmittedManifests?: boolean;
+  hasEmittedAssets?: boolean;
+  entryDirectoryLookup?: EntryPointLookup;
+  directoryExists: Set<string>;
 }
 
 /**
- * Core build pipeline that executes compilation, bundling, package.json generation, and asset copying.
+ * Creates a fresh {@link SingleBuildState} instance.
+ */
+export function createSingleBuildState(): SingleBuildState {
+  return {
+    previousBundleResults: new Map(),
+    pendingChangedEsmFiles: new Set(),
+    pendingChangedDtsFiles: new Set(),
+    directoryExists: new Set(),
+  };
+}
+
+/**
+ * Context required to execute a single library build iteration.
+ */
+export interface BuildActionContext {
+  options: NormalizedLibraryOptions;
+  context: BuilderContext;
+  stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary>;
+  isWatchMode: boolean;
+  allWatchedFiles: Set<string>;
+  buildState: SingleBuildState;
+  modifiedFiles?: Set<string>;
+}
+
+/**
+ * Executes a single iteration of the library build pipeline, including
+ * single-program Angular compilation, parallel typechecking, 2-instance Rolldown bundling,
+ * manifest generation, and asset copying.
  *
- * @param actionContext The build action context containing options, graph, and dependencies.
+ * @param actionContext The build action state and configuration.
  */
 export async function buildAction(actionContext: BuildActionContext): Promise<void> {
   const {
     options,
-    graph,
-    batches,
-    stylesheetBundler,
-    allWatchedFiles,
-    isWatchMode,
     context,
-    compilerWorkerPool,
+    stylesheetBundler,
+    isWatchMode,
+    allWatchedFiles,
+    buildState,
     modifiedFiles,
-    signal,
-    target,
-    sourceFileCache,
   } = actionContext;
 
-  signal?.throwIfAborted?.();
+  const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
+  const { pendingChangedEsmFiles, pendingChangedDtsFiles, directoryExists } = buildState;
 
-  const {
-    outputPath,
-    assets,
-    workspaceRoot,
-    packageJson: rawPackageJson,
-    allowedNonPeerDependencies,
-    packageJsonPath,
-  } = options;
-
-  // Validate allowed non-peer dependencies
-  validateDependencies(rawPackageJson, allowedNonPeerDependencies);
-
-  // Collect cached declaration files across all entry points in the graph.
-  // This provides in-memory declaration file access for incremental builds.
-  const upstreamDtsFiles = collectCachedDtsFiles(graph, outputPath);
-  const filesToEmit: OutputFile[] = [];
-  const successfulBundles: Array<{ node: EntryPointNode; bundleResult: BundleResult }> = [];
-
-  // Process batches in topological order. Within each batch, entry points are compiled concurrently up to maxWorkers.
-  for (const batch of batches) {
-    signal?.throwIfAborted?.();
-
-    await runConcurrent(batch, maxWorkers, async (node) => {
-      signal?.throwIfAborted?.();
-
-      const { entryPoint, isDirty } = node;
-      if (!isDirty) {
-        return;
-      }
-
-      const epStartTime = process.hrtime.bigint();
-      const { displayName, entryFilePath } = entryPoint;
-
-      context.logger.info(`Compiling ${displayName}...`);
-
-      try {
-        let compilation: CompilationOutput;
-        // In watch mode, compilation runs on the main thread to reuse the in-memory incremental
-        // program cache (`node.cachedProgram`). TypeScript Program and compiler instances contain
-        // ASTs, closures, and circular references that cannot be serialized or transferred across
-        // worker threads via structured clone (`postMessage`).
-        if (compilerWorkerPool && !isWatchMode) {
-          compilation = await compileEntryPointInWorker(
-            compilerWorkerPool,
-            entryPoint,
-            options,
-            target,
-            graph.upstreamDtsPaths,
-            upstreamDtsFiles,
-            modifiedFiles ? Array.from(modifiedFiles) : undefined,
-          );
-        } else {
-          const result = await compileEntryPoint(
-            entryPoint,
-            options,
-            stylesheetBundler,
-            graph.upstreamDtsPaths,
-            node.cachedProgram,
-            modifiedFiles,
-            upstreamDtsFiles,
-            sourceFileCache,
-          );
-          compilation = result.compilation;
-          node.cachedProgram = result.cachedProgram;
-        }
-
-        if (compilation.warnings?.length) {
-          for (const warning of compilation.warnings) {
-            context.logger.warn(warning);
-          }
-        }
-
-        // Track referenced source files for watch mode
-        node.referencedFiles.clear();
-        for (const ref of compilation.referencedFiles) {
-          node.referencedFiles.add(toPosixPath(ref));
-        }
-
-        // Bundle compiled JavaScript and declaration files with Rolldown
-        const bundleResult = await bundleEntryPoint(
-          entryPoint,
-          compilation,
-          options,
-          node.lastBundleResult,
-        );
-
-        filesToEmit.push(...bundleResult.filesToEmit);
-
-        for (const file of bundleResult.files) {
-          if (isDeclarationFile(file.path)) {
-            const posixPath = toPosixPath(path.join(outputPath, file.path));
-            const text = getFileText(file.contents);
-            upstreamDtsFiles.set(posixPath, text);
-            if (sourceFileCache && sourceFileCache.get(posixPath)?.text !== text) {
-              sourceFileCache.delete(posixPath);
-            }
-          }
-        }
-
-        // Invalidate downstream dependents if the public type declarations changed
-        if (node.lastDtsHash !== bundleResult.dtsHash) {
-          for (const dependent of node.dependents) {
-            dependent.isDirty = true;
-          }
-        }
-        node.lastDtsHash = bundleResult.dtsHash;
-        successfulBundles.push({ node, bundleResult });
-
-        const epDuration = Number(process.hrtime.bigint() - epStartTime) / 10 ** 9;
-        context.logger.info(`Compiled ${displayName} [${epDuration.toFixed(3)} seconds]`);
-      } finally {
-        // Ensure referenced files are watched even if compilation or bundling fails
-        for (const ref of node.referencedFiles) {
-          allWatchedFiles.add(ref);
-        }
-        allWatchedFiles.add(entryFilePath);
-      }
-    });
+  if (!modifiedFiles || modifiedFiles.has(posixPackageJsonPath)) {
+    buildState.hasEmittedManifests = false;
   }
 
-  signal?.throwIfAborted?.();
+  const shouldCompileEntryPoints =
+    !modifiedFiles ||
+    !buildState.singleProgramCache ||
+    Boolean(buildState.hasCompilationError) ||
+    pendingChangedEsmFiles.size > 0 ||
+    pendingChangedDtsFiles.size > 0 ||
+    hasModifiedWatchedFile(modifiedFiles, allWatchedFiles, posixPackageJsonPath);
+  const shouldGenerateManifests = !buildState.hasEmittedManifests;
 
-  // Copy assets if configured (collectAssetsToEmit handles incremental filtering in watch mode)
-  if (assets.length > 0) {
-    const resolvedAssets = await collectAssetsToEmit(
-      assets,
-      workspaceRoot,
-      allWatchedFiles,
+  if (shouldGenerateManifests) {
+    verifyAllowedDependencies(options);
+  }
+
+  const filesToEmit: OutputFile[] = [];
+
+  if (shouldCompileEntryPoints) {
+    buildState.hasCompilationError = true;
+
+    const {
+      esmFiles,
+      dtsFiles,
+      changedEsmFiles,
+      changedDtsFiles,
+      referencedFiles,
+      cache,
+      diagnosePromise,
+    } = await compileLibrary(
+      options.entryPoints.values(),
+      options,
+      stylesheetBundler,
+      buildState.singleProgramCache,
       modifiedFiles,
     );
+    buildState.singleProgramCache = cache;
 
-    filesToEmit.push(...resolvedAssets);
-  }
-
-  // Generate package.json and .npmignore files only on initial build or when package.json was modified.
-  if (!modifiedFiles || modifiedFiles.has(toPosixPath(packageJsonPath))) {
-    const manifestFiles = await generatePackageManifests(options, graph, isWatchMode);
-    filesToEmit.push(...manifestFiles);
-  }
-
-  // Emit all files (FESM, DTS, sourcemaps, assets, package.json manifests, .npmignore) with a single emitFilesToDisk call
-  if (filesToEmit.length > 0) {
-    signal?.throwIfAborted?.();
-    await emitOutputsToDisk(outputPath, filesToEmit);
-  }
-
-  for (const { node, bundleResult } of successfulBundles) {
-    node.lastBundleResult = bundleResult;
-    node.isDirty = false;
-  }
-}
-
-async function emitOutputsToDisk(
-  outputPath: string,
-  filesToEmit: readonly OutputFile[],
-): Promise<void> {
-  const createdDirectories = new Set<string>();
-  const directoryCreationPromises = new Map<string, Promise<void>>();
-
-  await emitFilesToDisk(filesToEmit, async (file) => {
-    const isInMemoryFile = file.type === 'memory';
-    const dest = path.join(outputPath, isInMemoryFile ? file.path : file.destination);
-    const destDir = path.dirname(dest);
-
-    if (!createdDirectories.has(destDir)) {
-      let createPromise = directoryCreationPromises.get(destDir);
-      if (!createPromise) {
-        createPromise = fs
-          .mkdir(destDir, { recursive: true })
-          .then(() => {
-            let current = destDir;
-            while (current) {
-              createdDirectories.add(current);
-              const parent = path.dirname(current);
-              if (parent === current || createdDirectories.has(parent)) {
-                break;
-              }
-              current = parent;
-            }
-          })
-          .finally(() => {
-            directoryCreationPromises.delete(destDir);
-          });
-
-        directoryCreationPromises.set(destDir, createPromise);
-      }
-
-      await createPromise;
+    for (const file of referencedFiles) {
+      allWatchedFiles.add(file);
     }
 
-    if (isInMemoryFile) {
-      await fs.writeFile(dest, file.contents);
+    for (const file of changedEsmFiles) {
+      pendingChangedEsmFiles.add(file);
+    }
+    for (const file of changedDtsFiles) {
+      pendingChangedDtsFiles.add(file);
+    }
+
+    const findEntryPoint = (buildState.entryDirectoryLookup ??= createEntryDirectoryLookup(
+      options.entryPoints.values(),
+    ));
+    const itemsToBundle: BundleEntryPointInput[] = [];
+
+    for (const entryPoint of options.entryPoints.values()) {
+      const previousBundleResult = buildState.previousBundleResults.get(entryPoint.name);
+      const hasEsmChanges =
+        !previousBundleResult ||
+        hasEntryPointChanges(
+          entryPoint,
+          previousBundleResult.esmModuleIds,
+          findEntryPoint,
+          pendingChangedEsmFiles,
+        );
+      const hasDtsChanges =
+        !previousBundleResult ||
+        hasEntryPointChanges(
+          entryPoint,
+          previousBundleResult.dtsModuleIds,
+          findEntryPoint,
+          pendingChangedDtsFiles,
+        );
+
+      if (hasEsmChanges || hasDtsChanges) {
+        context.logger.info(`Compiling ${entryPoint.displayName}...`);
+        itemsToBundle.push({
+          entryPoint,
+          hasEsmChanges,
+          hasDtsChanges,
+          previousBundleResult,
+        });
+      }
+    }
+
+    let bundleOutput: Awaited<ReturnType<typeof bundleEntryPoints>>;
+    let warnings: string[];
+    try {
+      [bundleOutput, warnings] = await Promise.all([
+        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, options, findEntryPoint),
+        diagnosePromise,
+      ]);
+    } catch (error) {
+      // Prioritize TypeScript/Angular diagnostic errors over secondary bundler failures.
+      await diagnosePromise;
+      throw error;
+    }
+
+    buildState.hasCompilationError = false;
+    pendingChangedEsmFiles.clear();
+    pendingChangedDtsFiles.clear();
+
+    for (const warning of warnings) {
+      context.logger.warn(warning);
+    }
+
+    filesToEmit.push(...bundleOutput.filesToEmit);
+    for (const [name, bundleResult] of bundleOutput.bundleResults) {
+      buildState.previousBundleResults.set(name, bundleResult);
+    }
+  }
+
+  if (shouldGenerateManifests) {
+    filesToEmit.push(...generatePackageManifests(options, isWatchMode));
+  }
+
+  filesToEmit.push(
+    ...(await collectAssetsToEmit(
+      options.assets,
+      options.workspaceRoot,
+      allWatchedFiles,
+      buildState.hasEmittedAssets ? modifiedFiles : undefined,
+    )),
+  );
+
+  await emitFilesToDisk<OutputFile>(filesToEmit, async (file) => {
+    const fullFilePath = path.join(options.outputPath, file.path);
+    const fileBasePath = path.dirname(fullFilePath);
+    if (fileBasePath && !directoryExists.has(fileBasePath)) {
+      await mkdir(fileBasePath, { recursive: true });
+      directoryExists.add(fileBasePath);
+    }
+
+    if (file.type === 'memory') {
+      await writeFile(fullFilePath, file.contents);
     } else {
-      await fs.copyFile(file.source, dest, fs.constants.COPYFILE_FICLONE);
+      await copyFile(file.source, fullFilePath, constants.COPYFILE_FICLONE);
     }
   });
+
+  buildState.hasEmittedManifests = true;
+  buildState.hasEmittedAssets = true;
 }
 
-/**
- * Collects bundled declaration files from previous build runs across the graph
- * to seed the in-memory declaration file cache for downstream dependency resolution.
- *
- * @param graph The entry point dependency graph.
- * @returns A map of POSIX declaration file paths to their text contents.
- */
-function collectCachedDtsFiles(graph: EntryPointGraph, outputPath: string): Map<string, string> {
-  const upstreamDtsFiles = new Map<string, string>();
-
-  for (const node of graph.nodes.values()) {
-    if (!node.lastBundleResult) {
-      continue;
-    }
-
-    for (const file of node.lastBundleResult.files) {
-      if (isDeclarationFile(file.path)) {
-        upstreamDtsFiles.set(
-          toPosixPath(path.join(outputPath, file.path)),
-          getFileText(file.contents),
-        );
-      }
+export function hasModifiedWatchedFile(
+  modifiedFiles: ReadonlySet<string>,
+  allWatchedFiles: ReadonlySet<string>,
+  posixPackageJsonPath: string,
+): boolean {
+  for (const file of modifiedFiles) {
+    if (file !== posixPackageJsonPath && allWatchedFiles.has(file)) {
+      return true;
     }
   }
 
-  return upstreamDtsFiles;
+  return false;
 }
 
-/**
- * Validate that the package.json dependencies only contain allowed dependencies.
- * @param pkg The package.json data.
- * @param allowedPatterns Array of regex patterns for allowed dependencies.
- */
-function validateDependencies(pkg: PackageJsonData, allowedPatterns: RegExp[]): void {
-  const { dependencies } = pkg;
-  if (!dependencies) {
-    return;
+function hasEntryPointChanges(
+  entryPoint: NormalizedEntryPoint,
+  moduleIds: ReadonlySet<string>,
+  findEntryPoint: EntryPointLookup,
+  changedFiles: ReadonlySet<string>,
+): boolean {
+  if (changedFiles.size === 0) {
+    return false;
   }
 
-  const invalidDeps: string[] = [];
+  for (const file of changedFiles) {
+    if (moduleIds.has(file) || findEntryPoint(file) === entryPoint) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function verifyAllowedDependencies(options: NormalizedLibraryOptions): void {
+  const { packageJson, allowedNonPeerDependencies } = options;
+  const dependencies = {
+    ...(packageJson.dependencies ?? {}),
+    ...(packageJson.optionalDependencies ?? {}),
+  };
 
   for (const dep of Object.keys(dependencies)) {
-    if (dep === 'tslib') {
-      continue;
+    if (!allowedNonPeerDependencies.some((regex) => regex.test(dep))) {
+      throw new Error(
+        `Dependency '${dep}' must be explicitly allowed using the 'allowedNonPeerDependencies' option, ` +
+          `or moved to 'peerDependencies' in 'package.json'.`,
+      );
     }
-
-    const isAllowed = allowedPatterns.some((pattern) => pattern.test(dep));
-    if (!isAllowed) {
-      invalidDeps.push(dep);
-    }
-  }
-
-  if (invalidDeps.length > 0) {
-    throw new Error(
-      `Package.json contains dependencies not listed in 'allowedNonPeerDependencies': ${invalidDeps.join(', ')}. ` +
-        `Third-party dependencies must usually be 'peerDependencies' in Angular libraries.`,
-    );
   }
 }
