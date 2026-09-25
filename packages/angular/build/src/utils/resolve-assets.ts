@@ -10,6 +10,11 @@ import path from 'node:path';
 import { glob } from 'tinyglobby';
 import { isSubDirectory } from './path';
 
+/**
+ * Default glob ignore patterns for assets.
+ */
+export const DEFAULT_ASSET_IGNORE = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
+
 export async function resolveAssets(
   entries: {
     glob: string;
@@ -21,8 +26,6 @@ export async function resolveAssets(
   }[],
   root: string,
 ): Promise<{ source: string; destination: string }[]> {
-  const defaultIgnore = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'];
-
   const outputFiles: { source: string; destination: string }[] = [];
 
   for (const entry of entries) {
@@ -35,7 +38,7 @@ export async function resolveAssets(
     const files = await glob(entry.glob, {
       cwd,
       dot: true,
-      ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
+      ignore: entry.ignore ? [...DEFAULT_ASSET_IGNORE, ...entry.ignore] : DEFAULT_ASSET_IGNORE,
       followSymbolicLinks: entry.followSymlinks,
     });
 
