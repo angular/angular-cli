@@ -21,6 +21,9 @@ export interface CompilerOptionOverrides {
   includeTestMetadata?: boolean;
   customConditions?: string[];
   rootFiles?: string[];
+  declarationMap?: boolean;
+  compilationMode?: 'full' | 'partial';
+  paths?: Record<string, string[]>;
 }
 
 export function transformCompilerOptions(
@@ -28,9 +31,11 @@ export function transformCompilerOptions(
   baseCompilerOptions: ng.CompilerOptions,
   overrides?: CompilerOptionOverrides,
   tsconfig?: string,
+  buildType: 'application' | 'library' = 'application',
 ): { compilerOptions: ng.CompilerOptions; warnings: PartialMessage[] } {
   const compilerOptions = { ...baseCompilerOptions };
   const warnings: PartialMessage[] = [];
+  const isLibrary = buildType === 'library';
 
   if (
     compilerOptions.target === undefined ||
@@ -57,13 +62,15 @@ export function transformCompilerOptions(
     });
   }
 
-  if (compilerOptions.compilationMode === 'partial') {
+  if (!isLibrary && compilerOptions.compilationMode === 'partial') {
     warnings.push({
       text: 'Angular partial compilation mode is not supported when building applications.',
       location: null,
       notes: [{ text: 'Full compilation mode will be used instead.' }],
     });
     compilerOptions.compilationMode = 'full';
+  } else if (overrides?.compilationMode) {
+    compilerOptions.compilationMode = overrides.compilationMode;
   }
 
   // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled
@@ -101,6 +108,16 @@ export function transformCompilerOptions(
     });
   }
 
+  if (isLibrary) {
+    compilerOptions.target = typeScript.ScriptTarget.ES2022;
+    compilerOptions.module = typeScript.ModuleKind.ES2022;
+    compilerOptions.moduleResolution = typeScript.ModuleResolutionKind.Bundler;
+    compilerOptions.importHelpers = true;
+    compilerOptions.declaration = true;
+    compilerOptions.declarationMap = overrides?.declarationMap;
+    compilerOptions.declarationDir = undefined;
+  }
+
   // Synchronize custom resolve conditions.
   // Set if using the supported bundler resolution mode (bundler is the default in new projects)
   if (
@@ -116,21 +133,25 @@ export function transformCompilerOptions(
       noEmitOnError: false,
       composite: false,
       inlineSources: !!overrides?.sourcemap,
-      inlineSourceMap: !!overrides?.sourcemap,
-      sourceMap: undefined,
+      inlineSourceMap: !isLibrary && !!overrides?.sourcemap,
+      sourceMap: isLibrary ? !!overrides?.sourcemap : undefined,
       mapRoot: undefined,
       sourceRoot: undefined,
       preserveSymlinks: overrides?.preserveSymlinks,
       externalRuntimeStyles: overrides?.externalRuntimeStyles,
       _enableHmr: !!overrides?.enableHmr,
       // TypeScript transpilation is forced if:
+      // - Building a library (TypeScript emits both .js and .d.ts in a single pass).
       // - isolatedModules is disabled (TS needs full module types to emit JS).
       // - Karma code coverage is active (the coverage instrumentation transformer is Babel-based
       //   and cannot parse raw TypeScript code; Vitest handles coverage instrumentation downstream).
       _useTypeScriptTranspilation:
-        !compilerOptions.isolatedModules || !!overrides?.instrumentForCoverage,
-      supportTestBed: !!overrides?.includeTestMetadata,
-      supportJitMode: !!overrides?.includeTestMetadata,
+        isLibrary || !compilerOptions.isolatedModules || !!overrides?.instrumentForCoverage,
+      supportTestBed: isLibrary ? undefined : !!overrides?.includeTestMetadata,
+      supportJitMode: isLibrary ? undefined : !!overrides?.includeTestMetadata,
+      paths: overrides?.paths
+        ? { ...baseCompilerOptions.paths, ...overrides.paths }
+        : baseCompilerOptions.paths,
     },
     warnings,
   };
