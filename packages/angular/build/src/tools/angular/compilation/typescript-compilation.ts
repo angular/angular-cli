@@ -24,6 +24,7 @@ export interface TransformedConfiguration {
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
+  #cachedConfiguration?: TransformedConfiguration;
 
   static async loadCompilerCli(): Promise<typeof ng> {
     TypeScriptCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
@@ -35,6 +36,12 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     tsconfig: string,
     compilerOptionOverrides?: CompilerOptionOverrides,
   ): Promise<TransformedConfiguration> {
+    // When `rootFiles` are explicitly provided (e.g., library builder), avoid re-parsing `tsconfig.json`
+    // and walking the project directory tree via `readConfiguration` on every watch rebuild (~200-350ms on large libraries).
+    if (compilerOptionOverrides?.rootFiles?.length && this.#cachedConfiguration) {
+      return this.#cachedConfiguration;
+    }
+
     const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
     const {
@@ -80,19 +87,30 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       tsconfig,
     );
 
-    return {
+    const config: TransformedConfiguration = {
       compilerOptions,
       rootNames,
       errors,
       warnings,
     };
+
+    if (compilerOptionOverrides?.rootFiles?.length) {
+      this.#cachedConfiguration = config;
+    }
+
+    return config;
   }
 
   protected readonly sourceFiles = new Map<string, ts.SourceFile>();
 
   protected invalidateFiles(files: Iterable<string>): void {
     for (const file of files) {
-      this.sourceFiles.delete(toPosixPath(file));
+      const posixFile = toPosixPath(file);
+      this.sourceFiles.delete(posixFile);
+      if (posixFile.endsWith('.json')) {
+        // If a tsconfig changes, we need to re-read the configuration.
+        this.#cachedConfiguration = undefined;
+      }
     }
   }
 
