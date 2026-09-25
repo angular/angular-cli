@@ -21,6 +21,7 @@ import {
 
 export function createAngularSsrInternalMiddleware(
   server: ViteDevServer,
+  resetComponentUpdates: () => void,
   indexHtmlTransformer?: (content: string) => Promise<string>,
 ): Connect.NextHandleFunction {
   let cachedAngularServerApp: ReturnType<typeof getOrCreateAngularServerApp> | undefined;
@@ -53,6 +54,7 @@ export function createAngularSsrInternalMiddleware(
       // Only Add the transform hook only if it's a different instance.
       if (cachedAngularServerApp !== angularServerApp) {
         angularServerApp.hooks.on('html:transform:pre', async ({ html, url }) => {
+          resetComponentUpdates();
           const processedHtml = await server.transformIndexHtml(url.pathname, html);
 
           return indexHtmlTransformer?.(processedHtml) ?? processedHtml;
@@ -76,13 +78,13 @@ export function createAngularSsrInternalMiddleware(
 
 export async function createAngularSsrExternalMiddleware(
   server: ViteDevServer,
+  resetComponentUpdates: () => void,
   indexHtmlTransformer?: (content: string) => Promise<string>,
 ): Promise<Connect.NextHandleFunction> {
   let fallbackWarningShown = false;
   let cachedAngularAppEngine: typeof SSRAngularAppEngine | undefined;
   let angularSsrInternalMiddleware:
-    | ReturnType<typeof createAngularSsrInternalMiddleware>
-    | undefined;
+    ReturnType<typeof createAngularSsrInternalMiddleware> | undefined;
 
   // Load the compiler because `@angular/ssr/node` depends on `@angular/` packages,
   // which must be processed by the runtime linker, even if they are not used.
@@ -120,6 +122,7 @@ export async function createAngularSsrExternalMiddleware(
 
         angularSsrInternalMiddleware ??= createAngularSsrInternalMiddleware(
           server,
+          resetComponentUpdates,
           indexHtmlTransformer,
         );
 
@@ -132,6 +135,7 @@ export async function createAngularSsrExternalMiddleware(
         AngularAppEngine.ɵdisableAllowedHostsCheck = disableAllowedHostsCheck;
         AngularAppEngine.ɵallowStaticRouteRender = true;
         AngularAppEngine.ɵhooks.on('html:transform:pre', async ({ html, url }) => {
+          resetComponentUpdates();
           const processedHtml = await server.transformIndexHtml(url.pathname, html);
 
           return indexHtmlTransformer?.(processedHtml) ?? processedHtml;
