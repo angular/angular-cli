@@ -280,79 +280,82 @@ export class AotCompilation extends TypeScriptCompilation {
     const syntactic = modes & DiagnosticModes.Syntactic;
     const semantic = modes & DiagnosticModes.Semantic;
 
-    // Collect program level diagnostics
-    if (modes & DiagnosticModes.Option) {
-      yield* typeScriptProgram.getConfigFileParsingDiagnostics();
-      yield* angularCompiler.getOptionDiagnostics();
-      yield* typeScriptProgram.getOptionsDiagnostics();
-    }
-    if (syntactic) {
-      yield* typeScriptProgram.getGlobalDiagnostics();
-    }
-
-    // Collect source file specific diagnostics
-    for (const sourceFile of typeScriptProgram.getSourceFiles()) {
-      if (angularCompiler.ignoreForDiagnostics.has(sourceFile)) {
-        continue;
+    try {
+      // Collect program level diagnostics
+      if (modes & DiagnosticModes.Option) {
+        yield* typeScriptProgram.getConfigFileParsingDiagnostics();
+        yield* angularCompiler.getOptionDiagnostics();
+        yield* typeScriptProgram.getOptionsDiagnostics();
       }
-
       if (syntactic) {
-        // TypeScript will use cached diagnostics for files that have not been
-        // changed or affected for this build when using incremental building.
+        yield* typeScriptProgram.getGlobalDiagnostics();
+      }
+
+      // Collect source file specific diagnostics
+      for (const sourceFile of typeScriptProgram.getSourceFiles()) {
+        if (angularCompiler.ignoreForDiagnostics.has(sourceFile)) {
+          continue;
+        }
+
+        if (syntactic) {
+          // TypeScript will use cached diagnostics for files that have not been
+          // changed or affected for this build when using incremental building.
+          yield* profileSync(
+            'NG_DIAGNOSTICS_SYNTACTIC',
+            () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
+            true,
+          );
+        }
+
+        if (!semantic) {
+          continue;
+        }
+
         yield* profileSync(
-          'NG_DIAGNOSTICS_SYNTACTIC',
-          () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
+          'NG_DIAGNOSTICS_SEMANTIC',
+          () => typeScriptProgram.getSemanticDiagnostics(sourceFile),
           true,
         );
-      }
 
-      if (!semantic) {
-        continue;
-      }
+        // Declaration files cannot have template diagnostics
+        if (sourceFile.isDeclarationFile) {
+          continue;
+        }
 
-      yield* profileSync(
-        'NG_DIAGNOSTICS_SEMANTIC',
-        () => typeScriptProgram.getSemanticDiagnostics(sourceFile),
-        true,
-      );
-
-      // Declaration files cannot have template diagnostics
-      if (sourceFile.isDeclarationFile) {
-        continue;
-      }
-
-      // Only request Angular template diagnostics for affected files to avoid
-      // overhead of template diagnostics for unchanged files.
-      if (affectedFiles.has(sourceFile)) {
-        const angularDiagnostics = profileSync(
-          'NG_DIAGNOSTICS_TEMPLATE',
-          () => angularCompiler.getDiagnosticsForFile(sourceFile, templateDiagnosticsOptimization),
-          true,
-        );
-        diagnosticCache.set(sourceFile, angularDiagnostics);
-        yield* angularDiagnostics;
-      } else {
-        const angularDiagnostics = diagnosticCache.get(sourceFile);
-        if (angularDiagnostics) {
+        // Only request Angular template diagnostics for affected files to avoid
+        // overhead of template diagnostics for unchanged files.
+        if (affectedFiles.has(sourceFile)) {
+          const angularDiagnostics = profileSync(
+            'NG_DIAGNOSTICS_TEMPLATE',
+            () =>
+              angularCompiler.getDiagnosticsForFile(sourceFile, templateDiagnosticsOptimization),
+            true,
+          );
+          diagnosticCache.set(sourceFile, angularDiagnostics);
           yield* angularDiagnostics;
+        } else {
+          const angularDiagnostics = diagnosticCache.get(sourceFile);
+          if (angularDiagnostics) {
+            yield* angularDiagnostics;
+          }
         }
       }
-    }
-
-    // Angular's template typechecker lazily creates `.ngtypecheck.ts` shims in a new `ts.Program`
-    // during `getDiagnosticsForFile`. Sync the builder program with `angularCompiler.getCurrentProgram()`
-    // so the next incremental build does not treat all `.ngtypecheck.ts` files as newly added files.
-    commitBuilderProgramState(typeScriptProgram);
-    const currentTsProgram = angularCompiler.getCurrentProgram();
-    if (currentTsProgram !== typeScriptProgram.getProgram()) {
-      ensureSourceFileVersions(currentTsProgram);
-      const updatedBuilder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
-        currentTsProgram,
-        this.#state.compilerHost,
-        typeScriptProgram,
-      );
-      commitBuilderProgramState(updatedBuilder);
-      this.#state.typeScriptProgram = updatedBuilder;
+    } finally {
+      // Angular's template typechecker lazily creates `.ngtypecheck.ts` shims in a new `ts.Program`
+      // during `getDiagnosticsForFile`. Sync the builder program with `angularCompiler.getCurrentProgram()`
+      // so the next incremental build does not treat all `.ngtypecheck.ts` files as newly added files.
+      commitBuilderProgramState(typeScriptProgram);
+      const currentTsProgram = angularCompiler.getCurrentProgram();
+      if (currentTsProgram !== typeScriptProgram.getProgram()) {
+        ensureSourceFileVersions(currentTsProgram);
+        const updatedBuilder = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
+          currentTsProgram,
+          this.#state.compilerHost,
+          typeScriptProgram,
+        );
+        commitBuilderProgramState(updatedBuilder);
+        this.#state.typeScriptProgram = updatedBuilder;
+      }
     }
   }
 
