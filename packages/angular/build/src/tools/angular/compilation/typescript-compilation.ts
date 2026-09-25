@@ -107,7 +107,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     for (const file of files) {
       const posixFile = toPosixPath(file);
       this.sourceFiles.delete(posixFile);
-      if (posixFile.endsWith('.json')) {
+      if (/\.json$/i.test(posixFile)) {
         // If a tsconfig changes, we need to re-read the configuration.
         this.#cachedConfiguration = undefined;
       }
