@@ -22,7 +22,7 @@ import {
 } from '../utility/dependency';
 import { JSONFile } from '../utility/json-file';
 import { latestVersions } from '../utility/latest-versions';
-import { getWorkspace } from '../utility/workspace';
+import { getWorkspace, updateWorkspace } from '../utility/workspace';
 import { Builders } from '../utility/workspace-models';
 import { Schema as VitestBrowserOptions } from './schema';
 
@@ -89,8 +89,19 @@ export default function (options: VitestBrowserOptions): Rule {
       }
     };
 
+    // Update angular.json to add the browsers option to the test target
+    const defaultBrowser = packageName === '@vitest/browser-webdriverio' ? 'chrome' : 'chromium';
+
     return chain([
       updateTsConfigRule,
+      updateWorkspace((workspace) => {
+        const testTarget = workspace.projects.get(options.project)?.targets.get('test');
+
+        if (testTarget) {
+          testTarget.options ??= {};
+          testTarget.options['browsers'] ??= [defaultBrowser];
+        }
+      }),
       ...dependencies.map((name) =>
         addDependency(name, latestVersions[name], {
           type: DependencyType.Dev,
@@ -101,8 +112,7 @@ export default function (options: VitestBrowserOptions): Rule {
       (_, context) => {
         context.logger.info(
           'Vitest browser testing support has been added. ' +
-            "To run tests in a browser, add a 'browsers' field to the 'test' target in 'angular.json', " +
-            "or use the '--browsers' command line option.",
+            `The test target has been configured with '${defaultBrowser}' as browser.`,
         );
       },
     ]);
