@@ -235,5 +235,30 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(result?.success).toBeTrue();
       expect(response?.status).toBe(404);
     });
+
+    it('serves an HTML asset emitted via file loader', async () => {
+      const htmlFileContent = '<h1>Custom HTML Asset</h1>';
+      await harness.writeFiles({
+        'src/test.html': htmlFileContent,
+        'src/types.d.ts': 'declare module "*.html" { const url: string; export default url; }',
+        'src/main.ts': 'import testHtml from "./test.html";\n console.log(testHtml);',
+      });
+
+      setupTarget(harness, {
+        loader: {
+          '.html': 'file',
+        },
+      });
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, response } = await executeOnceAndFetch(harness, 'media/test.html');
+      expect(result?.success).toBeTrue();
+      expect(response?.status).toBe(200);
+      expect(response?.headers.get('content-type')).toContain('text/html');
+      expect(await response?.text()).toBe(htmlFileContent);
+    });
   });
 });
