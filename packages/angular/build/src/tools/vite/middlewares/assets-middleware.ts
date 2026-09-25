@@ -98,7 +98,7 @@ export function createAngularAssetsMiddleware(
     // Resource files are handled directly.
     // Global stylesheets (CSS files) are currently considered resources to workaround
     // dev server sourcemap issues with stylesheets.
-    if (extension !== '.js' && extension !== '.html') {
+    if (extension !== '.js' && pathname !== '/index.html' && pathname !== '/index.csr.html') {
       const outputFile = outputFiles.get(pathname);
       if (outputFile?.servable) {
         let data: Uint8Array | string = outputFile.contents;
