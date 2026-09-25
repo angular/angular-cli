@@ -36,7 +36,7 @@ export async function resolveAssets(
       cwd,
       dot: true,
       ignore: entry.ignore ? defaultIgnore.concat(entry.ignore) : defaultIgnore,
-      followSymbolicLinks: entry.followSymlinks,
+      followSymbolicLinks: entry.followSymlinks ?? false,
     });
 
     for (const file of files) {
