@@ -148,6 +148,7 @@ ts_project(
         ":node_modules/@babel/core",
         ":node_modules/oxc-parser",
         "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/router",
         "//:node_modules/@types/jasmine",
         "//:node_modules/esbuild",
         "//:node_modules/prettier",
