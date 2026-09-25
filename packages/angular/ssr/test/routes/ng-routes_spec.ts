@@ -102,6 +102,257 @@ describe('extractRoutesAndCreateRouteTree', () => {
       );
     });
 
+    it("should error when 'getPrerenderParams' produces a protocol-relative path", async () => {
+      setAngularAppTestingManifest(
+        [{ path: ':slug', component: DummyComponent }],
+        [
+          {
+            path: ':slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: '/evil.example' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The ':slug' route produced an invalid prerender path: ` +
+          `'//evil.example' is not a valid same-origin path.`,
+      );
+    });
+
+    it("should error when 'getPrerenderParams' produces a path containing a backslash", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'docs/:id', component: DummyComponent }],
+        [
+          {
+            path: 'docs/:id',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ id: '\\evil.example' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The 'docs/:id' route produced an invalid prerender path: ` +
+          `'/docs/\\evil.example' is not a valid same-origin path.`,
+      );
+    });
+
+    it("should error when a 'redirectTo' is protocol-relative", async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'home', component: DummyComponent },
+          { path: 'redirect', redirectTo: '//evil.example' },
+        ],
+        [{ path: '**', renderMode: RenderMode.Server }],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `The 'redirectTo' value for the 'redirect' route is invalid: ` +
+          `'//evil.example' is not a valid same-origin path.`,
+      );
+    });
+
+    it("should error when a server route 'headers.Location' uses an unsupported protocol", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'external', component: DummyComponent }],
+        [
+          {
+            path: 'external',
+            renderMode: RenderMode.Prerender,
+            headers: { Location: 'javascript:alert(1)' },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `Invalid 'external' route configuration: the 'headers.Location' value is invalid: ` +
+          `the 'javascript:' protocol is not supported as a redirect target.`,
+      );
+    });
+
+    it("should error when a server route 'headers.Location' contains a backslash", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'external', component: DummyComponent }],
+        [
+          {
+            path: 'external',
+            renderMode: RenderMode.Prerender,
+            headers: { Location: '/\\evil.example' },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `Invalid 'external' route configuration: the 'headers.Location' value is invalid: ` +
+          `'/\\evil.example' is not a valid same-origin path.`,
+      );
+    });
+
+    it("should error when a server route 'headers.Location' resolves into a protocol-relative path", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'external', component: DummyComponent }],
+        [
+          {
+            path: 'external',
+            renderMode: RenderMode.Server,
+            status: 302,
+            headers: { Location: '/..//evil.example' },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `Invalid 'external' route configuration: the 'headers.Location' value is invalid: ` +
+          `'/..//evil.example' is not a valid same-origin path. ` +
+          `It resolves to the protocol-relative path '//evil.example'.`,
+      );
+    });
+
+    it("should error when a server route 'headers.Location' uses an unsupported protocol regardless of the header casing", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'external', component: DummyComponent }],
+        [
+          {
+            path: 'external',
+            renderMode: RenderMode.Prerender,
+            headers: { LoCaTiOn: 'javascript:alert(1)' },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors[0]).toContain(
+        `Invalid 'external' route configuration: the 'headers.Location' value is invalid: ` +
+          `the 'javascript:' protocol is not supported as a redirect target.`,
+      );
+    });
+
+    it("should store the normalized value of a server route 'headers.Location'", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'external', component: DummyComponent }],
+        [
+          {
+            path: 'external',
+            renderMode: RenderMode.Server,
+            headers: { location: 'HTTPS://Example.com/A b' },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+      expect(errors).toHaveSize(0);
+      expect(routeTree.match('/external')?.headers).toEqual({
+        location: 'https://example.com/A%20b',
+      });
+    });
+
+    it("should error when 'getPrerenderParams' produces a segment which decodes to a separator", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'store/:slug', component: DummyComponent }],
+        [
+          {
+            path: 'store/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: 'foo%2Fbar' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The 'store/:slug' route produced an invalid prerender path: ` +
+          `'/store/foo%2Fbar' is not a valid route path. ` +
+          `The 'foo%2Fbar' segment decodes to a value which is not a single path segment.`,
+      );
+    });
+
+    it("should error when 'getPrerenderParams' produces an encoded dot segment", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'store/:slug', component: DummyComponent }],
+        [
+          {
+            path: 'store/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: '%2E%2E' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The 'store/:slug' route produced an invalid prerender path: ` +
+          `'/store/%2E%2E' is not a valid route path. ` +
+          `The '%2E%2E' segment decodes to the '..' path traversal segment.`,
+      );
+    });
+
+    it("should error when 'getPrerenderParams' produces a malformed percent escape", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'store/:slug', component: DummyComponent }],
+        [
+          {
+            path: 'store/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: '50%' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The 'store/:slug' route produced an invalid prerender path: ` +
+          `'/store/50%' is not a valid route path. ` +
+          `The '50%' segment is not a valid percent-encoded value.`,
+      );
+    });
+
     it(`should not error when a catch-all route didn't match any Angular route`, async () => {
       setAngularAppTestingManifest(
         [{ path: 'home', component: DummyComponent }],
@@ -182,6 +433,65 @@ describe('extractRoutesAndCreateRouteTree', () => {
   });
 
   describe('when `invokeGetPrerenderParams` is true', () => {
+    it("should allow 'getPrerenderParams' values containing apostrophes and spaces", async () => {
+      setAngularAppTestingManifest(
+        [{ path: 'store/:slug', component: DummyComponent }],
+        [
+          {
+            path: 'store/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: `customer's-choice` }, { slug: 'summer sale' }];
+            },
+          },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: `/store/customer's-choice`, renderMode: RenderMode.Prerender },
+        { route: '/store/summer sale', renderMode: RenderMode.Prerender },
+      ]);
+    });
+
+    it('should keep the first route when a prerendered path collides with a literal route', async () => {
+      // A prerendered path is normalized by the URL parser while a literal route path is not, so
+      // the two reach the route tree in a different encoding even though they are the same node.
+      setAngularAppTestingManifest(
+        [
+          { path: 'produits/café', component: DummyComponent },
+          { path: 'produits/:slug', component: DummyComponent },
+        ],
+        [
+          { path: 'produits/café', renderMode: RenderMode.Server, status: 201 },
+          {
+            path: 'produits/:slug',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ slug: 'café' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/produits/café', renderMode: RenderMode.Server, status: 201 },
+      ]);
+    });
+
     it('should resolve parameterized routes for SSG and add a fallback route if fallback is Server', async () => {
       setAngularAppTestingManifest(
         [{ path: 'user/:id/role/:role', component: DummyComponent }],
@@ -326,6 +636,62 @@ describe('extractRoutesAndCreateRouteTree', () => {
         },
         { route: '/user/*/**', renderMode: RenderMode.Server },
       ]);
+    });
+
+    it('should resolve a catch-all value which carries the leading separator', async () => {
+      // The documented value of a '**' parameter is a path such as '/foo/bar', which already
+      // carries the separator that the matched '/**' placeholder includes. A root catch-all is the
+      // case where re-adding it composes a protocol-relative '//foo/bar'.
+      setAngularAppTestingManifest(
+        [{ path: '**', component: DummyComponent }],
+        [
+          {
+            path: '**',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ '**': '/foo/bar' }, { '**': 'foo/baz' }];
+            },
+          },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/foo/bar', renderMode: RenderMode.Prerender },
+        { route: '/foo/baz', renderMode: RenderMode.Prerender },
+      ]);
+    });
+
+    it('should still reject a catch-all value which is itself protocol-relative', async () => {
+      setAngularAppTestingManifest(
+        [{ path: '**', component: DummyComponent }],
+        [
+          {
+            path: '**',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ '**': '//evil.example' }];
+            },
+          },
+        ],
+      );
+
+      const { errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+
+      expect(errors[0]).toContain(
+        `The '**' route produced an invalid prerender path: ` +
+          `'//evil.example' is not a valid same-origin path.`,
+      );
     });
 
     it('should extract nested redirects that are not explicitly defined.', async () => {
