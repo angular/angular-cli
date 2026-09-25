@@ -32,6 +32,7 @@ import {
   OutputMode,
   OutputPathClass,
   Platform,
+  PrerenderFormat,
 } from './schema';
 
 /**
@@ -342,6 +343,20 @@ export async function normalizeOptions(
       options.outputMode === OutputMode.Static,
   };
 
+  let prerenderFormat = options.prerenderFormat ?? PrerenderFormat.Directory;
+  if (prerenderFormat === PrerenderFormat.File && !outputOptions.ignoreServer) {
+    // The server runtime of '@angular/ssr' looks up prerendered pages as '<route>/index.html'.
+    // The warning is only relevant when pages are actually prerendered, which the dev-server skips.
+    if ((prerenderOptions || appShellOptions) && !(options.partialSSRBuild || usePartialSsrBuild)) {
+      context.logger.warn(
+        'The "prerenderFormat" option set to "file" is not considered when the build produces a ' +
+          'server ("outputMode" set to "server", or "ssr" without "outputMode").',
+      );
+    }
+
+    prerenderFormat = PrerenderFormat.Directory;
+  }
+
   const outputNames = {
     bundles:
       options.outputHashing === OutputHashing.All || options.outputHashing === OutputHashing.Bundles
@@ -492,6 +507,7 @@ export async function normalizeOptions(
     subresourceIntegrity,
     serverEntryPoint,
     prerenderOptions,
+    prerenderFormat,
     appShellOptions,
     outputMode,
     ssrOptions,
