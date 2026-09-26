@@ -18,7 +18,7 @@ import { isNodeVersionMinSupported, supportedNodeVersions } from '../../src/util
 export { VERSION } from '../../src/utilities/version';
 
 /* eslint-disable no-console */
-export default async function (options: { cliArgs: string[] }) {
+export default async function execute(options: { cliArgs: string[] }) {
   // This node version check ensures that the requirements of the project instance of the CLI are met
 
   if (!isNodeVersionMinSupported()) {

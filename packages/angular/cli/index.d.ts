@@ -16,4 +16,4 @@ export declare class Version {
 
 export declare const VERSION: Version;
 
-export default function (options: { cliArgs: string[] }): Promise<number>;
+export default function execute(options: { cliArgs: string[] }): Promise<number>;
