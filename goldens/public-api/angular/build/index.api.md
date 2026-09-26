@@ -55,6 +55,7 @@ export type ApplicationBuilderOptions = {
     poll?: number;
     polyfills?: string[];
     prerender?: PrerenderUnion;
+    prerenderFormat?: PrerenderFormat;
     preserveSymlinks?: boolean;
     progress?: boolean;
     scripts?: ScriptElement[];
