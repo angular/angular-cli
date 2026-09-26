@@ -13,17 +13,11 @@ import { emitFilesToDisk } from '../../../tools/esbuild/utils';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
 import { collectAssetsToEmit } from './assets';
-import {
-  type BundleEntryPointInput,
-  type BundleResult,
-  type EntryPointLookup,
-  bundleEntryPoints,
-  createEntryDirectoryLookup,
-} from './bundler';
+import { type BundleEntryPointInput, type BundleResult, bundleEntryPoints } from './bundler';
 import { type SingleProgramCache, compileLibrary } from './compilation';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
-import type { OutputFile } from './utils';
+import { type EntryPointLookup, type OutputFile, createEntryDirectoryLookup } from './utils';
 
 /**
  * State preserved across incremental builds in watch mode.
