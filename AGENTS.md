@@ -50,7 +50,9 @@ This is the source code for the Angular CLI and related build tooling. This guid
   - Run a specific test target: `pnpm bazel test //packages/angular/build:test`
   - Query test targets: `pnpm bazel query "tests(//packages/...)"`
   - Focus specific tests when debugging: use `fdescribe()` and `fit()`. NEVER commit focused tests to the repository.
-  - Run tests without sharding: use `--config=no-sharding` (e.g., `pnpm bazel test //packages/angular/build:test --config=no-sharding`). This disables test sharding (`--test_sharding_strategy=disabled`) and flaky test retries (`--flaky_test_attempts=1`), which is especially useful when isolating test runs or debugging with focused tests (`fit`/`fdescribe`) to avoid empty shard failures and unnecessary re-runs.
+  - Run tests without sharding: use `--config=no-sharding` (e.g., `pnpm bazel test //packages/angular/build:test --config=no-sharding`).
+    This disables test sharding (`--test_sharding_strategy=disabled`) and flaky test retries (`--flaky_test_attempts=1`).
+    This is especially useful when isolating test runs or debugging with focused tests (`fit`/`fdescribe`) to avoid empty shard failures and unnecessary re-runs.
 - **End-to-End Tests:**
   - Run subset of E2E tests: `pnpm bazel test //tests:e2e_node22 --config=e2e --test_filter="<filter>"`
 
