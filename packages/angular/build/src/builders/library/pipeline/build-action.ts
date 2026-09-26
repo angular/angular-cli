@@ -15,9 +15,10 @@ import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options'
 import { collectAssetsToEmit } from './assets';
 import { type BundleEntryPointInput, type BundleResult, bundleEntryPoints } from './bundler';
 import { type SingleProgramCache, compileLibrary } from './compilation';
+import { type EntryPointLookup, createEntryDirectoryLookup } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
-import { type EntryPointLookup, type OutputFile, createEntryDirectoryLookup } from './utils';
+import type { OutputFile } from './utils';
 
 /**
  * State preserved across incremental builds in watch mode.

@@ -18,12 +18,11 @@ import {
 import { dts } from 'rolldown-plugin-dts';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
+import { type EntryPointLookup, createEntryDirectoryLookup } from './entry-points';
 import {
-  type EntryPointLookup,
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,
   TYPES_OUTPUT_DIR,
-  createEntryDirectoryLookup,
   createMemoryOutputFile,
 } from './utils';
 

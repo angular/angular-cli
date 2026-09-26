@@ -22,28 +22,10 @@ import {
   loadPostcssConfiguration,
 } from '../../utils/postcss-configuration';
 import { getProjectRootPaths } from '../../utils/project-metadata';
-import { getEntryPointBundleName } from './pipeline/utils';
+import { type NormalizedEntryPoint, getEntryPointBundleName } from './pipeline/entry-points';
 import type { Schema as LibraryBuilderOptions } from './schema';
 
-export interface NormalizedEntryPoint {
-  /** The subpath in package.json exports (e.g. '.' or './testing'). */
-  subpath: string;
-
-  /** Subpath name without leading './' (e.g. '.' or 'testing'). */
-  name: string;
-
-  /** Display name of the entry point (e.g. '@my/lib' or '@my/lib/testing'). */
-  displayName: string;
-
-  /** Base name of the output bundle (e.g. 'my-lib' or 'my-lib-testing'). */
-  bundleName: string;
-
-  /** Absolute path to entry file. */
-  entryFilePath: string;
-
-  /** Is this the primary entry point ('.')? */
-  isPrimary: boolean;
-}
+export type { NormalizedEntryPoint } from './pipeline/entry-points';
 
 export interface PackageJsonData {
   name: string;
