@@ -52,6 +52,7 @@ export class ParallelCompilation extends AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType: 'application' | 'library' = 'application',
   ): Promise<AngularCompilationResult> {
     const stylesheetChannel = new MessageChannel();
     // The request identifier is required because Angular can issue multiple concurrent requests
@@ -94,6 +95,7 @@ export class ParallelCompilation extends AngularCompilation {
           jit: this.jit,
           browserOnlyBuild: this.browserOnlyBuild,
           compilerOptionOverrides,
+          buildType,
           stylesheetPort: stylesheetChannel.port2,
           webWorkerPort: webWorkerChannel.port2,
           webWorkerSignal,

@@ -34,6 +34,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
   protected async loadConfiguration(
     tsconfig: string,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType: 'application' | 'library' = 'application',
   ): Promise<TransformedConfiguration> {
     const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
@@ -78,6 +79,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       originalCompilerOptions,
       compilerOptionOverrides,
       tsconfig,
+      buildType,
     );
 
     return {

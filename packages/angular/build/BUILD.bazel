@@ -25,6 +25,11 @@ ts_json_schema(
 )
 
 ts_json_schema(
+    name = "library_schema",
+    src = "src/builders/library/schema.json",
+)
+
+ts_json_schema(
     name = "ng_karma_schema",
     src = "src/builders/karma/schema.json",
 )
@@ -72,6 +77,7 @@ ts_project(
         "//packages/angular/build:src/builders/dev-server/schema.ts",
         "//packages/angular/build:src/builders/extract-i18n/schema.ts",
         "//packages/angular/build:src/builders/karma/schema.ts",
+        "//packages/angular/build:src/builders/library/schema.ts",
         "//packages/angular/build:src/builders/ng-packagr/schema.ts",
         "//packages/angular/build:src/builders/unit-test/schema.ts",
     ],
@@ -104,6 +110,7 @@ ts_project(
         ":node_modules/piscina",
         ":node_modules/postcss",
         ":node_modules/rolldown",
+        ":node_modules/rolldown-plugin-dts",
         ":node_modules/rollup",
         ":node_modules/sass",
         ":node_modules/sass-embedded",
@@ -287,6 +294,32 @@ ts_project(
     ],
 )
 
+ts_project(
+    name = "library_integration_test_lib",
+    testonly = True,
+    srcs = glob(include = ["src/builders/library/tests/**/*.ts"]),
+    deps = [
+        ":build",
+        "//packages/angular/build/private",
+        "//modules/testing/builder",
+        ":node_modules/@angular-devkit/architect",
+        ":node_modules/@angular-devkit/core",
+        "//:node_modules/@types/node",
+
+        # Base dependencies for the library in hello-world-lib.
+        "//:node_modules/@angular/common",
+        "//:node_modules/@angular/compiler",
+        "//:node_modules/@angular/compiler-cli",
+        "//:node_modules/@angular/core",
+        "//:node_modules/@angular/platform-browser",
+        "//:node_modules/@angular/router",
+        ":node_modules/rxjs",
+        "//:node_modules/tslib",
+        "//:node_modules/typescript",
+        "//:node_modules/zone.js",
+    ],
+)
+
 jasmine_test(
     name = "application_integration_tests",
     size = "medium",
@@ -326,6 +359,13 @@ jasmine_test(
     data = [":unit-test_integration_test_lib"],
     flaky = True,
     shard_count = 5,
+)
+
+jasmine_test(
+    name = "library_integration_tests",
+    size = "medium",
+    data = [":library_integration_test_lib"],
+    shard_count = 4,
 )
 
 genrule(
