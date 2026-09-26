@@ -269,6 +269,7 @@ async function renderPages(
   const usedFiles = new Map<string, string>();
 
   const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
+  const lowerIndexOutput = indexOutput?.toLowerCase();
   const appShellRouteWithoutBaseHref = appShellRoute
     ? addLeadingSlash(getRouteWithoutBaseHref(appShellRoute, baseHrefPathnameWithLeadingSlash))
     : undefined;
@@ -286,7 +287,7 @@ async function renderPages(
         routeWithoutBaseHref,
         route,
         filePath,
-        indexOutput,
+        lowerIndexOutput,
         usedFiles,
       );
       if (reason) {
@@ -541,7 +542,7 @@ function getFileFormatConflict(
   routeWithoutBaseHref: string,
   route: string,
   filePath: string,
-  indexOutput: string | undefined,
+  lowerIndexOutput: string | undefined,
   usedFiles: ReadonlyMap<string, string>,
 ): string | undefined {
   const routePath = getNormalizedRoutePath(routeWithoutBaseHref);
@@ -558,7 +559,7 @@ function getFileFormatConflict(
   }
 
   const lowerFilePath = filePath.toLowerCase();
-  if (indexOutput !== undefined && lowerFilePath === indexOutput.toLowerCase()) {
+  if (lowerIndexOutput !== undefined && lowerFilePath === lowerIndexOutput) {
     return `'${filePath}' is the index file of the application`;
   }
 
