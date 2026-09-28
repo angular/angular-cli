@@ -530,6 +530,8 @@ class ParcelExternalManager {
 
     try {
       const sub = await subPromise;
+      this.pendingSubscriptions.delete(dirKey);
+
       if (this.externalDirFiles.has(dirKey) && !this.isCoveredByExistingExternal(dirKey)) {
         this.extraSubscriptions.set(dirKey, sub);
 
