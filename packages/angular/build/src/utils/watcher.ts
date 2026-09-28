@@ -752,6 +752,7 @@ async function createChokidarWatcher(
 ): Promise<BuildWatcher> {
   const chokidar = chokidarModule ?? (await import('chokidar'));
   const watchedFiles = new Set<string>();
+  const fileStats = new Map<string, { mtimeMs: number; size: number }>();
 
   let queue: WatcherQueue;
   if (options?.polling) {
@@ -811,16 +812,36 @@ async function createChokidarWatcher(
       return;
     }
 
-    if (type !== 'removed') {
-      const stat = fs.statSync(rawPath, { throwIfNoEntry: false });
-      // Ignore historical events from before watcher initialization, but allow a 1000 ms window
-      // to account for coarse filesystem timestamp resolution (e.g., ext4/overlayfs integer second
-      // mtime truncation on Linux) where files modified during startup may have truncated .000 ms mtimes.
-      if (stat && stat.mtimeMs < initTime - 1000) {
-        return;
-      }
+    if (type === 'removed') {
+      fileStats.delete(lookupKey);
+      queue.addChange(type, rawPath);
+
+      return;
     }
 
+    const stat = fs.statSync(rawPath, { throwIfNoEntry: false });
+    if (!stat) {
+      return;
+    }
+
+    // Ignore historical events from before watcher initialization, but allow a 1000 ms window
+    // to account for coarse filesystem timestamp resolution (e.g., ext4/overlayfs integer second
+    // mtime truncation on Linux) where files modified during startup may have truncated .000 ms mtimes.
+    if (stat.mtimeMs < initTime - 1000) {
+      return;
+    }
+
+    const previousStat = fileStats.get(lookupKey);
+    if (
+      type === 'modified' &&
+      previousStat &&
+      previousStat.mtimeMs === stat.mtimeMs &&
+      previousStat.size === stat.size
+    ) {
+      return;
+    }
+
+    fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
     queue.addChange(type, rawPath);
   };
 
@@ -833,8 +854,20 @@ async function createChokidarWatcher(
       return this;
     },
 
-    next() {
-      return queue.next();
+    async next() {
+      const result = await queue.next();
+      if (result.value) {
+        for (const file of [...result.value.added, ...result.value.modified]) {
+          const stat = fs.statSync(file, { throwIfNoEntry: false });
+          if (stat?.isFile()) {
+            const posixPath = toPosixPathNormalized(file);
+            const lookupKey = toLookupKey(posixPath, isCaseSensitive);
+            fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
+          }
+        }
+      }
+
+      return result;
     },
 
     add(paths) {
@@ -845,6 +878,11 @@ async function createChokidarWatcher(
         const lookupKey = toLookupKey(posixPath, isCaseSensitive);
         if (!watchedFiles.has(lookupKey)) {
           watchedFiles.add(lookupKey);
+
+          const stat = fs.statSync(p, { throwIfNoEntry: false });
+          if (stat?.isFile()) {
+            fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
+          }
 
           // For files inside node_modules, register their package directory. Only newly encountered
           // package directories need to be added to Chokidar.
@@ -873,6 +911,7 @@ async function createChokidarWatcher(
         const lookupKey = toLookupKey(posixPath, isCaseSensitive);
         if (watchedFiles.has(lookupKey)) {
           watchedFiles.delete(lookupKey);
+          fileStats.delete(lookupKey);
 
           // When the last watched file in a package is removed, unwatch the package directory.
           const { isPackage, unwatchPkgDir } = nodeModulesManager.removePackageFile(
