@@ -857,14 +857,17 @@ async function createChokidarWatcher(
     async next() {
       const result = await queue.next();
       if (result.value) {
-        for (const file of [...result.value.added, ...result.value.modified]) {
-          const stat = fs.statSync(file, { throwIfNoEntry: false });
-          if (stat?.isFile()) {
-            const posixPath = toPosixPathNormalized(file);
-            const lookupKey = toLookupKey(posixPath, isCaseSensitive);
-            fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
-          }
-        }
+        const files = [...result.value.added, ...result.value.modified];
+        await Promise.all(
+          files.map(async (file) => {
+            const stat = await fs.promises.stat(file).catch(() => undefined);
+            if (stat?.isFile()) {
+              const posixPath = toPosixPathNormalized(file);
+              const lookupKey = toLookupKey(posixPath, isCaseSensitive);
+              fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
+            }
+          }),
+        );
       }
 
       return result;
@@ -878,11 +881,6 @@ async function createChokidarWatcher(
         const lookupKey = toLookupKey(posixPath, isCaseSensitive);
         if (!watchedFiles.has(lookupKey)) {
           watchedFiles.add(lookupKey);
-
-          const stat = fs.statSync(p, { throwIfNoEntry: false });
-          if (stat?.isFile()) {
-            fileStats.set(lookupKey, { mtimeMs: stat.mtimeMs, size: stat.size });
-          }
 
           // For files inside node_modules, register their package directory. Only newly encountered
           // package directories need to be added to Chokidar.
