@@ -158,11 +158,61 @@ describe('AngularCompilation', () => {
           suppressOutputPathCheck: true,
           outDir: undefined,
         }),
+        undefined,
+        jasmine.any(Map),
       );
       expect(result.rootNames).toEqual(['/src/main.ts']);
       expect(result.compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
       expect(result.compilerOptions.inlineSources).toBe(true);
       expect(result.warnings.length).toBeGreaterThan(0);
+      expect(result.tsConfigFiles).toEqual(['tsconfig.json']);
+    });
+
+    it('passes extendedConfigCache to readConfiguration and invalidates entries on config change', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      let passedCache: Map<string, ts.ExtendedConfigCacheEntry> | undefined;
+      const mockReadConfig = jasmine
+        .createSpy('readConfiguration')
+        .and.callFake((_project, _options, _host, extendedConfigCache) => {
+          passedCache = extendedConfigCache;
+          extendedConfigCache?.set(
+            '/path/to/tsconfig.base.json',
+            {} as ts.ExtendedConfigCacheEntry,
+          );
+
+          return {
+            options: { target: ts.ScriptTarget.ES2020 },
+            rootNames: ['/src/main.ts'],
+            errors: [],
+          };
+        });
+      spyOn(TypeScriptCompilation, 'loadCompilerCli').and.resolveTo({
+        readConfiguration: mockReadConfig,
+      } as unknown as typeof import('@angular/compiler-cli'));
+
+      const result1 = await compilation.testLoadConfiguration('tsconfig.json');
+      expect(mockReadConfig).toHaveBeenCalledTimes(1);
+      expect(passedCache).toBeDefined();
+      expect(passedCache?.has('/path/to/tsconfig.base.json')).toBeTrue();
+      expect(result1.tsConfigFiles).toEqual(['tsconfig.json', '/path/to/tsconfig.base.json']);
+
+      // Invalidation of non-config file should keep extended config cache intact
+      await compilation.update?.(new Set(['/src/main.ts']));
+      expect(passedCache?.has('/path/to/tsconfig.base.json')).toBeTrue();
+
+      // Invalidation of extended tsconfig file should remove it from cache
+      await compilation.update?.(new Set(['/path/to/tsconfig.base.json']));
+      expect(passedCache?.has('/path/to/tsconfig.base.json')).toBeFalse();
+
+      // Invalidation with different casing should also remove it from cache
+      passedCache?.set('/path/to/tsconfig.base.json', {} as ts.ExtendedConfigCacheEntry);
+      await compilation.update?.(new Set(['/PATH/TO/TSCONFIG.BASE.JSON']));
+      expect(passedCache?.has('/path/to/tsconfig.base.json')).toBeFalse();
+
+      // Subsequent configuration load re-uses the same cache instance
+      await compilation.testLoadConfiguration('tsconfig.json');
+      expect(mockReadConfig).toHaveBeenCalledTimes(2);
+      expect(mockReadConfig.calls.argsFor(1)[3]).toBe(passedCache);
     });
   });
 
