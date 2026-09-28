@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { writeFile, stat, mkdir, symlink, utimes } from 'node:fs/promises';
+import { writeFile, stat, mkdir, symlink, utimes, rm } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { expectFileToExist, expectFileToMatch } from '../../utils/fs';
 import { ng } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -64,4 +65,30 @@ export default async function () {
   await expectFileToExist('dist/test-project/browser/symlinkDir/subdir1/b.txt');
   await expectFileToExist('dist/test-project/browser/symlinkDir/subdir2/c.txt');
   await expectFileToExist('dist/test-project/browser/symlinkDir/subdir2/subsubdir1/d.txt');
+
+  // Ensure symlinks pointing outside workspace root (monorepo setups) are followed
+  const outsideAssetsDir = resolve(process.cwd(), '../outside-monorepo-assets');
+  await mkdir(`${outsideAssetsDir}/nested`, { recursive: true });
+  try {
+    await symlink(outsideAssetsDir, 'public/outsideAssets');
+    await Promise.all([
+      writeFile(`${outsideAssetsDir}/outside.txt`, 'outside asset'),
+      writeFile(`${outsideAssetsDir}/nested/nested.txt`, 'nested outside asset'),
+    ]);
+
+    await ng('build', '--configuration=development');
+
+    await expectFileToExist('dist/test-project/browser/outsideAssets/outside.txt');
+    await expectFileToExist('dist/test-project/browser/outsideAssets/nested/nested.txt');
+    await expectFileToMatch('dist/test-project/browser/outsideAssets/outside.txt', 'outside asset');
+    await expectFileToMatch(
+      'dist/test-project/browser/outsideAssets/nested/nested.txt',
+      'nested outside asset',
+    );
+  } finally {
+    await Promise.all([
+      rm(outsideAssetsDir, { force: true, recursive: true }),
+      rm('public/outsideAssets', { force: true }),
+    ]);
+  }
 }
