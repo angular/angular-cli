@@ -355,7 +355,8 @@ function translateMessage(
         substitutions,
       ];
     } else {
-      diagnostics.push({ type: 'error', message: (error as Error).message });
+      const message = error instanceof Error ? error.message : String(error);
+      diagnostics.push({ type: 'error', message });
 
       return [messageParts, substitutions];
     }
