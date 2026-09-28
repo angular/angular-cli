@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { ConsoleLogger, LogLevel } from '@angular/compiler-cli';
+import type { Logger } from '@angular/compiler-cli';
 import { type DeclarationScope, FileLinker, LinkerEnvironment } from '@angular/compiler-cli/linker';
 import type {
   AbsoluteFsPath,
@@ -45,7 +45,34 @@ const noopFileSystem: ReadonlyFileSystem = {
   relative: (_from: string, to: string) => to,
 } as unknown as ReadonlyFileSystem;
 
-let SHARED_LOGGER: ConsoleLogger;
+const defaultLogger: Logger = {
+  level: 1, // LogLevel.info
+  debug(...args: string[]) {
+    if (this.level <= 0) {
+      // eslint-disable-next-line no-console
+      console.debug(...args);
+    }
+  },
+  info(...args: string[]) {
+    if (this.level <= 1) {
+      // eslint-disable-next-line no-console
+      console.info(...args);
+    }
+  },
+  warn(...args: string[]) {
+    if (this.level <= 2) {
+      // eslint-disable-next-line no-console
+      console.warn(...args);
+    }
+  },
+  error(...args: string[]) {
+    if (this.level <= 3) {
+      // eslint-disable-next-line no-console
+      console.error(...args);
+    }
+  },
+};
+
 let SHARED_AST_HOST: OxcAstHost;
 let SHARED_DECLARATION_SCOPE: InlineDeclarationScope;
 
@@ -56,14 +83,13 @@ export class OxcLinker {
   readonly #fileLinker: FileLinker<unknown, string, unknown, string | undefined>;
 
   constructor(filename: string, code: string, jit = false) {
-    SHARED_LOGGER ??= new ConsoleLogger(LogLevel.info);
     SHARED_AST_HOST ??= new OxcAstHost();
     SHARED_DECLARATION_SCOPE ??= new InlineDeclarationScope();
 
     const astFactory = new StringAstFactory(code);
     const linkerEnvironment = LinkerEnvironment.create(
       noopFileSystem,
-      SHARED_LOGGER,
+      defaultLogger,
       SHARED_AST_HOST,
       astFactory,
       { linkerJitMode: jit, sourceMapping: false },
