@@ -291,7 +291,6 @@ jasmine_test(
     name = "application_integration_tests",
     size = "medium",
     data = [":application_integration_test_lib"],
-    flaky = True,
     shard_count = 25,
 )
 
@@ -303,7 +302,6 @@ jasmine_test(
         # Force IPv4 to resolve RBE resolution issues
         "NODE_OPTIONS": "--dns-result-order=ipv4first",
     },
-    flaky = True,
     shard_count = 10,
 )
 
@@ -316,7 +314,6 @@ jasmine_test(
         # or standardize to avoid complex configuration like this!
         "PUPPETEER_DOWNLOAD_PATH": "../../../node_modules/puppeteer/downloads",
     },
-    flaky = True,
     shard_count = 10,
 )
 
@@ -324,7 +321,6 @@ jasmine_test(
     name = "unit-test_integration_tests",
     size = "medium",
     data = [":unit-test_integration_test_lib"],
-    flaky = True,
     shard_count = 5,
 )
 
