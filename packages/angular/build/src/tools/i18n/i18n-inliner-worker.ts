@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
+import { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
 import {
   type ɵParsedTranslation,
   ɵisMissingTranslationError,
@@ -155,6 +155,8 @@ const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsed
  * The current inlining generation for this worker.
  */
 let currentGeneration: number | undefined;
+
+let remapping: typeof import('@ampproject/remapping').default | undefined;
 
 /**
  * Retrieves the file data for a filename, loading and extracting localization metadata.
@@ -557,6 +559,7 @@ async function inlineLocalize(
       includeContent: true,
       hires: 'boundary',
     });
+    remapping ??= (await import('@ampproject/remapping')).default;
     outputMap = remapping([{ ...rawMap, version: 3 } satisfies DecodedSourceMap, map], () => null);
   }
 
