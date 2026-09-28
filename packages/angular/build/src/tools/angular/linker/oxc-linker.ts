@@ -47,18 +47,29 @@ const noopFileSystem: ReadonlyFileSystem = {
 
 const defaultLogger: Logger = {
   level: 1, // LogLevel.info
-  debug() {},
+  debug(...args: string[]) {
+    if (this.level <= 0) {
+      // eslint-disable-next-line no-console
+      console.debug(...args);
+    }
+  },
   info(...args: string[]) {
-    // eslint-disable-next-line no-console
-    console.info(...args);
+    if (this.level <= 1) {
+      // eslint-disable-next-line no-console
+      console.info(...args);
+    }
   },
   warn(...args: string[]) {
-    // eslint-disable-next-line no-console
-    console.warn(...args);
+    if (this.level <= 2) {
+      // eslint-disable-next-line no-console
+      console.warn(...args);
+    }
   },
   error(...args: string[]) {
-    // eslint-disable-next-line no-console
-    console.error(...args);
+    if (this.level <= 3) {
+      // eslint-disable-next-line no-console
+      console.error(...args);
+    }
   },
 };
 
