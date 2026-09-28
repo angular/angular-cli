@@ -463,8 +463,8 @@ importers:
         specifier: 30.0.1
         version: 30.0.1(@noble/hashes@1.8.0)
       ng-packagr:
-        specifier: 22.2.1
-        version: 22.2.1(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.2
+        version: 22.2.2(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -578,8 +578,8 @@ importers:
         specifier: 4.9.1
         version: 4.9.1(supports-color@11.0.0)
       ng-packagr:
-        specifier: 22.2.1
-        version: 22.2.1(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.2
+        version: 22.2.2(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.28
         version: 8.5.28
@@ -866,8 +866,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 22.2.1
-        version: 22.2.1(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.2
+        version: 22.2.2(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       sass:
         specifier: 1.104.1
         version: 1.104.1
@@ -6734,8 +6734,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng-packagr@22.2.1:
-    resolution: {integrity: sha512-dp9/HZdELB8LVzAQxK2ruBNVU4O6wDwX0tdpGJoyYRm7I0umStgVhxFqq9KLKKD0cxTTJGBubK8aAnHCQSRT2A==}
+  ng-packagr@22.2.2:
+    resolution: {integrity: sha512-NQ/YcH+rn3ylewb5Li5mT6oVEpDmT/uq6vaEOyatLpCwwpP33mayhcP77d57ZNjj5zDee8/eI05XdgMINK8eGA==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
@@ -14922,7 +14922,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng-packagr@22.2.1(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
+  ng-packagr@22.2.2(@angular/compiler-cli@22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 22.2.0(@angular/compiler@22.2.0)(typescript@6.0.3)
