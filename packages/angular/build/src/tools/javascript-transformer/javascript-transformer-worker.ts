@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import remapping, { type DecodedSourceMap, type EncodedSourceMap } from '@ampproject/remapping';
+import type { DecodedSourceMap, EncodedSourceMap } from '@ampproject/remapping';
 import type { PluginItem } from '@babel/core';
 import { createRequire } from 'node:module';
 import { workerData } from 'node:worker_threads';
@@ -51,6 +51,8 @@ let babelLinkerDeps:
       ]
     >
   | undefined;
+
+let remapping: typeof import('@ampproject/remapping').default | undefined;
 
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
@@ -253,6 +255,7 @@ async function transformJavaScriptImpl(
       }
 
       if (remappingChain.length > 0) {
+        remapping ??= (await import('@ampproject/remapping')).default;
         const finalMap = remapping(remappingChain, () => null).toString();
         const base64Map = Buffer.from(finalMap).toString('base64');
         code += `\n//# sourceMappingURL=data:application/json;charset=utf-8;base64,${base64Map}`;
