@@ -20,10 +20,12 @@ export interface TransformedConfiguration {
   rootNames: string[];
   errors: ts.Diagnostic[];
   warnings: PartialMessage[];
+  tsConfigFiles: readonly string[];
 }
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
+  readonly #extendedConfigCache = new Map<string, ts.ExtendedConfigCacheEntry>();
 
   static async loadCompilerCli(): Promise<typeof ng> {
     TypeScriptCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
@@ -43,23 +45,30 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       rootNames: originalRootNames,
       errors,
     } = profileSync('NG_READ_CONFIG', () =>
-      readConfiguration(tsconfig, {
-        // Angular specific configuration defaults and overrides to ensure a functioning compilation.
-        suppressOutputPathCheck: true,
-        outDir: undefined,
-        sourceMap: false,
-        declaration: false,
-        declarationMap: false,
-        allowEmptyCodegenFiles: false,
-        annotationsAs: 'decorators',
-        enableResourceInlining: false,
-        supportTestBed: false,
-        supportJitMode: false,
-        // Disable removing of comments as TS is quite aggressive with these and can
-        // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
-        removeComments: false,
-      }),
+      readConfiguration(
+        tsconfig,
+        {
+          // Angular specific configuration defaults and overrides to ensure a functioning compilation.
+          suppressOutputPathCheck: true,
+          outDir: undefined,
+          sourceMap: false,
+          declaration: false,
+          declarationMap: false,
+          allowEmptyCodegenFiles: false,
+          annotationsAs: 'decorators',
+          enableResourceInlining: false,
+          supportTestBed: false,
+          supportJitMode: false,
+          // Disable removing of comments as TS is quite aggressive with these and can
+          // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
+          removeComments: false,
+        },
+        undefined,
+        this.#extendedConfigCache,
+      ),
     );
+
+    const tsConfigFiles = [toPosixPath(tsconfig), ...this.#extendedConfigCache.keys()];
 
     let rootNames = originalRootNames;
     if (compilerOptionOverrides?.rootFiles?.length) {
@@ -87,6 +96,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       rootNames,
       errors,
       warnings,
+      tsConfigFiles,
     };
   }
 
@@ -94,7 +104,20 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
 
   protected invalidateFiles(files: Iterable<string>): void {
     for (const file of files) {
-      this.sourceFiles.delete(toPosixPath(file));
+      const posixFile = toPosixPath(file);
+      this.sourceFiles.delete(posixFile);
+
+      if (this.#extendedConfigCache.size === 0) {
+        continue;
+      }
+
+      if (this.#extendedConfigCache.delete(posixFile)) {
+        continue;
+      }
+
+      // Check with lowercased key because TypeScript lowercases the keys
+      // of the extended config cache on case-insensitive operating systems.
+      this.#extendedConfigCache.delete(posixFile.toLowerCase());
     }
   }
 

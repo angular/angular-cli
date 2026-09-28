@@ -55,6 +55,7 @@ export class JitCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
       warnings,
+      tsConfigFiles,
     } = await this.loadConfiguration(tsconfig, compilerOptionOverrides, buildType);
 
     if (hostOptions.modifiedFiles) {
@@ -89,9 +90,10 @@ export class JitCompilation extends TypeScriptCompilation {
       createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
     );
 
-    const referencedFiles = typeScriptProgram
-      .getSourceFiles()
-      .map((sourceFile) => sourceFile.fileName);
+    const referencedFiles = [
+      ...tsConfigFiles,
+      ...typeScriptProgram.getSourceFiles().map((sourceFile) => sourceFile.fileName),
+    ];
 
     return { compilerOptions, referencedFiles, warnings };
   }
