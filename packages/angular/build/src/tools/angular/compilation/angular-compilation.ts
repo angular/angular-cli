@@ -23,6 +23,7 @@ export interface FileTransformResult {
 
 export interface AngularCompilationOptions {
   allowJs?: boolean;
+  declarationMap?: boolean;
   isolatedModules?: boolean;
   sourceMap?: boolean;
   inlineSourceMap?: boolean;
@@ -52,6 +53,7 @@ export abstract class AngularCompilation {
     tsconfig: string,
     hostOptions: AngularHostOptions,
     compilerOptionOverrides?: CompilerOptionOverrides,
+    buildType?: 'application' | 'library',
   ): Promise<AngularCompilationResult>;
 
   emitAffectedFiles(): Iterable<EmitFileResult> | Promise<Iterable<EmitFileResult>> {
