@@ -43,14 +43,14 @@
         "type": "string"
       },
       "default": ["**/*.spec.ts", "**/*.test.ts"],
-      "description": "Specifies glob patterns of files to include for testing, relative to the project root. This option also has special handling for directory paths (includes all test files within) and file paths (includes the corresponding test file if one exists)."
+      "description": "Specifies glob patterns of files to include for testing, relative to the project source root. This option also has special handling for directory paths (includes all test files within) and file paths (includes the corresponding test file if one exists)."
     },
     "exclude": {
       "type": "array",
       "items": {
         "type": "string"
       },
-      "description": "Specifies glob patterns of files to exclude from testing, relative to the project root."
+      "description": "Specifies glob patterns of files to exclude from testing, relative to the project source root."
     },
     "filter": {
       "type": "string",
