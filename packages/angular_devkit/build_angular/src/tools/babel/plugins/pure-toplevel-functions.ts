@@ -71,6 +71,13 @@ export default function (): PluginObject {
           return;
         }
 
+        // Do not annotate standalone expression statements.
+        // Standalone expression statements are executed solely for their side effects;
+        // marking them pure causes minifiers to drop them as dead code.
+        if (path.parentPath.isExpressionStatement()) {
+          return;
+        }
+
         const callee = path.get('callee');
         if (
           (callee.isFunctionExpression() || callee.isArrowFunctionExpression()) &&
@@ -93,6 +100,13 @@ export default function (): PluginObject {
       NewExpression(path: NodePath<types.NewExpression>, state: ExtendedPluginPass) {
         // If the expression has a function parent, it is not top-level
         if (path.getFunctionParent()) {
+          return;
+        }
+
+        // Do not annotate standalone expression statements.
+        // Standalone expression statements are executed solely for their side effects;
+        // marking them pure causes minifiers to drop them as dead code.
+        if (path.parentPath.isExpressionStatement()) {
           return;
         }
 
