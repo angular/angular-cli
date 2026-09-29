@@ -158,6 +158,8 @@ describe('AngularCompilation', () => {
           suppressOutputPathCheck: true,
           outDir: undefined,
         }),
+        undefined,
+        jasmine.any(Map),
       );
       expect(result.rootNames).toEqual(['/src/main.ts']);
       expect(result.compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
