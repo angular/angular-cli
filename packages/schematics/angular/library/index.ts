@@ -98,7 +98,9 @@ function addLibToWorkspaceFile(
     workspace.projects.add({
       name: projectName,
       root: projectRoot,
-      sourceRoot: `${projectRoot}/src`,
+      // TODO(alanagius): consider re-adding this when we move away from ng-packagr.
+      // sourceRoot: `${projectRoot}/src`,
+      sourceRoot: projectRoot,
       projectType: ProjectType.Library,
       prefix: options.prefix,
       targets: {

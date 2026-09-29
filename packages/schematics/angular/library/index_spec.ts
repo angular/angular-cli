@@ -328,7 +328,7 @@ describe('Library Schematic', () => {
       project: 'foo',
     };
     tree = await schematicRunner.runSchematic('component', componentOptions, tree);
-    expect(tree.exists('/projects/foo/src/lib/comp/comp.ts')).toBe(true);
+    expect(tree.exists('/projects/foo/lib/comp/comp.ts')).toBe(true);
   });
 
   it(`should support creating scoped libraries`, async () => {
