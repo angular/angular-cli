@@ -205,6 +205,15 @@ function parseOptions(args: string[]): Options {
     }
   }
 
+  for (const key of Object.keys(CLI_OPTION_DEFINITIONS)) {
+    const value = values[key];
+    if (value === 'true') {
+      values[key] = true;
+    } else if (value === 'false') {
+      values[key] = false;
+    }
+  }
+
   return {
     positionals,
     builderOptions,
