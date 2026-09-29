@@ -7,7 +7,12 @@
  */
 
 import remapping, { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
-import type { ɵParsedTranslation } from '@angular/localize';
+import {
+  type ɵParsedTranslation,
+  ɵisMissingTranslationError,
+  ɵmakeTemplateObject,
+  ɵtranslate,
+} from '@angular/localize';
 import { MagicString } from 'magic-string';
 import { deserialize } from 'node:v8';
 import { parseSync } from 'oxc-parser';
@@ -285,7 +290,7 @@ export async function inlineFileBatch(
         locale,
         code: result.code,
         map: result.map,
-        messages: result.diagnostics.messages,
+        messages: result.diagnostics,
       };
     }),
   );
@@ -317,33 +322,45 @@ export async function inlineCode(request: InlineCodeRequest): Promise<InlineCode
 
   return {
     output: result.code ?? request.code,
-    messages: result.diagnostics.messages,
+    messages: result.diagnostics,
   };
 }
 
-/**
- * A Type representing the localize tools module.
- */
-type LocalizeUtilityModule = typeof import('@angular/localize/tools');
+type DiagnosticMessage = { type: 'error' | 'warning'; message: string };
 
 /**
- * Cached instance of the `@angular/localize/tools` module.
- * This is used to remove the need to repeatedly import the module per file translation.
+ * Translates a $localize message using @angular/localize low-level runtime functions.
+ * Handles missing translations and errors without requiring @angular/localize/tools.
  */
-let localizeToolsModule: LocalizeUtilityModule | undefined;
+function translateMessage(
+  diagnostics: DiagnosticMessage[],
+  translations: Record<string, ɵParsedTranslation>,
+  messageParts: TemplateStringsArray,
+  substitutions: readonly number[],
+  missingTranslation: 'error' | 'warning' | 'ignore',
+): [TemplateStringsArray, readonly number[]] {
+  try {
+    return ɵtranslate(translations, messageParts, substitutions) as [
+      TemplateStringsArray,
+      readonly number[],
+    ];
+  } catch (error) {
+    if (ɵisMissingTranslationError(error)) {
+      if (missingTranslation !== 'ignore') {
+        diagnostics.push({ type: missingTranslation, message: error.message });
+      }
 
-/**
- * Attempts to load the `@angular/localize/tools` module containing the functionality to
- * perform the file translations.
- * This module must be dynamically loaded as it is an ESM module and this file is CommonJS.
- */
-async function loadLocalizeTools(): Promise<LocalizeUtilityModule> {
-  // Load ESM `@angular/localize/tools` using the TypeScript dynamic import workaround.
-  // Once TypeScript provides support for keeping the dynamic import this workaround can be
-  // changed to a direct dynamic import.
-  localizeToolsModule ??= await import('@angular/localize/tools');
+      return [
+        ɵmakeTemplateObject(error.parsedMessage.messageParts, error.parsedMessage.messageParts),
+        substitutions,
+      ];
+    } else {
+      const message = error instanceof Error ? error.message : String(error);
+      diagnostics.push({ type: 'error', message });
 
-  return localizeToolsModule;
+      return [messageParts, substitutions];
+    }
+  }
 }
 
 /**
@@ -465,21 +482,20 @@ async function inlineLocalize(
   missingTranslation: 'error' | 'warning' | 'ignore' = 'warning',
 ) {
   const magicString = new MagicString(code);
-  const { Diagnostics, translate } = await loadLocalizeTools();
-  const diagnostics = new Diagnostics();
+  const diagnostics: DiagnosticMessage[] = [];
 
   if (metadata.diagnostics) {
     for (const message of metadata.diagnostics) {
-      diagnostics.error(message);
+      diagnostics.push({ type: 'error', message });
     }
   }
 
   if (metadata.localeInsertSites.length > 0) {
     const localeData = await loadLocaleData(locale);
     if (localeData.error) {
-      diagnostics.error(localeData.error);
+      diagnostics.push({ type: 'error', message: localeData.error });
     } else if (localeData.warning) {
-      diagnostics.warn(localeData.warning);
+      diagnostics.push({ type: 'warning', message: localeData.warning });
     }
     let injected = false;
     for (const site of metadata.localeInsertSites) {
@@ -493,7 +509,7 @@ async function inlineLocalize(
   }
 
   for (const callSite of metadata.callSites) {
-    const [translatedParts, translatedSubstitutions] = translate(
+    const [translatedParts, translatedSubstitutions] = translateMessage(
       diagnostics,
       translation || {},
       callSite.messageParts,
