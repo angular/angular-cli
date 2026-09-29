@@ -245,6 +245,10 @@ export async function getVitestBuildOptions(
     }
   }
 
+  // The Angular compiler facade must be loaded in a dedicated setup file before TestBed initialization.
+  // This ensures the compiler facade is published before 'init-testbed' or any shared code-split chunks
+  // (such as those from a configured 'providersFile') are evaluated.
+  entryPoints.set('init-compiler', 'angular:compiler-init');
   entryPoints.set('init-testbed', 'angular:test-bed-init');
   entryPoints.set('vitest-mock-patch', 'angular:vitest-mock-patch');
 
@@ -340,6 +344,7 @@ export async function getVitestBuildOptions(
   return {
     buildOptions,
     virtualFiles: {
+      'angular:compiler-init': "import '@angular/compiler';",
       'angular:test-bed-init': testBedInitContents,
       'angular:vitest-mock-patch': mockPatchContents,
     },
