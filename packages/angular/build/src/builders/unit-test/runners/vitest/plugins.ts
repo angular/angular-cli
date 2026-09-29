@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { needsLinking } from '@angular/compiler-cli/linker';
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { platform } from 'node:os';
@@ -18,7 +19,9 @@ import type {
   Vite,
   VitestPluginContext,
 } from 'vitest/node';
+import type { JavaScriptTransformer } from '../../../../tools/javascript-transformer/javascript-transformer';
 import { createBuildAssetsMiddleware } from '../../../../tools/vite/middlewares/assets-middleware';
+import { getDepOptimizationConfig } from '../../../../tools/vite/utils';
 import { toPosixPath } from '../../../../utils/path';
 import { createProjectResolver } from '../../../../utils/resolve-project';
 import type { ResultFile } from '../../../application/results';
@@ -37,6 +40,7 @@ interface PluginOptions {
   projectName: string;
   buildResultFiles: ReadonlyMap<string, ResultFile>;
   testFileToEntryPoint: ReadonlyMap<string, string>;
+  prebundleTransformer: JavaScriptTransformer;
   setupFiles: readonly string[];
 }
 
@@ -55,6 +59,8 @@ interface VitestConfigPluginOptions {
   watch: boolean;
   isolate: boolean | undefined;
   preserveSymlinks?: boolean;
+  prebundleTransformer: JavaScriptTransformer;
+  target: string[];
 }
 
 async function findTestEnvironment(
@@ -253,11 +259,21 @@ export async function createVitestConfigPlugin(
           // Default to `false` to align with the Karma/Jasmine experience.
           isolate: false,
           sequence: { setupFiles: 'list' },
+          server: {
+            deps: {
+              inline: options.optimizeDepsInclude.filter((dep) => !dep.startsWith('@angular/')),
+            },
+          },
         },
-        optimizeDeps: {
-          noDiscovery: true,
+        optimizeDeps: getDepOptimizationConfig({
+          target: options.target,
+          disabled: false,
+          exclude: [],
           include: options.optimizeDepsInclude,
-        },
+          prebundleTransformer: options.prebundleTransformer,
+          thirdPartySourcemaps: false,
+          define: undefined,
+        }),
         resolve: {
           mainFields: ['es2020', 'module', 'main'],
           conditions: ['es2015', 'es2020', 'module', ...(browser ? ['browser'] : [])],
@@ -314,7 +330,13 @@ async function loadResultFile(file: ResultFile): Promise<string> {
 }
 
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
-  const { workspaceRoot, buildResultFiles, testFileToEntryPoint, setupFiles } = pluginOptions;
+  const {
+    workspaceRoot,
+    buildResultFiles,
+    testFileToEntryPoint,
+    setupFiles,
+    prebundleTransformer,
+  } = pluginOptions;
   const isWindows = platform() === 'win32';
   const setupFileSet = new Set(
     setupFiles.map((file) =>
@@ -324,6 +346,19 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
   let vitestConfig: ResolvedConfig;
 
   return [
+    {
+      name: 'angular:linker',
+      enforce: 'pre',
+      async transform(code: string, id: string) {
+        if (!needsLinking(id, code)) {
+          return null;
+        }
+
+        const transformedData = await prebundleTransformer.transformData(id, code);
+
+        return Buffer.from(transformedData).toString('utf-8');
+      },
+    },
     {
       name: 'angular:test-in-memory-provider',
       enforce: 'pre',

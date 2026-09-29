@@ -14,6 +14,7 @@ import type * as Vite from 'vite' with {
   'resolution-mode': 'import',
 };
 import type { Vitest } from 'vitest/node';
+import { JavaScriptTransformer } from '../../../../tools/javascript-transformer/javascript-transformer';
 import {
   DevServerExternalResultMetadata,
   updateExternalMetadata,
@@ -25,6 +26,11 @@ import {
   type ResultFile,
   ResultKind,
 } from '../../../application/results';
+import {
+  getSupportedBrowsers,
+  isZonelessApp,
+  transformSupportedBrowsersToTargets,
+} from '../../../dev-server/internal';
 import { NormalizedUnitTestBuilderOptions } from '../../options';
 import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
@@ -57,6 +63,12 @@ export class VitestExecutor implements TestExecutor {
   // Example: `Map<'/path/to/src/app.spec.ts', 'spec-src-app-spec'>`
   private readonly testFileToEntryPoint = new Map<string, string>();
   private readonly entryPointToTestFile = new Map<string, string>();
+  private readonly prebundleTransformer = new JavaScriptTransformer({
+    sourcemap: true,
+    jit: true,
+    thirdPartySourcemaps: false,
+    maxConcurrency: 1,
+  });
 
   constructor(
     projectName: string,
@@ -193,7 +205,7 @@ export class VitestExecutor implements TestExecutor {
     // Vitest does not return a failure result when coverage thresholds are not met.
     // Instead, it sets the process exit code to 1.
     // We check this exit code to determine if the test run should be considered a failure.
-    if (success && process.exitCode === 1) {
+    if (success && this.options.coverage?.enabled && process.exitCode === 1) {
       success = false;
       finalResultReason = 'Test run failed due to unmet coverage thresholds.';
       // Reset the exit code to prevent it from carrying over to subsequent runs/builds
@@ -218,17 +230,20 @@ export class VitestExecutor implements TestExecutor {
     const timeoutMs = 10_000;
 
     try {
-      await Promise.race([
-        this.vitest.close(),
-        setTimeout(timeoutMs, undefined, { signal: controller.signal, ref: false })
-          .then(() => {
-            this.logger.warn(
-              `Vitest instance failed to close cleanly within ${timeoutMs}ms. Continuing teardown...`,
-            );
-          })
-          .catch(() => {
-            // Suppress AbortError triggered by controller.abort() when close() resolves first
-          }),
+      await Promise.all([
+        this.prebundleTransformer.close(),
+        Promise.race([
+          this.vitest.close(),
+          setTimeout(timeoutMs, undefined, { signal: controller.signal, ref: false })
+            .then(() => {
+              this.logger.warn(
+                `Vitest instance failed to close cleanly within ${timeoutMs}ms. Continuing teardown...`,
+              );
+            })
+            .catch(() => {
+              // Suppress AbortError triggered by controller.abort() when close() resolves first
+            }),
+        ]),
       ]);
     } catch (error: unknown) {
       assertIsError(error);
@@ -334,6 +349,7 @@ export class VitestExecutor implements TestExecutor {
       buildResultFiles: this.buildResultFiles,
       testFileToEntryPoint: this.testFileToEntryPoint,
       setupFiles: testSetupFiles,
+      prebundleTransformer: this.prebundleTransformer,
     });
 
     const debugOptions = debug
@@ -379,6 +395,13 @@ export class VitestExecutor implements TestExecutor {
     });
     this.debugLog(DebugLogLevel.Verbose, 'Included test files (after filtering):', include);
 
+    const supportedBrowsers = getSupportedBrowsers(projectRoot, this.logger);
+    const target = transformSupportedBrowsersToTargets(supportedBrowsers);
+    if (!isZonelessApp(this.options.polyfills)) {
+      // Rolldown doesn't have an option to support Zone.js/async-await, so we need to support es2016.
+      target.push('es2016');
+    }
+
     const vitestConfig = {
       config: externalConfigPath,
       root: workspaceRoot,
@@ -412,6 +435,8 @@ export class VitestExecutor implements TestExecutor {
           watch,
           isolate: this.options.isolate,
           preserveSymlinks: this.options.preserveSymlinks,
+          prebundleTransformer: this.prebundleTransformer,
+          target,
         }),
       ],
     };
