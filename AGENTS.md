@@ -69,7 +69,7 @@ This is the source code for the Angular CLI and related build tooling. This guid
 - **Fixup Commits:**
   - When addressing review feedback, **ALWAYS** use fixup commits (`git commit --fixup <commit>`) instead of amending existing commits. This preserves commit history during review and allows reviewers to easily see incremental changes.
   - Only use fixup commits for changes that directly belong to the target commit. Unrelated changes must be made in a separate commit with their own commit message, not as a fixup commit.
-  - Fixup commits are automatically squashed when merging with `pnpm ng-dev pr merge` or rebasing with `pnpm ng-dev pr rebase <pr>`.
+  - Fixup commits are automatically squashed when merging with `pnpm ng-dev pr merge` or optionally when rebasing with `pnpm ng-dev pr rebase <pr>`.
 - Use `pnpm ng-dev pr` commands:
-  - `pnpm ng-dev pr rebase <pr>`: Rebase a PR branch on its target branch and squash fixup commits.
+  - `pnpm ng-dev pr rebase <pr>`: Rebase a PR branch on its target branch and optionally squash fixup commits.
   - `pnpm ng-dev pr merge <pr>`: Merge an approved PR into its targeted branches.
