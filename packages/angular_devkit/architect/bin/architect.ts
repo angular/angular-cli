@@ -205,6 +205,16 @@ function parseOptions(args: string[]): Options {
     }
   }
 
+  for (const [key, value] of Object.entries(values)) {
+    if (typeof value === 'string') {
+      if (value === 'true') {
+        values[key] = true;
+      } else if (value === 'false') {
+        values[key] = false;
+      }
+    }
+  }
+
   return {
     positionals,
     builderOptions,
