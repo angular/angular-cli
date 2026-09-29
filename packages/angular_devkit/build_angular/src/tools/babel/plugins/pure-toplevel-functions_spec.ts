@@ -154,6 +154,28 @@ describe('pure-toplevel-functions Babel plugin', () => {
     `),
   );
 
+  it('does not annotate top-level call expression statements', testCaseNoChange('someCall();'));
+
+  it(
+    'does not annotate top-level IIFE expression statements',
+    testCaseNoChange(`
+      (() => {
+        _defineProperty(_Injector, 'ɵprov', ɵɵdefineInjectable({ token: _Injector }));
+        _defineProperty(_Injector, '__NG_ELEMENT_ID__', -1);
+      })();
+    `),
+  );
+
+  it(
+    'does not annotate top-level static block helper calls',
+    testCaseNoChange(`
+      _staticBlock();
+      _staticBlock2();
+    `),
+  );
+
+  it('does not annotate top-level new expression statements', testCaseNoChange('new SomeClass();'));
+
   describe('topLevelSafeMode: true', () => {
     it(
       'annotates top-level `new InjectionToken` expressions',
