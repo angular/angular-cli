@@ -568,7 +568,8 @@ function parseOptions(args: string[]): Options {
     }
   }
 
-  for (const [key, value] of Object.entries(values)) {
+  for (const key of Object.keys(CLI_OPTION_DEFINITIONS)) {
+    const value = values[key];
     if (value === 'true') {
       values[key] = true;
     } else if (value === 'false') {
