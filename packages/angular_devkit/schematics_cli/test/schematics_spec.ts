@@ -59,6 +59,33 @@ describe('schematics-cli binary', () => {
     expect(res).toEqual(0);
   });
 
+  it('handles boolean CLI options with explicit inline false values', async () => {
+    const args = ['blank', 'foo', '--dry-run', '--debug=false'];
+    const res = await main({ args, stdout, stderr });
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).not.toMatch(/Debug mode enabled/);
+    expect(output).toMatch(/Dry run enabled\./);
+    expect(res).toEqual(0);
+  });
+
+  it('does not display help when --help=false is passed', async () => {
+    const args = ['blank', 'foo', '--dry-run', '--help=false'];
+    const res = await main({ args, stdout, stderr });
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).not.toMatch(/schematics \[collection-name:\]schematic-name/);
+    expect(output).toMatch(/Dry run enabled\./);
+    expect(res).toEqual(0);
+  });
+
+  it('does not list schematics when --list-schematics=false is passed', async () => {
+    const args = ['blank', 'foo', '--dry-run', '--list-schematics=false'];
+    const res = await main({ args, stdout, stderr });
+    const output = stripVTControlCharacters(stdout.read()?.toString() || '');
+    expect(output).not.toMatch(/blank/);
+    expect(output).toMatch(/Dry run enabled\./);
+    expect(res).toEqual(0);
+  });
+
   it('error when no name is provided', async () => {
     const args = ['blank'];
     const res = await main({ args, stdout, stderr });
