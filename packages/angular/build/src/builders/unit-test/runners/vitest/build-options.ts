@@ -185,6 +185,7 @@ export async function getVitestBuildOptions(
   const {
     workspaceRoot,
     projectSourceRoot,
+    projectRoot,
     include,
     polyfills,
     exclude = [],
@@ -194,7 +195,13 @@ export async function getVitestBuildOptions(
   } = options;
 
   // Find test files
-  const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
+  const testFiles = await findTests(
+    include,
+    exclude,
+    workspaceRoot,
+    projectSourceRoot,
+    projectRoot,
+  );
   if (testFiles.length === 0) {
     throw new Error(
       'No tests found matching the following patterns:\n' +

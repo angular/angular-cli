@@ -29,10 +29,17 @@ const MAX_FILENAME_LENGTH = 128;
  * test file. If a user provides a path to a directory, it will find all test
  * files within that directory.
  *
+ * A pattern that matches nothing under the project source root is retried from the
+ * project root, which is what the builder's schema documents patterns to be relative
+ * to. A pattern that already matches keeps matching exactly what it matches today, and
+ * a project rooted at the workspace root is never retried, so a search never widens to
+ * the whole workspace.
+ *
  * @param include Glob patterns of files to include.
  * @param exclude Glob patterns of files to exclude.
  * @param workspaceRoot The absolute path to the workspace root.
  * @param projectSourceRoot The absolute path to the project's source root.
+ * @param projectRoot The absolute path to the project root. Defaults to the source root.
  * @returns A unique set of absolute paths to all test files.
  */
 export async function findTests(
@@ -40,42 +47,86 @@ export async function findTests(
   exclude: string[],
   workspaceRoot: string,
   projectSourceRoot: string,
+  projectRoot = projectSourceRoot,
 ): Promise<string[]> {
   await initializeHash();
   const resolvedTestFiles = new Set<string>();
-  const dynamicPatterns: string[] = [];
 
-  const projectRootPrefix = toPosixPath(relative(workspaceRoot, projectSourceRoot) + '/');
-  const normalizedExcludes = exclude.map((p) => normalizePattern(p, projectRootPrefix));
+  const unmatched = await collectTests(
+    projectSourceRoot,
+    include,
+    exclude,
+    workspaceRoot,
+    resolvedTestFiles,
+  );
 
-  // 1. Separate static and dynamic patterns
+  // Retrying from the workspace root would search every project, so it is skipped.
+  if (unmatched.length > 0 && projectRoot !== projectSourceRoot && projectRoot !== workspaceRoot) {
+    await collectTests(projectRoot, unmatched, exclude, workspaceRoot, resolvedTestFiles);
+  }
+
+  return [...resolvedTestFiles];
+}
+
+/**
+ * Resolves include patterns against a single root, adding every match to `found`.
+ *
+ * @param searchRoot The absolute path the patterns are resolved against.
+ * @param include Glob patterns of files to include.
+ * @param exclude Glob patterns of files to exclude.
+ * @param workspaceRoot The absolute path to the workspace root.
+ * @param found Accumulates the absolute path of every matched file.
+ * @returns The patterns that matched nothing, so a caller can retry them elsewhere.
+ */
+async function collectTests(
+  searchRoot: string,
+  include: string[],
+  exclude: string[],
+  workspaceRoot: string,
+  found: Set<string>,
+): Promise<string[]> {
+  const relativeRoot = relative(workspaceRoot, searchRoot);
+  const searchRootPrefix = relativeRoot ? toPosixPath(relativeRoot + '/') : '';
+  const normalizedExcludes = exclude.map((p) => normalizePattern(p, searchRootPrefix));
+  const unmatched: string[] = [];
+
   for (const pattern of include) {
-    const normalized = normalizePattern(pattern, projectRootPrefix);
+    const normalized = normalizePattern(pattern, searchRootPrefix);
+    const dynamicPatterns: string[] = [];
+
+    // 1. Separate static and dynamic patterns
     if (isDynamicPattern(pattern)) {
       dynamicPatterns.push(normalized);
     } else {
-      const { resolved, unresolved } = await resolveStaticPattern(normalized, projectSourceRoot);
-      resolved.forEach((file) => resolvedTestFiles.add(file));
-      unresolved.forEach((p) => dynamicPatterns.push(p));
+      const { resolved, unresolved } = await resolveStaticPattern(normalized, searchRoot);
+      if (resolved.length > 0) {
+        resolved.forEach((file) => found.add(file));
+        continue;
+      }
+      dynamicPatterns.push(...unresolved);
     }
-  }
 
-  // 2. Execute a single glob for all dynamic patterns
-  if (dynamicPatterns.length > 0) {
+    // 2. Execute a glob for the pattern, so that a pattern which matches nothing here
+    // can be told apart from one that does and retried against another root.
     const globMatches = await glob(dynamicPatterns, {
-      cwd: projectSourceRoot,
+      cwd: searchRoot,
       absolute: true,
       expandDirectories: false,
       ignore: ['**/node_modules/**', ...normalizedExcludes],
     });
 
+    if (globMatches.length === 0) {
+      unmatched.push(pattern);
+      continue;
+    }
+
+    // 3. Combine and de-duplicate results
     for (const match of globMatches) {
-      resolvedTestFiles.add(toPosixPath(match));
+      found.add(toPosixPath(match));
     }
   }
 
-  // 3. Combine and de-duplicate results
-  return [...resolvedTestFiles];
+  return unmatched;
 }
 
 interface TestEntrypointsOptions {
@@ -255,7 +306,7 @@ function removeRoots(path: string, roots: string[]): string {
  * slashes, and making it relative to the project source root.
  *
  * @param pattern The glob pattern to normalize.
- * @param projectRootPrefix The POSIX-formatted prefix of the project's source root relative to the workspace root.
+ * @param projectRootPrefix The POSIX-formatted prefix of the search root relative to the workspace root.
  * @returns A normalized glob pattern.
  */
 function normalizePattern(pattern: string, projectRootPrefix: string): string {
@@ -266,8 +317,8 @@ function normalizePattern(pattern: string, projectRootPrefix: string): string {
     return posixPattern;
   }
 
-  // For relative paths, ensure they are correctly relative to the project source root.
-  // This involves removing the project root prefix if the user provided a workspace-relative path.
+  // For relative paths, ensure they are correctly relative to the search root.
+  // This involves removing the root prefix if the user provided a workspace-relative path.
   const normalizedRelative = removePrefix(posixPattern, projectRootPrefix);
 
   return normalizedRelative;

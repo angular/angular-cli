@@ -6,8 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import { initializeHash } from '../../utils/hash';
-import { generateNameFromPath, getTestEntrypoints } from './test-discovery';
+import { findTests, generateNameFromPath, getTestEntrypoints } from './test-discovery';
 
 describe('getTestEntrypoints', () => {
   beforeAll(async () => {
@@ -168,5 +171,96 @@ describe('generateNameFromPath', () => {
     const testFile = `/project/src/${name}.spec.ts`;
     const result = generateNameFromPath(testFile, roots, true);
     expect(result).toBe(name);
+  });
+});
+
+describe('findTests', () => {
+  let workspaceRoot: string;
+  let projectRoot: string;
+  let projectSourceRoot: string;
+  let insideSourceRoot: string;
+  let outsideSourceRoot: string;
+
+  beforeAll(async () => {
+    await initializeHash();
+
+    // The macOS temporary directory is a symlink, and the globber does not resolve one.
+    workspaceRoot = fs.realpathSync(fs.mkdtempSync(path.join(os.tmpdir(), 'find-tests-')));
+    projectRoot = path.join(workspaceRoot, 'projects', 'my-lib');
+    projectSourceRoot = path.join(projectRoot, 'src');
+    insideSourceRoot = path.join(projectSourceRoot, 'lib', 'inside.spec.ts');
+    outsideSourceRoot = path.join(projectRoot, 'secondary', 'outside.spec.ts');
+
+    for (const file of [insideSourceRoot, outsideSourceRoot]) {
+      fs.mkdirSync(path.dirname(file), { recursive: true });
+      fs.writeFileSync(file, '');
+    }
+  });
+
+  afterAll(() => {
+    fs.rmSync(workspaceRoot, { recursive: true, force: true });
+  });
+
+  it('should find a spec below the source root', async () => {
+    const found = await findTests(
+      ['**/*.spec.ts'],
+      [],
+      workspaceRoot,
+      projectSourceRoot,
+      projectRoot,
+    );
+
+    expect(found).toEqual([insideSourceRoot]);
+  });
+
+  it('should find a spec below the project root but outside the source root', async () => {
+    const found = await findTests(
+      ['secondary/**/*.spec.ts'],
+      [],
+      workspaceRoot,
+      projectSourceRoot,
+      projectRoot,
+    );
+
+    expect(found).toEqual([outsideSourceRoot]);
+  });
+
+  it('should find a static path below the project root', async () => {
+    const found = await findTests(
+      ['secondary/outside.spec.ts'],
+      [],
+      workspaceRoot,
+      projectSourceRoot,
+      projectRoot,
+    );
+
+    expect(found).toEqual([outsideSourceRoot]);
+  });
+
+  it('should not widen a pattern that already matches below the source root', async () => {
+    const found = await findTests(
+      ['**/*.spec.ts', 'secondary/**/*.spec.ts'],
+      [],
+      workspaceRoot,
+      projectSourceRoot,
+      projectRoot,
+    );
+
+    // The first pattern stays anchored at the source root, so it must not also
+    // collect the file the second pattern is there to reach.
+    expect(found).toEqual([insideSourceRoot, outsideSourceRoot]);
+  });
+
+  it('should not retry from a project root that is the workspace root', async () => {
+    // Retrying there would search every project in the workspace.
+    const found = await findTests(
+      ['projects/my-lib/secondary/**/*.spec.ts'],
+      [],
+      workspaceRoot,
+      path.join(workspaceRoot, 'src'),
+      workspaceRoot,
+    );
+
+    expect(found).toEqual([]);
   });
 });

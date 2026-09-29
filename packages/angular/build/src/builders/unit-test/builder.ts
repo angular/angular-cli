@@ -210,6 +210,7 @@ export async function* execute(
       normalizedOptions.exclude ?? [],
       normalizedOptions.workspaceRoot,
       normalizedOptions.projectSourceRoot,
+      normalizedOptions.projectRoot,
     );
 
     context.logger.info('Discovered test files:');
