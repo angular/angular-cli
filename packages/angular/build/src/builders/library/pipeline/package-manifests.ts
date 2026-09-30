@@ -26,7 +26,12 @@ export function generatePackageManifests(
   options: NormalizedLibraryOptions,
   isWatchMode: boolean,
 ): MemoryOutputFile[] {
-  const { packageJson: rawPackageJson, keepLifecycleScripts, compilationMode } = options;
+  const {
+    packageJson: rawPackageJson,
+    keepLifecycleScripts,
+    compilationMode,
+    tslibVersion,
+  } = options;
 
   const {
     devDependencies: _devDependencies,
@@ -72,6 +77,14 @@ export function generatePackageManifests(
     // https://github.com/angular/angular-cli/issues/20962
     version: isWatchMode ? `0.0.0-watch+${Date.now()}` : version,
   };
+
+  // A library compiles with `importHelpers`, so a bundle can carry a live
+  // `import ... from 'tslib'` while the library's own manifest declares nothing.
+  // On a hoisted node_modules it resolves anyway; on a strict layout the consumer
+  // gets ERR_MODULE_NOT_FOUND at runtime. Declare it, as ng-packagr does.
+  if (tslibVersion && !rawPackageJson.dependencies?.tslib && !rawPackageJson.peerDependencies?.tslib) {
+    distPackageJson.dependencies = { ...distPackageJson.dependencies, tslib: tslibVersion };
+  }
 
   // Retain scripts if keepLifecycleScripts is set
   if (keepLifecycleScripts && scripts) {

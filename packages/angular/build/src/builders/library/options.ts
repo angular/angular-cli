@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { createRequire } from 'node:module';
 import type { BuilderContext } from '@angular-devkit/architect';
 import fs from 'node:fs/promises';
 import path from 'node:path';
@@ -49,6 +50,8 @@ export interface PackageJsonData {
 export interface NormalizedLibraryOptions {
   workspaceRoot: string;
   projectRoot: string;
+  /** The tslib range `@angular/compiler` declares, when it can be resolved from the workspace. */
+  tslibVersion?: string;
   packageName: string;
   packageJson: PackageJsonData;
   outputPath: string;
@@ -193,6 +196,7 @@ export async function normalizeLibraryOptions(
     projectRoot,
     packageName,
     packageJson,
+    tslibVersion: resolveAngularTslibRange(workspaceRoot),
     outputPath: resolvedOutputPath,
     deleteOutputPath,
     packageJsonPath,
@@ -360,4 +364,27 @@ function normalizeEntryPoints(
   }
 
   return entryPoints;
+}
+
+/**
+ * The tslib range `@angular/compiler` declares, or `undefined` when it cannot be resolved.
+ *
+ * Resolved from the workspace so a library gets the range of the Angular it is built against,
+ * which is what ng-packagr reads too. A missing or unreadable manifest is not an error: the
+ * output then keeps exactly the dependencies the library declared itself.
+ */
+function resolveAngularTslibRange(workspaceRoot: string): string | undefined {
+  try {
+    const workspaceRequire = createRequire(path.join(workspaceRoot, 'index.js'));
+    const { dependencies, peerDependencies } = workspaceRequire(
+      '@angular/compiler/package.json',
+    ) as {
+      dependencies?: Record<string, string>;
+      peerDependencies?: Record<string, string>;
+    };
+
+    return peerDependencies?.['tslib'] ?? dependencies?.['tslib'];
+  } catch {
+    return undefined;
+  }
 }

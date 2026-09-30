@@ -307,4 +307,42 @@ describe('generatePackageManifests', () => {
     );
     expect(getRootPackageJson(files2).sideEffects).toEqual(['*.css']);
   });
+
+  it('declares tslib when the library does not', () => {
+    // A library compiles with importHelpers, so a bundle can import tslib while the
+    // library's own manifest declares nothing. On a strict node_modules layout the
+    // consumer then gets ERR_MODULE_NOT_FOUND. ng-packagr adds it; so does this.
+    const options = createOptions({ tslibVersion: '^2.3.0' });
+    const result = getRootPackageJson(generatePackageManifests(options, false));
+
+    expect(result.dependencies).toEqual({ tslib: '^2.3.0' });
+  });
+
+  it('leaves a declared tslib alone', () => {
+    const options = createOptions({
+      tslibVersion: '^2.3.0',
+      packageJson: { name: 'my-lib', dependencies: { tslib: '^2.0.0' } },
+    });
+    const result = getRootPackageJson(generatePackageManifests(options, false));
+
+    expect(result.dependencies).toEqual({ tslib: '^2.0.0' });
+  });
+
+  it('does not move a tslib that is declared as a peer', () => {
+    const options = createOptions({
+      tslibVersion: '^2.3.0',
+      packageJson: { name: 'my-lib', peerDependencies: { tslib: '^2.0.0' } },
+    });
+    const result = getRootPackageJson(generatePackageManifests(options, false));
+
+    expect(result.dependencies).toBeUndefined();
+    expect(result.peerDependencies).toEqual({ tslib: '^2.0.0' });
+  });
+
+  it('adds nothing when the range cannot be resolved', () => {
+    const options = createOptions();
+    const result = getRootPackageJson(generatePackageManifests(options, false));
+
+    expect(result.dependencies).toBeUndefined();
+  });
 });
