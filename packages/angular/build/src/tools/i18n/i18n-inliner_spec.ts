@@ -136,6 +136,20 @@ describe('I18nInliner', () => {
     expect(findFile(outputFiles, 'main.js').text).toContain('"Hello"');
   });
 
+  it('retains the original messages with placeholders for a locale without translations', async () => {
+    const source = 'export const greeting = $localize`:@@greeting:Hello ${name}:NAME:!`;\n';
+    const { outputFiles, errors, warnings } = await createInliner().inlineForLocale(
+      [browserFile('main.js', source)],
+      'en-US',
+      undefined,
+    );
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(findFile(outputFiles, 'main.js').text).toContain('`Hello ${name}!`');
+    expect(findFile(outputFiles, 'main.js').text).not.toContain('$localize');
+  });
+
   it('warns and retains the original message when a locale is missing a translation', async () => {
     const { outputFiles, errors, warnings } = await createInliner().inlineForLocale(
       [browserFile('main.js', GREETING_SOURCE)],
