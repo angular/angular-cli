@@ -52,10 +52,9 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/server-stats.json').toNotExist();
     });
 
-    it('attributes a shared component stylesheet output to the same input on every build', async () => {
+    it('attributes a shared component stylesheet output to every input on every build', async () => {
       // Two components in different directories with byte-identical stylesheets of the same
-      // file name bundle to the same output file. The merged metafile must attribute that output
-      // to the same input regardless of which stylesheet bundle finishes first.
+      // file name bundle to the same output file. The merged metafile must list both inputs.
       const component = (dir: string) => `
         import { Component } from '@angular/core';
         @Component({
@@ -102,7 +101,10 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         expect(result?.success).toBeTrue();
 
         const stats = JSON.parse(harness.readFile('dist/browser-stats.json'));
-        expect(Object.keys(stats.outputs['shared.css'].inputs)).toEqual(['src/app/b/shared.css']);
+        expect(Object.keys(stats.outputs['shared.css'].inputs)).toEqual([
+          'src/app/a/shared.css',
+          'src/app/b/shared.css',
+        ]);
       }
     });
 

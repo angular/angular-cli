@@ -626,12 +626,7 @@ export function createCompilerPlugin(
           angularCompilationContext.markAsReady(hasCompilationErrors);
         }
 
-        // Merge in key order: the map fills in completion order, and when two entries share an
-        // output file the last one merged wins, so the metafile would otherwise vary between builds.
-        const sortedResults = [...additionalResults].sort(([a], [b]) =>
-          a < b ? -1 : a > b ? 1 : 0,
-        );
-        for (const [, { outputFiles, metafile }] of sortedResults) {
+        for (const { outputFiles, metafile } of additionalResults.values()) {
           // Add any additional output files to the main output files
           if (outputFiles?.length) {
             result.outputFiles?.push(...outputFiles);
@@ -643,7 +638,15 @@ export function createCompilerPlugin(
             // mitigating significant performance overhead for large apps.
             // See: https://bugs.chromium.org/p/v8/issues/detail?id=11536
             Object.assign(result.metafile.inputs, metafile.inputs);
-            Object.assign(result.metafile.outputs, metafile.outputs);
+            for (const [outputPath, output] of Object.entries(metafile.outputs)) {
+              // Two stylesheets can bundle to the same output file. Union the inputs into a new
+              // object so every input is attributed and the bundler's cached metafile is untouched.
+              const existing: Metafile['outputs'][string] | undefined =
+                result.metafile.outputs[outputPath];
+              result.metafile.outputs[outputPath] = existing
+                ? { ...existing, inputs: { ...existing.inputs, ...output.inputs } }
+                : output;
+            }
           }
         }
 
