@@ -10,6 +10,7 @@ import {
   addLeadingSlash,
   addTrailingSlash,
   buildPathWithParams,
+  collapseLeadingSlashes,
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
@@ -81,6 +82,56 @@ describe('URL Utils', () => {
 
     it('should handle empty URL', () => {
       expect(addLeadingSlash('')).toBe('/');
+    });
+  });
+
+  describe('collapseLeadingSlashes', () => {
+    it('should collapse multiple leading slashes into a single slash', () => {
+      expect(collapseLeadingSlashes('//example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('///example.com')).toBe('/example.com');
+    });
+
+    it('should replace leading backslashes with a single slash', () => {
+      expect(collapseLeadingSlashes('\\example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('\\\\example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('/\\example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('\\/example.com')).toBe('/example.com');
+    });
+
+    it('should collapse characters the URL parser removes along with the slashes', () => {
+      // The WHATWG URL parser removes tab, line feed and carriage return from its input before
+      // parsing it, so these all describe the same protocol-relative URL as `//example.com`.
+      expect(collapseLeadingSlashes('/\t/example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('/\n/example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('/\r/example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('\t//example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('/\t\\example.com')).toBe('/example.com');
+      expect(collapseLeadingSlashes('/\t\t/example.com')).toBe('/example.com');
+    });
+
+    it('should not modify a path with a single leading slash', () => {
+      expect(collapseLeadingSlashes('/path/to/resource')).toBe('/path/to/resource');
+    });
+
+    it('should preserve a removable character that is not leading', () => {
+      // Once a path segment has started, a later tab cannot reopen an authority.
+      expect(collapseLeadingSlashes('/path/\t/to')).toBe('/path/\t/to');
+    });
+
+    it('should not modify a path without a leading slash', () => {
+      expect(collapseLeadingSlashes('path/to/resource')).toBe('path/to/resource');
+    });
+
+    it('should preserve slashes that are not leading', () => {
+      expect(collapseLeadingSlashes('/path//to///resource')).toBe('/path//to///resource');
+    });
+
+    it('should handle a path containing only slashes', () => {
+      expect(collapseLeadingSlashes('//')).toBe('/');
+    });
+
+    it('should handle an empty path', () => {
+      expect(collapseLeadingSlashes('')).toBe('');
     });
   });
 

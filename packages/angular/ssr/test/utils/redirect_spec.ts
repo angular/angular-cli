@@ -46,6 +46,86 @@ describe('Redirect Utils', () => {
       expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
     });
 
+    it('should normalize the Location header to an absolute path', () => {
+      const locations = {
+        '//example.com': '/example.com',
+        '///example.com': '/example.com',
+        '/\\example.com': '/example.com',
+        '\\\\example.com': '/example.com',
+        // A tab, line feed or carriage return is removed by the URL parser before it parses, so
+        // one between the slashes still yields a protocol-relative URL unless it is collapsed too.
+        '/\t/example.com': '/example.com',
+        '/\t\\example.com': '/example.com',
+        '\t//example.com': '/example.com',
+        '/\n/example.com': '/example.com',
+        '/\r/example.com': '/example.com',
+        'https://example.com/path': '/https://example.com/path',
+        '': '/',
+      };
+
+      for (const [location, expected] of Object.entries(locations)) {
+        const response = createRedirectResponse(location);
+        expect(response.headers.get('Location'))
+          .withContext(`Location: "${location}"`)
+          .toBe(expected);
+      }
+    });
+
+    it('should never emit a Location header that resolves to another origin', () => {
+      const origin = 'https://example.com';
+
+      // The guarantee is about every string, so the inputs are generated rather than listed: a
+      // hand-written list only covers the escapes that were thought of when it was written.
+      // These are the characters that can begin an authority once a client parses the value,
+      // either directly or because the URL parser removes them first.
+      const separators = ['/', '\\', '\t', '\n', '\r', ' ', '.', ';', '@', '%2f', '%5c', '%09'];
+      const locations = new Set([
+        'https://evil.test/path',
+        'evil.test:8080/path',
+        'javascript:alert(1)',
+        '',
+      ]);
+
+      for (const first of separators) {
+        for (const second of separators) {
+          for (const third of separators) {
+            locations.add(`${first}${second}${third}evil.test`);
+          }
+        }
+      }
+
+      const escapes: string[] = [];
+      for (const location of locations) {
+        let emitted: string | null;
+        try {
+          emitted = createRedirectResponse(location).headers.get('Location');
+        } catch {
+          // A value the Headers layer rejects, such as one containing a line feed, can never be
+          // emitted in the first place.
+          continue;
+        }
+
+        if (new URL(emitted ?? '', origin).origin !== origin) {
+          escapes.push(`${JSON.stringify(location)} -> ${JSON.stringify(emitted)}`);
+        }
+      }
+
+      expect(escapes)
+        .withContext(`Locations that left the origin: ${escapes.join(', ')}`)
+        .toEqual([]);
+    });
+
+    it('should warn if the Location is rewritten in dev mode', () => {
+      // @ts-expect-error accessing global
+      globalThis.ngDevMode = true;
+      const warnSpy = spyOn(console, 'warn');
+      createRedirectResponse('//example.com');
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Location "//example.com" is not an absolute path and was rewritten to "/example.com" ' +
+          'to keep the redirect on the current origin.',
+      );
+    });
+
     it('should warn if Location header is provided in extra headers in dev mode', () => {
       // @ts-expect-error accessing global
       globalThis.ngDevMode = true;

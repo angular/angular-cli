@@ -435,6 +435,92 @@ describe('AngularServerApp', () => {
         expect(response?.status).toBe(302);
       });
 
+      describe('protocol-relative redirects', () => {
+        /**
+         * Installs a route tree where the first URL segment is a parameter with a wildcard child.
+         * This allows the router to match a URL such as `/.;/(//example.com)`, which the router
+         * serializes with an empty leading segment.
+         */
+        function setupWildcardChildManifest(): AngularServerApp {
+          setAngularAppTestingManifest(
+            [
+              {
+                path: ':slug',
+                children: [{ path: '**', component: HomeComponent }],
+              },
+            ],
+            [{ path: '**', renderMode: RenderMode.Server }],
+          );
+
+          return new AngularServerApp();
+        }
+
+        afterEach(() => {
+          setupManifest();
+        });
+
+        it('should not redirect to another origin when the final URL has an empty leading segment', async () => {
+          const customApp = setupWildcardChildManifest();
+          const response = await customApp.handle(
+            new Request('http://localhost/.;/(//example.com)'),
+          );
+
+          expect(response?.status).toBe(302);
+          expect(response?.headers.get('location')).toBe('/example.com');
+        });
+
+        it('should keep the query string and userinfo on the current origin', async () => {
+          const customApp = setupWildcardChildManifest();
+          const response = await customApp.handle(
+            new Request('http://localhost/.;/(//user@example.com:8080/login)?session=abc'),
+          );
+
+          expect(response?.status).toBe(302);
+          expect(response?.headers.get('location')).toBe(
+            '/user@example.com:8080/login?session=abc',
+          );
+        });
+
+        it('should not redirect again when the redirect location is requested', async () => {
+          const customApp = setupWildcardChildManifest();
+          const response = await customApp.handle(new Request('http://localhost/example.com'));
+
+          expect(response?.status).toBe(200);
+          expect(await response?.text()).toContain('Home works');
+        });
+
+        it('should not redirect to another origin for any X-Forwarded-Prefix', async () => {
+          // `AngularAppEngine` rejects these headers before they reach here, but it is not the
+          // only caller: the development server drives `AngularServerApp` directly through
+          // `ɵgetOrCreateAngularServerApp`, without that validation.
+          const prefixes = [
+            '//evil.test',
+            '///evil.test',
+            '/\\evil.test',
+            '\\\\evil.test',
+            // A tab is a legal header value character, and the URL parser removes it before
+            // parsing, so these describe the same protocol-relative URL as the ones above.
+            '/\t/evil.test',
+            '/\t\\evil.test',
+            '\t//evil.test',
+            '/\t\t/evil.test',
+          ];
+
+          for (const prefix of prefixes) {
+            const response = await app.handle(
+              new Request('http://localhost/redirect', {
+                headers: { 'X-Forwarded-Prefix': prefix },
+              }),
+            );
+
+            const location = response?.headers.get('location') ?? '';
+            expect(new URL(location, 'http://localhost').origin)
+              .withContext(`X-Forwarded-Prefix: ${JSON.stringify(prefix)} -> ${location}`)
+              .toBe('http://localhost');
+          }
+        });
+      });
+
       it('should work with complex and encoded URLs', async () => {
         const urls = [
           'http://localhost/home?email=xyz%40xyz.com',

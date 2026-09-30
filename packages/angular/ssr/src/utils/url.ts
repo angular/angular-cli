@@ -79,6 +79,53 @@ export function addTrailingSlash(url: string): string {
 }
 
 /**
+ * Characters that cannot be left at the start of a path, because a client parsing the path as a
+ * URL would read them as the start of an authority.
+ *
+ * `/` and `\` are the two authority delimiters. Tab, line feed and carriage return are included
+ * because the WHATWG URL parser removes them from its input *before* parsing it, so they do not
+ * separate the delimiters around them: `/\t/example.com` is parsed as `//example.com`.
+ */
+const AUTHORITY_DELIMITERS: ReadonlySet<string> = new Set(['/', '\\', '\t', '\n', '\r']);
+
+/**
+ * Collapses the leading slashes of a URL path into a single slash.
+ *
+ * A path that starts with two or more slashes or backslashes is parsed as a protocol-relative
+ * URL (for example, `//example.com` resolves to `https://example.com`), which points to a
+ * different origin. Collapsing the leading slashes keeps the path relative to the current origin.
+ *
+ * Characters that the URL parser strips are collapsed along with the slashes, as a path is
+ * resolved by the client and not by this function: leaving them in place would let
+ * `/\t/example.com` be parsed as `//example.com` after the collapse has run.
+ *
+ * @param pathname - The URL path to collapse the leading slashes of.
+ * @returns The URL path with at most one leading slash.
+ *
+ * @example
+ * ```js
+ * collapseLeadingSlashes('//example.com'); // '/example.com'
+ * collapseLeadingSlashes('/\\example.com'); // '/example.com'
+ * collapseLeadingSlashes('/\t/example.com'); // '/example.com'
+ * collapseLeadingSlashes('/path'); // '/path'
+ * ```
+ */
+export function collapseLeadingSlashes(pathname: string): string {
+  // Use a "Pointer" to avoid intermediate slices
+  let start = 0;
+  while (start < pathname.length && AUTHORITY_DELIMITERS.has(pathname[start])) {
+    start++;
+  }
+
+  // Nothing to collapse when the path already starts with at most one forward slash.
+  if (start === 0 || (start === 1 && pathname[0] === '/')) {
+    return pathname;
+  }
+
+  return `/${pathname.slice(start)}`;
+}
+
+/**
  * Joins URL parts into a single URL string.
  *
  * This function takes multiple URL segments, normalizes them by removing leading

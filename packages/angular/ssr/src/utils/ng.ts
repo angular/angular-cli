@@ -24,7 +24,13 @@ import {
 } from '@angular/platform-server';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
-import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSlash } from './url';
+import {
+  addTrailingSlash,
+  collapseLeadingSlashes,
+  joinUrlParts,
+  stripIndexHtmlFromURL,
+  stripTrailingSlash,
+} from './url';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.
@@ -133,7 +139,10 @@ export async function renderAngular(
       const urlToRenderString = constructSerializedUrl(router, urlToRender, requestPrefix);
 
       if (urlToRenderString !== finalUrl) {
-        redirectTo = [pathname, search, hash].join('');
+        // The pathname is used as-is to preserve its encoding, as re-serializing it can alter it.
+        // Its leading slashes are collapsed because a pathname is allowed to start with `//`,
+        // which as a `Location` value is a protocol-relative URL pointing to another origin.
+        redirectTo = [collapseLeadingSlashes(pathname), search, hash].join('');
       }
     }
 
