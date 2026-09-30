@@ -295,6 +295,8 @@ function normalizeEntryPoints(
   const exportsRecord = typeof rawExports === 'string' ? { '.': rawExports } : rawExports;
 
   const entryPoints = new Map<string, NormalizedEntryPoint>();
+  // Bundle names flatten '/' to '-', so two distinct subpaths can produce one.
+  const bundleNameOrigins = new Map<string, string>();
   let hasPrimary = false;
 
   for (const [key, value] of Object.entries(exportsRecord)) {
@@ -346,6 +348,15 @@ function normalizeEntryPoints(
       );
     }
 
+    const collidingKey = bundleNameOrigins.get(entryPoint.bundleName);
+    if (collidingKey !== undefined) {
+      throw new Error(
+        `Entry points '${collidingKey}' and '${key}' both produce the bundle name ` +
+          `'${entryPoint.bundleName}'. Entry point subpaths must not differ only by '/' versus '-'.`,
+      );
+    }
+
+    bundleNameOrigins.set(entryPoint.bundleName, key);
     entryPoints.set(entryPoint.name, entryPoint);
 
     if (entryPoint.isPrimary) {

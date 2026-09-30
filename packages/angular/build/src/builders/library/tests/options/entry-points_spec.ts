@@ -45,6 +45,59 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
     });
 
+    it('should succeed with a nested entry point beside a similarly named flat one', async () => {
+      await harness.writeFiles({
+        'projects/lib/zz/child/public-api.ts': 'export const NESTED = 42;\n',
+        'projects/lib/zz-sibling/public-api.ts': 'export const FLAT = 7;\n',
+      });
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './zz/child': './zz/child/public-api.ts',
+          './zz-sibling': './zz-sibling/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectFile('dist/lib/fesm2022/lib-zz-child.mjs').toExist();
+      harness.expectFile('dist/lib/fesm2022/lib-zz-sibling.mjs').toExist();
+    });
+
+    it('should fail when two entry points produce the same bundle name', async () => {
+      // A bundle name flattens '/' to '-', so './zz/child' and './zz-child' both
+      // become 'lib-zz-child'. Without a guard the second silently overwrites the
+      // first in the bundler input map: the build exits 0, one entry point's code
+      // is gone, and both 'exports' keys resolve to the surviving file.
+      await harness.writeFiles({
+        'projects/lib/zz/child/public-api.ts': 'export const NESTED = 42;\n',
+        'projects/lib/zz-child/public-api.ts': 'export const FLAT = 7;\n',
+      });
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './zz/child': './zz/child/public-api.ts',
+          './zz-child': './zz-child/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result, error } = await harness.executeOnce({
+        outputLogsOnException: false,
+        outputLogsOnFailure: false,
+      });
+      expect(result).toBeUndefined();
+      expect(error).toBeDefined();
+      expect((error as Error).message).toMatch(
+        /both produce the bundle name 'lib-zz-child'/,
+      );
+    });
+
     it('should fail when entry point is not a .ts or .mts file', async () => {
       await harness.modifyFile('projects/lib/package.json', (content) => {
         const pkg = JSON.parse(content);
