@@ -540,8 +540,12 @@ export class I18nInliner {
         // at least one worker to process smaller chunks in parallel without starvation.
         const targetWorkers = Math.max(1, Math.min(workerCount - 1, MAX_DOMINANT_WORKERS));
         localesPerBatch = Math.max(1, Math.ceil(entries.length / targetWorkers));
+      } else if (uncachedByFile.size >= workerCount) {
+        // Worker pool is already saturated by file-level concurrency;
+        // process all locales in a single batch to avoid duplicate parsing and IPC overhead.
+        localesPerBatch = entries.length;
       } else {
-        // Intermediate files: moderate sharding
+        // Intermediate files with idle workers: moderate sharding
         localesPerBatch = Math.max(1, Math.ceil(entries.length / 2));
       }
 
