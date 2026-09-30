@@ -11,6 +11,7 @@ import {
   type ɵParsedTranslation,
   ɵisMissingTranslationError,
   ɵmakeTemplateObject,
+  ɵparseMessage,
   ɵtranslate,
 } from '@angular/localize';
 import { MagicString } from 'magic-string';
@@ -335,11 +336,20 @@ type DiagnosticMessage = { type: 'error' | 'warning'; message: string };
  */
 function translateMessage(
   diagnostics: DiagnosticMessage[],
-  translations: Record<string, ɵParsedTranslation>,
+  translations: Record<string, ɵParsedTranslation> | undefined,
   messageParts: TemplateStringsArray,
   substitutions: readonly number[],
   missingTranslation: 'error' | 'warning' | 'ignore',
 ): [TemplateStringsArray, readonly number[]] {
+  // Fast path: untranslated locale (e.g. source locale without a translation dictionary).
+  // Directly parse the message parts to strip metadata and placeholder markers without
+  // throwing and catching a MissingTranslationError exception.
+  if (translations === undefined) {
+    const message = ɵparseMessage(messageParts, substitutions);
+
+    return [ɵmakeTemplateObject(message.messageParts, message.messageParts), substitutions];
+  }
+
   try {
     return ɵtranslate(translations, messageParts, substitutions) as [
       TemplateStringsArray,
@@ -512,7 +522,7 @@ async function inlineLocalize(
   for (const callSite of metadata.callSites) {
     const [translatedParts, translatedSubstitutions] = translateMessage(
       diagnostics,
-      translation || {},
+      translation,
       callSite.messageParts,
       callSite.expressionIndexes,
       translation === undefined ? 'ignore' : missingTranslation,
