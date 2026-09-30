@@ -11,11 +11,10 @@ import { constants, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { emitFilesToDisk } from '../../../tools/esbuild/utils';
 import { toPosixPath } from '../../../utils/path';
-import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
+import type { NormalizedLibraryOptions } from '../options';
 import { collectAssetsToEmit } from './assets';
 import { type BundleEntryPointInput, type BundleResult, bundleEntryPoints } from './bundler';
 import { type SingleProgramCache, compileLibrary } from './compilation';
-import { type EntryPointLookup, createEntryDirectoryLookup } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
 import type { OutputFile } from './utils';
@@ -31,7 +30,6 @@ export interface SingleBuildState {
   hasCompilationError?: boolean;
   hasEmittedManifests?: boolean;
   hasEmittedAssets?: boolean;
-  entryDirectoryLookup?: EntryPointLookup;
   directoryExists: Set<string>;
 }
 
@@ -131,29 +129,16 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
       pendingChangedDtsFiles.add(file);
     }
 
-    const findEntryPoint = (buildState.entryDirectoryLookup ??= createEntryDirectoryLookup(
-      options.entryPoints.values(),
-    ));
     const itemsToBundle: BundleEntryPointInput[] = [];
 
     for (const entryPoint of options.entryPoints.values()) {
       const previousBundleResult = buildState.previousBundleResults.get(entryPoint.name);
       const hasEsmChanges =
         !previousBundleResult ||
-        hasEntryPointChanges(
-          entryPoint,
-          previousBundleResult.esmModuleIds,
-          findEntryPoint,
-          pendingChangedEsmFiles,
-        );
+        hasEntryPointChanges(previousBundleResult.esmModuleIds, pendingChangedEsmFiles);
       const hasDtsChanges =
         !previousBundleResult ||
-        hasEntryPointChanges(
-          entryPoint,
-          previousBundleResult.dtsModuleIds,
-          findEntryPoint,
-          pendingChangedDtsFiles,
-        );
+        hasEntryPointChanges(previousBundleResult.dtsModuleIds, pendingChangedDtsFiles);
 
       if (hasEsmChanges || hasDtsChanges) {
         context.logger.info(`Compiling ${entryPoint.displayName}...`);
@@ -170,7 +155,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     let warnings: string[];
     try {
       [bundleOutput, warnings] = await Promise.all([
-        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, options, findEntryPoint),
+        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, options),
         diagnosePromise,
       ]);
     } catch (error) {
@@ -240,9 +225,7 @@ export function hasModifiedWatchedFile(
 }
 
 function hasEntryPointChanges(
-  entryPoint: NormalizedEntryPoint,
   moduleIds: ReadonlySet<string>,
-  findEntryPoint: EntryPointLookup,
   changedFiles: ReadonlySet<string>,
 ): boolean {
   if (changedFiles.size === 0) {
@@ -250,7 +233,7 @@ function hasEntryPointChanges(
   }
 
   for (const file of changedFiles) {
-    if (moduleIds.has(file) || findEntryPoint(file) === entryPoint) {
+    if (moduleIds.has(file)) {
       return true;
     }
   }

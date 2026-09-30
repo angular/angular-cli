@@ -18,7 +18,6 @@ import {
 import { dts } from 'rolldown-plugin-dts';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
-import { type EntryPointLookup, createEntryDirectoryLookup } from './entry-points';
 import {
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,
@@ -87,7 +86,6 @@ interface MultiBundleOutput {
  * @param esmFiles Map of virtual ESM output file paths to their content.
  * @param dtsFiles Map of virtual TypeScript declaration file paths to their content.
  * @param options The normalized library builder options.
- * @param findEntryPoint Optional lookup function to find an entry point by file path.
  * @returns A promise resolving to the bundled output files and bundle cache results.
  */
 export async function bundleEntryPoints(
@@ -95,7 +93,6 @@ export async function bundleEntryPoints(
   esmFiles: ReadonlyMap<string, string>,
   dtsFiles: ReadonlyMap<string, string>,
   options: NormalizedLibraryOptions,
-  findEntryPoint: EntryPointLookup = createEntryDirectoryLookup(options.entryPoints.values()),
 ): Promise<BundleEntryPointsOutput> {
   const bundleResults = new Map<string, BundleResult>();
   if (items.length === 0) {
@@ -115,8 +112,8 @@ export async function bundleEntryPoints(
   }
 
   const [esmOutput, dtsOutput] = await Promise.all([
-    bundleAllEsm(esmEntryPoints, esmFiles, options, findEntryPoint),
-    bundleAllDts(dtsEntryPoints, dtsFiles, options, findEntryPoint),
+    bundleAllEsm(esmEntryPoints, esmFiles, options),
+    bundleAllDts(dtsEntryPoints, dtsFiles, options),
   ]);
 
   for (const { entryPoint, previousBundleResult } of items) {
@@ -138,8 +135,6 @@ export async function bundleEntryPoints(
     bundleResults,
   };
 }
-
-export { type EntryPointLookup, createEntryDirectoryLookup };
 
 /**
  * Generates the Rolldown input mapping object from the specified entry points.
@@ -170,14 +165,12 @@ function resolveEntryInputMap(
  * @param files Map of virtual file paths to their content.
  * @param extensions Candidate extensions to probe when resolving extensionless module specifiers.
  * @param includeMap Whether source map files should also be loaded from the memory map.
- * @param findEntryPoint Lookup function to identify the entry point owning a file path.
  * @returns A Rolldown plugin instance.
  */
 function createMemoryFileLoaderPlugin(
   files: ReadonlyMap<string, string>,
   extensions: readonly string[],
   includeMap: boolean,
-  findEntryPoint: EntryPointLookup,
 ): Plugin {
   return {
     name: 'memory-file-loader',
@@ -217,15 +210,6 @@ function createMemoryFileLoaderPlugin(
           }
         }
 
-        const importerEp = findEntryPoint(importerPosix);
-        const targetEp = findEntryPoint(resolvedCandidate ?? resolved);
-        if (importerEp && targetEp && importerEp.name !== targetEp.name) {
-          throw new Error(
-            `Entry point '${importerEp.name}' cannot import '${id}' from sibling entry point directly. ` +
-              `Import using the entry point package name instead.`,
-          );
-        }
-
         if (resolvedCandidate) {
           return { id: resolvedCandidate, external: false };
         }
@@ -245,27 +229,6 @@ function createMemoryFileLoaderPlugin(
       };
     },
   };
-}
-
-/**
- * Resolves the bundle prefix name for a shared chunk based on the entry point owning its modules.
- *
- * @param findEntryPoint Lookup function to identify entry points of module IDs.
- * @param moduleIds List of module IDs contained within the chunk.
- * @returns The bundle name if a containing entry point was found, otherwise undefined.
- */
-function resolveChunkBundleName(
-  findEntryPoint: EntryPointLookup,
-  moduleIds: readonly string[],
-): string | undefined {
-  for (const modId of moduleIds) {
-    const ep = findEntryPoint(modId);
-    if (ep) {
-      return ep.bundleName;
-    }
-  }
-
-  return undefined;
 }
 
 /**
@@ -352,7 +315,6 @@ async function executeMultiBundle(
   preserveSymlinks: boolean,
   extension: 'mjs' | 'd.ts',
   sourcemap: boolean,
-  findEntryPoint: EntryPointLookup,
 ): Promise<MultiBundleOutput> {
   const isDts = extension === 'd.ts';
   const dir = isDts ? TYPES_OUTPUT_DIR : FESM_OUTPUT_DIR;
@@ -373,12 +335,7 @@ async function executeMultiBundle(
       format: 'es',
       dir,
       entryFileNames: `[name].${extension}`,
-      chunkFileNames: (chunk) => {
-        const bundleName = resolveChunkBundleName(findEntryPoint, chunk.moduleIds);
-        const prefix = bundleName ? `${bundleName}-` : '';
-
-        return `${prefix}[name]-[hash].${extension}`;
-      },
+      chunkFileNames: `[name]-[hash].${extension}`,
       sourcemap,
       hoistTransitiveImports: false,
       comments: { jsdoc: isDts, legal: true, annotation: true },
@@ -396,14 +353,12 @@ async function executeMultiBundle(
  * @param entryPoints The entry points to bundle.
  * @param esmFiles Map of virtual ESM output file paths to contents.
  * @param options The normalized library options.
- * @param findEntryPoint Lookup function to resolve entry point ownership.
  * @returns A promise resolving to the multi-bundle output.
  */
 async function bundleAllEsm(
   entryPoints: readonly NormalizedEntryPoint[],
   esmFiles: ReadonlyMap<string, string>,
   options: NormalizedLibraryOptions,
-  findEntryPoint: EntryPointLookup,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
     return { filesToEmit: [], moduleIdsByBundle: new Map() };
@@ -411,11 +366,10 @@ async function bundleAllEsm(
 
   return executeMultiBundle(
     resolveEntryInputMap(entryPoints, false),
-    [createMemoryFileLoaderPlugin(esmFiles, ESM_EXTENSIONS, true, findEntryPoint)],
+    [createMemoryFileLoaderPlugin(esmFiles, ESM_EXTENSIONS, true)],
     options.preserveSymlinks,
     'mjs',
     true,
-    findEntryPoint,
   );
 }
 
@@ -425,14 +379,12 @@ async function bundleAllEsm(
  * @param entryPoints The entry points to bundle.
  * @param dtsFiles Map of virtual declaration output file paths to contents.
  * @param options The normalized library options.
- * @param findEntryPoint Lookup function to resolve entry point ownership.
  * @returns A promise resolving to the multi-bundle output.
  */
 async function bundleAllDts(
   entryPoints: readonly NormalizedEntryPoint[],
   dtsFiles: ReadonlyMap<string, string>,
   options: NormalizedLibraryOptions,
-  findEntryPoint: EntryPointLookup,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
     return { filesToEmit: [], moduleIdsByBundle: new Map() };
@@ -459,13 +411,9 @@ async function bundleAllDts(
 
   return executeMultiBundle(
     resolveEntryInputMap(entryPoints, true),
-    [
-      createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap, findEntryPoint),
-      ...dtsPlugins,
-    ],
+    [createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap), ...dtsPlugins],
     options.preserveSymlinks,
     'd.ts',
     dtsSourcemap,
-    findEntryPoint,
   );
 }
