@@ -52,6 +52,60 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       harness.expectFile('dist/server-stats.json').toNotExist();
     });
 
+    it('attributes a shared component stylesheet output to the same input on every build', async () => {
+      // Two components in different directories with byte-identical stylesheets of the same
+      // file name bundle to the same output file. The merged metafile must attribute that output
+      // to the same input regardless of which stylesheet bundle finishes first.
+      const component = (dir: string) => `
+        import { Component } from '@angular/core';
+        @Component({
+          selector: 'app-shared-${dir}',
+          template: '<p>${dir}</p>',
+          styleUrl: './shared.css',
+        })
+        export class Shared${dir.toUpperCase()}Component {}
+      `;
+      await harness.writeFiles({
+        'src/app/a/shared.component.ts': component('a'),
+        'src/app/a/shared.css': 'p { color: red; }',
+        'src/app/b/shared.component.ts': component('b'),
+        'src/app/b/shared.css': 'p { color: red; }',
+      });
+      await harness.writeFile(
+        'src/app/app.module.ts',
+        `
+        import { NgModule } from '@angular/core';
+        import { BrowserModule } from '@angular/platform-browser';
+        import { AppComponent } from './app.component';
+        import { SharedAComponent } from './a/shared.component';
+        import { SharedBComponent } from './b/shared.component';
+        @NgModule({
+          declarations: [AppComponent],
+          imports: [BrowserModule, SharedAComponent, SharedBComponent],
+          bootstrap: [AppComponent],
+        })
+        export class AppModule {}
+      `,
+      );
+      await harness.writeFile(
+        'src/app/app.component.html',
+        '<app-shared-a></app-shared-a><app-shared-b></app-shared-b>',
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        statsJson: true,
+      });
+
+      for (let i = 0; i < 2; i++) {
+        const { result } = await harness.executeOnce();
+        expect(result?.success).toBeTrue();
+
+        const stats = JSON.parse(harness.readFile('dist/browser-stats.json'));
+        expect(Object.keys(stats.outputs['shared.css'].inputs)).toEqual(['src/app/b/shared.css']);
+      }
+    });
+
     describe('server build', () => {
       beforeEach(async () => {
         await harness.modifyFile('src/tsconfig.app.json', (content) => {

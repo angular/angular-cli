@@ -626,7 +626,12 @@ export function createCompilerPlugin(
           angularCompilationContext.markAsReady(hasCompilationErrors);
         }
 
-        for (const { outputFiles, metafile } of additionalResults.values()) {
+        // Merge in key order: the map fills in completion order, and when two entries share an
+        // output file the last one merged wins, so the metafile would otherwise vary between builds.
+        const sortedResults = [...additionalResults].sort(([a], [b]) =>
+          a < b ? -1 : a > b ? 1 : 0,
+        );
+        for (const [, { outputFiles, metafile }] of sortedResults) {
           // Add any additional output files to the main output files
           if (outputFiles?.length) {
             result.outputFiles?.push(...outputFiles);
