@@ -339,6 +339,17 @@ describe('generatePackageManifests', () => {
     expect(result.peerDependencies).toEqual({ tslib: '^2.0.0' });
   });
 
+  it('does not add a tslib that is declared as optional', () => {
+    const options = createOptions({
+      tslibVersion: '^2.3.0',
+      packageJson: { name: 'my-lib', optionalDependencies: { tslib: '^2.0.0' } },
+    });
+    const result = getRootPackageJson(generatePackageManifests(options, false));
+
+    expect(result.dependencies).toBeUndefined();
+    expect(result.optionalDependencies).toEqual({ tslib: '^2.0.0' });
+  });
+
   it('adds nothing when the range cannot be resolved', () => {
     const options = createOptions();
     const result = getRootPackageJson(generatePackageManifests(options, false));

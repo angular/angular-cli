@@ -82,7 +82,12 @@ export function generatePackageManifests(
   // `import ... from 'tslib'` while the library's own manifest declares nothing.
   // On a hoisted node_modules it resolves anyway; on a strict layout the consumer
   // gets ERR_MODULE_NOT_FOUND at runtime. Declare it, as ng-packagr does.
-  if (tslibVersion && !rawPackageJson.dependencies?.tslib && !rawPackageJson.peerDependencies?.tslib) {
+  if (
+    tslibVersion &&
+    !rawPackageJson.dependencies?.tslib &&
+    !rawPackageJson.peerDependencies?.tslib &&
+    !rawPackageJson.optionalDependencies?.tslib
+  ) {
     distPackageJson.dependencies = { ...distPackageJson.dependencies, tslib: tslibVersion };
   }
 
