@@ -92,7 +92,8 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       ),
     );
 
-    this.#tsConfigFiles = new Set([toPosixPath(tsconfig), ...this.#extendedConfigCache.keys()]);
+    const tsConfigFiles = [toPosixPath(tsconfig), ...this.#extendedConfigCache.keys()];
+    this.#tsConfigFiles = new Set(tsConfigFiles);
 
     let rootNames = originalRootNames;
     if (compilerOptionOverrides?.rootFiles?.length) {
@@ -120,7 +121,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       rootNames,
       errors,
       warnings,
-      tsConfigFiles: Array.from(this.#tsConfigFiles),
+      tsConfigFiles,
     };
 
     if (currentRootFiles?.length) {
