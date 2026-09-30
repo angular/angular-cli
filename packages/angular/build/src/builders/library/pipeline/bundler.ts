@@ -17,24 +17,13 @@ import {
 } from 'rolldown';
 import { dts } from 'rolldown-plugin-dts';
 import { toPosixPath } from '../../../utils/path';
-import type { NormalizedEntryPoint, NormalizedLibraryOptions } from '../options';
+import type { BundleResult, NormalizedEntryPoint, NormalizedLibraryOptions } from '../types';
 import {
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,
   TYPES_OUTPUT_DIR,
   createMemoryOutputFile,
 } from './utils';
-
-/**
- * Cached module ID sets for a bundled entry point.
- */
-export interface BundleResult {
-  /** Exact set of virtual ESM module IDs bundled into this entry point. */
-  esmModuleIds: ReadonlySet<string>;
-
-  /** Exact set of virtual DTS module IDs bundled into this entry point. */
-  dtsModuleIds: ReadonlySet<string>;
-}
 
 /**
  * Output of the entry point bundling process.

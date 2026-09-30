@@ -7,7 +7,7 @@
  */
 
 import path from 'node:path';
-import type { NormalizedLibraryOptions, PackageJsonData } from '../options';
+import type { NormalizedLibraryOptions, PackageJsonData } from '../types';
 import {
   FESM_OUTPUT_DIR,
   type MemoryOutputFile,

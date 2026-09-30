@@ -8,7 +8,7 @@
 
 import { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import type { BundleStylesheetOptions } from '../../../tools/esbuild/stylesheets/bundle-options';
-import type { NormalizedLibraryOptions } from '../options';
+import type { NormalizedLibraryOptions } from '../types';
 
 export type LibraryStylesheetBundlerOptions = Pick<
   NormalizedLibraryOptions,

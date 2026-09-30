@@ -11,7 +11,7 @@ import path from 'node:path';
 import picomatch from 'picomatch';
 import { toPosixPath } from '../../../utils/path';
 import { DEFAULT_ASSET_IGNORE, resolveAssets } from '../../../utils/resolve-assets';
-import type { NormalizedLibraryOptions } from '../options';
+import type { NormalizedLibraryOptions } from '../types';
 import { type DiskOutputFile, createDiskOutputFile } from './utils';
 
 /**

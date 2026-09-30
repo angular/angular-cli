@@ -24,14 +24,11 @@ import { purgeStaleBuildCache } from '../../utils/purge-cache';
 import { getSupportedBrowsers } from '../../utils/supported-browsers';
 import { assertCompatibleAngularVersion } from '../../utils/version';
 import type { BuildWatcher } from '../../utils/watcher';
-import {
-  type NormalizedLibraryOptions,
-  type PackageJsonData,
-  normalizeLibraryOptions,
-} from './options';
-import type { SingleBuildState } from './pipeline/build-action';
+import { normalizeLibraryOptions } from './options';
+import { updateWatchedEntryPoints } from './pipeline/entry-points';
 import type { createComponentStylesheetBundlerForLibrary } from './pipeline/stylesheet-bundler';
 import type { Schema as LibraryBuilderOptions } from './schema';
+import type { NormalizedLibraryOptions, PackageJsonData, SingleBuildState } from './types';
 
 /**
  * Executes the library builder to compile, bundle, and package an Angular library into the Angular Package Format (APF).
@@ -275,6 +272,19 @@ async function* runWatchLoop(
       try {
         const packageJson = await loadPackageJson(packageJsonPath);
         options.packageJson = packageJson;
+        if (!packageJson.name) {
+          throw new Error(`The package.json at '${packageJsonPath}' must contain a 'name'.`);
+        }
+        options.packageName = packageJson.name;
+
+        updateWatchedEntryPoints(
+          packageJson,
+          options,
+          buildState,
+          allWatchedFiles,
+          packageJsonPath,
+        );
+
         hasPackageJsonChanges = true;
       } catch (error) {
         assertIsError(error);
@@ -290,7 +300,8 @@ async function* runWatchLoop(
 
     const hasSourceChanges =
       !buildState.singleProgramCache ||
-      Boolean(buildState.hasCompilationError) ||
+      buildState.hasCompilationError ||
+      buildState.hasEntryPointsChanges ||
       hasModifiedWatchedFile(changedFiles, allWatchedFiles, posixPackageJsonPath);
 
     if (

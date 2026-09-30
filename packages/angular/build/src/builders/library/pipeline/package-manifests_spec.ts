@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { join } from 'node:path';
-import type { NormalizedEntryPoint, NormalizedLibraryOptions, PackageJsonData } from '../options';
+import type { NormalizedEntryPoint, NormalizedLibraryOptions, PackageJsonData } from '../types';
 import { getEntryPointBundleName } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
 import type { MemoryOutputFile } from './utils';

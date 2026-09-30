@@ -11,27 +11,13 @@ import { constants, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { emitFilesToDisk } from '../../../tools/esbuild/utils';
 import { toPosixPath } from '../../../utils/path';
-import type { NormalizedLibraryOptions } from '../options';
+import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
 import { collectAssetsToEmit } from './assets';
-import { type BundleEntryPointInput, type BundleResult, bundleEntryPoints } from './bundler';
-import { type SingleProgramCache, compileLibrary } from './compilation';
+import { type BundleEntryPointInput, bundleEntryPoints } from './bundler';
+import { compileLibrary } from './compilation';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
 import type { OutputFile } from './utils';
-
-/**
- * State preserved across incremental builds in watch mode.
- */
-export interface SingleBuildState {
-  singleProgramCache?: SingleProgramCache;
-  previousBundleResults: Map<string, BundleResult>;
-  pendingChangedEsmFiles: Set<string>;
-  pendingChangedDtsFiles: Set<string>;
-  hasCompilationError?: boolean;
-  hasEmittedManifests?: boolean;
-  hasEmittedAssets?: boolean;
-  directoryExists: Set<string>;
-}
 
 /**
  * Creates a fresh {@link SingleBuildState} instance.
@@ -86,7 +72,8 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
   const shouldCompileEntryPoints =
     !modifiedFiles ||
     !buildState.singleProgramCache ||
-    Boolean(buildState.hasCompilationError) ||
+    buildState.hasCompilationError ||
+    buildState.hasEntryPointsChanges ||
     pendingChangedEsmFiles.size > 0 ||
     pendingChangedDtsFiles.size > 0 ||
     hasModifiedWatchedFile(modifiedFiles, allWatchedFiles, posixPackageJsonPath);
@@ -100,6 +87,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
 
   if (shouldCompileEntryPoints) {
     buildState.hasCompilationError = true;
+    buildState.hasEntryPointsChanges = false;
 
     const {
       esmFiles,
