@@ -296,6 +296,8 @@ function normalizeEntryPoints(
 
   const entryPoints = new Map<string, NormalizedEntryPoint>();
   // Bundle names flatten '/' to '-', so two distinct subpaths can produce one.
+  // Keyed case-insensitively: names differing only in case are distinct keys in
+  // the bundler input map but one file on a case-insensitive filesystem.
   const bundleNameOrigins = new Map<string, string>();
   let hasPrimary = false;
 
@@ -348,15 +350,17 @@ function normalizeEntryPoints(
       );
     }
 
-    const collidingKey = bundleNameOrigins.get(entryPoint.bundleName);
+    const bundleNameKey = entryPoint.bundleName.toLowerCase();
+    const collidingKey = bundleNameOrigins.get(bundleNameKey);
     if (collidingKey !== undefined) {
       throw new Error(
         `Entry points '${collidingKey}' and '${key}' both produce the bundle name ` +
-          `'${entryPoint.bundleName}'. Entry point subpaths must not differ only by '/' versus '-'.`,
+          `'${entryPoint.bundleName}'. Entry point subpaths must not differ only by ` +
+          `'/' versus '-', or by case.`,
       );
     }
 
-    bundleNameOrigins.set(entryPoint.bundleName, key);
+    bundleNameOrigins.set(bundleNameKey, key);
     entryPoints.set(entryPoint.name, entryPoint);
 
     if (entryPoint.isPrimary) {

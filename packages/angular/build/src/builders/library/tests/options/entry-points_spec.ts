@@ -98,6 +98,33 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
+    it('should fail when two entry points differ only by case', async () => {
+      // Distinct keys in the bundler input map, but one file on a case-insensitive
+      // filesystem, so the emitted bundle depends on which OS ran the build.
+      await harness.writeFiles({
+        'projects/lib/Zz/public-api.ts': 'export const UPPER = 42;\n',
+        'projects/lib/zz/public-api.ts': 'export const LOWER = 7;\n',
+      });
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './Zz': './Zz/public-api.ts',
+          './zz': './zz/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result, error } = await harness.executeOnce({
+        outputLogsOnException: false,
+        outputLogsOnFailure: false,
+      });
+      expect(result).toBeUndefined();
+      expect(error).toBeDefined();
+      expect((error as Error).message).toMatch(/both produce the bundle name/);
+    });
+
     it('should fail when entry point is not a .ts or .mts file', async () => {
       await harness.modifyFile('projects/lib/package.json', (content) => {
         const pkg = JSON.parse(content);
