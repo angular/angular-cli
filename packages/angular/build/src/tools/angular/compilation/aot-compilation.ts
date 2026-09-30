@@ -77,7 +77,7 @@ export class AotCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
       warnings,
-      extendedConfigFiles,
+      tsConfigFiles,
     } = await this.loadConfiguration(tsconfig, compilerOptionOverrides, buildType);
 
     const useTypeScriptTranspilation =
@@ -211,7 +211,7 @@ export class AotCompilation extends TypeScriptCompilation {
 
     // Get all files referenced in the TypeScript/Angular program including component resources
     const referencedFiles = [
-      ...(extendedConfigFiles ?? []),
+      ...tsConfigFiles,
       ...typeScriptProgram
         .getSourceFiles()
         .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))

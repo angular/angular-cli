@@ -55,7 +55,7 @@ export class JitCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
       warnings,
-      extendedConfigFiles,
+      tsConfigFiles,
     } = await this.loadConfiguration(tsconfig, compilerOptionOverrides, buildType);
 
     if (hostOptions.modifiedFiles) {
@@ -91,7 +91,7 @@ export class JitCompilation extends TypeScriptCompilation {
     );
 
     const referencedFiles = [
-      ...(extendedConfigFiles ?? []),
+      ...tsConfigFiles,
       ...typeScriptProgram.getSourceFiles().map((sourceFile) => sourceFile.fileName),
     ];
 

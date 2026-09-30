@@ -20,13 +20,14 @@ export interface TransformedConfiguration {
   rootNames: string[];
   errors: ts.Diagnostic[];
   warnings: PartialMessage[];
-  extendedConfigFiles?: readonly string[];
+  tsConfigFiles: readonly string[];
 }
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
   #cachedConfiguration?: TransformedConfiguration;
   #cachedRootFiles?: readonly string[];
+  #tsConfigFiles?: Set<string>;
   readonly #extendedConfigCache = new Map<string, ts.ExtendedConfigCacheEntry>();
 
   static async loadCompilerCli(): Promise<typeof ng> {
@@ -91,6 +92,8 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       ),
     );
 
+    this.#tsConfigFiles = new Set([toPosixPath(tsconfig), ...this.#extendedConfigCache.keys()]);
+
     let rootNames = originalRootNames;
     if (compilerOptionOverrides?.rootFiles?.length) {
       const rootFilesSet = new Set(
@@ -117,10 +120,10 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       rootNames,
       errors,
       warnings,
-      extendedConfigFiles: [...this.#extendedConfigCache.keys()],
+      tsConfigFiles: Array.from(this.#tsConfigFiles),
     };
 
-    if (config.extendedConfigFiles?.length && currentRootFiles?.length) {
+    if (currentRootFiles?.length) {
       this.#cachedConfiguration = config;
       this.#cachedRootFiles = currentRootFiles;
     }
@@ -131,34 +134,36 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
   protected readonly sourceFiles = new Map<string, ts.SourceFile>();
 
   protected invalidateFiles(files: Iterable<string>): void {
+    const tsConfigFiles = this.#tsConfigFiles;
+
     for (const file of files) {
       const posixFile = toPosixPath(file);
       this.sourceFiles.delete(posixFile);
 
-      if (!this.#extendedConfigCache.size) {
+      if (!tsConfigFiles) {
         continue;
       }
 
-      let cacheKey: string | undefined;
-      if (this.#extendedConfigCache.has(posixFile)) {
-        cacheKey = posixFile;
+      let tsConfigCachedPath: string | undefined;
+      if (tsConfigFiles.has(posixFile)) {
+        tsConfigCachedPath = posixFile;
       } else {
         // Check with lowercased key because TypeScript lowercases the keys
         // of the extended config cache on case-insensitive operating systems.
         const lowerCasedPosixFile = posixFile.toLowerCase();
-        if (this.#extendedConfigCache.has(lowerCasedPosixFile)) {
-          cacheKey = lowerCasedPosixFile;
+        if (tsConfigFiles.has(lowerCasedPosixFile)) {
+          tsConfigCachedPath = lowerCasedPosixFile;
         }
       }
 
-      if (!cacheKey) {
+      if (!tsConfigCachedPath) {
         continue;
       }
 
       // If a tsconfig changes, we need to re-read the configuration.
       this.#cachedConfiguration = undefined;
       this.#cachedRootFiles = undefined;
-      this.#extendedConfigCache.delete(cacheKey);
+      this.#extendedConfigCache.delete(tsConfigCachedPath);
     }
   }
 
