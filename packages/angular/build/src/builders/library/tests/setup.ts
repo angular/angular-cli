@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BuilderHandlerFn } from '@angular-devkit/architect';
+import type { BuilderHandlerFn } from '@angular-devkit/architect';
 import { TestProjectHost } from '@angular-devkit/architect/testing';
 import { json, normalize, join } from '@angular-devkit/core';
 import { readFileSync } from 'node:fs';

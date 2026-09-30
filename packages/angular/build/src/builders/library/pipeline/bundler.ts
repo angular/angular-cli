@@ -214,7 +214,7 @@ function createMemoryFileLoaderPlugin(
           return { id: resolvedCandidate, external: false };
         }
 
-        return { id, external: true };
+        return undefined;
       },
     },
     load(id) {
