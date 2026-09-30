@@ -312,6 +312,92 @@ export function createMonolithicScenario(options: ScenarioFactoryOptions = {}): 
 }
 
 /**
+ * 5. Multi-Dominant Scenario:
+ * 3 dominant bundles (3 MB each, e.g. main.js, polyfills.js, admin-portal.js) + 15 small chunks (40 KB),
+ * 8 locales, sourcemaps ON.
+ * Tests contention and worker distribution when multiple large files qualify as dominant in the same window.
+ */
+export function createMultiDominantScenario(
+  options: ScenarioFactoryOptions = {},
+): BenchmarkScenario {
+  let workload: GeneratedWorkload | undefined;
+
+  return {
+    name: 'multi-dominant',
+    description:
+      'Multi-Dominant: 3 large bundles (3 MB each) + 15 chunks (40 KB), 8 locales, sourcemaps ON',
+    get inputSizeBytes() {
+      return workload?.totalInputSizeBytes ?? 0;
+    },
+    get localeCount() {
+      return DEFAULT_LOCALES_8.length;
+    },
+    async setup() {
+      await initializeFixtures();
+      const files: BuildOutputFile[] = [];
+      const totalMessages = 3000;
+      const dominantCount = 3;
+      const dominantSize = 3 * 1024 * 1024;
+      const dominantMessages = 600; // 600 each x 3 = 1800 messages
+
+      for (let d = 0; d < dominantCount; d++) {
+        const { codeFile, mapFile } = generateSyntheticBundle({
+          filename: `dominant_${d}.js`,
+          targetByteSize: dominantSize,
+          messageCount: dominantMessages,
+          withSourceMap: true,
+          messageIdOffset: d * dominantMessages,
+        });
+        files.push(codeFile);
+        if (mapFile) {
+          files.push(mapFile);
+        }
+      }
+
+      const chunkCount = 15;
+      const chunkSizeBytes = 40 * 1024;
+      const remainingMessages = totalMessages - dominantCount * dominantMessages;
+      const messagesPerChunk = Math.max(1, Math.floor(remainingMessages / chunkCount));
+
+      for (let i = 0; i < chunkCount; i++) {
+        const { codeFile, mapFile } = generateSyntheticBundle({
+          filename: `chunk_${i}.js`,
+          targetByteSize: chunkSizeBytes,
+          messageCount: messagesPerChunk,
+          withSourceMap: true,
+          messageIdOffset: dominantCount * dominantMessages + i * messagesPerChunk,
+        });
+        files.push(codeFile);
+        if (mapFile) {
+          files.push(mapFile);
+        }
+      }
+
+      const locales = generateTranslations(DEFAULT_LOCALES_8, totalMessages);
+      workload = {
+        files,
+        locales,
+        totalInputSizeBytes: calculateInputSizeBytes(files),
+      };
+    },
+    async run() {
+      if (!workload) {
+        return;
+      }
+      const inliner = new I18nInliner({
+        missingTranslation: 'warning',
+        maxConcurrency: options.concurrency,
+      });
+      try {
+        await inliner.inlineAll(workload.files, workload.locales);
+      } finally {
+        await inliner.close();
+      }
+    },
+  };
+}
+
+/**
  * Helper to prime the persistent cache in an isolated process.
  */
 export async function primeCache(cacheDir: string, concurrency?: number): Promise<void> {
@@ -462,6 +548,7 @@ export function getAllScenarios(options: ScenarioFactoryOptions = {}): Benchmark
     createEnterpriseScenario(options),
     createLargeEnterpriseScenario(options),
     createMonolithicScenario(options),
+    createMultiDominantScenario(options),
     createPersistentCacheWarmScenario(options),
   ];
 }

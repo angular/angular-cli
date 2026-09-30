@@ -71,6 +71,13 @@ const SMALL_FILE_FLOOR_BYTES = 100 * 1024;
 const DOMINANT_FILE_RATIO = 0.7;
 
 /**
+ * Maximum number of worker threads to allocate concurrently for a single dominant file.
+ * Capping concurrency on dominant files (which hold large AST and sourcemap trees)
+ * prevents V8 heap and RSS explosion on machines with high CPU core counts.
+ */
+const MAX_DOMINANT_WORKERS = 4;
+
+/**
  * Serializes the translation messages for a locale for transfer to an inliner Worker.
  *
  * A SharedArrayBuffer is preferred because it enables zero-copy shared memory access
@@ -522,14 +529,17 @@ export class I18nInliner {
 
       let localesPerBatch: number;
       if (uncachedByFile.size === 1) {
-        // Single file in window: shard across all workers to avoid idle threads
-        localesPerBatch = Math.max(1, Math.ceil(entries.length / workerCount));
+        // Single file in window: shard across bounded workers to balance throughput and peak memory
+        const targetWorkers = Math.min(workerCount, MAX_DOMINANT_WORKERS);
+        localesPerBatch = Math.max(1, Math.ceil(entries.length / targetWorkers));
       } else if (fileSize < SMALL_FILE_FLOOR_BYTES) {
         // Small chunks (< 100 KB): process all locales in 1 batch to eliminate IPC overhead
         localesPerBatch = entries.length;
       } else if (fileSize >= maxFileSize * DOMINANT_FILE_RATIO) {
-        // Dominant file(s): shard across all workers for maximum multi-core parallelism
-        localesPerBatch = Math.max(1, Math.ceil(entries.length / workerCount));
+        // Dominant file(s) with multiple files: shard across bounded workers while always reserving
+        // at least one worker to process smaller chunks in parallel without starvation.
+        const targetWorkers = Math.max(1, Math.min(workerCount - 1, MAX_DOMINANT_WORKERS));
+        localesPerBatch = Math.max(1, Math.ceil(entries.length / targetWorkers));
       } else {
         // Intermediate files: moderate sharding
         localesPerBatch = Math.max(1, Math.ceil(entries.length / 2));
