@@ -361,7 +361,7 @@ async function executeMultiBundle(
     input,
     plugins,
     treeshake: false,
-    resolve: { symlinks: preserveSymlinks },
+    resolve: { symlinks: !preserveSymlinks },
     checks: { circularDependency: false },
     experimental: {
       attachDebugInfo: 'none',
