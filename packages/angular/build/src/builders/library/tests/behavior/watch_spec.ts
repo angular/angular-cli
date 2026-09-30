@@ -260,6 +260,121 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       ]);
     });
 
+    it('should re-analyze exports and compile new entry point when package.json is modified in watch mode', async () => {
+      await harness.writeFile(
+        'projects/lib/secondary/src/public-api.ts',
+        `export const secondary = 'secondary-initial';`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.hasFile('dist/lib/fesm2022/lib.mjs')).toBeTrue();
+          expect(harness.hasFile('dist/lib/fesm2022/lib-secondary.mjs')).toBeFalse();
+
+          // Add secondary entry point to package.json exports
+          const pkg = JSON.parse(harness.readFile('projects/lib/package.json'));
+          pkg.exports = {
+            '.': './src/public-api.ts',
+            './secondary': './secondary/src/public-api.ts',
+          };
+          await harness.writeFile('projects/lib/package.json', JSON.stringify(pkg, null, 2));
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.hasFile('dist/lib/fesm2022/lib-secondary.mjs')).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib-secondary.mjs')).toContain(
+            'secondary-initial',
+          );
+          const pkg = JSON.parse(harness.readFile('dist/lib/package.json'));
+          expect(pkg.exports['./secondary']).toBeDefined();
+
+          // Update secondary entry point source file to ensure it is being watched
+          await harness.writeFile(
+            'projects/lib/secondary/src/public-api.ts',
+            `export const secondary = 'secondary-updated';`,
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib-secondary.mjs')).toContain(
+            'secondary-updated',
+          );
+        },
+      ]);
+    });
+
+    it('should re-analyze exports and recompile when entry point path is changed in package.json in watch mode', async () => {
+      await harness.writeFile(
+        'projects/lib/src/alternative-api.ts',
+        `export const value = 'alternative-api-content';`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain('LibComponent');
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).not.toContain(
+            'alternative-api-content',
+          );
+
+          // Change primary entry point path in package.json
+          const pkg = JSON.parse(harness.readFile('projects/lib/package.json'));
+          pkg.exports = {
+            '.': './src/alternative-api.ts',
+          };
+          await harness.writeFile('projects/lib/package.json', JSON.stringify(pkg, null, 2));
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain(
+            'alternative-api-content',
+          );
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).not.toContain('LibComponent');
+        },
+      ]);
+    });
+
+    it('should fail with error when name is removed from package.json in watch mode', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+
+          // Remove name from package.json
+          const pkg = JSON.parse(harness.readFile('projects/lib/package.json'));
+          delete pkg.name;
+          await harness.writeFile('projects/lib/package.json', JSON.stringify(pkg, null, 2));
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeFalse();
+          expect(result?.error).toContain("must contain a 'name'");
+
+          // Restore name in package.json
+          const pkg = JSON.parse(harness.readFile('projects/lib/package.json'));
+          pkg.name = 'lib';
+          await harness.writeFile('projects/lib/package.json', JSON.stringify(pkg, null, 2));
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+        },
+      ]);
+    });
+
     it('should recover from compilation errors in watch mode', async () => {
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
