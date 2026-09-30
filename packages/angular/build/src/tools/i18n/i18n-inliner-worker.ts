@@ -276,26 +276,25 @@ export async function inlineFileBatch(
     map = rawMap ? (JSON.parse(rawMap) as SourceMapInput) : undefined;
   }
 
-  const results = await Promise.all(
-    Array.from(request.locales, async ([locale, translation]) => {
-      const result = await inlineLocalize(
-        code,
-        map,
-        metadata,
-        locale,
-        await loadTranslation(locale, translation),
-        request.filename,
-        request.missingTranslation,
-      );
+  const results = [];
+  for (const [locale, translation] of request.locales) {
+    const result = await inlineLocalize(
+      code,
+      map,
+      metadata,
+      locale,
+      await loadTranslation(locale, translation),
+      request.filename,
+      request.missingTranslation,
+    );
 
-      return {
-        locale,
-        code: result.code,
-        map: result.map,
-        messages: result.diagnostics,
-      };
-    }),
-  );
+    results.push({
+      locale,
+      code: result.code,
+      map: result.map,
+      messages: result.diagnostics,
+    });
+  }
 
   return {
     file: request.filename,
