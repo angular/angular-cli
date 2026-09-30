@@ -541,6 +541,113 @@ export function createLargeEnterpriseScenario(
   };
 }
 
+/**
+ * 7. Massive Multichunk Scenario:
+ * 800 chunks total (~150 MB JS): 1 main bundle (6 MB) + 250 small chunks (40 KB) + 549 feature chunks (245 KB),
+ * 8 locales, 5,000 translations, sourcemaps ON.
+ * Stresses worker thread pool queue capacity, dispatch throughput, IPC messaging, and memory reclamation
+ * across hundreds of parallel files.
+ */
+export function createMassiveMultichunkScenario(
+  options: ScenarioFactoryOptions = {},
+): BenchmarkScenario {
+  let workload: GeneratedWorkload | undefined;
+
+  return {
+    name: 'massive-multichunk',
+    description: 'Massive Multichunk: 800 chunks (~150 MB JS), 8 locales, sourcemaps ON',
+    get inputSizeBytes() {
+      return workload?.totalInputSizeBytes ?? 0;
+    },
+    get localeCount() {
+      return DEFAULT_LOCALES_8.length;
+    },
+    async setup() {
+      await initializeFixtures();
+      const files: BuildOutputFile[] = [];
+      const totalMessages = 5000;
+      let messageOffset = 0;
+
+      // 1. Dominant entry bundle: 6 MB, 1,000 messages
+      const mainMessages = 1000;
+      const { codeFile: mainCode, mapFile: mainMap } = generateSyntheticBundle({
+        filename: 'main.js',
+        targetByteSize: 6 * 1024 * 1024,
+        messageCount: mainMessages,
+        withSourceMap: true,
+        messageIdOffset: messageOffset,
+      });
+      files.push(mainCode);
+      if (mainMap) {
+        files.push(mainMap);
+      }
+      messageOffset += mainMessages;
+
+      // 2. Small route/dialog chunks (< 100 KB): 250 chunks x 40 KB = 10 MB, 1,000 messages (4 msgs/chunk)
+      const smallChunkCount = 250;
+      const smallChunkSizeBytes = 40 * 1024;
+      const smallChunkMessages = 4;
+      for (let i = 0; i < smallChunkCount; i++) {
+        const { codeFile, mapFile } = generateSyntheticBundle({
+          filename: `small_chunk_${i}.js`,
+          targetByteSize: smallChunkSizeBytes,
+          messageCount: smallChunkMessages,
+          withSourceMap: true,
+          messageIdOffset: messageOffset + i * smallChunkMessages,
+        });
+        files.push(codeFile);
+        if (mapFile) {
+          files.push(mapFile);
+        }
+      }
+      messageOffset += smallChunkCount * smallChunkMessages;
+
+      // 3. Medium/large feature chunks: 549 chunks x 245 KB = ~134.5 MB, 3,000 messages
+      const featureChunkCount = 549;
+      const featureChunkSizeBytes = 245 * 1024;
+      const remainingMessages = totalMessages - messageOffset;
+      const messagesPerFeatureChunk = Math.max(
+        1,
+        Math.floor(remainingMessages / featureChunkCount),
+      );
+      for (let i = 0; i < featureChunkCount; i++) {
+        const { codeFile, mapFile } = generateSyntheticBundle({
+          filename: `feature_chunk_${i}.js`,
+          targetByteSize: featureChunkSizeBytes,
+          messageCount: messagesPerFeatureChunk,
+          withSourceMap: true,
+          messageIdOffset: messageOffset + i * messagesPerFeatureChunk,
+        });
+        files.push(codeFile);
+        if (mapFile) {
+          files.push(mapFile);
+        }
+      }
+
+      const locales = generateTranslations(DEFAULT_LOCALES_8, totalMessages);
+      workload = {
+        files,
+        locales,
+        totalInputSizeBytes: calculateInputSizeBytes(files),
+      };
+    },
+    async run() {
+      if (!workload) {
+        return;
+      }
+      const inliner = new I18nInliner({
+        missingTranslation: 'warning',
+        maxConcurrency: options.concurrency,
+      });
+      try {
+        await inliner.inlineAll(workload.files, workload.locales);
+      } finally {
+        await inliner.close();
+      }
+    },
+  };
+}
+
 export function getAllScenarios(options: ScenarioFactoryOptions = {}): BenchmarkScenario[] {
   return [
     createStandardAppScenario(options),
@@ -549,6 +656,7 @@ export function getAllScenarios(options: ScenarioFactoryOptions = {}): Benchmark
     createLargeEnterpriseScenario(options),
     createMonolithicScenario(options),
     createMultiDominantScenario(options),
+    createMassiveMultichunkScenario(options),
     createPersistentCacheWarmScenario(options),
   ];
 }
