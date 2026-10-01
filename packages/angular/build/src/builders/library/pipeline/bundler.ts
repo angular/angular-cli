@@ -34,6 +34,9 @@ export interface BundleEntryPointsOutput {
 
   /** Map of entry point names to their bundle results containing bundled module IDs. */
   bundleResults: Map<string, BundleResult>;
+
+  /** Warning messages emitted during bundling. */
+  warnings: string[];
 }
 
 /**
@@ -65,6 +68,9 @@ interface MultiBundleOutput {
 
   /** Map of bundle entry names to the set of virtual module IDs included in the bundle. */
   moduleIdsByBundle: Map<string, Set<string>>;
+
+  /** Warning messages emitted during the bundle invocation. */
+  warnings: string[];
 }
 
 /**
@@ -85,7 +91,7 @@ export async function bundleEntryPoints(
 ): Promise<BundleEntryPointsOutput> {
   const bundleResults = new Map<string, BundleResult>();
   if (items.length === 0) {
-    return { filesToEmit: [], bundleResults };
+    return { filesToEmit: [], bundleResults, warnings: [] };
   }
 
   const esmEntryPoints: NormalizedEntryPoint[] = [];
@@ -122,6 +128,7 @@ export async function bundleEntryPoints(
   return {
     filesToEmit: [...esmOutput.filesToEmit, ...dtsOutput.filesToEmit],
     bundleResults,
+    warnings: [...esmOutput.warnings, ...dtsOutput.warnings],
   };
 }
 
@@ -228,7 +235,10 @@ function createMemoryFileLoaderPlugin(
  * @param dir The destination output directory prefix.
  * @returns The processed multi-bundle output.
  */
-function processRolldownOutput(output: RolldownOutput['output'], dir: string): MultiBundleOutput {
+function processRolldownOutput(
+  output: RolldownOutput['output'],
+  dir: string,
+): Pick<MultiBundleOutput, 'filesToEmit' | 'moduleIdsByBundle'> {
   const filesToEmit: MemoryOutputFile[] = [];
   const moduleIdsByBundle = new Map<string, Set<string>>();
   const chunksByFileName = new Map<string, OutputChunk>();
@@ -317,6 +327,7 @@ async function executeMultiBundle(
     sourcemap = true;
   }
 
+  const warnings: string[] = [];
   const bundle = await rolldown({
     context: 'this',
     input,
@@ -325,6 +336,11 @@ async function executeMultiBundle(
     treeshake: false,
     resolve: { symlinks: !preserveSymlinks },
     checks: { circularDependency: false },
+    onLog(level, log) {
+      if (level === 'warn') {
+        warnings.push(log.message);
+      }
+    },
     experimental: {
       attachDebugInfo: 'none',
     },
@@ -341,7 +357,10 @@ async function executeMultiBundle(
       comments: { jsdoc: isDts, legal: true, annotation: true },
     });
 
-    return processRolldownOutput(output, dir);
+    return {
+      ...processRolldownOutput(output, dir),
+      warnings,
+    };
   } finally {
     await bundle.close();
   }
@@ -361,7 +380,7 @@ async function bundleAllEsm(
   options: NormalizedLibraryOptions,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
-    return { filesToEmit: [], moduleIdsByBundle: new Map() };
+    return { filesToEmit: [], moduleIdsByBundle: new Map(), warnings: [] };
   }
 
   return executeMultiBundle(
@@ -386,7 +405,7 @@ async function bundleAllDts(
   options: NormalizedLibraryOptions,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
-    return { filesToEmit: [], moduleIdsByBundle: new Map() };
+    return { filesToEmit: [], moduleIdsByBundle: new Map(), warnings: [] };
   }
 
   const dtsSourcemap = options.declarationMap;

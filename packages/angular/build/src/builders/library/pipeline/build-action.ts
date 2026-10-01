@@ -156,7 +156,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     pendingChangedEsmFiles.clear();
     pendingChangedDtsFiles.clear();
 
-    for (const warning of warnings) {
+    for (const warning of [...warnings, ...bundleOutput.warnings]) {
       context.logger.warn(warning);
     }
 
