@@ -216,7 +216,10 @@ export class AotCompilation extends TypeScriptCompilation {
         // Also invalidate Angular diagnostics for a source file if component resources are modified
         if (this.#state && hostOptions.modifiedFiles?.size) {
           for (const resourceDependency of resourceDependencies) {
-            if (hostOptions.modifiedFiles.has(resourceDependency)) {
+            if (
+              hostOptions.modifiedFiles.has(resourceDependency) &&
+              !/\.(?:css|scss|sass|less)$/i.test(resourceDependency)
+            ) {
               this.#state.diagnosticCache.delete(sourceFile);
               // Also mark as affected in case changed template affects diagnostics
               affectedFiles.add(sourceFile);
