@@ -52,5 +52,25 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         }),
       );
     });
+
+    it('should log Rolldown bundler warnings', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `export function runDynamic(code: string) { return eval(code); }`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'warn',
+          message: jasmine.stringContaining('eval'),
+        }),
+      );
+    });
   });
 });
