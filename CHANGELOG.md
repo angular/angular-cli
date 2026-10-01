@@ -1,3 +1,26 @@
+<a name="22.3.0-next.0"></a>
+
+# 22.3.0-next.0 (2026-10-01)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                 |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [f52fb536a1](https://github.com/angular/angular-cli/commit/f52fb536a1fddabee42448a050961c7986314992) | fix  | decouple official Node.js support check from execution gate |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                  |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
+| [c5b8bf0369](https://github.com/angular/angular-cli/commit/c5b8bf036965f31c283b1d14bd02b31bdfc02353) | feat | add library builder                                          |
+| [feb41cc934](https://github.com/angular/angular-cli/commit/feb41cc9341ff001a67ffc22ac9816aba8750e65) | feat | add polyfills option to unit-test builder                    |
+| [d09f98ee70](https://github.com/angular/angular-cli/commit/d09f98ee701754bdb4eca7d56dcf506c8d8b6729) | fix  | avoid top-level await for Zone.js injection in Vitest runner |
+| [a0a6b422cd](https://github.com/angular/angular-cli/commit/a0a6b422cdc3ce4e79f5b8eaccf1e9ed82579afe) | fix  | ensure asset followSymlinks defaults to false                |
+| [69acf5b822](https://github.com/angular/angular-cli/commit/69acf5b822bebc0b4bebd30f1db6cc7b8d624531) | fix  | include dataurl option in global stylesheet config hash      |
+| [76dd17d522](https://github.com/angular/angular-cli/commit/76dd17d522751b91ff46d42c1eb11bb0f5cb1be9) | fix  | re-analyze exports on package.json change in library builder |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.1"></a>
 
 # 22.2.1 (2026-10-01)
