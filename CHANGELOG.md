@@ -1,3 +1,57 @@
+<a name="22.2.1"></a>
+
+# 22.2.1 (2026-10-01)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [db053444e0](https://github.com/angular/angular-cli/commit/db053444e0af22223100f931def9f41d1eea4426) | fix  | skip components with a change detection strategy in the zoneless migration tool |
+
+### @schematics/angular
+
+| Commit                                                                                               | Type | Description                                                               |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
+| [663c580c86](https://github.com/angular/angular-cli/commit/663c580c86645b5b3a31925154427588e48018ba) | fix  | add browsers option to angular.json during vitest browser provider ng-add |
+
+### @angular-devkit/schematics-cli
+
+| Commit                                                                                               | Type | Description                                                                                                        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------ |
+| [e6350b6f57](https://github.com/angular/angular-cli/commit/e6350b6f57a546f77d38515604d1c1fa46d85d39) | fix  | correctly parse inline boolean values in CLI options ([#34201](https://github.com/angular/angular-cli/pull/34201)) |
+
+### @angular-devkit/architect
+
+| Commit                                                                                               | Type | Description                                                                                                        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------ |
+| [516df4ee6d](https://github.com/angular/angular-cli/commit/516df4ee6d1d07ad8b851ff108595d08ef4d319b) | fix  | correctly parse inline boolean values in CLI options ([#34201](https://github.com/angular/angular-cli/pull/34201)) |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                                          |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [ac70f86208](https://github.com/angular/angular-cli/commit/ac70f862086343d2d9a36fd7b09b3a3680e907b0) | fix  | do not mark standalone expression statements as pure |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                       |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------------- |
+| [ec9c0b51c2](https://github.com/angular/angular-cli/commit/ec9c0b51c24fd0fba8a7f01dbb0ff25cf520a0d5) | fix  | deduplicate spurious chokidar polling change events ([#34188](https://github.com/angular/angular-cli/pull/34188)) |
+| [c1b5154180](https://github.com/angular/angular-cli/commit/c1b515418033685a9624140b5eecb6330ec07504) | fix  | encode script type in auto-CSP loader                                                                             |
+| [cb4dd71a1b](https://github.com/angular/angular-cli/commit/cb4dd71a1bbf9d7a8273061c54a8997cb725e9e3) | fix  | ensure @angular/compiler is loaded for Vitest TestBed initialization                                              |
+| [b198044048](https://github.com/angular/angular-cli/commit/b1980440484d809f89e54d04bdeb484ff2db6aae) | fix  | preserve nested workspace path for git worktree cache                                                             |
+| [5194b41531](https://github.com/angular/angular-cli/commit/5194b415314a4fb2435b29dcf42ccffbc26070a9) | fix  | prevent chokidar from scanning unimported node_modules in watch mode                                              |
+| [37cf399d95](https://github.com/angular/angular-cli/commit/37cf399d95d9376811cd79144bbd517f3efe3d32) | fix  | reset component updates on dev-server SSR page request                                                            |
+| [ddff42cb03](https://github.com/angular/angular-cli/commit/ddff42cb03cd45f1e668794057843f8a98501c0a) | fix  | serve emitted HTML assets in dev-server                                                                           |
+| [e3e893682d](https://github.com/angular/angular-cli/commit/e3e893682d501d3135bf3abcb1c74b9598f78017) | fix  | watchers outside the workspace via parcel didn&apos;t work                                                        |
+| [d55e899954](https://github.com/angular/angular-cli/commit/d55e899954e677c9d0751ab8e56b0364bf3a3098) | perf | avoid loading compiler-cli and typescript in js transform worker                                                  |
+| [3d08e5b053](https://github.com/angular/angular-cli/commit/3d08e5b053d50f9101215974039aafcc39f6a9e9) | perf | avoid sharding intermediate files under worker surplus in i18n inliner                                            |
+| [5ea36fe8b8](https://github.com/angular/angular-cli/commit/5ea36fe8b8b9732054a3749912018bae71e3b746) | perf | bound aggregate worker allocation across dominant files in i18n inliner                                           |
+| [90ee193bd1](https://github.com/angular/angular-cli/commit/90ee193bd188629da762e2f98cb664d8493ed733) | perf | bound concurrent worker allocation for dominant files in i18n inliner                                             |
+| [41b353856b](https://github.com/angular/angular-cli/commit/41b353856ba0babc03907701508d7a2b45c96743) | perf | process batch locales sequentially in i18n inliner worker                                                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.0"></a>
 
 # 22.2.0 (2026-09-23)
