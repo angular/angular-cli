@@ -54,15 +54,7 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       return this.#cachedConfiguration;
     }
 
-    // TODO(alanagius): remove casting when @angular/compiler-cli exports the correct typings.
-    const { readConfiguration } = (await TypeScriptCompilation.loadCompilerCli()) as typeof ng & {
-      readConfiguration(
-        project: string,
-        existingOptions?: ng.CompilerOptions,
-        host?: unknown,
-        extendedConfigCache?: Map<string, ts.ExtendedConfigCacheEntry>,
-      ): ng.ParsedConfiguration;
-    };
+    const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
     const {
       options: originalCompilerOptions,
