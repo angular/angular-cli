@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { normalizeCacheOptions } from './normalize-cache';
 
@@ -15,7 +15,9 @@ describe('normalizeCacheOptions', () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await mkdtemp(join(tmpdir(), 'angular-cache-spec-'));
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    tempDir = await mkdtemp(join(baseTmpDir, 'angular-cache-spec-'));
   });
 
   afterEach(async () => {
@@ -56,6 +58,64 @@ describe('normalizeCacheOptions', () => {
     expect(options.path).toBe(resolve(mainRepoRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
     expect(options.localBasePath).toBe(resolve(worktreeRoot, '.angular/cache'));
     expect(options.localPath).toBe(resolve(worktreeRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
+  });
+
+  it('should resolve cache path relative to corresponding nested workspace in main repository for a git worktree', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const mainWorkspaceRoot = join(mainRepoRoot, 'Site1/ClientApp');
+    const worktreeRoot = join(tempDir, 'worktree');
+    const worktreeWorkspaceRoot = join(worktreeRoot, 'Site1/ClientApp');
+
+    // Create main repo with a nested Angular workspace directory
+    await mkdir(mainGitDir, { recursive: true });
+    await mkdir(mainWorkspaceRoot, { recursive: true });
+
+    // Create worktree with the same nested Angular workspace structure and a .git file at the worktree root
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeWorkspaceRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+
+    // Point the worktree metadata back to the main .git directory
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions({}, worktreeWorkspaceRoot);
+
+    expect(options.basePath).toBe(resolve(mainWorkspaceRoot, '.angular/cache'));
+    expect(options.path).toBe(resolve(mainWorkspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
+    expect(options.localBasePath).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(worktreeWorkspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'),
+    );
+  });
+
+  it('should fall back to worktree workspace root when nested workspace does not exist in main repository', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+    const worktreeWorkspaceRoot = join(worktreeRoot, 'NewSite/ClientApp');
+
+    // Create main repo without the 'NewSite/ClientApp' subdirectory (e.g., added only on the worktree branch)
+    await mkdir(mainGitDir, { recursive: true });
+
+    // Create worktree with the new nested Angular workspace and link it to the main repo's .git directory
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeWorkspaceRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions({}, worktreeWorkspaceRoot);
+
+    expect(options.basePath).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
+    expect(options.path).toBe(
+      resolve(worktreeWorkspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'),
+    );
+    expect(options.localBasePath).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(worktreeWorkspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'),
+    );
   });
 
   it('should resolve local cache path relative to worktree root with custom relative path', async () => {
