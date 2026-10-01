@@ -8,7 +8,6 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
-import fs from 'node:fs/promises';
 import {
   resetSassWorkerPoolCaches,
   shutdownSassWorkerPool,
@@ -27,8 +26,9 @@ import type { BuildWatcher } from '../../utils/watcher';
 import { normalizeLibraryOptions } from './options';
 import { updateWatchedEntryPoints } from './pipeline/entry-points';
 import type { createComponentStylesheetBundlerForLibrary } from './pipeline/stylesheet-bundler';
+import { loadPackageJson } from './pipeline/utils';
 import type { Schema as LibraryBuilderOptions } from './schema';
-import type { NormalizedLibraryOptions, PackageJsonData, SingleBuildState } from './types';
+import type { NormalizedLibraryOptions, SingleBuildState } from './types';
 
 /**
  * Executes the library builder to compile, bundle, and package an Angular library into the Angular Package Format (APF).
@@ -338,15 +338,6 @@ async function* runWatchLoop(
       buildAction,
     );
   }
-}
-
-/**
- * Loads and parses a JSON file from disk.
- */
-async function loadPackageJson(packageJsonPath: string): Promise<PackageJsonData> {
-  const content = await fs.readFile(packageJsonPath, 'utf-8');
-
-  return JSON.parse(content) as PackageJsonData;
 }
 
 /**

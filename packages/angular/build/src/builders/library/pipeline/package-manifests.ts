@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import type { NormalizedLibraryOptions, PackageJsonData } from '../types';
 import {
@@ -13,6 +14,7 @@ import {
   type MemoryOutputFile,
   TYPES_OUTPUT_DIR,
   createMemoryOutputFile,
+  loadPackageJson,
 } from './utils';
 
 /**
@@ -20,12 +22,14 @@ import {
  *
  * @param options The normalized library options.
  * @param isWatchMode Whether the builder is running in watch mode.
+ * @param hasTslibImport Whether any output chunk imports 'tslib'.
  * @returns An array of memory output files containing generated package manifests and .npmignore.
  */
-export function generatePackageManifests(
+export async function generatePackageManifests(
   options: NormalizedLibraryOptions,
   isWatchMode: boolean,
-): MemoryOutputFile[] {
+  hasTslibImport = false,
+): Promise<MemoryOutputFile[]> {
   const { packageJson: rawPackageJson, keepLifecycleScripts, compilationMode } = options;
 
   const {
@@ -72,6 +76,16 @@ export function generatePackageManifests(
     // https://github.com/angular/angular-cli/issues/20962
     version: isWatchMode ? `0.0.0-watch+${Date.now()}` : version,
   };
+
+  if (hasTslibImport && !rawPackageJson.dependencies?.['tslib']) {
+    const tslibVersion = await getAngularTslibRange(options.workspaceRoot);
+    if (tslibVersion) {
+      distPackageJson.dependencies = {
+        ...rawPackageJson.dependencies,
+        tslib: tslibVersion,
+      };
+    }
+  }
 
   // Retain scripts if keepLifecycleScripts is set
   if (keepLifecycleScripts && scripts) {
@@ -165,4 +179,47 @@ function createExportConditions(
     ...otherConditions,
     default: fesmPath,
   };
+}
+
+/**
+ * Cached tslib range used by the Angular compiler.
+ */
+let cachedTslibRange: string | undefined;
+
+/**
+ * Get the tslib range used by the Angular compiler.
+ * @param workspaceRoot path to the workspace root
+ * @returns tslib range
+ */
+async function getAngularTslibRange(workspaceRoot: string): Promise<string> {
+  if (cachedTslibRange) {
+    return cachedTslibRange;
+  }
+
+  const workspaceRequire = createRequire(path.join(workspaceRoot, 'package.json'));
+
+  // Try resolving via @angular/compiler dependencies
+  try {
+    const angularCompilerPkg = await loadPackageJson(
+      workspaceRequire.resolve('@angular/compiler/package.json'),
+    );
+    cachedTslibRange = angularCompilerPkg.dependencies?.['tslib'];
+  } catch {}
+
+  // Fallback: Try resolving tslib directly
+  if (!cachedTslibRange) {
+    try {
+      const tslibPkg = await loadPackageJson(workspaceRequire.resolve('tslib/package.json'));
+      if (tslibPkg.version) {
+        cachedTslibRange = `^${tslibPkg.version}`;
+      }
+    } catch {}
+  }
+
+  // Fail fast if still unresolved
+  if (!cachedTslibRange) {
+    throw new Error('Unable to resolve tslib range.');
+  }
+
+  return cachedTslibRange;
 }

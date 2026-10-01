@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import fs from 'node:fs/promises';
+import type { PackageJsonData } from '../types';
+
 const IS_DTS_FILE_REGEXP = /\.d\.[cm]?ts$/i;
 const IS_DTS_MAP_FILE_REGEXP = /\.d\.[cm]?ts\.map$/i;
 
@@ -104,4 +107,16 @@ export function isDeclarationFile(path: string): boolean {
  */
 export function isDeclarationSourceMapFile(path: string): boolean {
   return IS_DTS_MAP_FILE_REGEXP.test(path);
+}
+
+/**
+ * Loads and parses a package.json file from disk.
+ *
+ * @param packageJsonPath The path to the package.json file.
+ * @returns The parsed package.json data.
+ */
+export async function loadPackageJson(packageJsonPath: string): Promise<PackageJsonData> {
+  const content = await fs.readFile(packageJsonPath, 'utf-8');
+
+  return JSON.parse(content) as PackageJsonData;
 }

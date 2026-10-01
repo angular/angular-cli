@@ -63,6 +63,9 @@ interface MultiBundleOutput {
   /** Map of bundle entry names to the set of virtual module IDs included in the bundle. */
   moduleIdsByBundle: Map<string, Set<string>>;
 
+  /** Set of bundle entry names that import 'tslib'. */
+  tslibBundles: Set<string>;
+
   /** Warning messages emitted during the bundle invocation. */
   warnings: string[];
 }
@@ -107,15 +110,16 @@ export async function bundleEntryPoints(
 
   for (const { entryPoint, previousBundleResult } of items) {
     const { bundleName, name } = entryPoint;
+    const esmModuleIds = esmOutput.moduleIdsByBundle.get(bundleName);
     bundleResults.set(name, {
-      esmModuleIds:
-        esmOutput.moduleIdsByBundle.get(bundleName) ??
-        previousBundleResult?.esmModuleIds ??
-        new Set(),
+      esmModuleIds: esmModuleIds ?? previousBundleResult?.esmModuleIds ?? new Set(),
       dtsModuleIds:
         dtsOutput.moduleIdsByBundle.get(bundleName) ??
         previousBundleResult?.dtsModuleIds ??
         new Set(),
+      hasTslibImport: esmModuleIds
+        ? esmOutput.tslibBundles.has(bundleName)
+        : (previousBundleResult?.hasTslibImport ?? false),
     });
   }
 
@@ -232,9 +236,10 @@ function createMemoryFileLoaderPlugin(
 function processRolldownOutput(
   output: RolldownOutput['output'],
   dir: string,
-): Pick<MultiBundleOutput, 'filesToEmit' | 'moduleIdsByBundle'> {
+): Omit<MultiBundleOutput, 'warnings'> {
   const filesToEmit: MemoryOutputFile[] = [];
   const moduleIdsByBundle = new Map<string, Set<string>>();
+  const tslibBundles = new Set<string>();
   const chunksByFileName = new Map<string, OutputChunk>();
   const entryChunks: OutputChunk[] = [];
 
@@ -280,6 +285,10 @@ function processRolldownOutput(
       }
 
       for (const depFile of [...chunk.imports, ...chunk.dynamicImports]) {
+        if (depFile === 'tslib') {
+          tslibBundles.add(entryChunk.name);
+        }
+
         const depChunk = chunksByFileName.get(depFile);
         if (depChunk && !visited.has(depChunk)) {
           queue.push(depChunk);
@@ -288,7 +297,7 @@ function processRolldownOutput(
     }
   }
 
-  return { filesToEmit, moduleIdsByBundle };
+  return { filesToEmit, moduleIdsByBundle, tslibBundles };
 }
 
 /**
@@ -375,7 +384,12 @@ async function bundleAllEsm(
   options: NormalizedLibraryOptions,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
-    return { filesToEmit: [], moduleIdsByBundle: new Map(), warnings: [] };
+    return {
+      filesToEmit: [],
+      moduleIdsByBundle: new Map(),
+      tslibBundles: new Set(),
+      warnings: [],
+    };
   }
 
   return executeMultiBundle(
@@ -400,7 +414,12 @@ async function bundleAllDts(
   options: NormalizedLibraryOptions,
 ): Promise<MultiBundleOutput> {
   if (entryPoints.length === 0) {
-    return { filesToEmit: [], moduleIdsByBundle: new Map(), warnings: [] };
+    return {
+      filesToEmit: [],
+      moduleIdsByBundle: new Map(),
+      tslibBundles: new Set(),
+      warnings: [],
+    };
   }
 
   // Ensure Rolldown's native binding is initialized via `loadRolldown()` before evaluating
