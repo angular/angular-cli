@@ -29,12 +29,12 @@
     "type": "git",
     "url": "git+https://github.com/angular/angular-cli.git"
   },
-  "packageManager": "pnpm@12.6.0",
+  "packageManager": "pnpm@12.8.1",
   "engines": {
     "node": "^22.22.3 || ^24.15.0 || >=26.0.0",
     "npm": "Please use pnpm instead of NPM to install dependencies",
     "yarn": "Please use pnpm instead of Yarn to install dependencies",
-    "pnpm": "12.6.0"
+    "pnpm": "12.8.1"
   },
   "author": "Angular Authors",
   "license": "MIT",
@@ -91,8 +91,8 @@
     "@types/semver": "^7.3.12",
     "@types/yargs": "^17.0.20",
     "@types/yargs-parser": "^21.0.0",
-    "@typescript-eslint/eslint-plugin": "8.70.1",
-    "@typescript-eslint/parser": "8.70.1",
+    "@typescript-eslint/eslint-plugin": "8.71.0",
+    "@typescript-eslint/parser": "8.71.0",
     "ajv": "8.20.0",
     "buffer": "6.0.3",
     "esbuild": "0.28.2",
