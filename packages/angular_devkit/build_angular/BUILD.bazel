@@ -281,7 +281,7 @@ ts_project(
 LARGE_SPECS = {
     "app-shell": {},
     "dev-server": {
-        "shards": 10,
+        "shards": 12,
         "size": "large",
         "flaky": True,
         "extra_deps": [
@@ -294,7 +294,7 @@ LARGE_SPECS = {
     },
     "extract-i18n": {},
     "karma": {
-        "shards": 6,
+        "shards": 10,
         "size": "large",
         "flaky": True,
         "extra_deps": [
@@ -309,6 +309,7 @@ LARGE_SPECS = {
         ],
     },
     "server": {
+        "shards": 6,
         "size": "large",
         "extra_deps": [
             "//:node_modules/@angular/animations",
@@ -317,7 +318,7 @@ LARGE_SPECS = {
     "ng-packagr": {
     },
     "browser": {
-        "shards": 10,
+        "shards": 20,
         "size": "large",
         "flaky": True,
         "extra_deps": [
@@ -327,7 +328,9 @@ LARGE_SPECS = {
             "//:node_modules/ajv",
         ],
     },
-    "prerender": {},
+    "prerender": {
+        "shards": 4,
+    },
     "browser-esbuild": {},
     "ssr-dev-server": {
         "extra_deps": [
