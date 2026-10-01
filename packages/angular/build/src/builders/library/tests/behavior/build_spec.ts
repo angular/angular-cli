@@ -37,6 +37,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       harness.expectFile('dist/lib/package.json').toExist();
       const pkgJson = JSON.parse(harness.readFile('dist/lib/package.json'));
+      expect(pkgJson.dependencies).toBeUndefined();
       expect(pkgJson).toEqual(
         jasmine.objectContaining({
           name: 'lib',
@@ -71,6 +72,72 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           message: jasmine.stringContaining('eval'),
         }),
       );
+    });
+
+    it('should automatically add tslib to dependencies when output chunks import tslib', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `
+        function CustomClassDecorator(): ClassDecorator {
+          return () => {};
+        }
+
+        @CustomClassDecorator()
+        export class DecoratedService {}
+        `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.error).toBeUndefined();
+      expect(result?.success).toBeTrue();
+
+      const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesmContent).toContain('tslib');
+
+      const pkgJson = JSON.parse(harness.readFile('dist/lib/package.json'));
+      expect(pkgJson.dependencies).toEqual({
+        tslib: jasmine.any(String),
+      });
+    });
+
+    it('should preserve existing user tslib version in package.json when output chunks import tslib', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `
+        function CustomClassDecorator(): ClassDecorator {
+          return () => {};
+        }
+
+        @CustomClassDecorator()
+        export class DecoratedService {}
+        `,
+      );
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.dependencies = {
+          tslib: '^2.0.0',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.error).toBeUndefined();
+      expect(result?.success).toBeTrue();
+
+      const pkgJson = JSON.parse(harness.readFile('dist/lib/package.json'));
+      expect(pkgJson.dependencies).toEqual({
+        tslib: '^2.0.0',
+      });
     });
   });
 });

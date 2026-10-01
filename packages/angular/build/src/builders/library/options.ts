@@ -7,7 +7,6 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import type { StylesheetPluginsass } from '../../tools/esbuild/stylesheets/stylesheet-plugin-factory';
 import { normalizeAssetPatterns } from '../../utils';
@@ -21,6 +20,7 @@ import {
 } from '../../utils/postcss-configuration';
 import { getProjectRootPaths } from '../../utils/project-metadata';
 import { normalizeEntryPoints } from './pipeline/entry-points';
+import { loadPackageJson } from './pipeline/utils';
 import type { Schema as LibraryBuilderOptions } from './schema';
 import type { NormalizedLibraryOptions, PackageJsonData } from './types';
 
@@ -55,8 +55,7 @@ export async function normalizeLibraryOptions(
 
   let packageJson: PackageJsonData;
   try {
-    const packageJsonContent = await fs.readFile(packageJsonPath, 'utf8');
-    packageJson = JSON.parse(packageJsonContent) as PackageJsonData;
+    packageJson = await loadPackageJson(packageJsonPath);
   } catch (error) {
     assertIsError(error);
     throw new Error(`Failed to read 'package.json' at '${packageJsonPath}': ${error.message}`, {
