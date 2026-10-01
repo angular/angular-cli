@@ -225,7 +225,7 @@ async function* runWatchLoop(
   hasModifiedWatchedFile: typeof import('./pipeline/build-action').hasModifiedWatchedFile,
   signal?: AbortSignal,
 ): AsyncIterableIterator<BuilderOutput> {
-  const { checkAssetChanges } = await import('./pipeline/assets');
+  const { collectAssetsToEmit } = await import('./pipeline/assets');
 
   const { workspaceRoot, packageJsonPath, assets, clearScreen } = options;
   const posixPackageJsonPath = toPosixPath(packageJsonPath);
@@ -304,11 +304,13 @@ async function* runWatchLoop(
       buildState.hasEntryPointsChanges ||
       hasModifiedWatchedFile(changedFiles, allWatchedFiles, posixPackageJsonPath);
 
-    if (
-      !hasSourceChanges &&
-      !hasPackageJsonChanges &&
-      !checkAssetChanges(assets, workspaceRoot, changedFiles)
-    ) {
+    const assetsToEmit = await collectAssetsToEmit(
+      assets,
+      workspaceRoot,
+      buildState.hasEmittedAssets ? changedFiles : undefined,
+    );
+
+    if (!hasSourceChanges && !hasPackageJsonChanges && assetsToEmit.length === 0) {
       continue;
     }
 
@@ -322,6 +324,7 @@ async function* runWatchLoop(
         context,
         buildState,
         modifiedFiles: changedFiles,
+        assetsToEmit,
       },
       withProgress,
       watcher,

@@ -17,7 +17,7 @@ import { type BundleEntryPointInput, bundleEntryPoints } from './bundler';
 import { compileLibrary } from './compilation';
 import { generatePackageManifests } from './package-manifests';
 import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
-import type { OutputFile } from './utils';
+import type { DiskOutputFile, OutputFile } from './utils';
 
 /**
  * Creates a fresh {@link SingleBuildState} instance.
@@ -42,6 +42,7 @@ export interface BuildActionContext {
   allWatchedFiles: Set<string>;
   buildState: SingleBuildState;
   modifiedFiles?: Set<string>;
+  assetsToEmit?: DiskOutputFile[];
 }
 
 /**
@@ -60,6 +61,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     allWatchedFiles,
     buildState,
     modifiedFiles,
+    assetsToEmit,
   } = actionContext;
 
   const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
@@ -170,14 +172,17 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     filesToEmit.push(...generatePackageManifests(options, isWatchMode));
   }
 
-  filesToEmit.push(
-    ...(await collectAssetsToEmit(
+  const resolvedAssetsToEmit =
+    assetsToEmit ??
+    (await collectAssetsToEmit(
       options.assets,
       options.workspaceRoot,
-      allWatchedFiles,
       buildState.hasEmittedAssets ? modifiedFiles : undefined,
-    )),
-  );
+    ));
+  for (const asset of resolvedAssetsToEmit) {
+    allWatchedFiles.add(toPosixPath(asset.source));
+  }
+  filesToEmit.push(...resolvedAssetsToEmit);
 
   await emitFilesToDisk<OutputFile>(filesToEmit, async (file) => {
     const fullFilePath = path.join(options.outputPath, file.path);
