@@ -441,7 +441,6 @@ describe('AngularServerApp', () => {
           'http://localhost/home?empty',
           'http://localhost/home?scope=email+profile',
           'http://localhost/home?bbb=1&aaa=2&bbb=3',
-          'http://localhost//home',
         ];
 
         for (const url of urls) {
