@@ -292,24 +292,35 @@ function processRolldownOutput(output: RolldownOutput['output'], dir: string): M
  *
  * @param input Map of bundle names to virtual entry file paths.
  * @param plugins Rolldown plugins to use during bundling.
- * @param preserveSymlinks Whether to preserve symlinks during module resolution.
  * @param extension Output file extension ('mjs' or 'd.ts').
- * @param sourcemap Whether to emit sourcemaps.
- * @param findEntryPoint Lookup function to resolve chunk entry point ownership.
+ * @param options The normalized library options.
  * @returns A promise resolving to the multi-bundle output.
  */
 async function executeMultiBundle(
   input: Record<string, string>,
   plugins: RolldownPluginOption[],
-  preserveSymlinks: boolean,
   extension: 'mjs' | 'd.ts',
-  sourcemap: boolean,
+  options: NormalizedLibraryOptions,
 ): Promise<MultiBundleOutput> {
+  const { workspaceRoot, preserveSymlinks, declarationMap, outputPath } = options;
   const isDts = extension === 'd.ts';
-  const dir = isDts ? TYPES_OUTPUT_DIR : FESM_OUTPUT_DIR;
+  const relativeOutputPath = path.posix.relative(outputPath, workspaceRoot);
+
+  let sourcemap: boolean;
+  let dir: string;
+  if (isDts) {
+    dir = TYPES_OUTPUT_DIR;
+    sourcemap = declarationMap;
+  } else {
+    dir = FESM_OUTPUT_DIR;
+    // FESM (.mjs) sourcemaps are always enabled.
+    sourcemap = true;
+  }
+
   const bundle = await rolldown({
     context: 'this',
     input,
+    cwd: workspaceRoot,
     plugins,
     treeshake: false,
     resolve: { symlinks: !preserveSymlinks },
@@ -326,6 +337,7 @@ async function executeMultiBundle(
       entryFileNames: `[name].${extension}`,
       chunkFileNames: `[name]-[hash].${extension}`,
       sourcemap,
+      sourcemapPathTransform: (sourcePath) => path.posix.join(relativeOutputPath, sourcePath),
       hoistTransitiveImports: false,
       comments: { jsdoc: isDts, legal: true, annotation: true },
     });
@@ -356,9 +368,8 @@ async function bundleAllEsm(
   return executeMultiBundle(
     resolveEntryInputMap(entryPoints, false),
     [createMemoryFileLoaderPlugin(esmFiles, ESM_EXTENSIONS, true)],
-    options.preserveSymlinks,
     'mjs',
-    true,
+    options,
   );
 }
 
@@ -389,10 +400,13 @@ async function bundleAllDts(
     dtsInput: true,
     tsconfig: false,
     sourcemap: dtsSourcemap,
+    generator: 'oxc',
   });
+
   const dtsPlugins = rawDtsPlugins.filter(
     (plugin) => plugin.name !== 'rolldown-plugin-dts:resolver',
   );
+
   assert(
     dtsPlugins.length < rawDtsPlugins.length,
     'Expected "rolldown-plugin-dts:resolver" plugin to be present in rolldown-plugin-dts.',
@@ -401,8 +415,7 @@ async function bundleAllDts(
   return executeMultiBundle(
     resolveEntryInputMap(entryPoints, true),
     [createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap), ...dtsPlugins],
-    options.preserveSymlinks,
     'd.ts',
-    dtsSourcemap,
+    options,
   );
 }

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { join } from 'node:path';
 import { executeLibraryBuilder } from '../../builder';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
@@ -21,10 +22,15 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
 
       harness.expectFile('dist/lib/fesm2022/lib.mjs').toExist();
-      expect(harness.hasFile('dist/lib/fesm2022/lib.mjs')).toBeTrue();
+      harness.expectFile('dist/lib/fesm2022/lib.mjs').toExist();
       const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
       expect(fesmContent).toContain('LibComponent');
       expect(fesmContent).toContain('ɵcmp');
+
+      harness.expectFile('dist/lib/fesm2022/lib.mjs.map').toExist();
+      const fesmMap = JSON.parse(harness.readFile('dist/lib/fesm2022/lib.mjs.map'));
+      expect(fesmMap.sources).toContain('../../../projects/lib/src/lib/lib.component.ts');
+      harness.expectFile(join('dist/lib/fesm2022', fesmMap.sources[0])).toExist();
 
       harness.expectFile('dist/lib/types/lib.d.ts').toExist();
       const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
