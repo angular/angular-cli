@@ -8,7 +8,7 @@
 
 import { isJsonObject } from '@angular-devkit/core';
 import { existsSync, readFileSync, statSync } from 'node:fs';
-import { dirname, isAbsolute, join, resolve } from 'node:path';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { Cache, Environment } from '../../../lib/config/workspace-schema';
 import { AngularWorkspace } from '../../utilities/config';
 
@@ -47,11 +47,16 @@ function getCacheBasePath(workspaceRoot: string, cachePathSetting: string): stri
               // It's a git worktree
               const commondir = readFileSync(commondirPath, 'utf8').trim();
               const commonGitDir = resolve(gitdir, commondir);
-
-              return resolve(dirname(commonGitDir), cachePathSetting);
+              const relativeWorkspacePath = relative(currentDir, workspaceRoot);
+              const mainWorkspaceRoot = resolve(dirname(commonGitDir), relativeWorkspacePath);
+              if (existsSync(mainWorkspaceRoot)) {
+                return resolve(mainWorkspaceRoot, cachePathSetting);
+              }
             }
           }
         }
+
+        break;
       }
       const parentDir = dirname(currentDir);
       if (parentDir === currentDir) {
