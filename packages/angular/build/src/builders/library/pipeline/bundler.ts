@@ -8,14 +8,8 @@
 
 import assert from 'node:assert';
 import path from 'node:path';
-import {
-  type OutputChunk,
-  type Plugin,
-  type RolldownOutput,
-  type RolldownPluginOption,
-  rolldown,
-} from 'rolldown';
-import { dts } from 'rolldown-plugin-dts';
+import type { OutputChunk, Plugin, RolldownOutput, RolldownPluginOption } from 'rolldown';
+import { loadRolldown } from '../../../utils/load-rolldown';
 import { toPosixPath } from '../../../utils/path';
 import type { BundleResult, NormalizedEntryPoint, NormalizedLibraryOptions } from '../types';
 import {
@@ -317,6 +311,7 @@ async function executeMultiBundle(
     sourcemap = true;
   }
 
+  const { rolldown } = await loadRolldown();
   const bundle = await rolldown({
     context: 'this',
     input,
@@ -388,6 +383,11 @@ async function bundleAllDts(
   if (entryPoints.length === 0) {
     return { filesToEmit: [], moduleIdsByBundle: new Map() };
   }
+
+  // Ensure Rolldown's native binding is initialized via `loadRolldown()` before evaluating
+  // `rolldown-plugin-dts`, which has top-level imports of `rolldown/experimental`.
+  await loadRolldown();
+  const { dts } = await import('rolldown-plugin-dts');
 
   const dtsSourcemap = options.declarationMap;
   // Filter out `rolldown-plugin-dts:resolver` because all `.d.ts` files are already emitted

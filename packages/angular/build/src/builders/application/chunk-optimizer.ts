@@ -29,6 +29,7 @@ import {
 } from '../../tools/esbuild/bundler-files';
 import { useRolldownChunks } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
+import { loadRolldown } from '../../utils/load-rolldown';
 import { toPosixPath } from '../../utils/path';
 
 /**
@@ -116,7 +117,7 @@ function bundleOutputToEsbuildMetafile(
         // Read once per module: in Rolldown, `renderedLength` is an uncached getter that
         // copies the entire module code across the NAPI bridge on each access.
         const { renderedLength } = renderedModule;
-        
+
         for (const [originalInputPath, originalInputInfo] of Object.entries(
           originalOutputEntry.inputs,
         )) {
@@ -296,7 +297,7 @@ export async function optimizeChunks(
     ];
 
     if (useRolldownChunks) {
-      const { rolldown } = await import('rolldown');
+      const { rolldown } = await loadRolldown();
       bundle = await rolldown({
         input: mainFile,
         plugins,
