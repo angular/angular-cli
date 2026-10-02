@@ -8,6 +8,7 @@
 
 import { executeLibraryBuilder } from '../../builder';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
+import { join } from 'node:path';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
   describe('Option: "declarationMap"', () => {
@@ -20,9 +21,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
 
       // FESM sourcemaps are always enabled
-      expect(harness.hasFile('dist/lib/fesm2022/lib.mjs.map')).toBeTrue();
+      harness.expectFile('dist/lib/fesm2022/lib.mjs.map').toExist();
       // DTS sourcemaps are disabled by default
-      expect(harness.hasFile('dist/lib/types/lib.d.ts.map')).toBeFalse();
+      harness.expectFile('dist/lib/types/lib.d.ts.map').toNotExist();
     });
 
     it('should emit declaration sourcemaps when declarationMap is true', async () => {
@@ -35,9 +36,13 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
 
       // FESM sourcemaps are always enabled
-      expect(harness.hasFile('dist/lib/fesm2022/lib.mjs.map')).toBeTrue();
+      harness.expectFile('dist/lib/fesm2022/lib.mjs.map').toExist();
+
       // DTS sourcemaps should be generated
-      expect(harness.hasFile('dist/lib/types/lib.d.ts.map')).toBeTrue();
+      harness.expectFile('dist/lib/types/lib.d.ts.map').toExist();
+      const dtsMap = JSON.parse(harness.readFile('dist/lib/types/lib.d.ts.map'));
+      expect(dtsMap.sources).toContain('../../../projects/lib/src/lib/lib.component.ts');
+      harness.expectFile(join('dist/lib/types', dtsMap.sources[0])).toExist();
     });
   });
 });
