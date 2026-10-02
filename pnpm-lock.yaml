@@ -401,8 +401,8 @@ importers:
         specifier: 4.0.4
         version: 4.0.4
       piscina:
-        specifier: 5.2.0
-        version: 5.2.0
+        specifier: 5.3.2
+        version: 5.3.2
       rollup:
         specifier: 4.59.0
         version: 4.59.0
@@ -696,8 +696,8 @@ importers:
         specifier: 4.0.4
         version: 4.0.4
       piscina:
-        specifier: 5.2.0
-        version: 5.2.0
+        specifier: 5.3.2
+        version: 5.3.2
       postcss:
         specifier: 8.5.23
         version: 8.5.23
@@ -978,6 +978,7 @@ packages:
   '@angular/animations@20.3.7':
     resolution: {integrity: sha512-i655RaL0zmLE3OESUlDnRNBDRIMW/67nTQvMqP6V1cQ42l2+SMJtREsxmX6cWt55/qvvgeytAA6aBN4aerBl5A==}
     engines: {node: ^20.19.0 || ^22.12.0 || >=24.0.0}
+    deprecated: '@angular/animations is deprecated. Use `animate.enter` and `animate.leave` instead. For more information see: https://v22.angular.dev/guide/animations.'
     peerDependencies:
       '@angular/core': 20.3.7
 
@@ -5651,6 +5652,7 @@ packages:
   eslint@9.33.0:
     resolution: {integrity: sha512-TS9bTNIryDzStCpJN93aC5VRSW3uTx9sClUn4B87pwiCaJh220otoI0X8mJKr+VcPtniMdN8GKjlwgWGUv5ZKA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -7845,8 +7847,8 @@ packages:
     resolution: {integrity: sha512-vnMCM6xZTb1WDmLvtG2lE/2p+t9hDEIvTWJsu6FejkE62vB7gDhvzrpFR4Cw2to+9JNQxVnkAKVPA1KPB98vWg==}
     hasBin: true
 
-  piscina@5.2.0:
-    resolution: {integrity: sha512-DszUCKeVN/5G5QKo6jAVHL8fmKnkJvQ0ACiVgY7YGCq3TUB2oznAOayvZPIAdEThvhczkXR+qm3IHsNXpFCYfA==}
+  piscina@5.3.2:
+    resolution: {integrity: sha512-vv7l/mM7B9WgrhDaudIqv1x6v4LOBRYYmpWGdWushhpbCmVHp11sUB2v4hj1CAeTGXVxuZFz6xOU1RalAiPKfQ==}
     engines: {node: '>=20.x'}
 
   pkce-challenge@5.0.0:
@@ -17159,7 +17161,7 @@ snapshots:
       jsonc-parser: 3.3.1
       less: 4.9.0
       ora: 8.2.0
-      piscina: 5.2.0
+      piscina: 5.3.2
       postcss: 8.5.23
       rollup-plugin-dts: 6.2.1(rollup@4.59.0)(typescript@5.9.2)
       rxjs: 7.8.2
@@ -17619,7 +17621,7 @@ snapshots:
       sonic-boom: 4.2.0
       thread-stream: 3.1.0
 
-  piscina@5.2.0:
+  piscina@5.3.2:
     optionalDependencies:
       '@napi-rs/nice': 1.1.1
 
