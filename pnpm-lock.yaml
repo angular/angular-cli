@@ -208,8 +208,8 @@ importers:
         specifier: 22.2.1
         version: 22.2.1(f74dd762e8bfe6a5ca59f2acdd50265d)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#dfd8e03750c5c37eee602c47b8d6bb625fcf085e
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/dfd8e03750c5c37eee602c47b8d6bb625fcf085e
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#ab7cfd62d4983d6a8fea23974a0cd7da0ec6c265
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ab7cfd62d4983d6a8fea23974a0cd7da0ec6c265
       '@angular/platform-browser':
         specifier: 22.2.1
         version: 22.2.1(@angular/animations@22.2.1(@angular/core@22.2.1(@angular/compiler@22.2.1)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.2.1(@angular/core@22.2.1(@angular/compiler@22.2.1)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.1(@angular/compiler@22.2.1)(rxjs@7.8.2)(zone.js@0.16.3))
@@ -463,8 +463,8 @@ importers:
         specifier: 30.0.1
         version: 30.0.1(@noble/hashes@1.8.0)
       ng-packagr:
-        specifier: 22.2.3
-        version: 22.2.3(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.4
+        version: 22.2.4(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -578,8 +578,8 @@ importers:
         specifier: 4.9.1
         version: 4.9.1(supports-color@11.0.0)
       ng-packagr:
-        specifier: 22.2.3
-        version: 22.2.3(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.4
+        version: 22.2.4(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.28
         version: 8.5.28
@@ -866,8 +866,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 22.2.3
-        version: 22.2.3(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.4
+        version: 22.2.4(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       sass:
         specifier: 1.104.1
         version: 1.104.1
@@ -1104,9 +1104,9 @@ packages:
       '@angular/platform-browser': ^22.0.0 || ^23.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/dfd8e03750c5c37eee602c47b8d6bb625fcf085e':
-    resolution: {gitHosted: true, integrity: sha512-g5u5DSugzVdzJB9fFogjRRE570/yN9mrqCbYAZURvwYmKIwxS0s3dxzgzoVrWvzrcx646CuCVSWbTYwjP3hJEw==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/dfd8e03750c5c37eee602c47b8d6bb625fcf085e}
-    version: 0.0.0-3b181b7da71ce256d7dc44532ed3df8198f7d853
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ab7cfd62d4983d6a8fea23974a0cd7da0ec6c265':
+    resolution: {gitHosted: true, integrity: sha512-spGbNuYDiw9T3qzr6If6RyvnsRzyDMM4cjAVMJtJjf2G9cpNx8vZFoeFoD0hr0+1Wz736saRR3aM+i1gOLJkcw==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ab7cfd62d4983d6a8fea23974a0cd7da0ec6c265}
+    version: 0.0.0-438f31efd5c7e1267eaadb4636f7ec0a6c1a088f
     hasBin: true
 
   '@angular/platform-browser@22.2.1':
@@ -2284,8 +2284,8 @@ packages:
     resolution: {integrity: sha512-IJn+8A3QZJfe7FUtWqHVNo3xJs7KFpurCWGWCiCz3oEh+BkRymKZ1QxfAbU2yGMDzTytLGQ2IV6T2r3cuo75/w==}
     engines: {node: '>=18'}
 
-  '@google/genai@2.24.0':
-    resolution: {integrity: sha512-bIu5eoxF1AaPWs9ivmUJGp1RpDHyapoODvWvnkzRDx2CTIW6UJXFhDdjj0BlRve3ZHMMuEkQBVrA/ALqpW4apA==}
+  '@google/genai@2.25.0':
+    resolution: {integrity: sha512-g1hyidWxahzIg+hh+lLqPeBJl+Fu6051we2QKhFXdWgE4yGYf8PWOS8S3mMAdpe3eLx3KCWmhQR7GWyd3LYT1A==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       '@modelcontextprotocol/sdk': ^1.25.2
@@ -6731,8 +6731,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng-packagr@22.2.3:
-    resolution: {integrity: sha512-beDEoCQTYkwzvA7OcBTw3zfDUNiVddynjvIOb76ImuTcFB83pvHqCdtAXa8aRl0rxyKbNcE7gY2DyGr/OsDUdA==}
+  ng-packagr@22.2.4:
+    resolution: {integrity: sha512-P7nklZYs3BHG0QtDkhE7tYYPBRkWQhEf+aK5/zz9Rfc7mc2MHfIcN8ZtEHzMIEaKbgoQgUjnGZPRoCr5isB7ig==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
@@ -8743,12 +8743,12 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/dfd8e03750c5c37eee602c47b8d6bb625fcf085e':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/ab7cfd62d4983d6a8fea23974a0cd7da0ec6c265':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 3.1.2(conventional-commits-filter@6.0.1)(conventional-commits-parser@7.1.2)
       '@google-cloud/spanner': 8.0.0(supports-color@11.0.0)
-      '@google/genai': 2.24.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)
+      '@google/genai': 2.25.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)
       '@inquirer/prompts': 8.7.2(@types/node@24.19.0)
       '@inquirer/type': 4.1.1(@types/node@24.19.0)
       '@octokit/auth-app': 8.3.1
@@ -10148,7 +10148,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@google/genai@2.24.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)':
+  '@google/genai@2.25.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)':
     dependencies:
       google-auth-library: 10.9.1(supports-color@11.0.0)
       p-retry: 4.6.2
@@ -14924,7 +14924,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng-packagr@22.2.3(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
+  ng-packagr@22.2.4(@angular/compiler-cli@22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 22.2.1(@angular/compiler@22.2.1)(typescript@6.0.3)
