@@ -77,6 +77,7 @@ export class AotCompilation extends TypeScriptCompilation {
       rootNames,
       errors: configurationDiagnostics,
       warnings,
+      tsConfigFiles,
     } = await this.loadConfiguration(tsconfig, compilerOptionOverrides, buildType);
 
     const useTypeScriptTranspilation =
@@ -209,25 +210,28 @@ export class AotCompilation extends TypeScriptCompilation {
     const componentResourcesDependencies = new Map<string, string[]>();
 
     // Get all files referenced in the TypeScript/Angular program including component resources
-    const referencedFiles = typeScriptProgram
-      .getSourceFiles()
-      .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
-      .flatMap((sourceFile) => {
-        const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
-        componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
-        // Also invalidate Angular diagnostics for a source file if component resources are modified
-        if (this.#state && hostOptions.modifiedFiles?.size) {
-          for (const resourceDependency of resourceDependencies) {
-            if (hostOptions.modifiedFiles.has(resourceDependency)) {
-              this.#state.diagnosticCache.delete(sourceFile);
-              // Also mark as affected in case changed template affects diagnostics
-              affectedFiles.add(sourceFile);
+    const referencedFiles = [
+      ...tsConfigFiles,
+      ...typeScriptProgram
+        .getSourceFiles()
+        .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
+        .flatMap((sourceFile) => {
+          const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
+          componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
+          // Also invalidate Angular diagnostics for a source file if component resources are modified
+          if (this.#state && hostOptions.modifiedFiles?.size) {
+            for (const resourceDependency of resourceDependencies) {
+              if (hostOptions.modifiedFiles.has(resourceDependency)) {
+                this.#state.diagnosticCache.delete(sourceFile);
+                // Also mark as affected in case changed template affects diagnostics
+                affectedFiles.add(sourceFile);
+              }
             }
           }
-        }
 
-        return [sourceFile.fileName, ...resourceDependencies];
-      });
+          return [sourceFile.fileName, ...resourceDependencies];
+        }),
+    ];
 
     this.#state = new AngularCompilationState(
       angularProgram,

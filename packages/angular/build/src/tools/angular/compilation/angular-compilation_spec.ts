@@ -158,11 +158,48 @@ describe('AngularCompilation', () => {
           suppressOutputPathCheck: true,
           outDir: undefined,
         }),
+        undefined,
+        jasmine.any(Map),
       );
       expect(result.rootNames).toEqual(['/src/main.ts']);
       expect(result.compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
       expect(result.compilerOptions.inlineSources).toBe(true);
       expect(result.warnings.length).toBeGreaterThan(0);
+      expect(result.tsConfigFiles).toEqual(['tsconfig.json']);
+    });
+
+    it('caches transformed configuration when rootFiles are provided and invalidates on config change', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const mockReadConfig = jasmine.createSpy('readConfiguration').and.returnValue({
+        options: { target: ts.ScriptTarget.ES2020 },
+        rootNames: ['/src/main.ts'],
+        errors: [],
+      });
+      spyOn(TypeScriptCompilation, 'loadCompilerCli').and.resolveTo({
+        readConfiguration: mockReadConfig,
+      } as unknown as typeof import('@angular/compiler-cli'));
+
+      const overrides: CompilerOptionOverrides = { rootFiles: ['/src/main.ts'] };
+
+      const result1 = await compilation.testLoadConfiguration('tsconfig.json', overrides);
+      expect(mockReadConfig).toHaveBeenCalledTimes(1);
+
+      // Re-loading with same rootFiles should return cached configuration without calling readConfiguration
+      const result2 = await compilation.testLoadConfiguration('tsconfig.json', overrides);
+      expect(mockReadConfig).toHaveBeenCalledTimes(1);
+      expect(result2).toBe(result1);
+
+      // Invalidation of non-config file should keep cache intact
+      await compilation.update?.(new Set(['/src/main.ts']));
+      const result3 = await compilation.testLoadConfiguration('tsconfig.json', overrides);
+      expect(mockReadConfig).toHaveBeenCalledTimes(1);
+      expect(result3).toBe(result1);
+
+      // Invalidation of tsconfig file should clear cache
+      await compilation.update?.(new Set(['tsconfig.json']));
+      const result4 = await compilation.testLoadConfiguration('tsconfig.json', overrides);
+      expect(mockReadConfig).toHaveBeenCalledTimes(2);
+      expect(result4).toBeDefined();
     });
   });
 

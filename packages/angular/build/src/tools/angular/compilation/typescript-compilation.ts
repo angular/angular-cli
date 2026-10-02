@@ -20,10 +20,15 @@ export interface TransformedConfiguration {
   rootNames: string[];
   errors: ts.Diagnostic[];
   warnings: PartialMessage[];
+  tsConfigFiles: readonly string[];
 }
 
 export abstract class TypeScriptCompilation extends AngularCompilation {
   static #angularCompilerCliModule?: typeof ng;
+  #cachedConfiguration?: TransformedConfiguration;
+  #cachedRootFiles?: readonly string[];
+  #tsConfigFiles?: Set<string>;
+  readonly #extendedConfigCache = new Map<string, ts.ExtendedConfigCacheEntry>();
 
   static async loadCompilerCli(): Promise<typeof ng> {
     TypeScriptCompilation.#angularCompilerCliModule ??= await import('@angular/compiler-cli');
@@ -36,6 +41,19 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
     compilerOptionOverrides?: CompilerOptionOverrides,
     buildType: 'application' | 'library' = 'application',
   ): Promise<TransformedConfiguration> {
+    // When `rootFiles` are explicitly provided (e.g., library builder), avoid re-parsing `tsconfig.json`
+    // and walking the project directory tree via `readConfiguration` on every watch rebuild (~200-350ms on large libraries).
+    const currentRootFiles = compilerOptionOverrides?.rootFiles;
+    if (
+      currentRootFiles &&
+      this.#cachedConfiguration &&
+      this.#cachedRootFiles &&
+      this.#cachedRootFiles.length === currentRootFiles.length &&
+      this.#cachedRootFiles.every((file, index) => file === currentRootFiles[index])
+    ) {
+      return this.#cachedConfiguration;
+    }
+
     const { readConfiguration } = await TypeScriptCompilation.loadCompilerCli();
 
     const {
@@ -43,23 +61,31 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       rootNames: originalRootNames,
       errors,
     } = profileSync('NG_READ_CONFIG', () =>
-      readConfiguration(tsconfig, {
-        // Angular specific configuration defaults and overrides to ensure a functioning compilation.
-        suppressOutputPathCheck: true,
-        outDir: undefined,
-        sourceMap: false,
-        declaration: false,
-        declarationMap: false,
-        allowEmptyCodegenFiles: false,
-        annotationsAs: 'decorators',
-        enableResourceInlining: false,
-        supportTestBed: false,
-        supportJitMode: false,
-        // Disable removing of comments as TS is quite aggressive with these and can
-        // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
-        removeComments: false,
-      }),
+      readConfiguration(
+        tsconfig,
+        {
+          // Angular specific configuration defaults and overrides to ensure a functioning compilation.
+          suppressOutputPathCheck: true,
+          outDir: undefined,
+          sourceMap: false,
+          declaration: false,
+          declarationMap: false,
+          allowEmptyCodegenFiles: false,
+          annotationsAs: 'decorators',
+          enableResourceInlining: false,
+          supportTestBed: false,
+          supportJitMode: false,
+          // Disable removing of comments as TS is quite aggressive with these and can
+          // remove important annotations, such as /* @__PURE__ */ and comments like /* vite-ignore */.
+          removeComments: false,
+        },
+        undefined,
+        this.#extendedConfigCache,
+      ),
     );
+
+    const tsConfigFiles = [toPosixPath(tsconfig), ...this.#extendedConfigCache.keys()];
+    this.#tsConfigFiles = new Set(tsConfigFiles);
 
     let rootNames = originalRootNames;
     if (compilerOptionOverrides?.rootFiles?.length) {
@@ -82,19 +108,55 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       buildType,
     );
 
-    return {
+    const config: TransformedConfiguration = {
       compilerOptions,
       rootNames,
       errors,
       warnings,
+      tsConfigFiles,
     };
+
+    if (currentRootFiles?.length) {
+      this.#cachedConfiguration = config;
+      this.#cachedRootFiles = currentRootFiles;
+    }
+
+    return config;
   }
 
   protected readonly sourceFiles = new Map<string, ts.SourceFile>();
 
   protected invalidateFiles(files: Iterable<string>): void {
+    const tsConfigFiles = this.#tsConfigFiles;
+
     for (const file of files) {
-      this.sourceFiles.delete(toPosixPath(file));
+      const posixFile = toPosixPath(file);
+      this.sourceFiles.delete(posixFile);
+
+      if (!tsConfigFiles) {
+        continue;
+      }
+
+      let tsConfigCachedPath: string | undefined;
+      if (tsConfigFiles.has(posixFile)) {
+        tsConfigCachedPath = posixFile;
+      } else {
+        // Check with lowercased key because TypeScript lowercases the keys
+        // of the extended config cache on case-insensitive operating systems.
+        const lowerCasedPosixFile = posixFile.toLowerCase();
+        if (tsConfigFiles.has(lowerCasedPosixFile)) {
+          tsConfigCachedPath = lowerCasedPosixFile;
+        }
+      }
+
+      if (!tsConfigCachedPath) {
+        continue;
+      }
+
+      // If a tsconfig changes, we need to re-read the configuration.
+      this.#cachedConfiguration = undefined;
+      this.#cachedRootFiles = undefined;
+      this.#extendedConfigCache.delete(tsConfigCachedPath);
     }
   }
 
