@@ -140,12 +140,13 @@ export function normalizeCacheOptions(
 
   const cacheBasePath = getCacheBasePath(workspaceRoot, path);
   const localCacheBasePath = isAbsolute(path) ? path : resolve(workspaceRoot, path);
+  const normalizedBuilderName = builderName.replaceAll(':', '-');
 
   return {
     enabled: cacheEnabled,
     basePath: cacheBasePath,
-    path: join(cacheBasePath, VERSION, projectName, builderName),
+    path: join(cacheBasePath, VERSION, projectName, normalizedBuilderName),
     localBasePath: localCacheBasePath,
-    localPath: join(localCacheBasePath, VERSION, projectName, builderName),
+    localPath: join(localCacheBasePath, VERSION, projectName, normalizedBuilderName),
   };
 }

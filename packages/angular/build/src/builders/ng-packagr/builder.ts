@@ -73,7 +73,7 @@ export async function* execute(
   const ngPackagrOptions: NgPackagrOptions = {
     cacheEnabled,
     poll: options.poll,
-    cacheDirectory: join(cacheDirectory, 'ng-packagr'),
+    cacheDirectory: cacheDirectory,
   };
 
   try {

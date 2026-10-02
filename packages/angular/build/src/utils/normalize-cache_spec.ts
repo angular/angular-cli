@@ -275,4 +275,18 @@ describe('normalizeCacheOptions', () => {
       resolve(worktreeRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/vite'),
     );
   });
+
+  it('should normalize builderName to avoid invalid path characters', async () => {
+    const workspaceRoot = join(tempDir, 'project');
+    await mkdir(join(workspaceRoot, '.git'), { recursive: true });
+
+    const options = normalizeCacheOptions({}, workspaceRoot, 'my-app', '@angular/build:unit-test');
+
+    expect(options.path).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+    );
+    expect(options.localPath).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+    );
+  });
 });
