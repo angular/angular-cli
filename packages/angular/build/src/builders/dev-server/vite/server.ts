@@ -165,11 +165,7 @@ export async function setupServer(
    */
   const preTransformRequests =
     externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
-  const cacheDir = join(
-    serverOptions.cacheOptions.localPath ?? serverOptions.cacheOptions.path,
-    serverOptions.buildTarget.project,
-    'vite',
-  );
+  const cacheDir = serverOptions.cacheOptions.localPath ?? serverOptions.cacheOptions.path;
 
   const configuration: Vite.InlineConfig = {
     configFile: false,

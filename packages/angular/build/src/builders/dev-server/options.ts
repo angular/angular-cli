@@ -39,7 +39,12 @@ export async function normalizeOptions(
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRoot = path.join(workspaceRoot, (projectMetadata.root as string | undefined) ?? '');
 
-  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
+  const cacheOptions = normalizeCacheOptions(
+    projectMetadata,
+    workspaceRoot,
+    projectName,
+    context.builder.builderName,
+  );
 
   // Target specifier defaults to the current project's build target using a development configuration
   const buildTargetSpecifier = options.buildTarget ?? `::development`;

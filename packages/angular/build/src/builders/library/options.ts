@@ -126,7 +126,12 @@ export async function normalizeLibraryOptions(
     projectSourceRoot,
   );
 
-  const cacheOptions = normalizeCacheOptions(projectMetadata, workspaceRoot);
+  const cacheOptions = normalizeCacheOptions(
+    projectMetadata,
+    workspaceRoot,
+    projectName,
+    context.builder.builderName,
+  );
 
   const styleIncludePaths = (stylePreprocessorOptions?.includePaths ?? []).map((p: string) =>
     path.resolve(workspaceRoot, p),
