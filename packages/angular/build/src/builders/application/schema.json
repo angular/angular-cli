@@ -587,6 +587,12 @@
         }
       ]
     },
+    "prerenderFormat": {
+      "type": "string",
+      "description": "Defines the file layout of prerendered (SSG) pages. 'directory': '/foo' is written to 'foo/index.html'. 'file': '/foo' is written to 'foo.html', which some hosting services serve for '/foo' without a redirect to '/foo/'. The root route of the application and of each locale is always written to 'index.html'. Routes that cannot be written safely to '<route>.html' keep '<route>/index.html' with a warning. Only considered when the build does not produce a server.",
+      "enum": ["directory", "file"],
+      "default": "directory"
+    },
     "ssr": {
       "description": "Server side render (SSR) pages of your application during runtime.",
       "default": false,

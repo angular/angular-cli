@@ -131,4 +131,20 @@ export default async function () {
 
   // Should not prerender the catch all
   await expectFileNotToExist(join('dist/test-project/browser/**/index.html'));
+
+  // Write each route to '<route>.html'
+  await noSilentNg('build', '--output-mode=static', '--prerender-format=file');
+
+  for (const [directoryPath, fileMatch] of Object.entries(expects)) {
+    const filePath =
+      directoryPath === 'index.html'
+        ? directoryPath
+        : directoryPath.replace(/\/index\.html$/, '.html');
+
+    await expectFileToMatch(join('dist/test-project/browser', filePath), fileMatch);
+
+    if (filePath !== directoryPath) {
+      await expectFileNotToExist(join('dist/test-project/browser', directoryPath));
+    }
+  }
 }

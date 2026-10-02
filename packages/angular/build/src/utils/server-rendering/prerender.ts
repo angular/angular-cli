@@ -9,7 +9,7 @@
 import { readFile } from 'node:fs/promises';
 import { extname, posix } from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
-import { OutputMode } from '../../builders/application/schema';
+import { OutputMode, PrerenderFormat } from '../../builders/application/schema';
 import {
   BuildOutputAsset,
   PrerenderedRoutesRecord,
@@ -17,7 +17,13 @@ import {
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { assertIsError } from '../error';
 import { toPosixPath } from '../path';
-import { addLeadingSlash, addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../url';
+import {
+  addLeadingSlash,
+  addTrailingSlash,
+  joinUrlParts,
+  stripLeadingSlash,
+  stripTrailingSlash,
+} from '../url';
 import { WorkerPool } from '../worker-pool';
 import {
   IMPORT_EXEC_ARGV,
@@ -51,6 +57,8 @@ type AppShellOptions = NormalizedApplicationBuildOptions['appShellOptions'];
  *   '/index.html': { content: '<html>...</html>', appShell: false },
  *   '/shell/index.html': { content: '<html>...</html>', appShellRoute: true }
  * }
+ *
+ * With the 'file' format, non-root routes are keyed as `<route>.html` (e.g. 'shell.html').
  */
 type PrerenderOutput = Record<string, { content: string; appShellRoute: boolean }>;
 
@@ -62,6 +70,8 @@ export async function prerenderPages(
   outputFiles: Readonly<BuildOutputFile[]>,
   assets: Readonly<BuildOutputAsset[]>,
   outputMode: OutputMode | undefined,
+  format: PrerenderFormat,
+  indexOutput: string | undefined,
   sourcemap = false,
   maxThreads = 1,
 ): Promise<{
@@ -191,7 +201,12 @@ export async function prerenderPages(
   }
 
   // Render routes
-  const { errors: renderingErrors, output } = await renderPages(
+  const {
+    errors: renderingErrors,
+    warnings: renderingWarnings,
+    output,
+    outPaths,
+  } = await renderPages(
     baseHref,
     sourcemap,
     serializableRouteTreeNodeForPrerender,
@@ -200,18 +215,20 @@ export async function prerenderPages(
     outputFilesForWorker,
     assetsReversed,
     outputMode,
+    format,
+    indexOutput,
     appShellRoute ?? appShellOptions?.route,
   );
 
   errors.push(...renderingErrors);
+  warnings.push(...renderingWarnings);
 
   const prerenderedRoutes: PrerenderedRoutesRecord = {};
-  const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
 
   for (const metadata of serializableRouteTreeNodeForPrerender) {
-    const outPath = getRouteOutPath(metadata.route, baseHrefPathnameWithLeadingSlash);
+    const outPath = outPaths.get(metadata.route);
 
-    if (output[outPath]) {
+    if (outPath !== undefined && output[outPath]) {
       prerenderedRoutes[metadata.route] = { headers: metadata.headers };
     }
   }
@@ -234,15 +251,25 @@ async function renderPages(
   outputFilesForWorker: Record<string, Uint8Array>,
   assetFilesForWorker: Record<string, string>,
   outputMode: OutputMode | undefined,
+  format: PrerenderFormat,
+  indexOutput: string | undefined,
   appShellRoute: string | undefined,
 ): Promise<{
   output: PrerenderOutput;
+  outPaths: Map<string, string>;
   errors: string[];
+  warnings: string[];
 }> {
   const output: PrerenderOutput = {};
+  const outPaths = new Map<string, string>();
   const errors: string[] = [];
+  const warnings: string[] = [];
+  // Output files taken by routes in the 'file' format, lower-cased because
+  // 'Foo.html' and 'foo.html' are the same file on case-insensitive file systems.
+  const usedFiles = new Map<string, string>();
 
   const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
+  const lowerIndexOutput = indexOutput?.toLowerCase();
   const appShellRouteWithoutBaseHref = appShellRoute
     ? addLeadingSlash(getRouteWithoutBaseHref(appShellRoute, baseHrefPathnameWithLeadingSlash))
     : undefined;
@@ -252,7 +279,26 @@ async function renderPages(
   for (const { route, redirectTo } of serializableRouteTreeNode) {
     // Remove the base href from the file output path.
     const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathnameWithLeadingSlash);
-    const outPath = getRouteOutPath(route, baseHrefPathnameWithLeadingSlash);
+    let outPath = getRouteOutPath(routeWithoutBaseHref, PrerenderFormat.Directory);
+
+    if (format === PrerenderFormat.File) {
+      const filePath = getRouteOutPath(routeWithoutBaseHref, PrerenderFormat.File);
+      const reason = getFileFormatConflict(
+        routeWithoutBaseHref,
+        route,
+        filePath,
+        lowerIndexOutput,
+        usedFiles,
+      );
+      if (reason) {
+        warnings.push(`Route '${route}' is written to '${outPath}' because ${reason}.`);
+      } else {
+        usedFiles.set(filePath.toLowerCase(), route);
+        outPath = filePath;
+      }
+    }
+
+    outPaths.set(route, outPath);
 
     if (typeof redirectTo === 'string') {
       output[outPath] = { content: generateRedirectStaticPage(redirectTo), appShellRoute: false };
@@ -270,7 +316,9 @@ async function renderPages(
   if (routesToRender.length === 0) {
     return {
       errors,
+      warnings,
       output,
+      outPaths,
     };
   }
 
@@ -351,7 +399,9 @@ async function renderPages(
 
   return {
     errors,
+    warnings,
     output,
+    outPaths,
   };
 }
 
@@ -456,8 +506,67 @@ function getRouteWithoutBaseHref(route: string, baseHrefPathname: string): strin
     : route;
 }
 
-function getRouteOutPath(route: string, baseHrefPathname: string): string {
-  const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathname);
+/**
+ * Normalizes a route path to a leading slash and no trailing slash, e.g. `foo/./bar/` to `/foo/bar`.
+ */
+function getNormalizedRoutePath(route: string): string {
+  return stripTrailingSlash(posix.normalize(addLeadingSlash(route)));
+}
+
+/**
+ * Returns the output file path of a prerendered route, relative to the browser output directory.
+ * The route must not include the `baseHref` option.
+ *
+ * - `directory`: `/foo/bar` is written to `foo/bar/index.html`.
+ * - `file`: `/foo/bar` is written to `foo/bar.html`.
+ *
+ * The root route (after removing the `baseHref` option) is written to `index.html` in both formats,
+ * so that the entry page of the application and of each locale is served for its base path.
+ */
+function getRouteOutPath(routeWithoutBaseHref: string, format: PrerenderFormat): string {
+  if (format === PrerenderFormat.File) {
+    const routePath = getNormalizedRoutePath(routeWithoutBaseHref);
+    if (routePath !== '/') {
+      return `${stripLeadingSlash(routePath)}.html`;
+    }
+  }
 
   return stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));
+}
+
+/**
+ * Returns why a route cannot be written to `filePath` in the 'file' format, or `undefined` if it can.
+ * Such a route keeps the 'directory' format.
+ */
+function getFileFormatConflict(
+  routeWithoutBaseHref: string,
+  route: string,
+  filePath: string,
+  lowerIndexOutput: string | undefined,
+  usedFiles: ReadonlyMap<string, string>,
+): string | undefined {
+  const routePath = getNormalizedRoutePath(routeWithoutBaseHref);
+  if (routePath === '/') {
+    return undefined;
+  }
+
+  // 'index.html' is served for the parent path, and on case-insensitive file systems
+  // 'Index.html' is the same file.
+  if (posix.basename(routePath).toLowerCase() === 'index') {
+    const parentPath = addTrailingSlash(posix.dirname(getNormalizedRoutePath(route)));
+
+    return `'${filePath}' would be served for '${parentPath}'`;
+  }
+
+  const lowerFilePath = filePath.toLowerCase();
+  if (lowerIndexOutput !== undefined && lowerFilePath === lowerIndexOutput) {
+    return `'${filePath}' is the index file of the application`;
+  }
+
+  const existingRoute = usedFiles.get(lowerFilePath);
+  if (existingRoute !== undefined) {
+    return `'${filePath}' is already used by route '${existingRoute}'`;
+  }
+
+  return undefined;
 }

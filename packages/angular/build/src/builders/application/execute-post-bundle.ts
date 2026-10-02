@@ -71,6 +71,7 @@ export async function executePostBundleSteps(
     outputMode,
     serverEntryPoint,
     prerenderOptions,
+    prerenderFormat,
     appShellOptions,
     publicPath,
     workspaceRoot,
@@ -168,6 +169,8 @@ export async function executePostBundleSteps(
       [...outputFiles, ...additionalOutputFiles],
       assetFiles,
       outputMode,
+      prerenderFormat,
+      indexHtmlOptions.output,
       sourcemapOptions.scripts,
       maxWorkers,
     );
