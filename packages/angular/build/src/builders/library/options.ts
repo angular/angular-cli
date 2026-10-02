@@ -14,7 +14,6 @@ import { normalizeAssetPatterns } from '../../utils';
 import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { isSubDirectory } from '../../utils/path';
 import {
   generateSearchDirectories,
   getTailwindConfig,
@@ -33,19 +32,6 @@ export async function normalizeLibraryOptions(
   const { workspaceRoot } = context;
   const projectMetadata = await context.getProjectMetadata(projectName);
   const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
-
-  const outputPath = options.outputPath ?? path.join(workspaceRoot, 'dist', projectName);
-  const resolvedOutputPath = path.resolve(workspaceRoot, outputPath);
-  if (
-    resolvedOutputPath === projectRoot ||
-    isSubDirectory(resolvedOutputPath, projectRoot) ||
-    isSubDirectory(projectRoot, resolvedOutputPath)
-  ) {
-    throw new Error(
-      `The 'outputPath' (${resolvedOutputPath}) cannot be the project root, ` +
-        `contain the project root, or be located within the project root.`,
-    );
-  }
 
   const {
     tsConfig,
@@ -143,7 +129,7 @@ export async function normalizeLibraryOptions(
     projectRoot,
     packageName,
     packageJson,
-    outputPath: resolvedOutputPath,
+    outputPath: path.resolve(workspaceRoot, options.outputPath ?? path.join('dist', projectName)),
     deleteOutputPath,
     packageJsonPath,
     tsConfigPath: resolvedTsConfigPath,
