@@ -340,7 +340,7 @@ export async function* execute(
     } satisfies ApplicationBuilderInternalOptions;
 
     const dumpDirectory = normalizedOptions.dumpVirtualFiles
-      ? path.join(normalizedOptions.cacheOptions.path, 'unit-test', 'output-files')
+      ? path.join(normalizedOptions.cacheOptions.path, 'output-files')
       : undefined;
 
     yield* runBuildAndTest(

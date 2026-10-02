@@ -66,12 +66,14 @@ export async function* execute(
   const { enabled: cacheEnabled, path: cacheDirectory } = normalizeCacheOptions(
     metadata,
     context.workspaceRoot,
+    projectName,
+    context.builder.builderName,
   );
 
   const ngPackagrOptions: NgPackagrOptions = {
     cacheEnabled,
     poll: options.poll,
-    cacheDirectory: join(cacheDirectory, 'ng-packagr'),
+    cacheDirectory: cacheDirectory,
   };
 
   try {

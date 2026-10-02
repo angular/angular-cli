@@ -197,4 +197,96 @@ describe('normalizeCacheOptions', () => {
     expect(options.localBasePath).toBe(resolve(workspaceRoot, '.angular/cache'));
     expect(options.localPath).toBe(resolve(workspaceRoot, '.angular/cache', '0.0.0-PLACEHOLDER'));
   });
+
+  it('should scope path and localPath to projectName when provided', async () => {
+    const workspaceRoot = join(tempDir, 'project');
+    await mkdir(join(workspaceRoot, '.git'), { recursive: true });
+
+    const options = normalizeCacheOptions({}, workspaceRoot, 'my-app');
+
+    expect(options.basePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.path).toBe(resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app'));
+    expect(options.localBasePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app'),
+    );
+  });
+
+  it('should scope path and localPath to projectName in a git worktree', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+
+    await mkdir(mainGitDir, { recursive: true });
+
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions({}, worktreeRoot, 'my-lib');
+
+    expect(options.basePath).toBe(resolve(mainRepoRoot, '.angular/cache'));
+    expect(options.path).toBe(resolve(mainRepoRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-lib'));
+    expect(options.localBasePath).toBe(resolve(worktreeRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(worktreeRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-lib'),
+    );
+  });
+
+  it('should scope path and localPath to projectName and builderName when provided', async () => {
+    const workspaceRoot = join(tempDir, 'project');
+    await mkdir(join(workspaceRoot, '.git'), { recursive: true });
+
+    const options = normalizeCacheOptions({}, workspaceRoot, 'my-app', 'vite');
+
+    expect(options.basePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.path).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/vite'),
+    );
+    expect(options.localBasePath).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/vite'),
+    );
+  });
+
+  it('should scope path and localPath to projectName and builderName in a git worktree', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+
+    await mkdir(mainGitDir, { recursive: true });
+
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const options = normalizeCacheOptions({}, worktreeRoot, 'my-app', 'vite');
+
+    expect(options.basePath).toBe(resolve(mainRepoRoot, '.angular/cache'));
+    expect(options.path).toBe(
+      resolve(mainRepoRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/vite'),
+    );
+    expect(options.localBasePath).toBe(resolve(worktreeRoot, '.angular/cache'));
+    expect(options.localPath).toBe(
+      resolve(worktreeRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/vite'),
+    );
+  });
+
+  it('should normalize builderName to avoid invalid path characters', async () => {
+    const workspaceRoot = join(tempDir, 'project');
+    await mkdir(join(workspaceRoot, '.git'), { recursive: true });
+
+    const options = normalizeCacheOptions({}, workspaceRoot, 'my-app', '@angular/build:unit-test');
+
+    expect(options.path).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+    );
+    expect(options.localPath).toBe(
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+    );
+  });
 });

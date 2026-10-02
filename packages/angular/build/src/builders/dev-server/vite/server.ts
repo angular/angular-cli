@@ -167,7 +167,6 @@ export async function setupServer(
     externalMetadata.explicitBrowser.length === 0 && ssrMode === ServerSsrMode.NoSsr;
   const cacheDir = join(
     serverOptions.cacheOptions.localPath ?? serverOptions.cacheOptions.path,
-    serverOptions.buildTarget.project,
     'vite',
   );
 
