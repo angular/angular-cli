@@ -22,7 +22,6 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
 
       harness.expectFile('dist/lib/fesm2022/lib.mjs').toExist();
-      harness.expectFile('dist/lib/fesm2022/lib.mjs').toExist();
       const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
       expect(fesmContent).toContain('LibComponent');
       expect(fesmContent).toContain('ɵcmp');

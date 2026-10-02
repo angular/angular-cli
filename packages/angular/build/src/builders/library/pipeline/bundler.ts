@@ -304,10 +304,10 @@ async function executeMultiBundle(
 ): Promise<MultiBundleOutput> {
   const { workspaceRoot, preserveSymlinks, declarationMap, outputPath } = options;
   const isDts = extension === 'd.ts';
-  const relativeOutputPath = path.posix.relative(outputPath, workspaceRoot);
 
   let sourcemap: boolean;
   let dir: string;
+
   if (isDts) {
     dir = TYPES_OUTPUT_DIR;
     sourcemap = declarationMap;
@@ -333,11 +333,10 @@ async function executeMultiBundle(
   try {
     const { output } = await bundle.generate({
       format: 'es',
-      dir,
+      dir: path.join(outputPath, dir),
       entryFileNames: `[name].${extension}`,
       chunkFileNames: `[name]-[hash].${extension}`,
       sourcemap,
-      sourcemapPathTransform: (sourcePath) => path.posix.join(relativeOutputPath, sourcePath),
       hoistTransitiveImports: false,
       comments: { jsdoc: isDts, legal: true, annotation: true },
     });
