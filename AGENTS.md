@@ -51,12 +51,18 @@ This is the source code for the Angular CLI and related build tooling. This guid
     });
     ```
   - **NEVER** use or fallback to `os.tmpdir()`. Bazel executes tests in hermetic sandboxes and sets `TEST_TMPDIR` to an isolated, sandboxed directory. Using `os.tmpdir()` can cause sandboxing failures, permission errors, or file leakage outside the Bazel sandbox.
-- **Unit Tests:**
-  - Run all unit tests: `pnpm bazel test //packages/...`
-  - Run a specific test target: `pnpm bazel test //packages/angular/build:test`
+- **Unit & Integration Tests:**
+  - Run all unit and integration tests: `pnpm bazel test //packages/...`
+  - Run a specific unit test target: `pnpm bazel test //packages/angular/build:test` (note: this excludes builder integration tests under `src/builders/**/tests/**`).
+  - Run `@angular/build` builder integration test targets (for specs in `packages/angular/build/src/builders/<builder>/tests/**`):
+    - `pnpm bazel test //packages/angular/build:application_integration_tests`
+    - `pnpm bazel test //packages/angular/build:dev-server_integration_tests`
+    - `pnpm bazel test //packages/angular/build:karma_integration_tests`
+    - `pnpm bazel test //packages/angular/build:library_integration_tests`
+    - `pnpm bazel test //packages/angular/build:unit-test_integration_tests`
   - Query test targets: `pnpm bazel query "tests(//packages/...)"`
   - Focus specific tests when debugging: use `fdescribe()` and `fit()`. NEVER commit focused tests to the repository.
-  - Run tests without sharding when isolating or debugging: use `--config=no-sharding` with a specific test target (e.g., `pnpm bazel test //packages/angular/build:test --config=no-sharding`).
+  - Run tests without sharding when isolating or debugging: use `--config=no-sharding` with a specific test target (e.g., `pnpm bazel test //packages/angular/build:library_integration_tests --config=no-sharding`).
     This disables test sharding (`--test_sharding_strategy=disabled`) and flaky test retries (`--flaky_test_attempts=1`).
     This is especially useful when isolating test runs or debugging with focused tests (`fit`/`fdescribe`) to avoid empty shard failures and unnecessary re-runs.
     Do not use this flag when running broad test suites (such as `//packages/...`), as executing tests without sharding takes significantly longer.
