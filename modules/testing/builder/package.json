@@ -8,7 +8,7 @@
     "browser-sync": "3.0.4",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "30.1.1",
-    "ng-packagr": "22.3.0-next.1",
+    "ng-packagr": "22.3.0-next.2",
     "rxjs": "7.8.2",
     "vitest": "5.0.2"
   }
