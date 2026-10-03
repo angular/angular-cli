@@ -93,7 +93,7 @@ describe('generatePackageManifests', () => {
     };
   }
 
-  it('should generate a valid APF package.json for an unscoped package', () => {
+  it('should generate a valid APF package.json for an unscoped package', async () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -108,7 +108,7 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result).toEqual({
@@ -131,7 +131,7 @@ describe('generatePackageManifests', () => {
     });
   });
 
-  it('should sanitize scoped package names in fesm and types paths', () => {
+  it('should sanitize scoped package names in fesm and types paths', async () => {
     const options = createOptions({
       packageJson: {
         name: '@my-scope/my-lib',
@@ -139,7 +139,7 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result).toEqual(
@@ -158,7 +158,7 @@ describe('generatePackageManifests', () => {
     );
   });
 
-  it('should retain scripts when keepLifecycleScripts is true', () => {
+  it('should retain scripts when keepLifecycleScripts is true', async () => {
     const options = createOptions({
       keepLifecycleScripts: true,
       packageJson: {
@@ -170,12 +170,12 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
     expect(result.scripts).toEqual({ postinstall: 'echo done' });
   });
 
-  it('should configure secondary entry points and create secondary manifests', () => {
+  it('should configure secondary entry points and create secondary manifests', async () => {
     const options = createOptions(
       {
         packageJson: {
@@ -186,7 +186,7 @@ describe('generatePackageManifests', () => {
       true,
     );
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result.exports).toEqual(
@@ -210,7 +210,7 @@ describe('generatePackageManifests', () => {
     expect(npmignoreFile?.contents).toContain('/testing/package.json');
   });
 
-  it('should inject watch version when isWatchMode is true', () => {
+  it('should inject watch version when isWatchMode is true', async () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -218,12 +218,12 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, true);
+    const files = await generatePackageManifests(options, true);
     const result = getRootPackageJson(files);
     expect(result.version).toMatch(/^0\.0\.0-watch\+\d+$/);
   });
 
-  it('should throw an error if primary entry point is missing', () => {
+  it('should throw an error if primary entry point is missing', async () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -232,12 +232,12 @@ describe('generatePackageManifests', () => {
       entryPoints: new Map(),
     });
 
-    expect(() => generatePackageManifests(options, false)).toThrowError(
+    await expectAsync(generatePackageManifests(options, false)).toBeRejectedWithError(
       /Primary entry point '\.' was not found in entryPoints\./,
     );
   });
 
-  it('should inject prepublishOnly guard script when compilationMode is full', () => {
+  it('should inject prepublishOnly guard script when compilationMode is full', async () => {
     const options = createOptions({
       compilationMode: 'full',
       packageJson: {
@@ -246,14 +246,14 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
     expect(result.scripts?.['prepublishOnly']).toContain(
       'Trying to publish a package that has been compiled in full compilation mode',
     );
   });
 
-  it('should preserve custom user exports in package.json and merge subpath conditions', () => {
+  it('should preserve custom user exports in package.json and merge subpath conditions', async () => {
     const options = createOptions({
       packageJson: {
         name: 'my-lib',
@@ -268,7 +268,7 @@ describe('generatePackageManifests', () => {
       },
     });
 
-    const files = generatePackageManifests(options, false);
+    const files = await generatePackageManifests(options, false);
     const result = getRootPackageJson(files);
 
     expect(result.exports).toEqual({
@@ -283,8 +283,8 @@ describe('generatePackageManifests', () => {
     });
   });
 
-  it('should default sideEffects to false if not specified, and preserve when set', () => {
-    const files1 = generatePackageManifests(
+  it('should default sideEffects to false if not specified, and preserve when set', async () => {
+    const files1 = await generatePackageManifests(
       createOptions({
         packageJson: {
           name: 'my-lib',
@@ -295,7 +295,7 @@ describe('generatePackageManifests', () => {
     );
     expect(getRootPackageJson(files1).sideEffects).toBeFalse();
 
-    const files2 = generatePackageManifests(
+    const files2 = await generatePackageManifests(
       createOptions({
         packageJson: {
           name: 'my-lib',
@@ -306,5 +306,43 @@ describe('generatePackageManifests', () => {
       false,
     );
     expect(getRootPackageJson(files2).sideEffects).toEqual(['*.css']);
+  });
+
+  it('should conditionally inject tslib into dependencies only when hasTslibImport is true', async () => {
+    const options = createOptions({
+      workspaceRoot: process.cwd(),
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+      },
+    });
+
+    const filesWithoutTslib = await generatePackageManifests(options, false, false);
+    expect(getRootPackageJson(filesWithoutTslib).dependencies).toBeUndefined();
+
+    const filesWithTslib = await generatePackageManifests(options, false, true);
+    expect(getRootPackageJson(filesWithTslib).dependencies).toEqual({
+      tslib: jasmine.any(String),
+    });
+  });
+
+  it('should preserve existing user tslib declaration when hasTslibImport is true', async () => {
+    const filesInDeps = await generatePackageManifests(
+      createOptions({
+        workspaceRoot: process.cwd(),
+        packageJson: {
+          name: 'my-lib',
+          version: '1.0.0',
+          dependencies: {
+            tslib: '^2.0.0',
+          },
+        },
+      }),
+      false,
+      true,
+    );
+    expect(getRootPackageJson(filesInDeps).dependencies).toEqual({
+      tslib: '^2.0.0',
+    });
   });
 });

@@ -193,8 +193,16 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     }
   }
 
-  if (shouldGenerateManifests) {
-    filesToEmit.push(...generatePackageManifests(options, isWatchMode));
+  let hasTslibImport = false;
+  for (const entryPoint of options.entryPoints.values()) {
+    if (buildState.previousBundleResults.get(entryPoint.name)?.hasTslibImport) {
+      hasTslibImport = true;
+      break;
+    }
+  }
+
+  if (shouldGenerateManifests || buildState.hasEmittedTslib !== hasTslibImport) {
+    filesToEmit.push(...(await generatePackageManifests(options, isWatchMode, hasTslibImport)));
   }
 
   const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
@@ -220,6 +228,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
   });
 
   buildState.hasEmittedManifests = true;
+  buildState.hasEmittedTslib = hasTslibImport;
   buildState.hasEmittedAssets = true;
 }
 

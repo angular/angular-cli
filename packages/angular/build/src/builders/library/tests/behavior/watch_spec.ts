@@ -515,5 +515,53 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
+
+    it('should update package.json in watch mode when tslib import is added or removed', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const pkg = JSON.parse(harness.readFile('dist/lib/package.json'));
+          expect(pkg.dependencies).toBeUndefined();
+
+          // Add a custom decorator that causes tslib to be imported
+          await harness.writeFile(
+            'projects/lib/src/public-api.ts',
+            `
+            function CustomClassDecorator(): ClassDecorator {
+              return () => {};
+            }
+
+            @CustomClassDecorator()
+            export class DecoratedService {}
+            `,
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const pkg = JSON.parse(harness.readFile('dist/lib/package.json'));
+          expect(pkg.dependencies).toEqual({
+            tslib: jasmine.any(String),
+          });
+
+          // Remove the custom decorator so tslib is no longer imported
+          await harness.writeFile(
+            'projects/lib/src/public-api.ts',
+            `
+            export class PlainService {}
+            `,
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const pkg = JSON.parse(harness.readFile('dist/lib/package.json'));
+          expect(pkg.dependencies).toBeUndefined();
+        },
+      ]);
+    });
   });
 });

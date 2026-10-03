@@ -98,6 +98,9 @@ export interface BundleResult {
 
   /** Exact set of virtual DTS module IDs bundled into this entry point. */
   dtsModuleIds: ReadonlySet<string>;
+
+  /** Whether this entry point bundle imports 'tslib'. */
+  hasTslibImport?: boolean;
 }
 
 /**
@@ -121,13 +124,33 @@ export interface SingleProgramCache {
  * State preserved across incremental builds in watch mode.
  */
 export interface SingleBuildState {
+  /** Cached unified TypeScript and Angular compilation state. */
   singleProgramCache?: SingleProgramCache;
+
+  /** Map of entry point names to their previous bundle results. */
   previousBundleResults: Map<string, BundleResult>;
+
+  /** Set of changed ESM file paths pending bundling. */
   pendingChangedEsmFiles: Set<string>;
+
+  /** Set of changed TypeScript declaration file paths pending bundling. */
   pendingChangedDtsFiles: Set<string>;
+
+  /** Whether the previous build iteration encountered a compilation or diagnostic error. */
   hasCompilationError?: boolean;
+
+  /** Whether package.json and secondary entry point manifests have been emitted. */
   hasEmittedManifests?: boolean;
+
+  /** Whether the last emitted root package.json included a tslib dependency. */
+  hasEmittedTslib?: boolean;
+
+  /** Whether static assets have been emitted in a prior iteration. */
   hasEmittedAssets?: boolean;
+
+  /** Whether entry points in package.json changed since the last compilation. */
   hasEntryPointsChanges?: boolean;
+
+  /** Cache of output directory paths known to exist on disk. */
   directoryExists: Set<string>;
 }
