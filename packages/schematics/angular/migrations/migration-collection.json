@@ -29,6 +29,13 @@
       "version": "22.0.0",
       "factory": "./update-workspace-config/migration",
       "description": "Update the angular workspace configuration."
+    },
+    "use-library-builder": {
+      "version": "22.3.0",
+      "factory": "./use-library-builder/migration",
+      "description": "Migrate library projects from 'ng-packagr' to the new '@angular/build:library' builder.",
+      "optional": true,
+      "recommended": false
     }
   }
 }
