@@ -238,7 +238,7 @@ export function updateWatchedEntryPoints(
   packageJson: PackageJsonData,
   options: NormalizedLibraryOptions,
   buildState: SingleBuildState,
-  allWatchedFiles: Set<string>,
+  watchedCompilationFiles: Set<string>,
   packageJsonPath: string,
 ): void {
   const newEntryPoints = normalizeEntryPoints(
@@ -250,7 +250,7 @@ export function updateWatchedEntryPoints(
 
   if (haveEntryPointsChanged(options.entryPoints, newEntryPoints)) {
     for (const entryPoint of newEntryPoints.values()) {
-      allWatchedFiles.add(toPosixPath(entryPoint.entryFilePath));
+      watchedCompilationFiles.add(toPosixPath(entryPoint.entryFilePath));
     }
 
     for (const name of buildState.previousBundleResults.keys()) {
