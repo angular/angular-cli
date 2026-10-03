@@ -53,7 +53,7 @@ This is the source code for the Angular CLI and related build tooling. This guid
   - **NEVER** use or fallback to `os.tmpdir()`. Bazel executes tests in hermetic sandboxes and sets `TEST_TMPDIR` to an isolated, sandboxed directory. Using `os.tmpdir()` can cause sandboxing failures, permission errors, or file leakage outside the Bazel sandbox.
 - **Unit & Integration Tests:**
   - Run all unit and integration tests: `pnpm bazel test //packages/...`
-  - Run a specific unit test target: `pnpm bazel test //packages/angular/build:test` (note: this excludes builder integration tests under `src/builders/**/tests/**`).
+  - Run a specific unit test target: `pnpm bazel test //packages/angular/build:test` (note: this excludes builder integration tests under `packages/angular/build/src/builders/**/tests/**`).
   - Run `@angular/build` builder integration test targets (for specs in `packages/angular/build/src/builders/<builder>/tests/**`):
     - `pnpm bazel test //packages/angular/build:application_integration_tests`
     - `pnpm bazel test //packages/angular/build:dev-server_integration_tests`
