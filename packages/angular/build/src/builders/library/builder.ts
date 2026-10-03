@@ -107,14 +107,14 @@ export async function* executeLibraryBuilder(
       target,
     );
 
-    // Track all referenced files for watch mode
-    const allWatchedFiles = new Set<string>([
+    // Track all referenced compilation files for watch mode
+    const watchedCompilationFiles = new Set<string>([
       toPosixPath(tsConfigPath),
       toPosixPath(packageJsonPath),
     ]);
 
     for (const entryPoint of normalizedOptions.entryPoints.values()) {
-      allWatchedFiles.add(toPosixPath(entryPoint.entryFilePath));
+      watchedCompilationFiles.add(toPosixPath(entryPoint.entryFilePath));
     }
 
     if (isWatchMode) {
@@ -131,7 +131,7 @@ export async function* executeLibraryBuilder(
         poll,
         preserveSymlinks,
         signal,
-        watchFiles: allWatchedFiles,
+        watchFiles: watchedCompilationFiles,
       });
 
       context.addTeardown?.(() => void watcher?.close());
@@ -143,7 +143,7 @@ export async function* executeLibraryBuilder(
       {
         options: normalizedOptions,
         stylesheetBundler,
-        allWatchedFiles,
+        watchedCompilationFiles,
         isWatchMode,
         context,
         buildState,
@@ -162,7 +162,7 @@ export async function* executeLibraryBuilder(
       watcher,
       normalizedOptions,
       stylesheetBundler,
-      allWatchedFiles,
+      watchedCompilationFiles,
       context,
       withProgress,
       buildState,
@@ -190,7 +190,7 @@ async function executeBuild(
   buildAction: typeof import('./pipeline/build-action').buildAction,
 ): Promise<BuilderOutput> {
   const startTime = process.hrtime.bigint();
-  const { context, allWatchedFiles, isWatchMode } = actionContext;
+  const { context, watchedCompilationFiles, isWatchMode } = actionContext;
 
   try {
     await withProgress(message, () => buildAction(actionContext));
@@ -206,7 +206,14 @@ async function executeBuild(
 
     return { success: false, error: error.message };
   } finally {
-    watcher?.add(Array.from(allWatchedFiles));
+    if (watcher) {
+      watcher.add(Array.from(watchedCompilationFiles));
+
+      const { assetsToEmit } = actionContext;
+      if (assetsToEmit?.length) {
+        watcher.add(assetsToEmit.map((asset) => asset.source));
+      }
+    }
   }
 }
 
@@ -217,7 +224,7 @@ async function* runWatchLoop(
   watcher: BuildWatcher,
   options: NormalizedLibraryOptions,
   stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary>,
-  allWatchedFiles: Set<string>,
+  watchedCompilationFiles: Set<string>,
   context: BuilderContext,
   withProgress: typeof withSpinner,
   buildState: SingleBuildState,
@@ -281,7 +288,7 @@ async function* runWatchLoop(
           packageJson,
           options,
           buildState,
-          allWatchedFiles,
+          watchedCompilationFiles,
           packageJsonPath,
         );
 
@@ -302,7 +309,7 @@ async function* runWatchLoop(
       !buildState.singleProgramCache ||
       buildState.hasCompilationError ||
       buildState.hasEntryPointsChanges ||
-      hasModifiedWatchedFile(changedFiles, allWatchedFiles, posixPackageJsonPath);
+      hasModifiedWatchedFile(changedFiles, watchedCompilationFiles, posixPackageJsonPath);
 
     const assetsToEmit = await collectAssetsToEmit(
       assets,
@@ -319,7 +326,7 @@ async function* runWatchLoop(
       {
         options,
         stylesheetBundler,
-        allWatchedFiles,
+        watchedCompilationFiles,
         isWatchMode: true,
         context,
         buildState,

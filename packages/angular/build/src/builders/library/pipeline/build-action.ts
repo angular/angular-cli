@@ -9,6 +9,7 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import { constants, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
+import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import { emitFilesToDisk } from '../../../tools/esbuild/utils';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
@@ -16,7 +17,6 @@ import { collectAssetsToEmit } from './assets';
 import { type BundleEntryPointInput, bundleEntryPoints } from './bundler';
 import { compileLibrary } from './compilation';
 import { generatePackageManifests } from './package-manifests';
-import type { createComponentStylesheetBundlerForLibrary } from './stylesheet-bundler';
 import type { DiskOutputFile, OutputFile } from './utils';
 
 /**
@@ -35,13 +35,39 @@ export function createSingleBuildState(): SingleBuildState {
  * Context required to execute a single library build iteration.
  */
 export interface BuildActionContext {
+  /** Normalized options for the library build. */
   options: NormalizedLibraryOptions;
+
+  /** The Architect builder context. */
   context: BuilderContext;
-  stylesheetBundler: ReturnType<typeof createComponentStylesheetBundlerForLibrary>;
+
+  /** Bundler instance used to process component stylesheets. */
+  stylesheetBundler: ComponentStylesheetBundler;
+
+  /** Whether the builder is running in watch mode. */
   isWatchMode: boolean;
-  allWatchedFiles: Set<string>;
+
+  /**
+   * Set of file paths tracked for compilation and configuration
+   * (including `tsconfig.json`, `package.json`, entry points, and referenced source,
+   * template, and stylesheet files). Updated during compilation and used to determine
+   * whether file changes require recompiling entry points, excluding asset files so
+   * asset-only changes do not trigger code compilation.
+   */
+  watchedCompilationFiles: Set<string>;
+
+  /** State preserved across incremental builds in watch mode. */
   buildState: SingleBuildState;
+
+  /** Set of file paths modified since the last build iteration. */
   modifiedFiles?: Set<string>;
+
+  /**
+   * Asset files to emit to disk for the current build iteration.
+   * Pre-collected in the watch loop to avoid redundant asset matching, or resolved and
+   * populated by `buildAction` when omitted (such as during the initial build) so the
+   * caller can register their source paths with the file watcher.
+   */
   assetsToEmit?: DiskOutputFile[];
 }
 
@@ -58,10 +84,9 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     context,
     stylesheetBundler,
     isWatchMode,
-    allWatchedFiles,
+    watchedCompilationFiles,
     buildState,
     modifiedFiles,
-    assetsToEmit,
   } = actionContext;
 
   const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
@@ -78,7 +103,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     buildState.hasEntryPointsChanges ||
     pendingChangedEsmFiles.size > 0 ||
     pendingChangedDtsFiles.size > 0 ||
-    hasModifiedWatchedFile(modifiedFiles, allWatchedFiles, posixPackageJsonPath);
+    hasModifiedWatchedFile(modifiedFiles, watchedCompilationFiles, posixPackageJsonPath);
   const shouldGenerateManifests = !buildState.hasEmittedManifests;
 
   if (shouldGenerateManifests) {
@@ -109,7 +134,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     buildState.singleProgramCache = cache;
 
     for (const file of referencedFiles) {
-      allWatchedFiles.add(file);
+      watchedCompilationFiles.add(file);
     }
 
     for (const file of changedEsmFiles) {
@@ -172,16 +197,11 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     filesToEmit.push(...generatePackageManifests(options, isWatchMode));
   }
 
-  const resolvedAssetsToEmit =
-    assetsToEmit ??
-    (await collectAssetsToEmit(
-      options.assets,
-      options.workspaceRoot,
-      buildState.hasEmittedAssets ? modifiedFiles : undefined,
-    ));
-  for (const asset of resolvedAssetsToEmit) {
-    allWatchedFiles.add(toPosixPath(asset.source));
-  }
+  const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
+    options.assets,
+    options.workspaceRoot,
+    buildState.hasEmittedAssets ? modifiedFiles : undefined,
+  ));
   filesToEmit.push(...resolvedAssetsToEmit);
 
   await emitFilesToDisk<OutputFile>(filesToEmit, async (file) => {
@@ -205,11 +225,11 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
 
 export function hasModifiedWatchedFile(
   modifiedFiles: ReadonlySet<string>,
-  allWatchedFiles: ReadonlySet<string>,
+  watchedCompilationFiles: ReadonlySet<string>,
   posixPackageJsonPath: string,
 ): boolean {
   for (const file of modifiedFiles) {
-    if (file !== posixPackageJsonPath && allWatchedFiles.has(file)) {
+    if (file !== posixPackageJsonPath && watchedCompilationFiles.has(file)) {
       return true;
     }
   }
