@@ -53,14 +53,10 @@ This is the source code for the Angular CLI and related build tooling. This guid
   - **NEVER** use or fallback to `os.tmpdir()`. Bazel executes tests in hermetic sandboxes and sets `TEST_TMPDIR` to an isolated, sandboxed directory. Using `os.tmpdir()` can cause sandboxing failures, permission errors, or file leakage outside the Bazel sandbox.
 - **Unit & Integration Tests:**
   - Run all unit and integration tests: `pnpm bazel test //packages/...`
-  - Run a specific unit test target: `pnpm bazel test //packages/angular/build:test` (note: this excludes builder integration tests under `packages/angular/build/src/builders/**/tests/**`).
-  - Run `@angular/build` builder integration test targets (for specs in `packages/angular/build/src/builders/<builder>/tests/**`):
-    - `pnpm bazel test //packages/angular/build:application_integration_tests`
-    - `pnpm bazel test //packages/angular/build:dev-server_integration_tests`
-    - `pnpm bazel test //packages/angular/build:karma_integration_tests`
-    - `pnpm bazel test //packages/angular/build:library_integration_tests`
-    - `pnpm bazel test //packages/angular/build:unit-test_integration_tests`
-  - Query test targets: `pnpm bazel query "tests(//packages/...)"`
+  - Run a specific unit test target (e.g., `pnpm bazel test //packages/angular/build:test`). Note that package `:test` targets may exclude builder integration tests (such as specs under `**/builders/**/tests/**`).
+  - Run a specific builder integration test target (e.g., `pnpm bazel test //packages/angular/build:library_integration_tests` or `pnpm bazel test //packages/angular/build:application_integration_tests`).
+  - Query all test targets: `pnpm bazel query "tests(//packages/...)"`
+  - Find the exact test target for a specific spec file: `pnpm bazel query "kind(jasmine_test, rdeps(//packages/..., <path/to/file_spec.ts>))"`
   - Focus specific tests when debugging: use `fdescribe()` and `fit()`. NEVER commit focused tests to the repository.
   - Run tests without sharding when isolating or debugging: use `--config=no-sharding` with a specific test target (e.g., `pnpm bazel test //packages/angular/build:library_integration_tests --config=no-sharding`).
     This disables test sharding (`--test_sharding_strategy=disabled`) and flaky test retries (`--flaky_test_attempts=1`).
