@@ -92,4 +92,21 @@ describe('addNonce', () => {
     expect(result).toContain('<script src="./main.js" nonce="{% nonce %}"></script>');
     expect(result).toContain(`<script nonce="{% nonce %}">console.log('bar');</script>`);
   });
+
+  it('should add the nonce expression to stylesheet link tags', async () => {
+    const result = await addNonce(`
+      <html>
+        <head>
+          <link rel="stylesheet" href="styles.css">
+          <link rel="preload" href="font.woff2" as="font">
+        </head>
+        <body>
+          <app ngCspNonce="{% nonce %}"></app>
+        </body>
+      </html>
+    `);
+
+    expect(result).toContain('<link rel="stylesheet" href="styles.css" nonce="{% nonce %}">');
+    expect(result).toContain('<link rel="preload" href="font.woff2" as="font">');
+  });
 });
