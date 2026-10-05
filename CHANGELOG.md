@@ -1,3 +1,15 @@
+<a name="21.2.25"></a>
+
+# 21.2.25 (2026-10-05)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description           |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------- |
+| [7e6d2da084](https://github.com/angular/angular-cli/commit/7e6d2da08406f240b18b1d7e692cad27f29af314) | fix  | bump piscina to 5.3.2 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.38"></a>
 
 # 20.3.38 (2026-10-05)
