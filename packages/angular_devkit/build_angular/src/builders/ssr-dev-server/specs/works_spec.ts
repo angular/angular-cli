@@ -9,6 +9,7 @@
 import { Architect } from '@angular-devkit/architect';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import * as browserSync from 'browser-sync';
+import { get } from 'node:http';
 import { createArchitect, host } from '../../../testing/test-utils';
 
 describe('Serve SSR Builder - Works', () => {
@@ -94,5 +95,33 @@ describe('Serve SSR Builder - Works', () => {
 
     expect(output.success).toBe(true);
     expect(output.baseUrl).not.toContain('4200');
+  });
+
+  it('rejects requests with a disallowed Host header', async () => {
+    const run = await architect.scheduleTarget(target, { port: 0 });
+    try {
+      const output = await run.result;
+      expect(output.success).toBeTrue();
+
+      const statusCode = await new Promise<number | undefined>((resolve, reject) => {
+        const req = get(
+          {
+            hostname: 'localhost',
+            port: output.port,
+            path: '/',
+            headers: { host: 'example.com' },
+          },
+          (res) => {
+            res.resume();
+            resolve(res.statusCode);
+          },
+        );
+        req.on('error', reject);
+      });
+
+      expect(statusCode).toBe(500);
+    } finally {
+      await run.stop();
+    }
   });
 });
