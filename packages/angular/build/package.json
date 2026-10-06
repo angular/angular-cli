@@ -58,7 +58,7 @@
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "30.1.1",
     "less": "4.9.1",
-    "ng-packagr": "22.3.0-next.1",
+    "ng-packagr": "22.3.0-next.2",
     "postcss": "8.5.28",
     "rollup": "4.63.5",
     "rxjs": "7.8.2",
