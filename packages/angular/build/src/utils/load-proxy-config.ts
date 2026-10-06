@@ -90,13 +90,16 @@ function normalizeProxyConfiguration(
       if (!('context' in proxyEntry)) {
         continue;
       }
-      if (!Array.isArray(proxyEntry.context)) {
+
+      // Array-form entries contain a context string array with the path(s)
+      // to use for the configuration entry. A single path string is also
+      // accepted, as with the Webpack-based development server.
+      const context =
+        typeof proxyEntry.context === 'string' ? [proxyEntry.context] : proxyEntry.context;
+      if (!Array.isArray(context)) {
         continue;
       }
 
-      // Array-form entries contain a context string array with the path(s)
-      // to use for the configuration entry.
-      const context = proxyEntry.context;
       delete proxyEntry.context;
       for (const contextEntry of context) {
         if (typeof contextEntry !== 'string') {
