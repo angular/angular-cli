@@ -302,19 +302,47 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         await proxyServer.close();
       }
     });
+
+    it('keeps the order of glob entries relative to other entries', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = await createProxyServer();
+      const otherProxyServer = await createProxyServer('OTHER_API_RETURN');
+      try {
+        await harness.writeFiles({
+          'proxy.config.json': `
+              {
+                "/api/test/**": { "target": "http://127.0.0.1:${proxyServer.address.port}" },
+                "/api": { "target": "http://127.0.0.1:${otherProxyServer.address.port}" }
+              }
+            `,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('TEST_API_RETURN');
+      } finally {
+        await proxyServer.close();
+        await otherProxyServer.close();
+      }
+    });
   });
 });
 
 /**
  * Creates an HTTP Server used for proxy testing that provides a `/test` endpoint
- * that returns a 200 response with a body of `TEST_API_RETURN`. All other requests
- * will return a 404 response.
+ * that returns a 200 response with a body of `body` (`TEST_API_RETURN` by default).
+ * All other requests will return a 404 response.
  */
-async function createProxyServer() {
+async function createProxyServer(body = 'TEST_API_RETURN') {
   const proxyServer = createServer((request, response) => {
     if (request.url?.endsWith('/test')) {
       response.writeHead(200);
-      response.end('TEST_API_RETURN');
+      response.end(body);
     } else {
       response.writeHead(404);
       response.end();
