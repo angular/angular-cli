@@ -114,13 +114,14 @@ function normalizeProxyConfiguration(
   }
 
   // TODO: Consider upstreaming glob support
-  for (const key of Object.keys(normalizedProxy)) {
-    if (key[0] !== '^' && isDynamicPattern(key)) {
-      const pattern = makeRegExpFromGlob(key).source;
-      normalizedProxy[pattern] = normalizedProxy[key];
-      delete normalizedProxy[key];
-    }
+  // The object is rebuilt so that converted glob entries keep their original position,
+  // since Vite proxies a request with the first entry that matches it.
+  const orderedProxy: Record<string, object> = {};
+  for (const [key, value] of Object.entries(normalizedProxy)) {
+    const context = key[0] !== '^' && isDynamicPattern(key) ? makeRegExpFromGlob(key).source : key;
+    orderedProxy[context] = value;
   }
+  normalizedProxy = orderedProxy;
 
   // Replace `pathRewrite` field with a `rewrite` function
   for (const proxyEntry of Object.values(normalizedProxy)) {
