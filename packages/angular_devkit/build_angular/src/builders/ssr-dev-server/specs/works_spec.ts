@@ -99,26 +99,29 @@ describe('Serve SSR Builder - Works', () => {
 
   it('rejects requests with a disallowed Host header', async () => {
     const run = await architect.scheduleTarget(target, { port: 0 });
-    const output = await run.result;
-    expect(output.success).toBeTrue();
+    try {
+      const output = await run.result;
+      expect(output.success).toBeTrue();
 
-    const statusCode = await new Promise<number | undefined>((resolve, reject) => {
-      const req = get(
-        {
-          hostname: 'localhost',
-          port: output.port,
-          path: '/',
-          headers: { host: 'example.com' },
-        },
-        (res) => {
-          res.resume();
-          resolve(res.statusCode);
-        },
-      );
-      req.on('error', reject);
-    });
+      const statusCode = await new Promise<number | undefined>((resolve, reject) => {
+        const req = get(
+          {
+            hostname: 'localhost',
+            port: output.port,
+            path: '/',
+            headers: { host: 'example.com' },
+          },
+          (res) => {
+            res.resume();
+            resolve(res.statusCode);
+          },
+        );
+        req.on('error', reject);
+      });
 
-    await run.stop();
-    expect(statusCode).toBe(500);
+      expect(statusCode).toBe(500);
+    } finally {
+      await run.stop();
+    }
   });
 });
