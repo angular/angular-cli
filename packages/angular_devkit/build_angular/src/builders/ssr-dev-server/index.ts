@@ -268,6 +268,7 @@ async function initBrowserSync(
       target: `localhost:${nodeServerPort}`,
       proxyOptions: {
         xfwd: true,
+        changeOrigin: false,
       },
       proxyRes: [
         (proxyRes) => {
@@ -277,7 +278,7 @@ async function initBrowserSync(
         },
       ],
       // proxyOptions is not in the typings
-    } as ProxyOptions & { proxyOptions: { xfwd: boolean } },
+    } as ProxyOptions & { proxyOptions: { xfwd: boolean; changeOrigin: boolean } },
     host,
     port: bsPort,
     ui: false,
