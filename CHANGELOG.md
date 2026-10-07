@@ -1,3 +1,15 @@
+<a name="20.3.39"></a>
+
+# 20.3.39 (2026-10-07)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [373a7cedce](https://github.com/angular/angular-cli/commit/373a7cedce59662f6db6f5361192b6158377e01d) | fix  | bump @modelcontextprotocol/sdk to 1.31.0 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.38"></a>
 
 # 20.3.38 (2026-10-05)
