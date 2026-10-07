@@ -32,7 +32,7 @@
     "@vitest/browser-webdriverio": "^5.0.0",
     "@vitest/browser-preview": "^5.0.0",
     "playwright": "^1.48.0",
-    "webdriverio": "^9.0.0",
+    "webdriverio": "^10.0.0",
     "zone.js": "~0.16.0"
   }
 }
