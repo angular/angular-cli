@@ -696,13 +696,16 @@ describe('Application Schematic', () => {
     expect(config).toContain('provideRouter(routes)');
   });
 
-  it('should create a main.ts', async () => {
-    const options = { ...defaultOptions, standalone: true };
-    const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+  for (const standalone of [true, false]) {
+    it(`should create a main.ts with an unknown catch parameter and a block body (standalone=${standalone})`, async () => {
+      const options = { ...defaultOptions, standalone };
+      const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
 
-    const main = tree.readContent('/projects/foo/src/main.ts');
-    expect(main).toContain('bootstrapApplication');
-  });
+      const main = tree.readContent('/projects/foo/src/main.ts');
+      expect(main).toContain(standalone ? 'bootstrapApplication' : 'bootstrapModule');
+      expect(main).toMatch(/\.catch\(\(err: unknown\) => \{\s+console\.error\(err\);\s+\}\);/);
+    });
+  }
 
   describe('standalone=false', () => {
     it('should add the provideZoneChangeDetection with event coalescing option by default with zone.js apps', async () => {
