@@ -1,3 +1,22 @@
+<a name="22.2.2"></a>
+
+# 22.2.2 (2026-10-07)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                                          |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [cfe970c8bc](https://github.com/angular/angular-cli/commit/cfe970c8bcfbc47e9fa1fa6b17e41cdf1d3b30bf) | fix  | preserve Host header when proxying in ssr-dev-server |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                   |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [405bfa370a](https://github.com/angular/angular-cli/commit/405bfa370ac3c8f14808d58cfc707b7ff23348c4) | fix  | keep the order of glob entries in the proxy configuration     |
+| [996e47f809](https://github.com/angular/angular-cli/commit/996e47f809a3172486df665bfce6d5c11e652154) | fix  | support a string `context` in array-form proxy configurations |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.26"></a>
 
 # 21.2.26 (2026-10-07)
