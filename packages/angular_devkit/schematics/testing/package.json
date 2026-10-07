@@ -1,5 +1,0 @@
-{
-  "name": "@angular-devkit/schematics/testing",
-  "main": "index.js",
-  "typings": "index.d.ts"
-}

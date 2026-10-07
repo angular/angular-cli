@@ -71,10 +71,8 @@ npm_package(
         ":license",
         ":schematics",
         "//packages/angular_devkit/schematics/tasks",
-        "//packages/angular_devkit/schematics/tasks:package.json",
         "//packages/angular_devkit/schematics/testing",
-        "//packages/angular_devkit/schematics/testing:package.json",
-        "//packages/angular_devkit/schematics/tools:package.json",
+        "//packages/angular_devkit/schematics/tools",
     ],
 )
 

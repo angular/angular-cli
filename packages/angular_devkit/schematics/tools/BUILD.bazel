@@ -16,7 +16,6 @@ ts_project(
             "**/*_spec.ts",
         ],
     ),
-    data = ["package.json"],
     deps = [
         "//:node_modules/@types/node",
         "//packages/angular_devkit/schematics",
