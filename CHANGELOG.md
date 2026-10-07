@@ -1,3 +1,27 @@
+<a name="22.3.0-next.1"></a>
+
+# 22.3.0-next.1 (2026-10-07)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                                          |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
+| [3379a13314](https://github.com/angular/angular-cli/commit/3379a133148825a6ecb5eeacafdd6bcfd3c8e50b) | fix  | preserve Host header when proxying in ssr-dev-server |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                           |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
+| [4244eb7ba1](https://github.com/angular/angular-cli/commit/4244eb7ba1be5371dc8eab0c8ee07a8269ce09aa) | fix  | allow library outputPath within project root                          |
+| [f61de66202](https://github.com/angular/angular-cli/commit/f61de6620271d71bb7fc051d0ea03426bfa2af5b) | fix  | capture and report Rolldown warnings and errors in library builder    |
+| [3871a9da91](https://github.com/angular/angular-cli/commit/3871a9da9106aefc4b10095d4716e30db09fd864) | fix  | keep the order of glob entries in the proxy configuration             |
+| [3d00c76eb9](https://github.com/angular/angular-cli/commit/3d00c76eb9c5ea38d1ede08e65ed0ea22f6f0232) | fix  | resolve library bundle sourcemap sources relative to output directory |
+| [5ffed3f3b6](https://github.com/angular/angular-cli/commit/5ffed3f3b6b39583cda1e35854cc001344ed6eba) | fix  | scope cache directory by project and builder name                     |
+| [1e45d4d46a](https://github.com/angular/angular-cli/commit/1e45d4d46ad79ad890fe973b5fe697664826cc2d) | fix  | support a string `context` in array-form proxy configurations         |
+| [2ffbebf24c](https://github.com/angular/angular-cli/commit/2ffbebf24c0b12c14490f98a1df0448031bd105d) | perf | immediately purge freed rolldown arena memory                         |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.2"></a>
 
 # 22.2.2 (2026-10-07)
