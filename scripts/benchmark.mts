@@ -9,6 +9,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
+import {
+  type LibraryBuilderBenchmarkOptions,
+  runLibraryBuilderBenchmarks,
+} from './benchmarks/library-builder/index.mts';
 
 function checkBuildStatus(logger: Console): boolean {
   const distFile = 'dist/@angular/build/src/tools/i18n/i18n-inliner.js';
@@ -36,6 +40,50 @@ function checkBuildStatus(logger: Console): boolean {
   return true;
 }
 
+function parseIntList(raw: string | undefined): number[] | undefined {
+  return raw?.split(',').map((s) => Number(s.trim()));
+}
+
+async function runLibraryBuilderSubsystem(options: {
+  layout?: string;
+  style?: string;
+  sizes?: string;
+  depths?: string;
+  iterations?: string | number;
+  json?: boolean;
+}): Promise<number> {
+  if (options.layout !== undefined && options.layout !== 'flat' && options.layout !== 'deep') {
+    // eslint-disable-next-line no-console
+    console.error(`Error: --layout must be "flat" or "deep", got "${options.layout}".`);
+
+    return 1;
+  }
+  if (
+    options.style !== undefined &&
+    !['inline', 'inline-scss', 'external'].includes(options.style)
+  ) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Error: --style must be one of "inline", "inline-scss", "external", got "${options.style}".`,
+    );
+
+    return 1;
+  }
+
+  const cliOptions: LibraryBuilderBenchmarkOptions = {
+    layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
+    style: options.style as LibraryBuilderBenchmarkOptions['style'],
+    sizes: parseIntList(options.sizes),
+    depths: parseIntList(options.depths),
+    iterations: options.iterations !== undefined ? Number(options.iterations) : undefined,
+    json: Boolean(options.json),
+  };
+
+  const { exitCode } = await runLibraryBuilderBenchmarks(cliOptions);
+
+  return exitCode;
+}
+
 export default async function (
   options: {
     _?: string[];
@@ -51,6 +99,10 @@ export default async function (
     'save-baseline'?: string;
     compareBaseline?: string;
     'compare-baseline'?: string;
+    layout?: string;
+    style?: string;
+    sizes?: string;
+    depths?: string;
     help?: boolean;
     [key: string]: unknown;
   },
@@ -69,8 +121,9 @@ Usage:
 
 Subsystems:
   i18n               Run i18n inliner performance benchmarks (default)
+  library-builder    Run @angular/build:library scaling benchmarks
 
-Options:
+Options (i18n):
   --scenario=<name>          Run a specific scenario (e.g. standard-app, enterprise-multilingual)
   --iterations=<n>           Number of measured iterations (default: 5)
   --warmup=<n>               Number of warmup iterations (default: 2)
@@ -80,15 +133,30 @@ Options:
   --json                     Output results in machine-readable JSON
   --save-baseline=<file>     Save run results to a baseline JSON file
   --compare-baseline=<file>  Compare run results against an existing baseline JSON file
+
+Options (library-builder):
+  --layout=<flat|deep>       Fixture layout (default: flat)
+  --style=<inline|inline-scss|external>  Component style variant (default: inline)
+  --sizes=<n,n,...>          Entry-point counts to sweep, layout=flat only (default: 10,50,300,1000,2000)
+  --depths=<n,n,...>         Tree depths to sweep, layout=deep only (default: 2,5,8,11)
+  --iterations=<n>           Measured iterations per size (default: 2)
+  --json                     Output raw measurements as JSON
+
   --help                     Show this help message
 `);
 
     return 0;
   }
 
+  if (targetSubsystem === 'library-builder') {
+    return runLibraryBuilderSubsystem(options);
+  }
+
   if (targetSubsystem !== 'i18n') {
     // eslint-disable-next-line no-console
-    console.error(`Unknown benchmark subsystem: "${targetSubsystem}". Supported subsystems: i18n`);
+    console.error(
+      `Unknown benchmark subsystem: "${targetSubsystem}". Supported subsystems: i18n, library-builder`,
+    );
 
     return 1;
   }
