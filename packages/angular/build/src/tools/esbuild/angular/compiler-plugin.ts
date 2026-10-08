@@ -61,7 +61,7 @@ export interface CompilerPluginOptions {
   externalRuntimeStyles?: boolean;
   instrumentForCoverage?: (request: string) => boolean;
   templateUpdates?: Map<string, string>;
-  rootFiles?: string[];
+  excludeRootFiles?: string[];
 }
 
 // eslint-disable-next-line max-lines-per-function
@@ -330,7 +330,7 @@ export function createCompilerPlugin(
               instrumentForCoverage: !!pluginOptions.instrumentForCoverage,
               includeTestMetadata: !!pluginOptions.includeTestMetadata,
               customConditions: build.initialOptions.conditions,
-              rootFiles: pluginOptions.rootFiles,
+              excludeRootFiles: pluginOptions.excludeRootFiles,
             },
           );
 

@@ -110,5 +110,77 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should compile NgModule declared components when using include in an NgModule app', async () => {
+      await harness.writeFiles({
+        'src/tsconfig.spec.json': JSON.stringify({
+          extends: '../tsconfig.json',
+          compilerOptions: {
+            outDir: '../out-tsc/spec',
+            types: ['vitest/globals'],
+          },
+          include: ['**/*.d.ts', '**/*.ts'],
+        }),
+        'src/app/app.module.ts': `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { RouterModule } from '@angular/router';
+          import { AppComponent } from './app.component';
+
+          @NgModule({
+            declarations: [AppComponent],
+            imports: [BrowserModule, RouterModule],
+          })
+          export class AppModule {}
+        `,
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'app-root',
+            standalone: false,
+            templateUrl: './app.component.html',
+          })
+          export class AppComponent {}
+        `,
+        'src/app/app.component.html': '<router-outlet />',
+        'src/app/app.component.spec.ts': `
+          import { TestBed } from '@angular/core/testing';
+          import { RouterModule } from '@angular/router';
+          import { AppComponent } from './app.component';
+
+          describe('AppComponent', () => {
+            beforeEach(async () => {
+              await TestBed.configureTestingModule({
+                imports: [RouterModule.forRoot([])],
+                declarations: [AppComponent],
+              }).compileComponents();
+            });
+
+            it('should create the app', () => {
+              const fixture = TestBed.createComponent(AppComponent);
+              const app = fixture.componentInstance;
+              expect(app).toBeTruthy();
+            });
+          });
+        `,
+        'src/app/broken.service.spec.ts': `
+          // This test has a TypeScript type error that would fail compilation if compiled
+          const invalidNumber: number = 'not a number';
+          describe('BrokenService', () => {
+            it('should fail compilation', () => {
+              expect(invalidNumber).toBe(1);
+            });
+          });`,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        include: ['src/app/app.component.spec.ts'],
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });

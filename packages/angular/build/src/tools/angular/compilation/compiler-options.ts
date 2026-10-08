@@ -21,6 +21,7 @@ export interface CompilerOptionOverrides {
   includeTestMetadata?: boolean;
   customConditions?: string[];
   rootFiles?: string[];
+  excludeRootFiles?: string[];
   declarationMap?: boolean;
   compilationMode?: 'full' | 'partial';
   paths?: Record<string, string[]>;

@@ -55,5 +55,68 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeFalse();
       expectLog(logs, `The specified tsConfig file 'random/tsconfig.spec.json' does not exist.`);
     });
+
+    it('should compile NgModule declared components when tsConfig includes application files', async () => {
+      await harness.writeFiles({
+        'src/tsconfig.spec.json': JSON.stringify({
+          extends: '../tsconfig.json',
+          compilerOptions: {
+            outDir: '../out-tsc/spec',
+            types: ['vitest/globals'],
+          },
+          include: ['**/*.d.ts', '**/*.ts'],
+        }),
+        'src/app/app.module.ts': `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { RouterModule } from '@angular/router';
+          import { AppComponent } from './app.component';
+
+          @NgModule({
+            declarations: [AppComponent],
+            imports: [BrowserModule, RouterModule],
+          })
+          export class AppModule {}
+        `,
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'app-root',
+            standalone: false,
+            templateUrl: './app.component.html',
+          })
+          export class AppComponent {}
+        `,
+        'src/app/app.component.html': '<router-outlet />',
+        'src/app/app.component.spec.ts': `
+          import { TestBed } from '@angular/core/testing';
+          import { RouterModule } from '@angular/router';
+          import { AppComponent } from './app.component';
+
+          describe('AppComponent', () => {
+            beforeEach(async () => {
+              await TestBed.configureTestingModule({
+                imports: [RouterModule.forRoot([])],
+                declarations: [AppComponent],
+              }).compileComponents();
+            });
+
+            it('should create the app', () => {
+              const fixture = TestBed.createComponent(AppComponent);
+              const app = fixture.componentInstance;
+              expect(app).toBeTruthy();
+            });
+          });
+        `,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+    });
   });
 });

@@ -21,6 +21,8 @@ import { type NormalizedUnitTestBuilderOptions, injectTestingPolyfills } from '.
 import { findTests, getTestEntrypoints } from '../../test-discovery';
 import { RunnerOptions } from '../api';
 
+const DEFAULT_TEST_PATTERNS = ['**/*.spec.ts', '**/*.test.ts'];
+
 /**
  * Creates the virtual file contents to initialize the Angular testing environment (TestBed).
  *
@@ -210,14 +212,7 @@ export async function getVitestBuildOptions(
     removeTestExtension: true,
   });
 
-  const rootFiles = [...testFiles];
-  if (providersFile) {
-    rootFiles.push(providersFile);
-  }
-
   if (setupFiles?.length) {
-    rootFiles.push(...setupFiles);
-
     const setupEntryPoints = getTestEntrypoints(setupFiles, {
       projectSourceRoot,
       workspaceRoot,
@@ -229,6 +224,21 @@ export async function getVitestBuildOptions(
       entryPoints.set(entryPoint, setupFile);
     }
   }
+
+  const allTestFiles = await findTests(DEFAULT_TEST_PATTERNS, [], workspaceRoot, projectSourceRoot);
+  const testFilesSet = new Set(testFiles);
+  if (providersFile) {
+    testFilesSet.add(toPosixPath(providersFile));
+  }
+
+  if (setupFiles?.length) {
+    for (const setupFile of setupFiles) {
+      testFilesSet.add(toPosixPath(setupFile));
+    }
+  }
+
+  const unselectedTestFiles = allTestFiles.filter((file) => !testFilesSet.has(file));
+  const excludeRootFiles = unselectedTestFiles.length > 0 ? unselectedTestFiles : undefined;
 
   // The Angular compiler facade must be loaded in a dedicated setup file before TestBed initialization.
   // This ensures the compiler facade is published before 'init-testbed' or any shared code-split chunks
@@ -267,7 +277,7 @@ export async function getVitestBuildOptions(
     optimization: false,
     namedChunks: false,
     entryPoints,
-    rootFiles,
+    excludeRootFiles,
     // Vitest's Node-based module loading emulation (vite-node) is not fully spec compliant and lacks
     // live ESM bindings across chunk boundaries. This can cause uninitialized exports or break mocking.
     // Disabling code splitting avoids shared chunks, but increases build and coverage memory/time.
