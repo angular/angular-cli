@@ -233,4 +233,31 @@ describe('inlineCriticalCss', () => {
     expect(warnings.length).toBeGreaterThan(0);
     expect(warnings[0]).toContain('missing.css');
   });
+
+  it('should retain nonce on stylesheet links and noscript fallback', async () => {
+    const initialContent = `
+      <html>
+      <head>
+        <link href="styles.css" rel="stylesheet" nonce="test-nonce">
+      </head>
+      <body></body>
+    </html>`;
+
+    const { content, errors, warnings } = await inlineCriticalCss(
+      initialContent,
+      '/dist/',
+      undefined,
+      false,
+      readAsset,
+    );
+
+    expect(errors).toEqual([]);
+    expect(warnings).toEqual([]);
+    expect(content).toContain(
+      '<link href="styles.css" rel="stylesheet" nonce="test-nonce" media="print" data-beasties-media="all">',
+    );
+    expect(content).toContain(
+      '<noscript><link href="styles.css" rel="stylesheet" nonce="test-nonce"></noscript>',
+    );
+  });
 });
