@@ -225,20 +225,33 @@ export async function getVitestBuildOptions(
     }
   }
 
-  const allTestFiles = await findTests(DEFAULT_TEST_PATTERNS, [], workspaceRoot, projectSourceRoot);
-  const testFilesSet = new Set(testFiles);
-  if (providersFile) {
-    testFilesSet.add(toPosixPath(providersFile));
-  }
+  let excludeRootFiles: string[] | undefined;
+  const isDefaultInclude =
+    exclude.length === 0 &&
+    include.length === DEFAULT_TEST_PATTERNS.length &&
+    include.every((val: string) => DEFAULT_TEST_PATTERNS.includes(val));
 
-  if (setupFiles?.length) {
-    for (const setupFile of setupFiles) {
-      testFilesSet.add(toPosixPath(setupFile));
+  if (!isDefaultInclude) {
+    const allTestFiles = await findTests(
+      DEFAULT_TEST_PATTERNS,
+      [],
+      workspaceRoot,
+      projectSourceRoot,
+    );
+    const testFilesSet = new Set(testFiles);
+    if (providersFile) {
+      testFilesSet.add(toPosixPath(providersFile));
     }
-  }
 
-  const unselectedTestFiles = allTestFiles.filter((file) => !testFilesSet.has(file));
-  const excludeRootFiles = unselectedTestFiles.length > 0 ? unselectedTestFiles : undefined;
+    if (setupFiles?.length) {
+      for (const setupFile of setupFiles) {
+        testFilesSet.add(toPosixPath(setupFile));
+      }
+    }
+
+    const unselectedTestFiles = allTestFiles.filter((file) => !testFilesSet.has(file));
+    excludeRootFiles = unselectedTestFiles.length > 0 ? unselectedTestFiles : undefined;
+  }
 
   // The Angular compiler facade must be loaded in a dedicated setup file before TestBed initialization.
   // This ensures the compiler facade is published before 'init-testbed' or any shared code-split chunks
