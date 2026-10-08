@@ -17,7 +17,8 @@ const NONCE_ATTR_PATTERN = /ngCspNonce/i;
 const TARGET_LINK_RELS: ReadonlySet<string> = new Set(['stylesheet', 'modulepreload']);
 
 /**
- * Finds the `ngCspNonce` value and copies it to all inline `<style>` and `<script> `tags.
+ * Finds the `ngCspNonce` value and copies it to all `<style>` and `<script>` tags,
+ * as well as stylesheet and modulepreload `<link>` tags.
  * @param html Markup that should be processed.
  */
 export async function addNonce(html: string): Promise<string> {

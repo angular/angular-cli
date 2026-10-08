@@ -93,11 +93,12 @@ describe('addNonce', () => {
     expect(result).toContain(`<script nonce="{% nonce %}">console.log('bar');</script>`);
   });
 
-  it('should add the nonce expression to stylesheet link tags', async () => {
+  it('should add the nonce expression to stylesheet and modulepreload link tags', async () => {
     const result = await addNonce(`
       <html>
         <head>
           <link rel="stylesheet" href="styles.css">
+          <link rel="modulepreload" href="main.js">
           <link rel="preload" href="font.woff2" as="font">
         </head>
         <body>
@@ -107,6 +108,24 @@ describe('addNonce', () => {
     `);
 
     expect(result).toContain('<link rel="stylesheet" href="styles.css" nonce="{% nonce %}">');
+    expect(result).toContain('<link rel="modulepreload" href="main.js" nonce="{% nonce %}">');
     expect(result).toContain('<link rel="preload" href="font.woff2" as="font">');
+  });
+
+  it('should add the nonce expression when link rel has mixed case or multiple tokens', async () => {
+    const result = await addNonce(`
+      <html>
+        <head>
+          <link rel="Stylesheet" href="styles.css">
+          <link rel="MODULEPRELOAD" href="main.js">
+        </head>
+        <body>
+          <app ngCspNonce="{% nonce %}"></app>
+        </body>
+      </html>
+    `);
+
+    expect(result).toContain('<link rel="Stylesheet" href="styles.css" nonce="{% nonce %}">');
+    expect(result).toContain('<link rel="MODULEPRELOAD" href="main.js" nonce="{% nonce %}">');
   });
 });
