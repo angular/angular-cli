@@ -170,7 +170,6 @@ export async function executePostBundleSteps(
       assetFiles,
       outputMode,
       prerenderFormat,
-      indexHtmlOptions.output,
       sourcemapOptions.scripts,
       maxWorkers,
     );

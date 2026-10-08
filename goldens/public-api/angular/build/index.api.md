@@ -55,7 +55,6 @@ export type ApplicationBuilderOptions = {
     poll?: number;
     polyfills?: string[];
     prerender?: PrerenderUnion;
-    prerenderFormat?: PrerenderFormat;
     preserveSymlinks?: boolean;
     progress?: boolean;
     scripts?: ScriptElement[];
@@ -168,7 +167,7 @@ export function executeUnitTestBuilder(options: UnitTestBuilderOptions, context:
 // @public
 export type ExtractI18nBuilderOptions = {
     buildTarget?: string;
-    format?: Format;
+    format?: Format_2;
     i18nDuplicateTranslation?: I18NDuplicateTranslation;
     outFile?: string;
     outputPath?: string;

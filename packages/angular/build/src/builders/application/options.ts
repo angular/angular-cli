@@ -32,7 +32,7 @@ import {
   OutputMode,
   OutputPathClass,
   Platform,
-  PrerenderFormat,
+  Format as PrerenderFormat,
 } from './schema';
 
 /**
@@ -258,15 +258,30 @@ export async function normalizeOptions(
     }
   }
 
+  let prerenderFormat =
+    (typeof options.prerender === 'object' && options.prerender.format) ||
+    PrerenderFormat.Directory;
+
   if (options.outputMode) {
     if (!options.server) {
       options.ssr = false;
     }
 
+    // Of the "prerender" option, only "format" is considered when pages are prerendered.
     if (options.prerender !== undefined) {
-      context.logger.warn(
-        'The "prerender" option is not considered when "outputMode" is specified.',
-      );
+      if (!options.server || typeof options.prerender !== 'object') {
+        context.logger.warn(
+          'The "prerender" option is not considered when "outputMode" is specified.',
+        );
+      } else if (
+        options.prerender.routesFile !== undefined ||
+        options.prerender.discoverRoutes === false
+      ) {
+        context.logger.warn(
+          'The "prerender.routesFile" and "prerender.discoverRoutes" options are not considered ' +
+            'when "outputMode" is specified.',
+        );
+      }
     }
 
     options.prerender = !!options.server;
@@ -343,16 +358,12 @@ export async function normalizeOptions(
       options.outputMode === OutputMode.Static,
   };
 
-  let prerenderFormat = options.prerenderFormat ?? PrerenderFormat.Directory;
   if (prerenderFormat === PrerenderFormat.File && !outputOptions.ignoreServer) {
     // The server runtime of '@angular/ssr' looks up prerendered pages as '<route>/index.html'.
-    // The warning is only relevant when pages are actually prerendered, which the dev-server skips.
-    if ((prerenderOptions || appShellOptions) && !(options.partialSSRBuild || usePartialSsrBuild)) {
-      context.logger.warn(
-        'The "prerenderFormat" option set to "file" is not considered when the build produces a ' +
-          'server ("outputMode" set to "server", or "ssr" without "outputMode").',
-      );
-    }
+    context.logger.warn(
+      'The "prerender.format" option set to "file" is not considered when the build produces a ' +
+        'server ("outputMode" set to "server", or "ssr" without "outputMode").',
+    );
 
     prerenderFormat = PrerenderFormat.Directory;
   }
