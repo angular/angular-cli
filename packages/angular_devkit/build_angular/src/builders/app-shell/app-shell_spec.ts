@@ -195,7 +195,7 @@ describe('AppShell Builder', () => {
     expect(content).toContain('<app-root ngcspnonce="{% nonce %}"');
     expect(content).toContain('<script nonce="{% nonce %}">');
     expect(content).toMatch(
-      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" media="print" data-beasties-media="all">/,
+      /<link rel="stylesheet" href="styles\.[a-z0-9]+\.css" nonce="{% nonce %}" media="print" data-beasties-media="all">/,
     );
   });
 });
