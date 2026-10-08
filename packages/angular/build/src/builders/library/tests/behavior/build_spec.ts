@@ -139,5 +139,55 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         tslib: '^2.0.0',
       });
     });
+
+    it('should log completion and output location', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'info',
+          message: jasmine.stringMatching(
+            /Library bundle generation complete\. \[\d+\.\d{3} seconds\] - \d{4}-\d{2}-\d{2}T/,
+          ),
+        }),
+      );
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'info',
+          message: jasmine.stringMatching(/Output location: .*dist[/\\]lib/),
+        }),
+      );
+    });
+
+    it('should log failure on build error', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `export const title: number = 'invalid type';`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
+          message: jasmine.stringMatching(
+            /Library bundle generation failed\. \[\d+\.\d{3} seconds\] - \d{4}-\d{2}-\d{2}T/,
+          ),
+        }),
+      );
+      expect(logs).not.toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringMatching(/Output location:/),
+        }),
+      );
+    });
   });
 });

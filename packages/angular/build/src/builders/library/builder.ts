@@ -118,10 +118,6 @@ export async function* executeLibraryBuilder(
     }
 
     if (isWatchMode) {
-      if (progress) {
-        logger.info('Watch mode enabled. Watching for file changes...');
-      }
-
       const { setupWatcher } = await import('../../utils/watcher');
       watcher = await setupWatcher({
         workspaceRoot,
@@ -158,6 +154,10 @@ export async function* executeLibraryBuilder(
       return;
     }
 
+    if (progress) {
+      logger.info('Watch mode enabled. Watching for file changes...');
+    }
+
     yield* runWatchLoop(
       watcher,
       normalizedOptions,
@@ -190,11 +190,11 @@ async function executeBuild(
   buildAction: typeof import('./pipeline/build-action').buildAction,
 ): Promise<BuilderOutput> {
   const startTime = process.hrtime.bigint();
-  const { context, watchedCompilationFiles, isWatchMode } = actionContext;
+  const { context, watchedCompilationFiles, isWatchMode, options } = actionContext;
 
   try {
     await withProgress(message, () => buildAction(actionContext));
-    logBuildResult(context.logger, startTime, true);
+    logBuildResult(context.logger, startTime, true, options.outputPath);
     if (isWatchMode) {
       logCumulativeDurations();
     }
@@ -343,14 +343,23 @@ async function* runWatchLoop(
 /**
  * Logs the build completion time and status.
  */
-function logBuildResult(logger: logging.LoggerApi, startTime: bigint, success: boolean): void {
-  const durationMs = Number(process.hrtime.bigint() - startTime) / 1_000_000;
-  const durationSec = (durationMs / 1000).toFixed(2);
+function logBuildResult(
+  logger: logging.LoggerApi,
+  startTime: bigint,
+  success: boolean,
+  outputPath?: string,
+): void {
+  const buildTime = Number(process.hrtime.bigint() - startTime) / 10 ** 9;
+  const message =
+    `Library bundle generation ${success ? 'complete' : 'failed'}.` +
+    ` [${buildTime.toFixed(3)} seconds] - ${new Date().toISOString()}`;
 
   if (success) {
-    logger.info(`Build at: ${new Date().toISOString()} - Time: ${durationMs.toFixed(0)}ms`);
-    logger.info(`Built Angular library in ${durationSec}s.`);
+    logger.info(message);
+    if (outputPath) {
+      logger.info(`Output location: ${outputPath}\n`);
+    }
   } else {
-    logger.error(`Build failed after ${durationSec}s.`);
+    logger.error(message);
   }
 }
