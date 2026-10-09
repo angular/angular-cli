@@ -192,6 +192,7 @@ async function* handleRoute(options: {
         yield {
           ...metadata,
           redirectTo: resolveRedirectTo(metadata.route, redirectTo),
+          relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
         };
       } else {
         yield metadata;
@@ -421,6 +422,7 @@ async function* handleSSGRoute(
 
   if (redirectTo !== undefined) {
     meta.redirectTo = resolveRedirectTo(currentRoutePath, redirectTo);
+    meta.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
   }
 
   const isCatchAllRoute = CATCH_ALL_REGEXP.test(currentRoutePath);
@@ -534,7 +536,8 @@ function handlePrerenderParamsReplacement(
  *
  * This function processes the `redirectTo` property to ensure that it correctly
  * resolves relative to the current route path. If `redirectTo` is an absolute path,
- * it is returned as is. If it is a relative path, it is resolved based on the current route path.
+ * it is returned as is. If it is a relative path, it is resolved based on the current route path,
+ * and, like in the Angular router, its query and fragment are ignored.
  *
  * @param routePath - The current route path.
  * @param redirectTo - The target path for redirection.
@@ -550,7 +553,9 @@ function resolveRedirectTo(routePath: string, redirectTo: string): string {
   const segments = routePath.replace(URL_PARAMETER_GLOBAL_REGEXP, '*').split('/');
   segments.pop(); // Remove the last segment to make it relative.
 
-  return joinUrlParts(...segments, redirectTo);
+  const [path] = redirectTo.split(/[?#]/, 1);
+
+  return joinUrlParts(...segments, path);
 }
 
 /**

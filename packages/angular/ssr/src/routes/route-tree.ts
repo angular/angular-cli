@@ -31,6 +31,9 @@ export interface RouteTreeNodeMetadata {
    */
   redirectTo?: string;
 
+  /** Indicates if `redirectTo` was defined as a relative path. */
+  relativeRedirect?: boolean;
+
   /**
    * The route path for this node.
    *

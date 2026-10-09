@@ -51,7 +51,13 @@ describe('extractRoutesAndCreateRouteTree', () => {
     expect(routeTree.toObject()).toEqual([
       { route: '/', renderMode: RenderMode.Server },
       { route: '/home', renderMode: RenderMode.Client },
-      { route: '/redirect', renderMode: RenderMode.Server, status: 301, redirectTo: '/home' },
+      {
+        route: '/redirect',
+        renderMode: RenderMode.Server,
+        status: 301,
+        redirectTo: '/home',
+        relativeRedirect: true,
+      },
       { route: '/user/*', renderMode: RenderMode.Server },
     ]);
   });
@@ -371,10 +377,25 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
       expect(errors).toHaveSize(0);
       expect(routeTree.toObject()).toEqual([
-        { route: '/', renderMode: RenderMode.Prerender, redirectTo: '/some' },
-        { route: '/some', renderMode: RenderMode.Prerender, redirectTo: '/some/thing' },
+        {
+          route: '/',
+          renderMode: RenderMode.Prerender,
+          redirectTo: '/some',
+          relativeRedirect: true,
+        },
+        {
+          route: '/some',
+          renderMode: RenderMode.Prerender,
+          redirectTo: '/some/thing',
+          relativeRedirect: true,
+        },
         { route: '/some/thing', renderMode: RenderMode.Prerender },
-        { redirectTo: '/*/thing', route: '/*', renderMode: RenderMode.Server },
+        {
+          redirectTo: '/*/thing',
+          relativeRedirect: true,
+          route: '/*',
+          renderMode: RenderMode.Server,
+        },
         { route: '/*/thing', renderMode: RenderMode.Server },
       ]);
     });
@@ -496,8 +517,13 @@ describe('extractRoutesAndCreateRouteTree', () => {
     const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
     expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toEqual([
-      { route: '/', renderMode: RenderMode.Server, redirectTo: '/some' },
-      { route: '/*', renderMode: RenderMode.Server, redirectTo: '/*/thing' },
+      { route: '/', renderMode: RenderMode.Server, redirectTo: '/some', relativeRedirect: true },
+      {
+        route: '/*',
+        renderMode: RenderMode.Server,
+        redirectTo: '/*/thing',
+        relativeRedirect: true,
+      },
       { route: '/*/thing', renderMode: RenderMode.Server },
     ]);
   });
@@ -526,8 +552,67 @@ describe('extractRoutesAndCreateRouteTree', () => {
     const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
     expect(errors).toHaveSize(0);
     expect(routeTree.toObject()).toEqual([
-      { route: '/*/*', renderMode: RenderMode.Server, redirectTo: '/*/*/thing' },
+      {
+        route: '/*/*',
+        renderMode: RenderMode.Server,
+        redirectTo: '/*/*/thing',
+        relativeRedirect: true,
+      },
       { route: '/*/*/thing', renderMode: RenderMode.Server },
+    ]);
+  });
+
+  it('should not mark absolute redirects as relative', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'server', redirectTo: '/home' },
+        { path: 'prerender', redirectTo: '/home' },
+        { path: 'home', component: DummyComponent },
+      ],
+      [
+        { path: 'prerender', renderMode: RenderMode.Prerender },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/server', renderMode: RenderMode.Server, redirectTo: '/home' },
+      { route: '/prerender', renderMode: RenderMode.Prerender, redirectTo: '/home' },
+      { route: '/home', renderMode: RenderMode.Server },
+    ]);
+  });
+
+  it('should ignore the query and fragment of relative redirect targets', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'server', redirectTo: 'home?param=value#fragment' },
+        { path: 'prerender', redirectTo: 'home?param=value#fragment' },
+        { path: 'home', component: DummyComponent },
+      ],
+      [
+        { path: 'prerender', renderMode: RenderMode.Prerender },
+        { path: '**', renderMode: RenderMode.Server },
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      {
+        route: '/server',
+        renderMode: RenderMode.Server,
+        redirectTo: '/home',
+        relativeRedirect: true,
+      },
+      {
+        route: '/prerender',
+        renderMode: RenderMode.Prerender,
+        redirectTo: '/home',
+        relativeRedirect: true,
+      },
+      { route: '/home', renderMode: RenderMode.Server },
     ]);
   });
 
