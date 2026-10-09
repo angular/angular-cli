@@ -146,6 +146,7 @@ type EntryPointToBrowserMapping = AngularAppManifest['entryPointToBrowserMapping
 async function* handleRoute(options: {
   metadata: ServerConfigRouteTreeNodeMetadata;
   currentRoutePath: string;
+  parentRoute: string;
   route: Route;
   compiler: Compiler;
   parentInjector: Injector;
@@ -158,6 +159,7 @@ async function* handleRoute(options: {
     const {
       metadata,
       currentRoutePath,
+      parentRoute,
       route,
       compiler,
       parentInjector,
@@ -176,6 +178,7 @@ async function* handleRoute(options: {
       yield* handleSSGRoute(
         serverConfigRouteTree,
         typeof redirectTo === 'string' ? redirectTo : undefined,
+        parentRoute,
         metadata,
         parentInjector,
         invokeGetPrerenderParams,
@@ -191,7 +194,7 @@ async function* handleRoute(options: {
       } else if (typeof redirectTo === 'string') {
         yield {
           ...metadata,
-          redirectTo: resolveRedirectTo(metadata.route, redirectTo),
+          redirectTo: resolveRedirectTo(parentRoute, redirectTo),
         };
       } else {
         yield metadata;
@@ -392,6 +395,7 @@ function appendPreloadToMetadata(
  *
  * @param serverConfigRouteTree - The tree representing the server's routing setup.
  * @param redirectTo - Optional path to redirect to, if specified.
+ * @param parentRoute - The path of the parent route.
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
@@ -401,6 +405,7 @@ function appendPreloadToMetadata(
 async function* handleSSGRoute(
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined,
   redirectTo: string | undefined,
+  parentRoute: string,
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
@@ -420,7 +425,7 @@ async function* handleSSGRoute(
   }
 
   if (redirectTo !== undefined) {
-    meta.redirectTo = resolveRedirectTo(currentRoutePath, redirectTo);
+    meta.redirectTo = resolveRedirectTo(parentRoute, redirectTo);
   }
 
   const isCatchAllRoute = CATCH_ALL_REGEXP.test(currentRoutePath);
@@ -478,7 +483,10 @@ async function* handleSSGRoute(
           redirectTo:
             redirectTo === undefined
               ? undefined
-              : resolveRedirectTo(routeWithResolvedParams, redirectTo),
+              : resolveRedirectTo(
+                  parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
+                  redirectTo,
+                ),
         };
       }
     } catch (error) {
@@ -533,24 +541,21 @@ function handlePrerenderParamsReplacement(
  * Resolves the `redirectTo` property for a given route.
  *
  * This function processes the `redirectTo` property to ensure that it correctly
- * resolves relative to the current route path. If `redirectTo` is an absolute path,
- * it is returned as is. If it is a relative path, it is resolved based on the current route path.
+ * resolves relative to the parent route path. If `redirectTo` is an absolute path,
+ * it is returned as is. If it is a relative path, it is resolved based on the parent route path.
  *
- * @param routePath - The current route path.
+ * @param parentRoute - The path of the parent route.
  * @param redirectTo - The target path for redirection.
  * @returns The resolved redirect path as a string.
  */
-function resolveRedirectTo(routePath: string, redirectTo: string): string {
+function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
   if (redirectTo[0] === '/') {
     // If the redirectTo path is absolute, return it as is.
     return redirectTo;
   }
 
-  // Resolve relative redirectTo based on the current route path.
-  const segments = routePath.replace(URL_PARAMETER_GLOBAL_REGEXP, '*').split('/');
-  segments.pop(); // Remove the last segment to make it relative.
-
-  return joinUrlParts(...segments, redirectTo);
+  // Match Angular router behavior: replace all segments matched by the route.
+  return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), redirectTo);
 }
 
 /**
