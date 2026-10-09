@@ -31,8 +31,8 @@ export interface SearchDirectory {
   files: Set<string>;
 }
 
-export async function generateSearchDirectories(roots: string[]): Promise<SearchDirectory[]> {
-  return await Promise.all(
+export function generateSearchDirectories(roots: string[]): Promise<SearchDirectory[]> {
+  return Promise.all(
     roots.map((root) =>
       readdir(root, { withFileTypes: true }).then((entries) => ({
         root,
@@ -63,11 +63,11 @@ export function findTailwindConfiguration(
   return findFile(searchDirectories, tailwindConfigFiles);
 }
 
-export async function getTailwindConfig(
+export function getTailwindConfig(
   searchDirectories: SearchDirectory[],
   workspaceRoot: string,
   logger?: { warn(message: string): void },
-): Promise<{ file: string; package: string } | undefined> {
+): { file: string; package: string } | undefined {
   const tailwindConfigurationPath = findTailwindConfiguration(searchDirectories);
   if (!tailwindConfigurationPath) {
     return undefined;
