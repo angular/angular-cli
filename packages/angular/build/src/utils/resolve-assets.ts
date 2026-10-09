@@ -45,11 +45,14 @@ export async function resolveAssets(
 
             return [{ source: src, destination: path.join(entry.output, filePath) }];
           }
+
+          if (!stats.isSymbolicLink()) {
+            return [];
+          }
         } catch {
           // File does not exist or cannot be accessed.
+          return [];
         }
-
-        return [];
       }
     }
 

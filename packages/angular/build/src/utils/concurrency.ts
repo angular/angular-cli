@@ -7,7 +7,7 @@
  */
 
 /**
- * Maximum number of concurrent filesystem reads allowed across worker tasks.
+ * Maximum number of concurrent file system read/stat operations to prevent OS file descriptor exhaustion.
  */
 export const MAX_CONCURRENT_READS = 16;
 
