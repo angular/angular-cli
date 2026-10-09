@@ -173,7 +173,7 @@ export class AngularServerApp {
 
       // Match Angular router behavior: relative redirects keep the query string.
       return createRedirectResponse(
-        relativeRedirect ? [location, url.search].join('') : location,
+        relativeRedirect ? location + url.search : location,
         status,
         headers,
       );
