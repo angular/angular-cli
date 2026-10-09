@@ -75,12 +75,22 @@ export abstract class TypeScriptCompilation extends AngularCompilation {
       const rootFilesSet = new Set(
         compilerOptionOverrides.rootFiles.map((file) => canonicalizePath(toPosixPath(file))),
       );
+
       for (const file of originalRootNames) {
         if (/\.d\.[cm]?ts$/i.test(file)) {
           rootFilesSet.add(canonicalizePath(toPosixPath(file)));
         }
       }
+
       rootNames = [...rootFilesSet];
+    }
+
+    if (compilerOptionOverrides?.excludeRootFiles?.length) {
+      const excludeSet = new Set(
+        compilerOptionOverrides.excludeRootFiles.map((file) => canonicalizePath(toPosixPath(file))),
+      );
+
+      rootNames = rootNames.filter((file) => !excludeSet.has(canonicalizePath(toPosixPath(file))));
     }
 
     const { compilerOptions, warnings } = transformCompilerOptions(
