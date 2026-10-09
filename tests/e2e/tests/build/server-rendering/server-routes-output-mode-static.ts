@@ -49,6 +49,10 @@ export default async function () {
       redirectTo: 'ssg'
     },
     {
+      path: 'ssg-redirect-external',
+      component: Ssg,
+    },
+    {
       path: 'ssg-redirect-via-guard',
       canActivate: [() => {
         return inject(Router).createUrlTree(['ssg'], { queryParams: { foo: 'bar' }})
@@ -73,6 +77,11 @@ export default async function () {
   import { RenderMode, ServerRoute } from '@angular/ssr';
 
   export const serverRoutes: ServerRoute[] = [
+    {
+      path: 'ssg-redirect-external',
+      renderMode: RenderMode.Prerender,
+      headers: { Location: 'https://example.com/docs?from=ssg&next=/ssg' },
+    },
     {
       path: 'ssg/:id',
       renderMode: RenderMode.Prerender,
@@ -115,6 +124,9 @@ export default async function () {
     'ssg/two/index.html': /ng-server-context="ssg".+ssg-with-params works!/,
     // When static redirects are generated as meta tags.
     'ssg-redirect/index.html': '<meta http-equiv="refresh" content="0; url=/ssg">',
+    // The target of a 'Location' header is HTML escaped before it is written to the page.
+    'ssg-redirect-external/index.html':
+      '<meta http-equiv="refresh" content="0; url=https://example.com/docs?from=ssg&amp;next=/ssg">',
     'ssg-redirect-via-guard/index.html':
       '<meta http-equiv="refresh" content="0; url=/ssg?foo=bar">',
   };
