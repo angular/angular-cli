@@ -42,10 +42,6 @@ export async function* executeLibraryBuilder(
   context: BuilderContext & { signal?: AbortSignal },
 ): AsyncIterableIterator<BuilderOutput> {
   assertCompatibleAngularVersion(context.workspaceRoot);
-  await initializeHash();
-
-  // Purge old build disk cache
-  await purgeStaleBuildCache(context);
 
   const projectName = context.target?.project;
   if (!projectName) {
@@ -54,7 +50,13 @@ export async function* executeLibraryBuilder(
     return;
   }
 
-  const normalizedOptions = await normalizeLibraryOptions(context, projectName, options);
+  const [normalizedOptions] = await Promise.all([
+    normalizeLibraryOptions(context, projectName, options),
+    initializeHash(),
+    // Purge old build disk cache
+    purgeStaleBuildCache(context),
+  ]);
+
   const {
     workspaceRoot,
     projectRoot,
