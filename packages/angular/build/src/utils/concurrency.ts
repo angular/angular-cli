@@ -7,6 +7,11 @@
  */
 
 /**
+ * Maximum number of concurrent filesystem reads allowed across worker tasks.
+ */
+export const MAX_CONCURRENT_READS = 16;
+
+/**
  * Executes an asynchronous function for each item in an array concurrently up to a specified limit.
  *
  * If any task fails, processing of subsequent items stops and the first encountered error is re-thrown

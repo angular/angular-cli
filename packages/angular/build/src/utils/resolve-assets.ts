@@ -6,8 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { lstat, stat } from 'node:fs/promises';
 import path from 'node:path';
-import { glob } from 'tinyglobby';
+import { glob, isDynamicPattern } from 'tinyglobby';
+import { MAX_CONCURRENT_READS, mapConcurrent } from './concurrency';
 import { isSubDirectory } from './path';
 
 /**
@@ -26,14 +28,30 @@ export async function resolveAssets(
   }[],
   root: string,
 ): Promise<{ source: string; destination: string }[]> {
-  const outputFiles: { source: string; destination: string }[] = [];
-
-  for (const entry of entries) {
+  const resolvedEntries = await mapConcurrent(entries, MAX_CONCURRENT_READS, async (entry) => {
     if (!isSubDirectory(root, entry.input)) {
       throw new Error(`The ${entry.input} asset path must be within the workspace root.`);
     }
 
     const cwd = path.resolve(root, entry.input);
+
+    if (!entry.ignore?.length && !isDynamicPattern(entry.glob)) {
+      const src = path.join(cwd, entry.glob);
+      if (isSubDirectory(cwd, src)) {
+        try {
+          const stats = await (entry.followSymlinks ? stat(src) : lstat(src));
+          if (stats.isFile()) {
+            const filePath = entry.flatten ? path.basename(entry.glob) : entry.glob;
+
+            return [{ source: src, destination: path.join(entry.output, filePath) }];
+          }
+        } catch {
+          // File does not exist or cannot be accessed.
+        }
+
+        return [];
+      }
+    }
 
     const files = await glob(entry.glob, {
       cwd,
@@ -42,13 +60,11 @@ export async function resolveAssets(
       followSymbolicLinks: entry.followSymlinks ?? false,
     });
 
-    for (const file of files) {
-      const src = path.join(cwd, file);
-      const filePath = entry.flatten ? path.basename(file) : file;
+    return files.map((file) => ({
+      source: path.join(cwd, file),
+      destination: path.join(entry.output, entry.flatten ? path.basename(file) : file),
+    }));
+  });
 
-      outputFiles.push({ source: src, destination: path.join(entry.output, filePath) });
-    }
-  }
-
-  return outputFiles;
+  return resolvedEntries.flat();
 }
