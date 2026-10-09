@@ -287,7 +287,7 @@ export async function normalizeOptions(
   // Skip tailwind configuration if postcss is customized
   const tailwindConfiguration = postcssConfiguration
     ? undefined
-    : await getTailwindConfig(searchDirectories, workspaceRoot, context.logger);
+    : getTailwindConfig(searchDirectories, workspaceRoot, context.logger);
 
   let serverEntryPoint: string | undefined;
   if (typeof options.server === 'string') {
