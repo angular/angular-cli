@@ -128,7 +128,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       expectLog(
         logs,
-        'The "prerender.format" option set to "file" is not considered when the build produces a server',
+        'The "prerender.format" option is not considered when the build produces a server.',
       );
 
       harness.expectFile('dist/browser/foo/index.html').content.toContain('foo works!');

@@ -17,13 +17,7 @@ import {
 import { BuildOutputFile, BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { assertIsError } from '../error';
 import { toPosixPath } from '../path';
-import {
-  addLeadingSlash,
-  addTrailingSlash,
-  joinUrlParts,
-  stripLeadingSlash,
-  stripTrailingSlash,
-} from '../url';
+import { addLeadingSlash, addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../url';
 import { WorkerPool } from '../worker-pool';
 import {
   IMPORT_EXEC_ARGV,
@@ -57,8 +51,6 @@ type AppShellOptions = NormalizedApplicationBuildOptions['appShellOptions'];
  *   '/index.html': { content: '<html>...</html>', appShell: false },
  *   '/shell/index.html': { content: '<html>...</html>', appShellRoute: true }
  * }
- *
- * With the 'file' format, non-root routes are keyed as `<route>.html` (e.g. 'shell.html').
  */
 type PrerenderOutput = Record<string, { content: string; appShellRoute: boolean }>;
 
@@ -467,22 +459,11 @@ function getRouteWithoutBaseHref(route: string, baseHrefPathname: string): strin
     : route;
 }
 
-/**
- * Returns the output file path of a prerendered route, relative to the browser output directory.
- *
- * - `directory`: `/foo/bar` is written to `foo/bar/index.html`.
- * - `file`: `/foo/bar` is written to `foo/bar.html`.
- *
- * The root route (after removing the `baseHref`) is written to `index.html` in both formats.
- */
 function getRouteOutPath(route: string, baseHrefPathname: string, format: PrerenderFormat): string {
   const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathname);
 
-  if (format === PrerenderFormat.File) {
-    const routePath = stripTrailingSlash(posix.normalize(addLeadingSlash(routeWithoutBaseHref)));
-    if (routePath !== '/') {
-      return `${stripLeadingSlash(routePath)}.html`;
-    }
+  if (format === PrerenderFormat.File && routeWithoutBaseHref !== '/') {
+    return stripLeadingSlash(`${routeWithoutBaseHref}.html`);
   }
 
   return stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));

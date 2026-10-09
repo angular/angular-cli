@@ -267,21 +267,17 @@ export async function normalizeOptions(
       options.ssr = false;
     }
 
-    // Of the "prerender" option, only "format" is considered when pages are prerendered.
-    if (options.prerender !== undefined) {
-      if (!options.server || typeof options.prerender !== 'object') {
-        context.logger.warn(
-          'The "prerender" option is not considered when "outputMode" is specified.',
-        );
-      } else if (
+    // "prerender.format" is considered when pages are prerendered.
+    if (
+      options.prerender !== undefined &&
+      (!options.server ||
+        typeof options.prerender !== 'object' ||
         options.prerender.routesFile !== undefined ||
-        options.prerender.discoverRoutes === false
-      ) {
-        context.logger.warn(
-          'The "prerender.routesFile" and "prerender.discoverRoutes" options are not considered ' +
-            'when "outputMode" is specified.',
-        );
-      }
+        options.prerender.discoverRoutes === false)
+    ) {
+      context.logger.warn(
+        'The "prerender" option is not considered when "outputMode" is specified.',
+      );
     }
 
     options.prerender = !!options.server;
@@ -361,8 +357,7 @@ export async function normalizeOptions(
   if (prerenderFormat === PrerenderFormat.File && !outputOptions.ignoreServer) {
     // The server runtime of '@angular/ssr' looks up prerendered pages as '<route>/index.html'.
     context.logger.warn(
-      'The "prerender.format" option set to "file" is not considered when the build produces a ' +
-        'server ("outputMode" set to "server", or "ssr" without "outputMode").',
+      'The "prerender.format" option is not considered when the build produces a server.',
     );
 
     prerenderFormat = PrerenderFormat.Directory;
