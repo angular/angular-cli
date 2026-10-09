@@ -9,7 +9,7 @@
 import { readFile } from 'node:fs/promises';
 import { extname, posix } from 'node:path';
 import { NormalizedApplicationBuildOptions } from '../../builders/application/options';
-import { OutputMode } from '../../builders/application/schema';
+import { OutputMode, Format as PrerenderFormat } from '../../builders/application/schema';
 import {
   BuildOutputAsset,
   PrerenderedRoutesRecord,
@@ -62,6 +62,7 @@ export async function prerenderPages(
   outputFiles: Readonly<BuildOutputFile[]>,
   assets: Readonly<BuildOutputAsset[]>,
   outputMode: OutputMode | undefined,
+  format: PrerenderFormat,
   sourcemap = false,
   maxThreads = 1,
 ): Promise<{
@@ -200,6 +201,7 @@ export async function prerenderPages(
     outputFilesForWorker,
     assetsReversed,
     outputMode,
+    format,
     appShellRoute ?? appShellOptions?.route,
   );
 
@@ -209,7 +211,7 @@ export async function prerenderPages(
   const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
 
   for (const metadata of serializableRouteTreeNodeForPrerender) {
-    const outPath = getRouteOutPath(metadata.route, baseHrefPathnameWithLeadingSlash);
+    const outPath = getRouteOutPath(metadata.route, baseHrefPathnameWithLeadingSlash, format);
 
     if (output[outPath]) {
       prerenderedRoutes[metadata.route] = { headers: metadata.headers };
@@ -234,6 +236,7 @@ async function renderPages(
   outputFilesForWorker: Record<string, Uint8Array>,
   assetFilesForWorker: Record<string, string>,
   outputMode: OutputMode | undefined,
+  format: PrerenderFormat,
   appShellRoute: string | undefined,
 ): Promise<{
   output: PrerenderOutput;
@@ -252,7 +255,7 @@ async function renderPages(
   for (const { route, redirectTo } of serializableRouteTreeNode) {
     // Remove the base href from the file output path.
     const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathnameWithLeadingSlash);
-    const outPath = getRouteOutPath(route, baseHrefPathnameWithLeadingSlash);
+    const outPath = getRouteOutPath(route, baseHrefPathnameWithLeadingSlash, format);
 
     if (typeof redirectTo === 'string') {
       output[outPath] = { content: generateRedirectStaticPage(redirectTo), appShellRoute: false };
@@ -456,8 +459,12 @@ function getRouteWithoutBaseHref(route: string, baseHrefPathname: string): strin
     : route;
 }
 
-function getRouteOutPath(route: string, baseHrefPathname: string): string {
+function getRouteOutPath(route: string, baseHrefPathname: string, format: PrerenderFormat): string {
   const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathname);
+
+  if (format === PrerenderFormat.File && routeWithoutBaseHref !== '/') {
+    return stripLeadingSlash(`${routeWithoutBaseHref}.html`);
+  }
 
   return stripLeadingSlash(posix.join(routeWithoutBaseHref, 'index.html'));
 }
