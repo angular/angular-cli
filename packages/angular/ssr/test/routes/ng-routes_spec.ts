@@ -378,6 +378,76 @@ describe('extractRoutesAndCreateRouteTree', () => {
         { route: '/*/thing', renderMode: RenderMode.Server },
       ]);
     });
+
+    it('should resolve multi-segment relative redirects of prerendered routes', async () => {
+      setAngularAppTestingManifest(
+        [
+          {
+            path: ':param',
+            children: [
+              { path: 'old/page', redirectTo: 'new/page' },
+              { path: 'new/page', component: DummyComponent },
+            ],
+          },
+        ],
+        [
+          {
+            path: ':param/old/page',
+            renderMode: RenderMode.Prerender,
+            async getPrerenderParams() {
+              return [{ param: 'some' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+        includePrerenderFallbackRoutes: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/*', renderMode: RenderMode.Server },
+        { route: '/*/old/page', renderMode: RenderMode.Server, redirectTo: '/*/new/page' },
+        { route: '/*/new/page', renderMode: RenderMode.Server },
+        { route: '/some/old/page', renderMode: RenderMode.Prerender, redirectTo: '/some/new/page' },
+      ]);
+    });
+
+    it('should resolve relative redirects of prerendered catch-all routes', async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'docs/**', redirectTo: 'new' },
+          { path: 'new', component: DummyComponent },
+        ],
+        [
+          {
+            path: 'docs/**',
+            renderMode: RenderMode.Prerender,
+            async getPrerenderParams() {
+              return [{ '**': 'a/b' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+        includePrerenderFallbackRoutes: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/docs/a/b', renderMode: RenderMode.Prerender, redirectTo: '/new' },
+        { route: '/docs/**', renderMode: RenderMode.Server, redirectTo: '/new' },
+        { route: '/new', renderMode: RenderMode.Server },
+      ]);
+    });
   });
 
   it('should extract routes with a route level matcher', async () => {
@@ -528,6 +598,29 @@ describe('extractRoutesAndCreateRouteTree', () => {
     expect(routeTree.toObject()).toEqual([
       { route: '/*/*', renderMode: RenderMode.Server, redirectTo: '/*/*/thing' },
       { route: '/*/*/thing', renderMode: RenderMode.Server },
+    ]);
+  });
+
+  it('should resolve multi-segment relative redirects against the parent route', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: ':param',
+          children: [
+            { path: 'old/page', redirectTo: 'new/page' },
+            { path: 'new/page', component: DummyComponent },
+          ],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/*', renderMode: RenderMode.Server },
+      { route: '/*/old/page', renderMode: RenderMode.Server, redirectTo: '/*/new/page' },
+      { route: '/*/new/page', renderMode: RenderMode.Server },
     ]);
   });
 
