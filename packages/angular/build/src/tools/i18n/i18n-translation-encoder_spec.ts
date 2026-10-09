@@ -165,4 +165,33 @@ describe('SharedArrayBuffer Translation Encoder & Reader', () => {
     const dictionary = new SharedTranslationDictionary(buffer);
     expect(dictionary.get('testKey')).toBeUndefined();
   });
+
+  it('safely handles undefined translation values', () => {
+    const translation = {
+      definedKey: 'value',
+      undefinedKey: undefined,
+    };
+
+    const buffer = encodeTranslationToBuffer(translation as Record<string, unknown>);
+    const dictionary = new SharedTranslationDictionary<unknown>(buffer);
+
+    expect(dictionary.get('definedKey')).toEqual('value');
+    expect(dictionary.get('undefinedKey')).toBeNull();
+  });
+
+  it('encodes and reads large translation dictionaries exceeding 64KB', () => {
+    const largeTranslation: Record<string, string> = {};
+    for (let i = 0; i < 4000; i++) {
+      largeTranslation[`key_${i.toString().padStart(6, '0')}`] = `Message content for key ${i}`;
+    }
+
+    const buffer = encodeTranslationToBuffer<string>(largeTranslation);
+    expect(buffer.byteLength).toBeGreaterThan(65536);
+
+    const dictionary = new SharedTranslationDictionary<string>(buffer);
+    expect(dictionary.get('key_000000')).toEqual('Message content for key 0');
+    expect(dictionary.get('key_002000')).toEqual('Message content for key 2000');
+    expect(dictionary.get('key_003999')).toEqual('Message content for key 3999');
+    expect(dictionary.get('nonexistent_key')).toBeUndefined();
+  });
 });
