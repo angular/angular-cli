@@ -15,12 +15,6 @@ import {
   expectNoLog,
 } from '../setup';
 
-/**
- * Maximum time in milliseconds for single build/rebuild
- * This accounts for CI variability.
- */
-export const BUILD_TIMEOUT = 30_000;
-
 describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
   describe('Behavior: "Rebuild Error Detection"', () => {
     it('detects template errors with no AOT codegen or TS emit differences', async () => {
@@ -117,6 +111,116 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
             // Make an unrelated change to verify error cache was updated
             // Should continue showing no error
+            await harness.modifyFile('src/main.ts', (content) => content + '\n');
+          },
+          ({ result, logs }) => {
+            expect(result?.success).toBeTrue();
+            expectNoLog(logs, typeErrorText);
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
+
+    it('detects template errors across components on watch rebuild when isolatedModules is enabled', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.modifyFile('tsconfig.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions = {
+          ...tsconfig.compilerOptions,
+          isolatedModules: true,
+        };
+
+        return JSON.stringify(tsconfig);
+      });
+
+      const goodChildComponentContents = `
+        import { Component, Input } from '@angular/core';
+        @Component({
+          selector: 'child',
+          standalone: true,
+          template: '<p>{{ value }}</p>',
+        })
+        export class ChildComponent {
+          @Input() value!: number;
+        }
+      `;
+
+      const typeErrorText = `Type 'number' is not assignable to type 'string'.`;
+
+      await harness.writeFiles({
+        'src/app/child.component.ts': goodChildComponentContents,
+        'src/app/app.module.ts': `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { AppComponent } from './app.component';
+          @NgModule({
+            imports: [
+              BrowserModule,
+              AppComponent,
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+          })
+          export class AppModule { }
+        `,
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+          import { ChildComponent } from './child.component';
+          @Component({
+            selector: 'app-root',
+            standalone: true,
+            imports: [ChildComponent],
+            template: '<child [value]="123" />',
+          })
+          export class AppComponent {}
+        `,
+      });
+
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+
+            // Update child component to change input type from number to string
+            await harness.writeFile(
+              'src/app/child.component.ts',
+              `
+              import { Component, Input } from '@angular/core';
+              @Component({
+                selector: 'child',
+                standalone: true,
+                template: '<p>{{ value }}</p>',
+              })
+              export class ChildComponent {
+                @Input() value!: string;
+              }
+            `,
+            );
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expectLog(logs, typeErrorText);
+
+            // Make an unrelated change to verify error persists
+            await harness.modifyFile('src/main.ts', (content) => content + '\n');
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expectLog(logs, typeErrorText);
+
+            // Revert back to number
+            await harness.writeFile('src/app/child.component.ts', goodChildComponentContents);
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeTrue();
+            expectNoLog(logs, typeErrorText);
+
+            // Make an unrelated change to verify error cache cleared
             await harness.modifyFile('src/main.ts', (content) => content + '\n');
           },
           ({ result, logs }) => {
@@ -234,7 +338,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
             await harness.appendToFile('src/app/app.component.html', '<div>Guten Tag</div>');
           },
           ({ logs }) => {
-            expectNoLog(logs, 'invalid-css-content');
+            expectNoLog(logs, 'Unexpected character "EOF"');
 
             harness.expectFile('dist/browser/main.js').content.toContain('Hello, world!');
             harness.expectFile('dist/browser/main.js').content.toContain('Guten Tag');
