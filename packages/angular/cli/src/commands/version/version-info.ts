@@ -104,6 +104,13 @@ export async function gatherVersionInfo(context: CommandContext): Promise<Versio
 
   const angularCoreVersion = packages['@angular/core'];
 
+  let packageManagerVersion: string | undefined;
+  try {
+    packageManagerVersion = await context.packageManager.getVersion();
+  } catch {
+    // Ignore errors if the package manager is not available.
+  }
+
   return {
     cli: {
       version: VERSION.full,
@@ -122,7 +129,7 @@ export async function gatherVersionInfo(context: CommandContext): Promise<Versio
       },
       packageManager: {
         name: context.packageManager.name,
-        version: await context.packageManager.getVersion(),
+        version: packageManagerVersion,
       },
     },
     packages,
