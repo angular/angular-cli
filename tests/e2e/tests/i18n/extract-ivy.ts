@@ -1,8 +1,9 @@
 import { join } from 'node:path';
 import { getGlobalVariable } from '../../utils/env';
-import { expectFileToMatch, writeFile } from '../../utils/fs';
+import { deleteFile, expectFileToMatch, writeFile } from '../../utils/fs';
 import { uninstallPackage } from '../../utils/packages';
 import { ng } from '../../utils/process';
+import { updateJsonFile } from '../../utils/project';
 import { expectToFail } from '../../utils/utils';
 import { readNgVersion } from '../../utils/version';
 
@@ -50,6 +51,14 @@ export default async function () {
     throw new Error('Expected no warnings to be shown. STDERR:\n' + message5);
   }
 
+  await expectFileToMatch('messages.xlf', 'Hello world');
+
+  // Template messages should also be extracted when the build target disables AOT
+  await updateJsonFile('angular.json', (workspaceJson) => {
+    workspaceJson.projects['test-project'].architect.build.options.aot = false;
+  });
+  await deleteFile('messages.xlf');
+  await ng('extract-i18n');
   await expectFileToMatch('messages.xlf', 'Hello world');
 
   await uninstallPackage('@angular/localize');

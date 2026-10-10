@@ -45,6 +45,7 @@ export async function extractMessages(
     );
   }
 
+  buildOptions.aot = true;
   buildOptions.optimization = false;
   buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
   buildOptions.localize = false;
