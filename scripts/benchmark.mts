@@ -40,8 +40,11 @@ function checkBuildStatus(logger: Console): boolean {
   return true;
 }
 
-function parseIntList(raw: string | undefined): number[] | undefined {
-  return raw?.split(',').map((s) => Number(s.trim()));
+function parseIntList(raw: string | number | undefined): number[] | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+  return String(raw).split(',').map((s) => Number(s.trim()));
 }
 
 async function runLibraryBuilderSubsystem(options: {
