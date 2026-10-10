@@ -39,6 +39,7 @@ export async function extractMessages(
     await context.getTargetOptions(options.buildTarget),
     builderName,
   )) as unknown as ApplicationBuilderInternalOptions;
+  buildOptions.aot = true;
   buildOptions.optimization = false;
   buildOptions.sourceMap = { scripts: true, vendor: true, styles: false };
   buildOptions.localize = false;
