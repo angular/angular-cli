@@ -32,7 +32,7 @@ function checkBuildStatus(logger: Console): boolean {
     if (srcMtime > distMtime) {
       logger.warn(
         'Warning: Source files in packages/angular/build are newer than dist/.\n' +
-          'Run "pnpm build" to ensure your benchmark reflects your latest local edits.\n',
+        'Run "pnpm build" to ensure your benchmark reflects your latest local edits.\n',
       );
     }
   }
@@ -54,7 +54,7 @@ async function runLibraryBuilderSubsystem(options: {
 }): Promise<number> {
   if (options.layout !== undefined && options.layout !== 'flat' && options.layout !== 'deep') {
     // eslint-disable-next-line no-console
-    console.error(`Error: --layout must be "flat" or "deep", got "${options.layout}".`);
+    console.error("Error: --layout must be \"flat\" or \"deep\", got \"" + options.layout + "\".");
 
     return 1;
   }
@@ -64,8 +64,32 @@ async function runLibraryBuilderSubsystem(options: {
   ) {
     // eslint-disable-next-line no-console
     console.error(
-      `Error: --style must be one of "inline", "inline-scss", "external", got "${options.style}".`,
+      "Error: --style must be one of \"inline\", \"inline-scss\", \"external\", got \"" + options.style + "\"."
     );
+
+    return 1;
+  }
+
+  const sizes = parseIntList(options.sizes);
+  if (sizes !== undefined && sizes.some((n) => !Number.isInteger(n) || n < 1)) {
+    // eslint-disable-next-line no-console
+    console.error("Error: --sizes must be a comma-separated list of positive integers, got \"" + options.sizes + "\".");
+
+    return 1;
+  }
+
+  const depths = parseIntList(options.depths);
+  if (depths !== undefined && depths.some((n) => !Number.isInteger(n) || n < 1)) {
+    // eslint-disable-next-line no-console
+    console.error("Error: --depths must be a comma-separated list of positive integers, got \"" + options.depths + "\".");
+
+    return 1;
+  }
+
+  const iterations = options.iterations !== undefined ? Number(options.iterations) : undefined;
+  if (iterations !== undefined && (!Number.isInteger(iterations) || iterations < 1)) {
+    // eslint-disable-next-line no-console
+    console.error("Error: --iterations must be a positive integer, got \"" + options.iterations + "\".");
 
     return 1;
   }
@@ -73,9 +97,9 @@ async function runLibraryBuilderSubsystem(options: {
   const cliOptions: LibraryBuilderBenchmarkOptions = {
     layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
     style: options.style as LibraryBuilderBenchmarkOptions['style'],
-    sizes: parseIntList(options.sizes),
-    depths: parseIntList(options.depths),
-    iterations: options.iterations !== undefined ? Number(options.iterations) : undefined,
+    sizes,
+    depths,
+    iterations,
     json: Boolean(options.json),
   };
 
