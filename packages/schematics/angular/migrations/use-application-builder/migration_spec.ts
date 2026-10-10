@@ -9,6 +9,7 @@
 import { JsonObject } from '@angular-devkit/core';
 import { EmptyTree } from '@angular-devkit/schematics';
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
+import { latestVersions } from '../../utility/latest-versions';
 import { Builders, ProjectType, WorkspaceSchema } from '../../utility/workspace-models';
 
 function createWorkSpaceConfig(tree: UnitTestTree) {
@@ -448,6 +449,47 @@ describe(`Migration to use the application builder`, () => {
     const { devDependencies } = JSON.parse(newTree.readContent('/package.json'));
 
     expect(devDependencies['postcss']).toBeUndefined();
+  });
+
+  describe('"@angular/build" version', () => {
+    async function migrateWith(
+      manifest: object,
+    ): Promise<{ devDependencies: Record<string, string> }> {
+      tree.overwrite('/package.json', JSON.stringify(manifest));
+      const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+      return JSON.parse(newTree.readContent('/package.json'));
+    }
+
+    it('should follow the "@angular-devkit/build-angular" range of the workspace', async () => {
+      const { devDependencies } = await migrateWith({
+        devDependencies: { '@angular-devkit/build-angular': '~19.1.4' },
+      });
+
+      expect(devDependencies['@angular/build']).toBe('~19.1.4');
+    });
+
+    it('should read "@angular-devkit/build-angular" from "dependencies" as well', async () => {
+      const { devDependencies } = await migrateWith({
+        dependencies: { '@angular-devkit/build-angular': '18.2.1' },
+      });
+
+      expect(devDependencies['@angular/build']).toBe('18.2.1');
+    });
+
+    it('should keep an "@angular/build" that is already installed', async () => {
+      const { devDependencies } = await migrateWith({
+        devDependencies: { '@angular-devkit/build-angular': '^19.2.0', '@angular/build': '19.0.3' },
+      });
+
+      expect(devDependencies['@angular/build']).toBe('19.0.3');
+    });
+
+    it('should fall back to the latest "@angular/build" without "@angular-devkit/build-angular"', async () => {
+      const { devDependencies } = await migrateWith({});
+
+      expect(devDependencies['@angular/build']).toBe(latestVersions.AngularBuild);
+    });
   });
 
   it('it should not add esModuleInterop and moduleResolution when module is preserve', async () => {

@@ -19,6 +19,7 @@ import {
   DependencyType,
   ExistingBehavior,
   addDependency,
+  getDependency,
   removeDependency,
 } from '../../utility/dependency';
 import { JSONFile } from '../../utility/json-file';
@@ -270,10 +271,14 @@ function updateProjects(tree: Tree, context: SchematicContext) {
       }
 
       // Add direct @angular/build dependencies and remove @angular-devkit/build-angular
+      // Keep the workspace version since this migration can run from a newer temporary CLI
+      const buildAngularVersion =
+        getDependency(tree, '@angular-devkit/build-angular')?.version ??
+        latestVersions.AngularBuild;
       rules.push(
-        addDependency('@angular/build', latestVersions.DevkitBuildAngular, {
+        addDependency('@angular/build', buildAngularVersion, {
           type: DependencyType.Dev,
-          existing: ExistingBehavior.Replace,
+          existing: ExistingBehavior.Skip,
         }),
         removeDependency('@angular-devkit/build-angular'),
       );
