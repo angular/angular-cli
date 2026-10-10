@@ -397,7 +397,12 @@ export class PackageManager {
       try {
         const { stdout } = await this.#run(this.descriptor.getPackageNameCommand);
         if (stdout) {
-          return JSON.parse(stdout);
+          const name = JSON.parse(stdout);
+
+          // In a workspace member npm prints an object keyed by workspace name instead of a string.
+          if (typeof name === 'string') {
+            return name;
+          }
         }
       } catch {
         // Fall back to reading file if command fails

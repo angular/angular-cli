@@ -378,6 +378,57 @@ describe('PackageManager', () => {
     });
   });
 
+  describe('getCurrentPackageName', () => {
+    it('should return the name printed by the package manager', async () => {
+      const pm = new PackageManager(host, '/repo/app', descriptor);
+      runCommandSpy.and.resolveTo({ stdout: '"app"', stderr: '' });
+      const readFileSpy = spyOn(host, 'readFile');
+
+      expect(await pm.getCurrentPackageName()).toBe('app');
+      expect(readFileSpy).not.toHaveBeenCalled();
+    });
+
+    it('should read package.json when npm prints an object keyed by workspace', async () => {
+      const pm = new PackageManager(host, '/repo/apps/app', descriptor);
+      // Inside a workspace member, `npm pkg get name` prints `{ "app": "app" }` instead of `"app"`.
+      runCommandSpy.and.resolveTo({ stdout: '{\n  "app": "app"\n}', stderr: '' });
+      const readFileSpy = spyOn(host, 'readFile').and.resolveTo('{"name": "app"}');
+
+      expect(await pm.getCurrentPackageName()).toBe('app');
+      expect(readFileSpy).toHaveBeenCalledWith(jasmine.stringMatching(/package\.json$/));
+    });
+  });
+
+  describe('getProjectDependencies', () => {
+    it('should list the dependencies of an npm workspace member', async () => {
+      const pm = new PackageManager(host, '/repo/apps/app', descriptor);
+      runCommandSpy.and.callFake((_binary: string, args: readonly string[]) =>
+        Promise.resolve({
+          stdout:
+            args[0] === 'pkg'
+              ? '{\n  "app": "app"\n}'
+              : JSON.stringify({
+                  name: 'monorepo',
+                  dependencies: {
+                    app: {
+                      version: '0.0.0',
+                      resolved: 'file:../apps/app',
+                      dependencies: { '@angular/core': { version: '22.0.0' } },
+                    },
+                  },
+                }),
+          stderr: '',
+        }),
+      );
+      spyOn(host, 'readFile').and.resolveTo('{"name": "app"}');
+
+      const dependencies = await pm.getProjectDependencies();
+
+      expect([...dependencies.keys()]).toEqual(['@angular/core']);
+      expect(dependencies.get('@angular/core')?.version).toBe('22.0.0');
+    });
+  });
+
   describe('initializationError', () => {
     it('should throw initializationError when running commands', async () => {
       const error = new Error('Not installed');
