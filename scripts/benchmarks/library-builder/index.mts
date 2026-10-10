@@ -58,7 +58,7 @@ function checkBuilderIsBuilt(
   if (!fs.existsSync(path.join(buildPkg, 'package.json')) || !fs.existsSync(architectCli)) {
     logger.error(
       'Error: @angular/build and/or @angular-devkit/architect have not been built yet.\n' +
-        'Run "pnpm build" (or "pnpm admin build --local" for a faster local build) first.',
+      'Run "pnpm build" (or "pnpm admin build --local" for a faster local build) first.',
     );
 
     return undefined;
@@ -171,6 +171,10 @@ function buildOnce(
   const durationMs = performance.now() - start;
   const status = result.status === 0 ? 'ok' : 'fail';
   if (status === 'fail') {
+    if (result.error) {
+      // eslint-disable-next-line no-console
+      console.error(result.error);
+    }
     // eslint-disable-next-line no-console
     console.error(result.stdout?.toString());
     // eslint-disable-next-line no-console
@@ -207,48 +211,50 @@ export async function runLibraryBuilderBenchmarks(
   fs.mkdirSync(scratchRoot, { recursive: true });
   const measurements: BuildMeasurement[] = [];
 
-  for (const sizeOrDepth of sizes) {
-    const label = `${layout}-${style}-${layout === 'deep' ? `depth${sizeOrDepth}` : sizeOrDepth}`;
-    const projectDir = path.join(scratchRoot, label);
+  try {
+    for (const sizeOrDepth of sizes) {
+      const label = layout + "-" + style + "-" + (layout === "deep" ? "depth" + sizeOrDepth : sizeOrDepth);
+      const projectDir = path.join(scratchRoot, label);
 
-    const fixtureOptions: FixtureOptions =
-      layout === 'flat'
-        ? { layout, style, count: sizeOrDepth }
-        : { layout, style, depth: sizeOrDepth };
-    const entryPoints = generateFixture(projectDir, fixtureOptions);
+      const fixtureOptions: FixtureOptions =
+        layout === 'flat'
+          ? { layout, style, count: sizeOrDepth }
+          : { layout, style, depth: sizeOrDepth };
+      const entryPoints = generateFixture(projectDir, fixtureOptions);
 
-    if (!options.json) {
-      // eslint-disable-next-line no-console
-      console.log(`\n[library-builder] ${label} (${entryPoints} entry points)`);
-    }
-
-    const durations: number[] = [];
-    for (let i = 1; i <= iterations; i++) {
-      const { durationMs, status } = buildOnce(projectDir, builder.architectCli);
       if (!options.json) {
         // eslint-disable-next-line no-console
+        console.log("\n[library-builder] " + label + " (" + entryPoints + " entry points)");
+      }
+
+      const durations: number[] = [];
+      for (let i = 1; i <= iterations; i++) {
+        const { durationMs, status } = buildOnce(projectDir, builder.architectCli);
+        if (!options.json) {
+          // eslint-disable-next-line no-console
+          console.log(
+            "  run " + i + "/" + iterations + ": " + (status === 'ok' ? 'done' : 'FAILED') + " in " + (durationMs / 1000).toFixed(2) + "s"
+          );
+        }
+        if (status === 'ok') {
+          durations.push(durationMs);
+        }
+        measurements.push({ layout, style, entryPoints, iteration: i, durationMs, status });
+      }
+
+      if (!options.json && durations.length > 0) {
+        const medianMs = median(durations);
+        // eslint-disable-next-line no-console
         console.log(
-          `  run ${i}/${iterations}: ${status === 'ok' ? 'done' : 'FAILED'} in ${(durationMs / 1000).toFixed(2)}s`,
+          "  median: " + (medianMs / 1000).toFixed(2) + "s  (" + (medianMs / entryPoints).toFixed(2) + "ms/entry)"
         );
       }
-      if (status === 'ok') {
-        durations.push(durationMs);
-      }
-      measurements.push({ layout, style, entryPoints, iteration: i, durationMs, status });
-    }
 
-    if (!options.json && durations.length > 0) {
-      const medianMs = median(durations);
-      // eslint-disable-next-line no-console
-      console.log(
-        `  median: ${(medianMs / 1000).toFixed(2)}s  (${(medianMs / entryPoints).toFixed(2)}ms/entry)`,
-      );
+      fs.rmSync(projectDir, { recursive: true, force: true });
     }
-
-    fs.rmSync(projectDir, { recursive: true, force: true });
+  } finally {
+    fs.rmSync(scratchRoot, { recursive: true, force: true });
   }
-
-  fs.rmSync(scratchRoot, { recursive: true, force: true });
 
   const anyFailed = measurements.some((m) => m.status === 'fail');
   if (options.json) {
