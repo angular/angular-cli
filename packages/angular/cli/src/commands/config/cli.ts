@@ -133,9 +133,8 @@ export default class ConfigCommandModule
  * ["a", 3, "foo", "bar", 2].
  * @param path The JSON string to parse.
  * @returns {(string|number)[]} The fragments for the string.
- * @private
  */
-function parseJsonPath(path: string): (string | number)[] {
+export function parseJsonPath(path: string): (string | number)[] {
   const fragments = (path || '').split(/\./g);
   const result: (string | number)[] = [];
 
@@ -155,7 +154,7 @@ function parseJsonPath(path: string): (string | number)[] {
       const indices = match[2]
         .slice(1, -1)
         .split('][')
-        .map((x) => (/^\d$/.test(x) ? +x : x.replace(/"|'/g, '')));
+        .map((x) => (/^\d+$/.test(x) ? +x : x.replace(/"|'/g, '')));
       result.push(...indices);
     }
   }
