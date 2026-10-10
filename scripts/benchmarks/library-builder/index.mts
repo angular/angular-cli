@@ -18,6 +18,7 @@ import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { performance } from 'node:perf_hooks';
+import { fileURLToPath } from 'node:url';
 import { type FixtureOptions, type Layout, type Style, generateFixture } from './fixtures.mts';
 
 export interface LibraryBuilderBenchmarkOptions {
@@ -42,7 +43,7 @@ export interface BuildMeasurement {
   status: 'ok' | 'fail';
 }
 
-const repoRoot = path.resolve(import.meta.dirname, '../../..');
+const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 const scratchRoot = path.join(repoRoot, 'dist', '.library-builder-benchmark-tmp');
 const rootNodeModules = path.join(repoRoot, 'node_modules');
 const pnpmStore = path.join(rootNodeModules, '.pnpm');
@@ -119,9 +120,21 @@ function ensureBuilderDepsLinkedAtRepoRoot(
 
 function linkIfMissing(name: string, target: string): void {
   const linkPath = path.join(rootNodeModules, name);
-  if (!fs.existsSync(linkPath)) {
-    fs.symlinkSync(target, linkPath, 'dir');
+  try {
+    const stat = fs.lstatSync(linkPath);
+    if (stat.isSymbolicLink() && !fs.existsSync(linkPath)) {
+      // Remove broken symlink to avoid EEXIST error on recreation
+      fs.unlinkSync(linkPath);
+    } else {
+      // Symlink already exists and is valid
+      return;
+    }
+  } catch (e: any) {
+    if (e.code !== 'ENOENT') {
+      throw e;
+    }
   }
+  fs.symlinkSync(target, linkPath, 'dir');
 }
 
 /** Resolves `dep` (e.g. "rxjs" or "@angular-devkit/core") to its pnpm store dir and symlinks it. */
