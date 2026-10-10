@@ -160,9 +160,9 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
 
   const angularCoreVersion = JSON.parse(
     fs.readFileSync(
-      path.resolve(import.meta.dirname, '../../../node_modules/@angular/core/package.json'),
-      'utf8',
-    ),
+      new URL('../../../node_modules/@angular/core/package.json', import.meta.url),
+      'utf8'
+    )
   ).version as string;
   // e.g. "22.3.0-next.0" -> "22.3.0-next" (drop the trailing prerelease build number only).
   const peerRange = `^${angularCoreVersion.replace(/\.\d+$/, '')}`;
