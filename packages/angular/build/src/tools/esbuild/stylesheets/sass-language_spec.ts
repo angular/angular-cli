@@ -342,26 +342,12 @@ describe('sass-language', () => {
         }
       }
 
-      const nonRebasingCompiler = new SassCompiler(false);
       globalThis.Promise = ZoneLikePromise as unknown as PromiseConstructor;
       try {
         const application = await compile(buttonStylesheet);
         expect(application).toContain('content: "project";');
-
-        const nonRebasingResult = await nonRebasingCompiler.compileStringAsync("@use 'theme';", {
-          importers: [
-            {
-              findFileUrl: async (url) =>
-                url === 'theme'
-                  ? pathToFileURL(join(projectRoot, 'node_modules', 'theme', '_index.scss'))
-                  : null,
-            },
-          ],
-        });
-        expect(nonRebasingResult.css).toContain('content: "project";');
       } finally {
         globalThis.Promise = originalPromise;
-        await nonRebasingCompiler.close();
       }
     });
   });

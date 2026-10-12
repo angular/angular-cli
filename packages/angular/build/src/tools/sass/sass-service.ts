@@ -37,10 +37,6 @@ function isFileImporter(value: Importers): value is FileImporter {
   return 'findFileUrl' in value;
 }
 
-function resolvePromise<T>(value: T | Promise<T>): T | Promise<T> {
-  return value && typeof value === 'object' && 'then' in value ? Promise.resolve(value) : value;
-}
-
 /**
  * A Sass renderer implementation that uses the persistent Dart Sass embedded compiler
  * daemon (`sass-embedded`) communicating over standard input/output with protocol buffers,
@@ -115,27 +111,7 @@ export class SassCompiler {
     const compiler = await this.#ensureAsyncCompiler();
 
     if (!this.rebase) {
-      return compiler.compileStringAsync(source, {
-        ...options,
-        importers: options.importers?.map((importer) => {
-          if (isFileImporter(importer)) {
-            return {
-              ...importer,
-              findFileUrl: (url, context) => resolvePromise(importer.findFileUrl(url, context)),
-            };
-          }
-
-          if ('canonicalize' in importer) {
-            return {
-              ...importer,
-              canonicalize: (url, context) => resolvePromise(importer.canonicalize(url, context)),
-              load: (canonicalUrl) => resolvePromise(importer.load(canonicalUrl)),
-            };
-          }
-
-          return importer;
-        }),
-      });
+      return compiler.compileStringAsync(source, options);
     }
 
     const { functions, importers, importer, url, logger, ...serializableOptions } = options;
