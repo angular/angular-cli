@@ -112,6 +112,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
       expect(dtsContent).toContain('Public API JSDoc comment');
+      expect(dtsContent).not.toContain('@__PURE__');
     });
 
     it('should automatically add tslib to dependencies when output chunks import tslib', async () => {
