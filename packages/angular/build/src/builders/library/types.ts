@@ -74,8 +74,8 @@ export interface NormalizedLibraryOptions {
   styleIncludePaths: string[];
   sass?: StylesheetPluginsass;
   assets: ReturnType<typeof normalizeAssetPatterns>;
-  compilationMode: 'partial' | 'full';
-  declarationMap: boolean;
+  compilationMode?: 'partial' | 'full';
+  declarationMap?: boolean;
   allowedNonPeerDependencies: RegExp[];
   keepLifecycleScripts: boolean;
   watch: boolean;
@@ -126,6 +126,9 @@ export interface SingleProgramCache {
 export interface SingleBuildState {
   /** Cached unified TypeScript and Angular compilation state. */
   singleProgramCache?: SingleProgramCache;
+
+  /** Effective compilation mode resolved from builder options and tsconfig. */
+  compilationMode?: 'partial' | 'full';
 
   /** Map of entry point names to their previous bundle results. */
   previousBundleResults: Map<string, BundleResult>;

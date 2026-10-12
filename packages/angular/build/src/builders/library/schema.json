@@ -71,14 +71,12 @@
     },
     "declarationMap": {
       "type": "boolean",
-      "description": "Generates a sourcemap for each corresponding '.d.ts' file.",
-      "default": false
+      "description": "Generates a sourcemap for each corresponding '.d.ts' file."
     },
     "compilationMode": {
       "type": "string",
       "description": "Angular compilation mode. Use 'partial' when publishing to npm (APF requirement). Use 'full' only during development or for private, internal monorepo packages that are never published.",
-      "enum": ["partial", "full"],
-      "default": "partial"
+      "enum": ["partial", "full"]
     },
     "allowedNonPeerDependencies": {
       "description": "A list of package names allowed in the 'dependencies' and 'optionalDependencies' sections of package.json. Values can be regular expression patterns.",
