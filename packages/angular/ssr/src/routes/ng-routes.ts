@@ -485,9 +485,12 @@ async function* handleSSGRoute(
           redirectTo:
             redirectTo === undefined
               ? undefined
-              : resolveRedirectTo(
-                  parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
-                  redirectTo,
+              : replaceRedirectParams(
+                  resolveRedirectTo(
+                    parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
+                    redirectTo,
+                  ),
+                  (parameter) => params[parameter.slice(1)],
                 ),
         };
       }
@@ -561,6 +564,29 @@ function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
   const [path] = redirectTo.split(/[?#]/, 1);
 
   return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
+}
+
+/**
+ * Replaces the route parameters, such as `:id`, in the path of `redirectTo`.
+ *
+ * Like in the Angular router, only whole path segments starting with `:` are parameters.
+ * Parameters for which `resolve` returns `undefined` are kept as is.
+ *
+ * @param redirectTo - The target path for redirection.
+ * @param resolve - A function that returns the replacement for a parameter, such as `:id`.
+ * @returns The redirect path with its route parameters replaced.
+ */
+function replaceRedirectParams(
+  redirectTo: string,
+  resolve: (parameter: string) => string | undefined,
+): string {
+  const [path] = redirectTo.split(/[?#]/, 1);
+  const resolvedPath = path
+    .split('/')
+    .map((segment) => (segment[0] === ':' ? (resolve(segment) ?? segment) : segment))
+    .join('/');
+
+  return resolvedPath + redirectTo.slice(path.length);
 }
 
 /**
@@ -836,8 +862,19 @@ export function extractRoutesAndCreateRouteTree(options: {
     );
 
     for (const { route, ...metadata } of routes) {
+      const fullRoute = joinUrlParts(baseHref, route);
+
       if (metadata.redirectTo !== undefined) {
-        metadata.redirectTo = joinUrlParts(baseHref, metadata.redirectTo);
+        // Reference the route parameters by their position in the URL (see `buildPathWithParams`).
+        const routeSegments = fullRoute.split('/');
+        metadata.redirectTo = replaceRedirectParams(
+          joinUrlParts(baseHref, metadata.redirectTo),
+          (parameter) => {
+            const position = routeSegments.lastIndexOf(parameter);
+
+            return position === -1 ? undefined : `*${position}`;
+          },
+        );
       }
 
       // Remove undefined fields
@@ -849,7 +886,6 @@ export function extractRoutesAndCreateRouteTree(options: {
         }
       }
 
-      const fullRoute = joinUrlParts(baseHref, route);
       routeTree.insert(fullRoute, metadata);
     }
 

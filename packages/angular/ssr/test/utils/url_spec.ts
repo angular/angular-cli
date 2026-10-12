@@ -184,6 +184,15 @@ describe('URL Utils', () => {
       expect(result.toString()).toBe('/base/path/details');
     });
 
+    it('should replace positional placeholders with the segments at those positions', () => {
+      expect(buildPathWithParams('/user/*2/*1', '/a/b')).toBe('/user/b/a');
+    });
+
+    it('should replace a positional placeholder followed by a query or fragment', () => {
+      expect(buildPathWithParams('/user/*1?tab=1', '/a')).toBe('/user/a?tab=1');
+      expect(buildPathWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
+    });
+
     it('should throw an error if the toPath does not start with "/"', () => {
       const fromPath = '/base/path';
       const toPath = 'details';
