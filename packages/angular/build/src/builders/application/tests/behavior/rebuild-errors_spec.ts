@@ -232,6 +232,125 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it('detects template errors when an input becomes required or a selector is renamed on watch rebuild', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.modifyFile('tsconfig.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions = {
+          ...tsconfig.compilerOptions,
+          isolatedModules: true,
+        };
+
+        return JSON.stringify(tsconfig);
+      });
+
+      const goodChildComponentContents = `
+        import { Component, input } from '@angular/core';
+        @Component({
+          selector: 'app-child',
+          standalone: true,
+          template: '<p>{{ label() }}</p>',
+        })
+        export class ChildComponent {
+          label = input('');
+        }
+      `;
+
+      const requiredInputErrorText = `Required input 'label' from component ChildComponent must be specified.`;
+      const unknownElementErrorText = `'app-child' is not a known element`;
+
+      await harness.writeFiles({
+        'src/app/child.component.ts': goodChildComponentContents,
+        'src/app/app.module.ts': `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { AppComponent } from './app.component';
+          @NgModule({
+            imports: [
+              BrowserModule,
+              AppComponent,
+            ],
+            providers: [],
+            bootstrap: [AppComponent]
+          })
+          export class AppModule { }
+        `,
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+          import { ChildComponent } from './child.component';
+          @Component({
+            selector: 'app-root',
+            standalone: true,
+            imports: [ChildComponent],
+            template: '<app-child />',
+          })
+          export class AppComponent {}
+        `,
+      });
+
+      await harness.executeWithCases(
+        [
+          async ({ result }) => {
+            expect(result?.success).toBeTrue();
+
+            // Make input required using signal input.required() (which has the same TS .d.ts type InputSignal<string>)
+            await harness.writeFile(
+              'src/app/child.component.ts',
+              `
+              import { Component, input } from '@angular/core';
+              @Component({
+                selector: 'app-child',
+                standalone: true,
+                template: '<p>{{ label() }}</p>',
+              })
+              export class ChildComponent {
+                label = input.required<string>();
+              }
+            `,
+            );
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expectLog(logs, requiredInputErrorText);
+
+            // Revert required input and rename selector instead
+            await harness.writeFile(
+              'src/app/child.component.ts',
+              `
+              import { Component, input } from '@angular/core';
+              @Component({
+                selector: 'app-child-renamed',
+                standalone: true,
+                template: '<p>{{ label() }}</p>',
+              })
+              export class ChildComponent {
+                label = input('');
+              }
+            `,
+            );
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expectNoLog(logs, requiredInputErrorText);
+            expectLog(logs, unknownElementErrorText);
+
+            // Revert back to valid child component
+            await harness.writeFile('src/app/child.component.ts', goodChildComponentContents);
+          },
+          ({ result, logs }) => {
+            expect(result?.success).toBeTrue();
+            expectNoLog(logs, requiredInputErrorText);
+            expectNoLog(logs, unknownElementErrorText);
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
+
     it('detects cumulative block syntax errors', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
