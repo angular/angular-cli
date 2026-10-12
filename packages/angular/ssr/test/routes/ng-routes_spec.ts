@@ -489,6 +489,38 @@ describe('extractRoutesAndCreateRouteTree', () => {
         { route: '/new', renderMode: RenderMode.Server },
       ]);
     });
+
+    it('should resolve route parameters of redirect targets of prerendered routes', async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'user/:id', redirectTo: '/profile/:id' },
+          { path: 'profile/:id', component: DummyComponent },
+        ],
+        [
+          {
+            path: 'user/:id',
+            renderMode: RenderMode.Prerender,
+            async getPrerenderParams() {
+              return [{ id: '7' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+        includePrerenderFallbackRoutes: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: '/user/7', renderMode: RenderMode.Prerender, redirectTo: '/profile/7' },
+        { route: '/user/*', renderMode: RenderMode.Server, redirectTo: '/profile/*2' },
+        { route: '/profile/*', renderMode: RenderMode.Server },
+      ]);
+    });
   });
 
   it('should extract routes with a route level matcher', async () => {
@@ -650,6 +682,52 @@ describe('extractRoutesAndCreateRouteTree', () => {
       },
       { route: '/*/*/thing', renderMode: RenderMode.Server },
     ]);
+  });
+
+  it('should reference route parameters of redirect targets by their position', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: ':lang',
+          children: [
+            { path: 'user/:id', redirectTo: 'profile/:id' },
+            { path: 'profile/:id', component: DummyComponent },
+          ],
+        },
+        { path: 'search/:term', redirectTo: '/find/:term' },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/*', renderMode: RenderMode.Server },
+      {
+        route: '/*/user/*',
+        renderMode: RenderMode.Server,
+        redirectTo: '/*/profile/*3',
+        relativeRedirect: true,
+      },
+      { route: '/*/profile/*', renderMode: RenderMode.Server },
+      { route: '/search/*', renderMode: RenderMode.Server, redirectTo: '/find/*2' },
+    ]);
+  });
+
+  it('should error when a redirect target uses a parameter not defined by the route', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: ':lang',
+          children: [{ path: 'user/:id', redirectTo: 'profile/:lang' }],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(1);
+    expect(errors[0]).toContain(`Cannot redirect to 'profile/:lang'. Cannot find ':lang'.`);
   });
 
   it('should resolve multi-segment relative redirects against the parent route', async () => {

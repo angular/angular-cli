@@ -147,6 +147,7 @@ async function* handleRoute(options: {
   metadata: ServerConfigRouteTreeNodeMetadata;
   currentRoutePath: string;
   parentRoute: string;
+  baseHref: string;
   route: Route;
   compiler: Compiler;
   parentInjector: Injector;
@@ -160,6 +161,7 @@ async function* handleRoute(options: {
       metadata,
       currentRoutePath,
       parentRoute,
+      baseHref,
       route,
       compiler,
       parentInjector,
@@ -179,8 +181,9 @@ async function* handleRoute(options: {
     if (metadata.renderMode === RenderMode.Prerender) {
       for await (const result of handleSSGRoute(
         serverConfigRouteTree,
-        typeof redirectTo === 'string' ? redirectTo : undefined,
+        route,
         parentRoute,
+        baseHref,
         metadata,
         parentInjector,
         invokeGetPrerenderParams,
@@ -200,9 +203,18 @@ async function* handleRoute(options: {
             `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
         };
       } else if (typeof redirectTo === 'string') {
+        // Reference the route parameters by their position in the URL (see `buildPathWithParams`).
+        const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
         parentRoutes.set(metadata.route, {
           ...metadata,
-          redirectTo: resolveRedirectTo(parentRoute, redirectTo),
+          redirectTo: resolveRedirectTo(
+            parentRoute,
+            replaceRedirectParams(
+              route,
+              redirectTo,
+              (parameter) => `*${routeSegments.lastIndexOf(parameter)}`,
+            ),
+          ),
           relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
         });
       } else {
@@ -290,6 +302,7 @@ async function* traverseRoutesConfig(options: {
   compiler: Compiler;
   parentInjector: Injector;
   parentRoute: string;
+  baseHref: string;
   serverConfigRouteTree?: RouteTree<ServerConfigRouteTreeAdditionalMetadata>;
   invokeGetPrerenderParams: boolean;
   includePrerenderFallbackRoutes: boolean;
@@ -421,8 +434,9 @@ function appendPreloadToMetadata(
  * all parameterized paths, returning any errors encountered.
  *
  * @param serverConfigRouteTree - The tree representing the server's routing setup.
- * @param redirectTo - Optional path to redirect to, if specified.
+ * @param route - The route configuration.
  * @param parentRoute - The path of the parent route.
+ * @param baseHref - The base href of the application.
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
@@ -431,8 +445,9 @@ function appendPreloadToMetadata(
  */
 async function* handleSSGRoute(
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined,
-  redirectTo: string | undefined,
+  route: Route,
   parentRoute: string,
+  baseHref: string,
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
@@ -451,8 +466,18 @@ async function* handleSSGRoute(
     delete meta['getPrerenderParams'];
   }
 
+  const redirectTo = typeof route.redirectTo === 'string' ? route.redirectTo : undefined;
   if (redirectTo !== undefined) {
-    meta.redirectTo = resolveRedirectTo(parentRoute, redirectTo);
+    // Reference the route parameters by their position in the URL (see `buildPathWithParams`).
+    const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
+    meta.redirectTo = resolveRedirectTo(
+      parentRoute,
+      replaceRedirectParams(
+        route,
+        redirectTo,
+        (parameter) => `*${routeSegments.lastIndexOf(parameter)}`,
+      ),
+    );
     meta.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
   }
 
@@ -513,7 +538,11 @@ async function* handleSSGRoute(
               ? undefined
               : resolveRedirectTo(
                   parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
-                  redirectTo,
+                  replaceRedirectParams(
+                    route,
+                    redirectTo,
+                    (parameter) => params[parameter.slice(1)],
+                  ),
                 ),
         };
       }
@@ -587,6 +616,48 @@ function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
   const [path] = redirectTo.split(/[?#]/, 1);
 
   return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
+}
+
+/**
+ * Replaces the route parameters, such as `:id`, in the path of `redirectTo`.
+ *
+ * Like in the Angular router, only whole path segments starting with `:` are parameters, and only
+ * the parameters defined in the path of the redirecting route itself can be used.
+ *
+ * @param route - The redirecting route.
+ * @param redirectTo - The target path for redirection.
+ * @param resolve - A function that returns the replacement for a parameter, such as `:id`.
+ * @returns The redirect path with its route parameters replaced.
+ * @throws If `redirectTo` uses a parameter that is not defined in the path of the route.
+ */
+function replaceRedirectParams(
+  route: Route,
+  redirectTo: string,
+  resolve: (parameter: string) => string,
+): string {
+  if (route.matcher) {
+    // The parameters of a custom matcher are only known at runtime.
+    return redirectTo;
+  }
+
+  const routeSegments = route.path?.split('/') ?? [];
+  const [path] = redirectTo.split(/[?#]/, 1);
+  const resolvedPath = path
+    .split('/')
+    .map((segment) => {
+      if (segment[0] !== ':') {
+        return segment;
+      }
+
+      if (!routeSegments.includes(segment)) {
+        throw new Error(`Cannot redirect to '${redirectTo}'. Cannot find '${segment}'.`);
+      }
+
+      return resolve(segment);
+    })
+    .join('/');
+
+  return resolvedPath + redirectTo.slice(path.length);
 }
 
 /**
@@ -742,6 +813,7 @@ export async function getRoutesFromAngularRouterConfig(
         compiler,
         parentInjector: injector,
         parentRoute: '',
+        baseHref,
         serverConfigRouteTree,
         invokeGetPrerenderParams,
         includePrerenderFallbackRoutes,
