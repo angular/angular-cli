@@ -15,11 +15,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 export type Layout = 'flat' | 'deep';
-export type Style = 'inline' | 'inline-scss' | 'external';
 
 export interface FixtureOptions {
   layout: Layout;
-  style: Style;
 
   /** Number of secondary entry points for `layout: 'flat'`. */
   count?: number;
@@ -28,36 +26,19 @@ export interface FixtureOptions {
   depth?: number;
 }
 
-function buildComponentSource(
-  className: string,
-  selector: string,
-  compBase: string,
-  id: string,
-  style: Style,
-): string {
-  const metadataLines = [`  selector: '${selector}',`];
-
-  if (style === 'external') {
-    metadataLines.push(`  templateUrl: './${compBase}.component.html',`);
-    metadataLines.push(`  styleUrls: ['./${compBase}.component.scss'],`);
-  } else {
-    metadataLines.push(`  template: '<div class="ref-comp">Reference component ${id}</div>',`);
-    if (style === 'inline-scss') {
-      metadataLines.push(`  styles: ['.ref-comp { display: block; padding: 4px; }'],`);
-    }
-  }
-
+function buildComponentSource(className: string, selector: string, id: string): string {
   return `import { Component } from '@angular/core';
 
 @Component({
-${metadataLines.join('\n')}
+  selector: '${selector}',
+  template: '<h2>Component no. ${id}</h2>',
 })
 export class ${className} {}
 `;
 }
 
 /** Writes one secondary entry point's source files (component + public-api.ts) into `entryDir`. */
-function writeEntryPointSource(entryDir: string, id: string, style: Style): void {
+function writeEntryPointSource(entryDir: string, id: string): void {
   fs.mkdirSync(entryDir, { recursive: true });
 
   const className = `RefComponent${id}`;
@@ -69,31 +50,20 @@ function writeEntryPointSource(entryDir: string, id: string, style: Style): void
     `export * from './${compBase}.component';\n`,
   );
 
-  if (style === 'external') {
-    fs.writeFileSync(
-      path.join(entryDir, `${compBase}.component.html`),
-      `<div class="ref-comp">Reference component ${id}</div>\n`,
-    );
-    fs.writeFileSync(
-      path.join(entryDir, `${compBase}.component.scss`),
-      `.ref-comp {\n  display: block;\n  padding: 4px;\n}\n`,
-    );
-  }
-
   fs.writeFileSync(
     path.join(entryDir, `${compBase}.component.ts`),
-    buildComponentSource(className, selector, compBase, id, style),
+    buildComponentSource(className, selector, id),
   );
 }
 
 /** Generates `count` flat secondary entry points as direct siblings, returning their relative dirs. */
-function generateFlatEntries(outDir: string, count: number, style: Style): string[] {
+function generateFlatEntries(outDir: string, count: number): string[] {
   const width = String(count).length;
   const dirs: string[] = [];
   for (let i = 1; i <= count; i++) {
     const id = String(i).padStart(width, '0');
     const relDir = `comp-${id}`;
-    writeEntryPointSource(path.join(outDir, relDir), id, style);
+    writeEntryPointSource(path.join(outDir, relDir), id);
     dirs.push(relDir);
   }
 
@@ -104,7 +74,7 @@ function generateFlatEntries(outDir: string, count: number, style: Style): strin
  * Generates a binary tree `depth` levels deep (`sub-a`/`sub-b` at each level), placing one
  * secondary entry point at each of the 2^depth leaves. Returns their relative dirs.
  */
-function generateDeepEntries(outDir: string, depth: number, style: Style): string[] {
+function generateDeepEntries(outDir: string, depth: number): string[] {
   const total = 2 ** depth;
   const width = String(total).length;
   const dirs: string[] = [];
@@ -114,7 +84,7 @@ function generateDeepEntries(outDir: string, depth: number, style: Style): strin
     if (level === depth) {
       counter++;
       const id = String(counter).padStart(width, '0');
-      writeEntryPointSource(path.join(outDir, currentRelDir), id, style);
+      writeEntryPointSource(path.join(outDir, currentRelDir), id);
       dirs.push(currentRelDir);
 
       return;
@@ -150,28 +120,33 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
 
   const secondaryDirs =
     options.layout === 'flat'
-      ? generateFlatEntries(outDir, options.count ?? 10, options.style)
-      : generateDeepEntries(outDir, options.depth ?? 2, options.style);
+      ? generateFlatEntries(outDir, options.count ?? 10)
+      : generateDeepEntries(outDir, options.depth ?? 2);
 
   const exportsMap: Record<string, string> = { '.': './public-api.ts' };
   for (const relDir of secondaryDirs) {
     exportsMap[`./${entryKey(relDir)}`] = `./${relDir.split(path.sep).join('/')}/public-api.ts`;
   }
 
-  const angularCoreVersion = JSON.parse(
-    fs.readFileSync(
-      new URL('../../../node_modules/@angular/core/package.json', import.meta.url),
-      'utf8'
-    )
-  ).version as string;
-  // e.g. "22.3.0-next.0" -> "22.3.0-next" (drop the trailing prerelease build number only).
-  const peerRange = `^${angularCoreVersion.replace(/\.\d+$/, '')}`;
+  // Fallback to a hardcoded version if the path lookup fails in the sandbox/environment.
+  let peerRange = '^22.0.0';
+  try {
+    const angularCoreVersion = JSON.parse(
+      fs.readFileSync(
+        new URL('../../../node_modules/@angular/core/package.json', import.meta.url),
+        'utf8',
+      ),
+    ).version as string;
+    peerRange = `^${angularCoreVersion.replace(/\.\d+$/, '')}`;
+  } catch {
+    // Ignore error, use fallback
+  }
 
   fs.writeFileSync(
     path.join(outDir, 'package.json'),
     JSON.stringify(
       {
-        name: `ref-${options.layout}-${options.style}`,
+        name: `ref-${options.layout}`,
         version: '0.0.1',
         peerDependencies: {
           '@angular/core': peerRange,

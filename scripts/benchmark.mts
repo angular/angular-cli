@@ -32,7 +32,7 @@ function checkBuildStatus(logger: Console): boolean {
     if (srcMtime > distMtime) {
       logger.warn(
         'Warning: Source files in packages/angular/build are newer than dist/.\n' +
-        'Run "pnpm build" to ensure your benchmark reflects your latest local edits.\n',
+          'Run "pnpm build" to ensure your benchmark reflects your latest local edits.\n',
       );
     }
   }
@@ -44,47 +44,45 @@ function parseIntList(raw: string | number | undefined): number[] | undefined {
   if (raw === undefined) {
     return undefined;
   }
-  return String(raw).split(',').map((s) => Number(s.trim()));
+  return String(raw)
+    .split(',')
+    .map((s) => Number(s.trim()));
 }
 
 async function runLibraryBuilderSubsystem(options: {
   layout?: string;
-  style?: string;
-  sizes?: string;
-  depths?: string;
+  count?: string;
+  depth?: string;
   iterations?: string | number;
   json?: boolean;
 }): Promise<number> {
   if (options.layout !== undefined && options.layout !== 'flat' && options.layout !== 'deep') {
     // eslint-disable-next-line no-console
-    console.error("Error: --layout must be \"flat\" or \"deep\", got \"" + options.layout + "\".");
+    console.error('Error: --layout must be "flat" or "deep", got "' + options.layout + '".');
 
     return 1;
   }
-  if (
-    options.style !== undefined &&
-    !['inline', 'inline-scss', 'external'].includes(options.style)
-  ) {
+
+  const count = parseIntList(options.count);
+  if (count !== undefined && count.some((n) => !Number.isInteger(n) || n < 1)) {
     // eslint-disable-next-line no-console
     console.error(
-      "Error: --style must be one of \"inline\", \"inline-scss\", \"external\", got \"" + options.style + "\"."
+      'Error: --count must be a comma-separated list of positive integers, got "' +
+        options.count +
+        '".',
     );
 
     return 1;
   }
 
-  const sizes = parseIntList(options.sizes);
-  if (sizes !== undefined && sizes.some((n) => !Number.isInteger(n) || n < 1)) {
+  const depth = parseIntList(options.depth);
+  if (depth !== undefined && depth.some((n) => !Number.isInteger(n) || n < 1)) {
     // eslint-disable-next-line no-console
-    console.error("Error: --sizes must be a comma-separated list of positive integers, got \"" + options.sizes + "\".");
-
-    return 1;
-  }
-
-  const depths = parseIntList(options.depths);
-  if (depths !== undefined && depths.some((n) => !Number.isInteger(n) || n < 1)) {
-    // eslint-disable-next-line no-console
-    console.error("Error: --depths must be a comma-separated list of positive integers, got \"" + options.depths + "\".");
+    console.error(
+      'Error: --depth must be a comma-separated list of positive integers, got "' +
+        options.depth +
+        '".',
+    );
 
     return 1;
   }
@@ -92,16 +90,17 @@ async function runLibraryBuilderSubsystem(options: {
   const iterations = options.iterations !== undefined ? Number(options.iterations) : undefined;
   if (iterations !== undefined && (!Number.isInteger(iterations) || iterations < 1)) {
     // eslint-disable-next-line no-console
-    console.error("Error: --iterations must be a positive integer, got \"" + options.iterations + "\".");
+    console.error(
+      'Error: --iterations must be a positive integer, got "' + options.iterations + '".',
+    );
 
     return 1;
   }
 
   const cliOptions: LibraryBuilderBenchmarkOptions = {
     layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
-    style: options.style as LibraryBuilderBenchmarkOptions['style'],
-    sizes,
-    depths,
+    count,
+    depth,
     iterations,
     json: Boolean(options.json),
   };
@@ -127,9 +126,8 @@ export default async function (
     compareBaseline?: string;
     'compare-baseline'?: string;
     layout?: string;
-    style?: string;
-    sizes?: string;
-    depths?: string;
+    count?: string;
+    depth?: string;
     help?: boolean;
     [key: string]: unknown;
   },
@@ -163,10 +161,12 @@ Options (i18n):
 
 Options (library-builder):
   --layout=<flat|deep>       Fixture layout (default: flat)
-  --style=<inline|inline-scss|external>  Component style variant (default: inline)
-  --sizes=<n,n,...>          Entry-point counts to sweep, layout=flat only (default: 10,50,300,1000,2000)
-  --depths=<n,n,...>         Tree depths to sweep, layout=deep only (default: 2,5,8,11)
-  --iterations=<n>           Measured iterations per size (default: 2)
+  --count=<n,n,...>          Entry-point count targets, drives both layouts
+                             (default: 10,20,50,100,200,300,400,500,1000,2000)
+  --depth=<n,n,...>          Explicit tree depths, layout=deep only. Overrides the depths
+                             that would otherwise be derived from --count (the smallest
+                             depth with 2^depth >= each target count).
+  --iterations=<n>           Measured iterations (default: 3)
   --json                     Output raw measurements as JSON
 
   --help                     Show this help message
