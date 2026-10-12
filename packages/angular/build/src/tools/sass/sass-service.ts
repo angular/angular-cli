@@ -111,7 +111,16 @@ export class SassCompiler {
     const compiler = await this.#ensureAsyncCompiler();
 
     if (!this.rebase) {
-      return compiler.compileStringAsync(source, options);
+      return compiler.compileStringAsync(source, {
+        ...options,
+        importers: options.importers?.map((importer) =>
+          isFileImporter(importer)
+            ? {
+                findFileUrl: (url, context) => Promise.resolve(importer.findFileUrl(url, context)),
+              }
+            : importer,
+        ),
+      });
     }
 
     const { functions, importers, importer, url, logger, ...serializableOptions } = options;

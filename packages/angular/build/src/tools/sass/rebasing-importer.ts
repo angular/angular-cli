@@ -344,14 +344,18 @@ export class AsyncModuleUrlRebasingImporter implements Importer<'async'> {
     this.load = this.load.bind(this);
   }
 
-  async canonicalize(url: string, options: CanonicalizeContext): Promise<URL | null> {
+  canonicalize(url: string, options: CanonicalizeContext): Promise<URL | null> | URL | null {
     if (url.startsWith('file://')) {
       return this.relativeImporter.canonicalize(url, options);
     }
 
-    const result = await this.finder(url, options);
-
-    return result ? this.relativeImporter.canonicalize(result.href, options) : null;
+    // Use `Promise.resolve` instead of an `async` method so the returned promise is an
+    // instance of the current `globalThis.Promise` (e.g., `ZoneAwarePromise` when Zone.js
+    // is loaded during SSR). `sass-embedded` checks `result instanceof Promise`, which fails
+    // for native `async` function return values when `globalThis.Promise` has been replaced.
+    return Promise.resolve(this.finder(url, options)).then((result) =>
+      result ? this.relativeImporter.canonicalize(result.href, options) : null,
+    );
   }
 
   load(canonicalUrl: URL): ImporterResult | null {
