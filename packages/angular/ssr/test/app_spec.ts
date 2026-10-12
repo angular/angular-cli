@@ -89,6 +89,7 @@ describe('AngularServerApp', () => {
         { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
         { path: 'redirect-with-query', redirectTo: 'home?param=value' },
+        { path: 'redirect-nested/:param', children: [{ path: 'old', redirectTo: 'new' }] },
         {
           path: 'redirect-to-function',
           redirectTo: () => 'home',
@@ -205,19 +206,25 @@ describe('AngularServerApp', () => {
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle relative nested redirects', async () => {
+      it('should correctly handle relative redirects on multi-segment routes', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
-        expect(response?.headers.get('location')).toBe('/redirect/home');
+        expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle relative nested redirects with parameter', async () => {
+      it('should correctly handle relative redirects on multi-segment routes with parameter', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
-        expect(response?.headers.get('location')).toBe('/redirect/param/home');
+        expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle absolute nested redirects', async () => {
+      it('should correctly handle relative redirects of parameterized parent routes', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-nested/x/old'));
+        expect(response?.headers.get('location')).toBe('/redirect-nested/x/new');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should correctly handle absolute redirects on multi-segment routes', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
         expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
