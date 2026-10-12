@@ -55,5 +55,38 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         },
       ]);
     });
+
+    it('should disable the Vite server file watcher when watch is true', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        watch: true,
+        runnerConfig: 'vitest.config.mts',
+      });
+
+      await harness.writeFile(
+        'vitest.config.mts',
+        `
+          import { defineConfig } from 'vitest/config';
+          export default defineConfig({
+            plugins: [
+              {
+                name: 'assert-watch-disabled',
+                configureVitest({ vitest, project }) {
+                  if (vitest.vite.config.server.watch !== null || project.vite.config.server.watch !== null) {
+                    throw new Error('Expected Vite server.watch to be null');
+                  }
+                },
+              },
+            ],
+          });
+        `,
+      );
+
+      await harness.executeWithCases([
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+        },
+      ]);
+    });
   });
 });
