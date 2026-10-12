@@ -1,6 +1,6 @@
 # Library Builds Scaling Benchmark
 
-This benchmark measures build time metrics for Angular libraries.
+This benchmark suites measures build time metrics for Angular libraries.
 
 ## Context
 
@@ -14,21 +14,24 @@ This benchmark suite is designed to quantify performance impacts and ensure scal
 
 ### Previous Benchmarks
 
-For context, when running a similar benchmark suite directly against `ng-packagr`, it hinted at a "U-curve" in build times,
+For context, when running a comparable benchmark suite directly against `ng-packagr`, it hinted at a "U-curve" in build times,
 where build time per entry point in `ng-packagr` drops until entry point N (with N varying in the range 200..500).
 This shape indicates an initial overhead as a possible explanation for a small number of entry points.
 However, we discovered that `ng-packagr` build time per entry point increases
 as the number of entry points scale past a certain N (in the test runs N=200+).
 
 [Landing Angular CLI's native `@angular/build:library` builder](https://github.com/angular/angular-cli/pull/34106#issuecomment-5744311681),
-indicated very favourable performance metrics for the new library builder that can be explained by number of
-architectural changes in the library build pipeline:
+indicated very favourable performance metrics for the new library builder that can be explained by a number of
+architectural changes in the design of the library build pipeline:
 
 - Shared Stylesheet Bundling
 - Public API Invalidation via Declaration Hashing
 - Dedicated Worker Pool for Production Builds
 - Single Pass Output Emission
 - Direct Async Pipeline
+
+The benchmark design of this suite is built to not only verify the previous results,
+but also to confirm or contradict the architectural choices in the library builder pipeline.
 
 ### Goals
 
@@ -108,7 +111,54 @@ pnpm admin benchmark library-builder --layout=flat --count=500
 
 ## Benchmark Results
 
-_(To be filled in once a sweep has been run and reviewed. Out of scope for this iteration.)_
+Each entry below is one benchmark run, with its own summary and conclusions.
+
+### 2026-10-12: Iteration 1 baseline sweep (native library builder, flat & deep)
+
+First full run of the default sweep against `@angular/build:library` only &mdash; no `ng-packagr` A/B comparison yet (still Future Work).
+Fixtures use inline HTML templates only, no stylesheets.
+Default `--count` sweep, `--iterations=3`, both layouts.
+Environment: 4-core / 16 GiB sandbox, NVMe SSD.
+Raw log: `tmp/benchmark-run-1791795379.log` (gitignored; not included in this commit).
+
+#### Flat layout (inline templates only)
+
+| Entries | Median | ms/entry |
+| ------: | -----: | -------: |
+|      10 |  3.25s |   324.63 |
+|      20 |  3.28s |   164.14 |
+|      50 |  3.33s |    66.61 |
+|     100 |  3.75s |    37.53 |
+|     200 |  4.31s |    21.56 |
+|     300 |  4.90s |    16.35 |
+|     400 |  5.51s |    13.78 |
+|     500 |  6.18s |    12.36 |
+|    1000 | 10.29s |    10.29 |
+|    2000 | 19.47s |     9.74 |
+
+#### Deep layout (inline templates only)
+
+| Entries | Median | ms/entry |
+| ------: | -----: | -------: |
+|      16 |  3.27s |   204.47 |
+|      32 |  3.30s |   103.16 |
+|      64 |  3.57s |    55.74 |
+|     128 |  4.20s |    32.84 |
+|     256 |  4.70s |    18.36 |
+|     512 |  6.31s |    12.32 |
+|    1024 | 10.25s |    10.01 |
+|    2048 | 21.67s |    10.58 |
+
+**Conclusion:** per-entry build time decreases monotonically across both layouts and flattens out
+around 9.6-10.6ms/entry at the largest sizes tested -- no U-shaped climb-back-up at any tested
+size (up to 2000/2048 entries), unlike the pattern reported for `ng-packagr` past N≈200-500. Flat
+and deep track each other closely at comparable entry-point scale, suggesting the directory
+layout itself isn't a meaningful cost driver for the native builder, just raw entry-point count.
+`deep`'s depth-11 run (2048 entries) showed slightly higher run-to-run variance (20.78s-22.46s)
+than `flat`'s 2000-entry run (19.46s-19.63s) -- possibly directory-tree-walk overhead at depth,
+but not a regression, and not yet investigated further.
+
+All 60 builds (10 sizes x 3 iterations x 2 layouts) completed with `status: "ok"`; zero failures.
 
 ## Future Work
 
