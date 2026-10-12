@@ -28,11 +28,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       await harness.executeWithCases([
         // 1. Initial success
-        ({ result }) => {
+        async ({ result }) => {
           expect(result?.success).toBeTrue();
 
           // 2. Introduce compilation error
-          harness.writeFiles({
+          await harness.writeFiles({
             'src/app/app.component.spec.ts': `
               import { describe, expect, test } from 'vitest'
               describe('AppComponent', () => {
@@ -44,11 +44,11 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
           });
         },
         // 3. Expect compilation error
-        ({ result }) => {
+        async ({ result }) => {
           expect(result?.success).toBeFalse();
 
           // 4. Fix compilation error BUT introduce test failure
-          harness.writeFiles({
+          await harness.writeFiles({
             'src/app/app.component.spec.ts': `
               import { describe, expect, test } from 'vitest'
               describe('AppComponent', () => {
