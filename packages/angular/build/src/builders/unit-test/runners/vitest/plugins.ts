@@ -164,6 +164,16 @@ export async function createVitestConfigPlugin(
 
   return {
     name: 'angular:vitest-configuration',
+    enforce: 'post',
+    configResolved: {
+      order: 'post',
+      handler(config: Vite.ResolvedConfig) {
+        // Vitest's internal post-configResolved hook resets `server.watch` to `{}` when
+        // `watch` is enabled (`server.watch ??= {}`). Force it back to `null` so Vite uses
+        // a no-op watcher and relies solely on the Angular CLI build watcher.
+        config.server.watch = null;
+      },
+    },
     async config(config: UserWorkspaceConfig & Vite.UserConfig) {
       const testConfig = config.test;
 
