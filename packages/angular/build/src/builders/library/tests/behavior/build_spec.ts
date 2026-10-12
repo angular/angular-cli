@@ -236,5 +236,47 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         }),
       );
     });
+
+    it('should write and reuse .tsbuildinfo in the persistent cache directory when cache is enabled', async () => {
+      harness.useProject('lib', {
+        root: 'projects/lib',
+        sourceRoot: 'projects/lib/src',
+        cli: {
+          cache: {
+            enabled: true,
+            environment: 'all',
+            path: '.angular/cache',
+          },
+        },
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const firstBuild = await harness.executeOnce();
+      expect(firstBuild.result?.success).toBeTrue();
+      harness
+        .expectFile('.angular/cache/0.0.0-PLACEHOLDER/lib/angular-build-library/.tsbuildinfo')
+        .toExist();
+
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `
+          export * from './lib/lib.service';
+          export * from './lib/lib.component';
+          export const CACHED_BUILD = true;
+        `,
+      );
+
+      const secondBuild = await harness.executeOnce();
+      expect(secondBuild.result?.success).toBeTrue();
+      const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesmContent).toContain('LibComponent');
+      expect(fesmContent).toContain('CACHED_BUILD');
+      const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
+      expect(dtsContent).toContain('LibComponent');
+      expect(dtsContent).toContain('CACHED_BUILD');
+    });
   });
 });
