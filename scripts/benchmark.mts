@@ -49,13 +49,17 @@ function parseIntList(raw: string | number | undefined): number[] | undefined {
     .map((s) => Number(s.trim()));
 }
 
-async function runLibraryBuilderSubsystem(options: {
-  layout?: string;
-  count?: string;
-  depth?: string;
-  iterations?: string | number;
-  json?: boolean;
-}): Promise<number> {
+async function runLibraryBuilderSubsystem(
+  options: {
+    layout?: string;
+    count?: string;
+    depth?: string;
+    iterations?: string | number;
+    json?: boolean;
+    csv?: string | boolean;
+  },
+  cwd: string,
+): Promise<number> {
   if (options.layout !== undefined && options.layout !== 'flat' && options.layout !== 'deep') {
     // eslint-disable-next-line no-console
     console.error('Error: --layout must be "flat" or "deep", got "' + options.layout + '".');
@@ -97,12 +101,20 @@ async function runLibraryBuilderSubsystem(options: {
     return 1;
   }
 
+  if (options.csv !== undefined && (typeof options.csv !== 'string' || options.csv.length === 0)) {
+    // eslint-disable-next-line no-console
+    console.error('Error: --csv requires a file path, got "' + options.csv + '".');
+
+    return 1;
+  }
+
   const cliOptions: LibraryBuilderBenchmarkOptions = {
     layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
     count,
     depth,
     iterations,
     json: Boolean(options.json),
+    csv: options.csv !== undefined ? path.resolve(cwd, options.csv as string) : undefined,
   };
 
   const { exitCode } = await runLibraryBuilderBenchmarks(cliOptions);
@@ -167,7 +179,8 @@ Options (library-builder):
                              that would otherwise be derived from --count (the smallest
                              depth with 2^depth >= each target count).
   --iterations=<n>           Measured iterations (default: 3)
-  --json                     Output raw measurements as JSON
+  --json                     Output raw measurements as JSON to stdout
+  --csv=<path>               Write raw per-iteration measurements as CSV to <path>
 
   --help                     Show this help message
 `);
@@ -176,7 +189,7 @@ Options (library-builder):
   }
 
   if (targetSubsystem === 'library-builder') {
-    return runLibraryBuilderSubsystem(options);
+    return runLibraryBuilderSubsystem(options, _cwd);
   }
 
   if (targetSubsystem !== 'i18n') {
