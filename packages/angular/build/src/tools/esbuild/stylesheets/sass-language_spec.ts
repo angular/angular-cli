@@ -288,7 +288,7 @@ describe('sass-language', () => {
     });
 
     it('should resolve imports when globalThis.Promise is replaced (e.g., by Zone.js)', async () => {
-      const OriginalPromise = globalThis.Promise;
+      const originalPromise = globalThis.Promise;
 
       // Simulate Zone.js replacing globalThis.Promise with a constructor where
       // native V8 async function return values fail `instanceof globalThis.Promise`.
@@ -301,7 +301,7 @@ describe('sass-language', () => {
             reject: (reason?: unknown) => void,
           ) => void,
         ) {
-          this.#inner = new OriginalPromise(executor);
+          this.#inner = new originalPromise(executor);
         }
 
         then<TResult1 = T, TResult2 = never>(
@@ -338,7 +338,7 @@ describe('sass-language', () => {
         }
 
         static all(values: Iterable<unknown>): ZoneLikePromise<unknown[]> {
-          return ZoneLikePromise.resolve(OriginalPromise.all(values));
+          return ZoneLikePromise.resolve(originalPromise.all(values));
         }
       }
 
@@ -360,7 +360,7 @@ describe('sass-language', () => {
         });
         expect(nonRebasingResult.css).toContain('content: "project";');
       } finally {
-        globalThis.Promise = OriginalPromise;
+        globalThis.Promise = originalPromise;
         await nonRebasingCompiler.close();
       }
     });
