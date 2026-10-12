@@ -206,13 +206,13 @@ describe('AngularServerApp', () => {
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle relative nested redirects', async () => {
+      it('should correctly handle relative redirects on multi-segment routes', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/relative'));
         expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle relative nested redirects with parameter', async () => {
+      it('should correctly handle relative redirects on multi-segment routes with parameter', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/param/relative'));
         expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
@@ -224,7 +224,7 @@ describe('AngularServerApp', () => {
         expect(response?.status).toBe(302);
       });
 
-      it('should correctly handle absolute nested redirects', async () => {
+      it('should correctly handle absolute redirects on multi-segment routes', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
         expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
