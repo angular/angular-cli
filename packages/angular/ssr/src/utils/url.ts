@@ -216,6 +216,43 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
   return joinUrlParts(...resolvedParts);
 }
 
+/**
+ * Resolves `:name` placeholders in the query of a URL, like the Angular router does for redirects.
+ *
+ * Each query parameter whose value is a `:name` placeholder gets the values of the `name`
+ * query parameter of `fromParams`, and is removed if `fromParams` has no such parameter.
+ *
+ * @param toUrl - A URL whose query may contain `:name` placeholders.
+ * @param fromParams - The query parameters that provide the values for the placeholders.
+ * @returns The URL with its query placeholders resolved.
+ *
+ * @example
+ * ```typescript
+ * buildQueryWithParams('/search?q=:term', new URLSearchParams('term=cats')); // returns '/search?q=cats'
+ * ```
+ */
+export function buildQueryWithParams(toUrl: string, fromParams: URLSearchParams): string {
+  const [, path, query, fragment] = /^([^?#]*)\?([^#]*)(.*)$/.exec(toUrl) ?? [];
+  if (query === undefined || !query.includes('=:')) {
+    return toUrl;
+  }
+
+  const resolvedParams = new URLSearchParams();
+  for (const [name, value] of new URLSearchParams(query)) {
+    if (value[0] === ':') {
+      for (const sourceValue of fromParams.getAll(value.slice(1))) {
+        resolvedParams.append(name, sourceValue);
+      }
+    } else {
+      resolvedParams.append(name, value);
+    }
+  }
+
+  const resolvedQuery = resolvedParams.toString();
+
+  return path + (resolvedQuery ? `?${resolvedQuery}` : '') + fragment;
+}
+
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;
 
 /**

@@ -93,6 +93,10 @@ describe('AngularServerApp', () => {
         { path: 'redirect-param/:a/:b', redirectTo: '/home/:b/:a' },
         { path: 'redirect-param-relative/:id', redirectTo: 'target/:id' },
         {
+          path: 'redirect-query-placeholder',
+          redirectTo: '/home?q=:term&id=:missing&static=value',
+        },
+        {
           path: 'redirect-to-function',
           redirectTo: () => 'home',
           pathMatch: 'full',
@@ -265,6 +269,14 @@ describe('AngularServerApp', () => {
           new Request('http://localhost/redirect-param-relative/7?filter=test'),
         );
         expect(response?.headers.get('location')).toBe('/target/7?filter=test');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should resolve query parameters in absolute redirect targets', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/redirect-query-placeholder?term=cats&term=dogs'),
+        );
+        expect(response?.headers.get('location')).toBe('/home?q=cats&q=dogs&static=value');
         expect(response?.status).toBe(302);
       });
 

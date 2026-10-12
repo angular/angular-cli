@@ -10,6 +10,7 @@ import {
   addLeadingSlash,
   addTrailingSlash,
   buildPathWithParams,
+  buildQueryWithParams,
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
@@ -201,6 +202,21 @@ describe('URL Utils', () => {
       expect(() => {
         buildPathWithParams(toPath, fromPath);
       }).toThrowError(`Invalid toPath: The string must start with a '/'. Received: 'details'`);
+    });
+  });
+
+  describe('buildQueryWithParams', () => {
+    it('should replace query placeholders with the values of the source parameters', () => {
+      const fromParams = new URLSearchParams('term=cats&term=dogs&page=2');
+      expect(buildQueryWithParams('/search?q=:term&p=:page&static=1#top', fromParams)).toBe(
+        '/search?q=cats&q=dogs&p=2&static=1#top',
+      );
+    });
+
+    it('should remove query parameters whose source parameter is missing', () => {
+      const fromParams = new URLSearchParams();
+      expect(buildQueryWithParams('/search?q=:term&static=1', fromParams)).toBe('/search?static=1');
+      expect(buildQueryWithParams('/search?q=:term', fromParams)).toBe('/search');
     });
   });
 
