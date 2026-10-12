@@ -44,6 +44,12 @@ export interface LibraryCompilationOutput {
 
   /** Promise that resolves to formatted compilation warnings or rejects on diagnostic errors. */
   readonly diagnosePromise: Promise<string[]>;
+
+  /** Effective declarationMap setting resolved from builder options and tsconfig. */
+  readonly declarationMap: boolean;
+
+  /** Effective compilationMode setting resolved from builder options and tsconfig. */
+  readonly compilationMode: 'partial' | 'full';
 }
 
 /**
@@ -125,7 +131,7 @@ export async function compileLibrary(
       processWebWorker: () => '',
     };
 
-    const { referencedFiles } = await compilationInstance.initialize(
+    const { referencedFiles, compilerOptions } = await compilationInstance.initialize(
       tsConfigPath,
       hostOptions,
       {
@@ -220,6 +226,8 @@ export async function compileLibrary(
         failedFiles: failedFiles.size > 0 ? failedFiles : undefined,
       },
       diagnosePromise,
+      declarationMap: !!compilerOptions.declarationMap,
+      compilationMode: compilerOptions.compilationMode === 'full' ? 'full' : 'partial',
     };
   } catch (error) {
     if (!cached) {

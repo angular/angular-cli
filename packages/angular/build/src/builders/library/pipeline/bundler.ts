@@ -323,7 +323,7 @@ async function executeMultiBundle(
 
   if (isDts) {
     dir = TYPES_OUTPUT_DIR;
-    sourcemap = declarationMap;
+    sourcemap = !!declarationMap;
   } else {
     dir = FESM_OUTPUT_DIR;
     // FESM (.mjs) sourcemaps are always enabled.
@@ -427,7 +427,7 @@ async function bundleAllDts(
   await loadRolldown();
   const { dts } = await import('rolldown-plugin-dts');
 
-  const dtsSourcemap = options.declarationMap;
+  const dtsSourcemap = !!options.declarationMap;
   // Filter out `rolldown-plugin-dts:resolver` because all `.d.ts` files are already emitted
   // in-memory by the Angular/TypeScript compilation and resolved via `createMemoryFileLoaderPlugin`.
   // The default `rolldown-plugin-dts:resolver` plugin performs filesystem resolution (`oxc-resolver`)

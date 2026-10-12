@@ -23,6 +23,7 @@ export interface FileTransformResult {
 
 export interface AngularCompilationOptions {
   allowJs?: boolean;
+  compilationMode?: 'full' | 'partial' | 'experimental-local';
   declarationMap?: boolean;
   isolatedModules?: boolean;
   sourceMap?: boolean;

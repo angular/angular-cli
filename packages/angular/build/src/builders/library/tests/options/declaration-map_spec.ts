@@ -44,5 +44,43 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(dtsMap.sources).toContain('../../../projects/lib/src/lib/lib.component.ts');
       harness.expectFile(join('dist/lib/types', dtsMap.sources[0])).toExist();
     });
+
+    it('should respect declarationMap from tsconfig when not set in builder options', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.declarationMap = true;
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/lib/types/lib.d.ts.map').toExist();
+    });
+
+    it('should override declarationMap from tsconfig when declarationMap is false', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.declarationMap = true;
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        declarationMap: false,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      harness.expectFile('dist/lib/fesm2022/lib.mjs.map').toExist();
+      harness.expectFile('dist/lib/types/lib.d.ts.map').toNotExist();
+    });
   });
 });

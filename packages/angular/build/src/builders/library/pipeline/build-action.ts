@@ -124,6 +124,8 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
       referencedFiles,
       cache,
       diagnosePromise,
+      declarationMap,
+      compilationMode,
     } = await compileLibrary(
       options.entryPoints.values(),
       options,
@@ -132,6 +134,10 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
       modifiedFiles,
     );
     buildState.singleProgramCache = cache;
+    if (buildState.compilationMode !== compilationMode) {
+      buildState.compilationMode = compilationMode;
+      buildState.hasEmittedManifests = false;
+    }
 
     for (const file of referencedFiles) {
       watchedCompilationFiles.add(file);
@@ -170,7 +176,11 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     let warnings: string[];
     try {
       [bundleOutput, warnings] = await Promise.all([
-        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, options),
+        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, {
+          ...options,
+          declarationMap,
+          compilationMode,
+        }),
         diagnosePromise,
       ]);
     } catch (error) {
@@ -201,8 +211,17 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     }
   }
 
-  if (shouldGenerateManifests || buildState.hasEmittedTslib !== hasTslibImport) {
-    filesToEmit.push(...(await generatePackageManifests(options, isWatchMode, hasTslibImport)));
+  if (!buildState.hasEmittedManifests || buildState.hasEmittedTslib !== hasTslibImport) {
+    filesToEmit.push(
+      ...(await generatePackageManifests(
+        {
+          ...options,
+          compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
+        },
+        isWatchMode,
+        hasTslibImport,
+      )),
+    );
   }
 
   const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(

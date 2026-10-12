@@ -37,5 +37,53 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       const fesm = harness.readFile('dist/lib/fesm2022/lib.mjs');
       expect(fesm).toContain('ɵɵdefineComponent');
     });
+
+    it('should respect angularCompilerOptions.compilationMode from tsconfig when not set in builder options', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.angularCompilerOptions = {
+          ...tsconfig.angularCompilerOptions,
+          compilationMode: 'full',
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const fesm = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesm).toContain('ɵɵdefineComponent');
+
+      const pkgJson = JSON.parse(harness.readFile('dist/lib/package.json'));
+      expect(pkgJson.scripts?.prepublishOnly).toContain('full compilation mode');
+    });
+
+    it('should override angularCompilerOptions.compilationMode from tsconfig when set in builder options', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.angularCompilerOptions = {
+          ...tsconfig.angularCompilerOptions,
+          compilationMode: 'full',
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        compilationMode: CompilationMode.Partial,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const fesm = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesm).toContain('ɵɵngDeclareComponent');
+    });
   });
 });
