@@ -614,5 +614,43 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       const { result } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
     });
+
+    it('should not serve stale cached modules across runs when an imported file changes', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.mts',
+      });
+
+      await harness.writeFiles({
+        'vitest.config.mts': `
+          import { defineConfig } from 'vitest/config';
+          export default defineConfig({
+            test: {
+              fsModuleCache: true,
+              fsModuleCachePath: './.vitest-cache',
+            },
+          });
+        `,
+        'src/app/value.ts': `export const VALUE = 'initial';`,
+        'src/app/app.component.spec.ts': `
+          import { test, expect } from 'vitest';
+          import { VALUE } from './value';
+
+          test('should use the latest value from imported module', () => {
+            expect(VALUE).toBe('updated');
+          });
+        `,
+      });
+
+      const firstRun = await harness.executeOnce();
+      expect(firstRun.result?.success).toBeFalse();
+
+      // Update the imported application file without modifying the .spec.ts file on disk
+      await harness.writeFile('src/app/value.ts', `export const VALUE = 'updated';`);
+
+      const secondRun = await harness.executeOnce();
+      expect(secondRun.result?.success).toBeTrue();
+      harness.expectDirectory('.vitest-cache').toNotExist();
+    });
   });
 });
