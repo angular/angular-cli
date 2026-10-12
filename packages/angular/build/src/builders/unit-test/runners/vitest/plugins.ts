@@ -271,6 +271,7 @@ export async function createVitestConfigPlugin(
         test: {
           name: projectName,
           include,
+          fsModuleCache: false,
           // CLI provider browser options override, if present
           ...(browser ? { browser } : {}),
           // Only override if the user explicitly set it via CLI
@@ -290,6 +291,7 @@ export async function createVitestConfigPlugin(
 
       return {
         test: {
+          fsModuleCache: false,
           coverage: await generateCoverageOption(
             options.coverage,
             testConfig?.coverage,
