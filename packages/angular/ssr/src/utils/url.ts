@@ -153,11 +153,17 @@ export function stripIndexHtmlFromURL(url: URL): URL {
 }
 
 /**
+ * Matches a `*<n>` placeholder that makes up a whole path segment.
+ */
+const POSITIONAL_PLACEHOLDER_REGEXP = /^\*(\d+)$/;
+
+/**
  * Resolves `*` placeholders in a path template by mapping them to corresponding segments
  * from a base path. This is useful for constructing paths dynamically based on a given base path.
  *
  * The function processes the `toPath` string, replacing each `*` placeholder with
- * the corresponding segment from the `fromPath`. If the `toPath` contains no placeholders,
+ * the corresponding segment from the `fromPath`, and each `*<n>` placeholder with the
+ * segment at position `n` of the `fromPath`. If the `toPath` contains no placeholders,
  * it is returned as-is. Invalid `toPath` formats (not starting with `/`) will throw an error.
  *
  * @param toPath - A path template string that may contain `*` placeholders. Each `*` is replaced
@@ -176,6 +182,10 @@ export function stripIndexHtmlFromURL(url: URL): URL {
  * const resolvedPath = buildPathWithParams('/*\/details', '/123/abc');
  * console.log(resolvedPath); // Outputs: '/123/details'
  *
+ * // Example with a positional placeholder
+ * const positionalPath = buildPathWithParams('/user/*1', '/123/abc');
+ * console.log(positionalPath); // Outputs: '/user/123'
+ *
  * // Example with a static path
  * const staticPath = buildPathWithParams('/static/path', '/base/unused');
  * console.log(staticPath); // Outputs: '/static/path'
@@ -190,17 +200,20 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
     throw new Error(`Invalid fromPath: The string must start with a '/'. Received: '${fromPath}'`);
   }
 
-  if (!toPath.includes('/*')) {
+  const [path] = toPath.split(/[?#]/, 1);
+  if (!path.includes('/*')) {
     return toPath;
   }
 
   const fromPathParts = fromPath.split('/');
-  const toPathParts = toPath.split('/');
+  const toPathParts = path.split('/');
   const resolvedParts = toPathParts.map((part, index) =>
-    toPathParts[index] === '*' ? fromPathParts[index] : part,
+    part === '*'
+      ? fromPathParts[index]
+      : part.replace(POSITIONAL_PLACEHOLDER_REGEXP, (_, position) => fromPathParts[position]),
   );
 
-  return joinUrlParts(...resolvedParts);
+  return joinUrlParts(...resolvedParts) + toPath.slice(path.length);
 }
 
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;
