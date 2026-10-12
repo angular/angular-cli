@@ -425,24 +425,19 @@ describe('PackageManager', () => {
   describe('getProjectDependencies', () => {
     it('should list the dependencies of an npm workspace member', async () => {
       const pm = new PackageManager(host, '/repo/apps/app', descriptor);
-      runCommandSpy.and.callFake((_binary: string, args: readonly string[]) =>
-        Promise.resolve({
-          stdout:
-            args[0] === 'pkg'
-              ? '{\n  "app": "app"\n}'
-              : JSON.stringify({
-                  name: 'monorepo',
-                  dependencies: {
-                    app: {
-                      version: '0.0.0',
-                      resolved: 'file:../apps/app',
-                      dependencies: { '@angular/core': { version: '22.0.0' } },
-                    },
-                  },
-                }),
-          stderr: '',
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({
+          name: 'monorepo',
+          dependencies: {
+            app: {
+              version: '0.0.0',
+              resolved: 'file:../apps/app',
+              dependencies: { '@angular/core': { version: '22.0.0' } },
+            },
+          },
         }),
-      );
+        stderr: '',
+      });
       spyOn(host, 'readFile').and.resolveTo('{"name": "app"}');
 
       const dependencies = await pm.getProjectDependencies();
