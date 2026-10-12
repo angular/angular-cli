@@ -99,7 +99,7 @@ export async function normalizeLibraryOptions(
     }
     defaultAssets.push({
       glob: 'README.md',
-      input: path.dirname(entryPoint.entryFilePath),
+      input: path.join(projectRoot, entryPoint.name),
       output: entryPoint.name,
     });
   }

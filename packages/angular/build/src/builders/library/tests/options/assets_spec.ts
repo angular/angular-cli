@@ -50,5 +50,29 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       expect(harness.readFile('dist/lib/docs/README.md')).toBe('# Library Docs');
     });
+
+    it('should copy secondary entry point README.md from the entry point directory by default', async () => {
+      await harness.writeFiles({
+        'projects/lib/package.json': JSON.stringify({
+          name: 'lib',
+          version: '0.0.1',
+          exports: {
+            '.': './src/public-api.ts',
+            './testing': './testing/src/public-api.ts',
+          },
+        }),
+        'projects/lib/testing/README.md': '# Testing Entry Point',
+        'projects/lib/testing/src/public-api.ts': 'export const TESTING = true;',
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expect(harness.readFile('dist/lib/testing/README.md')).toBe('# Testing Entry Point');
+    });
   });
 });
