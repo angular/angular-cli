@@ -74,6 +74,47 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
+    it('should not log EMPTY_BUNDLE warnings for type-only entry points', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `export interface OnlyType { id: string; }`,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      expect(logs.some((l) => l.level === 'warn')).toBeFalse();
+    });
+
+    it('should preserve JSDoc comments in .d.ts and annotation comments in .mjs bundles', async () => {
+      await harness.writeFile(
+        'projects/lib/src/public-api.ts',
+        `
+        function identity<T>(x: T): T { return x; }
+        /** Public API JSDoc comment */
+        export const VALUE = /* @__PURE__ */ identity('test');
+        `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesmContent).toContain('@__PURE__');
+      expect(fesmContent).not.toContain('Public API JSDoc comment');
+
+      const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
+      expect(dtsContent).toContain('Public API JSDoc comment');
+      expect(dtsContent).not.toContain('@__PURE__');
+    });
+
     it('should automatically add tslib to dependencies when output chunks import tslib', async () => {
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
