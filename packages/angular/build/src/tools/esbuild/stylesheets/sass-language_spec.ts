@@ -286,5 +286,69 @@ describe('sass-language', () => {
         pathToFileURL(join(projectRoot, 'node_modules', 'theme', '_index.scss')).href,
       );
     });
+
+    it('should resolve imports when globalThis.Promise is replaced (e.g., by Zone.js)', async () => {
+      const originalPromise = globalThis.Promise;
+
+      // Simulate Zone.js replacing globalThis.Promise with a constructor where
+      // native V8 async function return values fail `instanceof globalThis.Promise`.
+      class ZoneLikePromise<T> {
+        #inner: Promise<T>;
+
+        constructor(
+          executor: (
+            resolve: (value: T | PromiseLike<T>) => void,
+            reject: (reason?: unknown) => void,
+          ) => void,
+        ) {
+          this.#inner = new originalPromise(executor);
+        }
+
+        then<TResult1 = T, TResult2 = never>(
+          onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | null,
+          onrejected?: ((reason: unknown) => TResult2 | PromiseLike<TResult2>) | null,
+        ): ZoneLikePromise<TResult1 | TResult2> {
+          return new ZoneLikePromise((resolve, reject) => {
+            this.#inner.then(onfulfilled, onrejected).then(resolve, reject);
+          });
+        }
+
+        catch<TResult = never>(
+          onrejected?: ((reason: unknown) => TResult | PromiseLike<TResult>) | null,
+        ): ZoneLikePromise<T | TResult> {
+          return this.then(undefined, onrejected);
+        }
+
+        finally(onfinally?: (() => void) | null): ZoneLikePromise<T> {
+          return new ZoneLikePromise((resolve, reject) => {
+            this.#inner.finally(onfinally).then(resolve, reject);
+          });
+        }
+
+        static resolve<U>(value?: U | PromiseLike<U>): ZoneLikePromise<Awaited<U>> {
+          if (value instanceof ZoneLikePromise) {
+            return value;
+          }
+
+          return new ZoneLikePromise((resolve) => resolve(value as Awaited<U>));
+        }
+
+        static reject<U = never>(reason?: unknown): ZoneLikePromise<U> {
+          return new ZoneLikePromise((_, reject) => reject(reason));
+        }
+
+        static all(values: Iterable<unknown>): ZoneLikePromise<unknown[]> {
+          return ZoneLikePromise.resolve(originalPromise.all(values));
+        }
+      }
+
+      globalThis.Promise = ZoneLikePromise as unknown as PromiseConstructor;
+      try {
+        const application = await compile(buttonStylesheet);
+        expect(application).toContain('content: "project";');
+      } finally {
+        globalThis.Promise = originalPromise;
+      }
+    });
   });
 });
