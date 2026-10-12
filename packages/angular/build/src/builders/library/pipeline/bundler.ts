@@ -301,6 +301,15 @@ function processRolldownOutput(
 }
 
 /**
+ * Set of Rolldown warning codes that should be ignored.
+ */
+const IGNORED_ROLLDOWN_WARNING_CODES: ReadonlySet<string> = new Set([
+  'EMPTY_BUNDLE',
+  'UNUSED_EXTERNAL_IMPORT',
+  'THIS_IS_UNDEFINED',
+]);
+
+/**
  * Executes a Rolldown bundle build across all provided entry inputs.
  *
  * @param input Map of bundle names to virtual entry file paths.
@@ -341,7 +350,12 @@ async function executeMultiBundle(
     resolve: { symlinks: !preserveSymlinks },
     checks: { circularDependency: false },
     onLog(level, log) {
+      // Ignore specified warning codes
       if (level === 'warn') {
+        if (log.code && IGNORED_ROLLDOWN_WARNING_CODES.has(log.code)) {
+          return;
+        }
+
         warnings.push(log.message);
       }
     },
@@ -358,7 +372,7 @@ async function executeMultiBundle(
       chunkFileNames: `[name]-[hash].${extension}`,
       sourcemap,
       hoistTransitiveImports: false,
-      comments: { jsdoc: isDts, legal: true, annotation: true },
+      comments: { jsdoc: isDts, legal: true, annotation: !isDts },
     });
 
     return {
