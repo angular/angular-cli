@@ -6,6 +6,7 @@ This benchmark measures build time metrics for Angular libraries.
 
 Angular CLI is in the process of transitioning from `ng-packagr` to Angular CLI's native library builder.
 Both library build systems are registered Architect builders:
+
 - `@angular/build:ng-packagr`: runs library builds through the legacy `ng-packagr` build pipeline.
 - `@angular/build:library`: runs library builds through Angular CLI's native library builder.
 
@@ -22,6 +23,7 @@ as the number of entry points scale past a certain N (in the test runs N=200+).
 [Landing Angular CLI's native `@angular/build:library` builder](https://github.com/angular/angular-cli/pull/34106#issuecomment-5744311681),
 indicated very favourable performance metrics for the new library builder that can be explained by number of
 architectural changes in the library build pipeline:
+
 - Shared Stylesheet Bundling
 - Public API Invalidation via Declaration Hashing
 - Dedicated Worker Pool for Production Builds
@@ -83,13 +85,13 @@ pnpm admin benchmark library-builder [options]
 
 ### Options
 
-| Option                 | Description                                     | Default                                  |
-| :--------------------- | :----------------------------------------------- | :---------------------------------------- |
-| `--layout=<flat\|deep>` | Fixture layout                                  | `flat`                                    |
-| `--count=<n,n,...>`    | Entry-point count targets, drives both layouts  | `10,20,50,100,200,300,400,500,1000,2000` |
-| `--depth=<n,n,...>`    | **`layout=deep` only.** Explicit tree depths, overriding the depths otherwise derived from `--count` | derived from `--count` |
-| `--iterations=<n>`     | Measured iterations per size                    | `3`                                       |
-| `--json`               | Output raw measurements as JSON                 | N/A                                       |
+| Option                  | Description                                                                                          | Default                                  |
+| :---------------------- | :--------------------------------------------------------------------------------------------------- | :--------------------------------------- |
+| `--layout=<flat\|deep>` | Fixture layout                                                                                       | `flat`                                   |
+| `--count=<n,n,...>`     | Entry-point count targets, drives both layouts                                                       | `10,20,50,100,200,300,400,500,1000,2000` |
+| `--depth=<n,n,...>`     | **`layout=deep` only.** Explicit tree depths, overriding the depths otherwise derived from `--count` | derived from `--count`                   |
+| `--iterations=<n>`      | Measured iterations per size                                                                         | `3`                                      |
+| `--json`                | Output raw measurements as JSON                                                                      | N/A                                      |
 
 > `--count` and `--depth` are not independent sweep axes for `layout=deep`: `--count` is translated
 > into depths (smallest `depth` with `2^depth >= n` per target, de-duplicated); `--depth` only
