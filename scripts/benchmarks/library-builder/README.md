@@ -94,7 +94,8 @@ pnpm admin benchmark library-builder [options]
 | `--count=<n,n,...>`     | Entry-point count targets, drives both layouts                                                       | `10,20,50,100,200,300,400,500,1000,2000` |
 | `--depth=<n,n,...>`     | **`layout=deep` only.** Explicit tree depths, overriding the depths otherwise derived from `--count` | derived from `--count`                   |
 | `--iterations=<n>`      | Measured iterations per size                                                                         | `3`                                      |
-| `--json`                | Output raw measurements as JSON                                                                      | N/A                                      |
+| `--json`                | Output raw per-iteration measurements as JSON to stdout                                              | N/A                                      |
+| `--csv=<path>`          | Write raw per-iteration measurements as CSV to `<path>`                                              | N/A (opt-in only)                        |
 
 > `--count` and `--depth` are not independent sweep axes for `layout=deep`: `--count` is translated
 > into depths (smallest `depth` with `2^depth >= n` per target, de-duplicated); `--depth` only
@@ -167,5 +168,10 @@ All 60 builds (10 sizes x 3 iterations x 2 layouts) completed with `status: "ok"
 - Dependencies between entry points.
 - Shared stylesheet tokens imported by multiple components.
 - Watch mode.
-- Peak memory (`ru_maxrss`) and CPU time (`ru_utime` + `ru_stime`) metrics per build, in addition to wall-clock build time.
+- Peak memory and CPU time metrics per build, in addition to wall-clock build time. Note:
+  `child.resourceUsage()` does **not** exist on Node's `ChildProcess` (only `process.resourceUsage()`
+  exists, and it reports the calling process's own usage, not a child's) -- the real path is
+  polling `/proc/<pid>/status` (`VmHWM`) and `/proc/<pid>/stat` (`utime`+`stime`) on a timer while
+  the build subprocess is alive, which is Linux-only and requires moving `buildOnce` off
+  `spawnSync` onto `spawn()` so a polling timer can interleave with the child's lifetime.
 - Library "taste" variants beyond plain flat/deep, e.g. flat/deep with inter-entry-point dependencies or shared SCSS tokens (currently out of scope, listed above).

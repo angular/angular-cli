@@ -15,6 +15,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { type FixtureOptions, type Layout, generateFixture } from './fixtures.mts';
 import { type BuildMeasurement, buildOnce, checkBuilderIsBuilt, median } from './harness.mts';
+import { formatCsvReport, formatJsonReport } from './reporters.mts';
 
 export interface LibraryBuilderBenchmarkOptions {
   layout?: Layout;
@@ -22,6 +23,7 @@ export interface LibraryBuilderBenchmarkOptions {
   depth?: number[];
   iterations?: number;
   json?: boolean;
+  csv?: string;
 }
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
@@ -125,7 +127,15 @@ export async function runLibraryBuilderBenchmarks(
   const anyFailed = measurements.some((m) => m.status === 'fail');
   if (options.json) {
     // eslint-disable-next-line no-console
-    console.log(JSON.stringify(measurements, null, 2));
+    console.log(formatJsonReport(measurements));
+  }
+
+  if (options.csv) {
+    fs.writeFileSync(options.csv, formatCsvReport(measurements));
+    if (!options.json) {
+      // eslint-disable-next-line no-console
+      console.log('CSV written to: ' + options.csv);
+    }
   }
 
   return { measurements, exitCode: anyFailed ? 1 : 0 };
