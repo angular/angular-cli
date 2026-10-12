@@ -88,6 +88,7 @@ describe('AngularServerApp', () => {
         { path: 'redirect/relative', redirectTo: 'home' },
         { path: 'redirect/:param/relative', redirectTo: 'home' },
         { path: 'redirect/absolute', redirectTo: '/home' },
+        { path: 'redirect-with-query', redirectTo: 'home?param=value' },
         {
           path: 'redirect-to-function',
           redirectTo: () => 'home',
@@ -218,6 +219,28 @@ describe('AngularServerApp', () => {
 
       it('should correctly handle absolute nested redirects', async () => {
         const response = await app.handle(new Request('http://localhost/redirect/absolute'));
+        expect(response?.headers.get('location')).toBe('/home');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should preserve query parameters on relative redirects', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect?filter=test'));
+        expect(response?.headers.get('location')).toBe('/home?filter=test');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should ignore query parameters of relative redirect targets', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/redirect-with-query?filter=test'),
+        );
+        expect(response?.headers.get('location')).toBe('/home?filter=test');
+        expect(response?.status).toBe(302);
+      });
+
+      it('should not preserve query parameters on absolute redirects', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/redirect/absolute?filter=test'),
+        );
         expect(response?.headers.get('location')).toBe('/home');
         expect(response?.status).toBe(302);
       });
@@ -496,6 +519,16 @@ describe('AngularServerApp', () => {
             }),
           );
           expect(response?.headers.get('location')).toBe('/base/home');
+          expect(response?.status).toBe(302);
+        });
+
+        it('returns a 302 status and keeps the query string for relative redirects', async () => {
+          const response = await app.handle(
+            new Request('http://localhost/redirect?filter=test', {
+              headers,
+            }),
+          );
+          expect(response?.headers.get('location')).toBe('/base/home?filter=test');
           expect(response?.status).toBe(302);
         });
       });
