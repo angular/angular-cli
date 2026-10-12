@@ -163,14 +163,17 @@ export class AngularServerApp {
       return null;
     }
 
-    const { redirectTo, status, renderMode, headers } = matchedRoute;
+    const { redirectTo, relativeRedirect, status, renderMode, headers } = matchedRoute;
 
     if (redirectTo !== undefined) {
+      const location = joinUrlParts(
+        request.headers.get('X-Forwarded-Prefix') ?? '',
+        buildPathWithParams(redirectTo, url.pathname),
+      );
+
+      // Match Angular router behavior: relative redirects keep the query string.
       return createRedirectResponse(
-        joinUrlParts(
-          request.headers.get('X-Forwarded-Prefix') ?? '',
-          buildPathWithParams(redirectTo, url.pathname),
-        ),
+        relativeRedirect ? location + url.search : location,
         status,
         headers,
       );

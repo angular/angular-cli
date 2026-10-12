@@ -55,6 +55,7 @@ describe('ServerRouter', () => {
       });
       expect(router.match(new URL('http://localhost/redirect'))).toEqual({
         redirectTo: '/home',
+        relativeRedirect: true,
         route: '/redirect',
         renderMode: RenderMode.Server,
         status: 301,
@@ -89,6 +90,7 @@ describe('ServerRouter', () => {
       });
       expect(redirectMetadata).toEqual({
         redirectTo: '/home',
+        relativeRedirect: true,
         route: '/redirect',
         status: 301,
         renderMode: RenderMode.Server,
@@ -110,6 +112,7 @@ describe('ServerRouter', () => {
       });
       expect(redirectMetadata).toEqual({
         redirectTo: '/home',
+        relativeRedirect: true,
         route: '/redirect',
         status: 301,
         renderMode: RenderMode.Server,
