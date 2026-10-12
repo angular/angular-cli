@@ -216,6 +216,62 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
   return joinUrlParts(...resolvedParts) + toPath.slice(path.length);
 }
 
+/**
+ * Resolves `:name` placeholders in the query of a URL, like the Angular router does for redirects.
+ *
+ * Each query parameter whose value is a `:name` placeholder gets the values of the `name`
+ * query parameter of `fromParams`, or `undefined` if `fromParams` has no such parameter.
+ * Like in the Angular router, placeholders of repeated query parameters are not resolved.
+ *
+ * @param toUrl - A URL whose query may contain `:name` placeholders.
+ * @param fromParams - The query parameters that provide the values for the placeholders.
+ * @returns The URL with its query placeholders resolved.
+ *
+ * @example
+ * ```typescript
+ * buildQueryWithParams('/find?q=:x', new URLSearchParams('x=cats')); // returns '/find?q=cats'
+ * ```
+ */
+export function buildQueryWithParams(toUrl: string, fromParams: URLSearchParams): string {
+  const [, path, query, fragment] = /^([^?#]*)\?([^#]*)(.*)$/.exec(toUrl) ?? [];
+  if (query === undefined) {
+    return toUrl;
+  }
+
+  const params = query.split('&');
+  const names = params.map((param) => param.split('=', 1)[0]);
+  const resolvedQuery = params
+    .map((param, index) => {
+      const name = names[index];
+      const value = param.slice(name.length + 1);
+      if (value[0] !== ':' || names.indexOf(name) !== names.lastIndexOf(name)) {
+        return param;
+      }
+
+      const sourceValues = fromParams.getAll(value.slice(1));
+
+      return (sourceValues.length ? sourceValues : ['undefined'])
+        .map((sourceValue) => `${name}=${encodeQueryValue(sourceValue)}`)
+        .join('&');
+    })
+    .join('&');
+
+  return `${path}?${resolvedQuery}${fragment}`;
+}
+
+/**
+ * Encodes a query parameter value like the Angular router (`DefaultUrlSerializer`), which keeps
+ * `@`, `:`, `$`, `,` and `;` as is.
+ *
+ * @param value - The query parameter value to encode.
+ * @returns The encoded query parameter value.
+ */
+function encodeQueryValue(value: string): string {
+  return encodeURIComponent(value).replace(/%(40|3A|24|2C|3B)/g, (match) =>
+    decodeURIComponent(match),
+  );
+}
+
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;
 
 /**

@@ -24,7 +24,12 @@ import { ServerRouter } from './routes/router';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
-import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
+import {
+  buildPathWithParams,
+  buildQueryWithParams,
+  joinUrlParts,
+  stripLeadingSlash,
+} from './utils/url';
 import { getFirstHeaderValue } from './utils/validation';
 
 /**
@@ -174,7 +179,7 @@ export class AngularServerApp {
 
       // Match Angular router behavior: relative redirects keep the query string.
       return createRedirectResponse(
-        relativeRedirect ? location + url.search : location,
+        relativeRedirect ? location + url.search : buildQueryWithParams(location, url.searchParams),
         status,
         headers,
       );
