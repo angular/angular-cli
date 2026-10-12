@@ -39,6 +39,12 @@ export async function generatePackageManifests(
     version,
     exports: userExports,
     workspaces: _workspaces,
+    ngPackage: _ngPackage,
+    browserslist: _browserslist,
+    prettier: _prettier,
+    stylelint: _stylelint,
+    jest: _jest,
+    husky: _husky,
     ...restPackageJson
   } = rawPackageJson;
 
@@ -77,7 +83,11 @@ export async function generatePackageManifests(
     version: isWatchMode ? `0.0.0-watch+${Date.now()}` : version,
   };
 
-  if (hasTslibImport && !rawPackageJson.dependencies?.['tslib']) {
+  if (
+    hasTslibImport &&
+    !rawPackageJson.dependencies?.['tslib'] &&
+    !rawPackageJson.peerDependencies?.['tslib']
+  ) {
     const tslibVersion = await getAngularTslibRange(options.workspaceRoot);
     if (tslibVersion) {
       distPackageJson.dependencies = {
@@ -182,9 +192,20 @@ function createExportConditions(
 }
 
 /**
- * Cached tslib range used by the Angular compiler.
+ * Cached tslib ranges used by the Angular compiler, keyed by workspace root.
  */
-let cachedTslibRange: string | undefined;
+const cachedTslibRanges = new Map<string, string>();
+let localRequire: NodeJS.Require | undefined;
+
+function resolveFromWorkspaceOrLocal(workspaceRequire: NodeJS.Require, specifier: string): string {
+  try {
+    return workspaceRequire.resolve(specifier);
+  } catch {
+    localRequire ??= createRequire(__filename);
+
+    return localRequire.resolve(specifier);
+  }
+}
 
 /**
  * Get the tslib range used by the Angular compiler.
@@ -192,34 +213,40 @@ let cachedTslibRange: string | undefined;
  * @returns tslib range
  */
 async function getAngularTslibRange(workspaceRoot: string): Promise<string> {
-  if (cachedTslibRange) {
-    return cachedTslibRange;
+  const cached = cachedTslibRanges.get(workspaceRoot);
+  if (cached) {
+    return cached;
   }
 
   const workspaceRequire = createRequire(path.join(workspaceRoot, 'package.json'));
+  let tslibRange: string | undefined;
 
   // Try resolving via @angular/compiler dependencies
   try {
     const angularCompilerPkg = await loadPackageJson(
-      workspaceRequire.resolve('@angular/compiler/package.json'),
+      resolveFromWorkspaceOrLocal(workspaceRequire, '@angular/compiler/package.json'),
     );
-    cachedTslibRange = angularCompilerPkg.dependencies?.['tslib'];
+    tslibRange = angularCompilerPkg.dependencies?.['tslib'];
   } catch {}
 
   // Fallback: Try resolving tslib directly
-  if (!cachedTslibRange) {
+  if (!tslibRange) {
     try {
-      const tslibPkg = await loadPackageJson(workspaceRequire.resolve('tslib/package.json'));
+      const tslibPkg = await loadPackageJson(
+        resolveFromWorkspaceOrLocal(workspaceRequire, 'tslib/package.json'),
+      );
       if (tslibPkg.version) {
-        cachedTslibRange = `^${tslibPkg.version}`;
+        tslibRange = `^${tslibPkg.version}`;
       }
     } catch {}
   }
 
   // Fail fast if still unresolved
-  if (!cachedTslibRange) {
+  if (!tslibRange) {
     throw new Error('Unable to resolve tslib range.');
   }
 
-  return cachedTslibRange;
+  cachedTslibRanges.set(workspaceRoot, tslibRange);
+
+  return tslibRange;
 }

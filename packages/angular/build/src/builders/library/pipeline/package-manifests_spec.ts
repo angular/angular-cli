@@ -344,5 +344,67 @@ describe('generatePackageManifests', () => {
     expect(getRootPackageJson(filesInDeps).dependencies).toEqual({
       tslib: '^2.0.0',
     });
+
+    const filesInPeerDeps = await generatePackageManifests(
+      createOptions({
+        workspaceRoot: process.cwd(),
+        packageJson: {
+          name: 'my-lib',
+          version: '1.0.0',
+          peerDependencies: {
+            tslib: '^2.0.0',
+          },
+        },
+      }),
+      false,
+      true,
+    );
+    const peerResult = getRootPackageJson(filesInPeerDeps);
+    expect(peerResult.dependencies).toBeUndefined();
+    expect(peerResult.peerDependencies).toEqual({
+      tslib: '^2.0.0',
+    });
+  });
+
+  it('should strip development and tooling configuration fields from package.json', async () => {
+    const options = createOptions({
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+        ngPackage: { dest: '../../dist/my-lib' },
+        browserslist: ['> 0.5%'],
+        prettier: { singleQuote: true },
+        stylelint: { extends: 'stylelint-config-standard' },
+        jest: { preset: 'jest-preset-angular' },
+        husky: { hooks: {} },
+        workspaces: ['packages/*'],
+      },
+    });
+
+    const files = await generatePackageManifests(options, false);
+    const result = getRootPackageJson(files);
+
+    expect(result.ngPackage).toBeUndefined();
+    expect(result.browserslist).toBeUndefined();
+    expect(result.prettier).toBeUndefined();
+    expect(result.stylelint).toBeUndefined();
+    expect(result.jest).toBeUndefined();
+    expect(result.husky).toBeUndefined();
+    expect(result.workspaces).toBeUndefined();
+  });
+
+  it('should fallback to local package resolution for tslib when workspaceRoot does not contain node_modules', async () => {
+    const options = createOptions({
+      workspaceRoot: '/non-existent-workspace-root',
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+      },
+    });
+
+    const files = await generatePackageManifests(options, false, true);
+    expect(getRootPackageJson(files).dependencies).toEqual({
+      tslib: jasmine.any(String),
+    });
   });
 });
