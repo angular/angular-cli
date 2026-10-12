@@ -69,7 +69,8 @@ export async function compileLibrary(
   cached?: SingleProgramCache,
   modifiedFiles?: Set<string>,
 ): Promise<LibraryCompilationOutput> {
-  const { tsConfigPath, compilationMode, preserveSymlinks, colors, declarationMap } = options;
+  const { tsConfigPath, compilationMode, preserveSymlinks, colors, declarationMap, cacheOptions } =
+    options;
 
   const entryPathsMap: Record<string, string[]> = {};
   const rootFiles: string[] = [];
@@ -141,6 +142,7 @@ export async function compileLibrary(
         declarationMap,
         compilationMode,
         paths: entryPathsMap,
+        cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
       },
       'library',
     );
