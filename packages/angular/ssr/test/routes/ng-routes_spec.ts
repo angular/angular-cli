@@ -1044,4 +1044,95 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
     expect(isDiscoveringRoutes).toBeTrue();
   });
+
+  it('should preserve preload metadata for routes under nested empty-path routes', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: '',
+          children: [
+            {
+              path: '',
+              pathMatch: 'full',
+              loadChildren: () => [
+                {
+                  path: '',
+                  loadComponent: () => DummyComponent,
+                  ɵentryName: 'home-page',
+                } as Route,
+              ],
+              ɵentryName: 'home-routes',
+            } as Route,
+            {
+              path: '',
+              children: [
+                {
+                  path: 'pricing',
+                  loadChildren: () => [
+                    {
+                      path: '',
+                      loadComponent: () => DummyComponent,
+                      ɵentryName: 'pricing-page',
+                    } as Route,
+                  ],
+                  ɵentryName: 'pricing-routes',
+                } as Route,
+              ],
+            },
+          ],
+        },
+        {
+          path: 'es',
+          children: [
+            {
+              path: '',
+              pathMatch: 'full',
+              loadChildren: () => [
+                {
+                  path: '',
+                  loadComponent: () => DummyComponent,
+                  ɵentryName: 'home-page',
+                } as Route,
+              ],
+              ɵentryName: 'home-routes',
+            } as Route,
+          ],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Prerender }],
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      {
+        'home-routes': ['chunk-home-routes.js'],
+        'home-page': ['chunk-home-page.js'],
+        'pricing-routes': ['chunk-pricing-routes.js'],
+        'pricing-page': ['chunk-pricing-page.js'],
+      },
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      {
+        route: '/',
+        renderMode: RenderMode.Prerender,
+        preload: ['chunk-home-routes.js', 'chunk-home-page.js'],
+      },
+      {
+        route: '/pricing',
+        renderMode: RenderMode.Prerender,
+        preload: ['chunk-pricing-routes.js', 'chunk-pricing-page.js'],
+      },
+      {
+        route: '/es',
+        renderMode: RenderMode.Prerender,
+        preload: ['chunk-home-routes.js', 'chunk-home-page.js'],
+      },
+    ]);
+  });
 });
