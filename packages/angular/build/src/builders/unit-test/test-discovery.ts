@@ -74,8 +74,10 @@ export async function findTests(
     }
   }
 
-  // 3. Combine and de-duplicate results
-  return [...resolvedTestFiles];
+  // 3. Combine, de-duplicate and sort the results. The glob crawls directories asynchronously and
+  // returns matches in a varying order; the order feeds the build entry points, so an unsorted list
+  // makes the output (chunk contents and names) differ between two builds of the same sources.
+  return [...resolvedTestFiles].sort();
 }
 
 interface TestEntrypointsOptions {

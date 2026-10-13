@@ -6,8 +6,40 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import { promises as fs } from 'node:fs';
+import { join } from 'node:path';
 import { initializeHash } from '../../utils/hash';
-import { generateNameFromPath, getTestEntrypoints } from './test-discovery';
+import { toPosixPath } from '../../utils/path';
+import { findTests, generateNameFromPath, getTestEntrypoints } from './test-discovery';
+
+describe('findTests', () => {
+  let projectSourceRoot: string;
+
+  beforeEach(async () => {
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    projectSourceRoot = await fs.mkdtemp(join(baseTmpDir, 'angular-find-tests-'));
+  });
+
+  afterEach(async () => {
+    await fs.rm(projectSourceRoot, { recursive: true, force: true });
+  });
+
+  it('should return the test files sorted, regardless of the crawl order', async () => {
+    const files = ['z/z.spec.ts', 'a/b/c.spec.ts', 'm.spec.ts', 'a/a.spec.ts', 'b/x/y.spec.ts'];
+    for (const file of files) {
+      const path = join(projectSourceRoot, file);
+      await fs.mkdir(join(path, '..'), { recursive: true });
+      await fs.writeFile(path, '');
+    }
+
+    const result = await findTests(['**/*.spec.ts'], [], projectSourceRoot, projectSourceRoot);
+
+    const expected = files.map((file) => toPosixPath(join(projectSourceRoot, file))).sort();
+    expect(result).toEqual(expected);
+  });
+});
 
 describe('getTestEntrypoints', () => {
   beforeAll(async () => {
