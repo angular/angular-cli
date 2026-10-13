@@ -36,7 +36,7 @@ export async function emitFilesToDisk<T extends EmittableFile = EmittableFile>(
     return;
   }
 
-  const directoryExists = new Set<string>();
+  const directoryCreationPromises = new Map<string, Promise<string | undefined>>();
 
   await runConcurrent(files, MAX_CONCURRENT_WRITES, async (file) => {
     const fullFilePath = resolveDestinationPath(file);
@@ -46,9 +46,13 @@ export async function emitFilesToDisk<T extends EmittableFile = EmittableFile>(
 
     // Ensure output subdirectories exist
     const fileBasePath = dirname(fullFilePath);
-    if (fileBasePath && !directoryExists.has(fileBasePath)) {
-      await mkdir(fileBasePath, { recursive: true });
-      directoryExists.add(fileBasePath);
+    if (fileBasePath) {
+      let mkdirPromise = directoryCreationPromises.get(fileBasePath);
+      if (!mkdirPromise) {
+        mkdirPromise = mkdir(fileBasePath, { recursive: true });
+        directoryCreationPromises.set(fileBasePath, mkdirPromise);
+      }
+      await mkdirPromise;
     }
 
     if (file.origin === 'memory') {
