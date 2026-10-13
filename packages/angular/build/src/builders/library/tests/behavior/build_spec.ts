@@ -173,7 +173,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         ...BASE_OPTIONS,
       });
 
-      const { result, logs } = await harness.executeOnce();
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
       expect(result?.success).toBeFalse();
       expect(logs).toContain(
         jasmine.objectContaining({

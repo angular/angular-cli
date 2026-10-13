@@ -148,14 +148,15 @@ export async function* executeLibraryBuilder(
       watcher,
       buildAction,
     );
+
+    if (isWatchMode && progress) {
+      logger.info('Watch mode enabled. Watching for file changes...');
+    }
+
     yield initialResult;
 
     if (!isWatchMode || !watcher) {
       return;
-    }
-
-    if (progress) {
-      logger.info('Watch mode enabled. Watching for file changes...');
     }
 
     yield* runWatchLoop(
