@@ -140,6 +140,19 @@ describe('chain', () => {
     expect(rulesCalled[2]).toBe(tree2);
     expect(result).toBe(tree3);
   });
+
+  it('works with a large number of rules', async () => {
+    const tree0 = empty();
+    let callCount = 0;
+    const rules: Rule[] = Array.from({ length: 20_000 }, () => () => {
+      callCount++;
+    });
+
+    const result = await lastValueFrom(callRule(chain(rules), tree0, context));
+
+    expect(result).toBe(tree0);
+    expect(callCount).toBe(20_000);
+  });
 });
 
 describe('apply', () => {

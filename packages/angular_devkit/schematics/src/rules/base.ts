@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Observable, concat, map, mapTo, toArray } from 'rxjs';
+import { concat, lastValueFrom, map, mapTo, toArray } from 'rxjs';
 import { FileOperator, Rule, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
@@ -34,18 +34,18 @@ export function empty(): Source {
  */
 export function chain(rules: Iterable<Rule> | AsyncIterable<Rule>): Rule {
   return async (initialTree, context) => {
-    let intermediateTree: Observable<Tree> | undefined;
+    let intermediateTree = initialTree;
     if (Symbol.asyncIterator in rules) {
       for await (const rule of rules) {
-        intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+        intermediateTree = await lastValueFrom(callRule(rule, intermediateTree, context));
       }
     } else {
       for (const rule of rules) {
-        intermediateTree = callRule(rule, intermediateTree ?? initialTree, context);
+        intermediateTree = await lastValueFrom(callRule(rule, intermediateTree, context));
       }
     }
 
-    return () => intermediateTree;
+    return intermediateTree;
   };
 }
 
