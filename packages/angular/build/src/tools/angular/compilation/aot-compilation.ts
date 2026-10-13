@@ -253,7 +253,6 @@ export class AotCompilation extends TypeScriptCompilation {
               angularCompiler,
               usingBuildInfo,
               this.#state?.typeScriptProgram,
-              hostOptions.modifiedFiles,
               filesWithoutDtsSignature,
             ),
           )
@@ -588,7 +587,6 @@ function findAffectedFiles(
   { ignoreForDiagnostics, incrementalCompilation }: ng.NgtscProgram['compiler'],
   includeTTC: boolean,
   oldBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined,
-  modifiedFiles: ReadonlySet<string> | undefined,
   filesWithoutDtsSignature: Set<string>,
 ): Set<ts.SourceFile> {
   const affectedFiles = new Set<ts.SourceFile>();
@@ -620,9 +618,7 @@ function findAffectedFiles(
       }
 
       if (oldProgram && filesWithoutDtsSignature.has(targetSourceFile.fileName)) {
-        const oldSourceFile = !modifiedFiles?.has(targetSourceFile.fileName)
-          ? oldProgram.getSourceFile(targetSourceFile.fileName)
-          : undefined;
+        const oldSourceFile = oldProgram.getSourceFile(targetSourceFile.fileName);
         if (oldSourceFile) {
           let oldDtsText: string | undefined;
           let oldHasDiagnostics = false;
@@ -761,12 +757,8 @@ function populatePreviousDtsSignatures(
 ): void {
   const filesToUpdate: ts.SourceFile[] = [];
   for (const modifiedFile of modifiedFiles) {
-    if (!filesWithoutDtsSignature.delete(modifiedFile)) {
-      continue;
-    }
-
     const sf = oldProgram.getSourceFile(modifiedFile);
-    if (sf && !sf.isDeclarationFile) {
+    if (sf && !sf.isDeclarationFile && filesWithoutDtsSignature.delete(sf.fileName)) {
       filesToUpdate.push(sf);
     }
   }
