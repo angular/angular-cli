@@ -31,7 +31,7 @@ import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
 import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
-import { addTrailingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
+import { joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
   RenderMode,
@@ -170,12 +170,14 @@ async function* handleRoute(options: {
     } = options;
 
     const { redirectTo, loadChildren, loadComponent, children, ɵentryName } = route;
-    if (ɵentryName && loadComponent) {
+    if (ɵentryName && (loadComponent || loadChildren)) {
       appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata);
     }
 
+    const parentRoutes = new Map<string, RouteTreeNodeMetadata>();
+
     if (metadata.renderMode === RenderMode.Prerender) {
-      yield* handleSSGRoute(
+      for await (const result of handleSSGRoute(
         serverConfigRouteTree,
         typeof redirectTo === 'string' ? redirectTo : undefined,
         parentRoute,
@@ -183,7 +185,13 @@ async function* handleRoute(options: {
         parentInjector,
         invokeGetPrerenderParams,
         includePrerenderFallbackRoutes,
-      );
+      )) {
+        if ('error' in result) {
+          yield result;
+        } else {
+          parentRoutes.set(result.route, result);
+        }
+      }
     } else if (redirectTo !== undefined) {
       if (metadata.status && !isValidRedirectResponseCode(metadata.status)) {
         yield {
@@ -192,34 +200,23 @@ async function* handleRoute(options: {
             `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
         };
       } else if (typeof redirectTo === 'string') {
-        yield {
+        parentRoutes.set(metadata.route, {
           ...metadata,
           redirectTo: resolveRedirectTo(parentRoute, redirectTo),
           relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
-        };
+        });
       } else {
-        yield metadata;
+        parentRoutes.set(metadata.route, metadata);
       }
     } else {
-      yield metadata;
+      parentRoutes.set(metadata.route, metadata);
     }
 
-    // Recursively process child routes
-    if (children?.length) {
-      yield* traverseRoutesConfig({
-        ...options,
-        routes: children,
-        parentRoute: currentRoutePath,
-        parentPreloads: metadata.preload,
-      });
-    }
+    // Recursively process child and lazy-loaded routes
+    let childRoutes: Route[] | undefined = children;
+    let childInjector = parentInjector;
 
-    // Load and process lazy-loaded child routes
-    if (loadChildren) {
-      if (ɵentryName) {
-        appendPreloadToMetadata(ɵentryName, entryPointToBrowserMapping, metadata);
-      }
-
+    if (!childRoutes?.length && loadChildren) {
       const routeInjector = route.providers
         ? createEnvironmentInjector(
             route.providers,
@@ -230,16 +227,48 @@ async function* handleRoute(options: {
 
       const loadedChildRoutes = await loadChildrenHelper(route, compiler, routeInjector);
       if (loadedChildRoutes) {
-        const { routes: childRoutes, injector = routeInjector } = loadedChildRoutes;
-        yield* traverseRoutesConfig({
-          ...options,
-          routes: childRoutes,
-          parentInjector: injector,
-          parentRoute: currentRoutePath,
-          parentPreloads: metadata.preload,
-        });
+        childRoutes = loadedChildRoutes.routes;
+        childInjector = loadedChildRoutes.injector ?? routeInjector;
       }
     }
+
+    if (!childRoutes?.length) {
+      yield* parentRoutes.values();
+
+      return;
+    }
+
+    const childResults: (RouteTreeNodeMetadata | { error: string })[] = [];
+    const overriddenParentRoutes = new Set<string>();
+    const traverseChildRoutes = traverseRoutesConfig({
+      ...options,
+      routes: childRoutes,
+      parentInjector: childInjector,
+      parentRoute: currentRoutePath,
+      parentPreloads: metadata.preload,
+    });
+
+    for await (const result of traverseChildRoutes) {
+      if ('error' in result) {
+        childResults.push(result);
+        continue;
+      }
+
+      // If a child route resolves to the exact same path as the parent (i.e., an empty-path child),
+      // let the first matching child override the parent's metadata so accumulated preloads and
+      // redirects from the activated descendant chain are preserved.
+      if (parentRoutes.has(result.route)) {
+        if (!overriddenParentRoutes.has(result.route)) {
+          overriddenParentRoutes.add(result.route);
+          parentRoutes.set(result.route, result);
+        }
+      } else {
+        childResults.push(result);
+      }
+    }
+
+    yield* parentRoutes.values();
+    yield* childResults;
   } catch (error) {
     yield {
       error: `Error in handleRoute for '${options.currentRoutePath}': ${(error as Error).message}`,
@@ -344,10 +373,7 @@ async function* traverseRoutesConfig(options: {
         renderMode: RenderMode.Prerender,
         ...matchedMetaData,
         preload: parentPreloads,
-        // Match Angular router behavior
-        // ['one', 'two', ''] -> 'one/two/'
-        // ['one', 'two', 'three'] -> 'one/two/three'
-        route: path === '' ? addTrailingSlash(currentRoutePath) : currentRoutePath,
+        route: currentRoutePath,
         presentInClientRouter: undefined,
       },
       currentRoutePath,
