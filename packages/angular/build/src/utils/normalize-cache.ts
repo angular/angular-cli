@@ -140,7 +140,7 @@ export function normalizeCacheOptions(
 
   const cacheBasePath = getCacheBasePath(workspaceRoot, path);
   const localCacheBasePath = isAbsolute(path) ? path : resolve(workspaceRoot, path);
-  const normalizedBuilderName = builderName.replaceAll(':', '-');
+  const normalizedBuilderName = builderName.replace('@', '').replaceAll(/[:/]/g, '-');
 
   return {
     enabled: cacheEnabled,
