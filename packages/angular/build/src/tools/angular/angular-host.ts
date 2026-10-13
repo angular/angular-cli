@@ -35,7 +35,10 @@ export interface AngularHostOptions {
  * field. The `version` field is required when used with a TypeScript BuilderProgram.
  * @param program The TypeScript Program instance to patch.
  */
-export function ensureSourceFileVersions(program: ts.Program): void {
+export function ensureSourceFileVersions(
+  program: ts.Program,
+  previousProgram?: ts.BuilderProgram,
+): void {
   const baseGetSourceFiles = program.getSourceFiles;
   // TODO: Update Angular compiler to add versions to all internal files and remove this
   program.getSourceFiles = function (...parameters) {
@@ -45,7 +48,11 @@ export function ensureSourceFileVersions(program: ts.Program): void {
 
     for (const file of files) {
       if (file.version === undefined) {
-        file.version = calculateHash(file.text);
+        const previousFile: (ts.SourceFile & { version?: string }) | undefined =
+          previousProgram && !file.fileName.endsWith('.ngtypecheck.ts')
+            ? previousProgram.getSourceFile(file.fileName)
+            : undefined;
+        file.version = previousFile?.version ?? calculateHash(file.text);
       }
     }
 

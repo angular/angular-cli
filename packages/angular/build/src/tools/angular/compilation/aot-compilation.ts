@@ -37,16 +37,41 @@ import { printSourceFileWithMap } from './typescript-printer';
  */
 const HMR_MODIFIED_FILE_LIMIT = 32;
 
+/**
+ * Extension for Angular type-checking files.
+ */
+const TTC_EXTENSION = '.ngtypecheck.ts';
+
+/**
+ * Length of the `.ngtypecheck.ts` extension.
+ */
+const TTC_EXTENSION_LENGTH = TTC_EXTENSION.length;
+
+/**
+ * Checks if a file is an Angular type-checking shim file.
+ */
+function isNgTypeCheckFile(fileName: string): boolean {
+  return fileName.endsWith(TTC_EXTENSION);
+}
+
+/**
+ * Returns the original filename for a type-checking shim file.
+ */
+function getOriginalFilename(fileName: string): string {
+  return fileName.slice(0, -TTC_EXTENSION_LENGTH) + '.ts';
+}
+
 class AngularCompilationState {
   constructor(
     public readonly angularProgram: ng.NgtscProgram,
     public readonly compilerHost: ng.CompilerHost,
-    public readonly typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
+    public typeScriptProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
     public readonly affectedFiles: ReadonlySet<ts.SourceFile>,
     public readonly templateDiagnosticsOptimization: ng.OptimizeFor,
     public readonly webWorkerTransform: ts.TransformerFactory<ts.SourceFile>,
     public readonly useTypeScriptTranspilation: boolean,
     public readonly diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>(),
+    public readonly filesWithoutDtsSignature = new Set<string>(),
   ) {}
 
   get angularCompiler() {
@@ -103,8 +128,8 @@ export class AotCompilation extends TypeScriptCompilation {
     if (hostOptions.modifiedFiles) {
       this.invalidateFiles(hostOptions.modifiedFiles);
 
-      for (const modifiedFile of hostOptions.modifiedFiles) {
-        if (this.#state) {
+      if (this.#state && hostOptions.modifiedFiles.size > 0) {
+        for (const modifiedFile of hostOptions.modifiedFiles) {
           // Clear package.json cache if a node modules file was modified
           if (!clearPackageJsonCache && modifiedFile.includes('node_modules')) {
             clearPackageJsonCache = true;
@@ -119,6 +144,14 @@ export class AotCompilation extends TypeScriptCompilation {
               staleSourceFiles.set(modifiedFile, sourceFile);
             }
           }
+        }
+
+        if (useTypeChecking || useTypeScriptTranspilation) {
+          populatePreviousDtsSignatures(
+            this.#state.typeScriptProgram,
+            hostOptions.modifiedFiles,
+            this.#state.filesWithoutDtsSignature,
+          );
         }
       }
     }
@@ -154,6 +187,18 @@ export class AotCompilation extends TypeScriptCompilation {
       oldProgram,
       configurationDiagnostics,
     );
+
+    const filesWithoutDtsSignature = this.#state?.filesWithoutDtsSignature ?? new Set<string>();
+    if (!this.#state) {
+      for (const sourceFile of typeScriptProgram.getSourceFiles()) {
+        if (
+          !sourceFile.isDeclarationFile &&
+          !angularCompiler.ignoreForDiagnostics.has(sourceFile)
+        ) {
+          filesWithoutDtsSignature.add(sourceFile.fileName);
+        }
+      }
+    }
 
     await profileAsync('NG_ANALYZE_PROGRAM', () => angularCompiler.analyzeAsync());
 
@@ -203,38 +248,62 @@ export class AotCompilation extends TypeScriptCompilation {
     const affectedFiles =
       useTypeChecking || useTypeScriptTranspilation
         ? profileSync('NG_FIND_AFFECTED', () =>
-            findAffectedFiles(typeScriptProgram, angularCompiler, usingBuildInfo),
+            findAffectedFiles(
+              typeScriptProgram,
+              angularCompiler,
+              usingBuildInfo,
+              this.#state?.typeScriptProgram,
+              filesWithoutDtsSignature,
+            ),
           )
         : new Set<ts.SourceFile>();
 
     const componentResourcesDependencies = new Map<string, string[]>();
 
     // Get all files referenced in the TypeScript/Angular program including component resources
-    const referencedFiles = [
-      ...tsConfigFiles,
-      ...typeScriptProgram
-        .getSourceFiles()
-        .filter((sourceFile) => !angularCompiler.ignoreForEmit.has(sourceFile))
-        .flatMap((sourceFile) => {
-          const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
-          componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
-          // Also invalidate Angular diagnostics for a source file if component resources are modified
-          if (this.#state && hostOptions.modifiedFiles?.size) {
-            for (const resourceDependency of resourceDependencies) {
-              if (
-                hostOptions.modifiedFiles.has(resourceDependency) &&
-                !/\.(?:css|scss|sass|less)$/i.test(resourceDependency)
-              ) {
-                this.#state.diagnosticCache.delete(sourceFile);
-                // Also mark as affected in case changed template affects diagnostics
-                affectedFiles.add(sourceFile);
-              }
-            }
+    const referencedFiles = [...tsConfigFiles];
+    for (const sourceFile of typeScriptProgram.getSourceFiles()) {
+      if (angularCompiler.ignoreForEmit.has(sourceFile)) {
+        continue;
+      }
+
+      referencedFiles.push(sourceFile.fileName);
+      if (sourceFile.isDeclarationFile) {
+        continue;
+      }
+
+      const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
+      componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
+
+      if (resourceDependencies.length === 0) {
+        continue;
+      }
+
+      referencedFiles.push(...resourceDependencies);
+
+      // Also invalidate Angular diagnostics for a source file if component resources are modified
+      if (this.#state && hostOptions.modifiedFiles?.size) {
+        for (const resourceDependency of resourceDependencies) {
+          if (
+            !hostOptions.modifiedFiles.has(resourceDependency) ||
+            /\.(?:css|scss|sass|less)$/i.test(resourceDependency)
+          ) {
+            continue;
           }
 
-          return [sourceFile.fileName, ...resourceDependencies];
-        }),
-    ];
+          this.#state.diagnosticCache.delete(sourceFile);
+
+          const oldSourceFile = this.#state.typeScriptProgram.getSourceFile(sourceFile.fileName);
+          if (oldSourceFile) {
+            this.#state.diagnosticCache.delete(oldSourceFile);
+          }
+
+          // Also mark as affected in case changed template affects diagnostics
+          affectedFiles.add(sourceFile);
+          break;
+        }
+      }
+    }
 
     this.#state = new AngularCompilationState(
       angularProgram,
@@ -245,6 +314,7 @@ export class AotCompilation extends TypeScriptCompilation {
       createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
       useTypeScriptTranspilation,
       this.#state?.diagnosticCache,
+      filesWithoutDtsSignature,
     );
 
     return {
@@ -270,61 +340,92 @@ export class AotCompilation extends TypeScriptCompilation {
     const syntactic = modes & DiagnosticModes.Syntactic;
     const semantic = modes & DiagnosticModes.Semantic;
 
-    // Collect program level diagnostics
-    if (modes & DiagnosticModes.Option) {
-      yield* typeScriptProgram.getConfigFileParsingDiagnostics();
-      yield* angularCompiler.getOptionDiagnostics();
-      yield* typeScriptProgram.getOptionsDiagnostics();
-    }
-    if (syntactic) {
-      yield* typeScriptProgram.getGlobalDiagnostics();
-    }
-
-    // Collect source file specific diagnostics
-    for (const sourceFile of typeScriptProgram.getSourceFiles()) {
-      if (angularCompiler.ignoreForDiagnostics.has(sourceFile)) {
-        continue;
+    try {
+      // Collect program level diagnostics
+      if (modes & DiagnosticModes.Option) {
+        yield* typeScriptProgram.getConfigFileParsingDiagnostics();
+        yield* angularCompiler.getOptionDiagnostics();
+        yield* typeScriptProgram.getOptionsDiagnostics();
       }
-
       if (syntactic) {
-        // TypeScript will use cached diagnostics for files that have not been
-        // changed or affected for this build when using incremental building.
+        yield* typeScriptProgram.getGlobalDiagnostics();
+      }
+
+      // Collect source file specific diagnostics
+      for (const sourceFile of typeScriptProgram.getSourceFiles()) {
+        if (angularCompiler.ignoreForDiagnostics.has(sourceFile)) {
+          continue;
+        }
+
+        if (syntactic) {
+          // TypeScript will use cached diagnostics for files that have not been
+          // changed or affected for this build when using incremental building.
+          yield* profileSync(
+            'NG_DIAGNOSTICS_SYNTACTIC',
+            () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
+            true,
+          );
+        }
+
+        if (!semantic) {
+          continue;
+        }
+
         yield* profileSync(
-          'NG_DIAGNOSTICS_SYNTACTIC',
-          () => typeScriptProgram.getSyntacticDiagnostics(sourceFile),
+          'NG_DIAGNOSTICS_SEMANTIC',
+          () => typeScriptProgram.getSemanticDiagnostics(sourceFile),
           true,
         );
-      }
 
-      if (!semantic) {
-        continue;
-      }
+        // Declaration files cannot have template diagnostics
+        if (sourceFile.isDeclarationFile) {
+          continue;
+        }
 
-      yield* profileSync(
-        'NG_DIAGNOSTICS_SEMANTIC',
-        () => typeScriptProgram.getSemanticDiagnostics(sourceFile),
-        true,
-      );
-
-      // Declaration files cannot have template diagnostics
-      if (sourceFile.isDeclarationFile) {
-        continue;
-      }
-
-      // Only request Angular template diagnostics for affected files to avoid
-      // overhead of template diagnostics for unchanged files.
-      if (affectedFiles.has(sourceFile)) {
-        const angularDiagnostics = profileSync(
-          'NG_DIAGNOSTICS_TEMPLATE',
-          () => angularCompiler.getDiagnosticsForFile(sourceFile, templateDiagnosticsOptimization),
-          true,
-        );
-        diagnosticCache.set(sourceFile, angularDiagnostics);
-        yield* angularDiagnostics;
-      } else {
-        const angularDiagnostics = diagnosticCache.get(sourceFile);
-        if (angularDiagnostics) {
+        // Only request Angular template diagnostics for affected files to avoid
+        // overhead of template diagnostics for unchanged files.
+        if (affectedFiles.has(sourceFile)) {
+          const angularDiagnostics = profileSync(
+            'NG_DIAGNOSTICS_TEMPLATE',
+            () =>
+              angularCompiler.getDiagnosticsForFile(sourceFile, templateDiagnosticsOptimization),
+            true,
+          );
+          diagnosticCache.set(sourceFile, angularDiagnostics);
           yield* angularDiagnostics;
+        } else {
+          const angularDiagnostics = diagnosticCache.get(sourceFile);
+          if (angularDiagnostics) {
+            yield* angularDiagnostics;
+          }
+        }
+      }
+    } finally {
+      // Angular's template typechecker lazily creates `.ngtypecheck.ts` shims in a new `ts.Program`
+      // during `getDiagnosticsForFile`. Sync the builder program with `angularCompiler.getCurrentProgram()`
+      // so the next incremental build does not treat all `.ngtypecheck.ts` files as newly added files.
+      const currentTsProgram = angularCompiler.getCurrentProgram();
+      if (currentTsProgram !== typeScriptProgram.getProgram()) {
+        ensureSourceFileVersions(currentTsProgram, typeScriptProgram);
+        this.#state.typeScriptProgram = ts.createEmitAndSemanticDiagnosticsBuilderProgram(
+          currentTsProgram,
+          this.#state.compilerHost,
+          typeScriptProgram,
+        );
+
+        const baseEmit = currentTsProgram.emit;
+        currentTsProgram.emit = () => ({ emitSkipped: true, diagnostics: [] });
+        try {
+          while (
+            this.#state.typeScriptProgram.getSemanticDiagnosticsOfNextAffectedFile(
+              undefined,
+              () => true,
+            )
+          ) {
+            /* empty */
+          }
+        } finally {
+          currentTsProgram.emit = baseEmit;
         }
       }
     }
@@ -419,7 +520,7 @@ export class AotCompilation extends TypeScriptCompilation {
 
       if (
         angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile) &&
-        !affectedFiles.has(sourceFile)
+        (!useTypeScriptTranspilation || !affectedFiles.has(sourceFile))
       ) {
         continue;
       }
@@ -483,40 +584,138 @@ export class AotCompilation extends TypeScriptCompilation {
 
 function findAffectedFiles(
   builder: ts.EmitAndSemanticDiagnosticsBuilderProgram,
-  { ignoreForDiagnostics }: ng.NgtscProgram['compiler'],
+  { ignoreForDiagnostics, incrementalCompilation }: ng.NgtscProgram['compiler'],
   includeTTC: boolean,
+  oldBuilder: ts.EmitAndSemanticDiagnosticsBuilderProgram | undefined,
+  filesWithoutDtsSignature: Set<string>,
 ): Set<ts.SourceFile> {
   const affectedFiles = new Set<ts.SourceFile>();
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    const result = builder.getSemanticDiagnosticsOfNextAffectedFile(undefined, (sourceFile) => {
-      // If the affected file is a TTC shim, add the shim's original source file.
-      // This ensures that changes that affect TTC are typechecked even when the changes
-      // are otherwise unrelated from a TS perspective and do not result in Ivy codegen changes.
-      // For example, changing @Input property types of a directive used in another component's
-      // template.
-      // A TTC shim is a file that has been ignored for diagnostics and has a filename ending in `.ngtypecheck.ts`.
-      if (ignoreForDiagnostics.has(sourceFile) && sourceFile.fileName.endsWith('.ngtypecheck.ts')) {
-        // This file name conversion relies on internal compiler logic and should be converted
-        // to an official method when available. 15 is length of `.ngtypecheck.ts`
-        const originalFilename = sourceFile.fileName.slice(0, -15) + '.ts';
-        const originalSourceFile = builder.getSourceFile(originalFilename);
-        if (originalSourceFile) {
-          affectedFiles.add(originalSourceFile);
+  // Temporarily disable `isolatedModules` and `verbatimModuleSyntax` while walking affected
+  // files so TypeScript's `getFilesAffectedByUpdatedShapeWhenModuleEmit` yields dependent
+  // `.ngtypecheck.ts` shims to the `ignoreSourceFile` callback when a file's `.d.ts` shape
+  // changes, instead of returning only the modified file itself.
+  const compilerOptions = builder.getCompilerOptions();
+  const prevIsolatedModules = compilerOptions.isolatedModules;
+  const prevVerbatimModuleSyntax = compilerOptions.verbatimModuleSyntax;
+  compilerOptions.isolatedModules = false;
+  compilerOptions.verbatimModuleSyntax = false;
+
+  const program = builder.getProgram();
+  const baseEmit = program.emit;
+  const oldProgram = oldBuilder?.getProgram();
+  program.emit = (
+    targetSourceFile,
+    writeFile,
+    cancellationToken,
+    emitOnly,
+    customTransformers,
+    ...rest
+  ) => {
+    if (targetSourceFile) {
+      if (isNgTypeCheckFile(targetSourceFile.fileName)) {
+        return { emitSkipped: true, diagnostics: [] };
+      }
+
+      if (oldProgram && filesWithoutDtsSignature.has(targetSourceFile.fileName)) {
+        const oldSourceFile = oldProgram.getSourceFile(targetSourceFile.fileName);
+        if (oldSourceFile) {
+          let oldDtsText: string | undefined;
+          let oldHasDiagnostics = false;
+          oldProgram.emit(
+            oldSourceFile,
+            (_fileName, text, _bom, _onError, _sourceFiles, data) => {
+              oldDtsText = text;
+              oldHasDiagnostics = !!(data as { diagnostics?: unknown[] } | undefined)?.diagnostics
+                ?.length;
+            },
+            cancellationToken,
+            emitOnly,
+            customTransformers,
+            ...(rest as []),
+          );
+
+          return baseEmit.call(
+            program,
+            targetSourceFile,
+            (fileName, text, writeByteOrderMark, onError, sourceFiles, data) => {
+              const newHasDiagnostics = !!(data as { diagnostics?: unknown[] } | undefined)
+                ?.diagnostics?.length;
+              if (text !== oldDtsText || newHasDiagnostics !== oldHasDiagnostics) {
+                filesWithoutDtsSignature.delete(targetSourceFile.fileName);
+                writeFile?.(fileName, text, writeByteOrderMark, onError, sourceFiles, data);
+              }
+            },
+            cancellationToken,
+            emitOnly,
+            customTransformers,
+            ...(rest as []),
+          );
+        }
+
+        filesWithoutDtsSignature.delete(targetSourceFile.fileName);
+      }
+    }
+
+    return baseEmit.call(
+      program,
+      targetSourceFile,
+      writeFile,
+      cancellationToken,
+      emitOnly,
+      customTransformers,
+      ...(rest as []),
+    );
+  };
+
+  try {
+    while (
+      builder.getSemanticDiagnosticsOfNextAffectedFile(undefined, (sourceFile) => {
+        if (ignoreForDiagnostics.has(sourceFile)) {
+          // If the affected file is a TTC shim, add the shim's original source file.
+          // This ensures that changes that affect TTC are typechecked even when the changes
+          // are otherwise unrelated from a TS perspective and do not result in Ivy codegen changes.
+          // For example, changing @Input property types of a directive used in another component's
+          // template.
+          // A TTC shim is a file that has been ignored for diagnostics and has a filename ending in `.ngtypecheck.ts`.
+          if (isNgTypeCheckFile(sourceFile.fileName)) {
+            // This file name conversion relies on internal compiler logic and should be converted
+            // to an official method when available. 15 is length of `.ngtypecheck.ts`
+            const originalFilename = getOriginalFilename(sourceFile.fileName);
+            const originalSourceFile = builder.getSourceFile(originalFilename);
+            if (originalSourceFile) {
+              affectedFiles.add(originalSourceFile);
+            }
+          }
+        } else {
+          affectedFiles.add(sourceFile);
         }
 
         return true;
-      }
+      })
+    ) {
+      /* empty */
+    }
+  } finally {
+    program.emit = baseEmit;
+    compilerOptions.isolatedModules = prevIsolatedModules;
+    compilerOptions.verbatimModuleSyntax = prevVerbatimModuleSyntax;
+  }
 
-      return false;
-    });
-
-    if (!result) {
-      break;
+  // Also include files identified by Angular's incremental compilation graph as needing
+  // re-emission or template re-typechecking (such as selector renames or required input changes
+  // that only affect Angular metadata without altering standard TypeScript `.d.ts` signatures).
+  for (const sourceFile of builder.getSourceFiles()) {
+    if (sourceFile.isDeclarationFile || ignoreForDiagnostics.has(sourceFile)) {
+      continue;
     }
 
-    affectedFiles.add(result.affected as ts.SourceFile);
+    if (
+      !incrementalCompilation.safeToSkipEmit(sourceFile) ||
+      incrementalCompilation.priorTypeCheckingResultsFor(sourceFile) === null
+    ) {
+      affectedFiles.add(sourceFile);
+    }
   }
 
   // Add all files with associated template type checking files.
@@ -525,10 +724,10 @@ function findAffectedFiles(
   // info is present.
   if (includeTTC) {
     for (const sourceFile of builder.getSourceFiles()) {
-      if (ignoreForDiagnostics.has(sourceFile) && sourceFile.fileName.endsWith('.ngtypecheck.ts')) {
+      if (ignoreForDiagnostics.has(sourceFile) && isNgTypeCheckFile(sourceFile.fileName)) {
         // This file name conversion relies on internal compiler logic and should be converted
         // to an official method when available. 15 is length of `.ngtypecheck.ts`
-        const originalFilename = sourceFile.fileName.slice(0, -15) + '.ts';
+        const originalFilename = getOriginalFilename(sourceFile.fileName);
         const originalSourceFile = builder.getSourceFile(originalFilename);
         if (originalSourceFile) {
           affectedFiles.add(originalSourceFile);
@@ -538,4 +737,76 @@ function findAffectedFiles(
   }
 
   return affectedFiles;
+}
+
+/**
+ * Ensures `.d.ts` shape signatures are computed on the previous `BuilderProgram` for modified
+ * files before the next `BuilderProgram` is created.
+ *
+ * On the initial build (`oldProgram === undefined`), TypeScript initializes each file's shape
+ * signature to its `.ts` source version hash rather than emitting `.d.ts` declarations for every
+ * file. When a file is modified on a watch rebuild, TypeScript computes its new `.d.ts` signature
+ * and compares it against the previous program's stored signature. Emitting the `.d.ts` signature
+ * on `oldProgram` for the modified file replaces its initial `.ts` version hash with its true
+ * `.d.ts` signature prior to diffing, avoiding false-positive `.d.ts` cascades across importers.
+ */
+function populatePreviousDtsSignatures(
+  oldProgram: ts.EmitAndSemanticDiagnosticsBuilderProgram,
+  modifiedFiles: ReadonlySet<string>,
+  filesWithoutDtsSignature: Set<string>,
+): void {
+  const filesToUpdate: ts.SourceFile[] = [];
+  for (const modifiedFile of modifiedFiles) {
+    const sf = oldProgram.getSourceFile(modifiedFile);
+    if (sf && !sf.isDeclarationFile && filesWithoutDtsSignature.delete(sf.fileName)) {
+      filesToUpdate.push(sf);
+    }
+  }
+
+  if (filesToUpdate.length === 0) {
+    return;
+  }
+
+  const compilerOptions = oldProgram.getCompilerOptions();
+  const prevDeclaration = compilerOptions.declaration;
+  const prevComposite = compilerOptions.composite;
+  const prevNoEmit = compilerOptions.noEmit;
+  const prevNoEmitOnError = compilerOptions.noEmitOnError;
+
+  compilerOptions.declaration = true;
+  compilerOptions.composite = false;
+  compilerOptions.noEmit = false;
+  compilerOptions.noEmitOnError = false;
+
+  const program = oldProgram.getProgram();
+  const baseEmit = program.emit as (
+    targetSourceFile?: ts.SourceFile,
+    writeFile?: ts.WriteFileCallback,
+    cancellationToken?: ts.CancellationToken,
+    emitOnlyDtsFiles?: boolean | number,
+    customTransformers?: ts.CustomTransformers,
+    forceDtsEmit?: boolean,
+  ) => ts.EmitResult;
+  program.emit = (targetSourceFile, writeFile, cancellationToken) =>
+    baseEmit.call(
+      program,
+      targetSourceFile,
+      writeFile,
+      cancellationToken,
+      2, // ts.EmitOnly.BuilderSignature
+      undefined,
+      true, // forceDtsEmit
+    );
+
+  try {
+    for (const sf of filesToUpdate) {
+      oldProgram.emit(sf, () => {}, undefined, true);
+    }
+  } finally {
+    program.emit = baseEmit;
+    compilerOptions.declaration = prevDeclaration;
+    compilerOptions.composite = prevComposite;
+    compilerOptions.noEmit = prevNoEmit;
+    compilerOptions.noEmitOnError = prevNoEmitOnError;
+  }
 }
