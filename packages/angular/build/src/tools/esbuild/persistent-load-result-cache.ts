@@ -32,7 +32,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Cache as PersistentCacheStore } from '../../utils/cache';
-import { mapConcurrent, runConcurrent } from '../../utils/concurrency';
+import { MAX_CONCURRENT_READS, mapConcurrent, runConcurrent } from '../../utils/concurrency';
 import { calculateHash, createContentHash } from '../../utils/hash';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 
@@ -111,9 +111,6 @@ export function extractDiskFilePath(path: string): string | undefined {
 
   return isAbsolute(path) ? path : undefined;
 }
-
-/** Maximum number of concurrent file system read/stat operations to prevent OS file descriptor exhaustion. */
-const MAX_CONCURRENT_READS = 16;
 
 /**
  * Validates that all imported watch files exist on disk and their contents match.
