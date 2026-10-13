@@ -91,8 +91,12 @@ describe('AngularCompilation', () => {
         return this.sourceFiles;
       }
 
-      public async testLoadConfiguration(tsconfig: string, overrides?: CompilerOptionOverrides) {
-        return this.loadConfiguration(tsconfig, overrides);
+      public async testLoadConfiguration(
+        tsconfig: string,
+        overrides?: CompilerOptionOverrides,
+        buildType?: 'application' | 'library',
+      ) {
+        return this.loadConfiguration(tsconfig, overrides, buildType);
       }
     }
 
@@ -162,10 +166,81 @@ describe('AngularCompilation', () => {
         jasmine.any(Map),
       );
       expect(result.rootNames).toEqual(['/src/main.ts']);
+      expect(result.fallbackRootNames).toBeUndefined();
       expect(result.compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
       expect(result.compilerOptions.inlineSources).toBe(true);
       expect(result.warnings.length).toBeGreaterThan(0);
       expect(result.tsConfigFiles).toEqual(['tsconfig.json']);
+    });
+
+    it('filters rootNames to rootFiles while retaining ambient declaration files and setting fallbackRootNames', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const mockReadConfig = jasmine.createSpy('readConfiguration').and.returnValue({
+        options: { target: ts.ScriptTarget.ES2022 },
+        rootNames: [
+          '/src/app/included.spec.ts',
+          '/src/app/excluded.spec.ts',
+          '/src/app/app-module.ts',
+          '/src/env.d.ts',
+          '/src/types.d.mts',
+          '/src/legacy.d.cts',
+        ],
+        errors: [],
+      });
+      spyOn(TypeScriptCompilation, 'loadCompilerCli').and.resolveTo({
+        readConfiguration: mockReadConfig,
+      } as unknown as typeof import('@angular/compiler-cli'));
+
+      const result = await compilation.testLoadConfiguration('tsconfig.spec.json', {
+        rootFiles: ['/src/app/included.spec.ts'],
+      });
+
+      expect(result.rootNames).toEqual([
+        '/src/app/included.spec.ts',
+        '/src/env.d.ts',
+        '/src/types.d.mts',
+        '/src/legacy.d.cts',
+      ]);
+      expect(result.fallbackRootNames).toEqual([
+        '/src/app/included.spec.ts',
+        '/src/app/excluded.spec.ts',
+        '/src/app/app-module.ts',
+        '/src/env.d.ts',
+        '/src/types.d.mts',
+        '/src/legacy.d.cts',
+      ]);
+    });
+
+    it('omits fallbackRootNames when buildType is "library" or when rootFiles covers all tsconfig files', async () => {
+      const compilation = new MockTypeScriptCompilation();
+      const mockReadConfig = jasmine.createSpy('readConfiguration').and.returnValue({
+        options: { target: ts.ScriptTarget.ES2022 },
+        rootNames: ['/src/public-api.ts', '/src/internal.ts', '/src/env.d.ts'],
+        errors: [],
+      });
+      spyOn(TypeScriptCompilation, 'loadCompilerCli').and.resolveTo({
+        readConfiguration: mockReadConfig,
+      } as unknown as typeof import('@angular/compiler-cli'));
+
+      const libraryResult = await compilation.testLoadConfiguration(
+        'tsconfig.lib.json',
+        { rootFiles: ['/src/public-api.ts'] },
+        'library',
+      );
+      expect(libraryResult.rootNames).toEqual(['/src/public-api.ts', '/src/env.d.ts']);
+      expect(libraryResult.fallbackRootNames).toBeUndefined();
+
+      const fullSetResult = await compilation.testLoadConfiguration(
+        'tsconfig.app.json',
+        { rootFiles: ['/src/public-api.ts', '/src/internal.ts'] },
+        'application',
+      );
+      expect(fullSetResult.rootNames).toEqual([
+        '/src/public-api.ts',
+        '/src/internal.ts',
+        '/src/env.d.ts',
+      ]);
+      expect(fullSetResult.fallbackRootNames).toBeUndefined();
     });
 
     it('passes extendedConfigCache to readConfiguration and invalidates entries on config change', async () => {
