@@ -439,7 +439,10 @@ async function bundleAllDts(
   // Ensure Rolldown's native binding is initialized via `loadRolldown()` before evaluating
   // `rolldown-plugin-dts`, which has top-level imports of `rolldown/experimental`.
   await loadRolldown();
-  const { dts } = await import('rolldown-plugin-dts');
+  const { dts } = (await import('rolldown-plugin-dts' as string)) as typeof import(
+    'rolldown-plugin-dts',
+    { with: { 'resolution-mode': 'import' } }
+  );
 
   const dtsSourcemap = !!options.declarationMap;
   // Filter out `rolldown-plugin-dts:resolver` because all `.d.ts` files are already emitted
