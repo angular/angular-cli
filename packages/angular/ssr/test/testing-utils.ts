@@ -17,7 +17,7 @@ import { bootstrapApplication } from '@angular/platform-browser';
 import { RouterOutlet, Routes, provideRouter } from '@angular/router';
 import { type CompactPlan, compileSheet, encodePlan } from 'beasties/compiler';
 import { destroyAngularServerApp } from '../src/app';
-import { ServerAsset, setAngularAppManifest } from '../src/manifest';
+import { AngularAppManifest, ServerAsset, setAngularAppManifest } from '../src/manifest';
 import { ServerRoute, provideServerRendering, withRoutes } from '../src/routes/route-config';
 
 @Component({
@@ -44,6 +44,7 @@ class AppComponent {}
  *                         root component and all its children.
  * @param inlineCriticalCss - An optional record of stylesheet paths to CSS content to be compiled into critical CSS plans.
  * @param nonce - An optional Content Security Policy (CSP) nonce to be used for inlined critical CSS.
+ * @param entryPointToBrowserMapping - An optional mapping of entry-point names to their associated browser bundles.
  */
 export function setAngularAppTestingManifest(
   routes: Routes,
@@ -55,6 +56,7 @@ export function setAngularAppTestingManifest(
   extraProviders: Array<Provider | EnvironmentProviders> = [],
   inlineCriticalCss?: Record<string, string>,
   nonce?: string,
+  entryPointToBrowserMapping?: AngularAppManifest['entryPointToBrowserMapping'],
 ): void {
   destroyAngularServerApp();
 
@@ -70,6 +72,7 @@ export function setAngularAppTestingManifest(
   setAngularAppManifest({
     criticalCssPlans,
     nonce,
+    entryPointToBrowserMapping,
     baseHref,
     locale,
     assets: {
