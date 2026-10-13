@@ -34,7 +34,6 @@ export {
 
 // Tools
 export type { ExternalResultMetadata } from './tools/esbuild/bundler-execution-result';
-export { emitFilesToDisk } from './tools/esbuild/utils';
 export { transformSupportedBrowsersToTargets } from './tools/esbuild/target';
 export { SassCompiler } from './tools/sass/sass-service';
 
@@ -73,6 +72,7 @@ export { ComponentStylesheetBundler } from './tools/esbuild/angular/component-st
 export * from './utils/bundle-calculator';
 export { checkPort } from './utils/check-port';
 export { deleteOutputDir } from './utils/delete-output-dir';
+export { emitFilesToDisk } from './utils/emit-files-to-disk';
 export { type I18nOptions, createI18nOptions, loadTranslations } from './utils/i18n-options';
 export {
   IndexHtmlGenerator,

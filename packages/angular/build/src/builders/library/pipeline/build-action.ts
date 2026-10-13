@@ -7,10 +7,9 @@
  */
 
 import type { BuilderContext } from '@angular-devkit/architect';
-import { constants, copyFile, mkdir, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
-import { emitFilesToDisk } from '../../../tools/esbuild/utils';
+import { emitFilesToDisk } from '../../../utils/emit-files-to-disk';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
 import { collectAssetsToEmit } from './assets';
@@ -27,7 +26,6 @@ export function createSingleBuildState(): SingleBuildState {
     previousBundleResults: new Map(),
     pendingChangedEsmFiles: new Set(),
     pendingChangedDtsFiles: new Set(),
-    directoryExists: new Set(),
   };
 }
 
@@ -90,7 +88,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
   } = actionContext;
 
   const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
-  const { pendingChangedEsmFiles, pendingChangedDtsFiles, directoryExists } = buildState;
+  const { pendingChangedEsmFiles, pendingChangedDtsFiles } = buildState;
 
   if (!modifiedFiles || modifiedFiles.has(posixPackageJsonPath)) {
     buildState.hasEmittedManifests = false;
@@ -231,20 +229,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
   ));
   filesToEmit.push(...resolvedAssetsToEmit);
 
-  await emitFilesToDisk<OutputFile>(filesToEmit, async (file) => {
-    const fullFilePath = path.join(options.outputPath, file.path);
-    const fileBasePath = path.dirname(fullFilePath);
-    if (fileBasePath && !directoryExists.has(fileBasePath)) {
-      await mkdir(fileBasePath, { recursive: true });
-      directoryExists.add(fileBasePath);
-    }
-
-    if (file.type === 'memory') {
-      await writeFile(fullFilePath, file.contents);
-    } else {
-      await copyFile(file.source, fullFilePath, constants.COPYFILE_FICLONE);
-    }
-  });
+  await emitFilesToDisk(filesToEmit, (file) => path.join(options.outputPath, file.path));
 
   buildState.hasEmittedManifests = true;
   buildState.hasEmittedTslib = hasTslibImport;

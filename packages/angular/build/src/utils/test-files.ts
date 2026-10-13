@@ -6,11 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import * as fs from 'node:fs/promises';
 import path from 'node:path';
 import { ResultFile } from '../builders/application/results';
 import { BuildOutputFileType } from '../tools/esbuild/bundler-files';
-import { emitFilesToDisk } from '../tools/esbuild/utils';
+import { emitFilesToDisk } from './emit-files-to-disk';
 
 /**
  * Writes a collection of build result files to a specified directory.
@@ -20,29 +19,11 @@ import { emitFilesToDisk } from '../tools/esbuild/utils';
  * @param files A collection of `ResultFile` objects, representing the build output.
  * @param testDir The absolute path to the directory where the files should be written.
  */
-export async function writeTestFiles(files: readonly ResultFile[], testDir: string): Promise<void> {
-  const directoryExists = new Set<string>();
+export function writeTestFiles(files: readonly ResultFile[], testDir: string): Promise<void> {
   // Writes the test related output files to disk and ensures the containing directories are present
-  await emitFilesToDisk(files, async (file) => {
-    if (file.type !== BuildOutputFileType.Browser && file.type !== BuildOutputFileType.Media) {
-      return;
-    }
-
-    const fullFilePath = path.join(testDir, file.path);
-
-    // Ensure output subdirectories exist
-    const fileBasePath = path.dirname(fullFilePath);
-    if (fileBasePath && !directoryExists.has(fileBasePath)) {
-      await fs.mkdir(fileBasePath, { recursive: true });
-      directoryExists.add(fileBasePath);
-    }
-
-    if (file.origin === 'memory') {
-      // Write file contents
-      await fs.writeFile(fullFilePath, file.contents);
-    } else {
-      // Copy file contents
-      await fs.copyFile(file.inputPath, fullFilePath, fs.constants.COPYFILE_FICLONE);
-    }
-  });
+  return emitFilesToDisk(files, (file) =>
+    file.type === BuildOutputFileType.Browser || file.type === BuildOutputFileType.Media
+      ? path.join(testDir, file.path)
+      : undefined,
+  );
 }

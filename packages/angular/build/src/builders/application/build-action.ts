@@ -333,7 +333,7 @@ function* emitOutputResults(
     incrementalResult.files.push({
       path: destination,
       type: BuildOutputFileType.Browser,
-      inputPath: source,
+      source: source,
       origin: 'disk',
     });
   }
@@ -406,7 +406,7 @@ function createFullResult(
       ...assetFiles.map(({ source, destination }) => ({
         path: destination,
         type: BuildOutputFileType.Browser,
-        inputPath: source,
+        source,
         origin: 'disk' as const,
       })),
       ...outputFiles.map((file) => ({
