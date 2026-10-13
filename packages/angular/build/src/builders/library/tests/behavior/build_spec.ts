@@ -219,6 +219,12 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(logs).toContain(
         jasmine.objectContaining({
           level: 'error',
+          message: jasmine.stringContaining('TS2322'),
+        }),
+      );
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
           message: jasmine.stringMatching(
             /Library bundle generation failed\. \[\d+\.\d{3} seconds\] - \d{4}-\d{2}-\d{2}T/,
           ),
