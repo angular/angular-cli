@@ -594,7 +594,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
             `,
           );
         },
-        async ({ result }) => {
+        ({ result }) => {
           expect(result?.success).toBeTrue();
           const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
           expect(content).toContain('lib-recreated');

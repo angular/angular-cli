@@ -333,7 +333,7 @@ function* emitOutputResults(
     incrementalResult.files.push({
       path: destination,
       type: BuildOutputFileType.Browser,
-      source: source,
+      source,
       origin: 'disk',
     });
   }
