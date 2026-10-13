@@ -283,10 +283,10 @@ describe('normalizeCacheOptions', () => {
     const options = normalizeCacheOptions({}, workspaceRoot, 'my-app', '@angular/build:unit-test');
 
     expect(options.path).toBe(
-      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/angular-build-unit-test'),
     );
     expect(options.localPath).toBe(
-      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/@angular/build-unit-test'),
+      resolve(workspaceRoot, '.angular/cache/0.0.0-PLACEHOLDER/my-app/angular-build-unit-test'),
     );
   });
 });
