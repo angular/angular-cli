@@ -393,25 +393,39 @@ export class PackageManager {
    * Gets the name of the package in the current project.
    */
   async getCurrentPackageName(): Promise<string | undefined> {
+    try {
+      const content = await this.host.readFile(join(this.cwd, 'package.json'));
+      const { name } = JSON.parse(content) as { name?: unknown };
+      if (typeof name === 'string') {
+        return name;
+      }
+    } catch {
+      // Fall back to package manager command if reading file fails
+    }
+
     if (this.descriptor.getPackageNameCommand) {
       try {
         const { stdout } = await this.#run(this.descriptor.getPackageNameCommand);
         if (stdout) {
-          return JSON.parse(stdout);
+          const name = JSON.parse(stdout);
+          if (typeof name === 'string') {
+            return name;
+          }
+
+          // In a workspace member npm prints an object keyed by workspace name instead of a string.
+          if (name && typeof name === 'object') {
+            const values = Object.values(name);
+            if (values.length === 1 && typeof values[0] === 'string') {
+              return values[0];
+            }
+          }
         }
       } catch {
-        // Fall back to reading file if command fails
+        // Ignore command failure
       }
     }
 
-    try {
-      const content = await this.host.readFile(join(this.cwd, 'package.json'));
-      const pkgJson = JSON.parse(content);
-
-      return pkgJson.name;
-    } catch {
-      return undefined;
-    }
+    return undefined;
   }
 
   /**

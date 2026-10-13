@@ -378,6 +378,75 @@ describe('PackageManager', () => {
     });
   });
 
+  describe('getCurrentPackageName', () => {
+    it('should return the name from package.json without running the package manager command', async () => {
+      const pm = new PackageManager(host, '/repo/app', descriptor);
+      const readFileSpy = spyOn(host, 'readFile').and.resolveTo('{"name": "app"}');
+
+      expect(await pm.getCurrentPackageName()).toBe('app');
+      expect(readFileSpy).toHaveBeenCalledWith(jasmine.stringMatching(/package\.json$/));
+      expect(runCommandSpy).not.toHaveBeenCalled();
+    });
+
+    it('should fall back to the package manager command when reading package.json fails', async () => {
+      const pm = new PackageManager(host, '/repo/app/src', descriptor);
+      spyOn(host, 'readFile').and.rejectWith(new Error('ENOENT'));
+      runCommandSpy.and.resolveTo({ stdout: '"app"', stderr: '' });
+
+      expect(await pm.getCurrentPackageName()).toBe('app');
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        descriptor.binary,
+        descriptor.getPackageNameCommand,
+        jasmine.objectContaining({ cwd: '/repo/app/src' }),
+      );
+    });
+
+    it('should extract the package name when npm prints a single-entry workspace object', async () => {
+      const pm = new PackageManager(host, '/repo/apps/app/src', descriptor);
+      spyOn(host, 'readFile').and.rejectWith(new Error('ENOENT'));
+      // Inside a workspace member, `npm pkg get name` prints `{ "app": "app" }` instead of `"app"`.
+      runCommandSpy.and.resolveTo({ stdout: '{\n  "app": "app"\n}', stderr: '' });
+
+      expect(await pm.getCurrentPackageName()).toBe('app');
+    });
+
+    it('should return undefined when npm prints multiple workspace entries and package.json is unavailable', async () => {
+      const pm = new PackageManager(host, '/repo', descriptor);
+      spyOn(host, 'readFile').and.rejectWith(new Error('ENOENT'));
+      runCommandSpy.and.resolveTo({
+        stdout: '{\n  "app-a": "app-a",\n  "app-b": "app-b"\n}',
+        stderr: '',
+      });
+
+      expect(await pm.getCurrentPackageName()).toBeUndefined();
+    });
+  });
+
+  describe('getProjectDependencies', () => {
+    it('should list the dependencies of an npm workspace member', async () => {
+      const pm = new PackageManager(host, '/repo/apps/app', descriptor);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({
+          name: 'monorepo',
+          dependencies: {
+            app: {
+              version: '0.0.0',
+              resolved: 'file:../apps/app',
+              dependencies: { '@angular/core': { version: '22.0.0' } },
+            },
+          },
+        }),
+        stderr: '',
+      });
+      spyOn(host, 'readFile').and.resolveTo('{"name": "app"}');
+
+      const dependencies = await pm.getProjectDependencies();
+
+      expect([...dependencies.keys()]).toEqual(['@angular/core']);
+      expect(dependencies.get('@angular/core')?.version).toBe('22.0.0');
+    });
+  });
+
   describe('initializationError', () => {
     it('should throw initializationError when running commands', async () => {
       const error = new Error('Not installed');
