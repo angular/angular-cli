@@ -24,10 +24,14 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         ...BASE_OPTIONS,
       });
 
-      const { result } = await harness.executeOnce();
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
       expect(result?.success).toBeFalse();
-      expect(result?.error).toContain('allowedNonPeerDependencies');
-      expect(result?.error).toContain('lodash-es');
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
+          message: jasmine.stringMatching(/lodash-es.*allowedNonPeerDependencies/),
+        }),
+      );
     });
 
     it('should succeed build when dependency matches allowedNonPeerDependencies pattern', async () => {

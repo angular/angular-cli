@@ -21,6 +21,17 @@ import { isDeclarationFile, isDeclarationSourceMapFile } from './utils';
 const EMITTED_EXTENSIONS = ['.js', '.mjs', '.cjs', '.d.ts', '.d.mts', '.d.cts'];
 
 /**
+ * Formatted diagnostic messages produced during library compilation.
+ */
+export interface LibraryCompilationDiagnostics {
+  /** Formatted compilation error messages. */
+  readonly errors: string[];
+
+  /** Formatted compilation warning messages. */
+  readonly warnings: string[];
+}
+
+/**
  * Output of the unified library compilation step.
  */
 export interface LibraryCompilationOutput {
@@ -42,8 +53,11 @@ export interface LibraryCompilationOutput {
   /** Cached compilation state for subsequent incremental builds. */
   readonly cache: SingleProgramCache;
 
-  /** Promise that resolves to formatted compilation warnings or rejects on diagnostic errors. */
-  readonly diagnosePromise: Promise<string[]>;
+  /** Whether any component stylesheet bundling errors occurred. */
+  readonly hasStylesheetErrors: boolean;
+
+  /** Promise that resolves to formatted compilation diagnostic errors and warnings. */
+  readonly diagnosePromise: Promise<LibraryCompilationDiagnostics>;
 
   /** Effective declarationMap setting resolved from builder options and tsconfig. */
   readonly declarationMap: boolean;
@@ -145,17 +159,14 @@ export async function compileLibrary(
       'library',
     );
 
-    const emittedFiles =
-      stylesheetErrors.length === 0 ? await compilationInstance.emitAffectedFiles() : [];
+    const hasStylesheetErrors = stylesheetErrors.length > 0;
+    const emittedFiles = hasStylesheetErrors ? [] : await compilationInstance.emitAffectedFiles();
     const diagnosePromise = runDiagnosticsAndFormat(
       compilationInstance,
       stylesheetErrors,
       stylesheetWarnings,
       colors,
     );
-
-    // Prevent unhandled promise rejection if an error occurs before diagnosePromise is awaited.
-    diagnosePromise.catch(() => {});
 
     const esmFiles = cached?.esmFiles ?? new Map<string, string>();
     const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
@@ -225,6 +236,7 @@ export async function compileLibrary(
         dtsFiles,
         failedFiles: failedFiles.size > 0 ? failedFiles : undefined,
       },
+      hasStylesheetErrors,
       diagnosePromise,
       declarationMap: !!compilerOptions.declarationMap,
       compilationMode: compilerOptions.compilationMode === 'full' ? 'full' : 'partial',
@@ -238,34 +250,31 @@ export async function compileLibrary(
 }
 
 /**
- * Validates stylesheet bundling results and runs TypeScript/Angular diagnostics.
+ * Formats stylesheet bundling diagnostics and TypeScript/Angular diagnostics.
  *
  * @param compilationInstance The active Angular compilation instance.
  * @param stylesheetErrors List of stylesheet bundling errors.
  * @param stylesheetWarnings List of stylesheet bundling warnings.
  * @param colors Whether diagnostic messages should be formatted with ANSI colors.
- * @returns A promise resolving to formatted warning messages.
- * @throws If stylesheet bundling errors or compilation errors occur.
+ * @returns A promise resolving to the formatted diagnostic errors and warnings.
  */
 async function runDiagnosticsAndFormat(
   compilationInstance: AngularCompilation,
   stylesheetErrors: PartialMessage[],
   stylesheetWarnings: PartialMessage[],
   colors: boolean,
-): Promise<string[]> {
-  if (stylesheetErrors.length > 0) {
-    const formatted = await formatMessages(stylesheetErrors, { kind: 'error', color: colors });
-
-    throw new Error(`Failed to bundle stylesheet:\n${formatted.join('\n')}`);
-  }
-
+): Promise<LibraryCompilationDiagnostics> {
+  const errorsOut: string[] = [];
   const warningsOut: string[] = [];
 
-  if (useTypeChecking) {
+  if (stylesheetErrors.length > 0) {
+    const formatted = await formatMessages(stylesheetErrors, { kind: 'error', color: colors });
+    errorsOut.push(...formatted);
+  } else if (useTypeChecking) {
     const { errors, warnings } = await compilationInstance.diagnoseFiles();
     if (errors?.length) {
-      const errorMessages = await formatMessages(errors, { kind: 'error', color: colors });
-      throw new Error(`Compilation failed with errors:\n${errorMessages.join('\n')}`);
+      const formatted = await formatMessages(errors, { kind: 'error', color: colors });
+      errorsOut.push(...formatted);
     }
 
     if (warnings?.length) {
@@ -282,5 +291,8 @@ async function runDiagnosticsAndFormat(
     warningsOut.push(...formattedStyleWarnings);
   }
 
-  return warningsOut;
+  return {
+    errors: errorsOut,
+    warnings: warningsOut,
+  };
 }

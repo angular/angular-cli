@@ -10,13 +10,29 @@ import type { BuilderContext } from '@angular-devkit/architect';
 import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import { emitFilesToDisk } from '../../../utils/emit-files-to-disk';
+import { assertIsError } from '../../../utils/error';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
 import { collectAssetsToEmit } from './assets';
-import { type BundleEntryPointInput, bundleEntryPoints } from './bundler';
-import { compileLibrary } from './compilation';
+import { bundleEntryPoints } from './bundler';
+import { type LibraryCompilationDiagnostics, compileLibrary } from './compilation';
+import { collectEntryPointsToBundle } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
 import type { DiskOutputFile, OutputFile } from './utils';
+
+/**
+ * Result of executing a single library build iteration.
+ */
+export interface BuildActionResult {
+  /** Formatted error messages produced during the build. */
+  errors: string[];
+
+  /** Formatted warning messages produced during the build. */
+  warnings: string[];
+
+  /** Informational log messages produced during the build. */
+  logs: string[];
+}
 
 /**
  * Creates a fresh {@link SingleBuildState} instance.
@@ -76,16 +92,19 @@ export interface BuildActionContext {
  *
  * @param actionContext The build action state and configuration.
  */
-export async function buildAction(actionContext: BuildActionContext): Promise<void> {
+export async function buildAction(actionContext: BuildActionContext): Promise<BuildActionResult> {
   const {
     options,
-    context,
     stylesheetBundler,
     isWatchMode,
     watchedCompilationFiles,
     buildState,
     modifiedFiles,
   } = actionContext;
+
+  const errors: string[] = [];
+  const warnings: string[] = [];
+  const logs: string[] = [];
 
   const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
   const { pendingChangedEsmFiles, pendingChangedDtsFiles } = buildState;
@@ -102,140 +121,150 @@ export async function buildAction(actionContext: BuildActionContext): Promise<vo
     pendingChangedEsmFiles.size > 0 ||
     pendingChangedDtsFiles.size > 0 ||
     hasModifiedWatchedFile(modifiedFiles, watchedCompilationFiles, posixPackageJsonPath);
-  const shouldGenerateManifests = !buildState.hasEmittedManifests;
 
-  if (shouldGenerateManifests) {
-    verifyAllowedDependencies(options);
-  }
+  try {
+    if (!buildState.hasEmittedManifests) {
+      const dependencyErrors = verifyAllowedDependencies(options);
+      if (dependencyErrors.length > 0) {
+        errors.push(...dependencyErrors);
 
-  const filesToEmit: OutputFile[] = [];
-
-  if (shouldCompileEntryPoints) {
-    buildState.hasCompilationError = true;
-    buildState.hasEntryPointsChanges = false;
-
-    const {
-      esmFiles,
-      dtsFiles,
-      changedEsmFiles,
-      changedDtsFiles,
-      referencedFiles,
-      cache,
-      diagnosePromise,
-      declarationMap,
-      compilationMode,
-    } = await compileLibrary(
-      options.entryPoints.values(),
-      options,
-      stylesheetBundler,
-      buildState.singleProgramCache,
-      modifiedFiles,
-    );
-    buildState.singleProgramCache = cache;
-    if (buildState.compilationMode !== compilationMode) {
-      buildState.compilationMode = compilationMode;
-      buildState.hasEmittedManifests = false;
-    }
-
-    for (const file of referencedFiles) {
-      watchedCompilationFiles.add(file);
-    }
-
-    for (const file of changedEsmFiles) {
-      pendingChangedEsmFiles.add(file);
-    }
-    for (const file of changedDtsFiles) {
-      pendingChangedDtsFiles.add(file);
-    }
-
-    const itemsToBundle: BundleEntryPointInput[] = [];
-
-    for (const entryPoint of options.entryPoints.values()) {
-      const previousBundleResult = buildState.previousBundleResults.get(entryPoint.name);
-      const hasEsmChanges =
-        !previousBundleResult ||
-        hasEntryPointChanges(previousBundleResult.esmModuleIds, pendingChangedEsmFiles);
-      const hasDtsChanges =
-        !previousBundleResult ||
-        hasEntryPointChanges(previousBundleResult.dtsModuleIds, pendingChangedDtsFiles);
-
-      if (hasEsmChanges || hasDtsChanges) {
-        context.logger.info(`Compiling ${entryPoint.displayName}...`);
-        itemsToBundle.push({
-          entryPoint,
-          hasEsmChanges,
-          hasDtsChanges,
-          previousBundleResult,
-        });
+        return { errors, warnings, logs };
       }
     }
 
-    let bundleOutput: Awaited<ReturnType<typeof bundleEntryPoints>>;
-    let warnings: string[];
-    try {
-      [bundleOutput, warnings] = await Promise.all([
-        bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, {
-          ...options,
-          declarationMap,
-          compilationMode,
-        }),
+    const filesToEmit: OutputFile[] = [];
+
+    if (shouldCompileEntryPoints) {
+      buildState.hasCompilationError = true;
+      buildState.hasEntryPointsChanges = false;
+
+      const {
+        esmFiles,
+        dtsFiles,
+        changedEsmFiles,
+        changedDtsFiles,
+        referencedFiles,
+        cache,
+        hasStylesheetErrors,
         diagnosePromise,
-      ]);
-    } catch (error) {
-      // Prioritize TypeScript/Angular diagnostic errors over secondary bundler failures.
-      await diagnosePromise;
-      throw error;
+        declarationMap,
+        compilationMode,
+      } = await compileLibrary(
+        options.entryPoints.values(),
+        options,
+        stylesheetBundler,
+        buildState.singleProgramCache,
+        modifiedFiles,
+      );
+      buildState.singleProgramCache = cache;
+      if (buildState.compilationMode !== compilationMode) {
+        buildState.compilationMode = compilationMode;
+        buildState.hasEmittedManifests = false;
+      }
+
+      for (const file of referencedFiles) {
+        watchedCompilationFiles.add(file);
+      }
+      for (const file of changedEsmFiles) {
+        pendingChangedEsmFiles.add(file);
+      }
+      for (const file of changedDtsFiles) {
+        pendingChangedDtsFiles.add(file);
+      }
+
+      const itemsToBundle = collectEntryPointsToBundle(options, buildState, logs);
+
+      let bundleOutput: Awaited<ReturnType<typeof bundleEntryPoints>> | undefined;
+      let diagnostics: LibraryCompilationDiagnostics;
+      if (hasStylesheetErrors) {
+        diagnostics = await diagnosePromise;
+      } else {
+        try {
+          [bundleOutput, diagnostics] = await Promise.all([
+            bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, {
+              ...options,
+              declarationMap,
+              compilationMode,
+            }),
+            diagnosePromise,
+          ]);
+        } catch (error) {
+          assertIsError(error);
+          // Prioritize TypeScript/Angular diagnostic errors over secondary bundler failures.
+          diagnostics = await diagnosePromise;
+          if (diagnostics.errors.length === 0) {
+            errors.push(error.message);
+          }
+        }
+      }
+
+      warnings.push(...diagnostics.warnings, ...(bundleOutput?.warnings ?? []));
+      if (diagnostics.errors.length > 0 || errors.length > 0 || !bundleOutput) {
+        errors.push(...diagnostics.errors);
+
+        return { errors, warnings, logs };
+      }
+
+      buildState.hasCompilationError = false;
+      pendingChangedEsmFiles.clear();
+      pendingChangedDtsFiles.clear();
+
+      filesToEmit.push(...bundleOutput.filesToEmit);
+      for (const [name, bundleResult] of bundleOutput.bundleResults) {
+        buildState.previousBundleResults.set(name, bundleResult);
+      }
     }
 
-    buildState.hasCompilationError = false;
-    pendingChangedEsmFiles.clear();
-    pendingChangedDtsFiles.clear();
-
-    for (const warning of [...warnings, ...bundleOutput.warnings]) {
-      context.logger.warn(warning);
+    let hasTslibImport = false;
+    for (const entryPoint of options.entryPoints.values()) {
+      if (buildState.previousBundleResults.get(entryPoint.name)?.hasTslibImport) {
+        hasTslibImport = true;
+        break;
+      }
     }
 
-    filesToEmit.push(...bundleOutput.filesToEmit);
-    for (const [name, bundleResult] of bundleOutput.bundleResults) {
-      buildState.previousBundleResults.set(name, bundleResult);
+    if (!buildState.hasEmittedManifests || buildState.hasEmittedTslib !== hasTslibImport) {
+      filesToEmit.push(
+        ...(await generatePackageManifests(
+          {
+            ...options,
+            compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
+          },
+          isWatchMode,
+          hasTslibImport,
+        )),
+      );
     }
+
+    const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
+      options.assets,
+      options.workspaceRoot,
+      buildState.hasEmittedAssets ? modifiedFiles : undefined,
+    ));
+    filesToEmit.push(...resolvedAssetsToEmit);
+
+    await emitFilesToDisk(filesToEmit, (file) => path.join(options.outputPath, file.path));
+
+    buildState.hasEmittedManifests = true;
+    buildState.hasEmittedTslib = hasTslibImport;
+    buildState.hasEmittedAssets = true;
+  } catch (error) {
+    assertIsError(error);
+    errors.push(error.message);
   }
 
-  let hasTslibImport = false;
-  for (const entryPoint of options.entryPoints.values()) {
-    if (buildState.previousBundleResults.get(entryPoint.name)?.hasTslibImport) {
-      hasTslibImport = true;
-      break;
-    }
-  }
-
-  if (!buildState.hasEmittedManifests || buildState.hasEmittedTslib !== hasTslibImport) {
-    filesToEmit.push(
-      ...(await generatePackageManifests(
-        {
-          ...options,
-          compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
-        },
-        isWatchMode,
-        hasTslibImport,
-      )),
-    );
-  }
-
-  const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
-    options.assets,
-    options.workspaceRoot,
-    buildState.hasEmittedAssets ? modifiedFiles : undefined,
-  ));
-  filesToEmit.push(...resolvedAssetsToEmit);
-
-  await emitFilesToDisk(filesToEmit, (file) => path.join(options.outputPath, file.path));
-
-  buildState.hasEmittedManifests = true;
-  buildState.hasEmittedTslib = hasTslibImport;
-  buildState.hasEmittedAssets = true;
+  return { errors, warnings, logs };
 }
 
+/**
+ * Checks whether any modified file (excluding `package.json`) is part of the
+ * tracked compilation file set.
+ *
+ * @param modifiedFiles Set of POSIX file paths modified since the last build.
+ * @param watchedCompilationFiles Set of POSIX file paths tracked for compilation.
+ * @param posixPackageJsonPath The normalized POSIX path to the library's `package.json`.
+ * @returns `true` if a watched compilation file was modified; otherwise `false`.
+ */
 export function hasModifiedWatchedFile(
   modifiedFiles: ReadonlySet<string>,
   watchedCompilationFiles: ReadonlySet<string>,
@@ -250,36 +279,29 @@ export function hasModifiedWatchedFile(
   return false;
 }
 
-function hasEntryPointChanges(
-  moduleIds: ReadonlySet<string>,
-  changedFiles: ReadonlySet<string>,
-): boolean {
-  if (changedFiles.size === 0) {
-    return false;
-  }
-
-  for (const file of changedFiles) {
-    if (moduleIds.has(file)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-function verifyAllowedDependencies(options: NormalizedLibraryOptions): void {
+/**
+ * Validates that all direct and optional dependencies in `package.json` are
+ * permitted by `allowedNonPeerDependencies`.
+ *
+ * @param options The normalized library builder options.
+ * @returns An array of error messages for any disallowed dependencies.
+ */
+function verifyAllowedDependencies(options: NormalizedLibraryOptions): string[] {
   const { packageJson, allowedNonPeerDependencies } = options;
   const dependencies = {
     ...(packageJson.dependencies ?? {}),
     ...(packageJson.optionalDependencies ?? {}),
   };
 
+  const errors: string[] = [];
   for (const dep of Object.keys(dependencies)) {
     if (!allowedNonPeerDependencies.some((regex) => regex.test(dep))) {
-      throw new Error(
+      errors.push(
         `Dependency '${dep}' must be explicitly allowed using the 'allowedNonPeerDependencies' option, ` +
           `or moved to 'peerDependencies' in 'package.json'.`,
       );
     }
   }
+
+  return errors;
 }
