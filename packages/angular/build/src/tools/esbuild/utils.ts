@@ -17,11 +17,7 @@ import { OutputMode } from '../../builders/application/schema';
 import { BudgetCalculatorResult } from '../../utils/bundle-calculator';
 
 import { BundleStats, generateEsbuildBuildStatsTable } from '../../utils/stats-table';
-import {
-  BuildOutputAsset,
-  ExecutionResult,
-  PrerenderedRoutesRecord,
-} from './bundler-execution-result';
+import { ExecutionResult, PrerenderedRoutesRecord } from './bundler-execution-result';
 import { type BuildOutputFile, BuildOutputFileType, type InitialFileRecord } from './bundler-files';
 
 export function logBuildStats(
@@ -210,24 +206,6 @@ export function getFeatureSupport(nativeAsyncAwait: boolean): BuildOptions['supp
     // For more details: https://bugs.chromium.org/p/v8/issues/detail?id=11536
     'object-rest-spread': false,
   };
-}
-
-const MAX_CONCURRENT_WRITES = 64;
-export async function emitFilesToDisk<T = BuildOutputAsset | BuildOutputFile>(
-  files: readonly T[],
-  writeFileCallback: (file: T) => Promise<void>,
-): Promise<void> {
-  // Write files in groups of MAX_CONCURRENT_WRITES to avoid too many open files
-  for (let fileIndex = 0; fileIndex < files.length;) {
-    const groupMax = Math.min(fileIndex + MAX_CONCURRENT_WRITES, files.length);
-
-    const actions = [];
-    while (fileIndex < groupMax) {
-      actions.push(writeFileCallback(files[fileIndex++]));
-    }
-
-    await Promise.all(actions);
-  }
 }
 
 interface BuildManifest {

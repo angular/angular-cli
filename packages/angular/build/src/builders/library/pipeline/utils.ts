@@ -26,7 +26,7 @@ export const TYPES_OUTPUT_DIR = 'types';
  * Represents an in-memory file to be emitted to disk.
  */
 export interface MemoryOutputFile {
-  type: 'memory';
+  origin: 'memory';
 
   /** The destination path where the file should be written. */
   path: string;
@@ -39,7 +39,7 @@ export interface MemoryOutputFile {
  * Represents an existing file on disk to be copied to a destination path.
  */
 export interface DiskOutputFile {
-  type: 'disk';
+  origin: 'disk';
 
   /** The path to the source file on disk. */
   source: string;
@@ -62,7 +62,7 @@ export type OutputFile = MemoryOutputFile | DiskOutputFile;
  */
 export function createDiskOutputFile(source: string, path: string): DiskOutputFile {
   return {
-    type: 'disk',
+    origin: 'disk',
     source,
     path,
   };
@@ -80,7 +80,7 @@ export function createMemoryOutputFile(
   contents: string | Uint8Array | Record<string, unknown>,
 ): MemoryOutputFile {
   return {
-    type: 'memory',
+    origin: 'memory',
     path,
     contents:
       typeof contents === 'string' || contents instanceof Uint8Array

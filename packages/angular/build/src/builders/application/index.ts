@@ -11,9 +11,10 @@ import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
-import { createJsonBuildManifest, emitFilesToDisk } from '../../tools/esbuild/utils';
+import { createJsonBuildManifest } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
+import { emitFilesToDisk } from '../../utils/emit-files-to-disk';
 import { bazelEsbuildPluginPath, useJSONBuildLogs } from '../../utils/environment-options';
 import { isSubDirectory } from '../../utils/path';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
@@ -197,37 +198,14 @@ export async function* buildApplication(
     }
 
     // Writes the output files to disk and ensures the containing directories are present
-    const directoryExists = new Set<string>();
     try {
-      await emitFilesToDisk(result.files, async (file) => {
-        if (
-          outputOptions.ignoreServer &&
-          (file.type === BuildOutputFileType.ServerApplication ||
-            file.type === BuildOutputFileType.ServerRoot)
-        ) {
-          return;
-        }
-
-        const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
-
-        // Ensure output subdirectories exist
-        const fileBasePath = path.dirname(fullFilePath);
-        if (fileBasePath && !directoryExists.has(fileBasePath)) {
-          await fs.mkdir(fileBasePath, { recursive: true });
-          directoryExists.add(fileBasePath);
-        }
-
-        if (file.origin === 'memory') {
-          // Write file contents
-          await fs.writeFile(fullFilePath, file.contents);
-        } else {
-          // Copy file contents
-          await fs.cp(file.inputPath, fullFilePath, {
-            mode: fs.constants.COPYFILE_FICLONE,
-            preserveTimestamps: true,
-          });
-        }
-      });
+      await emitFilesToDisk(result.files, (file) =>
+        outputOptions.ignoreServer &&
+        (file.type === BuildOutputFileType.ServerApplication ||
+          file.type === BuildOutputFileType.ServerRoot)
+          ? undefined
+          : generateFullPath(file.path, file.type, outputOptions),
+      );
     } catch (error) {
       context.logger.error(error instanceof Error ? error.message : String(error));
       yield { success: false };

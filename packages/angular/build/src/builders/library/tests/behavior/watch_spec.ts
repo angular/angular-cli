@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { rm } from 'node:fs/promises';
 import { executeLibraryBuilder } from '../../builder';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
@@ -560,6 +561,43 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           expect(result?.success).toBeTrue();
           const pkg = JSON.parse(harness.readFile('dist/lib/package.json'));
           expect(pkg.dependencies).toBeUndefined();
+        },
+      ]);
+    });
+
+    it('should recreate deleted output directories on subsequent watch rebuilds', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.hasFile('dist/lib/fesm2022/lib.mjs')).toBeTrue();
+
+          // Remove output subdirectory externally between rebuilds
+          await rm(harness.resolvePath('dist/lib/fesm2022'), { recursive: true, force: true });
+          expect(harness.hasFile('dist/lib/fesm2022/lib.mjs')).toBeFalse();
+
+          // Trigger a rebuild
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.ts',
+            `
+            import { Component } from '@angular/core';
+
+            @Component({
+              selector: 'lib-recreated',
+              template: '<span>Recreated</span>',
+            })
+            export class LibComponent {}
+            `,
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
+          expect(content).toContain('lib-recreated');
         },
       ]);
     });

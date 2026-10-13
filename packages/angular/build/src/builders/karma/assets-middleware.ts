@@ -60,7 +60,7 @@ export class AngularAssetsMiddleware {
     // https://github.com/karma-runner/karma/blob/84f85e7016efc2266fa6b3465f494a3fa151c85c/lib/middleware/common.js#L10
     switch (file.origin) {
       case 'disk':
-        this.serveFile(file.inputPath, undefined, res, undefined, undefined, /* doNotCache */ true);
+        this.serveFile(file.source, undefined, res, undefined, undefined, /* doNotCache */ true);
         break;
       case 'memory':
         // Include pathname to help with Content-Type headers.

@@ -322,7 +322,7 @@ async function loadResultFile(file: ResultFile): Promise<string> {
     return textDecoder.decode(file.contents);
   }
 
-  return readFile(file.inputPath, 'utf-8');
+  return readFile(file.source, 'utf-8');
 }
 
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {

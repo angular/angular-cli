@@ -153,7 +153,4 @@ export interface SingleBuildState {
 
   /** Whether entry points in package.json changed since the last compilation. */
   hasEntryPointsChanges?: boolean;
-
-  /** Cache of output directory paths known to exist on disk. */
-  directoryExists: Set<string>;
 }

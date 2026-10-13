@@ -40,7 +40,7 @@ export function updateResultRecord(
 ): void {
   if (file.origin === 'disk') {
     assetFiles.set('/' + normalizePath(file.path), {
-      source: normalizePath(file.inputPath),
+      source: normalizePath(file.source),
       updated: !initial,
     });
 
