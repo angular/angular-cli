@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import type * as ParcelWatcher from '@parcel/watcher';
 import assert from 'node:assert';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -13,6 +14,7 @@ import { setTimeout } from 'node:timers/promises';
 import {
   type BuildWatcher,
   ChangedFiles,
+  ParcelExternalManager,
   createWatcher,
   extractNodeModulesPackageDir,
   getDirectoryPath,
@@ -829,5 +831,364 @@ describe('Watcher', () => {
         fs.rmSync(externalDir, { recursive: true, force: true });
       }
     }, 10000);
+
+    it('should detect changes across multiple external directories when using @parcel/watcher', async () => {
+      const externalRoot = fs.mkdtempSync(path.join(TMP_DIR, 'parcel-external-spec-'));
+      let watcher: BuildWatcher | undefined;
+
+      try {
+        const lib1Dir = path.join(externalRoot, 'libs', 'lib-1', 'src');
+        const lib2Dir = path.join(externalRoot, 'libs', 'lib-2', 'src');
+        fs.mkdirSync(lib1Dir, { recursive: true });
+        fs.mkdirSync(lib2Dir, { recursive: true });
+
+        const file1 = path.join(lib1Dir, 'index.ts');
+        const file2 = path.join(lib2Dir, 'index.ts');
+        fs.writeFileSync(file1, 'export const a = 1;');
+        fs.writeFileSync(file2, 'export const b = 1;');
+
+        // Backdate initial file timestamps to earlier than `initTime - 1000` so that any
+        // delayed initial FSEvents replay from file creation is ignored by the watcher.
+        const pastTime = new Date(Date.now() - 5000);
+        fs.utimesSync(file1, pastTime, pastTime);
+        fs.utimesSync(file2, pastTime, pastTime);
+
+        watcher = await createWatcher({ cwd: tempDir });
+        watcher.add([file1, file2]);
+
+        await setTimeout(150);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+
+        let nextPromise = iterator.next();
+        fs.writeFileSync(file1, 'export const a = 2;');
+        let result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('lib-1'))).toBeTrue();
+
+        nextPromise = iterator.next();
+        fs.writeFileSync(file2, 'export const b = 2;');
+        result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('lib-2'))).toBeTrue();
+      } finally {
+        await watcher?.close();
+        fs.rmSync(externalRoot, { recursive: true, force: true });
+      }
+    }, 10000);
+  });
+
+  describe('ParcelExternalManager', () => {
+    function createMockParcelWatcher(options?: {
+      failAfter?: number;
+      onSubscribe?: (dir: string, opts?: ParcelWatcher.Options) => void;
+    }) {
+      const activeDirs = new Set<string>();
+      const subscribeHistory: { dir: string; options?: ParcelWatcher.Options }[] = [];
+      let totalCalls = 0;
+
+      const mockWatcher = {
+        subscribe: jasmine
+          .createSpy('subscribe')
+          .and.callFake(
+            async (
+              dir: string,
+              _cb: ParcelWatcher.SubscribeCallback,
+              opts?: ParcelWatcher.Options,
+            ): Promise<ParcelWatcher.AsyncSubscription> => {
+              totalCalls++;
+              options?.onSubscribe?.(dir, opts);
+              if (options?.failAfter !== undefined && activeDirs.size >= options.failAfter) {
+                throw new Error('Error starting FSEvents stream');
+              }
+              activeDirs.add(dir);
+              subscribeHistory.push({ dir, options: opts });
+
+              return {
+                unsubscribe: async () => {
+                  activeDirs.delete(dir);
+                },
+              };
+            },
+          ),
+      } as unknown as typeof ParcelWatcher;
+
+      return {
+        mockWatcher,
+        activeDirs,
+        subscribeHistory,
+        getTotalCalls: () => totalCalls,
+      };
+    }
+
+    it('should batch synchronous watchFile calls and subsume child directories added before parent', async () => {
+      const { mockWatcher, activeDirs, getTotalCalls } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        undefined,
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+      );
+
+      // Add deeper child directories first, then their parent directory in the same synchronous turn
+      manager.watchFile(
+        '/monorepo/libs/lib-1/src/components/button/button.ts',
+        '/monorepo/libs/lib-1/src/components/button/button.ts',
+      );
+      manager.watchFile(
+        '/monorepo/libs/lib-1/src/components/card/card.ts',
+        '/monorepo/libs/lib-1/src/components/card/card.ts',
+      );
+      manager.watchFile('/monorepo/libs/lib-1/src/index.ts', '/monorepo/libs/lib-1/src/index.ts');
+
+      await manager.flush();
+
+      // Should only ever have subscribed once to the parent '/monorepo/libs/lib-1/src'
+      expect(getTotalCalls()).toBe(1);
+      expect(Array.from(activeDirs)).toEqual(['/monorepo/libs/lib-1/src']);
+
+      await manager.close();
+    });
+
+    it('should normalize external node_modules paths to their package root directory', async () => {
+      const { mockWatcher, activeDirs, getTotalCalls } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        undefined,
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+      );
+
+      manager.watchFile(
+        '/monorepo/node_modules/my-pkg/fesm2022/my-pkg.mjs',
+        '/monorepo/node_modules/my-pkg/fesm2022/my-pkg.mjs',
+      );
+      manager.watchFile(
+        '/monorepo/node_modules/my-pkg/esm2022/sub/helper.mjs',
+        '/monorepo/node_modules/my-pkg/esm2022/sub/helper.mjs',
+      );
+      manager.watchFile(
+        '/monorepo/node_modules/@scope/scoped-pkg/fesm2022/index.mjs',
+        '/monorepo/node_modules/@scope/scoped-pkg/fesm2022/index.mjs',
+      );
+      manager.watchFile(
+        '/monorepo/node_modules/@scope/scoped-pkg/package.json',
+        '/monorepo/node_modules/@scope/scoped-pkg/package.json',
+      );
+
+      await manager.flush();
+
+      expect(getTotalCalls()).toBe(2);
+      expect(Array.from(activeDirs).sort()).toEqual([
+        '/monorepo/node_modules/@scope/scoped-pkg',
+        '/monorepo/node_modules/my-pkg',
+      ]);
+
+      // Removing one file from my-pkg should keep the package subscription active
+      manager.removeFile('/monorepo/node_modules/my-pkg/fesm2022/my-pkg.mjs');
+      await manager.flush();
+      expect(activeDirs.has('/monorepo/node_modules/my-pkg')).toBeTrue();
+
+      // Removing the last file from my-pkg should unsubscribe the package directory
+      manager.removeFile('/monorepo/node_modules/my-pkg/esm2022/sub/helper.mjs');
+      await manager.flush();
+      expect(activeDirs.has('/monorepo/node_modules/my-pkg')).toBeFalse();
+      expect(Array.from(activeDirs)).toEqual(['/monorepo/node_modules/@scope/scoped-pkg']);
+
+      await manager.close();
+    });
+
+    it('should coalesce large numbers of external library and node_modules directories into common ancestors within budget', async () => {
+      const { mockWatcher, activeDirs, getTotalCalls } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        undefined,
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+        64,
+      );
+
+      // Simulate 600 sibling libraries and 200 hoisted node_modules packages (800 external dirs)
+      for (let i = 0; i < 600; i++) {
+        const file = `/monorepo/libs/lib-${i}/src/index.ts`;
+        manager.watchFile(file, file);
+      }
+      for (let i = 0; i < 200; i++) {
+        const file = `/monorepo/node_modules/pkg-${i}/dist/index.mjs`;
+        manager.watchFile(file, file);
+      }
+
+      await manager.flush();
+
+      // All 600 libs coalesce into '/monorepo/libs' and all 200 packages coalesce into '/monorepo/node_modules'
+      expect(getTotalCalls()).toBe(2);
+      expect(Array.from(activeDirs).sort()).toEqual(['/monorepo/libs', '/monorepo/node_modules']);
+
+      await manager.close();
+    });
+
+    it('should prioritize collapsing deeper branching subdirectories before broader ancestor directories', async () => {
+      const { mockWatcher, activeDirs } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        undefined,
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+        3, // Budget of 3 subscriptions
+      );
+
+      // lib-1 has 4 component subdirectories, lib-2 and lib-3 have 1 each (total = 6 leaf dirs)
+      for (let c = 1; c <= 4; c++) {
+        const file = `/monorepo/libs/lib-1/src/comp-${c}/comp.ts`;
+        manager.watchFile(file, file);
+      }
+      manager.watchFile('/monorepo/libs/lib-2/src/index.ts', '/monorepo/libs/lib-2/src/index.ts');
+      manager.watchFile('/monorepo/libs/lib-3/src/index.ts', '/monorepo/libs/lib-3/src/index.ts');
+
+      await manager.flush();
+
+      // Collapsing lib-1/src reduces total leaves from 6 to 3, meeting the budget of 3
+      // without needing to collapse all of '/monorepo/libs'
+      expect(Array.from(activeDirs).sort()).toEqual([
+        '/monorepo/libs/lib-1/src',
+        '/monorepo/libs/lib-2/src',
+        '/monorepo/libs/lib-3/src',
+      ]);
+
+      await manager.close();
+    });
+
+    it('should ignore workspaceRoot when coalescing into an ancestor of workspaceRoot (Tier 2)', async () => {
+      const { mockWatcher, activeDirs, subscribeHistory } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        { ignored: ['/monorepo/apps/app/dist'] },
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+        2, // Budget of 2 subscriptions
+      );
+
+      // Sibling apps/packages directly under /monorepo/apps (which is an ancestor of /monorepo/apps/app)
+      manager.watchFile(
+        '/monorepo/apps/shared-1/src/index.ts',
+        '/monorepo/apps/shared-1/src/index.ts',
+      );
+      manager.watchFile(
+        '/monorepo/apps/shared-2/src/index.ts',
+        '/monorepo/apps/shared-2/src/index.ts',
+      );
+      manager.watchFile(
+        '/monorepo/apps/shared-3/src/index.ts',
+        '/monorepo/apps/shared-3/src/index.ts',
+      );
+
+      await manager.flush();
+
+      expect(Array.from(activeDirs)).toEqual(['/monorepo/apps']);
+      expect(subscribeHistory.length).toBe(1);
+      expect(subscribeHistory[0].options?.ignore).toEqual([
+        '/monorepo/apps/app/dist',
+        '/monorepo/apps/app',
+        '/monorepo/apps/app/**',
+      ]);
+
+      await manager.close();
+    });
+
+    it('should dynamically lower budget and coalesce into ancestor when subscribe fails with FSEvents stream limit error', async () => {
+      const externalRoot = fs.mkdtempSync(path.join(TMP_DIR, 'parcel-fallback-spec-'));
+
+      try {
+        const rootPosix = toPosixPathNormalized(path.join(externalRoot, 'apps', 'app'));
+        const libFiles: string[] = [];
+        for (let i = 0; i < 6; i++) {
+          const libDir = path.join(externalRoot, 'libs', `lib-${i}`, 'src');
+          fs.mkdirSync(libDir, { recursive: true });
+          const file = toPosixPathNormalized(path.join(libDir, 'index.ts'));
+          fs.writeFileSync(file, 'export const x = 1;');
+          libFiles.push(file);
+        }
+
+        // Allow at most 2 active FSEvents streams even though manager budget starts at 64
+        const { mockWatcher, activeDirs } = createMockParcelWatcher({ failAfter: 2 });
+        const manager = new ParcelExternalManager(
+          mockWatcher,
+          undefined,
+          rootPosix,
+          rootPosix,
+          true,
+          () => {},
+          64,
+        );
+
+        for (const file of libFiles) {
+          manager.watchFile(file, file);
+        }
+
+        await manager.flush();
+
+        // Should have shrunk and coalesced the 6 libraries into the single '/libs' ancestor directory
+        const expectedLibsDir = toPosixPathNormalized(path.join(externalRoot, 'libs'));
+        expect(Array.from(activeDirs)).toEqual([expectedLibsDir]);
+
+        await manager.close();
+      } finally {
+        fs.rmSync(externalRoot, { recursive: true, force: true });
+      }
+    });
+
+    it('should uncoalesce and subscribe to remaining leaf directories when removals bring count back within budget', async () => {
+      const { mockWatcher, activeDirs } = createMockParcelWatcher();
+      const manager = new ParcelExternalManager(
+        mockWatcher,
+        undefined,
+        '/monorepo/apps/app',
+        '/monorepo/apps/app',
+        true,
+        () => {},
+        2, // Budget of 2 subscriptions
+      );
+
+      const file1 = '/monorepo/libs/lib-1/src/index.ts';
+      const file2 = '/monorepo/libs/lib-2/src/index.ts';
+      const file3 = '/monorepo/libs/lib-3/src/index.ts';
+
+      manager.watchFile(file1, file1);
+      manager.watchFile(file2, file2);
+      manager.watchFile(file3, file3);
+
+      await manager.flush();
+
+      // 3 directories exceed budget of 2, so they coalesce into '/monorepo/libs'
+      expect(Array.from(activeDirs)).toEqual(['/monorepo/libs']);
+
+      // Removing file3 brings remaining directories to 2, which fits within budget
+      manager.removeFile(file3);
+      await manager.flush();
+
+      expect(Array.from(activeDirs).sort()).toEqual([
+        '/monorepo/libs/lib-1/src',
+        '/monorepo/libs/lib-2/src',
+      ]);
+
+      // Removing the remaining files unsubscribes everything
+      manager.removeFile(file1);
+      manager.removeFile(file2);
+      await manager.flush();
+
+      expect(activeDirs.size).toBe(0);
+
+      await manager.close();
+    });
   });
 });
