@@ -118,6 +118,12 @@ export interface BundleResult {
   /** Exact set of virtual POSIX DTS module IDs bundled into this entry point. */
   dtsModuleIds: ReadonlySet<string>;
 
+  /** Relative POSIX output paths of ESM bundle files and sourcemaps emitted for this entry point. */
+  esmOutputFiles?: ReadonlySet<string>;
+
+  /** Relative POSIX output paths of DTS bundle files and sourcemaps emitted for this entry point. */
+  dtsOutputFiles?: ReadonlySet<string>;
+
   /** Whether this entry point bundle imports 'tslib'. */
   hasTslibImport?: boolean;
 }
@@ -157,6 +163,15 @@ export interface SingleBuildState {
 
   /** Set of changed POSIX TypeScript declaration file paths pending bundling. */
   pendingChangedDtsFiles: Set<string>;
+
+  /** Set of relative POSIX output paths for bundle files emitted in the previous build iteration. */
+  emittedBundleFiles: Set<string>;
+
+  /** Set of relative POSIX output paths for package manifest files emitted in the previous build iteration. */
+  emittedManifestFiles: Set<string>;
+
+  /** Map of normalized POSIX asset source paths to their relative POSIX output paths. */
+  emittedAssets: Map<string, string>;
 
   /** Whether the previous build iteration encountered a compilation or diagnostic error. */
   hasCompilationError?: boolean;

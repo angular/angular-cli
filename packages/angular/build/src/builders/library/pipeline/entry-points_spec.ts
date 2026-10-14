@@ -7,7 +7,6 @@
  */
 
 import { join, resolve } from 'node:path';
-import { toPosixPath } from '../../../utils/path';
 import type {
   BundleResult,
   NormalizedEntryPoint,
@@ -530,7 +529,10 @@ describe('entry-points pipeline', () => {
         hasEntryPointsChanges: false,
       } as unknown as SingleBuildState;
 
-      const watchedCompilationFiles = new Set<string>();
+      const watchedCompilationFiles = new Set<string>([
+        join(projectRoot, 'src/public-api.ts'),
+        join(projectRoot, 'old-feature/src/public-api.ts'),
+      ]);
 
       const newPackageJson: PackageJsonData = {
         name: packageName,
@@ -553,13 +555,12 @@ describe('entry-points pipeline', () => {
       expect(options.entryPoints.has('old-feature')).toBeFalse();
       expect(buildState.previousBundleResults.has('old-feature')).toBeFalse();
       expect(buildState.previousBundleResults.has('.')).toBeTrue();
+      expect(watchedCompilationFiles.has(join(projectRoot, 'src/public-api.ts'))).toBeTrue();
       expect(
-        watchedCompilationFiles.has(toPosixPath(join(projectRoot, 'src/public-api.ts'))),
-      ).toBeTrue();
+        watchedCompilationFiles.has(join(projectRoot, 'old-feature/src/public-api.ts')),
+      ).toBeFalse();
       expect(
-        watchedCompilationFiles.has(
-          toPosixPath(join(projectRoot, 'new-feature/src/public-api.ts')),
-        ),
+        watchedCompilationFiles.has(join(projectRoot, 'new-feature/src/public-api.ts')),
       ).toBeTrue();
     });
 
@@ -657,9 +658,7 @@ describe('entry-points pipeline', () => {
       expect(options.entryPoints.get('.')?.entryFilePath).toBe(
         join(projectRoot, 'src/other-api.ts'),
       );
-      expect(
-        watchedCompilationFiles.has(toPosixPath(join(projectRoot, 'src/other-api.ts'))),
-      ).toBeTrue();
+      expect(watchedCompilationFiles.has(join(projectRoot, 'src/other-api.ts'))).toBeTrue();
     });
 
     it('should prune previousBundleResults when an entry point bundleName changes', () => {

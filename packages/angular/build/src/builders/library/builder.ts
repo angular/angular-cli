@@ -127,7 +127,10 @@ export async function* executeLibraryBuilder(
         poll,
         preserveSymlinks,
         signal,
-        watchFiles: watchedCompilationFiles,
+        watchFiles: [
+          ...watchedCompilationFiles,
+          ...normalizedOptions.assets.map((asset) => asset.input),
+        ],
       });
 
       context.addTeardown?.(() => void watcher?.close());
@@ -224,9 +227,9 @@ async function executeBuild(
     if (watcher) {
       watcher.add(Array.from(watchedCompilationFiles));
 
-      const { assetsToEmit } = actionContext;
-      if (assetsToEmit?.length) {
-        watcher.add(assetsToEmit.map((asset) => asset.source));
+      const { collectedAssets } = actionContext;
+      if (collectedAssets?.filesToEmit.length) {
+        watcher.add(collectedAssets.filesToEmit.map((asset) => asset.source));
       }
     }
   }
@@ -337,13 +340,19 @@ async function* runWatchLoop(
       buildState.hasEntryPointsChanges ||
       hasModifiedWatchedFile(changedFiles, watchedCompilationFiles, packageJsonPath);
 
-    const assetsToEmit = await collectAssetsToEmit(
+    const collectedAssets = await collectAssetsToEmit(
       assets,
       workspaceRoot,
       buildState.hasEmittedAssets ? changedFiles : undefined,
+      buildState.emittedAssets,
     );
 
-    if (!hasSourceChanges && !hasPackageJsonChanges && assetsToEmit.length === 0) {
+    if (
+      !hasSourceChanges &&
+      !hasPackageJsonChanges &&
+      collectedAssets.filesToEmit.length === 0 &&
+      collectedAssets.filesToDelete.length === 0
+    ) {
       continue;
     }
 
@@ -357,7 +366,7 @@ async function* runWatchLoop(
         context,
         buildState,
         modifiedFiles: changedFiles,
-        assetsToEmit,
+        collectedAssets,
       },
       withProgress,
       watcher,

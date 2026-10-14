@@ -260,6 +260,10 @@ export function updateWatchedEntryPoints(
   );
 
   if (haveEntryPointsChanged(options.entryPoints, newEntryPoints)) {
+    for (const oldEntryPoint of options.entryPoints.values()) {
+      watchedCompilationFiles.delete(oldEntryPoint.entryFilePath);
+    }
+
     for (const entryPoint of newEntryPoints.values()) {
       watchedCompilationFiles.add(entryPoint.entryFilePath);
     }

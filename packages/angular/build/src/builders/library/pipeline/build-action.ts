@@ -9,15 +9,15 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
-import { emitFilesToDisk } from '../../../utils/disk-files';
+import { deleteFilesFromDisk, emitFilesToDisk } from '../../../utils/disk-files';
 import { assertIsError } from '../../../utils/error';
-import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
-import { collectAssetsToEmit } from './assets';
+import type { BundleResult, NormalizedLibraryOptions, SingleBuildState } from '../types';
+import { type CollectedAssets, collectAssetsToEmit } from './assets';
 import { bundleEntryPoints } from './bundler';
 import { type LibraryCompilationDiagnostics, compileLibrary } from './compilation';
 import { collectEntryPointsToBundle } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
-import type { DiskOutputFile, OutputFile } from './utils';
+import type { OutputFile } from './utils';
 
 /**
  * Result of executing a single library build iteration.
@@ -41,6 +41,9 @@ export function createSingleBuildState(): SingleBuildState {
     previousBundleResults: new Map(),
     pendingChangedEsmFiles: new Set(),
     pendingChangedDtsFiles: new Set(),
+    emittedBundleFiles: new Set(),
+    emittedManifestFiles: new Set(),
+    emittedAssets: new Map(),
   };
 }
 
@@ -76,12 +79,12 @@ export interface BuildActionContext {
   modifiedFiles?: Set<string>;
 
   /**
-   * Asset files to emit to disk for the current build iteration.
+   * Collected asset changes for the current build iteration.
    * Pre-collected in the watch loop to avoid redundant asset matching, or resolved and
    * populated by `buildAction` when omitted (such as during the initial build) so the
-   * caller can register their source paths with the file watcher.
+   * caller can register their POSIX source paths with the file watcher.
    */
-  assetsToEmit?: DiskOutputFile[];
+  collectedAssets?: CollectedAssets;
 }
 
 /**
@@ -133,8 +136,12 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
     }
 
     const filesToEmit: OutputFile[] = [];
+    const filesToDelete = new Set<string>();
+    let nextBundleFiles: Set<string> | undefined;
+    let nextManifestFiles: Set<string> | undefined;
 
     if (shouldCompileEntryPoints) {
+      const hadEntryPointsChanges = buildState.hasEntryPointsChanges;
       buildState.hasCompilationError = true;
       buildState.hasEntryPointsChanges = false;
 
@@ -212,6 +219,18 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
       for (const [name, bundleResult] of bundleOutput.bundleResults) {
         buildState.previousBundleResults.set(name, bundleResult);
       }
+
+      if (
+        bundleOutput.bundleResults.size > 0 ||
+        hadEntryPointsChanges ||
+        buildState.emittedBundleFiles.size === 0
+      ) {
+        nextBundleFiles = collectBundleOutputFiles(
+          buildState.previousBundleResults.values(),
+          buildState.emittedBundleFiles,
+          filesToDelete,
+        );
+      }
     }
 
     let hasTslibImport = false;
@@ -223,27 +242,45 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
     }
 
     if (!buildState.hasEmittedManifests || buildState.hasEmittedTslib !== hasTslibImport) {
-      filesToEmit.push(
-        ...(await generatePackageManifests(
-          {
-            ...options,
-            compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
-          },
-          isWatchMode,
-          hasTslibImport,
-        )),
+      const manifestFiles = await generatePackageManifests(
+        {
+          ...options,
+          compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
+        },
+        isWatchMode,
+        hasTslibImport,
       );
+
+      filesToEmit.push(...manifestFiles);
+
+      nextManifestFiles = new Set(manifestFiles.map((file) => file.path));
+      for (const prevFile of buildState.emittedManifestFiles) {
+        if (!nextManifestFiles.has(prevFile)) {
+          filesToDelete.add(prevFile);
+        }
+      }
     }
 
-    const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
+    const collectedAssets = (actionContext.collectedAssets ??= await collectAssetsToEmit(
       options.assets,
       options.workspaceRoot,
       buildState.hasEmittedAssets ? modifiedFiles : undefined,
+      buildState.emittedAssets,
     ));
-    filesToEmit.push(...resolvedAssetsToEmit);
+    filesToEmit.push(...collectedAssets.filesToEmit);
 
     await emitFilesToDisk(filesToEmit, (file) => path.posix.join(options.outputPath, file.path));
 
+    updateEmittedAssetState(buildState, collectedAssets, filesToDelete);
+
+    if (filesToDelete.size) {
+      await deleteFilesFromDisk(
+        Array.from(filesToDelete, (file) => path.join(options.outputPath, file)),
+      );
+    }
+
+    buildState.emittedBundleFiles = nextBundleFiles ?? buildState.emittedBundleFiles;
+    buildState.emittedManifestFiles = nextManifestFiles ?? buildState.emittedManifestFiles;
     buildState.hasEmittedManifests = true;
     buildState.hasEmittedTslib = hasTslibImport;
     buildState.hasEmittedAssets = true;
@@ -253,6 +290,79 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
   }
 
   return { errors, warnings, logs };
+}
+
+/**
+ * Collects the active POSIX bundle output file paths across all entry points and queues any
+ * previously emitted bundle files that are no longer present for deletion.
+ *
+ * @param bundleResults Active bundle results across all entry points.
+ * @param previousBundleFiles Relative POSIX output paths emitted in the previous build iteration.
+ * @param filesToDelete Set of relative POSIX output paths queued for deletion.
+ * @returns The new set of active relative POSIX bundle output file paths.
+ */
+function collectBundleOutputFiles(
+  bundleResults: Iterable<BundleResult>,
+  previousBundleFiles: ReadonlySet<string>,
+  filesToDelete: Set<string>,
+): Set<string> {
+  const nextBundleFiles = new Set<string>();
+  for (const result of bundleResults) {
+    if (result.esmOutputFiles) {
+      for (const file of result.esmOutputFiles) {
+        nextBundleFiles.add(file);
+      }
+    }
+    if (result.dtsOutputFiles) {
+      for (const file of result.dtsOutputFiles) {
+        nextBundleFiles.add(file);
+      }
+    }
+  }
+
+  for (const prevFile of previousBundleFiles) {
+    if (!nextBundleFiles.has(prevFile)) {
+      filesToDelete.add(prevFile);
+    }
+  }
+
+  return nextBundleFiles;
+}
+
+/**
+ * Updates `buildState.emittedAssets` with newly emitted and deleted assets, queuing any
+ * deleted asset POSIX output paths that are not produced by another active asset for removal.
+ *
+ * @param buildState The state preserved across incremental builds.
+ * @param collectedAssets The collected asset files to emit and delete.
+ * @param filesToDelete Set of relative POSIX output paths queued for deletion.
+ */
+function updateEmittedAssetState(
+  buildState: SingleBuildState,
+  collectedAssets: CollectedAssets,
+  filesToDelete: Set<string>,
+): void {
+  const emittedAssets = buildState.emittedAssets;
+  const toDelete = collectedAssets.filesToDelete;
+  const toEmit = collectedAssets.filesToEmit;
+
+  for (const deletedAsset of toDelete) {
+    emittedAssets.delete(deletedAsset.source);
+  }
+
+  for (const emittedAsset of toEmit) {
+    emittedAssets.set(emittedAsset.source, emittedAsset.path);
+  }
+
+  if (toDelete.length) {
+    const activeAssetOutputs = new Set(emittedAssets.values());
+
+    for (const deletedAsset of toDelete) {
+      if (!activeAssetOutputs.has(deletedAsset.path)) {
+        filesToDelete.add(deletedAsset.path);
+      }
+    }
+  }
 }
 
 /**

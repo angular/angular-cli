@@ -63,6 +63,9 @@ interface MultiBundleOutput {
   /** Map of bundle entry names to the set of virtual POSIX module IDs included in the bundle. */
   moduleIdsByBundle: Map<string, Set<string>>;
 
+  /** Map of bundle entry names to the set of relative POSIX output paths generated for the bundle. */
+  outputFilesByBundle: Map<string, Set<string>>;
+
   /** Set of bundle entry names that import 'tslib'. */
   tslibBundles: Set<string>;
 
@@ -116,6 +119,14 @@ export async function bundleEntryPoints(
       dtsModuleIds:
         dtsOutput.moduleIdsByBundle.get(bundleName) ??
         previousBundleResult?.dtsModuleIds ??
+        new Set(),
+      esmOutputFiles:
+        esmOutput.outputFilesByBundle.get(bundleName) ??
+        previousBundleResult?.esmOutputFiles ??
+        new Set(),
+      dtsOutputFiles:
+        dtsOutput.outputFilesByBundle.get(bundleName) ??
+        previousBundleResult?.dtsOutputFiles ??
         new Set(),
       hasTslibImport: esmModuleIds
         ? esmOutput.tslibBundles.has(bundleName)
@@ -232,11 +243,14 @@ function processRolldownOutput(
 ): Omit<MultiBundleOutput, 'warnings'> {
   const filesToEmit: MemoryOutputFile[] = [];
   const moduleIdsByBundle = new Map<string, Set<string>>();
+  const outputFilesByBundle = new Map<string, Set<string>>();
   const tslibBundles = new Set<string>();
   const chunksByFileName = new Map<string, OutputChunk>();
+  const outputFileNames = new Set<string>();
   const entryChunks: OutputChunk[] = [];
 
   for (const item of output) {
+    outputFileNames.add(item.fileName);
     filesToEmit.push(
       createMemoryOutputFile(
         path.posix.join(dir, item.fileName),
@@ -254,7 +268,9 @@ function processRolldownOutput(
 
   for (const entryChunk of entryChunks) {
     const modSet = new Set<string>();
+    const outSet = new Set<string>();
     moduleIdsByBundle.set(entryChunk.name, modSet);
+    outputFilesByBundle.set(entryChunk.name, outSet);
 
     const visited = new Set<OutputChunk>();
     const queue: OutputChunk[] = [entryChunk];
@@ -270,6 +286,11 @@ function processRolldownOutput(
       }
 
       visited.add(chunk);
+      outSet.add(path.posix.join(dir, chunk.fileName));
+      const mapFileName = `${chunk.fileName}.map`;
+      if (outputFileNames.has(mapFileName)) {
+        outSet.add(path.posix.join(dir, mapFileName));
+      }
 
       for (const modId of chunk.moduleIds) {
         if (modId[0] !== '\0') {
@@ -290,7 +311,7 @@ function processRolldownOutput(
     }
   }
 
-  return { filesToEmit, moduleIdsByBundle, tslibBundles };
+  return { filesToEmit, moduleIdsByBundle, outputFilesByBundle, tslibBundles };
 }
 
 /**
@@ -394,6 +415,7 @@ async function bundleAllEsm(
     return {
       filesToEmit: [],
       moduleIdsByBundle: new Map(),
+      outputFilesByBundle: new Map(),
       tslibBundles: new Set(),
       warnings: [],
     };
@@ -424,6 +446,7 @@ async function bundleAllDts(
     return {
       filesToEmit: [],
       moduleIdsByBundle: new Map(),
+      outputFilesByBundle: new Map(),
       tslibBundles: new Set(),
       warnings: [],
     };
