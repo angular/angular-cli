@@ -1,3 +1,15 @@
+<a name="20.3.40"></a>
+
+# 20.3.40 (2026-10-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------- |
+| [bfe1908f4](https://github.com/angular/angular-cli/commit/bfe1908f46f5799e839dcf0f162955df59a94cb0) | fix  | update zod to 4.6.6 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.3.0-next.1"></a>
 
 # 22.3.0-next.1 (2026-10-07)
