@@ -13,6 +13,7 @@ import { normalizeAssetPatterns } from '../../utils';
 import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
+import { toPosixPath } from '../../utils/path';
 import {
   generateSearchDirectories,
   getTailwindConfig,
@@ -24,14 +25,25 @@ import { loadPackageJson } from './pipeline/utils';
 import type { Schema as LibraryBuilderOptions } from './schema';
 import type { NormalizedLibraryOptions, PackageJsonData } from './types';
 
+/**
+ * Normalizes raw library builder options into {@link NormalizedLibraryOptions} with all
+ * file and directory paths normalized to POSIX format.
+ *
+ * @param context The Architect builder context.
+ * @param projectName The name of the library project.
+ * @param options The raw library builder schema options.
+ * @returns A promise resolving to the normalized library options.
+ */
 export async function normalizeLibraryOptions(
   context: BuilderContext,
   projectName: string,
   options: LibraryBuilderOptions,
 ): Promise<NormalizedLibraryOptions> {
-  const { workspaceRoot } = context;
+  const workspaceRoot = toPosixPath(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
-  const { projectRoot, projectSourceRoot } = getProjectRootPaths(workspaceRoot, projectMetadata);
+  const projectRootPaths = getProjectRootPaths(workspaceRoot, projectMetadata);
+  const projectRoot = toPosixPath(projectRootPaths.projectRoot);
+  const projectSourceRoot = toPosixPath(projectRootPaths.projectSourceRoot);
 
   const {
     tsConfig,
@@ -50,8 +62,8 @@ export async function normalizeLibraryOptions(
     clearScreen,
   } = options;
 
-  const resolvedTsConfigPath = path.resolve(workspaceRoot, tsConfig);
-  const packageJsonPath = path.join(projectRoot, 'package.json');
+  const resolvedTsConfigPath = toPosixPath(path.resolve(workspaceRoot, tsConfig));
+  const packageJsonPath = path.posix.join(projectRoot, 'package.json');
 
   let packageJson: PackageJsonData;
   try {
@@ -99,7 +111,7 @@ export async function normalizeLibraryOptions(
     }
     defaultAssets.push({
       glob: 'README.md',
-      input: path.dirname(entryPoint.entryFilePath),
+      input: path.posix.dirname(entryPoint.entryFilePath),
       output: entryPoint.name,
     });
   }
@@ -109,7 +121,11 @@ export async function normalizeLibraryOptions(
     workspaceRoot,
     projectRoot,
     projectSourceRoot,
-  );
+  ).map((asset) => ({
+    ...asset,
+    input: toPosixPath(path.resolve(workspaceRoot, asset.input)),
+    output: toPosixPath(asset.output),
+  }));
 
   const cacheOptions = normalizeCacheOptions(
     projectMetadata,
@@ -119,7 +135,7 @@ export async function normalizeLibraryOptions(
   );
 
   const styleIncludePaths = (stylePreprocessorOptions?.includePaths ?? []).map((p: string) =>
-    path.resolve(workspaceRoot, p),
+    toPosixPath(path.resolve(workspaceRoot, p)),
   );
 
   const searchDirectories = await generateSearchDirectories([projectRoot, workspaceRoot]);
@@ -133,7 +149,9 @@ export async function normalizeLibraryOptions(
     projectRoot,
     packageName,
     packageJson,
-    outputPath: path.resolve(workspaceRoot, options.outputPath ?? path.join('dist', projectName)),
+    outputPath: toPosixPath(
+      path.resolve(workspaceRoot, options.outputPath ?? path.posix.join('dist', projectName)),
+    ),
     deleteOutputPath,
     packageJsonPath,
     tsConfigPath: resolvedTsConfigPath,

@@ -111,13 +111,10 @@ export async function* executeLibraryBuilder(
     );
 
     // Track all referenced compilation files for watch mode
-    const watchedCompilationFiles = new Set<string>([
-      toPosixPath(tsConfigPath),
-      toPosixPath(packageJsonPath),
-    ]);
+    const watchedCompilationFiles = new Set<string>([tsConfigPath, packageJsonPath]);
 
     for (const entryPoint of normalizedOptions.entryPoints.values()) {
-      watchedCompilationFiles.add(toPosixPath(entryPoint.entryFilePath));
+      watchedCompilationFiles.add(entryPoint.entryFilePath);
     }
 
     if (isWatchMode) {
@@ -237,6 +234,17 @@ async function executeBuild(
 
 /**
  * Runs the watch loop, rebuilding the library as watched files are modified.
+ *
+ * @param watcher The file watcher instance.
+ * @param options The normalized library builder options with POSIX paths.
+ * @param stylesheetBundler The component stylesheet bundler instance.
+ * @param watchedCompilationFiles Set of POSIX file paths tracked for compilation.
+ * @param context The Architect builder context.
+ * @param withProgress Progress wrapper function (`withSpinner` or `withNoProgress`).
+ * @param buildState The state preserved across incremental builds.
+ * @param buildAction The library build action function to execute.
+ * @param hasModifiedWatchedFile Helper to check whether watched compilation files changed.
+ * @param signal Optional abort signal to terminate the watch loop.
  */
 async function* runWatchLoop(
   watcher: BuildWatcher,
@@ -253,7 +261,6 @@ async function* runWatchLoop(
   const { collectAssetsToEmit } = await import('./pipeline/assets');
 
   const { workspaceRoot, packageJsonPath, assets, clearScreen } = options;
-  const posixPackageJsonPath = toPosixPath(packageJsonPath);
 
   for await (const changes of watcher) {
     if (signal?.aborted) {
@@ -293,13 +300,13 @@ async function* runWatchLoop(
 
     // Check if package.json was modified
     let hasPackageJsonChanges = false;
-    if (changedFiles.has(posixPackageJsonPath)) {
+    if (changedFiles.has(packageJsonPath)) {
       try {
         const packageJson = await loadPackageJson(packageJsonPath);
-        options.packageJson = packageJson;
         if (!packageJson.name) {
           throw new Error(`The package.json at '${packageJsonPath}' must contain a 'name'.`);
         }
+        options.packageJson = packageJson;
         options.packageName = packageJson.name;
 
         updateWatchedEntryPoints(
@@ -328,7 +335,7 @@ async function* runWatchLoop(
       !buildState.singleProgramCache ||
       buildState.hasCompilationError ||
       buildState.hasEntryPointsChanges ||
-      hasModifiedWatchedFile(changedFiles, watchedCompilationFiles, posixPackageJsonPath);
+      hasModifiedWatchedFile(changedFiles, watchedCompilationFiles, packageJsonPath);
 
     const assetsToEmit = await collectAssetsToEmit(
       assets,
@@ -388,7 +395,7 @@ function logMessages(
  * @param logger The Architect logger API.
  * @param startTime High-resolution timestamp recorded when the build iteration started.
  * @param success Whether the build iteration succeeded without errors.
- * @param outputPath Optional output directory path to log on successful builds.
+ * @param outputPath Optional POSIX output directory path to log on successful builds.
  */
 function logBuildResult(
   logger: logging.LoggerApi,
