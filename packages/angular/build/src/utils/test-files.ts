@@ -9,7 +9,7 @@
 import path from 'node:path';
 import { ResultFile } from '../builders/application/results';
 import { BuildOutputFileType } from '../tools/esbuild/bundler-files';
-import { emitFilesToDisk } from './emit-files-to-disk';
+import { emitFilesToDisk } from './disk-files';
 
 /**
  * Writes a collection of build result files to a specified directory.

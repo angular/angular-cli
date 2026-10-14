@@ -72,7 +72,7 @@ export { ComponentStylesheetBundler } from './tools/esbuild/angular/component-st
 export * from './utils/bundle-calculator';
 export { checkPort } from './utils/check-port';
 export { deleteOutputDir } from './utils/delete-output-dir';
-export { emitFilesToDisk } from './utils/emit-files-to-disk';
+export { emitFilesToDisk } from './utils/disk-files';
 export { type I18nOptions, createI18nOptions, loadTranslations } from './utils/i18n-options';
 export {
   IndexHtmlGenerator,
