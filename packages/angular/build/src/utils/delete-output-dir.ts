@@ -17,8 +17,9 @@ export async function deleteOutputDir(
   outputPath: string,
   emptyOnlyDirectories?: string[],
 ): Promise<void> {
-  const resolvedOutputPath = resolve(root, outputPath);
-  if (resolvedOutputPath === root) {
+  const resolvedRoot = resolve(root);
+  const resolvedOutputPath = resolve(resolvedRoot, outputPath);
+  if (resolvedOutputPath === resolvedRoot) {
     throw new Error('Output path MUST not be project root directory!');
   }
 

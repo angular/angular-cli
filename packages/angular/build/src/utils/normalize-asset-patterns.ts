@@ -24,14 +24,15 @@ export function normalizeAssetPatterns(
 
   // When sourceRoot is not available, we default to ${projectRoot}/src.
   const sourceRoot = projectSourceRoot || path.join(projectRoot, 'src');
-  const resolvedSourceRoot = path.resolve(workspaceRoot, sourceRoot);
-  const resolvedProjectRoot = path.resolve(workspaceRoot, projectRoot);
+  const resolvedWorkspaceRoot = path.resolve(workspaceRoot);
+  const resolvedSourceRoot = path.resolve(resolvedWorkspaceRoot, sourceRoot);
+  const resolvedProjectRoot = path.resolve(resolvedWorkspaceRoot, projectRoot);
 
   return assetPatterns.map((assetPattern) => {
     // Normalize string asset patterns to objects.
     if (typeof assetPattern === 'string') {
       const assetPath = path.normalize(assetPattern);
-      const resolvedAssetPath = path.resolve(workspaceRoot, assetPath);
+      const resolvedAssetPath = path.resolve(resolvedWorkspaceRoot, assetPath);
       let root: string;
 
       // Check if the string asset is within sourceRoot.
@@ -39,8 +40,8 @@ export function normalizeAssetPatterns(
         root = resolvedSourceRoot;
       } else if (resolvedAssetPath.startsWith(resolvedProjectRoot)) {
         root = resolvedProjectRoot;
-      } else if (resolvedAssetPath.startsWith(workspaceRoot)) {
-        root = workspaceRoot;
+      } else if (resolvedAssetPath.startsWith(resolvedWorkspaceRoot)) {
+        root = resolvedWorkspaceRoot;
       } else {
         throw new Error(`The ${assetPattern} asset path must be within the workspace root.`);
       }
@@ -67,11 +68,11 @@ export function normalizeAssetPatterns(
       }
 
       // Output directory for both is the relative path from the root to input.
-      const output = path.relative(root, path.resolve(workspaceRoot, input));
+      const output = path.relative(root, path.resolve(resolvedWorkspaceRoot, input));
 
       assetPattern = { glob, input, output };
     } else {
-      if (!isSubDirectory(workspaceRoot, assetPattern.input)) {
+      if (!isSubDirectory(resolvedWorkspaceRoot, assetPattern.input)) {
         throw new Error(`The ${assetPattern.input} asset path must be within the workspace root.`);
       }
 
