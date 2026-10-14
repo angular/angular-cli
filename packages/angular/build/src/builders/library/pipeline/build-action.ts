@@ -9,7 +9,7 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
-import { emitFilesToDisk } from '../../../utils/emit-files-to-disk';
+import { emitFilesToDisk } from '../../../utils/disk-files';
 import { assertIsError } from '../../../utils/error';
 import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, SingleBuildState } from '../types';

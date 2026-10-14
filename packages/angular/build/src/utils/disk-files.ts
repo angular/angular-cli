@@ -6,14 +6,14 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { constants, cp, mkdir, writeFile } from 'node:fs/promises';
+import { constants, cp, mkdir, rm, writeFile } from 'node:fs/promises';
 import { dirname } from 'node:path';
 import { runConcurrent } from './concurrency';
 
 /**
  * Maximum number of concurrent file system write/copy operations to avoid open file descriptor exhaustion.
  */
-const MAX_CONCURRENT_WRITES = 64;
+const MAX_CONCURRENT_OPS = 64;
 
 /**
  * Represents a file that can be emitted to disk from memory or copied from an existing path on disk.
@@ -38,7 +38,7 @@ export async function emitFilesToDisk<T extends EmittableFile = EmittableFile>(
 
   const directoryCreationPromises = new Map<string, Promise<string | undefined>>();
 
-  await runConcurrent(files, MAX_CONCURRENT_WRITES, async (file) => {
+  await runConcurrent(files, MAX_CONCURRENT_OPS, async (file) => {
     const fullFilePath = resolveDestinationPath(file);
     if (!fullFilePath) {
       return;
@@ -68,4 +68,16 @@ export async function emitFilesToDisk<T extends EmittableFile = EmittableFile>(
       preserveTimestamps: true,
     });
   });
+}
+
+/**
+ * Deletes a collection of files from disk with bounded concurrency.
+ * @param files The collection of files to delete.
+ */
+export async function deleteFilesFromDisk(files: readonly string[]): Promise<void> {
+  if (files.length === 0) {
+    return;
+  }
+
+  await runConcurrent(files, MAX_CONCURRENT_OPS, (file) => rm(file, { force: true }));
 }

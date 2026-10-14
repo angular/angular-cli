@@ -8,13 +8,12 @@
 
 import { Builder, BuilderContext, BuilderOutput, createBuilder } from '@angular-devkit/architect';
 import assert from 'node:assert';
-import fs from 'node:fs/promises';
 import path from 'node:path';
 import { BuildOutputFileType } from '../../tools/esbuild/bundler-files';
 import { createJsonBuildManifest } from '../../tools/esbuild/utils';
 import { colors as ansiColors } from '../../utils/color';
 import { deleteOutputDir } from '../../utils/delete-output-dir';
-import { emitFilesToDisk } from '../../utils/emit-files-to-disk';
+import { deleteFilesFromDisk, emitFilesToDisk } from '../../utils/disk-files';
 import { bazelEsbuildPluginPath, useJSONBuildLogs } from '../../utils/environment-options';
 import { isSubDirectory } from '../../utils/path';
 import { purgeStaleBuildCache } from '../../utils/purge-cache';
@@ -215,13 +214,10 @@ export async function* buildApplication(
     // Delete any removed files if incremental
     if (result.kind === ResultKind.Incremental && result.removed?.length) {
       try {
-        await Promise.all(
-          result.removed.map((file) => {
-            const fullFilePath = generateFullPath(file.path, file.type, outputOptions);
-
-            return fs.rm(fullFilePath, { force: true, maxRetries: 3 });
-          }),
+        const filesToDelete = result.removed.map((file) =>
+          generateFullPath(file.path, file.type, outputOptions),
         );
+        await deleteFilesFromDisk(filesToDelete);
       } catch (error) {
         context.logger.error(error instanceof Error ? error.message : String(error));
         yield { success: false };
