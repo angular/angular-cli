@@ -324,6 +324,46 @@ describe('Migration to use the library builder', () => {
     });
   });
 
+  it('should preserve existing stylePreprocessorOptions.includePaths when migrating styleIncludePaths', async () => {
+    const angularJson = JSON.parse(tree.readContent('/angular.json'));
+    angularJson.projects['my-lib'].architect.build.options.stylePreprocessorOptions = {
+      includePaths: ['existing/styles'],
+    };
+    tree.overwrite('/angular.json', JSON.stringify(angularJson, undefined, 2));
+
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify(
+        {
+          lib: {
+            entryFile: 'src/public-api.ts',
+            styleIncludePaths: ['../theme'],
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.stylePreprocessorOptions).toEqual({
+      includePaths: ['existing/styles', 'projects/theme'],
+    });
+  });
+
+  it('should throw an error when entry file is not configured and no default candidate exists', async () => {
+    tree.overwrite('/projects/my-lib/ng-package.json', JSON.stringify({}, undefined, 2));
+
+    await expectAsync(schematicRunner.runSchematic(schematicName, {}, tree)).toBeRejectedWithError(
+      'Could not find an entry file for library entry point at "projects/my-lib".',
+    );
+  });
+
   it('should migrate package.json with ngPackage configuration', async () => {
     tree.overwrite(
       '/projects/my-lib/package.json',

@@ -7,7 +7,13 @@
  */
 
 import { type JsonObject, type JsonValue, isJsonObject } from '@angular-devkit/core';
-import { type Rule, type SchematicContext, type Tree, chain } from '@angular-devkit/schematics';
+import {
+  type Rule,
+  type SchematicContext,
+  SchematicsException,
+  type Tree,
+  chain,
+} from '@angular-devkit/schematics';
 import { dirname, join, normalize, relative } from 'node:path/posix';
 import {
   DependencyType,
@@ -100,7 +106,7 @@ function parseNgPackageFile(tree: Tree, filePath: string): NgPackageConfig | und
 /**
  * Resolves the TypeScript entry file path for a library entry point directory.
  * Uses the explicitly configured `entryFile` when provided, or checks common
- * default locations before falling back to `'src/public-api.ts'`.
+ * default locations.
  *
  * @param tree The virtual file system tree.
  * @param dir The directory of the primary or secondary entry point.
@@ -127,7 +133,9 @@ function resolveEntryFile(tree: Tree, dir: string, configuredEntry?: string): st
     }
   }
 
-  return 'src/public-api.ts';
+  throw new SchematicsException(
+    `Could not find an entry file for library entry point at "${dir || '.'}".`,
+  );
 }
 
 /**
@@ -150,12 +158,7 @@ function findSecondaryEntryPoints(
   const rootDir = tree.getDir(normalizedRoot);
   const directories = [rootDir];
 
-  while (directories.length > 0) {
-    const current = directories.shift();
-    if (!current) {
-      break;
-    }
-
+  for (const current of directories) {
     const currentPath = normalizeRelativePath(current.path);
 
     if (currentPath !== normalizedRoot) {
@@ -270,9 +273,16 @@ function migrateTargetOptions(
         : {};
 
     if (ngPackageConfig.lib.styleIncludePaths?.length) {
-      existingPreprocessorOptions['includePaths'] = ngPackageConfig.lib.styleIncludePaths.map((p) =>
+      const existingIncludePaths = Array.isArray(existingPreprocessorOptions['includePaths'])
+        ? (existingPreprocessorOptions['includePaths'] as string[])
+        : [];
+      const migratedIncludePaths = ngPackageConfig.lib.styleIncludePaths.map((p) =>
         join(projectDir, p),
       );
+      existingPreprocessorOptions['includePaths'] = [
+        ...existingIncludePaths,
+        ...migratedIncludePaths,
+      ];
     }
     if (ngPackageConfig.lib.sass) {
       existingPreprocessorOptions['sass'] = ngPackageConfig.lib.sass;
