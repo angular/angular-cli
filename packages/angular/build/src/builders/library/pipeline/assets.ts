@@ -35,12 +35,12 @@ export async function collectAssetsToEmit(
     const filesToEmit: DiskOutputFile[] = [];
 
     for (const file of modifiedFiles) {
-      for (const { asset, isMatch } of matchers) {
-        const relative = path.posix.relative(asset.input, file);
-        if (!relative || relative.startsWith('..') || path.posix.isAbsolute(relative)) {
+      for (const { asset, prefix, isMatch } of matchers) {
+        if (!file.startsWith(prefix)) {
           continue;
         }
 
+        const relative = file.slice(prefix.length);
         if (!isMatch(relative)) {
           continue;
         }
@@ -65,7 +65,8 @@ function createAssetMatchers(assets: NormalizedLibraryOptions['assets']) {
       dot: true,
       ignore: [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])],
     });
+    const prefix = asset.input.endsWith('/') ? asset.input : `${asset.input}/`;
 
-    return { asset, isMatch };
+    return { asset, prefix, isMatch };
   });
 }
