@@ -38,9 +38,9 @@ export function getEntryPointBundleName(packageName: string, entryPointName = '.
  * @param posixKey Normalized POSIX key without trailing slashes.
  * @param isPrimary Whether this is the primary entry point.
  * @param targetPath The relative file path string from exports.
- * @param projectRoot The library project root directory.
+ * @param projectRoot The library project root POSIX directory path.
  * @param packageName The root package name (e.g. `@my/lib`).
- * @returns The normalized entry point descriptor.
+ * @returns The normalized entry point descriptor with POSIX paths.
  */
 function normalizeEntryPoint(
   key: string,
@@ -65,7 +65,7 @@ function normalizeEntryPoint(
   const subpath = isPrimary ? '.' : `./${name}`;
   const displayName = (isPrimary ? packageName : `${packageName}/${name}`).toLowerCase();
   const bundleName = getEntryPointBundleName(packageName, name);
-  const entryFilePath = path.resolve(projectRoot, targetPath);
+  const entryFilePath = toPosixPath(path.resolve(projectRoot, targetPath));
 
   if (!/(?<!\.d)\.(?:ts|mts)$/.test(entryFilePath)) {
     throw new Error(
@@ -117,10 +117,10 @@ function resolveTarget(value: unknown): string | undefined {
  * Normalizes all entry points from the library's `package.json` `exports` field.
  *
  * @param rawExports The `exports` field from `package.json`.
- * @param projectRoot The library project root directory.
- * @param packageJsonPath Path to `package.json` for error reporting.
+ * @param projectRoot The library project root POSIX directory path.
+ * @param packageJsonPath POSIX path to `package.json` for error reporting.
  * @param packageName The root package name (e.g. `@my/lib`).
- * @returns A Map of normalized entry points keyed by name.
+ * @returns A Map of normalized entry points keyed by name with POSIX entry file paths.
  */
 export function normalizeEntryPoints(
   rawExports: unknown,
@@ -206,7 +206,11 @@ export function normalizeEntryPoints(
 }
 
 /**
- * Determines whether two sets of normalized entry points differ in keys, paths, or subpaths.
+ * Determines whether two sets of normalized entry points differ in keys, POSIX entry paths, or subpaths.
+ *
+ * @param oldEntryPoints The previous map of normalized entry points.
+ * @param newEntryPoints The new map of normalized entry points.
+ * @returns `true` if any entry point was added, removed, or modified; otherwise `false`.
  */
 export function haveEntryPointsChanged(
   oldEntryPoints: ReadonlyMap<string, NormalizedEntryPoint>,
@@ -234,6 +238,12 @@ export function haveEntryPointsChanged(
 
 /**
  * Updates watched files, entry points in options, and cached bundle results when package.json entry points change.
+ *
+ * @param packageJson The reloaded `package.json` data.
+ * @param options The normalized library builder options.
+ * @param buildState The state preserved across incremental builds.
+ * @param watchedCompilationFiles Set of POSIX file paths tracked for compilation.
+ * @param packageJsonPath Normalized POSIX path to `package.json`.
  */
 export function updateWatchedEntryPoints(
   packageJson: PackageJsonData,
@@ -251,7 +261,7 @@ export function updateWatchedEntryPoints(
 
   if (haveEntryPointsChanged(options.entryPoints, newEntryPoints)) {
     for (const entryPoint of newEntryPoints.values()) {
-      watchedCompilationFiles.add(toPosixPath(entryPoint.entryFilePath));
+      watchedCompilationFiles.add(entryPoint.entryFilePath);
     }
 
     for (const name of buildState.previousBundleResults.keys()) {
@@ -315,8 +325,8 @@ export function collectEntryPointsToBundle(
 /**
  * Checks whether any file in `changedFiles` belongs to the given entry point's `moduleIds`.
  *
- * @param moduleIds Set of module IDs referenced by the entry point's previous bundle.
- * @param changedFiles Set of file paths that changed during compilation.
+ * @param moduleIds Set of virtual POSIX module IDs referenced by the entry point's previous bundle.
+ * @param changedFiles Set of POSIX file paths that changed during compilation.
  * @returns `true` if at least one changed file is part of `moduleIds`; otherwise `false`.
  */
 function hasEntryPointChanges(

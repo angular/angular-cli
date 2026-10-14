@@ -11,7 +11,6 @@ import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import { emitFilesToDisk } from '../../../utils/disk-files';
 import { assertIsError } from '../../../utils/error';
-import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, SingleBuildState } from '../types';
 import { collectAssetsToEmit } from './assets';
 import { bundleEntryPoints } from './bundler';
@@ -49,7 +48,7 @@ export function createSingleBuildState(): SingleBuildState {
  * Context required to execute a single library build iteration.
  */
 export interface BuildActionContext {
-  /** Normalized options for the library build. */
+  /** Normalized options for the library build with POSIX paths. */
   options: NormalizedLibraryOptions;
 
   /** The Architect builder context. */
@@ -62,7 +61,7 @@ export interface BuildActionContext {
   isWatchMode: boolean;
 
   /**
-   * Set of file paths tracked for compilation and configuration
+   * Set of POSIX file paths tracked for compilation and configuration
    * (including `tsconfig.json`, `package.json`, entry points, and referenced source,
    * template, and stylesheet files). Updated during compilation and used to determine
    * whether file changes require recompiling entry points, excluding asset files so
@@ -73,7 +72,7 @@ export interface BuildActionContext {
   /** State preserved across incremental builds in watch mode. */
   buildState: SingleBuildState;
 
-  /** Set of file paths modified since the last build iteration. */
+  /** Set of POSIX file paths modified since the last build iteration. */
   modifiedFiles?: Set<string>;
 
   /**
@@ -91,6 +90,7 @@ export interface BuildActionContext {
  * manifest generation, and asset copying.
  *
  * @param actionContext The build action state and configuration.
+ * @returns A promise resolving to the build action result containing errors, warnings, and logs.
  */
 export async function buildAction(actionContext: BuildActionContext): Promise<BuildActionResult> {
   const {
@@ -106,10 +106,10 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
   const warnings: string[] = [];
   const logs: string[] = [];
 
-  const posixPackageJsonPath = toPosixPath(options.packageJsonPath);
+  const { packageJsonPath } = options;
   const { pendingChangedEsmFiles, pendingChangedDtsFiles } = buildState;
 
-  if (!modifiedFiles || modifiedFiles.has(posixPackageJsonPath)) {
+  if (!modifiedFiles || modifiedFiles.has(packageJsonPath)) {
     buildState.hasEmittedManifests = false;
   }
 
@@ -120,7 +120,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
     buildState.hasEntryPointsChanges ||
     pendingChangedEsmFiles.size > 0 ||
     pendingChangedDtsFiles.size > 0 ||
-    hasModifiedWatchedFile(modifiedFiles, watchedCompilationFiles, posixPackageJsonPath);
+    hasModifiedWatchedFile(modifiedFiles, watchedCompilationFiles, packageJsonPath);
 
   try {
     if (!buildState.hasEmittedManifests) {
@@ -172,13 +172,12 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
         pendingChangedDtsFiles.add(file);
       }
 
-      const itemsToBundle = collectEntryPointsToBundle(options, buildState, logs);
-
       let bundleOutput: Awaited<ReturnType<typeof bundleEntryPoints>> | undefined;
       let diagnostics: LibraryCompilationDiagnostics;
       if (hasStylesheetErrors) {
         diagnostics = await diagnosePromise;
       } else {
+        const itemsToBundle = collectEntryPointsToBundle(options, buildState, logs);
         try {
           [bundleOutput, diagnostics] = await Promise.all([
             bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, {
@@ -243,7 +242,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
     ));
     filesToEmit.push(...resolvedAssetsToEmit);
 
-    await emitFilesToDisk(filesToEmit, (file) => path.join(options.outputPath, file.path));
+    await emitFilesToDisk(filesToEmit, (file) => path.posix.join(options.outputPath, file.path));
 
     buildState.hasEmittedManifests = true;
     buildState.hasEmittedTslib = hasTslibImport;
@@ -262,16 +261,16 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Bu
  *
  * @param modifiedFiles Set of POSIX file paths modified since the last build.
  * @param watchedCompilationFiles Set of POSIX file paths tracked for compilation.
- * @param posixPackageJsonPath The normalized POSIX path to the library's `package.json`.
+ * @param packageJsonPath The normalized POSIX path to the library's `package.json`.
  * @returns `true` if a watched compilation file was modified; otherwise `false`.
  */
 export function hasModifiedWatchedFile(
   modifiedFiles: ReadonlySet<string>,
   watchedCompilationFiles: ReadonlySet<string>,
-  posixPackageJsonPath: string,
+  packageJsonPath: string,
 ): boolean {
   for (const file of modifiedFiles) {
-    if (file !== posixPackageJsonPath && watchedCompilationFiles.has(file)) {
+    if (file !== packageJsonPath && watchedCompilationFiles.has(file)) {
       return true;
     }
   }
