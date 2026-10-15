@@ -48,6 +48,15 @@ const TTC_EXTENSION = '.ngtypecheck.ts';
 const TTC_EXTENSION_LENGTH = TTC_EXTENSION.length;
 
 /**
+ * Internal TypeScript `ts.EmitOnly` enum values used by `Program.emit`.
+ */
+enum EmitOnly {
+  Js = 0,
+  Dts = 1,
+  BuilderSignature = 2,
+}
+
+/**
  * Checks if a file is an Angular type-checking shim file.
  */
 function isNgTypeCheckFile(fileName: string): boolean {
@@ -226,7 +235,7 @@ export class AotCompilation extends TypeScriptCompilation {
     );
 
     const filesWithoutDtsSignature = this.#state?.filesWithoutDtsSignature ?? new Set<string>();
-    if (!this.#state) {
+    if (!this.#state && !usingBuildInfo && (useTypeChecking || useTypeScriptTranspilation)) {
       for (const sourceFile of typeScriptProgram.getSourceFiles()) {
         if (
           !sourceFile.isDeclarationFile &&
@@ -449,19 +458,30 @@ export class AotCompilation extends TypeScriptCompilation {
           typeScriptProgram,
         );
 
+        // Temporarily enable `isolatedModules` and `assumeChangesOnlyAffectDirectDependencies` while
+        // draining the newly created `.ngtypecheck.ts` files. Because each component `.ts` file
+        // references its `.ngtypecheck.ts` shim via `sourceFile.referencedFiles`, TypeScript's
+        // `referencedMap` treats the component `.ts` file as depending on its `.ngtypecheck.ts` shim.
+        // Without both flags (whether `isolatedModules` is enabled or disabled in `tsconfig`),
+        // TypeScript would walk from `.ngtypecheck.ts` to the component `.ts` file and its transitive
+        // importers, resetting their `.d.ts` shape signatures and queueing them into
+        // `affectedFilesPendingEmit` for the next incremental rebuild.
+        const compilerOptions = currentTsProgram.getCompilerOptions();
+        const prevIsolatedModules = compilerOptions.isolatedModules;
+        const prevAssumeDirect = compilerOptions.assumeChangesOnlyAffectDirectDependencies;
+        compilerOptions.isolatedModules = true;
+        compilerOptions.assumeChangesOnlyAffectDirectDependencies = true;
+
         const baseEmit = currentTsProgram.emit;
         currentTsProgram.emit = () => ({ emitSkipped: true, diagnostics: [] });
         try {
-          while (
-            this.#state.typeScriptProgram.getSemanticDiagnosticsOfNextAffectedFile(
-              undefined,
-              () => true,
-            )
-          ) {
+          while (this.#state.typeScriptProgram.emitNextAffectedFile(() => {})) {
             /* empty */
           }
         } finally {
           currentTsProgram.emit = baseEmit;
+          compilerOptions.isolatedModules = prevIsolatedModules;
+          compilerOptions.assumeChangesOnlyAffectDirectDependencies = prevAssumeDirect;
         }
       }
     }
@@ -478,11 +498,12 @@ export class AotCompilation extends TypeScriptCompilation {
       useTypeScriptTranspilation,
     } = this.#state;
     const compilerOptions = typeScriptProgram.getCompilerOptions();
-    const isLibraryEmit = !!compilerOptions.declaration;
+    const emitDeclarations = !!compilerOptions.declaration;
     const buildInfoFilename = compilerOptions.tsBuildInfoFile ?? '.tsbuildinfo';
 
     const emittedFiles = new Map<string, EmitFileResult>();
     const emittedSourceFiles = new Set<ts.SourceFile>();
+    const emittedDtsSourceFiles = new Set<ts.SourceFile>();
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
       if (!sourceFiles?.length && filename.endsWith(buildInfoFilename)) {
         // Save builder info contents to specified location
@@ -497,13 +518,20 @@ export class AotCompilation extends TypeScriptCompilation {
         return;
       }
 
-      angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
-      emittedSourceFiles.add(sourceFile);
-      const targetFilename = isLibraryEmit ? filename : sourceFile.fileName;
+      const isMap = filename.endsWith('.map');
+      const isDts = !isMap && /\.d\.[cm]?ts$/i.test(filename);
+      if (!emitDeclarations || (!isMap && !isDts)) {
+        angularCompiler.incrementalCompilation.recordSuccessfulEmit(sourceFile);
+        emittedSourceFiles.add(sourceFile);
+      } else if (isDts) {
+        emittedDtsSourceFiles.add(sourceFile);
+      }
+
+      const targetFilename = emitDeclarations ? filename : sourceFile.fileName;
       emittedFiles.set(targetFilename, { filename: targetFilename, contents });
     };
     const transformers = angularCompiler.prepareEmit().transformers;
-    if (!isLibraryEmit) {
+    if (!emitDeclarations) {
       transformers.before ??= [];
       transformers.before.push(
         replaceBootstrap(() => typeScriptProgram.getProgram().getTypeChecker()),
@@ -513,6 +541,8 @@ export class AotCompilation extends TypeScriptCompilation {
       if (!this.browserOnlyBuild) {
         transformers.before.push(lazyRoutesTransformer(compilerOptions, compilerHost));
       }
+    } else if (transformers.before?.length && transformers.afterDeclarations?.length) {
+      ensurePreDeclarationTransformers(transformers);
     }
 
     // Emit is handled in write file callback when using TypeScript
@@ -554,15 +584,14 @@ export class AotCompilation extends TypeScriptCompilation {
         continue;
       }
 
-      if (
-        angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile) &&
-        (!useTypeScriptTranspilation || !affectedFiles.has(sourceFile))
-      ) {
+      if (angularCompiler.incrementalCompilation.safeToSkipEmit(sourceFile)) {
         continue;
       }
 
       if (useTypeScriptTranspilation) {
-        const emitOnly = affectedFiles.has(sourceFile) ? undefined : false;
+        const emitOnly = emittedDtsSourceFiles.has(sourceFile)
+          ? (EmitOnly.Js as unknown as boolean)
+          : undefined;
         typeScriptProgram.emit(sourceFile, writeFileCallback, undefined, emitOnly, transformers);
         continue;
       }
@@ -618,6 +647,60 @@ export class AotCompilation extends TypeScriptCompilation {
   }
 }
 
+/**
+ * When TypeScript's `BuilderProgram.emitNextAffectedFile` emits `.d.ts`-only (`emitOnly = Dts`)
+ * for a transitive importer, TypeScript skips `transformers.before`. However, Angular's
+ * `declarationTransformFactory` in `afterDeclarations` relies on `ivyTransformFactory` in
+ * `before` having compiled the file's classes to populate `dtsTransforms`.
+ *
+ * This helper ensures `before` transformers have executed on the original `SourceFile` prior to
+ * `afterDeclarations`, and caches the transformed `SourceFile` so a subsequent `.js` emit for the
+ * same file does not re-execute `before` transformers.
+ */
+function ensurePreDeclarationTransformers(transformers: ts.CustomTransformers): void {
+  if (!transformers.before?.length || !transformers.afterDeclarations?.length) {
+    return;
+  }
+
+  const beforeTransformers = transformers.before as ts.TransformerFactory<ts.SourceFile>[];
+  const transformedSourceFiles = new Set<ts.SourceFile>();
+  transformers.before = beforeTransformers.map((factory, index) =>
+    index === 0
+      ? (context) => {
+          const transform = factory(context);
+
+          return (sourceFile) => {
+            transformedSourceFiles.add(ts.getOriginalNode(sourceFile, ts.isSourceFile));
+
+            return transform(sourceFile);
+          };
+        }
+      : factory,
+  );
+  transformers.afterDeclarations = [
+    (context) => {
+      let beforeTransforms: ts.Transformer<ts.SourceFile>[] | undefined;
+
+      return (fileOrBundle) => {
+        if (!ts.isBundle(fileOrBundle)) {
+          const originalSourceFile = ts.getOriginalNode(fileOrBundle, ts.isSourceFile);
+          if (!transformedSourceFiles.has(originalSourceFile)) {
+            transformedSourceFiles.add(originalSourceFile);
+            beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
+            let current = originalSourceFile;
+            for (const transform of beforeTransforms) {
+              current = transform(current);
+            }
+          }
+        }
+
+        return fileOrBundle;
+      };
+    },
+    ...transformers.afterDeclarations,
+  ];
+}
+
 function findAffectedFiles(
   builder: ts.EmitAndSemanticDiagnosticsBuilderProgram,
   { ignoreForDiagnostics, incrementalCompilation }: ng.NgtscProgram['compiler'],
@@ -627,10 +710,15 @@ function findAffectedFiles(
 ): Set<ts.SourceFile> {
   const affectedFiles = new Set<ts.SourceFile>();
 
-  // Temporarily disable `isolatedModules` and `verbatimModuleSyntax` while walking affected
-  // files so TypeScript's `getFilesAffectedByUpdatedShapeWhenModuleEmit` yields dependent
-  // `.ngtypecheck.ts` shims to the `ignoreSourceFile` callback when a file's `.d.ts` shape
-  // changes, instead of returning only the modified file itself.
+  // Temporarily disable `isolatedModules` and `verbatimModuleSyntax` while walking affected files.
+  // In TypeScript, `getIsolatedModules(options)` is true when either `isolatedModules` or
+  // `verbatimModuleSyntax` is enabled, which causes `getFilesAffectedByUpdatedShapeWhenModuleEmit`
+  // to short-circuit and return only `[sourceFileWithUpdatedShape]` instead of walking
+  // `referencedMap` during `getSemanticDiagnosticsOfNextAffectedFile`.
+  // Disabling both flags forces TypeScript to traverse `referencedMap` when a file's `.d.ts` shape
+  // signature changes so that dependent files—especially `.ngtypecheck.ts` shims that reference
+  // directives or pipes used in templates—are visited by the `ignoreSourceFile` callback and have
+  // their own `.d.ts` shape signatures updated along the dependency chain.
   const compilerOptions = builder.getCompilerOptions();
   const prevIsolatedModules = compilerOptions.isolatedModules;
   const prevVerbatimModuleSyntax = compilerOptions.verbatimModuleSyntax;
@@ -640,6 +728,8 @@ function findAffectedFiles(
   const program = builder.getProgram();
   const baseEmit = program.emit;
   const oldProgram = oldBuilder?.getProgram();
+  const hadDtsSignatureComputed = new Set<string>();
+  const tsAffectedFiles: ts.SourceFile[] = [];
   program.emit = (
     targetSourceFile,
     writeFile,
@@ -677,8 +767,9 @@ function findAffectedFiles(
             (fileName, text, writeByteOrderMark, onError, sourceFiles, data) => {
               const newHasDiagnostics = !!(data as { diagnostics?: unknown[] } | undefined)
                 ?.diagnostics?.length;
-              if (text !== oldDtsText || newHasDiagnostics !== oldHasDiagnostics) {
+              if (text !== oldDtsText || oldHasDiagnostics || newHasDiagnostics) {
                 filesWithoutDtsSignature.delete(targetSourceFile.fileName);
+                hadDtsSignatureComputed.add(targetSourceFile.fileName);
                 writeFile?.(fileName, text, writeByteOrderMark, onError, sourceFiles, data);
               }
             },
@@ -691,6 +782,8 @@ function findAffectedFiles(
 
         filesWithoutDtsSignature.delete(targetSourceFile.fileName);
       }
+
+      hadDtsSignatureComputed.add(targetSourceFile.fileName);
     }
 
     return baseEmit.call(
@@ -716,7 +809,7 @@ function findAffectedFiles(
           // A TTC shim is a file that has been ignored for diagnostics and has a filename ending in `.ngtypecheck.ts`.
           if (isNgTypeCheckFile(sourceFile.fileName)) {
             // This file name conversion relies on internal compiler logic and should be converted
-            // to an official method when available. 15 is length of `.ngtypecheck.ts`
+            // to an official method when available.
             const originalFilename = getOriginalFilename(sourceFile.fileName);
             const originalSourceFile = builder.getSourceFile(originalFilename);
             if (originalSourceFile) {
@@ -725,6 +818,7 @@ function findAffectedFiles(
           }
         } else {
           affectedFiles.add(sourceFile);
+          tsAffectedFiles.push(sourceFile);
         }
 
         return true;
@@ -736,6 +830,16 @@ function findAffectedFiles(
     program.emit = baseEmit;
     compilerOptions.isolatedModules = prevIsolatedModules;
     compilerOptions.verbatimModuleSyntax = prevVerbatimModuleSyntax;
+  }
+
+  // Transitive importers visited by `getSemanticDiagnosticsOfNextAffectedFile` via
+  // `handleDtsMayChangeOf` do not have a `.d.ts` signature computed via `program.emit` and
+  // instead have their BuilderProgram signature reset to `sourceFile.version`. Track them so
+  // `populatePreviousDtsSignatures` restores their `.d.ts` signature if they are modified later.
+  for (const sourceFile of tsAffectedFiles) {
+    if (!sourceFile.isDeclarationFile && !hadDtsSignatureComputed.has(sourceFile.fileName)) {
+      filesWithoutDtsSignature.add(sourceFile.fileName);
+    }
   }
 
   // Also include files identified by Angular's incremental compilation graph as needing
@@ -762,7 +866,7 @@ function findAffectedFiles(
     for (const sourceFile of builder.getSourceFiles()) {
       if (ignoreForDiagnostics.has(sourceFile) && isNgTypeCheckFile(sourceFile.fileName)) {
         // This file name conversion relies on internal compiler logic and should be converted
-        // to an official method when available. 15 is length of `.ngtypecheck.ts`
+        // to an official method when available.
         const originalFilename = getOriginalFilename(sourceFile.fileName);
         const originalSourceFile = builder.getSourceFile(originalFilename);
         if (originalSourceFile) {
@@ -819,7 +923,7 @@ function populatePreviousDtsSignatures(
     targetSourceFile?: ts.SourceFile,
     writeFile?: ts.WriteFileCallback,
     cancellationToken?: ts.CancellationToken,
-    emitOnlyDtsFiles?: boolean | number,
+    emitOnlyDtsFiles?: boolean | EmitOnly,
     customTransformers?: ts.CustomTransformers,
     forceDtsEmit?: boolean,
   ) => ts.EmitResult;
@@ -829,7 +933,7 @@ function populatePreviousDtsSignatures(
       targetSourceFile,
       writeFile,
       cancellationToken,
-      2, // ts.EmitOnly.BuilderSignature
+      EmitOnly.BuilderSignature,
       undefined,
       true, // forceDtsEmit
     );

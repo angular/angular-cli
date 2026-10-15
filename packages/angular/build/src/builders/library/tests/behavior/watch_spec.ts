@@ -8,7 +8,7 @@
 
 import { rm } from 'node:fs/promises';
 import { executeLibraryBuilder } from '../../builder';
-import { InlineStyleLanguage } from '../../schema';
+import { CompilationMode, InlineStyleLanguage } from '../../schema';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
@@ -646,6 +646,204 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
           expect(content).toMatch(/color:\s*(?:#c86432|rgb\(200,\s*100,\s*50\))/);
           expect(content).toMatch(/padding:\s*12px/);
+        },
+      ]);
+    });
+
+    it('should only rebuild affected entry point when an external template is modified with isolatedModules enabled', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/lib.component.html': '<p>Primary Initial</p>',
+        'projects/lib/src/lib/lib.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-primary',
+            templateUrl: './lib.component.html',
+          })
+          export class LibComponent {}
+        `,
+        'projects/lib/secondary/src/secondary.component.html': '<p>Secondary Initial</p>',
+        'projects/lib/secondary/src/secondary.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-secondary',
+            templateUrl: './secondary.component.html',
+          })
+          export class SecondaryComponent {}
+        `,
+        'projects/lib/secondary/src/public-api.ts': `
+          export { SecondaryComponent } from './secondary.component';
+        `,
+      });
+
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.isolatedModules = true;
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './secondary': './secondary/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib-secondary.mjs')).toContain(
+            'Secondary Initial',
+          );
+          expect(harness.readFile('dist/lib/types/lib.d.ts')).toContain('ɵcmp');
+          expect(harness.readFile('dist/lib/types/lib-secondary.d.ts')).toContain('ɵcmp');
+
+          await harness.writeFile(
+            'projects/lib/secondary/src/secondary.component.html',
+            '<p>Secondary Updated</p>',
+          );
+        },
+        ({ result, logs }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib-secondary.mjs')).toContain(
+            'Secondary Updated',
+          );
+          expect(harness.readFile('dist/lib/types/lib.d.ts')).toContain('ɵcmp');
+          expect(harness.readFile('dist/lib/types/lib-secondary.d.ts')).toContain('ɵcmp');
+
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib/secondary...'),
+            }),
+          );
+          expect(logs).not.toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib...'),
+            }),
+          );
+        },
+      ]);
+    });
+
+    it('should rebuild dependent entry point when a shared component input is added in watch mode', async () => {
+      await harness.writeFiles({
+        'projects/lib/shared/src/public-api.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-shared-icon',
+            template: '<span>icon</span>',
+          })
+          export class SharedIconComponent {}
+        `,
+        'projects/lib/src/lib/lib.component.ts': `
+          import { Component } from '@angular/core';
+          import { SharedIconComponent } from 'lib/shared';
+
+          @Component({
+            selector: 'lib-primary',
+            imports: [SharedIconComponent],
+            template: '<lib-shared-icon />',
+          })
+          export class LibComponent {}
+        `,
+      });
+
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.isolatedModules = true;
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './shared': './shared/src/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        compilationMode: CompilationMode.Partial,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+
+          // Trigger a rebuild of `lib` first so `lib/shared` undergoes a `.d.ts`-only check
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.ts',
+            `
+            import { Component } from '@angular/core';
+            import { SharedIconComponent } from 'lib/shared';
+
+            @Component({
+              selector: 'lib-primary',
+              imports: [SharedIconComponent],
+              template: '<lib-shared-icon class="updated" />',
+            })
+            export class LibComponent {}
+            `,
+          );
+        },
+        async ({ result, logs }) => {
+          expect(result?.success).toBeTrue();
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib...'),
+            }),
+          );
+          expect(logs).not.toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib/shared...'),
+            }),
+          );
+
+          // Add a new @Input() to SharedIconComponent
+          await harness.writeFile(
+            'projects/lib/shared/src/public-api.ts',
+            `
+            import { Component, Input } from '@angular/core';
+
+            @Component({
+              selector: 'lib-shared-icon',
+              template: '<span>{{ name }}</span>',
+            })
+            export class SharedIconComponent {
+              @Input() name = 'default';
+            }
+            `,
+          );
+        },
+        ({ result, logs }) => {
+          expect(result?.success).toBeTrue();
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib/shared...'),
+            }),
+          );
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('Compiling lib...'),
+            }),
+          );
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain('"name"');
         },
       ]);
     });
