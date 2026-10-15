@@ -775,7 +775,7 @@ describe('Watcher', () => {
       }
     }, 10000);
 
-    it('should unwatch linked package directory when all its files are removed via watcher.remove', async () => {
+    it('should unwatch linked package file when removed via watcher.remove', async () => {
       const externalDir = fs.mkdtempSync(path.join(TMP_DIR, 'watcher-remove-npm-link-'));
       let watcher: BuildWatcher | undefined;
 
@@ -813,7 +813,7 @@ describe('Watcher', () => {
 
         // Remove the linked file from the watcher
         watcher.remove(linkedFile);
-        // Allow a brief moment for Chokidar to asynchronously complete unwatching the package directory
+        // Allow a brief moment for Chokidar to asynchronously complete unwatching the file
         await setTimeout(250);
 
         // Modify both the removed linked file and the regular file
@@ -874,6 +874,98 @@ describe('Watcher', () => {
       } finally {
         await watcher?.close();
         fs.rmSync(externalRoot, { recursive: true, force: true });
+      }
+    }, 10000);
+
+    it('should detect file deletion and recreation when watching multiple files with followSymlinks: true', async () => {
+      const subDirA = path.join(tempDir, 'dir-a');
+      const subDirB = path.join(tempDir, 'dir-b');
+      fs.mkdirSync(subDirA);
+      fs.mkdirSync(subDirB);
+
+      const fileA = path.join(subDirA, 'a.ts');
+      const fileB = path.join(subDirB, 'b.ts');
+      fs.writeFileSync(fileA, 'export const a = 1;');
+      fs.writeFileSync(fileB, 'export const b = 1;');
+
+      const watcher = await createWatcher({
+        followSymlinks: true,
+        cwd: tempDir,
+      });
+
+      try {
+        watcher.add([fileA, fileB]);
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+
+        // Delete fileA and wait past Chokidar's atomic write window
+        fs.rmSync(fileA);
+        let result = await iterator.next();
+        expect(result.done).toBeFalsy();
+        expect(result.value?.removed.size).toBeGreaterThan(0);
+
+        await setTimeout(150);
+
+        // Recreate fileA and verify the watcher still detects it
+        fs.writeFileSync(fileA, 'export const a = 2;');
+        result = await iterator.next();
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('a.ts'))).toBeTrue();
+
+        // Modify recreated fileA again to ensure ongoing changes are tracked
+        await setTimeout(150);
+        fs.writeFileSync(fileA, 'export const a = 3;');
+        result = await iterator.next();
+        expect(result.done).toBeFalsy();
+        expect(result.value?.all.some((f: string) => f.includes('a.ts'))).toBeTrue();
+      } finally {
+        await watcher.close();
+      }
+    }, 10000);
+
+    it('should prune node_modules when watching root directory while watching added package files', async () => {
+      const nodeModulesDir = path.join(tempDir, 'node_modules');
+      const pkgDir = path.join(nodeModulesDir, 'some-pkg');
+      fs.mkdirSync(pkgDir, { recursive: true });
+
+      const watchedPkgFile = path.join(pkgDir, 'index.js');
+      const unwatchedPkgFile = path.join(pkgDir, 'other.js');
+      const rootFile = path.join(tempDir, 'main.ts');
+      fs.writeFileSync(watchedPkgFile, 'export const idx = 1;');
+      fs.writeFileSync(unwatchedPkgFile, 'export const other = 1;');
+      fs.writeFileSync(rootFile, 'export const main = 1;');
+
+      const pastTime = new Date(Date.now() - 5000);
+      fs.utimesSync(watchedPkgFile, pastTime, pastTime);
+      fs.utimesSync(unwatchedPkgFile, pastTime, pastTime);
+      fs.utimesSync(rootFile, pastTime, pastTime);
+
+      const watcher = await createWatcher({
+        followSymlinks: true,
+        cwd: tempDir,
+      });
+
+      try {
+        // Watch both the root directory and a specific file in node_modules
+        watcher.add([tempDir, watchedPkgFile]);
+        await setTimeout(250);
+
+        const iterator = watcher[Symbol.asyncIterator]();
+        const nextPromise = iterator.next();
+
+        // Modify unwatched file in node_modules (should be ignored even though tempDir is watched)
+        // and watched file in node_modules
+        fs.writeFileSync(unwatchedPkgFile, 'export const other = 2;');
+        fs.writeFileSync(watchedPkgFile, 'export const idx = 2;');
+
+        const result = await nextPromise;
+        expect(result.done).toBeFalsy();
+        const changed = result.value?.all ?? [];
+        expect(changed.some((f: string) => f.includes('index.js'))).toBeTrue();
+        expect(changed.some((f: string) => f.includes('other.js'))).toBeFalse();
+      } finally {
+        await watcher.close();
       }
     }, 10000);
   });
