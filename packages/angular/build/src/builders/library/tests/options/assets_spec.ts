@@ -15,6 +15,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       await harness.writeFiles({
         'projects/lib/assets-dir/file-a.png': 'PNG_A',
         'projects/lib/assets-dir/file-b.png': 'PNG_B',
+        'projects/lib/assets-dir/ignored.png': 'PNG_IGNORED',
         'projects/lib/assets-dir/file-c.svg': 'SVG_C',
       });
 
@@ -25,6 +26,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
             glob: '**/*.png',
             input: 'projects/lib/assets-dir',
             output: 'assets',
+            ignore: ['ignored.png'],
           },
         ],
       });
@@ -34,6 +36,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       expect(harness.readFile('dist/lib/assets/file-a.png')).toBe('PNG_A');
       expect(harness.readFile('dist/lib/assets/file-b.png')).toBe('PNG_B');
+      expect(harness.hasFile('dist/lib/assets/ignored.png')).toBeFalse();
       expect(harness.hasFile('dist/lib/assets/file-c.svg')).toBeFalse();
     });
 
