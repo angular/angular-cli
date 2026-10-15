@@ -25,6 +25,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
 import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSlash } from './url';
+import { getFirstHeaderValue } from './validation';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.
@@ -126,7 +127,9 @@ export async function renderAngular(
 
       const requestPrefix =
         envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
-        envInjector.get(REQUEST, null, { optional: true })?.headers.get('X-Forwarded-Prefix');
+        getFirstHeaderValue(
+          envInjector.get(REQUEST, null, { optional: true })?.headers.get('X-Forwarded-Prefix'),
+        );
 
       const { pathname, search, hash } = envInjector.get(PlatformLocation);
       const finalUrl = constructSerializedUrl(router, { pathname, search, hash }, requestPrefix);
