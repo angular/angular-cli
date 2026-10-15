@@ -26,7 +26,7 @@ const EMITTED_EXTENSIONS = ['.js', '.mjs', '.cjs', '.d.ts', '.d.mts', '.d.cts'];
  *
  * @param options The normalized library builder options with POSIX paths.
  * @param stylesheetBundler The component stylesheet bundler instance.
- * @param buildState The build state tracking compilation caches and diagnostics.
+ * @param buildState The build state tracking compilation caches, file references, and diagnostics.
  * @param modifiedFiles Optional set of modified POSIX file paths for incremental compilation.
  * @returns A promise resolving to the compilation output containing emitted files and cache state.
  */
@@ -70,9 +70,9 @@ export async function compileLibrary(
 
     if (effectiveModifiedFiles && effectiveModifiedFiles.size > 0) {
       await compilationInstance.update?.(effectiveModifiedFiles);
+      buildState.clearFileReferences(effectiveModifiedFiles);
     }
 
-    const allReferencedFiles = new Set<string>();
     const stylesheetWarnings: PartialMessage[] = [];
     const stylesheetErrors: PartialMessage[] = [];
     const failedFiles = new Set<string>();
@@ -88,7 +88,13 @@ export async function compileLibrary(
           ? await stylesheetBundler.bundleFile(stylesheetFile)
           : await stylesheetBundler.bundleInline(data, containingFile);
 
-        result.referencedFiles?.forEach((f) => allReferencedFiles.add(toPosixPath(f)));
+        if (result.referencedFiles) {
+          buildState.addFileReferences(containingFile, result.referencedFiles);
+          if (stylesheetFile) {
+            buildState.addFileReferences(stylesheetFile, result.referencedFiles);
+          }
+        }
+
         if (result.warnings.length > 0) {
           stylesheetWarnings.push(...result.warnings);
         }
@@ -137,14 +143,11 @@ export async function compileLibrary(
     const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
     const changedEsmFiles = new Set<string>();
     const changedDtsFiles = new Set<string>();
-
-    for (const ref of referencedFiles) {
-      allReferencedFiles.add(toPosixPath(ref));
-    }
+    const posixReferencedFiles = new Set(referencedFiles.map(toPosixPath));
 
     if (cached && effectiveModifiedFiles) {
       for (const modifiedFile of effectiveModifiedFiles) {
-        if (allReferencedFiles.has(modifiedFile)) {
+        if (posixReferencedFiles.has(modifiedFile)) {
           continue;
         }
 
@@ -187,7 +190,7 @@ export async function compileLibrary(
       dtsFiles,
       changedEsmFiles,
       changedDtsFiles,
-      referencedFiles: allReferencedFiles,
+      referencedFiles: posixReferencedFiles,
       cache: {
         compilationInstance,
         esmFiles,

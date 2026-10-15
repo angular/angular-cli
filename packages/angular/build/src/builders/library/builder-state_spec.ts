@@ -70,6 +70,58 @@ describe('BuilderState', () => {
     });
   });
 
+  describe('file reference tracking', () => {
+    it('should expand transitive multi-hop references and ignore self-references', () => {
+      const state = new BuilderState();
+      const compTs = '/workspace/projects/my-lib/src/lib/comp.ts';
+      const compScss = '/workspace/projects/my-lib/src/lib/comp.scss';
+      const varsScss = '/workspace/projects/my-lib/src/lib/_vars.scss';
+
+      state.addFileReferences(compTs, [compTs, compScss, varsScss]);
+      state.addFileReferences(compScss, [compScss, varsScss]);
+
+      expect(state.watchedCompilationFiles.has(compTs)).toBeTrue();
+      expect(state.watchedCompilationFiles.has(compScss)).toBeTrue();
+      expect(state.watchedCompilationFiles.has(varsScss)).toBeTrue();
+
+      const affected = state.getAffectedFiles([varsScss]);
+      expect(affected).toEqual(new Set([varsScss, compTs, compScss]));
+
+      // Subsequent getAffectedFiles calls preserve mappings when not yet overwritten
+      const affectedAgain = state.getAffectedFiles([varsScss]);
+      expect(affectedAgain).toEqual(new Set([varsScss, compTs, compScss]));
+    });
+
+    it('should accumulate references across multiple stylesheets for the same containing file', () => {
+      const state = new BuilderState();
+      const compTs = '/workspace/projects/my-lib/src/lib/comp.ts';
+      const firstPartial = '/workspace/projects/my-lib/src/lib/_first.scss';
+      const secondPartial = '/workspace/projects/my-lib/src/lib/_second.scss';
+
+      state.addFileReferences(compTs, [compTs, firstPartial]);
+      state.addFileReferences(compTs, [compTs, secondPartial]);
+
+      expect(state.getAffectedFiles([firstPartial])).toEqual(new Set([firstPartial, compTs]));
+      expect(state.getAffectedFiles([secondPartial])).toEqual(new Set([secondPartial, compTs]));
+    });
+
+    it('should prune stale references when a containing file is cleared and re-recorded', () => {
+      const state = new BuilderState();
+      const compTs = '/workspace/projects/my-lib/src/lib/comp.ts';
+      const oldPartial = '/workspace/projects/my-lib/src/lib/_old.scss';
+      const newPartial = '/workspace/projects/my-lib/src/lib/_new.scss';
+
+      state.addFileReferences(compTs, [compTs, oldPartial]);
+      expect(state.getAffectedFiles([oldPartial])).toEqual(new Set([oldPartial, compTs]));
+
+      // Clear and re-record references for compTs without oldPartial
+      state.clearFileReferences([compTs]);
+      state.addFileReferences(compTs, [compTs, newPartial]);
+      expect(state.getAffectedFiles([oldPartial])).toEqual(new Set([oldPartial]));
+      expect(state.getAffectedFiles([newPartial])).toEqual(new Set([newPartial, compTs]));
+    });
+  });
+
   describe('shouldCompileEntryPoints & getCompilationModifiedFiles', () => {
     it('should preserve pending compilation files across aborted iterations', () => {
       const state = new BuilderState({
