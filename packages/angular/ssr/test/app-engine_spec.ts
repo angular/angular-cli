@@ -16,6 +16,7 @@ import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
 import { RenderMode } from '../src/routes/route-config';
+import { DEFAULT_MAX_REDIRECT_LOCATION_LENGTH } from '../src/utils/redirect';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 @Component({
@@ -215,6 +216,41 @@ describe('AngularAppEngine', () => {
         expect(response?.headers.get('Location')).toBe('/app/it');
       });
 
+      it('should return a 400 status when the locale redirect location is too long', async () => {
+        const consoleErrorSpy = spyOn(console, 'error');
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/' + 'a'.repeat(DEFAULT_MAX_REDIRECT_LOCATION_LENGTH),
+          },
+        });
+
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(400);
+        expect(response?.headers.get('Location')).toBeNull();
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('exceeds the maximum allowed length of 2048 characters'),
+        );
+      });
+
+      it('should allow longer locale redirect locations when "maxRedirectLocationLength" is set', async () => {
+        const prefix = '/' + 'a'.repeat(DEFAULT_MAX_REDIRECT_LOCATION_LENGTH);
+        const engine = new AngularAppEngine({
+          trustProxyHeaders: true,
+          maxRedirectLocationLength: 4096,
+        });
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': prefix,
+          },
+        });
+
+        const response = await engine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe(`${prefix}/it`);
+      });
+
       it('should completely ignore proxy headers if not allowed', async () => {
         const strictEngine = new AngularAppEngine({ trustProxyHeaders: false });
         const request = new Request('https://example.com', {
@@ -312,7 +348,10 @@ describe('AngularAppEngine', () => {
         entryPoints: {
           '': async () => {
             setAngularAppTestingManifest(
-              [{ path: 'home', component: HomeComponent }],
+              [
+                { path: 'home', component: HomeComponent },
+                { path: 'redirect', redirectTo: 'home' },
+              ],
               [{ path: '**', renderMode: RenderMode.Server }],
             );
 
@@ -351,6 +390,39 @@ describe('AngularAppEngine', () => {
       const request = new Request('https://example.com/home/index.html');
       const response = await appEngine.handle(request);
       expect(await response?.text()).toContain('Home works');
+    });
+
+    it('should return a 400 status when the redirect location exceeds the default maximum length', async () => {
+      const consoleErrorSpy = spyOn(console, 'error');
+      const engine = new AngularAppEngine();
+      const request = new Request(
+        `https://example.com/redirect?q=${'a'.repeat(DEFAULT_MAX_REDIRECT_LOCATION_LENGTH)}`,
+      );
+
+      const response = await engine.handle(request);
+      expect(response?.status).toBe(400);
+      expect(response?.headers.get('Location')).toBeNull();
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('exceeds the maximum allowed length of 2048 characters'),
+      );
+    });
+
+    it('should allow longer redirect locations when "maxRedirectLocationLength" is set', async () => {
+      const query = 'a'.repeat(DEFAULT_MAX_REDIRECT_LOCATION_LENGTH);
+      const engine = new AngularAppEngine({ maxRedirectLocationLength: 4096 });
+      const request = new Request(`https://example.com/redirect?q=${query}`);
+
+      const response = await engine.handle(request);
+      expect(response?.status).toBe(302);
+      expect(response?.headers.get('Location')).toBe(`/home?q=${query}`);
+    });
+
+    it('should throw an error when "maxRedirectLocationLength" is not a positive integer', () => {
+      for (const maxRedirectLocationLength of [0, -1, 1.5, NaN, Infinity]) {
+        expect(() => new AngularAppEngine({ maxRedirectLocationLength }))
+          .withContext(`maxRedirectLocationLength: ${maxRedirectLocationLength}`)
+          .toThrowError(/"maxRedirectLocationLength" must be a positive integer/);
+      }
     });
   });
 

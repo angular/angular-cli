@@ -77,6 +77,14 @@ interface AngularServerAppOptions {
    * If not provided, a new `Hooks` instance is created.
    */
   hooks?: Hooks;
+
+  /**
+   * The maximum length of the `Location` header in redirect responses.
+   *
+   * When a redirect location is longer, a 400 (Bad Request) response is returned instead.
+   * If not provided, the length is not limited, such as when prerendering.
+   */
+  maxRedirectLocationLength?: number;
 }
 
 /**
@@ -177,6 +185,7 @@ export class AngularServerApp {
         relativeRedirect ? location + url.search : location,
         status,
         headers,
+        this.options.maxRedirectLocationLength,
       );
     }
 
@@ -330,7 +339,12 @@ export class AngularServerApp {
     }
 
     if (result.redirectTo) {
-      return createRedirectResponse(result.redirectTo, responseInit.status, responseInit.headers);
+      return createRedirectResponse(
+        result.redirectTo,
+        responseInit.status,
+        responseInit.headers,
+        this.options.maxRedirectLocationLength,
+      );
     }
 
     if (renderMode === RenderMode.Prerender) {

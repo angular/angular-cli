@@ -313,6 +313,59 @@ describe('AngularServerApp', () => {
       });
     });
 
+    describe('redirect location length', () => {
+      let appWithLimit: AngularServerApp;
+
+      beforeEach(() => {
+        // Other tests replace the manifest, which is read when the app is created.
+        setupManifest();
+        appWithLimit = new AngularServerApp({ maxRedirectLocationLength: 100 });
+      });
+
+      it('should not limit the length of redirect locations when "maxRedirectLocationLength" is not set', async () => {
+        const filter = 'a'.repeat(5000);
+        const response = await app.handle(
+          new Request(`http://localhost/redirect?filter=${filter}`),
+        );
+        expect(response?.headers.get('location')).toBe(`/home?filter=${filter}`);
+        expect(response?.status).toBe(302);
+      });
+
+      it('should redirect when the location has the maximum allowed length', async () => {
+        // '/home?filter=' is 13 characters long.
+        const filter = 'a'.repeat(87);
+        const response = await appWithLimit.handle(
+          new Request(`http://localhost/redirect?filter=${filter}`),
+        );
+        expect(response?.headers.get('location')).toBe(`/home?filter=${filter}`);
+        expect(response?.status).toBe(302);
+      });
+
+      it('should return a 400 status when the location of a route redirect is too long', async () => {
+        const consoleErrorSpy = spyOn(console, 'error');
+        const response = await appWithLimit.handle(
+          new Request(`http://localhost/redirect?filter=${'a'.repeat(88)}`),
+        );
+        expect(response?.headers.get('location')).toBeNull();
+        expect(response?.status).toBe(400);
+        expect(await response?.text()).toContain(
+          'exceeds the maximum allowed length of 100 characters.',
+        );
+        expect(consoleErrorSpy).toHaveBeenCalledWith(
+          jasmine.stringMatching('Redirect location is 101 characters long'),
+        );
+      });
+
+      it('should return a 400 status when the location of a redirect during rendering is too long', async () => {
+        spyOn(console, 'error');
+        const response = await appWithLimit.handle(
+          new Request(`http://localhost/redirect-to-function?filter=${'a'.repeat(200)}`),
+        );
+        expect(response?.headers.get('location')).toBeNull();
+        expect(response?.status).toBe(400);
+      });
+    });
+
     describe('SSG pages', () => {
       it('should correctly serve the content for the requested prerendered page', async () => {
         const response = await app.handle(new Request('http://localhost/home-ssg'));

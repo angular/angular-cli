@@ -10,7 +10,7 @@ import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
-import { createRedirectResponse } from './utils/redirect';
+import { DEFAULT_MAX_REDIRECT_LOCATION_LENGTH, createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
 import {
   getFirstHeaderValue,
@@ -46,6 +46,22 @@ export interface AngularAppEngineOptions {
    * @default false
    */
   trustProxyHeaders?: boolean | readonly string[];
+
+  /**
+   * The maximum length of the `Location` header in redirect responses.
+   *
+   * When the location of a redirect is longer, a 400 (Bad Request) response is returned instead.
+   *
+   * @remarks
+   * Redirect locations can contain data from the request, such as the path, the query string and
+   * the `X-Forwarded-Prefix` header. Reverse proxies and load balancers read the response headers
+   * into a buffer of limited size (4 KB by default in NGINX) and fail the request when they do not
+   * fit. Only increase this value when every proxy in front of the server accepts larger response
+   * headers.
+   *
+   * @default 2048
+   */
+  maxRedirectLocationLength?: number;
 }
 
 /**
@@ -108,6 +124,11 @@ export class AngularAppEngine {
   private readonly trustProxyHeaders: ReadonlySet<string>;
 
   /**
+   * The maximum length of the `Location` header in redirect responses.
+   */
+  readonly #maxRedirectLocationLength: number;
+
+  /**
    * A cache that holds entry points, keyed by their potential locale string.
    */
   private readonly entryPointsCache = new Map<string, Promise<EntryPointExports>>();
@@ -119,6 +140,16 @@ export class AngularAppEngine {
   constructor(options?: AngularAppEngineOptions) {
     this.allowedHosts = this.getAllowedHosts(options);
     this.trustProxyHeaders = normalizeTrustProxyHeaders(options?.trustProxyHeaders);
+
+    const maxRedirectLocationLength =
+      options?.maxRedirectLocationLength ?? DEFAULT_MAX_REDIRECT_LOCATION_LENGTH;
+    if (!Number.isInteger(maxRedirectLocationLength) || maxRedirectLocationLength < 1) {
+      throw new Error(
+        `"maxRedirectLocationLength" must be a positive integer. Received: ${maxRedirectLocationLength}.`,
+      );
+    }
+
+    this.#maxRedirectLocationLength = maxRedirectLocationLength;
   }
 
   private getAllowedHosts(options: AngularAppEngineOptions | undefined): ReadonlySet<string> {
@@ -216,6 +247,7 @@ export class AngularAppEngine {
           302,
           // Use a 302 redirect as language preference may change.
           { 'Vary': 'Accept-Language' },
+          this.#maxRedirectLocationLength,
         );
       }
     }
@@ -250,6 +282,7 @@ export class AngularAppEngine {
     const serverApp = ɵgetOrCreateAngularServerApp({
       allowStaticRouteRender: AngularAppEngine.ɵallowStaticRouteRender,
       hooks: AngularAppEngine.ɵhooks,
+      maxRedirectLocationLength: this.#maxRedirectLocationLength,
     });
 
     return serverApp;

@@ -46,6 +46,41 @@ describe('Redirect Utils', () => {
       expect(response.headers.get('Vary')).toBe('X-Forwarded-Prefix, Host');
     });
 
+    it('should create a redirect response when the location has the maximum allowed length', () => {
+      const location = '/' + 'a'.repeat(99);
+      const response = createRedirectResponse(location, 302, undefined, 100);
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe(location);
+    });
+
+    it('should return a 400 response when the location exceeds the maximum allowed length', async () => {
+      const errorSpy = spyOn(console, 'error');
+      const response = createRedirectResponse(
+        '/' + 'a'.repeat(100),
+        301,
+        { 'Cache-Control': 'public, max-age=3600' },
+        100,
+      );
+
+      expect(response.status).toBe(400);
+      expect(response.headers.get('Location')).toBeNull();
+      expect(response.headers.get('Cache-Control')).toBeNull();
+      expect(response.headers.get('Content-Type')).toBe('text/plain');
+      expect(await response.text()).toBe(
+        'Redirect location is 101 characters long, which exceeds the maximum allowed length of 100 characters.',
+      );
+      expect(errorSpy).toHaveBeenCalledWith(
+        jasmine.stringMatching('Redirect location is 101 characters long'),
+      );
+    });
+
+    it('should not limit the length of the location when no maximum length is provided', () => {
+      const location = '/' + 'a'.repeat(10_000);
+      const response = createRedirectResponse(location);
+      expect(response.status).toBe(302);
+      expect(response.headers.get('Location')).toBe(location);
+    });
+
     it('should warn if Location header is provided in extra headers in dev mode', () => {
       // @ts-expect-error accessing global
       globalThis.ngDevMode = true;
