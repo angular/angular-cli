@@ -261,29 +261,14 @@ async function* runWatchLoop(
       console.clear();
     }
 
-    const changedFiles = new Set<string>();
-    let hasStyleChanges = false;
-    let hasSassChanges = false;
-    for (const file of changes.all) {
-      const posixFile = toPosixPath(file);
-      changedFiles.add(posixFile);
-      if (/\.(?:scss|sass)$/i.test(posixFile)) {
-        hasStyleChanges = true;
-        hasSassChanges = true;
-      } else if (/\.(?:less|css)$/i.test(posixFile)) {
-        hasStyleChanges = true;
-      }
-    }
+    const rawChangedFiles = changes.all.map(toPosixPath);
+    stylesheetBundler.invalidate(rawChangedFiles);
+    const changedFiles = buildState.getAffectedFiles(rawChangedFiles);
 
-    if (hasStyleChanges) {
-      if (hasSassChanges) {
+    for (const posixFile of changedFiles) {
+      if (/\.(?:scss|sass)$/i.test(posixFile)) {
         resetSassWorkerPoolCaches();
-      }
-      const invalidatedStyles = stylesheetBundler.invalidate(changedFiles);
-      if (invalidatedStyles) {
-        for (const styleFile of invalidatedStyles) {
-          changedFiles.add(toPosixPath(styleFile));
-        }
+        break;
       }
     }
 

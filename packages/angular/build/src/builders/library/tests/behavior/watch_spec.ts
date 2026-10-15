@@ -8,6 +8,7 @@
 
 import { rm } from 'node:fs/promises';
 import { executeLibraryBuilder } from '../../builder';
+import { InlineStyleLanguage } from '../../schema';
 import { BASE_OPTIONS, LIBRARY_BUILDER_INFO, describeLibraryBuilder } from '../setup';
 
 describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) => {
@@ -598,6 +599,53 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           expect(result?.success).toBeTrue();
           const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
           expect(content).toContain('lib-recreated');
+        },
+      ]);
+    });
+
+    it('should rebuild when a Sass partial imported by an inline component stylesheet is modified in watch mode', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/_vars.scss': '$primary-color: rgb(10, 20, 30);',
+        'projects/lib/src/lib/_spacing.scss': '$pad: 12px;',
+        'projects/lib/src/lib/lib.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-inline-sass',
+            template: '<span>Inline Sass</span>',
+            styles: [
+              '@use "./vars"; :host { color: vars.$primary-color; }',
+              '@use "./spacing"; :host { padding: spacing.$pad; }',
+            ],
+          })
+          export class LibComponent {}
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        inlineStyleLanguage: InlineStyleLanguage.Scss,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
+          expect(content).toMatch(/color:\s*(?:#0a141e|rgb\(10,\s*20,\s*30\))/);
+          expect(content).toMatch(/padding:\s*12px/);
+
+          // Modify the Sass partial referenced by the first inline component style
+          await harness.writeFile(
+            'projects/lib/src/lib/_vars.scss',
+            '$primary-color: rgb(200, 100, 50);',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
+          expect(content).toMatch(/color:\s*(?:#c86432|rgb\(200,\s*100,\s*50\))/);
+          expect(content).toMatch(/padding:\s*12px/);
         },
       ]);
     });
