@@ -9,9 +9,9 @@
 import type { BuilderContext } from '@angular-devkit/architect';
 import path from 'node:path';
 import type { StylesheetPluginsass } from '../../tools/esbuild/stylesheets/stylesheet-plugin-factory';
-import { normalizeAssetPatterns } from '../../utils';
 import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
+import { normalizeAssetPatterns } from '../../utils/normalize-asset-patterns';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { toPosixPath } from '../../utils/path';
 import {

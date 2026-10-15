@@ -6,18 +6,35 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import assert from 'node:assert';
 import { statSync } from 'node:fs';
-import * as path from 'node:path';
-import { AssetPattern, AssetPatternClass } from '../builders/application/schema';
+import path from 'node:path';
+import type { AssetPattern, AssetPatternClass } from '../builders/application/schema';
 import { isSubDirectory } from './path';
 
+/**
+ * Asset pattern configuration normalized into its object form with a resolved `output` directory.
+ */
+export interface NormalizedAssetsPattern extends AssetPatternClass {
+  /** Relative output directory within the build output path. */
+  output: string;
+}
+
+/**
+ * Normalizes raw string and object asset patterns into {@link NormalizedAssetsPattern} objects
+ * and validates that all asset inputs and outputs stay within the workspace and output directories.
+ *
+ * @param assetPatterns Raw string or object asset patterns from builder options.
+ * @param workspaceRoot Workspace root directory path.
+ * @param projectRoot Project root directory path.
+ * @param projectSourceRoot Optional project source root directory path.
+ * @returns An array of normalized asset pattern configurations.
+ */
 export function normalizeAssetPatterns(
   assetPatterns: AssetPattern[],
   workspaceRoot: string,
   projectRoot: string,
   projectSourceRoot: string | undefined,
-): (AssetPatternClass & { output: string })[] {
+): NormalizedAssetsPattern[] {
   if (assetPatterns.length === 0) {
     return [];
   }
@@ -29,6 +46,8 @@ export function normalizeAssetPatterns(
   const resolvedProjectRoot = path.resolve(resolvedWorkspaceRoot, projectRoot);
 
   return assetPatterns.map((assetPattern) => {
+    let normalized: NormalizedAssetsPattern;
+
     // Normalize string asset patterns to objects.
     if (typeof assetPattern === 'string') {
       const assetPath = path.normalize(assetPattern);
@@ -46,45 +65,32 @@ export function normalizeAssetPatterns(
         throw new Error(`The ${assetPattern} asset path must be within the workspace root.`);
       }
 
-      let glob: string, input: string;
-      let isDirectory: boolean;
-
+      let isDirectory = true;
       try {
-        isDirectory = statSync(resolvedAssetPath).isDirectory();
-      } catch {
-        isDirectory = true;
-      }
-
-      if (isDirectory) {
-        // Folders get a recursive star glob.
-        glob = '**/*';
-        // Input directory is their original path.
-        input = assetPath;
-      } else {
-        // Files are their own glob.
-        glob = path.basename(assetPath);
-        // Input directory is their original dirname.
-        input = path.dirname(assetPath);
-      }
+        isDirectory = statSync(resolvedAssetPath, { throwIfNoEntry: false })?.isDirectory() ?? true;
+      } catch {}
+      const glob = isDirectory ? '**/*' : path.basename(assetPath);
+      const input = isDirectory ? assetPath : path.dirname(assetPath);
 
       // Output directory for both is the relative path from the root to input.
       const output = path.relative(root, path.resolve(resolvedWorkspaceRoot, input));
 
-      assetPattern = { glob, input, output };
+      normalized = { glob, input, output };
     } else {
       if (!isSubDirectory(resolvedWorkspaceRoot, assetPattern.input)) {
         throw new Error(`The ${assetPattern.input} asset path must be within the workspace root.`);
       }
 
-      assetPattern.output = path.join('.', assetPattern.output ?? '');
+      normalized = {
+        ...assetPattern,
+        output: path.join('.', assetPattern.output ?? ''),
+      };
     }
 
-    assert(assetPattern.output !== undefined);
-
-    if (assetPattern.output.startsWith('..')) {
+    if (normalized.output.startsWith('..')) {
       throw new Error('An asset cannot be written to a location outside of the output path.');
     }
 
-    return assetPattern as AssetPatternClass & { output: string };
+    return normalized;
   });
 }
