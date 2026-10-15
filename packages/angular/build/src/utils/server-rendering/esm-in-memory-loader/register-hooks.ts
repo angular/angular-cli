@@ -6,8 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { register } from 'node:module';
-import { pathToFileURL } from 'node:url';
+import { registerHooks } from 'node:module';
 import { workerData } from 'node:worker_threads';
+import { initialize, load, resolve } from './loader-hooks';
 
-register('./loader-hooks.js', { parentURL: pathToFileURL(__filename), data: workerData });
+initialize(workerData);
+registerHooks({ resolve, load });
