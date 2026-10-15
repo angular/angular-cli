@@ -1,3 +1,15 @@
+<a name="21.2.27"></a>
+
+# 21.2.27 (2026-10-14)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description         |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------- |
+| [2e1742adf](https://github.com/angular/angular-cli/commit/2e1742adf28645635bb6cff3cc08ad9c94c7d085) | fix  | update zod to 4.6.6 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.40"></a>
 
 # 20.3.40 (2026-10-14)
