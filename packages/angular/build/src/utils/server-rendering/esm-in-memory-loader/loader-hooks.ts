@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { randomUUID } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
@@ -110,7 +110,7 @@ export function resolve(
   });
 }
 
-export async function load(url: string, context: { format?: string | null }, nextLoad: Function) {
+export function load(url: string, context: { format?: string | null }, nextLoad: Function) {
   const { format } = context;
 
   // Load the file from memory if the URL is based in the virtual root
@@ -137,7 +137,7 @@ export async function load(url: string, context: { format?: string | null }, nex
     }
 
     const filePath = fileURLToPath(url);
-    const fileBytes = await readFile(filePath);
+    const fileBytes = readFileSync(filePath);
     const source = Buffer.concat([NG_SERVER_MODE_INIT_BYTES, fileBytes]);
 
     return {
