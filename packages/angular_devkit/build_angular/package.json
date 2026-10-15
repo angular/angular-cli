@@ -43,7 +43,7 @@
     "ora": "9.4.1",
     "picomatch": "4.0.7",
     "piscina": "5.3.2",
-    "postcss": "8.5.29",
+    "postcss": "8.5.30",
     "postcss-loader": "8.2.1",
     "resolve-url-loader": "5.0.0",
     "rxjs": "7.8.2",
@@ -68,7 +68,7 @@
     "browser-sync": "3.0.4",
     "ng-packagr": "22.3.0-next.2",
     "sass": "1.105.1",
-    "undici": "8.11.2"
+    "undici": "8.12.1"
   },
   "peerDependencies": {
     "@angular/compiler-cli": "0.0.0-ANGULAR-FW-PEER-DEP",
