@@ -39,5 +39,5 @@ export default class DeployCommandModule
   command = 'deploy [project]';
   override longDescription = longDescription;
   describe =
-    'Invokes the deploy builder for a specified project or for the default project in the workspace.';
+    'Invokes the deploy builder for a specified project or for the project in the current working directory.';
 }
