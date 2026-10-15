@@ -25,6 +25,7 @@ import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
 import { buildPathWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
+import { getFirstHeaderValue } from './utils/validation';
 
 /**
  * A set of well-known URLs that are not handled by Angular.
@@ -167,7 +168,7 @@ export class AngularServerApp {
 
     if (redirectTo !== undefined) {
       const location = joinUrlParts(
-        request.headers.get('X-Forwarded-Prefix') ?? '',
+        getFirstHeaderValue(request.headers.get('X-Forwarded-Prefix')) ?? '',
         buildPathWithParams(redirectTo, url.pathname),
       );
 

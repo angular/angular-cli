@@ -202,6 +202,19 @@ describe('AngularAppEngine', () => {
         expect(response?.headers.get('Vary')).toBe('X-Forwarded-Prefix, Accept-Language');
       });
 
+      it('should only use the first value of the forwarded prefix in locale redirect location', async () => {
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            'X-Forwarded-Prefix': '/app, /"<other>',
+          },
+        });
+
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(302);
+        expect(response?.headers.get('Location')).toBe('/app/it');
+      });
+
       it('should completely ignore proxy headers if not allowed', async () => {
         const strictEngine = new AngularAppEngine({ trustProxyHeaders: false });
         const request = new Request('https://example.com', {

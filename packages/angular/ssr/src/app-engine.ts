@@ -13,6 +13,7 @@ import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
 import {
+  getFirstHeaderValue,
   normalizeTrustProxyHeaders,
   sanitizeRequestHeaders,
   validateRequest,
@@ -208,7 +209,7 @@ export class AngularAppEngine {
     if (preferredLocale) {
       const subPath = supportedLocales[preferredLocale];
       if (subPath !== undefined) {
-        const prefix = request.headers.get('X-Forwarded-Prefix') ?? '';
+        const prefix = getFirstHeaderValue(request.headers.get('X-Forwarded-Prefix')) ?? '';
 
         return createRedirectResponse(
           joinUrlParts(prefix, pathname, subPath),
