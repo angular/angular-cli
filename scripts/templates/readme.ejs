@@ -97,7 +97,7 @@ Angular is cross-platform, fast, scalable, has incredible tooling, and is loved 
 
 ## Upgrading
 
-Check out our [upgrade guide](https://update.angular.dev/) to find out the best way to upgrade your project.
+Check out our [upgrade guide](https://angular.dev/update-guide) to find out the best way to upgrade your project.
 
 ## Contributing
 

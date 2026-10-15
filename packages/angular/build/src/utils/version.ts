@@ -66,7 +66,7 @@ export function assertCompatibleAngularVersion(projectRoot: string): void | neve
     console.error(
       `Error: The current version of "@angular/build" supports Angular versions ${supportedAngularSemver},\n` +
         `but detected Angular version ${raw} instead.\n` +
-        'Please visit the link below to find instructions on how to update Angular.\nhttps://update.angular.dev/',
+        'Please visit the link below to find instructions on how to update Angular.\nhttps://angular.dev/update-guide',
     );
 
     process.exit(3);
