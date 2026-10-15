@@ -14,27 +14,90 @@ import type { NormalizedLibraryOptions } from '../types';
 import { type DiskOutputFile, createDiskOutputFile } from './utils';
 
 /**
- * Resolves and collects configured library assets to be emitted to disk.
+ * Result of resolving and collecting library assets for a build iteration.
+ */
+export interface CollectedAssets {
+  /** Asset files to emit to disk, with POSIX source and destination paths. */
+  filesToEmit: DiskOutputFile[];
+
+  /** Previously emitted asset files whose source files were deleted and should be removed from output. */
+  filesToDelete: DiskOutputFile[];
+}
+
+/**
+ * Compiled asset matcher for incremental watch-mode matching.
+ */
+export interface AssetMatcher {
+  /** Normalized asset pattern configuration. */
+  asset: NormalizedLibraryOptions['assets'][number];
+
+  /** Normalized POSIX input directory path with a trailing slash. */
+  prefix: string;
+
+  /** Compiled picomatch matcher function for the asset glob. */
+  isMatch: picomatch.Matcher;
+}
+
+/**
+ * Compiles picomatch matchers and POSIX input prefixes for each asset configuration.
  *
- * @param assets The normalized asset patterns with POSIX paths.
- * @param workspaceRoot The normalized POSIX workspace root directory path.
+ * @param assets The normalized asset patterns with POSIX input and output paths.
+ * @returns An array of compiled asset matcher descriptors.
+ */
+export function createAssetMatchers(
+  assets: NormalizedLibraryOptions['assets'],
+): readonly AssetMatcher[] {
+  return assets.map((asset) => {
+    const isMatch = picomatch(asset.glob, {
+      dot: true,
+      ignore: [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])],
+    });
+    const prefix = asset.input.endsWith('/') ? asset.input : `${asset.input}/`;
+
+    return { asset, prefix, isMatch };
+  });
+}
+
+/**
+ * Resolves and collects configured library assets to be emitted to or deleted from disk.
+ *
+ * @param assets The normalized asset patterns with POSIX input and output paths.
+ * @param workspaceRoot The workspace root POSIX directory path.
+ * @param emittedAssets Map of previously emitted POSIX source file paths to sets of relative POSIX output paths.
  * @param modifiedFiles Optional set of modified POSIX file paths for incremental copying in watch mode.
- * @returns An array of disk file emission descriptors.
+ * @param assetMatchers Optional pre-compiled asset matchers for incremental matching.
+ * @returns The collected asset files to emit and delete.
  */
 export async function collectAssetsToEmit(
   assets: NormalizedLibraryOptions['assets'],
   workspaceRoot: string,
+  emittedAssets: ReadonlyMap<string, ReadonlySet<string>>,
   modifiedFiles?: ReadonlySet<string>,
-): Promise<DiskOutputFile[]> {
+  assetMatchers?: readonly AssetMatcher[],
+): Promise<CollectedAssets> {
   if (assets.length === 0 || modifiedFiles?.size === 0) {
-    return [];
+    return { filesToEmit: [], filesToDelete: [] };
   }
 
   if (modifiedFiles) {
-    const matchers = createAssetMatchers(assets);
+    const matchers = assetMatchers ?? createAssetMatchers(assets);
     const filesToEmit: DiskOutputFile[] = [];
+    const filesToDelete: DiskOutputFile[] = [];
 
     for (const file of modifiedFiles) {
+      let isFile: boolean | undefined;
+
+      const previousOutputs = emittedAssets.get(file);
+      if (previousOutputs) {
+        isFile = statSync(file, { throwIfNoEntry: false })?.isFile() ?? false;
+        if (!isFile) {
+          for (const output of previousOutputs) {
+            filesToDelete.push(createDiskOutputFile(file, output));
+          }
+          continue;
+        }
+      }
+
       for (const { asset, prefix, isMatch } of matchers) {
         if (!file.startsWith(prefix)) {
           continue;
@@ -45,28 +108,24 @@ export async function collectAssetsToEmit(
           continue;
         }
 
-        if (statSync(file, { throwIfNoEntry: false })?.isFile()) {
-          filesToEmit.push(createDiskOutputFile(file, path.posix.join(asset.output, relative)));
+        isFile ??= statSync(file, { throwIfNoEntry: false })?.isFile() ?? false;
+        if (!isFile) {
+          break;
         }
+
+        filesToEmit.push(createDiskOutputFile(file, path.posix.join(asset.output, relative)));
       }
     }
 
-    return filesToEmit;
+    return { filesToEmit, filesToDelete };
   }
 
   const resolvedAssets = await resolveAssets(assets, workspaceRoot);
 
-  return resolvedAssets.map(({ source, destination }) => createDiskOutputFile(source, destination));
-}
-
-function createAssetMatchers(assets: NormalizedLibraryOptions['assets']) {
-  return assets.map((asset) => {
-    const isMatch = picomatch(asset.glob, {
-      dot: true,
-      ignore: [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])],
-    });
-    const prefix = asset.input.endsWith('/') ? asset.input : `${asset.input}/`;
-
-    return { asset, prefix, isMatch };
-  });
+  return {
+    filesToEmit: resolvedAssets.map(({ source, destination }) =>
+      createDiskOutputFile(source, destination),
+    ),
+    filesToDelete: [],
+  };
 }

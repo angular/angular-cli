@@ -8,6 +8,13 @@
 
 import { toPosixPath } from '../../utils/path';
 import { ExecutionResult } from './execution-result';
+import {
+  type AssetMatcher,
+  type CollectedAssets,
+  collectAssetsToEmit,
+  createAssetMatchers,
+} from './pipeline/assets';
+import type { OutputFile } from './pipeline/utils';
 import type {
   BundleResult,
   LibraryCompilationOutput,
@@ -17,17 +24,29 @@ import type {
 
 /**
  * Encapsulates incremental compilation state, transitive resource reference tracking,
- * watched compilation file tracking, and execution results across watch-mode rebuilds.
+ * asset matchers, and emitted output file tracking across watch-mode rebuilds.
  */
 export class BuilderState {
   readonly #referencingFiles = new Map<string, Set<string>>();
   readonly #referencedByFile = new Map<string, Set<string>>();
   readonly #watchedCompilationFiles = new Set<string>();
   readonly #pendingCompilationFiles = new Set<string>();
+  readonly #pendingAssetFiles = new Set<string>();
+  readonly #assetMatchers?: readonly AssetMatcher[];
+
+  #emittedBundleFiles = new Set<string>();
+  #emittedManifestFiles = new Set<string>();
+  readonly #emittedAssets = new Map<string, Set<string>>();
+  #hasEmittedAssets = false;
 
   #executionResult = new ExecutionResult();
+  #nextBundleFiles?: Set<string>;
+  #nextManifestFiles?: Set<string>;
+  readonly #filesToDelete = new Set<string>();
+
   #singleProgramCache?: SingleProgramCache;
   #compilationMode?: 'partial' | 'full';
+  #hasEmittedTslib = false;
 
   /** Map of entry point names to their previous bundle results. */
   readonly previousBundleResults = new Map<string, BundleResult>();
@@ -44,18 +63,12 @@ export class BuilderState {
   /** Whether package.json and secondary entry point manifests have been emitted. */
   hasEmittedManifests = false;
 
-  /** Whether the last emitted root package.json included a tslib dependency. */
-  hasEmittedTslib = false;
-
-  /** Whether static assets have been emitted in a prior iteration. */
-  hasEmittedAssets = false;
-
   /** Whether entry points in package.json changed since the last compilation. */
   hasEntryPointsChanges = false;
 
   constructor(
     options?: Partial<
-      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints'>
+      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints' | 'assets'>
     >,
   ) {
     if (options?.tsConfigPath) {
@@ -69,6 +82,8 @@ export class BuilderState {
         this.#watchedCompilationFiles.add(entryPoint.entryFilePath);
       }
     }
+
+    this.#assetMatchers = options?.assets ? createAssetMatchers(options.assets) : undefined;
   }
 
   /** Cached unified TypeScript and Angular compilation state. */
@@ -79,6 +94,11 @@ export class BuilderState {
   /** Effective compilation mode resolved from builder options and tsconfig. */
   get compilationMode(): 'partial' | 'full' | undefined {
     return this.#compilationMode;
+  }
+
+  /** Whether the last emitted root package.json included a tslib dependency. */
+  get hasEmittedTslib(): boolean {
+    return this.#hasEmittedTslib;
   }
 
   /** Whether any active entry point bundle imports `tslib`. */
@@ -109,12 +129,15 @@ export class BuilderState {
   }
 
   /**
-   * Resets the execution result for a new build iteration.
+   * Resets the execution result and staged output state for a new build iteration.
    *
    * @returns The fresh `ExecutionResult` instance for the current build iteration.
    */
   resetExecutionResult(): ExecutionResult {
     this.#executionResult = new ExecutionResult();
+    this.#nextBundleFiles = undefined;
+    this.#nextManifestFiles = undefined;
+    this.#filesToDelete.clear();
 
     return this.#executionResult;
   }
@@ -221,6 +244,9 @@ export class BuilderState {
         if (file !== packageJsonPath) {
           this.#pendingCompilationFiles.add(file);
         }
+        if (this.#hasEmittedAssets) {
+          this.#pendingAssetFiles.add(file);
+        }
       }
     }
 
@@ -295,11 +321,13 @@ export class BuilderState {
 
   /**
    * Records active bundle results across entry points after compilation and bundling succeed,
-   * clearing pending compilation/bundle flags.
+   * clearing pending compilation/bundle flags and queuing any previously emitted bundle files
+   * that are no longer present for deletion.
    *
    * @param bundleResults Newly bundled results keyed by entry point name.
    */
   recordBundleOutput(bundleResults: ReadonlyMap<string, BundleResult>): void {
+    const hadEntryPointsChanges = this.hasEntryPointsChanges;
     this.hasCompilationError = false;
     this.hasEntryPointsChanges = false;
     this.pendingChangedEsmFiles.clear();
@@ -308,6 +336,123 @@ export class BuilderState {
     for (const [name, bundleResult] of bundleResults) {
       this.previousBundleResults.set(name, bundleResult);
     }
+
+    if (bundleResults.size === 0 && !hadEntryPointsChanges && this.#emittedBundleFiles.size > 0) {
+      return;
+    }
+
+    const nextBundleFiles = new Set<string>();
+    for (const result of this.previousBundleResults.values()) {
+      for (const file of result.esmOutputFiles) {
+        nextBundleFiles.add(file);
+      }
+      for (const file of result.dtsOutputFiles) {
+        nextBundleFiles.add(file);
+      }
+    }
+
+    for (const prevFile of this.#emittedBundleFiles) {
+      if (!nextBundleFiles.has(prevFile)) {
+        this.#filesToDelete.add(prevFile);
+      }
+    }
+
+    this.#nextBundleFiles = nextBundleFiles;
+  }
+
+  /**
+   * Computes the active manifest output file set and queues any previously emitted
+   * manifest files that are no longer present for deletion.
+   *
+   * @param manifestFiles Manifest output files generated in this iteration.
+   */
+  recordManifestOutput(manifestFiles: readonly OutputFile[]): void {
+    const nextManifestFiles = new Set(manifestFiles.map((file) => file.path));
+    for (const prevFile of this.#emittedManifestFiles) {
+      if (!nextManifestFiles.has(prevFile)) {
+        this.#filesToDelete.add(prevFile);
+      }
+    }
+
+    this.#nextManifestFiles = nextManifestFiles;
+  }
+
+  /**
+   * Resolves and collects configured library assets to be emitted to or deleted from disk.
+   *
+   * @param options Normalized library options containing `assets` and `workspaceRoot`.
+   * @param modifiedFiles Optional set of modified POSIX file paths in watch mode.
+   * @returns The collected asset files to emit and delete.
+   */
+  collectAssets(
+    options: Pick<NormalizedLibraryOptions, 'assets' | 'workspaceRoot'>,
+    modifiedFiles?: ReadonlySet<string>,
+  ): Promise<CollectedAssets> {
+    let effectiveModifiedFiles: ReadonlySet<string> | undefined;
+    if (this.#hasEmittedAssets && modifiedFiles) {
+      for (const file of modifiedFiles) {
+        this.#pendingAssetFiles.add(file);
+      }
+      effectiveModifiedFiles = this.#pendingAssetFiles;
+    }
+
+    return collectAssetsToEmit(
+      options.assets,
+      options.workspaceRoot,
+      this.#emittedAssets,
+      effectiveModifiedFiles,
+      this.#assetMatchers,
+    );
+  }
+
+  /**
+   * Records emitted bundle, manifest, and asset output files after disk emission,
+   * queuing any stale or deleted output paths for removal from disk.
+   *
+   * @param collectedAssets Collected asset files emitted and deleted in this iteration.
+   * @returns Read-only set of relative POSIX output paths queued for deletion from disk.
+   */
+  recordEmittedOutputs(collectedAssets: CollectedAssets): ReadonlySet<string> {
+    const { filesToDelete: toDelete, filesToEmit: toEmit } = collectedAssets;
+
+    for (const deletedAsset of toDelete) {
+      this.#emittedAssets.delete(deletedAsset.source);
+    }
+
+    for (const emittedAsset of toEmit) {
+      let outputs = this.#emittedAssets.get(emittedAsset.source);
+      if (!outputs) {
+        outputs = new Set();
+        this.#emittedAssets.set(emittedAsset.source, outputs);
+      }
+      outputs.add(emittedAsset.path);
+    }
+
+    if (toDelete.length) {
+      const activeAssetOutputs = new Set<string>();
+      for (const outputs of this.#emittedAssets.values()) {
+        for (const output of outputs) {
+          activeAssetOutputs.add(output);
+        }
+      }
+
+      for (const deletedAsset of toDelete) {
+        if (!activeAssetOutputs.has(deletedAsset.path)) {
+          this.#filesToDelete.add(deletedAsset.path);
+        }
+      }
+    }
+
+    this.#emittedBundleFiles = this.#nextBundleFiles ?? this.#emittedBundleFiles;
+    this.#emittedManifestFiles = this.#nextManifestFiles ?? this.#emittedManifestFiles;
+    this.#nextBundleFiles = undefined;
+    this.#nextManifestFiles = undefined;
+    this.hasEmittedManifests = true;
+    this.#hasEmittedTslib = this.hasTslibImport;
+    this.#hasEmittedAssets = true;
+    this.#pendingAssetFiles.clear();
+
+    return this.#filesToDelete;
   }
 
   /**
@@ -317,8 +462,8 @@ export class BuilderState {
     await this.#singleProgramCache?.compilationInstance.close?.();
     this.#singleProgramCache = undefined;
     this.#compilationMode = undefined;
-    this.hasEmittedTslib = false;
-    this.hasEmittedAssets = false;
+    this.#hasEmittedTslib = false;
+    this.#hasEmittedAssets = false;
     this.hasCompilationError = false;
     this.hasEmittedManifests = false;
     this.hasEntryPointsChanges = false;
@@ -326,8 +471,15 @@ export class BuilderState {
     this.pendingChangedEsmFiles.clear();
     this.pendingChangedDtsFiles.clear();
     this.#pendingCompilationFiles.clear();
+    this.#pendingAssetFiles.clear();
     this.#referencingFiles.clear();
     this.#referencedByFile.clear();
     this.#watchedCompilationFiles.clear();
+    this.#emittedBundleFiles.clear();
+    this.#emittedManifestFiles.clear();
+    this.#emittedAssets.clear();
+    this.#nextBundleFiles = undefined;
+    this.#nextManifestFiles = undefined;
+    this.#filesToDelete.clear();
   }
 }

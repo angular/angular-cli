@@ -31,6 +31,8 @@ describe('entry-points pipeline', () => {
     return {
       esmModuleIds: new Set(),
       dtsModuleIds: new Set(),
+      esmOutputFiles: new Set(),
+      dtsOutputFiles: new Set(),
       hasTslibImport: false,
       ...overrides,
     };

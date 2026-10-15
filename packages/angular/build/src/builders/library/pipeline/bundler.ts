@@ -26,7 +26,7 @@ export interface BundleEntryPointsOutput {
   /** In-memory files produced by bundling to be written to disk. */
   filesToEmit: MemoryOutputFile[];
 
-  /** Map of entry point names to their bundle results containing bundled module IDs. */
+  /** Map of entry point names to their bundle results. */
   bundleResults: Map<string, BundleResult>;
 
   /** Warning messages emitted during bundling. */
@@ -62,6 +62,9 @@ interface MultiBundleOutput {
 
   /** Map of bundle entry names to the set of virtual POSIX module IDs included in the bundle. */
   moduleIdsByBundle: Map<string, Set<string>>;
+
+  /** Map of bundle entry names to the set of relative POSIX output paths generated for the bundle. */
+  outputFilesByBundle: Map<string, Set<string>>;
 
   /** Set of bundle entry names that import 'tslib'. */
   tslibBundles: Set<string>;
@@ -111,12 +114,21 @@ export async function bundleEntryPoints(
   for (const { entryPoint, previousBundleResult } of items) {
     const { bundleName, name } = entryPoint;
     const esmModuleIds = esmOutput.moduleIdsByBundle.get(bundleName);
+
     bundleResults.set(name, {
-      esmModuleIds: esmModuleIds ?? previousBundleResult?.esmModuleIds ?? new Set(),
-      dtsModuleIds:
-        dtsOutput.moduleIdsByBundle.get(bundleName) ??
-        previousBundleResult?.dtsModuleIds ??
-        new Set(),
+      esmModuleIds: getUpdatedOrPreviousSet(esmModuleIds, previousBundleResult?.esmModuleIds),
+      dtsModuleIds: getUpdatedOrPreviousSet(
+        dtsOutput.moduleIdsByBundle.get(bundleName),
+        previousBundleResult?.dtsModuleIds,
+      ),
+      esmOutputFiles: getUpdatedOrPreviousSet(
+        esmOutput.outputFilesByBundle.get(bundleName),
+        previousBundleResult?.esmOutputFiles,
+      ),
+      dtsOutputFiles: getUpdatedOrPreviousSet(
+        dtsOutput.outputFilesByBundle.get(bundleName),
+        previousBundleResult?.dtsOutputFiles,
+      ),
       hasTslibImport: esmModuleIds
         ? esmOutput.tslibBundles.has(bundleName)
         : (previousBundleResult?.hasTslibImport ?? false),
@@ -177,7 +189,7 @@ function createMemoryFileLoaderPlugin(
           return files.has(id) ? { id, external: false } : undefined;
         }
 
-        if (id[0] !== '.' && !path.isAbsolute(id)) {
+        if (id[0] !== '.' && !path.posix.isAbsolute(id)) {
           return { id, external: true };
         }
 
@@ -220,7 +232,8 @@ function createMemoryFileLoaderPlugin(
 
 /**
  * Processes Rolldown output assets and chunks, extracting emitted files and computing
- * the transitive set of module IDs belonging to each entry point bundle.
+ * the transitive sets of module IDs, output file paths, and tslib imports belonging to
+ * each entry point bundle.
  *
  * @param output The array of output chunks and assets from Rolldown.
  * @param dir The destination POSIX output directory prefix.
@@ -232,11 +245,14 @@ function processRolldownOutput(
 ): Omit<MultiBundleOutput, 'warnings'> {
   const filesToEmit: MemoryOutputFile[] = [];
   const moduleIdsByBundle = new Map<string, Set<string>>();
+  const outputFilesByBundle = new Map<string, Set<string>>();
   const tslibBundles = new Set<string>();
   const chunksByFileName = new Map<string, OutputChunk>();
+  const outputFileNames = new Set<string>();
   const entryChunks: OutputChunk[] = [];
 
   for (const item of output) {
+    outputFileNames.add(item.fileName);
     filesToEmit.push(
       createMemoryOutputFile(
         path.posix.join(dir, item.fileName),
@@ -254,22 +270,17 @@ function processRolldownOutput(
 
   for (const entryChunk of entryChunks) {
     const modSet = new Set<string>();
+    const outSet = new Set<string>();
     moduleIdsByBundle.set(entryChunk.name, modSet);
+    outputFilesByBundle.set(entryChunk.name, outSet);
 
-    const visited = new Set<OutputChunk>();
-    const queue: OutputChunk[] = [entryChunk];
-
-    while (queue.length) {
-      const chunk = queue.pop();
-      if (!chunk) {
-        break;
+    const visited = new Set<OutputChunk>([entryChunk]);
+    for (const chunk of visited) {
+      outSet.add(path.posix.join(dir, chunk.fileName));
+      const mapFileName = `${chunk.fileName}.map`;
+      if (outputFileNames.has(mapFileName)) {
+        outSet.add(path.posix.join(dir, mapFileName));
       }
-
-      if (visited.has(chunk)) {
-        continue;
-      }
-
-      visited.add(chunk);
 
       for (const modId of chunk.moduleIds) {
         if (modId[0] !== '\0') {
@@ -283,14 +294,14 @@ function processRolldownOutput(
         }
 
         const depChunk = chunksByFileName.get(depFile);
-        if (depChunk && !visited.has(depChunk)) {
-          queue.push(depChunk);
+        if (depChunk) {
+          visited.add(depChunk);
         }
       }
     }
   }
 
-  return { filesToEmit, moduleIdsByBundle, tslibBundles };
+  return { filesToEmit, moduleIdsByBundle, outputFilesByBundle, tslibBundles };
 }
 
 /**
@@ -319,18 +330,9 @@ async function executeMultiBundle(
 ): Promise<MultiBundleOutput> {
   const { workspaceRoot, preserveSymlinks, declarationMap, outputPath } = options;
   const isDts = extension === 'd.ts';
-
-  let sourcemap: boolean;
-  let dir: string;
-
-  if (isDts) {
-    dir = TYPES_OUTPUT_DIR;
-    sourcemap = !!declarationMap;
-  } else {
-    dir = FESM_OUTPUT_DIR;
-    // FESM (.mjs) sourcemaps are always enabled.
-    sourcemap = true;
-  }
+  const dir = isDts ? TYPES_OUTPUT_DIR : FESM_OUTPUT_DIR;
+  // FESM (.mjs) sourcemaps are always enabled.
+  const sourcemap = isDts ? !!declarationMap : true;
 
   const warnings: string[] = [];
   const { rolldown } = await loadRolldown();
@@ -394,6 +396,7 @@ async function bundleAllEsm(
     return {
       filesToEmit: [],
       moduleIdsByBundle: new Map(),
+      outputFilesByBundle: new Map(),
       tslibBundles: new Set(),
       warnings: [],
     };
@@ -424,6 +427,7 @@ async function bundleAllDts(
     return {
       filesToEmit: [],
       moduleIdsByBundle: new Map(),
+      outputFilesByBundle: new Map(),
       tslibBundles: new Set(),
       warnings: [],
     };
@@ -465,4 +469,20 @@ async function bundleAllDts(
     'd.ts',
     options,
   );
+}
+
+/**
+ * Returns the newly generated set from the current bundle pass if present,
+ * falling back to the cached set from the previous build (when that bundle
+ * pass was skipped in incremental watch mode) or an empty set.
+ *
+ * @param current The set produced by the current bundle pass, if executed.
+ * @param previous The cached set from the previous build iteration, if available.
+ * @returns The active set to store in the bundle result.
+ */
+function getUpdatedOrPreviousSet(
+  current: ReadonlySet<string> | undefined,
+  previous: ReadonlySet<string> | undefined,
+): ReadonlySet<string> {
+  return current ?? previous ?? new Set<string>();
 }
