@@ -56,6 +56,9 @@ describe('find-module', () => {
       expect(() => findModule(host, 'foo/src/app/anything-routing')).toThrowError(
         /Could not find a non Routing NgModule/,
       );
+      expect(() => findModule(host, 'foo/src/app/anything-routing')).toThrowError(
+        /Modules with suffix '-routing-module\.ts' or '-routing\.module\.ts' are strictly reserved/,
+      );
     });
 
     it('should throw if two modules found', () => {
