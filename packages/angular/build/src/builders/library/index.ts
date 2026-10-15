@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { Builder, createBuilder } from '@angular-devkit/architect';
+import { type Builder, createBuilder } from '@angular-devkit/architect';
 import { executeLibraryBuilder } from './builder';
 import type { Schema as LibraryBuilderOptions } from './schema';
 

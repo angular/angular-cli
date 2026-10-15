@@ -6,16 +6,16 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { join, resolve } from 'node:path';
-import { toPosixPath } from '../../../utils/path';
+import { join } from 'node:path';
+import { BuilderState } from '../builder-state';
 import type {
   BundleResult,
   NormalizedEntryPoint,
   NormalizedLibraryOptions,
   PackageJsonData,
-  SingleBuildState,
 } from '../types';
 import {
+  collectEntryPointsToBundle,
   getEntryPointBundleName,
   haveEntryPointsChanged,
   normalizeEntryPoints,
@@ -23,9 +23,18 @@ import {
 } from './entry-points';
 
 describe('entry-points pipeline', () => {
-  const projectRoot = resolve('/workspace/projects/my-lib');
+  const projectRoot = '/workspace/projects/my-lib';
   const packageJsonPath = join(projectRoot, 'package.json');
   const packageName = '@my-scope/my-lib';
+
+  function createBundleResult(overrides: Partial<BundleResult> = {}): BundleResult {
+    return {
+      esmModuleIds: new Set(),
+      dtsModuleIds: new Set(),
+      hasTslibImport: false,
+      ...overrides,
+    };
+  }
 
   describe('getEntryPointBundleName', () => {
     it('should compute bundle name for primary entry point without scope', () => {
@@ -505,6 +514,8 @@ describe('entry-points pipeline', () => {
   });
 
   describe('updateWatchedEntryPoints', () => {
+    const tsConfigPath = join(projectRoot, 'tsconfig.lib.json');
+
     it('should update options, watched files, build state, and prune removed bundles when entry points change', () => {
       const initialEntryPoints = normalizeEntryPoints(
         {
@@ -520,17 +531,14 @@ describe('entry-points pipeline', () => {
         entryPoints: initialEntryPoints,
         projectRoot,
         packageName,
+        packageJsonPath,
+        tsConfigPath,
+        assets: [],
       } as unknown as NormalizedLibraryOptions;
 
-      const buildState = {
-        previousBundleResults: new Map<string, BundleResult>([
-          ['.', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-          ['old-feature', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-        ]),
-        hasEntryPointsChanges: false,
-      } as unknown as SingleBuildState;
-
-      const watchedCompilationFiles = new Set<string>();
+      const buildState = new BuilderState(options);
+      buildState.previousBundleResults.set('.', createBundleResult());
+      buildState.previousBundleResults.set('old-feature', createBundleResult());
 
       const newPackageJson: PackageJsonData = {
         name: packageName,
@@ -540,13 +548,7 @@ describe('entry-points pipeline', () => {
         },
       };
 
-      updateWatchedEntryPoints(
-        newPackageJson,
-        options,
-        buildState,
-        watchedCompilationFiles,
-        packageJsonPath,
-      );
+      updateWatchedEntryPoints(newPackageJson, options, buildState);
 
       expect(buildState.hasEntryPointsChanges).toBeTrue();
       expect(options.entryPoints.has('new-feature')).toBeTrue();
@@ -554,16 +556,17 @@ describe('entry-points pipeline', () => {
       expect(buildState.previousBundleResults.has('old-feature')).toBeFalse();
       expect(buildState.previousBundleResults.has('.')).toBeTrue();
       expect(
-        watchedCompilationFiles.has(toPosixPath(join(projectRoot, 'src/public-api.ts'))),
+        buildState.watchedCompilationFiles.has(join(projectRoot, 'src/public-api.ts')),
       ).toBeTrue();
       expect(
-        watchedCompilationFiles.has(
-          toPosixPath(join(projectRoot, 'new-feature/src/public-api.ts')),
-        ),
+        buildState.watchedCompilationFiles.has(join(projectRoot, 'old-feature/src/public-api.ts')),
+      ).toBeFalse();
+      expect(
+        buildState.watchedCompilationFiles.has(join(projectRoot, 'new-feature/src/public-api.ts')),
       ).toBeTrue();
     });
 
-    it('should not mutate buildState or options when entry points do not change', () => {
+    it('should not mutate buildState or options.entryPoints when entry points do not change', () => {
       const initialEntryPoints = normalizeEntryPoints(
         {
           '.': './src/public-api.ts',
@@ -578,17 +581,14 @@ describe('entry-points pipeline', () => {
         entryPoints: initialEntryPoints,
         projectRoot,
         packageName,
+        packageJsonPath,
+        tsConfigPath,
+        assets: [],
       } as unknown as NormalizedLibraryOptions;
 
-      const buildState = {
-        previousBundleResults: new Map<string, BundleResult>([
-          ['.', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-          ['feature', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-        ]),
-        hasEntryPointsChanges: false,
-      } as unknown as SingleBuildState;
-
-      const watchedCompilationFiles = new Set<string>();
+      const buildState = new BuilderState(options);
+      buildState.previousBundleResults.set('.', createBundleResult());
+      buildState.previousBundleResults.set('feature', createBundleResult());
 
       const samePackageJson: PackageJsonData = {
         name: packageName,
@@ -598,17 +598,10 @@ describe('entry-points pipeline', () => {
         },
       };
 
-      updateWatchedEntryPoints(
-        samePackageJson,
-        options,
-        buildState,
-        watchedCompilationFiles,
-        packageJsonPath,
-      );
+      updateWatchedEntryPoints(samePackageJson, options, buildState);
 
       expect(buildState.hasEntryPointsChanges).toBeFalse();
       expect(options.entryPoints).toBe(initialEntryPoints);
-      expect(watchedCompilationFiles).toHaveSize(0);
       expect(buildState.previousBundleResults).toHaveSize(2);
     });
 
@@ -626,16 +619,13 @@ describe('entry-points pipeline', () => {
         entryPoints: initialEntryPoints,
         projectRoot,
         packageName,
+        packageJsonPath,
+        tsConfigPath,
+        assets: [],
       } as unknown as NormalizedLibraryOptions;
 
-      const buildState = {
-        previousBundleResults: new Map<string, BundleResult>([
-          ['.', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-        ]),
-        hasEntryPointsChanges: false,
-      } as unknown as SingleBuildState;
-
-      const watchedCompilationFiles = new Set<string>();
+      const buildState = new BuilderState(options);
+      buildState.previousBundleResults.set('.', createBundleResult());
 
       const updatedPackageJson: PackageJsonData = {
         name: packageName,
@@ -644,13 +634,7 @@ describe('entry-points pipeline', () => {
         },
       };
 
-      updateWatchedEntryPoints(
-        updatedPackageJson,
-        options,
-        buildState,
-        watchedCompilationFiles,
-        packageJsonPath,
-      );
+      updateWatchedEntryPoints(updatedPackageJson, options, buildState);
 
       expect(buildState.hasEntryPointsChanges).toBeTrue();
       expect(buildState.previousBundleResults.has('.')).toBeFalse();
@@ -658,7 +642,7 @@ describe('entry-points pipeline', () => {
         join(projectRoot, 'src/other-api.ts'),
       );
       expect(
-        watchedCompilationFiles.has(toPosixPath(join(projectRoot, 'src/other-api.ts'))),
+        buildState.watchedCompilationFiles.has(join(projectRoot, 'src/other-api.ts')),
       ).toBeTrue();
     });
 
@@ -676,16 +660,13 @@ describe('entry-points pipeline', () => {
         entryPoints: initialEntryPoints,
         projectRoot,
         packageName,
+        packageJsonPath,
+        tsConfigPath,
+        assets: [],
       } as unknown as NormalizedLibraryOptions;
 
-      const buildState = {
-        previousBundleResults: new Map<string, BundleResult>([
-          ['.', { esmModuleIds: new Set(), dtsModuleIds: new Set() }],
-        ]),
-        hasEntryPointsChanges: false,
-      } as unknown as SingleBuildState;
-
-      const watchedCompilationFiles = new Set<string>();
+      const buildState = new BuilderState(options);
+      buildState.previousBundleResults.set('.', createBundleResult());
 
       const updatedPackageJson: PackageJsonData = {
         name: '@renamed-scope/my-lib',
@@ -694,19 +675,108 @@ describe('entry-points pipeline', () => {
         },
       };
 
-      options.packageName = updatedPackageJson.name;
-
-      updateWatchedEntryPoints(
-        updatedPackageJson,
-        options,
-        buildState,
-        watchedCompilationFiles,
-        packageJsonPath,
-      );
+      updateWatchedEntryPoints(updatedPackageJson, options, buildState);
 
       expect(buildState.hasEntryPointsChanges).toBeTrue();
       expect(buildState.previousBundleResults.has('.')).toBeFalse();
+      expect(options.packageName).toBe('@renamed-scope/my-lib');
       expect(options.entryPoints.get('.')?.bundleName).toBe('renamed-scope-my-lib');
+    });
+
+    it('should throw when updated packageJson is missing a name field', () => {
+      const options = {
+        entryPoints: new Map(),
+        projectRoot,
+        packageName,
+        packageJsonPath,
+        assets: [],
+      } as unknown as NormalizedLibraryOptions;
+      const buildState = new BuilderState(options);
+
+      expect(() =>
+        updateWatchedEntryPoints({} as PackageJsonData, options, buildState),
+      ).toThrowError(/must contain a 'name'/);
+    });
+  });
+
+  describe('collectEntryPointsToBundle', () => {
+    it('should return all entry points with ESM and DTS changes on initial build', () => {
+      const entryPoints = normalizeEntryPoints(
+        {
+          '.': './src/public-api.ts',
+          './testing': './testing/src/public-api.ts',
+        },
+        projectRoot,
+        packageJsonPath,
+        packageName,
+      );
+      const options = { entryPoints } as unknown as NormalizedLibraryOptions;
+      const buildState = new BuilderState(options);
+
+      const items = collectEntryPointsToBundle(options, buildState);
+
+      expect(items).toHaveSize(2);
+      expect(items[0]).toEqual({
+        entryPoint: jasmine.objectContaining({ name: '.' }),
+        previousBundleResult: undefined,
+        hasEsmChanges: true,
+        hasDtsChanges: true,
+      });
+      expect(items[1]).toEqual({
+        entryPoint: jasmine.objectContaining({ name: 'testing' }),
+        previousBundleResult: undefined,
+        hasEsmChanges: true,
+        hasDtsChanges: true,
+      });
+      expect(buildState.executionResult.logs).toEqual([
+        'Compiling @my-scope/my-lib...',
+        'Compiling @my-scope/my-lib/testing...',
+      ]);
+    });
+
+    it('should only return entry points whose ESM or DTS module IDs intersect pending changes', () => {
+      const entryPoints = normalizeEntryPoints(
+        {
+          '.': './src/public-api.ts',
+          './testing': './testing/src/public-api.ts',
+        },
+        projectRoot,
+        packageJsonPath,
+        packageName,
+      );
+      const options = { entryPoints } as unknown as NormalizedLibraryOptions;
+      const buildState = new BuilderState(options);
+
+      const primaryEntryJs = join(projectRoot, 'src/public-api.js');
+      const primaryEntryDts = join(projectRoot, 'src/public-api.d.ts');
+      const testingEntryJs = join(projectRoot, 'testing/src/public-api.js');
+      const testingEntryDts = join(projectRoot, 'testing/src/public-api.d.ts');
+
+      buildState.previousBundleResults.set(
+        '.',
+        createBundleResult({
+          esmModuleIds: new Set([primaryEntryJs]),
+          dtsModuleIds: new Set([primaryEntryDts]),
+        }),
+      );
+      buildState.previousBundleResults.set(
+        'testing',
+        createBundleResult({
+          esmModuleIds: new Set([testingEntryJs]),
+          dtsModuleIds: new Set([testingEntryDts]),
+        }),
+      );
+
+      buildState.pendingChangedEsmFiles.add(testingEntryJs);
+
+      const items = collectEntryPointsToBundle(options, buildState);
+
+      expect(items).toHaveSize(1);
+      expect(items[0]?.entryPoint.name).toBe('testing');
+      expect(items[0]?.hasEsmChanges).toBeTrue();
+      expect(items[0]?.hasDtsChanges).toBeFalse();
+      expect(items[0]?.previousBundleResult).toBe(buildState.previousBundleResults.get('testing'));
+      expect(buildState.executionResult.logs).toEqual(['Compiling @my-scope/my-lib/testing...']);
     });
   });
 });
