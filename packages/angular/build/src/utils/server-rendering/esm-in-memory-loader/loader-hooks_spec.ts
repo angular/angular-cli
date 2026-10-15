@@ -6,6 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { initialize, load, resolve } from './loader-hooks';
 import { createSharedServerFiles } from './utils';
 
@@ -124,12 +128,12 @@ describe('esm-in-memory-loader loader-hooks', () => {
   });
 
   describe('load', () => {
-    it('should load in-memory file source from SharedArrayBuffer backed Uint8Array', async () => {
+    it('should load in-memory file source from SharedArrayBuffer backed Uint8Array', () => {
       const memoryUrl = new URL('./main.server.mjs', 'memory://').href;
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      const result = await load(rootResolve.url, { format: 'module' }, nextLoad);
+      const result = load(rootResolve.url, { format: 'module' }, nextLoad);
 
       expect(nextLoad).not.toHaveBeenCalled();
       expect(result.format).toBe('module');
@@ -137,12 +141,12 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.source).toBe('export const main = true;');
     });
 
-    it('should load in-memory file with multi-byte UTF-8 characters', async () => {
+    it('should load in-memory file with multi-byte UTF-8 characters', () => {
       const memoryUrl = new URL('./utf8.mjs', 'memory://').href;
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      const result = await load(rootResolve.url, { format: 'module' }, nextLoad);
+      const result = load(rootResolve.url, { format: 'module' }, nextLoad);
 
       expect(nextLoad).not.toHaveBeenCalled();
       expect(result.format).toBe('module');
@@ -150,12 +154,12 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.source).toBe('export const text = "🔥 UTF-8 🚀";');
     });
 
-    it('should load in-memory file with empty content', async () => {
+    it('should load in-memory file with empty content', () => {
       const memoryUrl = new URL('./empty.mjs', 'memory://').href;
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      const result = await load(rootResolve.url, { format: 'module' }, nextLoad);
+      const result = load(rootResolve.url, { format: 'module' }, nextLoad);
 
       expect(nextLoad).not.toHaveBeenCalled();
       expect(result.format).toBe('module');
@@ -163,7 +167,7 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.source).toBe('');
     });
 
-    it('should load in-memory file source with non-zero byteOffset in Uint8Array', async () => {
+    it('should load in-memory file source with non-zero byteOffset in Uint8Array', () => {
       const target = 'export const sliced = 42;';
       const fullBuffer = Buffer.from(`__PADDING__${target}__MORE__`);
       const offset = Buffer.byteLength('__PADDING__', 'utf-8');
@@ -181,7 +185,7 @@ describe('esm-in-memory-loader loader-hooks', () => {
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      const result = await load(rootResolve.url, { format: 'module' }, nextLoad);
+      const result = load(rootResolve.url, { format: 'module' }, nextLoad);
 
       expect(nextLoad).not.toHaveBeenCalled();
       expect(result.format).toBe('module');
@@ -189,7 +193,7 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.source).toBe(target);
     });
 
-    it('should load in-memory file source when outputFiles contain string values', async () => {
+    it('should load in-memory file source when outputFiles contain string values', () => {
       initialize({
         workspaceRoot,
         outputFiles: {
@@ -201,7 +205,7 @@ describe('esm-in-memory-loader loader-hooks', () => {
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      const result = await load(rootResolve.url, { format: 'module' }, nextLoad);
+      const result = load(rootResolve.url, { format: 'module' }, nextLoad);
 
       expect(nextLoad).not.toHaveBeenCalled();
       expect(result.format).toBe('module');
@@ -209,21 +213,46 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.source).toBe('export const fromString = 1;');
     });
 
-    it('should reject when in-memory file does not exist in outputFiles', async () => {
+    it('should throw when in-memory file does not exist in outputFiles', () => {
       const memoryUrl = new URL('./main.server.mjs', 'memory://').href;
       const rootResolve = resolve(memoryUrl, { parentURL: undefined }, () => {});
       const nonExistentVirtualUrl = rootResolve.url.replace('main.server.mjs', 'missing.mjs');
       const nextLoad = jasmine.createSpy('nextLoad');
 
-      await expectAsync(
-        load(nonExistentVirtualUrl, { format: 'module' }, nextLoad),
-      ).toBeRejectedWithError(/Resolved in-memory ESM file should always exist/);
+      expect(() => load(nonExistentVirtualUrl, { format: 'module' }, nextLoad)).toThrowError(
+        /Resolved in-memory ESM file should always exist/,
+      );
       expect(nextLoad).not.toHaveBeenCalled();
     });
 
-    it('should delegate to nextLoad for non-angular file URLs', async () => {
-      const nextLoad = jasmine.createSpy('nextLoad').and.resolveTo({ format: 'module' });
-      const result = await load(
+    it('should prepend ngServerMode initialization for @angular/ file URLs', async () => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      const tmpDir = await mkdtemp(join(baseTmpDir, 'loader-hooks-test-'));
+
+      try {
+        const angularDir = join(tmpDir, '@angular/core');
+        await mkdir(angularDir, { recursive: true });
+        const filePath = join(angularDir, 'index.mjs');
+        await writeFile(filePath, 'export const VERSION = "1.0.0";');
+
+        const nextLoad = jasmine.createSpy('nextLoad');
+        const result = load(pathToFileURL(filePath).href, { format: 'module' }, nextLoad);
+
+        expect(nextLoad).not.toHaveBeenCalled();
+        expect(result.format).toBe('module');
+        expect(result.shortCircuit).toBeTrue();
+        expect(new TextDecoder().decode(result.source)).toBe(
+          'var ngServerMode=true;export const VERSION = "1.0.0";',
+        );
+      } finally {
+        await rm(tmpDir, { recursive: true, force: true });
+      }
+    });
+
+    it('should delegate to nextLoad for non-angular file URLs', () => {
+      const nextLoad = jasmine.createSpy('nextLoad').and.returnValue({ format: 'module' });
+      const result = load(
         'file:///workspace/node_modules/rxjs/index.js',
         { format: 'module' },
         nextLoad,
@@ -235,9 +264,9 @@ describe('esm-in-memory-loader loader-hooks', () => {
       expect(result.format).toBe('module');
     });
 
-    it('should delegate to nextLoad for non-memory non-file URLs', async () => {
-      const nextLoad = jasmine.createSpy('nextLoad').and.resolveTo({ format: 'builtin' });
-      const result = await load('node:fs', { format: 'builtin' }, nextLoad);
+    it('should delegate to nextLoad for non-memory non-file URLs', () => {
+      const nextLoad = jasmine.createSpy('nextLoad').and.returnValue({ format: 'builtin' });
+      const result = load('node:fs', { format: 'builtin' }, nextLoad);
 
       expect(nextLoad).toHaveBeenCalledWith('node:fs');
       expect(result.format).toBe('builtin');
