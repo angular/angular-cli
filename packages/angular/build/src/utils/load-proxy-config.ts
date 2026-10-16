@@ -118,7 +118,7 @@ function normalizeProxyConfiguration(
   // since Vite proxies a request with the first entry that matches it.
   const orderedProxy: Record<string, object> = {};
   for (const [key, value] of Object.entries(normalizedProxy)) {
-    const context = key[0] !== '^' && isDynamicPattern(key) ? makeRegExpFromGlob(key).source : key;
+    const context = key[0] !== '^' && isDynamicPattern(key) ? makeUrlRegExpFromGlob(key) : key;
     orderedProxy[context] = value;
   }
   normalizedProxy = orderedProxy;
@@ -149,6 +149,36 @@ function normalizeProxyConfiguration(
   }
 
   return normalizedProxy;
+}
+
+/**
+ * Converts a glob pattern to a regular expression source string that matches
+ * the pathname portion of a request URL while allowing an optional query string.
+ *
+ * Vite tests regex proxy keys against `req.url`, which includes the query string,
+ * whereas `picomatch` generates regexes assuming the input is only a pathname.
+ */
+function makeUrlRegExpFromGlob(glob: string): string {
+  const { source } = makeRegExpFromGlob(glob);
+
+  return (
+    source
+      // Ensure picomatch's "at least one character" lookahead does not
+      // treat the `?` query delimiter as a pathname character (e.g., `/api/*` on `/api/?a=1`).
+      .replaceAll('(?=.)', '(?=[^?])')
+      // Prevent single-segment wildcards (`*` and `?`) from matching
+      // across `?` into the query string (e.g., `/api/*.json` on `/api/users?file=data.json`).
+      .replaceAll('[^/]', '[^/?]')
+      // Prevent leading-dot-aware `?` wildcards from matching the `?` delimiter.
+      .replaceAll('[^.\\/]', '[^.\\/?]')
+      // Prevent multi-segment globstars (`**`) from matching across `?` into the query string
+      // (e.g., `/api/**/users` on `/api/other?redirect=/users`).
+      .replaceAll('\\.).)*?', '\\.)[^?])*?')
+      // Replace unescaped end-of-input anchors (`$`, both at the end of the pattern and inside
+      // internal alternation groups for trailing `/**` or negated globs) so an optional query
+      // string is permitted after the matched pathname.
+      .replace(/(?<!\\)\$/g, '(?:\\?.*)?$')
+  );
 }
 
 function pathRewriter(pathRewriteEntries: [RegExp, string][], path: string): string {
