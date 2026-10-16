@@ -9,6 +9,7 @@
 import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import * as path from 'node:path';
+import { join } from 'node:path';
 import type ts from 'typescript';
 
 export interface CompilerOptionOverrides {
@@ -24,6 +25,7 @@ export interface CompilerOptionOverrides {
   declarationMap?: boolean;
   compilationMode?: 'full' | 'partial';
   paths?: Record<string, string[]>;
+  basePath?: string;
 }
 
 export function transformCompilerOptions(
@@ -134,6 +136,7 @@ export function transformCompilerOptions(
   return {
     compilerOptions: {
       ...compilerOptions,
+      basePath: overrides?.basePath ?? compilerOptions.basePath,
       noEmitOnError: false,
       composite: false,
       inlineSources: !!overrides?.sourcemap,
