@@ -13,7 +13,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { type FixtureOptions, type Layout, generateFixture } from './fixtures.mts';
+import {
+  DEFAULT_STYLE_FLAVOR,
+  type FixtureOptions,
+  type Layout,
+  type StyleFlavor,
+  generateFixture,
+} from './fixtures.mts';
 import { type BuildMeasurement, buildOnce, checkBuilderIsBuilt, median } from './harness.mts';
 import { formatCsvReport, formatJsonReport } from './reporters.mts';
 
@@ -21,6 +27,7 @@ export interface LibraryBuilderBenchmarkOptions {
   layout?: Layout;
   count?: number[];
   depth?: number[];
+  styleFlavor?: StyleFlavor[];
   iterations?: number;
   json?: boolean;
   csv?: string;
@@ -65,60 +72,73 @@ export async function runLibraryBuilderBenchmarks(
     layout === 'flat'
       ? (options.count ?? DEFAULT_FLAT_COUNTS)
       : (options.depth ?? depthsForEntryPointTargets(options.count ?? DEFAULT_FLAT_COUNTS));
+  // Defaults to just `inline` (matching this suite's original, style-agnostic sweep) rather than
+  // the full matrix -- the matrix is opt-in via `--style-flavor=<list>` since it multiplies the
+  // number of builds run by up to 6x.
+  const styleFlavors = options.styleFlavor ?? [DEFAULT_STYLE_FLAVOR];
 
   fs.mkdirSync(scratchRoot, { recursive: true });
   const measurements: BuildMeasurement[] = [];
 
   try {
-    for (const sizeOrDepth of sizes) {
-      const label = layout + '-' + (layout === 'deep' ? 'depth' + sizeOrDepth : sizeOrDepth);
-      const projectDir = path.join(scratchRoot, label);
+    for (const styleFlavor of styleFlavors) {
+      for (const sizeOrDepth of sizes) {
+        const label =
+          layout +
+          '-' +
+          (layout === 'deep' ? 'depth' + sizeOrDepth : sizeOrDepth) +
+          '-' +
+          styleFlavor;
+        const projectDir = path.join(scratchRoot, label);
 
-      const fixtureOptions: FixtureOptions =
-        layout === 'flat' ? { layout, count: sizeOrDepth } : { layout, depth: sizeOrDepth };
-      const entryPoints = generateFixture(projectDir, fixtureOptions);
+        const fixtureOptions: FixtureOptions =
+          layout === 'flat'
+            ? { layout, count: sizeOrDepth, styleFlavor }
+            : { layout, depth: sizeOrDepth, styleFlavor };
+        const entryPoints = generateFixture(projectDir, fixtureOptions);
 
-      if (!options.json) {
-        // eslint-disable-next-line no-console
-        console.log('\n[library-builder] ' + label + ' (' + entryPoints + ' entry points)');
-      }
-
-      const durations: number[] = [];
-      for (let i = 1; i <= iterations; i++) {
-        const { durationMs, status } = buildOnce(projectDir, builder.architectCli);
         if (!options.json) {
           // eslint-disable-next-line no-console
+          console.log('\n[library-builder] ' + label + ' (' + entryPoints + ' entry points)');
+        }
+
+        const durations: number[] = [];
+        for (let i = 1; i <= iterations; i++) {
+          const { durationMs, status } = buildOnce(projectDir, builder.architectCli);
+          if (!options.json) {
+            // eslint-disable-next-line no-console
+            console.log(
+              '  run ' +
+                i +
+                '/' +
+                iterations +
+                ': ' +
+                (status === 'ok' ? 'done' : 'FAILED') +
+                ' in ' +
+                (durationMs / 1000).toFixed(2) +
+                's',
+            );
+          }
+          if (status === 'ok') {
+            durations.push(durationMs);
+          }
+          measurements.push({ layout, styleFlavor, entryPoints, iteration: i, durationMs, status });
+        }
+
+        if (!options.json && durations.length > 0) {
+          const medianMs = median(durations);
+          // eslint-disable-next-line no-console
           console.log(
-            '  run ' +
-              i +
-              '/' +
-              iterations +
-              ': ' +
-              (status === 'ok' ? 'done' : 'FAILED') +
-              ' in ' +
-              (durationMs / 1000).toFixed(2) +
-              's',
+            '  median: ' +
+              (medianMs / 1000).toFixed(2) +
+              's  (' +
+              (medianMs / entryPoints).toFixed(2) +
+              'ms/entry)',
           );
         }
-        if (status === 'ok') {
-          durations.push(durationMs);
-        }
-        measurements.push({ layout, entryPoints, iteration: i, durationMs, status });
-      }
 
-      if (!options.json && durations.length > 0) {
-        const medianMs = median(durations);
-        // eslint-disable-next-line no-console
-        console.log(
-          '  median: ' +
-            (medianMs / 1000).toFixed(2) +
-            's  (' +
-            (medianMs / entryPoints).toFixed(2) +
-            'ms/entry)',
-        );
+        fs.rmSync(projectDir, { recursive: true, force: true });
       }
-
-      fs.rmSync(projectDir, { recursive: true, force: true });
     }
   } finally {
     fs.rmSync(scratchRoot, { recursive: true, force: true });

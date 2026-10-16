@@ -9,6 +9,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
+import { STYLE_FLAVORS, type StyleFlavor } from './benchmarks/library-builder/fixtures.mts';
 import {
   type LibraryBuilderBenchmarkOptions,
   runLibraryBuilderBenchmarks,
@@ -44,9 +45,18 @@ function parseIntList(raw: string | number | undefined): number[] | undefined {
   if (raw === undefined) {
     return undefined;
   }
+
   return String(raw)
     .split(',')
     .map((s) => Number(s.trim()));
+}
+
+function parseStringList(raw: string | undefined): string[] | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  return raw.split(',').map((s) => s.trim());
 }
 
 async function runLibraryBuilderSubsystem(
@@ -54,6 +64,7 @@ async function runLibraryBuilderSubsystem(
     layout?: string;
     count?: string;
     depth?: string;
+    'style-flavor'?: string;
     iterations?: string | number;
     json?: boolean;
     csv?: string | boolean;
@@ -108,10 +119,26 @@ async function runLibraryBuilderSubsystem(
     return 1;
   }
 
+  const styleFlavor = parseStringList(options['style-flavor']);
+  const validStyleFlavors: readonly string[] = STYLE_FLAVORS;
+  if (styleFlavor !== undefined && styleFlavor.some((f) => !validStyleFlavors.includes(f))) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --style-flavor must be a comma-separated list of: ' +
+        STYLE_FLAVORS.join(', ') +
+        '. Got "' +
+        options['style-flavor'] +
+        '".',
+    );
+
+    return 1;
+  }
+
   const cliOptions: LibraryBuilderBenchmarkOptions = {
     layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
     count,
     depth,
+    styleFlavor: styleFlavor as StyleFlavor[] | undefined,
     iterations,
     json: Boolean(options.json),
     csv: options.csv !== undefined ? path.resolve(cwd, options.csv as string) : undefined,
@@ -140,6 +167,7 @@ export default async function (
     layout?: string;
     count?: string;
     depth?: string;
+    'style-flavor'?: string;
     help?: boolean;
     [key: string]: unknown;
   },
@@ -178,6 +206,9 @@ Options (library-builder):
   --depth=<n,n,...>          Explicit tree depths, layout=deep only. Overrides the depths
                              that would otherwise be derived from --count (the smallest
                              depth with 2^depth >= each target count).
+  --style-flavor=<f,f,...>   Style-flavor targets, one or more of: inline, inline-css,
+                             inline-scss, external, external-css, external-scss
+                             (default: inline)
   --iterations=<n>           Measured iterations (default: 3)
   --json                     Output raw measurements as JSON to stdout
   --csv=<path>               Write raw per-iteration measurements as CSV to <path>

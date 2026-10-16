@@ -16,9 +16,11 @@ export function formatJsonReport(measurements: BuildMeasurement[]): string {
 }
 
 export function formatCsvReport(measurements: BuildMeasurement[]): string {
-  const header = 'layout,entryPoints,iteration,durationMs,status';
+  const header = 'layout,styleFlavor,entryPoints,iteration,durationMs,status';
   const rows = measurements.map((m) =>
-    [m.layout, m.entryPoints, m.iteration, m.durationMs.toFixed(2), m.status].join(','),
+    [m.layout, m.styleFlavor, m.entryPoints, m.iteration, m.durationMs.toFixed(2), m.status].join(
+      ',',
+    ),
   );
 
   return [header, ...rows].join('\n') + '\n';
