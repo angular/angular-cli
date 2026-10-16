@@ -142,7 +142,7 @@ export interface NormalizedLibraryOptions {
 }
 
 /**
- * Cached module ID sets for a bundled entry point.
+ * Cached module ID and output file sets for a bundled entry point.
  */
 export interface BundleResult {
   /** Exact set of virtual POSIX ESM module IDs bundled into this entry point. */
@@ -151,8 +151,14 @@ export interface BundleResult {
   /** Exact set of virtual POSIX DTS module IDs bundled into this entry point. */
   dtsModuleIds: ReadonlySet<string>;
 
+  /** Relative POSIX output paths of ESM bundle files and sourcemaps emitted for this entry point. */
+  esmOutputFiles: ReadonlySet<string>;
+
+  /** Relative POSIX output paths of DTS bundle files and sourcemaps emitted for this entry point. */
+  dtsOutputFiles: ReadonlySet<string>;
+
   /** Whether this entry point bundle imports 'tslib'. */
-  hasTslibImport?: boolean;
+  hasTslibImport: boolean;
 }
 
 /**
