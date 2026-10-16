@@ -10,6 +10,7 @@ import {
   addLeadingSlash,
   addTrailingSlash,
   buildPathWithParams,
+  buildQueryWithParams,
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
@@ -184,6 +185,15 @@ describe('URL Utils', () => {
       expect(result.toString()).toBe('/base/path/details');
     });
 
+    it('should replace positional placeholders with the segments at those positions', () => {
+      expect(buildPathWithParams('/user/*2/*1', '/a/b')).toBe('/user/b/a');
+    });
+
+    it('should replace a positional placeholder followed by a query or fragment', () => {
+      expect(buildPathWithParams('/user/*1?tab=1', '/a')).toBe('/user/a?tab=1');
+      expect(buildPathWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
+    });
+
     it('should throw an error if the toPath does not start with "/"', () => {
       const fromPath = '/base/path';
       const toPath = 'details';
@@ -192,6 +202,21 @@ describe('URL Utils', () => {
       expect(() => {
         buildPathWithParams(toPath, fromPath);
       }).toThrowError(`Invalid toPath: The string must start with a '/'. Received: 'details'`);
+    });
+  });
+
+  describe('buildQueryWithParams', () => {
+    it('should replace query placeholders with the values of the source parameters', () => {
+      const fromParams = new URLSearchParams('term=cats&term=dogs&page=2');
+      expect(buildQueryWithParams('/search?q=:term&p=:page&static=1#top', fromParams)).toBe(
+        '/search?q=cats&q=dogs&p=2&static=1#top',
+      );
+    });
+
+    it('should remove query parameters whose source parameter is missing', () => {
+      const fromParams = new URLSearchParams();
+      expect(buildQueryWithParams('/search?q=:term&static=1', fromParams)).toBe('/search?static=1');
+      expect(buildQueryWithParams('/search?q=:term', fromParams)).toBe('/search');
     });
   });
 

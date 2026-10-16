@@ -153,11 +153,18 @@ export function stripIndexHtmlFromURL(url: URL): URL {
 }
 
 /**
+ * Matches a `*<n>` placeholder that makes up a whole path segment, which may be followed by
+ * the query or fragment of the URL.
+ */
+const POSITIONAL_PLACEHOLDER_REGEXP = /^\*(\d+)(?=[?#]|$)/;
+
+/**
  * Resolves `*` placeholders in a path template by mapping them to corresponding segments
  * from a base path. This is useful for constructing paths dynamically based on a given base path.
  *
  * The function processes the `toPath` string, replacing each `*` placeholder with
- * the corresponding segment from the `fromPath`. If the `toPath` contains no placeholders,
+ * the corresponding segment from the `fromPath`, and each `*<n>` placeholder with the
+ * segment at position `n` of the `fromPath`. If the `toPath` contains no placeholders,
  * it is returned as-is. Invalid `toPath` formats (not starting with `/`) will throw an error.
  *
  * @param toPath - A path template string that may contain `*` placeholders. Each `*` is replaced
@@ -175,6 +182,10 @@ export function stripIndexHtmlFromURL(url: URL): URL {
  * // Example with placeholders resolved
  * const resolvedPath = buildPathWithParams('/*\/details', '/123/abc');
  * console.log(resolvedPath); // Outputs: '/123/details'
+ *
+ * // Example with a positional placeholder
+ * const positionalPath = buildPathWithParams('/user/*1', '/123/abc');
+ * console.log(positionalPath); // Outputs: '/user/123'
  *
  * // Example with a static path
  * const staticPath = buildPathWithParams('/static/path', '/base/unused');
@@ -197,10 +208,49 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
   const fromPathParts = fromPath.split('/');
   const toPathParts = toPath.split('/');
   const resolvedParts = toPathParts.map((part, index) =>
-    toPathParts[index] === '*' ? fromPathParts[index] : part,
+    part === '*'
+      ? fromPathParts[index]
+      : part.replace(POSITIONAL_PLACEHOLDER_REGEXP, (_, position) => fromPathParts[position]),
   );
 
   return joinUrlParts(...resolvedParts);
+}
+
+/**
+ * Resolves `:name` placeholders in the query of a URL, like the Angular router does for redirects.
+ *
+ * Each query parameter whose value is a `:name` placeholder gets the values of the `name`
+ * query parameter of `fromParams`, and is removed if `fromParams` has no such parameter.
+ *
+ * @param toUrl - A URL whose query may contain `:name` placeholders.
+ * @param fromParams - The query parameters that provide the values for the placeholders.
+ * @returns The URL with its query placeholders resolved.
+ *
+ * @example
+ * ```typescript
+ * buildQueryWithParams('/search?q=:term', new URLSearchParams('term=cats')); // returns '/search?q=cats'
+ * ```
+ */
+export function buildQueryWithParams(toUrl: string, fromParams: URLSearchParams): string {
+  const [, path, query, fragment] = /^([^?#]*)\?([^#]*)(.*)$/.exec(toUrl) ?? [];
+  if (query === undefined || !query.includes('=:')) {
+    return toUrl;
+  }
+
+  const resolvedParams = new URLSearchParams();
+  for (const [name, value] of new URLSearchParams(query)) {
+    if (value[0] === ':') {
+      for (const sourceValue of fromParams.getAll(value.slice(1))) {
+        resolvedParams.append(name, sourceValue);
+      }
+    } else {
+      resolvedParams.append(name, value);
+    }
+  }
+
+  const resolvedQuery = resolvedParams.toString();
+
+  return path + (resolvedQuery ? `?${resolvedQuery}` : '') + fragment;
 }
 
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;
