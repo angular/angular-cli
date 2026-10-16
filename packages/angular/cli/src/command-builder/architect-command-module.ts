@@ -69,7 +69,8 @@ export abstract class ArchitectCommandModule
 
     const localYargs: Argv<ArchitectCommandArgs> = argv
       .positional('project', {
-        describe: 'The name of the project to build. Can be an application or a library.',
+        describe:
+          'The name of the project to run the command for. Can be an application or a library.',
         type: 'string',
         // Hide choices from JSON help so that we don't display them in AIO.
         choices: jsonHelp ? undefined : this.getProjectChoices(),
