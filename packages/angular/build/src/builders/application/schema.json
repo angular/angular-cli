@@ -581,6 +581,12 @@
               "type": "boolean",
               "description": "Whether the builder should process the Angular Router configuration to find all unparameterized routes and prerender them.",
               "default": true
+            },
+            "format": {
+              "type": "string",
+              "description": "Defines the file layout of prerendered pages. 'directory': '/foo' is written to 'foo/index.html'. 'file': '/foo' is written to 'foo.html', which some hosting services serve for '/foo' without a redirect to '/foo/'. The root route of the application and of each locale is always written to 'index.html'. Only considered when the build does not produce a server.",
+              "enum": ["directory", "file"],
+              "default": "directory"
             }
           },
           "additionalProperties": false

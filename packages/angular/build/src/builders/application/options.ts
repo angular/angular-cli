@@ -32,6 +32,7 @@ import {
   OutputMode,
   OutputPathClass,
   Platform,
+  Format as PrerenderFormat,
 } from './schema';
 
 /**
@@ -261,12 +262,23 @@ export async function normalizeOptions(
     }
   }
 
+  let prerenderFormat =
+    (typeof options.prerender === 'object' && options.prerender.format) ||
+    PrerenderFormat.Directory;
+
   if (options.outputMode) {
     if (!options.server) {
       options.ssr = false;
     }
 
-    if (options.prerender !== undefined) {
+    // "prerender.format" is considered when pages are prerendered.
+    if (
+      options.prerender !== undefined &&
+      (!options.server ||
+        typeof options.prerender !== 'object' ||
+        options.prerender.routesFile !== undefined ||
+        options.prerender.discoverRoutes === false)
+    ) {
       context.logger.warn(
         'The "prerender" option is not considered when "outputMode" is specified.',
       );
@@ -345,6 +357,15 @@ export async function normalizeOptions(
         options.outputMode === undefined) ||
       options.outputMode === OutputMode.Static,
   };
+
+  if (prerenderFormat === PrerenderFormat.File && !outputOptions.ignoreServer) {
+    // The server runtime of '@angular/ssr' looks up prerendered pages as '<route>/index.html'.
+    context.logger.warn(
+      'The "prerender.format" option is not considered when the build produces a server.',
+    );
+
+    prerenderFormat = PrerenderFormat.Directory;
+  }
 
   const outputNames = {
     bundles:
@@ -496,6 +517,7 @@ export async function normalizeOptions(
     subresourceIntegrity,
     serverEntryPoint,
     prerenderOptions,
+    prerenderFormat,
     appShellOptions,
     outputMode,
     ssrOptions,
