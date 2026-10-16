@@ -19,16 +19,17 @@ export default function (options: EnvironmentOptions): Rule {
   return updateWorkspace((workspace) => {
     const project = workspace.projects.get(options.project);
     if (!project) {
-      throw new SchematicsException(`Project name "${options.project}" doesn't not exist.`);
+      throw new SchematicsException(`Project name "${options.project}" does not exist.`);
     }
 
     const type = project.extensions['projectType'];
     if (type !== 'application') {
       return log(
         'error',
-        'Only application project types are support by this schematic.' + type
-          ? ` Project "${options.project}" has a "projectType" of "${type}".`
-          : ` Project "${options.project}" has no "projectType" defined.`,
+        'Only application project types are supported by this schematic.' +
+          (type
+            ? ` Project "${options.project}" has a "projectType" of "${type}".`
+            : ` Project "${options.project}" has no "projectType" defined.`),
       );
     }
 
@@ -89,7 +90,7 @@ function* generateConfigurationEnvironments(
   if (serverTarget && serverTarget.builder !== AngularBuilder.Server) {
     yield log(
       'warn',
-      `"server" target found for project "${projectName}" has a third-party builder "${buildTarget.builder}".` +
+      `"server" target found for project "${projectName}" has a third-party builder "${serverTarget.builder}".` +
         ' The generated project options may not be compatible with this builder.',
     );
   }
