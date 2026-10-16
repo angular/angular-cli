@@ -114,22 +114,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       const workerMatch = mainContent.match(/(worker-[A-Z0-9]{8}\.js)/);
       expect(workerMatch).not.toBeNull();
 
-      const visited = new Set<string>();
-      const queue = ['main.js', workerMatch![1]];
-      while (queue.length > 0) {
-        const file = queue.pop()!;
-        if (visited.has(file)) {
-          continue;
-        }
-        visited.add(file);
+      const filesToCheck = new Set(['main.js']);
+      if (workerMatch) {
+        filesToCheck.add(workerMatch[1]);
+      }
 
+      for (const file of filesToCheck) {
         expect(harness.hasFile(`dist/browser/${file}`))
           .withContext(`Expected dist/browser/${file} to exist`)
           .toBeTrue();
 
         const content = harness.readFile(`dist/browser/${file}`);
         for (const match of content.matchAll(/(?:from|import)\s*\(?["']\.\/([^"']+\.js)["']\)?/g)) {
-          queue.push(match[1]);
+          filesToCheck.add(match[1]);
         }
       }
     });
