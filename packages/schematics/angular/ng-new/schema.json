@@ -8,7 +8,7 @@
   "properties": {
     "directory": {
       "type": "string",
-      "description": "The directory where the new workspace and project should be created. If not specified, a new directory named after the workspace is created in the current directory."
+      "description": "The directory where the new workspace and project should be created. If not specified, the workspace will be created in a subfolder within the current directory, using the workspace's name."
     },
     "name": {
       "description": "The name for the new workspace and the initial project. This name will be used for the root directory and various identifiers throughout the project.",
