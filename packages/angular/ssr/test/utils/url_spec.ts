@@ -11,6 +11,7 @@ import {
   addTrailingSlash,
   buildPathWithParams,
   joinUrlParts,
+  normalizeUrlPath,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
   stripMatrixParams,
@@ -218,6 +219,54 @@ describe('URL Utils', () => {
 
     it('should handle an empty string', () => {
       expect(stripMatrixParams('')).toBe('');
+    });
+  });
+  describe('normalizeUrlPath', () => {
+    it('should resolve spellings that `@angular/router` treats as the same route', () => {
+      // Each left-hand value is what `DefaultUrlSerializer` resolves the path to,
+      // verified against the published @angular/router 22.1.6.
+      expect(normalizeUrlPath('/page)')).toBe('/page');
+      expect(normalizeUrlPath('/page(')).toBe('/page');
+      expect(normalizeUrlPath('/page;')).toBe('/page');
+      expect(normalizeUrlPath('/(page)')).toBe('/page');
+      expect(normalizeUrlPath('/a/1//b')).toBe('/a/1');
+      expect(normalizeUrlPath('/a/b)c/d')).toBe('/a/b');
+    });
+
+    it('should leave an ordinary path unchanged', () => {
+      expect(normalizeUrlPath('/page')).toBe('/page');
+      expect(normalizeUrlPath('/a/b/c')).toBe('/a/b/c');
+      expect(normalizeUrlPath('/user/123')).toBe('/user/123');
+      expect(normalizeUrlPath('/')).toBe('/');
+    });
+
+    it('should preserve encoding, including an encoded slash', () => {
+      expect(normalizeUrlPath('/a%2Fb')).toBe('/a%2Fb');
+      expect(normalizeUrlPath('/encoding%20url')).toBe('/encoding%20url');
+    });
+
+    it('should preserve matrix parameters so stripMatrixParams still owns them', () => {
+      expect(normalizeUrlPath('/page;p=1')).toBe('/page;p=1');
+    });
+
+    it('should return a path it cannot parse unchanged', () => {
+      // Malformed percent-encoding keeps its existing behaviour.
+      expect(normalizeUrlPath('/%zz')).toBe('/%zz');
+    });
+
+    it('should not alter dot segments or index.html handling', () => {
+      expect(normalizeUrlPath('/a/./b')).toBe('/a/./b');
+      expect(normalizeUrlPath('/page/index.html')).toBe('/page/index.html');
+    });
+
+    it('should still normalize paths a metacharacter-only check would skip', () => {
+      // The fast path is an allowlist for this reason: a check that bails out only on
+      // `(`, `)`, `;` and `//` leaves these unnormalized, which is the same
+      // cheap-predicate-versus-real-parser split this function exists to close.
+      expect(normalizeUrlPath('/a b')).toBe('/a%20b');
+      expect(normalizeUrlPath('/a+b')).toBe('/a%2Bb');
+      expect(normalizeUrlPath('/%41')).toBe('/A');
+      expect(normalizeUrlPath('/a%2fb')).toBe('/a%2Fb');
     });
   });
 });
