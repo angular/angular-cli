@@ -30,8 +30,14 @@ import { Console } from '../console';
 import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
-import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
-import { joinUrlParts, stripLeadingSlash } from '../utils/url';
+import {
+  NormalizedUrl,
+  VALID_REDIRECT_RESPONSE_CODES,
+  isValidRedirectResponseCode,
+  normalizeAndValidateRedirect,
+  normalizeAndValidateRoutePath,
+} from '../utils/redirect';
+import { addLeadingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
   RenderMode,
@@ -200,11 +206,16 @@ async function* handleRoute(options: {
             `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
         };
       } else if (typeof redirectTo === 'string') {
-        parentRoutes.set(metadata.route, {
-          ...metadata,
-          redirectTo: resolveRedirectTo(parentRoute, redirectTo),
-          relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
-        });
+        const { url, error } = resolveRedirectTo(parentRoute, redirectTo);
+        if (error !== undefined) {
+          yield { error: invalidRedirectError(metadata.route, error) };
+        } else {
+          parentRoutes.set(metadata.route, {
+            ...metadata,
+            redirectTo: url,
+            relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
+          });
+        }
       } else {
         parentRoutes.set(metadata.route, metadata);
       }
@@ -452,7 +463,14 @@ async function* handleSSGRoute(
   }
 
   if (redirectTo !== undefined) {
-    meta.redirectTo = resolveRedirectTo(parentRoute, redirectTo);
+    const { url, error } = resolveRedirectTo(parentRoute, redirectTo);
+    if (error !== undefined) {
+      yield { error: invalidRedirectError(currentRoutePath, error) };
+
+      return;
+    }
+
+    meta.redirectTo = url;
     meta.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
   }
 
@@ -505,16 +523,41 @@ async function* handleSSGRoute(
           .replace(URL_PARAMETER_GLOBAL_REGEXP, replacer)
           .replace(CATCH_ALL_REGEXP, replacer);
 
+        // A parameter value is only meaningful in the context of the route it is substituted into,
+        // so the composed path is what gets normalized and validated. This also catches values that
+        // only become unsafe once combined with the route, such as a protocol-relative `//`.
+        const { url: route, error: routeError } = normalizeAndValidateRoutePath(
+          addLeadingSlash(routeWithResolvedParams),
+        );
+        if (routeError !== undefined) {
+          yield {
+            error:
+              `The '${stripLeadingSlash(currentRoutePath)}' route produced an invalid ` +
+              `prerender path: ${routeError}`,
+          };
+
+          continue;
+        }
+
+        let resolvedRedirectTo: string | undefined;
+        if (redirectTo !== undefined) {
+          const { url, error } = resolveRedirectTo(
+            parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
+            redirectTo,
+          );
+          if (error !== undefined) {
+            yield { error: invalidRedirectError(routeWithResolvedParams, error) };
+
+            continue;
+          }
+
+          resolvedRedirectTo = url;
+        }
+
         yield {
           ...meta,
-          route: routeWithResolvedParams,
-          redirectTo:
-            redirectTo === undefined
-              ? undefined
-              : resolveRedirectTo(
-                  parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
-                  redirectTo,
-                ),
+          route,
+          redirectTo: resolvedRedirectTo,
         };
       }
     } catch (error) {
@@ -561,7 +604,10 @@ function handlePrerenderParamsReplacement(
       );
     }
 
-    return parameterName === '**' ? `/${value}` : value;
+    // The matched placeholder includes the separator, so it has to be re-added. The documented
+    // value of a `**` parameter is a path, which may already carry it: re-adding it unconditionally
+    // would compose a root catch-all into a protocol-relative `//foo/bar`.
+    return parameterName === '**' ? addLeadingSlash(value) : value;
   };
 }
 
@@ -573,20 +619,70 @@ function handlePrerenderParamsReplacement(
  * it is returned as is. If it is a relative path, it is resolved based on the parent route path,
  * and, like in the Angular router, its query and fragment are ignored.
  *
+ * The resolved target is then normalized and validated, so that every `redirectTo` reaching the
+ * route tree is a safe HTTP(S) URL or same-origin path.
+ *
  * @param parentRoute - The path of the parent route.
  * @param redirectTo - The target path for redirection.
- * @returns The resolved redirect path as a string.
+ * @returns The normalized redirect target, or the reason it was rejected.
  */
-function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
+function resolveRedirectTo(parentRoute: string, redirectTo: string): NormalizedUrl {
   if (redirectTo[0] === '/') {
-    // If the redirectTo path is absolute, return it as is.
-    return redirectTo;
+    // If the redirectTo path is absolute, use it as is.
+    return normalizeAndValidateRedirect(redirectTo);
   }
 
   // Match Angular router behavior: replace all segments matched by the route.
   const [path] = redirectTo.split(/[?#]/, 1);
 
-  return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
+  return normalizeAndValidateRedirect(
+    joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path),
+  );
+}
+
+/**
+ * Builds the diagnostic emitted when a route's `redirectTo` cannot be normalized.
+ *
+ * @param routePath - The route the `redirectTo` is defined on.
+ * @param reason - The reason reported by the redirect normalization.
+ * @returns The error message to report.
+ */
+function invalidRedirectError(routePath: string, reason: string): string {
+  return `The 'redirectTo' value for the '${stripLeadingSlash(routePath)}' route is invalid: ${reason}`;
+}
+
+/**
+ * Validates and normalizes the `Location` header of a server route configuration.
+ *
+ * A configured `Location` header turns the route into a redirect, both at runtime and in the static
+ * redirect page generated when prerendering, so its value is validated as a redirect target. HTTP
+ * header names are case-insensitive, so every entry which names the `Location` header is checked.
+ *
+ * @param headers - The headers configured for the route.
+ * @returns The headers with each `Location` value normalized, or the reason one was rejected.
+ */
+function normalizeLocationHeaders(
+  headers: Record<string, string>,
+): { headers: Record<string, string>; error?: undefined } | { headers?: undefined; error: string } {
+  let normalized: Record<string, string> | undefined;
+
+  for (const [name, value] of Object.entries(headers)) {
+    if (name.toLowerCase() !== 'location') {
+      continue;
+    }
+
+    const { url, error } = normalizeAndValidateRedirect(value);
+    if (error !== undefined) {
+      return { error };
+    }
+
+    // Store the normalized value so that the header sent at runtime and the generated static
+    // redirect page are the value which was validated.
+    normalized ??= { ...headers };
+    normalized[name] = url;
+  }
+
+  return { headers: normalized ?? headers };
 }
 
 /**
@@ -629,10 +725,43 @@ function buildServerConfigRouteTree({ routes, appShellRoute }: ServerRoutesConfi
       continue;
     }
 
+    if (metadata.headers) {
+      const { headers, error } = normalizeLocationHeaders(metadata.headers);
+      if (error !== undefined) {
+        errors.push(
+          `Invalid '${path}' route configuration: the 'headers.Location' value is invalid: ${error}`,
+        );
+        continue;
+      }
+
+      metadata.headers = headers;
+    }
+
     serverConfigRouteTree.insert(path, metadata);
   }
 
   return { serverConfigRouteTree, errors };
+}
+
+/**
+ * Builds the key used to de-duplicate an extracted route.
+ *
+ * `RouteTree` percent-decodes every segment when a route is inserted, so two route paths which
+ * differ only in their encoding land on the same node, where the later one overwrites the earlier.
+ * De-duplication therefore runs on the decoded path rather than on the path as it was written:
+ * a prerendered path is normalized by the URL parser while the path of every other render mode is
+ * not, so the same route can be reached in both an encoded and an unencoded form.
+ *
+ * @param route - The route path to build a key for.
+ * @returns The decoded route path.
+ */
+function routeDeduplicationKey(route: string): string {
+  try {
+    return route.split('/').map(decodeURIComponent).join('/');
+  } catch {
+    // A malformed percent escape is reported when the route is inserted into the route tree.
+    return route;
+  }
 }
 
 /**
@@ -757,7 +886,7 @@ export async function getRoutesFromAngularRouterConfig(
 
         // If a result already exists for the exact same route, subsequent matches should be ignored.
         // This aligns with Angular's app router behavior, which prioritizes the first route.
-        const routePath = routeMetadata.route;
+        const routePath = routeDeduplicationKey(routeMetadata.route);
         if (!seenRoutes.has(routePath)) {
           routesResults.push(routeMetadata);
           seenRoutes.add(routePath);
