@@ -330,6 +330,56 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         await otherProxyServer.close();
       }
     });
+
+    it('matches glob entries against the URL pathname when a query string is present', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = await createProxyServer();
+      try {
+        await harness.writeFiles({
+          'proxy.config.json': `
+              {
+                "/api/test/**": { "target": "http://127.0.0.1:${proxyServer.address.port}" }
+              }
+            `,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test?q=angular');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).toContain('TEST_API_RETURN');
+      } finally {
+        await proxyServer.close();
+      }
+    });
+
+    it('does not match glob wildcards against query string parameters', async () => {
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        proxyConfig: 'proxy.config.json',
+      });
+
+      const proxyServer = await createProxyServer();
+      try {
+        await harness.writeFiles({
+          'proxy.config.json': `
+              {
+                "/api/*.json": { "target": "http://127.0.0.1:${proxyServer.address.port}" }
+              }
+            `,
+        });
+
+        const { result, response } = await executeOnceAndFetch(harness, '/api/test?file=data.json');
+
+        expect(result?.success).toBeTrue();
+        expect(await response?.text()).not.toContain('TEST_API_RETURN');
+      } finally {
+        await proxyServer.close();
+      }
+    });
   });
 });
 
@@ -340,7 +390,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
  */
 async function createProxyServer(body = 'TEST_API_RETURN') {
   const proxyServer = createServer((request, response) => {
-    if (request.url?.endsWith('/test')) {
+    if (request.url?.split('?')[0].endsWith('/test')) {
       response.writeHead(200);
       response.end(body);
     } else {
