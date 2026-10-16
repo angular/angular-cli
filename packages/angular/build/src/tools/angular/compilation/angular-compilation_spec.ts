@@ -326,7 +326,11 @@ describe('AngularCompilation', () => {
     it('applies override options correctly', () => {
       const { compilerOptions } = transformCompilerOptions(
         ts,
-        { target: ts.ScriptTarget.ES2022, isolatedModules: true },
+        {
+          target: ts.ScriptTarget.ES2022,
+          isolatedModules: true,
+          basePath: '/workspace/projects/app',
+        },
         {
           sourcemap: true,
           preserveSymlinks: true,
@@ -334,9 +338,11 @@ describe('AngularCompilation', () => {
           enableHmr: true,
           instrumentForCoverage: true,
           includeTestMetadata: true,
+          basePath: '/workspace',
         },
       );
 
+      expect(compilerOptions.basePath).toBe('/workspace');
       expect(compilerOptions.inlineSources).toBe(true);
       expect(compilerOptions.inlineSourceMap).toBe(true);
       expect(compilerOptions.preserveSymlinks).toBe(true);
