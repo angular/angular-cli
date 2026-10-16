@@ -192,4 +192,48 @@ describe('Environments Schematic', () => {
       }),
     );
   });
+
+  it('should log an error for non-application projects', async () => {
+    const config = JSON.parse(applicationTree.readContent('/angular.json'));
+    config.projects.foo.projectType = 'library';
+    applicationTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+
+    const logs: string[] = [];
+    const loggerSubscription = schematicRunner.logger.subscribe(({ message }) =>
+      logs.push(message),
+    );
+
+    try {
+      await runEnvironmentsSchematic();
+    } finally {
+      loggerSubscription.unsubscribe();
+    }
+
+    expect(logs).toEqual([
+      'Only application project types are supported by this schematic.' +
+        ' Project "foo" has a "projectType" of "library".',
+    ]);
+  });
+
+  it('should log the builder of a third-party server target', async () => {
+    const config = JSON.parse(applicationTree.readContent('/angular.json'));
+    config.projects.foo.architect.server = { builder: 'custom:server' };
+    applicationTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+
+    const logs: string[] = [];
+    const loggerSubscription = schematicRunner.logger.subscribe(({ message }) =>
+      logs.push(message),
+    );
+
+    try {
+      await runEnvironmentsSchematic();
+    } finally {
+      loggerSubscription.unsubscribe();
+    }
+
+    expect(logs).toContain(
+      '"server" target found for project "foo" has a third-party builder "custom:server".' +
+        ' The generated project options may not be compatible with this builder.',
+    );
+  });
 });
