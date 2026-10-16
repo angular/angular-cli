@@ -13,10 +13,11 @@
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Layout } from './fixtures.mts';
+import type { Layout, StyleFlavor } from './fixtures.mts';
 
 export interface BuildMeasurement {
   layout: Layout;
+  styleFlavor: StyleFlavor;
   entryPoints: number;
   iteration: number;
   durationMs: number;

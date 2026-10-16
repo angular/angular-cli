@@ -16,6 +16,28 @@ import path from 'node:path';
 
 export type Layout = 'flat' | 'deep';
 
+/**
+ * Style-flavor matrix: crosses template location (inline vs. external `templateUrl`) with
+ * stylesheet presence/language (none, CSS, SCSS). `external` has no stylesheet, matching
+ * `inline`'s "no stylesheet" baseline but with an external `templateUrl` file instead of an
+ * inline `template` string -- isolating the cost of extra per-entry file reads from the cost of
+ * stylesheet processing.
+ */
+export type StyleFlavor =
+  'inline' | 'inline-css' | 'inline-scss' | 'external' | 'external-css' | 'external-scss';
+
+/** All style flavors, in matrix order (inline row, then external row). */
+export const STYLE_FLAVORS: readonly StyleFlavor[] = [
+  'inline',
+  'inline-css',
+  'inline-scss',
+  'external',
+  'external-css',
+  'external-scss',
+];
+
+export const DEFAULT_STYLE_FLAVOR: StyleFlavor = 'inline';
+
 export interface FixtureOptions {
   layout: Layout;
 
@@ -24,21 +46,67 @@ export interface FixtureOptions {
 
   /** Binary-tree depth for `layout: 'deep'` (2^depth leaf entry points). */
   depth?: number;
+
+  /** Template/stylesheet flavor for every entry point in the fixture. Defaults to `inline`. */
+  styleFlavor?: StyleFlavor;
 }
 
-function buildComponentSource(className: string, selector: string, id: string): string {
+/** Per-entry CSS/SCSS content, varied by `id` like the template so entries aren't byte-identical. */
+function buildCssContent(selector: string, id: string): string {
+  return `/* entry ${id} */\n.${selector} {\n  color: #336699;\n}\n`;
+}
+
+function buildScssContent(selector: string, id: string): string {
+  return `$ref-color-${id}: #336699;\n.${selector} {\n  color: $ref-color-${id};\n}\n`;
+}
+
+function buildComponentSource(
+  className: string,
+  selector: string,
+  id: string,
+  compBase: string,
+  styleFlavor: StyleFlavor,
+): string {
+  const metadata: string[] = [`  selector: '${selector}',`];
+
+  switch (styleFlavor) {
+    case 'inline':
+      metadata.push(`  template: '<h2>Component no. ${id}</h2>',`);
+      break;
+    case 'inline-css':
+      metadata.push(`  template: '<h2 class="${selector}">Component no. ${id}</h2>',`);
+      metadata.push(`  styles: [\`.${selector} { color: #336699; }\`],`);
+      break;
+    case 'inline-scss':
+      metadata.push(`  template: '<h2 class="${selector}">Component no. ${id}</h2>',`);
+      metadata.push(
+        `  styles: [\`$ref-color-${id}: #336699; .${selector} { color: $ref-color-${id}; }\`],`,
+      );
+      break;
+    case 'external':
+      metadata.push(`  templateUrl: './${compBase}.component.html',`);
+      break;
+    case 'external-css':
+      metadata.push(`  templateUrl: './${compBase}.component.html',`);
+      metadata.push(`  styleUrl: './${compBase}.component.css',`);
+      break;
+    case 'external-scss':
+      metadata.push(`  templateUrl: './${compBase}.component.html',`);
+      metadata.push(`  styleUrl: './${compBase}.component.scss',`);
+      break;
+  }
+
   return `import { Component } from '@angular/core';
 
 @Component({
-  selector: '${selector}',
-  template: '<h2>Component no. ${id}</h2>',
+${metadata.join('\n')}
 })
 export class ${className} {}
 `;
 }
 
 /** Writes one secondary entry point's source files (component + public-api.ts) into `entryDir`. */
-function writeEntryPointSource(entryDir: string, id: string): void {
+function writeEntryPointSource(entryDir: string, id: string, styleFlavor: StyleFlavor): void {
   fs.mkdirSync(entryDir, { recursive: true });
 
   const className = `RefComponent${id}`;
@@ -52,18 +120,43 @@ function writeEntryPointSource(entryDir: string, id: string): void {
 
   fs.writeFileSync(
     path.join(entryDir, `${compBase}.component.ts`),
-    buildComponentSource(className, selector, id),
+    buildComponentSource(className, selector, id, compBase, styleFlavor),
   );
+
+  if (
+    styleFlavor === 'external' ||
+    styleFlavor === 'external-css' ||
+    styleFlavor === 'external-scss'
+  ) {
+    fs.writeFileSync(
+      path.join(entryDir, `${compBase}.component.html`),
+      `<h2 class="${selector}">Component no. ${id}</h2>\n`,
+    );
+  }
+
+  if (styleFlavor === 'external-css') {
+    fs.writeFileSync(
+      path.join(entryDir, `${compBase}.component.css`),
+      buildCssContent(selector, id),
+    );
+  }
+
+  if (styleFlavor === 'external-scss') {
+    fs.writeFileSync(
+      path.join(entryDir, `${compBase}.component.scss`),
+      buildScssContent(selector, id),
+    );
+  }
 }
 
 /** Generates `count` flat secondary entry points as direct siblings, returning their relative dirs. */
-function generateFlatEntries(outDir: string, count: number): string[] {
+function generateFlatEntries(outDir: string, count: number, styleFlavor: StyleFlavor): string[] {
   const width = String(count).length;
   const dirs: string[] = [];
   for (let i = 1; i <= count; i++) {
     const id = String(i).padStart(width, '0');
     const relDir = `comp-${id}`;
-    writeEntryPointSource(path.join(outDir, relDir), id);
+    writeEntryPointSource(path.join(outDir, relDir), id, styleFlavor);
     dirs.push(relDir);
   }
 
@@ -74,7 +167,7 @@ function generateFlatEntries(outDir: string, count: number): string[] {
  * Generates a binary tree `depth` levels deep (`sub-a`/`sub-b` at each level), placing one
  * secondary entry point at each of the 2^depth leaves. Returns their relative dirs.
  */
-function generateDeepEntries(outDir: string, depth: number): string[] {
+function generateDeepEntries(outDir: string, depth: number, styleFlavor: StyleFlavor): string[] {
   const total = 2 ** depth;
   const width = String(total).length;
   const dirs: string[] = [];
@@ -84,7 +177,7 @@ function generateDeepEntries(outDir: string, depth: number): string[] {
     if (level === depth) {
       counter++;
       const id = String(counter).padStart(width, '0');
-      writeEntryPointSource(path.join(outDir, currentRelDir), id);
+      writeEntryPointSource(path.join(outDir, currentRelDir), id, styleFlavor);
       dirs.push(currentRelDir);
 
       return;
@@ -113,6 +206,8 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
   fs.rmSync(outDir, { recursive: true, force: true });
   fs.mkdirSync(outDir, { recursive: true });
 
+  const styleFlavor = options.styleFlavor ?? DEFAULT_STYLE_FLAVOR;
+
   fs.writeFileSync(
     path.join(outDir, 'public-api.ts'),
     `export const REFERENCE_VERSION = '1.0.0';\n`,
@@ -120,8 +215,8 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
 
   const secondaryDirs =
     options.layout === 'flat'
-      ? generateFlatEntries(outDir, options.count ?? 10)
-      : generateDeepEntries(outDir, options.depth ?? 2);
+      ? generateFlatEntries(outDir, options.count ?? 10, styleFlavor)
+      : generateDeepEntries(outDir, options.depth ?? 2, styleFlavor);
 
   const exportsMap: Record<string, string> = { '.': './public-api.ts' };
   for (const relDir of secondaryDirs) {
@@ -203,6 +298,17 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
     ) + '\n',
   );
 
+  const buildOptions: Record<string, unknown> = {
+    tsConfig: './tsconfig.lib.json',
+    outputPath: 'dist',
+  };
+  if (styleFlavor === 'inline-scss') {
+    // Inline style language is a project-wide builder option, not per-component -- this is the
+    // only flavor that needs it set, since external .scss files are detected by extension and
+    // 'css' (the default) already covers the other flavors.
+    buildOptions['inlineStyleLanguage'] = 'scss';
+  }
+
   fs.writeFileSync(
     path.join(outDir, 'angular.json'),
     JSON.stringify(
@@ -217,7 +323,7 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
             targets: {
               build: {
                 builder: '@angular/build:library',
-                options: { tsConfig: './tsconfig.lib.json', outputPath: 'dist' },
+                options: buildOptions,
               },
             },
           },
