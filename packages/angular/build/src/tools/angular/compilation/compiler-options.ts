@@ -21,6 +21,7 @@ export interface CompilerOptionOverrides {
   includeTestMetadata?: boolean;
   customConditions?: string[];
   rootFiles?: string[];
+  basePath?: string;
 }
 
 export function transformCompilerOptions(
@@ -113,6 +114,7 @@ export function transformCompilerOptions(
   return {
     compilerOptions: {
       ...compilerOptions,
+      basePath: overrides?.basePath ?? compilerOptions.basePath,
       noEmitOnError: false,
       composite: false,
       inlineSources: !!overrides?.sourcemap,
