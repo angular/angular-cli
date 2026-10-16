@@ -151,15 +151,19 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         .not.toBeNull();
 
       const mapping = JSON.parse(mappingSource![1]) as Record<string, string[]>;
+      const mainServerContent = harness.readFile('dist/server/main.server.mjs');
 
-      // Every lazy route entry point must retain a mapping entry after optimization.
+      // Every lazy route entry point must retain a mapping entry after optimization
+      // that matches the ɵentryName emitted into the server bundle.
       for (const name of LAZY_ROUTE_NAMES) {
-        const key = Object.keys(mapping).find((entryPoint) =>
-          entryPoint.endsWith(`${name}.component.ts`),
-        );
-        expect(key)
-          .withContext(`mapping entry for lazy route '${name}' should exist`)
+        const expectedEntryPoint = `src/app/${name}.component.ts`;
+        expect(mapping[expectedEntryPoint])
+          .withContext(`mapping entry for '${expectedEntryPoint}' should exist`)
           .toBeDefined();
+
+        expect(mainServerContent)
+          .withContext(`main.server.mjs should contain ɵentryName '${expectedEntryPoint}'`)
+          .toContain(expectedEntryPoint);
       }
 
       // Every browser file referenced by the mapping must exist on disk.
