@@ -538,6 +538,16 @@ describe('AngularServerApp', () => {
           expect(response?.headers.get('location')).toBe('/base/home?filter=test');
           expect(response?.status).toBe(302);
         });
+
+        it('should only use the first value of the "X-Forwarded-Prefix" header in redirects', async () => {
+          const response = await app.handle(
+            new Request('http://localhost/redirect', {
+              headers: { 'X-Forwarded-Prefix': '/base, /"<other>' },
+            }),
+          );
+          expect(response?.headers.get('location')).toBe('/base/home');
+          expect(response?.status).toBe(302);
+        });
       });
 
       describe('Critical CSS inlining', () => {
