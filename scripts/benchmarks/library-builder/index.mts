@@ -20,7 +20,13 @@ import {
   type StyleFlavor,
   generateFixture,
 } from './fixtures.mts';
-import { type BuildMeasurement, buildOnce, checkBuilderIsBuilt, median } from './harness.mts';
+import {
+  type BuildMeasurement,
+  buildOnce,
+  checkBuilderIsBuilt,
+  median,
+  prepareBuilderEnv,
+} from './harness.mts';
 import { formatCsvReport, formatJsonReport } from './reporters.mts';
 
 export interface LibraryBuilderBenchmarkOptions {
@@ -35,6 +41,7 @@ export interface LibraryBuilderBenchmarkOptions {
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 const scratchRoot = path.join(repoRoot, 'dist', '.library-benchmark-fixtures');
+const nodeModulesShimDir = path.join(repoRoot, 'dist', '.library-benchmark-node-modules-shim');
 
 /**
  * Default entry-point counts for the `flat` layout, chosen to resolve a U-shaped scaling curve.
@@ -63,6 +70,11 @@ export async function runLibraryBuilderBenchmarks(
 ): Promise<{ measurements: BuildMeasurement[]; exitCode: number }> {
   const builder = checkBuilderIsBuilt(repoRoot, console);
   if (!builder) {
+    return { measurements: [], exitCode: 1 };
+  }
+
+  const builderEnv = prepareBuilderEnv(repoRoot, builder, nodeModulesShimDir, console);
+  if (!builderEnv) {
     return { measurements: [], exitCode: 1 };
   }
 
@@ -104,7 +116,11 @@ export async function runLibraryBuilderBenchmarks(
 
         const durations: number[] = [];
         for (let i = 1; i <= iterations; i++) {
-          const { durationMs, status } = buildOnce(projectDir, builder.architectCli);
+          const { durationMs, status } = buildOnce(
+            projectDir,
+            builder.architectCli,
+            builderEnv.nodePath,
+          );
           if (!options.json) {
             // eslint-disable-next-line no-console
             console.log(
