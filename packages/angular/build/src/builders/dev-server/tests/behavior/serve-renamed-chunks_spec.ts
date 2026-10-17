@@ -32,7 +32,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
           expect(result?.success).toBeTrue();
 
           const main = await (await fetch(new URL('main.js', `${result?.baseUrl}`))).text();
-          oldChunk = main.match(/chunk-[A-Z0-9]+\.js/)?.[0] ?? '';
+          oldChunk = main.match(/chunk-[a-zA-Z0-9]+\.js/)?.[0] ?? '';
           expect(oldChunk).not.toBe('');
 
           // Request the chunk so that Vite transforms and caches it
