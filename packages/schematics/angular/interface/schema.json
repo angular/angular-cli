@@ -8,7 +8,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name for the new interface. This will be used to create the interface file (e.g., `my-interface.interface.ts`).",
+      "description": "The name for the new interface. This will be used to create the interface file (e.g., `my-interface.ts`).",
       "$default": {
         "$source": "argv",
         "index": 0
