@@ -9,6 +9,7 @@
 import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
 import { Schema as ApplicationOptions } from '../application/schema';
+import { Builders } from '../utility/workspace-models';
 import { Schema as WorkspaceOptions } from '../workspace/schema';
 import { Schema as WebWorkerOptions } from './schema';
 
@@ -64,6 +65,25 @@ describe('Web Worker Schematic', () => {
     const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
     const { projects } = JSON.parse(tree.readContent('/angular.json'));
     expect(projects.bar.architect.build.options.webWorkerTsConfig).toBe(
+      'projects/bar/tsconfig.worker.json',
+    );
+  });
+
+  it('should not add the webWorkerTsConfig option to a unit-test builder test target', async () => {
+    const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.bar.architect.test.builder).toBe(Builders.BuildUnitTest);
+    expect(projects.bar.architect.test.options?.webWorkerTsConfig).toBeUndefined();
+  });
+
+  it('should add the webWorkerTsConfig option to a karma builder test target', async () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.architect.test = { builder: Builders.BuildKarma, options: {} };
+    appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+
+    const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.bar.architect.test.options.webWorkerTsConfig).toBe(
       'projects/bar/tsconfig.worker.json',
     );
   });

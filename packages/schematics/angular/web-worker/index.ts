@@ -26,6 +26,7 @@ import { parseName } from '../utility/parse-name';
 import { relativePathToWorkspaceRoot } from '../utility/paths';
 import { createProjectSchematic } from '../utility/project';
 import { buildDefaultPath, updateWorkspace } from '../utility/workspace';
+import { Builders } from '../utility/workspace-models';
 import { Schema as WebWorkerOptions } from './schema';
 
 function addSnippet(options: WebWorkerOptions): Rule {
@@ -115,7 +116,8 @@ const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic
 
         const workerConfigPath = join(root, 'tsconfig.worker.json');
         (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
-        if (testTarget) {
+        // The unit-test builder has no `webWorkerTsConfig` option and reads it from the build target.
+        if (testTarget && testTarget.builder !== Builders.BuildUnitTest) {
           (testTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
         }
       }),
