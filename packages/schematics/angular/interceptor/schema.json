@@ -8,7 +8,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name for the new interceptor. This will be used to create the interceptor's class and spec files (e.g., `my-interceptor.interceptor.ts` and `my-interceptor.interceptor.spec.ts`).",
+      "description": "The name for the new interceptor. This will be used to create the interceptor's class and spec files (e.g., `example-interceptor.ts` and `example-interceptor.spec.ts`).",
       "$default": {
         "$source": "argv",
         "index": 0

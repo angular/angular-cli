@@ -8,7 +8,7 @@
   "properties": {
     "name": {
       "type": "string",
-      "description": "The name for the new pipe. This will be used to create the pipe's class and spec files (e.g., `my-pipe.pipe.ts` and `my-pipe.pipe.spec.ts`).",
+      "description": "The name for the new pipe. This will be used to create the pipe's class and spec files (e.g., `example-pipe.ts` and `example-pipe.spec.ts`).",
       "$default": {
         "$source": "argv",
         "index": 0
