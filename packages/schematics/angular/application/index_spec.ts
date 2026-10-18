@@ -704,6 +704,35 @@ describe('Application Schematic', () => {
     expect(main).toContain('bootstrapApplication');
   });
 
+  it(`should set 'encapsulation' in the root component when 'viewEncapsulation' is provided`, async () => {
+    const options = { ...defaultOptions, viewEncapsulation: ViewEncapsulation.None };
+    const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+    const component = tree.readContent('/projects/foo/src/app/app.ts');
+    expect(component).toContain(
+      `import { Component, signal, ViewEncapsulation } from '@angular/core';`,
+    );
+    expect(component).toContain('encapsulation: ViewEncapsulation.None');
+  });
+
+  it(`should add 'viewEncapsulation' to the component schematic defaults when provided`, async () => {
+    const options = { ...defaultOptions, viewEncapsulation: ViewEncapsulation.None };
+    const tree = await schematicRunner.runSchematic('application', options, workspaceTree);
+
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.foo.schematics['@schematics/angular:component'].viewEncapsulation).toBe('None');
+  });
+
+  it(`should not set 'encapsulation' in the root component by default`, async () => {
+    const tree = await schematicRunner.runSchematic('application', defaultOptions, workspaceTree);
+
+    expect(tree.readContent('/projects/foo/src/app/app.ts')).not.toContain('encapsulation');
+    const { projects } = JSON.parse(tree.readContent('/angular.json'));
+    expect(projects.foo.schematics?.['@schematics/angular:component']?.viewEncapsulation).toBe(
+      undefined,
+    );
+  });
+
   describe('standalone=false', () => {
     it('should add the provideZoneChangeDetection with event coalescing option by default with zone.js apps', async () => {
       const tree = await schematicRunner.runSchematic(
@@ -720,7 +749,7 @@ describe('Application Schematic', () => {
       expect(content).toContain('provideZoneChangeDetection({ eventCoalescing: true })');
     });
 
-    it(`should set 'defaultEncapsulation' in main.ts when 'ViewEncapsulation' is provided`, async () => {
+    it(`should set 'encapsulation' in the root component when 'viewEncapsulation' is provided`, async () => {
       const tree = await schematicRunner.runSchematic(
         'application',
         {
@@ -731,10 +760,12 @@ describe('Application Schematic', () => {
         workspaceTree,
       );
 
-      const path = '/projects/foo/src/main.ts';
-      const content = tree.readContent(path);
-      expect(content).toContain('defaultEncapsulation: ViewEncapsulation.ShadowDom');
-      expect(content).toContain(`import { ViewEncapsulation } from '@angular/core'`);
+      const component = tree.readContent('/projects/foo/src/app/app.ts');
+      expect(component).toContain(
+        `import { Component, signal, ViewEncapsulation } from '@angular/core';`,
+      );
+      expect(component).toContain('encapsulation: ViewEncapsulation.ShadowDom');
+      expect(tree.readContent('/projects/foo/src/main.ts')).not.toContain('defaultEncapsulation');
     });
 
     it('should handle the routing flag', async () => {

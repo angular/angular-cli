@@ -1,6 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal<% if (!!viewEncapsulation) { %>, ViewEncapsulation<% } %> } from '@angular/core';
 
-@Component({
+@Component({<% if (!!viewEncapsulation) { %>
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %>,<% } %>
   selector: '<%= selector %>',
   standalone: false,<% if (inlineStyle) { %>
   styles: [],<% } else { %>

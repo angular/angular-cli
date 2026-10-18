@@ -206,7 +206,8 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     options.inlineTemplate ||
     options.inlineStyle ||
     options.minimal ||
-    options.style !== Style.Css
+    options.style !== Style.Css ||
+    options.viewEncapsulation
   ) {
     const componentSchematicsOptions: JsonObject = {};
     if (options.inlineTemplate ?? options.minimal) {
@@ -217,6 +218,9 @@ function addAppToWorkspaceFile(options: ApplicationOptions, appDir: string): Rul
     }
     if (options.style && options.style !== Style.Css) {
       componentSchematicsOptions.style = options.style;
+    }
+    if (options.viewEncapsulation) {
+      componentSchematicsOptions.viewEncapsulation = options.viewEncapsulation;
     }
 
     schematics['@schematics/angular:component'] = componentSchematicsOptions;
