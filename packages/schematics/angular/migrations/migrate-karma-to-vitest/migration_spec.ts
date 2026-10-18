@@ -68,6 +68,23 @@ describe('Migration from Karma to Vitest unit-test builder', () => {
     expect(projects.app.targets.test.options.karmaConfig).toBeUndefined();
   });
 
+  it('should suggest a valid command to refactor Jasmine tests', async () => {
+    const logs: string[] = [];
+    const loggerSubscription = schematicRunner.logger.subscribe(({ message }) =>
+      logs.push(message),
+    );
+
+    try {
+      await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    } finally {
+      loggerSubscription.unsubscribe();
+    }
+
+    expect(logs.join('\n')).toContain(
+      'ng g @schematics/angular:refactor-jasmine-vitest --project <project_name>',
+    );
+  });
+
   it('should map codeCoverage to coverage', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.test.options.codeCoverage = true;

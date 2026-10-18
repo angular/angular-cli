@@ -203,7 +203,7 @@ function logSummary(
   if (migratedProjects.length > 0) {
     context.logger.info(
       `\nNote: To refactor your test files from Jasmine to Vitest, consider running the following command:` +
-        `\n  ng g @schematics/angular:refactor-jasmine-vitest <project_name>`,
+        `\n  ng g @schematics/angular:refactor-jasmine-vitest --project <project_name>`,
     );
   }
   context.logger.info('-----------------------------------------\n');
