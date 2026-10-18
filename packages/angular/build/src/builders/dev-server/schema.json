@@ -11,7 +11,7 @@
     },
     "port": {
       "type": "number",
-      "description": "Port to listen on.",
+      "description": "Port to listen on. The `PORT` environment variable, when set, takes precedence over this option.",
       "default": 4200
     },
     "host": {
