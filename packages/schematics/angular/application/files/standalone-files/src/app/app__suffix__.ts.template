@@ -1,7 +1,8 @@
-import { Component, signal } from '@angular/core';<% if (routing) { %>
+import { Component, signal<% if (!!viewEncapsulation) { %>, ViewEncapsulation<% } %> } from '@angular/core';<% if (routing) { %>
 import { RouterOutlet } from '@angular/router';<% } %>
 
-@Component({
+@Component({<% if (!!viewEncapsulation) { %>
+  encapsulation: ViewEncapsulation.<%= viewEncapsulation %>,<% } %>
   imports: [<% if (routing) { %>RouterOutlet<% } %>],
   selector: '<%= selector %>',<% if (inlineStyle) { %>
   styles: [],<% } else { %>
