@@ -62,6 +62,23 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           .content.toContain('<link rel="stylesheet" href="styles.css">');
       });
 
+      it('processes a style with a single quote in its path', async () => {
+        await harness.writeFile(`src/dev's theme/test-style-a.css`, '.test-a {color: red}');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          styles: [`src/dev's theme/test-style-a.css`],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+
+        harness
+          .expectFile('dist/browser/styles.css')
+          .content.toMatch(/\.test-a {\s*color: red;?\s*}/);
+      });
+
       it('processes multiple styles into a single output', async () => {
         await harness.writeFiles({
           'src/test-style-a.css': '.test-a {color: red}',
