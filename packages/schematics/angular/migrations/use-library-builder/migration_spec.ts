@@ -349,6 +349,24 @@ describe('Migration to use the library builder', () => {
     ]);
   });
 
+  it('should keep ng-packagr assets outside the project root as paths', async () => {
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({
+        assets: ['../../../shared-assets'],
+        lib: { entryFile: 'src/public-api.ts' },
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.assets).toEqual(['../shared-assets']);
+  });
+
   it('should preserve existing stylePreprocessorOptions.includePaths when migrating styleIncludePaths', async () => {
     const angularJson = JSON.parse(tree.readContent('/angular.json'));
     angularJson.projects['my-lib'].architect.build.options.stylePreprocessorOptions = {
