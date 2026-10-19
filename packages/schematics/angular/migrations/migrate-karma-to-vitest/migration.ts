@@ -306,9 +306,15 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
       for (const [configKey, configOptions] of Object.entries(customBuildOptions)) {
         const finalConfig: Record<string, json.JsonValue | undefined> = {};
 
+        // A test configuration inherits the base test options, so its build configuration must
+        // include the build options moved from them, with the configuration's own values on top.
+        const mergedOptions = configKey
+          ? { ...customBuildOptions[''], ...configOptions }
+          : configOptions;
+
         // Omit options that already have the same value in the base build options.
         // Using isDeepStrictEqual for a deep comparison of arrays and objects.
-        for (const [key, value] of Object.entries(configOptions)) {
+        for (const [key, value] of Object.entries(mergedOptions)) {
           if (!isDeepStrictEqual(value, baseOptions[key])) {
             finalConfig[key] = value;
           }

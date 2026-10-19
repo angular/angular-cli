@@ -128,6 +128,28 @@ describe('Migration from Karma to Vitest unit-test builder', () => {
     expect(newProjects.app.targets.test.configurations.ci.assets).toBeUndefined();
   });
 
+  it('should keep base custom build options in per configuration testing configurations', async () => {
+    const { projects } = tree.readJson('/angular.json') as any;
+    projects.app.targets.test.options.styles = ['src/test-styles.scss'];
+    projects.app.targets.test.configurations = {
+      ci: {
+        watch: false,
+      },
+    };
+    tree.overwrite('/angular.json', JSON.stringify({ version: 1, projects }));
+
+    const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    const { projects: newProjects } = newTree.readJson('/angular.json') as any;
+
+    expect(newProjects.app.targets.build.configurations.testing.styles).toEqual([
+      'src/test-styles.scss',
+    ]);
+    expect(newProjects.app.targets.test.configurations.ci.buildTarget).toBe(':build:testing-ci');
+    expect(newProjects.app.targets.build.configurations['testing-ci'].styles).toEqual([
+      'src/test-styles.scss',
+    ]);
+  });
+
   it('should omit testing configuration if options match base build options', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.build.options.aot = false;
