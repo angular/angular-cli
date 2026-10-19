@@ -24,8 +24,8 @@ import { BundleMergedContextResult } from '../../tools/esbuild/bundler-context';
 import {
   type BuildOutputFile,
   BuildOutputFileType,
-  type InitialFileRecord,
   createOutputFile,
+  findTransitiveInitialFiles,
 } from '../../tools/esbuild/bundler-files';
 import { useRolldownChunks } from '../../utils/environment-options';
 import { assertIsError } from '../../utils/error';
@@ -164,21 +164,6 @@ function bundleOutputToEsbuildMetafile(
   }
 
   return newMetafile;
-}
-
-/**
- * Creates an InitialFileRecord object with a specified depth.
- * @param depth The depth of the file in the dependency graph.
- * @returns An InitialFileRecord object.
- */
-function createInitialFileRecord(depth: number): InitialFileRecord {
-  return {
-    type: 'script',
-    entrypoint: false,
-    external: false,
-    serverFile: false,
-    depth,
-  };
 }
 
 /**
@@ -369,13 +354,10 @@ export async function optimizeChunks(
   );
 
   // Add new optimized chunks
-  const importsPerFile: Record<string, string[]> = {};
   for (const optimizedFile of optimizedOutput) {
     if (optimizedFile.type !== 'chunk') {
       continue;
     }
-
-    importsPerFile[optimizedFile.fileName] = optimizedFile.imports;
 
     original.outputFiles.push(
       createOutputFile(optimizedFile.fileName, optimizedFile.code, BuildOutputFileType.Browser),
@@ -392,41 +374,17 @@ export async function optimizeChunks(
   }
 
   // Update initial files to reflect optimized chunks
-  const entriesToAnalyze: [string, InitialFileRecord][] = [];
   for (const usedFile of usedChunks) {
     // Leave the main file since its information did not change
-    if (usedFile === mainFile) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      entriesToAnalyze.push([mainFile, original.initialFiles.get(mainFile)!]);
-      continue;
+    if (usedFile !== mainFile) {
+      original.initialFiles.delete(usedFile);
     }
-
-    // Remove all other used chunks
-    original.initialFiles.delete(usedFile);
   }
 
   // Analyze for transitive initial files
-  let currentEntry;
-  while ((currentEntry = entriesToAnalyze.pop())) {
-    const [entryPath, entryRecord] = currentEntry;
-
-    for (const importPath of importsPerFile[entryPath]) {
-      const existingRecord = original.initialFiles.get(importPath);
-      if (existingRecord) {
-        // Store the smallest value depth
-        if (existingRecord.depth > entryRecord.depth + 1) {
-          existingRecord.depth = entryRecord.depth + 1;
-        }
-
-        continue;
-      }
-
-      const record = createInitialFileRecord(entryRecord.depth + 1);
-
-      original.initialFiles.set(importPath, record);
-      entriesToAnalyze.push([importPath, record]);
-    }
-  }
+  const mainRecord = original.initialFiles.get(mainFile);
+  assert(mainRecord, `Main file record should always be present in initialFiles [${mainFile}].`);
+  findTransitiveInitialFiles(newMetafile, original.initialFiles, [[mainFile, mainRecord]]);
 
   return original;
 }
