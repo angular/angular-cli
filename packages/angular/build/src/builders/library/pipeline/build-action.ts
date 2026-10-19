@@ -8,17 +8,17 @@
 
 import path from 'node:path';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
-import { emitFilesToDisk } from '../../../utils/disk-files';
+import { deleteFilesFromDisk, emitFilesToDisk } from '../../../utils/disk-files';
 import { assertIsError } from '../../../utils/error';
 import type { BuilderState } from '../builder-state';
 import type { ExecutionResult } from '../execution-result';
 import type { NormalizedLibraryOptions } from '../types';
-import { collectAssetsToEmit } from './assets';
+import type { CollectedAssets } from './assets';
 import { type BundleEntryPointsOutput, bundleEntryPoints } from './bundler';
 import { compileLibrary } from './compilation';
 import { collectEntryPointsToBundle } from './entry-points';
 import { generatePackageManifests } from './package-manifests';
-import type { DiskOutputFile, OutputFile } from './utils';
+import type { OutputFile } from './utils';
 
 /**
  * Context required to execute a single library build iteration.
@@ -33,19 +33,18 @@ export interface BuildActionContext {
   /** Whether the builder is running in watch mode. */
   isWatchMode: boolean;
 
-  /** Build state tracking compilation caches and emitted outputs. */
+  /** Build state tracking compilation caches, file references, and emitted outputs. */
   buildState: BuilderState;
 
   /** Set of POSIX file paths modified since the last build iteration. */
   modifiedFiles?: Set<string>;
 
   /**
-   * Asset files to emit for the current build iteration.
-   * Pre-collected in the watch loop to avoid redundant asset matching, or resolved and
-   * populated by `buildAction` when omitted (such as during the initial build) so the
-   * caller can register their POSIX source paths with the file watcher.
+   * Collected asset changes for the current build iteration.
+   * Pre-collected in the watch loop to avoid redundant asset matching, or resolved by
+   * `buildAction` when omitted (such as during the initial build).
    */
-  assetsToEmit?: DiskOutputFile[];
+  collectedAssets?: CollectedAssets;
 }
 
 /**
@@ -131,32 +130,34 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
       buildState.recordBundleOutput(bundleOutput.bundleResults);
     }
 
+    let manifestFiles: OutputFile[] | undefined;
     const { hasTslibImport } = buildState;
     if (!buildState.hasEmittedManifests || buildState.hasEmittedTslib !== hasTslibImport) {
-      filesToEmit.push(
-        ...(await generatePackageManifests(
-          {
-            ...options,
-            compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
-          },
-          isWatchMode,
-          hasTslibImport,
-        )),
+      manifestFiles = await generatePackageManifests(
+        {
+          ...options,
+          compilationMode: buildState.compilationMode ?? options.compilationMode ?? 'partial',
+        },
+        isWatchMode,
+        hasTslibImport,
       );
+
+      filesToEmit.push(...manifestFiles);
     }
 
-    const resolvedAssetsToEmit = (actionContext.assetsToEmit ??= await collectAssetsToEmit(
-      options.assets,
-      options.workspaceRoot,
-      buildState.hasEmittedAssets ? modifiedFiles : undefined,
-    ));
-    filesToEmit.push(...resolvedAssetsToEmit);
+    const collectedAssets =
+      actionContext.collectedAssets ?? (await buildState.collectAssets(options, modifiedFiles));
+    filesToEmit.push(...collectedAssets.filesToEmit);
 
     await emitFilesToDisk(filesToEmit, (file) => path.posix.join(options.outputPath, file.path));
 
-    buildState.hasEmittedManifests = true;
-    buildState.hasEmittedTslib = hasTslibImport;
-    buildState.hasEmittedAssets = true;
+    const filesToDelete = buildState.recordEmittedOutputs(collectedAssets, manifestFiles);
+
+    if (filesToDelete.size) {
+      await deleteFilesFromDisk(
+        Array.from(filesToDelete, (file) => path.posix.join(options.outputPath, file)),
+      );
+    }
   } catch (error) {
     assertIsError(error);
     result.addError(error.message);
