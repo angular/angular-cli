@@ -415,13 +415,13 @@ export async function normalizeOptions(
   if (appShellOptions || ssrOptions || prerenderOptions) {
     if (!serverEntryPoint) {
       throw new Error(
-        'The "server" option is required when enabling "ssr", "prerender" or "app-shell".',
+        'The "server" option is required when enabling "ssr", "prerender" or "appShell".',
       );
     }
 
     if (!indexHtmlOptions) {
       throw new Error(
-        'The "index" option cannot be set to false when enabling "ssr", "prerender" or "app-shell".',
+        'The "index" option cannot be set to false when enabling "ssr", "prerender" or "appShell".',
       );
     }
   }
