@@ -281,19 +281,48 @@ export async function optimizeChunks(
       },
     ];
 
+    const chunkFileNames = (chunkInfo: { name: string }) =>
+      `${chunkInfo.name.replace(/-[a-zA-Z0-9_-]{8}$/, '')}-[hash].js`;
+
     if (useRolldownChunks) {
       const { rolldown } = await loadRolldown();
       bundle = await rolldown({
         input: mainFile,
+        // Allow Rolldown to extend the main entry chunk's exports when merging shared initial
+        // modules into `main` so that lazy chunks can import those symbols directly from `main`.
+        preserveEntrySignatures: 'allow-extension',
         plugins,
       });
 
-      const result = await bundle.generate({
+      let result = await bundle.generate({
         minify: { mangle: false, compress: false },
         sourcemap,
-        chunkFileNames: (chunkInfo) =>
-          `${chunkInfo.name.replace(/-[a-zA-Z0-9_-]{8}$/, '')}-[hash].js`,
+        codeSplitting: {
+          // Consolidate all modules statically reachable from the initial entry point (`$initial`)
+          // back into the `main` chunk. This prevents multi-level initial chunk waterfalls caused
+          // by esbuild splitting out modules that are shared across `main` and subsets of lazy
+          // routes, while keeping shared chunks used exclusively by lazy routes separate.
+          groups: [{ name: 'main', tags: ['$initial'] }],
+        },
+        chunkFileNames,
       });
+
+      // If any module in `$initial` uses top-level `await`, Rolldown cannot fold the manual
+      // `main` group into the entry chunk and emits an empty entry facade instead. Fall back to
+      // Rolldown's default TLA-aware chunking in that case.
+      if (
+        result.output.some(
+          (chunk) =>
+            chunk.type === 'chunk' && chunk.isEntry && Object.keys(chunk.modules).length === 0,
+        )
+      ) {
+        result = await bundle.generate({
+          minify: { mangle: false, compress: false },
+          sourcemap,
+          chunkFileNames,
+        });
+      }
+
       optimizedOutput = result.output;
     } else {
       let rollup;
@@ -313,8 +342,7 @@ export async function optimizeChunks(
       const result = await bundle.generate({
         compact: true,
         sourcemap,
-        chunkFileNames: (chunkInfo) =>
-          `${chunkInfo.name.replace(/-[a-zA-Z0-9_-]{8}$/, '')}-[hash].js`,
+        chunkFileNames,
       });
       optimizedOutput = result.output;
     }
