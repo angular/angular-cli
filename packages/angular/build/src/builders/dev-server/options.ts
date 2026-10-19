@@ -147,8 +147,8 @@ export async function normalizeOptions(
     proxyConfig,
     servePath,
     ssl,
-    sslCert: sslCert && path.resolve(workspaceRoot, sslCert),
-    sslKey: sslKey && path.resolve(workspaceRoot, sslKey),
+    sslCert: sslCert && path.join(workspaceRoot, sslCert),
+    sslKey: sslKey && path.join(workspaceRoot, sslKey),
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && !optimization.scripts && prebundle,
     inspect,
