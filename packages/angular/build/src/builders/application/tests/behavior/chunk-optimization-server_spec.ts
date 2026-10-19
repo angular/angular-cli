@@ -187,5 +187,149 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           .toBeTrue();
       }
     });
+
+    it('consolidates multi-level initial shared modules into main while preserving lazy-only shared chunks', async () => {
+      await harness.writeFiles({
+        'src/shared-1.ts': `
+          import { shared2 } from './shared-2';
+          export function shared1(): string {
+            return 's1-' + shared2();
+          }
+        `,
+        'src/shared-2.ts': `
+          import { shared3 } from './shared-3';
+          export function shared2(): string {
+            return 's2-' + shared3();
+          }
+        `,
+        'src/shared-3.ts': `
+          import { shared4 } from './shared-4';
+          export function shared3(): string {
+            return 's3-' + shared4();
+          }
+        `,
+        'src/shared-4.ts': `
+          export function shared4(): string {
+            return 's4-' + Date.now().toString(36);
+          }
+        `,
+        'src/lazy-shared.ts': `
+          export function lazyOnlyShared(): string {
+            return 'lazy-only-' + Date.now().toString(36);
+          }
+        `,
+        'src/app/app.component.ts': `
+          import { Component } from '@angular/core';
+          import { RouterOutlet } from '@angular/router';
+          import { shared1 } from '../shared-1';
+
+          @Component({
+            selector: 'app-root',
+            imports: [RouterOutlet],
+            template: '<p>{{ val }}</p><router-outlet></router-outlet>',
+          })
+          export class AppComponent {
+            val = shared1();
+          }
+        `,
+        'src/app/lazy-a.component.ts': `
+          import { Component } from '@angular/core';
+          import { shared1 } from '../shared-1';
+          import { lazyOnlyShared } from '../lazy-shared';
+
+          @Component({ selector: 'app-lazy-a', template: '{{ val }}' })
+          export default class LazyAComponent {
+            val = shared1() + lazyOnlyShared();
+          }
+        `,
+        'src/app/lazy-b.component.ts': `
+          import { Component } from '@angular/core';
+          import { shared2 } from '../shared-2';
+          import { lazyOnlyShared } from '../lazy-shared';
+
+          @Component({ selector: 'app-lazy-b', template: '{{ val }}' })
+          export default class LazyBComponent {
+            val = shared2() + lazyOnlyShared();
+          }
+        `,
+        'src/app/lazy-c.component.ts': `
+          import { Component } from '@angular/core';
+          import { shared3 } from '../shared-3';
+
+          @Component({ selector: 'app-lazy-c', template: '{{ val }}' })
+          export default class LazyCComponent {
+            val = shared3();
+          }
+        `,
+        'src/app/lazy-d.component.ts': `
+          import { Component } from '@angular/core';
+          import { shared4 } from '../shared-4';
+
+          @Component({ selector: 'app-lazy-d', template: '{{ val }}' })
+          export default class LazyDComponent {
+            val = shared4();
+          }
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: ['zone.js'],
+        optimization: true,
+        namedChunks: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const mainContent = harness.readFile('dist/browser/main.js');
+      expect(mainContent).toContain('s1-');
+      expect(mainContent).toContain('s2-');
+      expect(mainContent).toContain('s3-');
+      expect(mainContent).toContain('s4-');
+      expect(mainContent).not.toContain('lazy-only-');
+
+      // No modulepreload hints should be needed in index.html because all initial shared
+      // modules (shared-1 through shared-4) were consolidated into main.js.
+      const indexContent = harness.readFile('dist/browser/index.html');
+      expect(indexContent).not.toContain('rel="modulepreload"');
+
+      // The lazy-only shared module should still be emitted as a separate shared chunk.
+      expect(harness.hasFileMatch('dist/browser', /^chunk-/)).toBeTrue();
+    });
+
+    it('falls back to TLA-safe chunking without emitting an empty main facade when top-level await is used', async () => {
+      await harness.writeFiles({
+        'src/main.ts': `
+          import { provideZonelessChangeDetection } from '@angular/core';
+          import { bootstrapApplication } from '@angular/platform-browser';
+          import { AppComponent } from './app/app.component';
+          import { appConfig } from './app/app.config';
+
+          await Promise.resolve();
+          console.log('main-tla-entry');
+          await bootstrapApplication(AppComponent, {
+            ...appConfig,
+            providers: [...appConfig.providers, provideZonelessChangeDetection()],
+          });
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: [],
+        optimization: true,
+        namedChunks: true,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      // main.js should contain the entry point code directly rather than being an empty
+      // facade importing a separate `main-<hash>.js` chunk.
+      expect(harness.hasFileMatch('dist/browser', /^main-/)).toBeFalse();
+      const mainContent = harness.readFile('dist/browser/main.js');
+      expect(mainContent).toContain('main-tla-entry');
+    });
   });
 });
