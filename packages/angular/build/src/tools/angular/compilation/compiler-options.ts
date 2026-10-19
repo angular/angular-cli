@@ -10,6 +10,7 @@ import type * as ng from '@angular/compiler-cli';
 import type { PartialMessage } from 'esbuild';
 import * as path from 'node:path';
 import type ts from 'typescript';
+import { toPosixPath } from '../../../utils/path';
 
 export interface CompilerOptionOverrides {
   sourcemap?: boolean;
@@ -114,7 +115,7 @@ export function transformCompilerOptions(
   return {
     compilerOptions: {
       ...compilerOptions,
-      basePath: overrides?.basePath ?? compilerOptions.basePath,
+      basePath: overrides?.basePath ? toPosixPath(overrides.basePath) : compilerOptions.basePath,
       noEmitOnError: false,
       composite: false,
       inlineSources: !!overrides?.sourcemap,
