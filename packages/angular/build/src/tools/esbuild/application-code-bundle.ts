@@ -364,8 +364,8 @@ export function createServerMainCodeBundleOptions(
             `export { ɵresetCompiledComponents } from '@angular/core';`,
 
             // Re-export all symbols including default export from 'main.server.ts'
-            `export { default } from '${mainServerEntryPointJsImport}';`,
-            `export * from '${mainServerEntryPointJsImport}';`,
+            `export { default } from ${JSON.stringify(mainServerEntryPointJsImport)};`,
+            `export * from ${JSON.stringify(mainServerEntryPointJsImport)};`,
           ];
 
           return {
@@ -496,8 +496,8 @@ export function createSsrEntryCodeBundleOptions(
             `import '${ssrInjectManifestNamespace}';`,
 
             // Re-export all symbols including default export
-            `import * as server from '${serverEntryPointJsImport}';`,
-            `export * from '${serverEntryPointJsImport}';`,
+            `import * as server from ${JSON.stringify(serverEntryPointJsImport)};`,
+            `export * from ${JSON.stringify(serverEntryPointJsImport)};`,
             // The below is needed to avoid
             // `Import "default" will always be undefined because there is no matching export` warning when no default is present.
             `const defaultExportName = 'default';`,
@@ -740,7 +740,9 @@ function getEsBuildCommonPolyfillsOptions(
         }
 
         // Generate module contents with an import statement per defined polyfill
-        let contents = polyfillPaths.map((file) => `import '${toPosixPath(file)}';`).join('\n');
+        let contents = polyfillPaths
+          .map((file) => `import ${JSON.stringify(toPosixPath(file))};`)
+          .join('\n');
 
         // The below should be done after loading `$localize` as otherwise the locale will be overridden.
         if (i18nOptions.shouldInline) {
