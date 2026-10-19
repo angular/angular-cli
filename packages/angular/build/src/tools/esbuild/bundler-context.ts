@@ -24,6 +24,7 @@ import {
   BuildOutputFileType,
   type InitialFileRecord,
   convertOutputFile,
+  findTransitiveInitialFiles,
 } from './bundler-files';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
 
@@ -363,41 +364,7 @@ export class BundlerContext {
     }
 
     // Analyze for transitive initial files
-    const entriesToAnalyze = [...initialFiles];
-    let currentEntry;
-    while ((currentEntry = entriesToAnalyze.pop())) {
-      const [entryPath, entryRecord] = currentEntry;
-
-      for (const initialImport of result.metafile.outputs[entryPath].imports) {
-        const existingRecord = initialFiles.get(initialImport.path);
-        if (existingRecord) {
-          // Store the smallest value depth
-          if (existingRecord.depth > entryRecord.depth + 1) {
-            existingRecord.depth = entryRecord.depth + 1;
-          }
-
-          continue;
-        }
-
-        if (initialImport.kind === 'import-statement' || initialImport.kind === 'import-rule') {
-          const record: InitialFileRecord = {
-            type: initialImport.kind === 'import-rule' ? 'style' : 'script',
-            entrypoint: false,
-            external: initialImport.external,
-            serverFile: isPlatformServer,
-            depth: entryRecord.depth + 1,
-          };
-
-          if (!this.initialFilter || this.initialFilter(record)) {
-            initialFiles.set(initialImport.path, record);
-          }
-
-          if (!initialImport.external) {
-            entriesToAnalyze.push([initialImport.path, record]);
-          }
-        }
-      }
-    }
+    findTransitiveInitialFiles(result.metafile, initialFiles, undefined, this.initialFilter);
 
     // Collect all external package names
     const externalImports = new Set<string>();

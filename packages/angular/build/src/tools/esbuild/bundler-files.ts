@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { OutputFile } from 'esbuild';
+import type { Metafile, OutputFile } from 'esbuild';
 import { calculateHash } from '../../utils/hash';
 
 export interface InitialFileRecord {
@@ -16,6 +16,57 @@ export interface InitialFileRecord {
   external?: boolean;
   serverFile: boolean;
   depth: number;
+}
+
+/**
+ * Analyzes a metafile to find and record all transitive initial files starting from the given
+ * initial entries using breadth-first traversal so each file is recorded at its minimum depth.
+ *
+ * @param metafile The esbuild metafile containing output import relationships.
+ * @param initialFiles The map of initial files to populate.
+ * @param entriesToAnalyze Optional starting entries to traverse; defaults to all current `initialFiles`.
+ *   Entries must share the same starting depth (or be ordered by non-decreasing depth) to guarantee
+ *   that each transitive file is visited at its minimum depth first.
+ * @param initialFilter Optional filter predicate to determine whether a discovered record should be added.
+ */
+export function findTransitiveInitialFiles(
+  metafile: Metafile,
+  initialFiles: Map<string, InitialFileRecord>,
+  entriesToAnalyze: Iterable<[string, InitialFileRecord]> = initialFiles,
+  initialFilter?: (initial: Readonly<InitialFileRecord>) => boolean,
+): void {
+  const queue = [...entriesToAnalyze];
+  for (let i = 0; i < queue.length; i++) {
+    const [entryPath, entryRecord] = queue[i];
+    const entryOutput = metafile.outputs[entryPath];
+    if (!entryOutput) {
+      continue;
+    }
+
+    for (const initialImport of entryOutput.imports) {
+      if (initialFiles.has(initialImport.path)) {
+        continue;
+      }
+
+      if (initialImport.kind === 'import-statement' || initialImport.kind === 'import-rule') {
+        const record: InitialFileRecord = {
+          type: initialImport.kind === 'import-rule' ? 'style' : 'script',
+          entrypoint: false,
+          external: initialImport.external,
+          serverFile: entryRecord.serverFile,
+          depth: entryRecord.depth + 1,
+        };
+
+        if (!initialFilter || initialFilter(record)) {
+          initialFiles.set(initialImport.path, record);
+
+          if (!initialImport.external) {
+            queue.push([initialImport.path, record]);
+          }
+        }
+      }
+    }
+  }
 }
 
 export enum BuildOutputFileType {
