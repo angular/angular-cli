@@ -1,4 +1,4 @@
-Creates and initializes a new Angular application that is the default project for a new workspace.
+Creates and initializes a new Angular workspace with an initial application.
 
 Provides interactive prompts for optional configuration, such as adding routing support.
 All prompts can safely be allowed to default.
