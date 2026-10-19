@@ -42,7 +42,9 @@ more control over exactly where this configuration lives, you can manually set i
 shell run at startup:
 
 ```bash
-source <(ng completion script)
+if [[ $- == *i* ]]; then
+  source <(ng completion script)
+fi
 ```
 
 This is equivalent to what `ng completion` will automatically set up, and gives power users more
