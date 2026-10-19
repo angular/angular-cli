@@ -6,7 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { BuilderState } from './builder-state';
+import { createDiskOutputFile, createMemoryOutputFile } from './pipeline/utils';
 import type { LibraryCompilationOutput, SingleProgramCache } from './types';
 
 describe('BuilderState', () => {
@@ -183,7 +187,151 @@ describe('BuilderState', () => {
     });
   });
 
-  describe('dispose', () => {
+  describe('output tracking and cleanup', () => {
+    it('should track bundle and manifest outputs and queue stale files for deletion', () => {
+      const state = new BuilderState();
+
+      const initialBundles = new Map([
+        [
+          '.',
+          {
+            esmModuleIds: new Set(['/src/index.js']),
+            dtsModuleIds: new Set(['/src/index.d.ts']),
+            esmOutputFiles: new Set(['fesm2022/my-lib.mjs']),
+            dtsOutputFiles: new Set(['types/my-lib.d.ts']),
+            hasTslibImport: false,
+          },
+        ],
+        [
+          'testing',
+          {
+            esmModuleIds: new Set(['/testing/index.js']),
+            dtsModuleIds: new Set(['/testing/index.d.ts']),
+            esmOutputFiles: new Set(['fesm2022/my-lib-testing.mjs']),
+            dtsOutputFiles: new Set(['types/my-lib-testing.d.ts']),
+            hasTslibImport: true,
+          },
+        ],
+      ]);
+
+      state.recordBundleOutput(initialBundles);
+      expect(state.hasTslibImport).toBeTrue();
+
+      const initialFilesToDelete = state.recordEmittedOutputs(
+        {
+          filesToEmit: [],
+          filesToDelete: [],
+        },
+        [
+          createMemoryOutputFile('package.json', '{}'),
+          createMemoryOutputFile('testing/package.json', '{}'),
+        ],
+      );
+      expect(initialFilesToDelete).toHaveSize(0);
+      expect(state.hasEmittedTslib).toBeTrue();
+
+      // No-op bundle pass when nothing changed
+      state.resetExecutionResult();
+      state.recordBundleOutput(new Map());
+      expect(state.recordEmittedOutputs({ filesToEmit: [], filesToDelete: [] })).toHaveSize(0);
+
+      // Remove secondary entry point 'testing'
+      state.resetExecutionResult();
+      state.previousBundleResults.delete('testing');
+      state.hasEntryPointsChanges = true;
+      expect(state.hasTslibImport).toBeFalse();
+
+      state.recordBundleOutput(new Map());
+      const filesToDelete = state.recordEmittedOutputs(
+        {
+          filesToEmit: [],
+          filesToDelete: [],
+        },
+        [createMemoryOutputFile('package.json', '{}')],
+      );
+
+      expect(state.hasEntryPointsChanges).toBeFalse();
+      expect(state.hasEmittedTslib).toBeFalse();
+      expect(filesToDelete).toEqual(
+        new Set([
+          'fesm2022/my-lib-testing.mjs',
+          'types/my-lib-testing.d.ts',
+          'testing/package.json',
+        ]),
+      );
+    });
+
+    it('should not delete an asset output path when another source still emits to it', () => {
+      const state = new BuilderState();
+
+      const sourceA = '/workspace/projects/my-lib/README.md';
+      const sourceB = '/workspace/docs/README.md';
+
+      state.recordEmittedOutputs({
+        filesToEmit: [
+          createDiskOutputFile(sourceA, 'README.md'),
+          createDiskOutputFile(sourceB, 'README.md'),
+        ],
+        filesToDelete: [],
+      });
+
+      // Delete sourceB while sourceA remains active
+      state.resetExecutionResult();
+      const firstDeletes = state.recordEmittedOutputs({
+        filesToEmit: [],
+        filesToDelete: [sourceB],
+      });
+      expect(firstDeletes.has('README.md')).toBeFalse();
+
+      // Delete sourceA as well; now README.md should be queued for deletion
+      state.resetExecutionResult();
+      const secondDeletes = state.recordEmittedOutputs({
+        filesToEmit: [],
+        filesToDelete: [sourceA],
+      });
+      expect(secondDeletes.has('README.md')).toBeTrue();
+    });
+
+    it('should preserve pending asset modifications across failed iterations', async () => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      const tempRoot = await mkdtemp(join(baseTmpDir, 'angular-cli-builder-state-'));
+
+      try {
+        const readmePath = join(tempRoot, 'README.md');
+        await writeFile(readmePath, '# Initial');
+
+        const options = {
+          workspaceRoot: tempRoot,
+          assets: [{ glob: 'README.md', input: tempRoot, output: '.' }],
+        };
+        const state = new BuilderState(options);
+
+        // Initial build emits README.md
+        const initialAssets = await state.collectAssets(options);
+        expect(initialAssets.filesToEmit).toHaveSize(1);
+        state.recordEmittedOutputs(initialAssets);
+
+        // Watch iteration 1: README.md is modified, but build fails before recordEmittedOutputs
+        await writeFile(readmePath, '# Updated');
+        const failedIterAssets = await state.collectAssets(options, new Set([readmePath]));
+        expect(failedIterAssets.filesToEmit).toHaveSize(1);
+
+        // Watch iteration 2: only an unrelated file is in modifiedFiles; README.md is still collected
+        const unrelatedFile = join(tempRoot, 'src/index.ts');
+        const recoveryAssets = await state.collectAssets(options, new Set([unrelatedFile]));
+        expect(recoveryAssets.filesToEmit).toHaveSize(1);
+        expect(recoveryAssets.filesToEmit[0]?.source).toBe(readmePath);
+
+        // Once recovery outputs are recorded, pending asset modifications are cleared
+        state.recordEmittedOutputs(recoveryAssets);
+        const subsequentAssets = await state.collectAssets(options, new Set([unrelatedFile]));
+        expect(subsequentAssets.filesToEmit).toHaveSize(0);
+      } finally {
+        await rm(tempRoot, { recursive: true, force: true });
+      }
+    });
+
     it('should close compilationInstance and clear cached state on dispose', async () => {
       const closeSpy = jasmine.createSpy('close').and.resolveTo();
       const state = new BuilderState({ packageJsonPath });

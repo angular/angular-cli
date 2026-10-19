@@ -215,11 +215,6 @@ async function executeBuild(
   } finally {
     if (watcher) {
       watcher.add(Array.from(buildState.watchedCompilationFiles));
-
-      const { assetsToEmit } = actionContext;
-      if (assetsToEmit?.length) {
-        watcher.add(assetsToEmit.map((asset) => asset.source));
-      }
     }
   }
 }
@@ -247,9 +242,7 @@ async function* runWatchLoop(
   buildAction: typeof import('./pipeline/build-action').buildAction,
   signal: AbortSignal,
 ): AsyncIterableIterator<BuilderOutput> {
-  const { collectAssetsToEmit } = await import('./pipeline/assets');
-
-  const { workspaceRoot, packageJsonPath, assets, clearScreen } = options;
+  const { packageJsonPath, clearScreen } = options;
 
   for await (const changes of watcher) {
     if (signal.aborted) {
@@ -298,13 +291,14 @@ async function* runWatchLoop(
       await buildState.singleProgramCache?.compilationInstance.update?.(changedFiles);
     }
 
-    const assetsToEmit = await collectAssetsToEmit(
-      assets,
-      workspaceRoot,
-      buildState.hasEmittedAssets ? changedFiles : undefined,
-    );
+    const collectedAssets = await buildState.collectAssets(options, changedFiles);
 
-    if (!hasSourceChanges && buildState.hasEmittedManifests && assetsToEmit.length === 0) {
+    if (
+      !hasSourceChanges &&
+      buildState.hasEmittedManifests &&
+      collectedAssets.filesToEmit.length === 0 &&
+      collectedAssets.filesToDelete.length === 0
+    ) {
       continue;
     }
 
@@ -316,7 +310,7 @@ async function* runWatchLoop(
         isWatchMode: true,
         buildState,
         modifiedFiles: changedFiles,
-        assetsToEmit,
+        collectedAssets,
       },
       logger,
       withProgress,
