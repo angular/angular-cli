@@ -12,7 +12,7 @@ import {
 const testRegistry = getGlobalVariable('package-registry');
 
 const AUTOCOMPLETION_SNIPPET = `
-# Load Angular CLI autocompletion.
+# Load Angular CLI autocompletion for interactive shells.
 if [[ $- == *i* ]]; then
   source <(ng completion script)
 fi
