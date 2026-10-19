@@ -251,7 +251,19 @@ function migrateTargetOptions(
       : [];
     const migratedAssets = ngPackageConfig.assets.map((asset) => {
       if (typeof asset === 'string') {
-        return join(projectDir, asset);
+        const assetPath = join(projectDir, asset);
+        if (tree.exists(assetPath)) {
+          return assetPath;
+        }
+
+        const assetDir = tree.getDir(assetPath);
+        if (assetDir.subfiles.length || assetDir.subdirs.length) {
+          return assetPath;
+        }
+
+        // `ng-packagr` treats a string that is neither a file nor a directory as a glob relative
+        // to the package root, while the library builder only accepts files and directories.
+        return { glob: normalize(asset), input: join(projectDir, '.'), output: '/' };
       }
       if (isJsonObject(asset) && typeof asset['input'] === 'string') {
         return {
