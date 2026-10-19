@@ -7,4 +7,4 @@ For example, the `serve` target for a newly generated app has a predefined
 alternate configuration named `production`.
 
 You can define new targets and their configuration options in the `architect` section
-of the `angular.json` file which you can run them from the command line using the `ng run` command.
+of the `angular.json` file, which you can run from the command line using the `ng run` command.

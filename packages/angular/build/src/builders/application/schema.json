@@ -568,7 +568,7 @@
       "oneOf": [
         {
           "type": "boolean",
-          "description": "Enable prerending of pages of your application during build time."
+          "description": "Enable prerendering of pages of your application during build time."
         },
         {
           "type": "object",

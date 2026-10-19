@@ -203,12 +203,12 @@
       "oneOf": [
         {
           "type": "string",
-          "description": "A comma seperate list of browsers to run tests against."
+          "description": "A comma-separated list of browsers to run tests against."
         },
         {
           "const": false,
           "type": "boolean",
-          "description": "Does use run tests against a browser."
+          "description": "Does not run tests against a browser."
         }
       ]
     },
