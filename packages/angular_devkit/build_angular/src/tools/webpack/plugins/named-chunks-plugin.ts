@@ -9,7 +9,7 @@
 import { AsyncDependenciesBlock, Chunk, Compiler, Template, dependencies } from 'webpack';
 
 // `ImportDependency` is not part of Webpack's depenencies typings.
-const ImportDependency: typeof dependencies.ModuleDependency = require('webpack/lib/dependencies/ImportDependency');
+const ImportDependency: typeof dependencies.ModuleDependency = require('webpack/lib/dependencies/import/ImportDependency');
 
 const PLUGIN_NAME = 'named-chunks-plugin';
 
