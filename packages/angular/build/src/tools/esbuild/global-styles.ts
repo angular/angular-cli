@@ -92,7 +92,9 @@ export function createGlobalStylesBundleOptions(
           assert(files, `global style name should always be found [${args.path}]`);
 
           return {
-            contents: files.map((file) => `@import '${toPosixPath(file)}';`).join('\n'),
+            contents: files
+              .map((file) => `@import ${JSON.stringify(toPosixPath(file))};`)
+              .join('\n'),
             loader: 'css',
             resolveDir: workspaceRoot,
           };

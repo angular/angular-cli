@@ -89,5 +89,21 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         });
       });
     }
+
+    it('uses a provided file with a single quote in its path', async () => {
+      await harness.writeFile('src/main.ts', 'console.log("TEST");');
+      await harness.writeFile(`src/dev's polyfills/polyfills.js`, `console.log('main');`);
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        polyfills: [`src/dev's polyfills/polyfills.js`],
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBe(true);
+
+      harness.expectFile('dist/browser/polyfills.js').content.toContain(`console.log("main")`);
+    });
   });
 });
