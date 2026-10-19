@@ -6,6 +6,9 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import { mkdtemp, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { executeDevServer } from '../../index';
 import { describeServeBuilder } from '../jasmine-helpers';
 import { BASE_OPTIONS, DEV_SERVER_BUILDER_INFO } from '../setup';
@@ -48,6 +51,28 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
         ssl: true,
         sslKey: 'ssl/server.key',
         sslCert: 'ssl/server.crt',
+      });
+
+      const { result } = await harness.executeOnce();
+
+      expect(result?.success).toBeTrue();
+      expect(result?.baseUrl).toMatch(/^https:\/\/[^/]+:\d+\//);
+    });
+
+    it('supports absolute "sslKey" and "sslCert" paths outside the workspace', async () => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      const certsDir = await mkdtemp(join(baseTmpDir, 'angular-cli-ssl-'));
+      const sslKey = join(certsDir, 'server.key');
+      const sslCert = join(certsDir, 'server.crt');
+      await writeFile(sslKey, SSL_KEY);
+      await writeFile(sslCert, SSL_CERT);
+
+      harness.useTarget('serve', {
+        ...BASE_OPTIONS,
+        ssl: true,
+        sslKey,
+        sslCert,
       });
 
       const { result } = await harness.executeOnce();
