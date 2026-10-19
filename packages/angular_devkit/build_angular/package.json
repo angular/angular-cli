@@ -54,7 +54,7 @@
     "terser": "5.51.2",
     "tinyglobby": "0.2.17",
     "tslib": "2.8.1",
-    "webpack": "5.111.0",
+    "webpack": "5.112.0",
     "webpack-dev-middleware": "8.3.0",
     "webpack-dev-server": "6.0.0",
     "webpack-merge": "6.0.1",
