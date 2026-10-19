@@ -7,7 +7,7 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import type * as Vite from 'vite' with {
   'resolution-mode': 'import',
 };
@@ -85,8 +85,8 @@ async function createServerConfig(
 
   if (serverOptions.ssl && serverOptions.sslCert && serverOptions.sslKey) {
     const [cert, key] = await Promise.all([
-      readFile(serverOptions.sslCert),
-      readFile(serverOptions.sslKey),
+      readFile(resolve(serverOptions.workspaceRoot, serverOptions.sslCert)),
+      readFile(resolve(serverOptions.workspaceRoot, serverOptions.sslKey)),
     ]);
 
     server.https = {
