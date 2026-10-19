@@ -252,6 +252,10 @@ function migrateTargetOptions(
     const migratedAssets = ngPackageConfig.assets.map((asset) => {
       if (typeof asset === 'string') {
         const assetPath = join(projectDir, asset);
+        if (assetPath.startsWith('..')) {
+          return assetPath;
+        }
+
         if (tree.exists(assetPath)) {
           return assetPath;
         }
