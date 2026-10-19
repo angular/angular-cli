@@ -91,8 +91,15 @@ export async function generateIndexHtml(
   let chunksIntegrity: ReadonlyMap<string, string> | undefined;
   if (subresourceIntegrity) {
     const integrity = new Map<string, string>();
+    // Entry points and module preload hints carry their own integrity attribute. Any other
+    // initial chunk (e.g. beyond the module preload limit) is only covered by the import map.
+    const hinted = new Set(hints.map(({ url }) => url));
     for (const file of browserOutputFiles) {
-      if (!file.path.endsWith('.js') || initialFiles.has(file.path)) {
+      if (
+        !file.path.endsWith('.js') ||
+        initialFiles.get(file.path)?.entrypoint ||
+        hinted.has(file.path)
+      ) {
         continue;
       }
       const hash = createHash('sha384').update(file.contents).digest('base64');
