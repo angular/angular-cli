@@ -101,7 +101,7 @@ export default class ConfigCommandModule
     const { logger } = this.context;
 
     if (!config || !configPath) {
-      throw new CommandModuleError('Confguration file cannot be found.');
+      throw new CommandModuleError('Configuration file cannot be found.');
     }
 
     const normalizeUUIDValue = (v: string | undefined) => (v === '' ? randomUUID() : `${v}`);

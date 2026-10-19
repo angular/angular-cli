@@ -192,10 +192,7 @@ export interface ServerRouteServer extends ServerRouteCommon {
  * @see {@link withRoutes}
  */
 export type ServerRoute =
-  | ServerRouteClient
-  | ServerRoutePrerender
-  | ServerRoutePrerenderWithParams
-  | ServerRouteServer;
+  ServerRouteClient | ServerRoutePrerender | ServerRoutePrerenderWithParams | ServerRouteServer;
 
 /**
  * Configuration value for server routes configuration.
@@ -464,7 +461,7 @@ export function provideServerRendering(
 
   if (!hasServerRoutes && hasAppShell) {
     throw new Error(
-      `Configuration error: found 'withAppShell()' without 'withRoutes()' in the same call to 'provideServerRendering()'.` +
+      `Configuration error: found 'withAppShell()' without 'withRoutes()' in the same call to 'provideServerRendering()'. ` +
         `The 'withAppShell()' function requires 'withRoutes()' to be used.`,
     );
   }

@@ -197,7 +197,7 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
 
         // only registry identifiers are supported
         if (!packageIdentifier.registry) {
-          logger.error(`Package '${request}' is not a registry package identifer.`);
+          logger.error(`Package '${request}' is not a registry package identifier.`);
 
           return 1;
         }
