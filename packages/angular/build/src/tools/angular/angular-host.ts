@@ -30,34 +30,27 @@ export interface AngularHostOptions {
 }
 
 /**
- * Patches in-place the `getSourceFiles` function on an instance of a TypeScript
- * `Program` to ensure that all returned SourceFile instances have a `version`
- * field. The `version` field is required when used with a TypeScript BuilderProgram.
- * @param program The TypeScript Program instance to patch.
+ * Ensures that all `SourceFile` instances in a TypeScript `Program` have a `version`
+ * field. The `version` field is required when used with a TypeScript `BuilderProgram`.
+ * @param program The TypeScript Program instance.
+ * @param previousProgram Optional previous BuilderProgram to reuse existing source file versions.
  */
 export function ensureSourceFileVersions(
   program: ts.Program,
   previousProgram?: ts.BuilderProgram,
 ): void {
-  const baseGetSourceFiles = program.getSourceFiles;
   // TODO: Update Angular compiler to add versions to all internal files and remove this
-  program.getSourceFiles = function (...parameters) {
-    const files: readonly (ts.SourceFile & { version?: string })[] = baseGetSourceFiles(
-      ...parameters,
-    );
+  const files: readonly (ts.SourceFile & { version?: string })[] = program.getSourceFiles();
 
-    for (const file of files) {
-      if (file.version === undefined) {
-        const previousFile: (ts.SourceFile & { version?: string }) | undefined =
-          previousProgram && !file.fileName.endsWith('.ngtypecheck.ts')
-            ? previousProgram.getSourceFile(file.fileName)
-            : undefined;
-        file.version = previousFile?.version ?? calculateHash(file.text);
-      }
+  for (const file of files) {
+    if (file.version === undefined) {
+      const previousFile: (ts.SourceFile & { version?: string }) | undefined =
+        previousProgram && !file.fileName.endsWith('.ngtypecheck.ts')
+          ? previousProgram.getSourceFile(file.fileName)
+          : undefined;
+      file.version = previousFile?.version ?? calculateHash(file.text);
     }
-
-    return files;
-  };
+  }
 }
 
 function augmentHostWithCaching(host: ts.CompilerHost, cache: Map<string, ts.SourceFile>): void {
@@ -94,39 +87,46 @@ function augmentResolveModuleNames(
   typescript: typeof ts,
   host: ts.CompilerHost,
   resolvedModuleModifier: (
-    resolvedModule: ts.ResolvedModule | undefined,
+    resolvedModule: ts.ResolvedModuleFull | undefined,
     moduleName: string,
-  ) => ts.ResolvedModule | undefined,
+  ) => ts.ResolvedModuleFull | undefined,
   moduleResolutionCache?: ts.ModuleResolutionCache,
 ): void {
-  if (host.resolveModuleNames) {
-    const baseResolveModuleNames = host.resolveModuleNames;
-    host.resolveModuleNames = function (moduleNames: string[], ...parameters) {
-      return moduleNames.map((name) => {
-        const result = baseResolveModuleNames.call(host, [name], ...parameters);
+  if (host.resolveModuleNameLiterals) {
+    const baseResolveModuleNameLiterals = host.resolveModuleNameLiterals;
+    host.resolveModuleNameLiterals = function (moduleLiterals, ...parameters) {
+      return moduleLiterals.map((name) => {
+        const result = baseResolveModuleNameLiterals.call(host, [name], ...parameters);
 
-        return resolvedModuleModifier(result[0], name);
+        return {
+          ...result[0],
+          resolvedModule: resolvedModuleModifier(result[0].resolvedModule, name.text),
+        };
       });
     };
   } else {
-    host.resolveModuleNames = function (
-      moduleNames: string[],
-      containingFile: string,
-      _reusedNames: string[] | undefined,
-      redirectedReference: ts.ResolvedProjectReference | undefined,
-      options: ts.CompilerOptions,
+    host.resolveModuleNameLiterals = function (
+      moduleLiterals,
+      containingFile,
+      redirectedReference,
+      options,
+      containingSourceFile,
     ) {
-      return moduleNames.map((name) => {
+      return moduleLiterals.map((name) => {
         const result = typescript.resolveModuleName(
-          name,
+          name.text,
           containingFile,
           options,
           host,
           moduleResolutionCache,
           redirectedReference,
-        ).resolvedModule;
+          containingSourceFile.impliedNodeFormat,
+        );
 
-        return resolvedModuleModifier(result, name);
+        return {
+          ...result,
+          resolvedModule: resolvedModuleModifier(result.resolvedModule, name.text),
+        };
       });
     };
   }
@@ -151,10 +151,13 @@ function augmentHostWithReplacements(
     normalizedReplacements[normalizePath(key)] = normalizePath(value);
   }
 
-  const tryReplace = (resolvedModule: ts.ResolvedModule | undefined) => {
+  const tryReplace = (
+    resolvedModule: ts.ResolvedModuleFull | undefined,
+  ): ts.ResolvedModuleFull | undefined => {
     const replacement = resolvedModule && normalizedReplacements[resolvedModule.resolvedFileName];
     if (replacement) {
       return {
+        ...resolvedModule,
         resolvedFileName: replacement,
         isExternalLibraryImport: /[/\\]node_modules[/\\]/.test(replacement),
       };
@@ -254,6 +257,25 @@ export function createAngularCompilerHost(
     packageJsonCache,
   );
   host.getModuleResolutionCache = () => resolutionCache;
+  host.resolveModuleNameLiterals = (
+    moduleLiterals,
+    containingFile,
+    redirectedReference,
+    options,
+    containingSourceFile,
+  ) => {
+    return moduleLiterals.map((moduleLiteral) => {
+      return typescript.resolveModuleName(
+        moduleLiteral.text,
+        containingFile,
+        options,
+        host,
+        resolutionCache,
+        redirectedReference,
+        containingSourceFile.impliedNodeFormat,
+      );
+    });
+  };
 
   // Augment TypeScript Host for file replacements option
   if (hostOptions.fileReplacements) {
