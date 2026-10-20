@@ -198,6 +198,68 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it('rebuilds PostCSS stylesheet when a file is added to a plugin directory dependency', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+        styles: ['src/styles.css'],
+      });
+
+      // Emits a class for each source file, similar to Tailwind CSS v4 content scanning
+      await harness.writeFile(
+        'test-plugin.js',
+        `
+        const fs = require('fs');
+        const path = require('path');
+        module.exports = () => {
+          return {
+            postcssPlugin: 'test-plugin',
+            Once(root, { result }) {
+              const dir = path.join(path.dirname(root.source.input.file), 'sources');
+              result.messages.push({
+                type: 'dir-dependency',
+                dir,
+                glob: '**/*.txt',
+              });
+              for (const file of fs.readdirSync(dir, { recursive: true })) {
+                if (file.endsWith('.txt')) {
+                  const name = fs.readFileSync(path.join(dir, file), 'utf-8').trim();
+                  root.append('.' + name + ' { color: red; }');
+                }
+              }
+            },
+          };
+        };
+        module.exports.postcss = true;
+        `,
+      );
+      await harness.writeFile(
+        '.postcssrc.json',
+        JSON.stringify({
+          plugins: {
+            './test-plugin.js': {},
+          },
+        }),
+      );
+      await harness.writeFile('src/styles.css', '/* base */');
+      await harness.writeFile('src/sources/foo/a.txt', 'foo-class');
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/browser/styles.css').content.toContain('.foo-class');
+          harness.expectFile('dist/browser/styles.css').content.not.toContain('.bar-class');
+
+          await harness.writeFile('src/sources/bar/b.txt', 'bar-class');
+        },
+        ({ result }) => {
+          expect(result?.success).toBe(true);
+          harness.expectFile('dist/browser/styles.css').content.toContain('.foo-class');
+          harness.expectFile('dist/browser/styles.css').content.toContain('.bar-class');
+        },
+      ]);
+    });
+
     it('rebuilds PostCSS stylesheet after CSS syntax error on initial build from import', async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
