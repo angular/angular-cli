@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import {
-  BuildOutputFile,
   BuildOutputFileType,
   InitialFileRecord,
+  createOutputFile,
 } from '../../tools/esbuild/bundler-files';
 import { generateIndexHtml } from './index-html-generator';
 import { NormalizedApplicationBuildOptions } from './options';
@@ -21,7 +21,9 @@ describe('generateIndexHtml', () => {
   let tempDir: string;
 
   beforeEach(async () => {
-    tempDir = await mkdtemp(join(tmpdir(), 'index-html-generator-spec-'));
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    tempDir = await mkdtemp(join(baseTmpDir, 'index-html-generator-spec-'));
     await writeFile(
       join(tempDir, 'index.html'),
       '<html><head><base href="/"></head><body><app-root></app-root></body></html>',
@@ -32,23 +34,15 @@ describe('generateIndexHtml', () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  function createOutputFile(path: string): BuildOutputFile {
-    const text = `console.log(${JSON.stringify(path)});`;
-
-    return {
-      path,
-      text,
-      contents: Buffer.from(text),
-      type: BuildOutputFileType.Browser,
-    } as unknown as BuildOutputFile;
-  }
-
-  function createOptions(subresourceIntegrity: boolean): NormalizedApplicationBuildOptions {
+  function createOptions(
+    subresourceIntegrity: boolean,
+    preloadInitial = true,
+  ): NormalizedApplicationBuildOptions {
     return {
       indexHtmlOptions: {
         input: join(tempDir, 'index.html'),
         insertionOrder: [['main.js', true]],
-        preloadInitial: true,
+        preloadInitial,
       },
       subresourceIntegrity,
       baseHref: '/',
@@ -56,7 +50,7 @@ describe('generateIndexHtml', () => {
     } as unknown as NormalizedApplicationBuildOptions;
   }
 
-  it('adds integrity metadata for every initial chunk when there are more than the module preload limit', async () => {
+  it('should add integrity metadata for every initial chunk when there are more than the module preload limit', async () => {
     const chunkCount = 15;
     const chunks = Array.from({ length: chunkCount }, (_, i) => `chunk-${i}.js`);
     const initialFiles = new Map<string, InitialFileRecord>([
@@ -69,46 +63,43 @@ describe('generateIndexHtml', () => {
           ],
       ),
     ]);
-    const outputFiles = ['main.js', ...chunks].map(createOutputFile);
+    const outputFiles = ['main.js', ...chunks].map((path) =>
+      createOutputFile(path, `console.log(${JSON.stringify(path)});`, BuildOutputFileType.Browser),
+    );
 
     const { csrContent, errors } = await generateIndexHtml(
       initialFiles,
       outputFiles,
       createOptions(true),
     );
-    expect(errors).toEqual([]);
+    expect(errors).toHaveSize(0);
 
-    const importMapMatch = /<script type="importmap">(.*?)<\/script>/.exec(csrContent);
-    const importMapIntegrity: Record<string, string> = importMapMatch
-      ? JSON.parse(importMapMatch[1]).integrity
-      : {};
+    for (const chunk of chunks.slice(0, 10)) {
+      expect(csrContent).toContain(`<link rel="modulepreload" href="${chunk}" integrity="sha384`);
+      expect(csrContent).not.toContain(`./${chunk}`);
+    }
 
-    for (const chunk of chunks) {
-      const hasPreloadIntegrity = new RegExp(
-        `<link rel="modulepreload" href="${chunk}" integrity="sha384-[^"]+"`,
-      ).test(csrContent);
-
-      expect(hasPreloadIntegrity || `./${chunk}` in importMapIntegrity)
-        .withContext(`Expected integrity metadata for ${chunk}`)
-        .toBeTrue();
+    for (const chunk of chunks.slice(10)) {
+      expect(csrContent).toContain(`./${chunk}`);
+      expect(csrContent).not.toContain(`<link rel="modulepreload" href="${chunk}"`);
     }
   });
 
-  it('adds integrity metadata for initial chunks when module preloads are disabled', async () => {
+  it('should add integrity metadata for initial chunks when module preloads are disabled', async () => {
     const initialFiles = new Map<string, InitialFileRecord>([
       ['main.js', { entrypoint: true, name: 'main', type: 'script', serverFile: false, depth: 0 }],
       ['chunk-a.js', { entrypoint: false, type: 'script', serverFile: false, depth: 1 }],
     ]);
-    const outputFiles = ['main.js', 'chunk-a.js'].map(createOutputFile);
-    const options = createOptions(true);
-    options.indexHtmlOptions!.preloadInitial = false;
+    const outputFiles = ['main.js', 'chunk-a.js'].map((path) =>
+      createOutputFile(path, `console.log(${JSON.stringify(path)});`, BuildOutputFileType.Browser),
+    );
+    const options = createOptions(true, false);
 
     const { csrContent, errors } = await generateIndexHtml(initialFiles, outputFiles, options);
-    expect(errors).toEqual([]);
+    expect(errors).toHaveSize(0);
 
-    const importMapMatch = /<script type="importmap">(.*?)<\/script>/.exec(csrContent);
-    const importMapIntegrity: Record<string, string> = JSON.parse(importMapMatch![1]).integrity;
-
-    expect(Object.keys(importMapIntegrity)).toEqual(['./chunk-a.js']);
+    expect(csrContent).toContain(`"./${outputFiles[1].path}":`);
+    expect(csrContent).not.toContain(`"./${outputFiles[0].path}":`);
+    expect(csrContent).not.toContain('rel="modulepreload"');
   });
 });
