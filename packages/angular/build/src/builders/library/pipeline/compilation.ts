@@ -89,10 +89,7 @@ export async function compileLibrary(
           : await stylesheetBundler.bundleInline(data, containingFile);
 
         if (result.referencedFiles) {
-          buildState.addFileReferences(containingFile, result.referencedFiles);
-          if (stylesheetFile) {
-            buildState.addFileReferences(stylesheetFile, result.referencedFiles);
-          }
+          buildState.addFileReferences(stylesheetFile ?? containingFile, result.referencedFiles);
         }
 
         if (result.warnings.length > 0) {

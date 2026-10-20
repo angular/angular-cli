@@ -984,5 +984,79 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         { outputLogsOnFailure: false },
       );
     });
+
+    it('should rebuild when an external Sass partial or template is modified and recover from template errors', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/_vars.scss': '$primary-color: rgb(10, 20, 30);',
+        'projects/lib/src/lib/lib.component.scss':
+          '@use "./vars"; :host { color: vars.$primary-color; }',
+        'projects/lib/src/lib/lib.component.html': '<h1>{{ title }}</h1>',
+        'projects/lib/src/lib/lib.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-external-resources',
+            templateUrl: './lib.component.html',
+            styleUrl: './lib.component.scss',
+          })
+          export class LibComponent {
+            title = 'Hello';
+          }
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
+          expect(content).toContain('h1');
+          expect(content).toMatch(/color:\s*(?:#0a141e|rgb\(10,\s*20,\s*30\))/);
+          expect(harness.readFile('dist/lib/types/lib.d.ts')).toContain('LibComponent');
+
+          // Modify the imported Sass partial
+          await harness.writeFile(
+            'projects/lib/src/lib/_vars.scss',
+            '$primary-color: rgb(200, 100, 50);',
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toMatch(
+            /color:\s*(?:#c86432|rgb\(200,\s*100,\s*50\))/,
+          );
+          expect(harness.readFile('dist/lib/types/lib.d.ts')).toContain('LibComponent');
+
+          // Introduce a template type-checking error in the external HTML template
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.html',
+            '<section>{{ nonExistentProp }}</section>',
+          );
+        },
+        async ({ result, logs }) => {
+          expect(result?.success).toBeFalse();
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              message: jasmine.stringContaining('nonExistentProp'),
+            }),
+          );
+
+          // Fix the external HTML template error
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.html',
+            '<footer>{{ title }}</footer>',
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain('footer');
+          expect(harness.readFile('dist/lib/types/lib.d.ts')).toContain('LibComponent');
+        },
+      ]);
+    });
   });
 });
