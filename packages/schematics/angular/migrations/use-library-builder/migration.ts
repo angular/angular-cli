@@ -267,7 +267,7 @@ function migrateTargetOptions(
 
         // `ng-packagr` treats a string that is neither a file nor a directory as a glob relative
         // to the package root, while the library builder only accepts files and directories.
-        return { glob: normalize(asset), input: join(projectDir, '.'), output: '/' };
+        return { glob: asset, input: projectDir };
       }
       if (isJsonObject(asset) && typeof asset['input'] === 'string') {
         return {
