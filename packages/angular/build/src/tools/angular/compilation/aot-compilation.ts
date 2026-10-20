@@ -663,24 +663,27 @@ export function ensurePreDeclarationTransformers(transformers: ts.CustomTransfor
   }
 
   const beforeTransformers = transformers.before as ts.TransformerFactory<ts.SourceFile>[];
-  const transformedSourceFiles = new Map<ts.SourceFile, ts.SourceFile>();
+  const seenSourceFiles = new Set<ts.SourceFile>();
+  const preTransformedSourceFiles = new Map<ts.SourceFile, ts.SourceFile>();
   transformers.before = [
     (context) => {
       let beforeTransforms: ts.Transformer<ts.SourceFile>[] | undefined;
 
       return (sourceFile) => {
         const originalSourceFile = ts.getOriginalNode(sourceFile, ts.isSourceFile);
-        const cached = transformedSourceFiles.get(originalSourceFile);
-        if (cached) {
-          return cached;
+        const preTransformed = preTransformedSourceFiles.get(originalSourceFile);
+        if (preTransformed !== undefined) {
+          preTransformedSourceFiles.delete(originalSourceFile);
+
+          return preTransformed;
         }
 
+        seenSourceFiles.add(originalSourceFile);
         beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
         let current = sourceFile;
         for (const transform of beforeTransforms) {
           current = transform(current);
         }
-        transformedSourceFiles.set(originalSourceFile, current);
 
         return current;
       };
@@ -693,13 +696,14 @@ export function ensurePreDeclarationTransformers(transformers: ts.CustomTransfor
       return (fileOrBundle) => {
         if (!ts.isBundle(fileOrBundle)) {
           const originalSourceFile = ts.getOriginalNode(fileOrBundle, ts.isSourceFile);
-          if (!transformedSourceFiles.has(originalSourceFile)) {
+          if (!seenSourceFiles.has(originalSourceFile)) {
+            seenSourceFiles.add(originalSourceFile);
             beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
             let current = originalSourceFile;
             for (const transform of beforeTransforms) {
               current = transform(current);
             }
-            transformedSourceFiles.set(originalSourceFile, current);
+            preTransformedSourceFiles.set(originalSourceFile, current);
           }
         }
 
