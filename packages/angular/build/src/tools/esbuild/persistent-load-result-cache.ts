@@ -28,10 +28,15 @@
  */
 
 import type { Loader, OnLoadResult, PartialMessage } from 'esbuild';
+import { existsSync } from 'node:fs';
 import { readFile, stat } from 'node:fs/promises';
-import { isAbsolute } from 'node:path';
+import { isAbsolute, join, normalize } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { Cache as PersistentCacheStore } from '../../utils/cache';
+import {
+  type Cache as PersistentCacheStore,
+  type PersistentCacheStore as RawPersistentCacheStore,
+  createPersistentCacheStore,
+} from '../../utils/cache';
 import { MAX_CONCURRENT_READS, mapConcurrent, runConcurrent } from '../../utils/concurrency';
 import { calculateHash, createContentHash } from '../../utils/hash';
 import { LoadResultCache, MemoryLoadResultCache } from './load-result-cache';
@@ -185,25 +190,27 @@ async function validateAndHealCacheEntry(
  */
 async function computeMetadataForWatchFiles(
   watchFiles: string[],
-  knownContents?: Map<string, string | Uint8Array>,
+  metadataCache: Map<string, Promise<CachedDependencyMetadata | undefined>>,
 ): Promise<Record<string, CachedDependencyMetadata>> {
   const watchFilesMetadata: Record<string, CachedDependencyMetadata> = {};
 
   await runConcurrent(watchFiles, MAX_CONCURRENT_READS, async (filePath) => {
-    try {
-      const knownContent = knownContents?.get(filePath);
-      const [content, stats] = await Promise.all([
-        knownContent !== undefined ? knownContent : readFile(filePath),
-        stat(filePath),
-      ]);
-      const hash = calculateHash(content);
-      watchFilesMetadata[filePath] = {
-        hash,
-        mtimeMs: stats.mtimeMs,
-        size: stats.size,
-      };
-    } catch {
-      // Ignore unreadable files
+    let metadataPromise = metadataCache.get(filePath);
+    if (!metadataPromise) {
+      metadataPromise = Promise.all([readFile(filePath), stat(filePath)]).then(
+        ([content, stats]) => ({
+          hash: calculateHash(content),
+          mtimeMs: stats.mtimeMs,
+          size: stats.size,
+        }),
+        () => undefined,
+      );
+      metadataCache.set(filePath, metadataPromise);
+    }
+
+    const metadata = await metadataPromise;
+    if (metadata) {
+      watchFilesMetadata[filePath] = metadata;
     }
   });
 
@@ -211,12 +218,62 @@ async function computeMetadataForWatchFiles(
 }
 
 export class PersistentLoadResultCache implements LoadResultCache {
-  private readonly memoryCache = new MemoryLoadResultCache();
+  readonly #memoryCache = new MemoryLoadResultCache();
+  readonly #globalConfigHash: string;
+  readonly #cachePath?: string;
+  readonly #dependencyMetadataCache = new Map<
+    string,
+    Promise<CachedDependencyMetadata | undefined>
+  >();
+  #persistentStore?: PersistentCacheStore<CachedLoadResultEntry>;
+  #rawStore?: RawPersistentCacheStore;
+  #storePromise?: Promise<PersistentCacheStore<CachedLoadResultEntry> | undefined>;
+  #storeInitFailed = false;
+  #canHitL2: boolean;
+  #hasStoredEntries = false;
 
   constructor(
-    private readonly persistentStore?: PersistentCacheStore<CachedLoadResultEntry>,
-    private readonly globalConfigHash: string = '',
-  ) {}
+    persistentStoreOrPath?: PersistentCacheStore<CachedLoadResultEntry> | string,
+    globalConfigHash: string = '',
+  ) {
+    this.#globalConfigHash = globalConfigHash;
+    if (typeof persistentStoreOrPath === 'string') {
+      this.#cachePath = persistentStoreOrPath;
+      const baseCachePath = join(persistentStoreOrPath, 'angular-styles');
+      this.#canHitL2 =
+        existsSync(baseCachePath + '.db') || existsSync(baseCachePath + '-sqlite.db');
+    } else {
+      this.#persistentStore = persistentStoreOrPath;
+      this.#canHitL2 = !!persistentStoreOrPath;
+    }
+  }
+
+  async #getStore(): Promise<PersistentCacheStore<CachedLoadResultEntry> | undefined> {
+    if (this.#persistentStore) {
+      return this.#persistentStore;
+    }
+
+    if (!this.#cachePath || this.#storeInitFailed) {
+      return undefined;
+    }
+
+    this.#storePromise ??= createPersistentCacheStore(join(this.#cachePath, 'angular-styles')).then(
+      (store) => {
+        this.#rawStore = store;
+        this.#persistentStore = store.createCache<CachedLoadResultEntry>('load-results');
+
+        return this.#persistentStore;
+      },
+      () => {
+        this.#storeInitFailed = true;
+        this.#storePromise = undefined;
+
+        return undefined;
+      },
+    );
+
+    return this.#storePromise;
+  }
 
   /**
    * Retrieves a load result from cache.
@@ -225,27 +282,27 @@ export class PersistentLoadResultCache implements LoadResultCache {
    */
   async get(path: string): Promise<OnLoadResult | undefined> {
     // 1. Check L1 Memory Cache
-    const memoryResult = this.memoryCache.get(path);
+    const memoryResult = this.#memoryCache.get(path);
     if (memoryResult) {
       return memoryResult;
     }
 
-    if (!this.persistentStore) {
+    if (!this.#canHitL2) {
+      return undefined;
+    }
+
+    const store = await this.#getStore();
+    if (!store) {
       return undefined;
     }
 
     // 2. Check L2 Persistent Disk Cache
-    const cacheKey = calculateCacheKey(this.globalConfigHash, path);
-    const cached = await this.persistentStore.get(cacheKey);
+    const cacheKey = calculateCacheKey(this.#globalConfigHash, path);
+    const cached = await store.get(cacheKey);
 
     if (
       cached &&
-      (await validateAndHealCacheEntry(
-        cached.watchFilesMetadata,
-        this.persistentStore,
-        cacheKey,
-        cached,
-      ))
+      (await validateAndHealCacheEntry(cached.watchFilesMetadata, store, cacheKey, cached))
     ) {
       const result: OnLoadResult = {
         contents: cached.contents,
@@ -257,7 +314,7 @@ export class PersistentLoadResultCache implements LoadResultCache {
       };
 
       // Populate L1 Memory Cache for subsequent lookups
-      await this.memoryCache.put(path, result);
+      await this.#memoryCache.put(path, result);
 
       return result;
     }
@@ -269,43 +326,44 @@ export class PersistentLoadResultCache implements LoadResultCache {
    * Stores a load result in both L1 memory cache and L2 persistent disk store.
    */
   async put(path: string, result: OnLoadResult): Promise<void> {
-    await this.memoryCache.put(path, result);
+    await this.#memoryCache.put(path, result);
 
     // Persist to L2 store if persistentStore is configured and contents exist (including empty strings/buffers)
-    if (this.persistentStore && result.contents !== undefined) {
-      let content: string | Uint8Array = '';
-      const filePath = extractDiskFilePath(path);
-      if (filePath) {
-        try {
-          content = await readFile(filePath);
-        } catch {
-          // Skip L2 persistent store if target disk file cannot be read
-          return;
-        }
-      }
-
-      const cacheKey = calculateCacheKey(this.globalConfigHash, path);
-
-      // Reuse the target file's pre-read content buffer to avoid redundant disk reads (readFile)
-      // during dependency watch file metadata computation.
-      const knownContents = filePath
-        ? new Map<string, string | Uint8Array>([[filePath, content]])
-        : undefined;
-      const allWatchFiles = Array.from(
-        new Set(filePath ? [filePath, ...(result.watchFiles ?? [])] : result.watchFiles),
-      );
-      const watchFilesMetadata = await computeMetadataForWatchFiles(allWatchFiles, knownContents);
-
-      await this.persistentStore.put(cacheKey, {
-        contents: result.contents,
-        loader: result.loader,
-        watchFiles: result.watchFiles ?? [],
-        watchDirs: result.watchDirs,
-        watchFilesMetadata,
-        warnings: result.warnings,
-        errors: result.errors,
-      });
+    if (result.contents === undefined) {
+      return;
     }
+
+    const store = await this.#getStore();
+    if (!store) {
+      return;
+    }
+
+    const filePath = extractDiskFilePath(path);
+    const allWatchFiles = Array.from(
+      new Set(filePath ? [filePath, ...(result.watchFiles ?? [])] : result.watchFiles),
+    );
+    const watchFilesMetadata = await computeMetadataForWatchFiles(
+      allWatchFiles,
+      this.#dependencyMetadataCache,
+    );
+
+    if (filePath && !watchFilesMetadata[filePath]) {
+      // Skip L2 persistent store if target disk file cannot be read
+      return;
+    }
+
+    const cacheKey = calculateCacheKey(this.#globalConfigHash, path);
+
+    await store.put(cacheKey, {
+      contents: result.contents,
+      loader: result.loader,
+      watchFiles: result.watchFiles ?? [],
+      watchDirs: result.watchDirs,
+      watchFilesMetadata,
+      warnings: result.warnings,
+      errors: result.errors,
+    });
+    this.#hasStoredEntries = true;
   }
 
   /**
@@ -316,10 +374,38 @@ export class PersistentLoadResultCache implements LoadResultCache {
    * during `get()` via dependency metadata verification (`validateAndHealCacheEntry`).
    */
   invalidate(path: string): boolean {
-    return this.memoryCache.invalidate(path);
+    this.#dependencyMetadataCache.delete(normalize(path));
+    this.#dependencyMetadataCache.delete(path);
+    if (this.#hasStoredEntries) {
+      this.#canHitL2 = true;
+    }
+
+    return this.#memoryCache.invalidate(path);
+  }
+
+  clear(): void {
+    this.#dependencyMetadataCache.clear();
+    if (this.#hasStoredEntries) {
+      this.#canHitL2 = true;
+    }
+    this.#memoryCache.clear();
+  }
+
+  async dispose(): Promise<void> {
+    this.clear();
+    const rawStore =
+      this.#rawStore ??
+      (await this.#storePromise?.then(
+        () => this.#rawStore,
+        () => undefined,
+      ));
+    this.#rawStore = undefined;
+    this.#persistentStore = undefined;
+    this.#storePromise = undefined;
+    await rawStore?.close();
   }
 
   get watchFiles(): ReadonlyArray<string> {
-    return this.memoryCache.watchFiles;
+    return this.#memoryCache.watchFiles;
   }
 }

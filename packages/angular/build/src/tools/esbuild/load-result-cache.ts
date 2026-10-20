@@ -13,6 +13,8 @@ export interface LoadResultCache {
   get(path: string): OnLoadResult | Promise<OnLoadResult | undefined> | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
   invalidate(path: string): boolean;
+  clear?(): void;
+  dispose?(): Promise<void> | void;
   readonly watchFiles: ReadonlyArray<string>;
 }
 
@@ -108,16 +110,16 @@ export class MemoryLoadResultCache implements LoadResultCache {
   }
 
   invalidate(path: string): boolean {
+    let invalidated = this.#loadResults.delete(path);
     const affectedPaths = this.#fileDependencies.get(path);
-    if (!affectedPaths) {
-      return false;
+    if (affectedPaths) {
+      for (const affected of affectedPaths) {
+        this.#loadResults.delete(affected);
+      }
+      invalidated = true;
     }
 
-    for (const affected of affectedPaths) {
-      this.#loadResults.delete(affected);
-    }
-
-    return true;
+    return invalidated;
   }
 
   get watchFiles(): string[] {

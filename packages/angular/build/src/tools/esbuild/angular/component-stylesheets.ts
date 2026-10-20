@@ -12,11 +12,13 @@ import { MemoryCache } from '../../../utils/cache';
 import { createContentHash } from '../../../utils/hash';
 import { BundleContextResult, BundlerContext } from '../bundler-context';
 import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
-import { MemoryLoadResultCache } from '../load-result-cache';
+import { type LoadResultCache, MemoryLoadResultCache } from '../load-result-cache';
+import { PersistentLoadResultCache } from '../persistent-load-result-cache';
 import {
   BundleStylesheetOptions,
   createStylesheetBundleOptions,
 } from '../stylesheets/bundle-options';
+import { calculateGlobalStylesheetConfigHash } from '../stylesheets/stylesheet-cache-key';
 
 export type ComponentStylesheetResult = BundleContextResult & {
   contents: string;
@@ -31,18 +33,29 @@ export type ComponentStylesheetResult = BundleContextResult & {
 export class ComponentStylesheetBundler {
   readonly #fileContexts = new MemoryCache<BundlerContext>();
   readonly #inlineContexts = new MemoryCache<BundlerContext>();
-  readonly #loadCache = new MemoryLoadResultCache();
+  readonly #loadCache: LoadResultCache;
 
   /**
    * @param options An object containing the stylesheet bundling options.
    * @param defaultInlineLanguage The default language to use for inline component styles.
    * @param incremental True if incremental watch mode is enabled.
+   * @param loadCache Optional cache instance to use for stylesheet load results.
    */
   constructor(
     private readonly options: BundleStylesheetOptions,
     private readonly defaultInlineLanguage: string,
     private readonly incremental: boolean,
-  ) {}
+    loadCache?: LoadResultCache,
+  ) {
+    this.#loadCache =
+      loadCache ??
+      (options.cacheOptions.enabled && options.cacheOptions.path
+        ? new PersistentLoadResultCache(
+            options.cacheOptions.path,
+            calculateGlobalStylesheetConfigHash(options),
+          )
+        : new MemoryLoadResultCache());
+  }
 
   /**
    * Bundle a file-based component stylesheet for use within an AOT compiled Angular application.
@@ -217,12 +230,25 @@ export class ComponentStylesheetBundler {
       const firstSemi = entry.indexOf(';');
       const secondSemi = firstSemi !== -1 ? entry.indexOf(';', firstSemi + 1) : -1;
       const filename = secondSemi !== -1 ? entry.slice(secondSemi + 1) : '';
-      if (filename && normalizedFiles.has(path.normalize(filename))) {
+      const normalizedFilename = filename ? path.normalize(filename) : '';
+      if (
+        normalizedFilename &&
+        (normalizedFiles.has(normalizedFilename) ||
+          (!path.isAbsolute(normalizedFilename) &&
+            normalizedFiles.has(
+              path.normalize(path.join(this.options.workspaceRoot, normalizedFilename)),
+            )))
+      ) {
         this.#inlineContexts.delete(entry);
+        this.#loadCache.invalidate(`angular:styles/component:${entry}`);
         void bundler.dispose().catch(() => {});
       } else {
         bundler.invalidate(normalizedFiles);
       }
+    }
+
+    for (const file of normalizedFiles) {
+      this.#loadCache.invalidate(file);
     }
 
     return entries;
@@ -244,9 +270,12 @@ export class ComponentStylesheetBundler {
     const contexts = [...this.#fileContexts.values(), ...this.#inlineContexts.values()];
     this.#fileContexts.clear();
     this.#inlineContexts.clear();
-    this.#loadCache.clear();
+    this.#loadCache.clear?.();
 
-    await Promise.allSettled(contexts.map((context) => context.dispose()));
+    await Promise.allSettled([
+      ...contexts.map((context) => context.dispose()),
+      this.#loadCache.dispose?.(),
+    ]);
   }
 
   private extractResult(
