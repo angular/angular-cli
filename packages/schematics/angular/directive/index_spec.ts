@@ -255,6 +255,23 @@ describe('Directive Schematic', () => {
       expect(appModule).toMatch(/import { Foo } from '.\/foo'/);
     });
 
+    it('should declare the class name without the type when addTypeToClassName is false', async () => {
+      const options = {
+        ...defaultNonStandaloneOptions,
+        module: 'app-module.ts',
+        type: 'directive',
+        addTypeToClassName: false,
+      };
+
+      const tree = await schematicRunner.runSchematic('directive', options, appTree);
+      const directive = tree.readContent('/projects/baz/src/app/foo.directive.ts');
+      const appModule = tree.readContent('/projects/baz/src/app/app-module.ts');
+
+      expect(directive).toContain('export class Foo {');
+      expect(appModule).toMatch(/import { Foo } from '.\/foo.directive'/);
+      expect(appModule).not.toContain('FooDirective');
+    });
+
     it('should fail if specified module does not exist', async () => {
       const options = {
         ...defaultNonStandaloneOptions,

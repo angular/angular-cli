@@ -20,6 +20,9 @@ export interface DeclarationToNgModuleOptions {
   export?: boolean;
   type: string;
   typeSeparator?: '.' | '-';
+
+  /** Whether the type is part of the class name. Defaults to `true`. */
+  addTypeToClassName?: boolean;
   skipImport?: boolean;
   standalone?: boolean;
 }
@@ -44,7 +47,8 @@ export function addDeclarationToNgModule(options: DeclarationToNgModuleOptions):
 
     const importPath = buildRelativePath(modulePath, filePath);
     const classifiedName =
-      strings.classify(options.name) + (options.type ? strings.classify(options.type) : '');
+      strings.classify(options.name) +
+      (options.type && options.addTypeToClassName !== false ? strings.classify(options.type) : '');
     const changes = addDeclarationToModule(source, modulePath, classifiedName, importPath);
 
     if (options.export) {
