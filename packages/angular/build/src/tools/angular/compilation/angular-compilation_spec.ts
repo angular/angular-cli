@@ -488,7 +488,6 @@ describe('AngularCompilation', () => {
           target: ts.ScriptTarget.ES2020,
           noEmit: true,
           emitDeclarationOnly: true,
-          emitDecoratorMetadata: true,
           isolatedModules: true,
         },
         {
@@ -502,7 +501,6 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.useDefineForClassFields).toBeUndefined();
       expect(compilerOptions.noEmit).toBe(false);
       expect(compilerOptions.emitDeclarationOnly).toBe(false);
-      expect(compilerOptions.emitDecoratorMetadata).toBe(false);
       expect(compilerOptions.incremental).toBe(true);
       expect(compilerOptions.tsBuildInfoFile).toBe(path.join('/tmp/cache', '.tsbuildinfo'));
       expect(warnings).toEqual([]);

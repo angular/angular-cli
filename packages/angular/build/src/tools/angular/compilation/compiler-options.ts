@@ -39,10 +39,22 @@ export function transformCompilerOptions(
   const warnings: PartialMessage[] = [];
   const isLibrary = buildType === 'library';
 
+  if (isLibrary) {
+    compilerOptions.target = typeScript.ScriptTarget.ES2022;
+    compilerOptions.module = typeScript.ModuleKind.ES2022;
+    compilerOptions.importHelpers = true;
+    compilerOptions.declaration = true;
+    compilerOptions.declarationMap = !!(
+      overrides?.declarationMap ?? compilerOptions.declarationMap
+    );
+    compilerOptions.declarationDir = undefined;
+    compilerOptions.noEmit = false;
+    compilerOptions.emitDeclarationOnly = false;
+  }
+
   if (
-    !isLibrary &&
-    (compilerOptions.target === undefined ||
-      compilerOptions.target < typeScript.ScriptTarget.ES2022)
+    compilerOptions.target === undefined ||
+    compilerOptions.target < typeScript.ScriptTarget.ES2022
   ) {
     // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
     // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
@@ -85,21 +97,6 @@ export function transformCompilerOptions(
     compilerOptions.tsBuildInfoFile = path.join(overrides.cachePath, '.tsbuildinfo');
   } else {
     compilerOptions.incremental = false;
-  }
-
-  if (isLibrary) {
-    compilerOptions.target = typeScript.ScriptTarget.ES2022;
-    compilerOptions.module = typeScript.ModuleKind.ES2022;
-    compilerOptions.moduleResolution = typeScript.ModuleResolutionKind.Bundler;
-    compilerOptions.importHelpers = true;
-    compilerOptions.declaration = true;
-    compilerOptions.declarationMap = !!(
-      overrides?.declarationMap ?? compilerOptions.declarationMap
-    );
-    compilerOptions.declarationDir = undefined;
-    compilerOptions.noEmit = false;
-    compilerOptions.emitDeclarationOnly = false;
-    compilerOptions.emitDecoratorMetadata = false;
   }
 
   if (

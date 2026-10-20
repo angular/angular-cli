@@ -286,7 +286,6 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           ...tsconfig.compilerOptions,
           noEmit: true,
           emitDeclarationOnly: true,
-          emitDecoratorMetadata: true,
         };
 
         return JSON.stringify(tsconfig, null, 2);
