@@ -64,7 +64,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
       expect(result?.success).toBeFalse();
       expectLog(
         logs,
-        `The "browsers" option requires either "@vitest/browser-playwright", "@vitest/browser-webdriverio", or "@vitest/browser-preview" to be installed`,
+        `The "browsers" option requires either "@vitest/browser-playwright", "@vitest/browser-webdriverio", or "@vitest/browser-preview" to be installed within the project`,
       );
     });
   });
