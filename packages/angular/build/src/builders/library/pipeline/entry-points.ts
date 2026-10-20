@@ -65,7 +65,7 @@ function normalizeEntryPoint(
     );
   }
 
-  if (!/(?<!\.d)\.(?:ts|mts)$/.test(entryFilePath)) {
+  if (!/(?<!\.d)\.m?ts$/.test(entryFilePath)) {
     throw new Error(
       `Entry point '${key}' file path must be a TypeScript file ('.ts' or '.mts'): '${entryFilePath}'.`,
     );

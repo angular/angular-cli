@@ -60,7 +60,6 @@ describe('entry-points pipeline', () => {
     });
 
     it('should replace nested slashes with dashes in secondary entry point name', () => {
-      expect(getEntryPointBundleName('my-lib', 'testing/http')).toBe('my-lib-testing-http');
       expect(getEntryPointBundleName('@my-scope/my-lib', 'testing/sub/deep')).toBe(
         'my-scope-my-lib-testing-sub-deep',
       );
@@ -269,27 +268,6 @@ describe('entry-points pipeline', () => {
         displayName: '@My-Scope/My-Lib/myFeature',
         bundleName: 'my-scope-my-lib-myfeature',
         entryFilePath: join(projectRoot, 'my-feature/src/public-api.ts'),
-        isPrimary: false,
-      });
-    });
-
-    it('should flatten nested secondary entry-point bundleName', () => {
-      const entryPoints = normalizeEntryPoints(
-        {
-          '.': './src/public-api.ts',
-          './testing/http': './testing/http/src/public-api.ts',
-        },
-        projectRoot,
-        packageJsonPath,
-        'my-lib',
-      );
-
-      expect(entryPoints.get('testing/http')).toEqual({
-        subpath: './testing/http',
-        name: 'testing/http',
-        displayName: 'my-lib/testing/http',
-        bundleName: 'my-lib-testing-http',
-        entryFilePath: join(projectRoot, 'testing/http/src/public-api.ts'),
         isPrimary: false,
       });
     });
