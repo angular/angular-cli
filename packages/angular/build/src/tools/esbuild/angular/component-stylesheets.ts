@@ -176,13 +176,37 @@ export class ComponentStylesheetBundler {
       );
     });
 
+    const result = await bundlerContext.bundle();
+    const watchFile = path.isAbsolute(filename)
+      ? filename
+      : path.join(this.options.workspaceRoot, filename);
+    if (result.errors) {
+      for (const error of result.errors) {
+        if (error.location?.file.startsWith('angular:styles/component:')) {
+          error.location.file = filename;
+          bundlerContext.watchFiles.add(watchFile);
+        }
+        for (const note of error.notes) {
+          if (note.location?.file.startsWith('angular:styles/component:')) {
+            note.location.file = filename;
+            bundlerContext.watchFiles.add(watchFile);
+          }
+        }
+      }
+    }
+    for (const warning of result.warnings) {
+      if (warning.location?.file.startsWith('angular:styles/component:')) {
+        warning.location.file = filename;
+      }
+      for (const note of warning.notes) {
+        if (note.location?.file.startsWith('angular:styles/component:')) {
+          note.location.file = filename;
+        }
+      }
+    }
+
     // Extract the result of the bundling from the output files
-    return this.extractResult(
-      await bundlerContext.bundle(),
-      bundlerContext.watchFiles,
-      !!externalId,
-      false,
-    );
+    return this.extractResult(result, bundlerContext.watchFiles, !!externalId, false);
   }
 
   /**
