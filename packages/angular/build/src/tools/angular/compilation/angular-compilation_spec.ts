@@ -479,5 +479,32 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.noEmitOnError).toBe(false);
       expect(compilerOptions.composite).toBe(false);
     });
+
+    it('enforces library compiler options and skips app-only target warning and .tsbuildinfo', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(
+        ts,
+        {
+          target: ts.ScriptTarget.ES2020,
+          noEmit: true,
+          emitDeclarationOnly: true,
+          emitDecoratorMetadata: true,
+          isolatedModules: true,
+        },
+        {
+          cachePath: '/tmp/cache',
+        },
+        'tsconfig.lib.json',
+        'library',
+      );
+
+      expect(compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(compilerOptions.useDefineForClassFields).toBeUndefined();
+      expect(compilerOptions.noEmit).toBe(false);
+      expect(compilerOptions.emitDeclarationOnly).toBe(false);
+      expect(compilerOptions.emitDecoratorMetadata).toBe(false);
+      expect(compilerOptions.incremental).toBe(false);
+      expect(compilerOptions.tsBuildInfoFile).toBeUndefined();
+      expect(warnings).toEqual([]);
+    });
   });
 });

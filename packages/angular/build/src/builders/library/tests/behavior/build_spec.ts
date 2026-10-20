@@ -237,7 +237,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
-    it('should write and reuse .tsbuildinfo in the persistent cache directory when cache is enabled', async () => {
+    it('should succeed without emitting .tsbuildinfo in the persistent cache directory when cache is enabled', async () => {
       harness.useProject('lib', {
         root: 'projects/lib',
         sourceRoot: 'projects/lib/src',
@@ -258,7 +258,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(firstBuild.result?.success).toBeTrue();
       harness
         .expectFile('.angular/cache/0.0.0-PLACEHOLDER/lib/angular-build-library/.tsbuildinfo')
-        .toExist();
+        .toNotExist();
 
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
@@ -277,6 +277,33 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
       expect(dtsContent).toContain('LibComponent');
       expect(dtsContent).toContain('CACHED_BUILD');
+    });
+
+    it('should override noEmit and emitDeclarationOnly in tsconfig.lib.json and emit both JS and .d.ts files', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions = {
+          ...tsconfig.compilerOptions,
+          noEmit: true,
+          emitDeclarationOnly: true,
+          emitDecoratorMetadata: true,
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.error).toBeUndefined();
+      expect(result?.success).toBeTrue();
+
+      const fesmContent = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesmContent).toContain('LibComponent');
+      const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
+      expect(dtsContent).toContain('LibComponent');
     });
   });
 });

@@ -37,11 +37,12 @@ export function transformCompilerOptions(
 ): { compilerOptions: ng.CompilerOptions; warnings: PartialMessage[] } {
   const compilerOptions = { ...baseCompilerOptions };
   const warnings: PartialMessage[] = [];
-  const isLibrary = buildType === 'library';
+  const isLibrary = buildType === 'library' || !!baseCompilerOptions.declaration;
 
   if (
-    compilerOptions.target === undefined ||
-    compilerOptions.target < typeScript.ScriptTarget.ES2022
+    !isLibrary &&
+    (compilerOptions.target === undefined ||
+      compilerOptions.target < typeScript.ScriptTarget.ES2022)
   ) {
     // If 'useDefineForClassFields' is already defined in the users project leave the value as is.
     // Otherwise fallback to false due to https://github.com/microsoft/TypeScript/issues/45995
@@ -77,13 +78,32 @@ export function transformCompilerOptions(
     compilerOptions.compilationMode ??= 'partial';
   }
 
-  // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled
-  if (compilerOptions.incremental !== false && overrides?.cachePath) {
+  // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled.
+  // Library compilation does not reuse on-disk .tsbuildinfo files across builds because all JS and .d.ts
+  // outputs must be emitted into in-memory maps on every cold build, while watch mode uses in-memory
+  // BuilderProgram state directly.
+  if (!isLibrary && compilerOptions.incremental !== false && overrides?.cachePath) {
     compilerOptions.incremental = true;
     // Set the build info file location to the configured cache directory
     compilerOptions.tsBuildInfoFile = path.join(overrides.cachePath, '.tsbuildinfo');
   } else {
     compilerOptions.incremental = false;
+    compilerOptions.tsBuildInfoFile = undefined;
+  }
+
+  if (isLibrary) {
+    compilerOptions.target = typeScript.ScriptTarget.ES2022;
+    compilerOptions.module = typeScript.ModuleKind.ES2022;
+    compilerOptions.moduleResolution = typeScript.ModuleResolutionKind.Bundler;
+    compilerOptions.importHelpers = true;
+    compilerOptions.declaration = true;
+    compilerOptions.declarationMap = !!(
+      overrides?.declarationMap ?? compilerOptions.declarationMap
+    );
+    compilerOptions.declarationDir = undefined;
+    compilerOptions.noEmit = false;
+    compilerOptions.emitDeclarationOnly = false;
+    compilerOptions.emitDecoratorMetadata = false;
   }
 
   if (
@@ -110,18 +130,6 @@ export function transformCompilerOptions(
         },
       ],
     });
-  }
-
-  if (isLibrary) {
-    compilerOptions.target = typeScript.ScriptTarget.ES2022;
-    compilerOptions.module = typeScript.ModuleKind.ES2022;
-    compilerOptions.moduleResolution = typeScript.ModuleResolutionKind.Bundler;
-    compilerOptions.importHelpers = true;
-    compilerOptions.declaration = true;
-    compilerOptions.declarationMap = !!(
-      overrides?.declarationMap ?? compilerOptions.declarationMap
-    );
-    compilerOptions.declarationDir = undefined;
   }
 
   // Synchronize custom resolve conditions.
