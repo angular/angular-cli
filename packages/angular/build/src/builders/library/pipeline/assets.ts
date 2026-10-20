@@ -40,7 +40,7 @@ export interface AssetMatcher {
 
 /**
  * Normalizes a glob pattern to match `tinyglobby` semantics by stripping trailing slashes,
- * expanding directory patterns that do not end in `*` with `/**`, and normalizing POSIX segments.
+ * expanding directory patterns with `/**`, and normalizing POSIX segments.
  *
  * @param pattern The raw glob pattern string.
  * @returns The normalized POSIX glob pattern.
@@ -65,7 +65,7 @@ export function createAssetMatchers(assets: NormalizedAssetsPattern[]): readonly
     const ignore = [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])]
       .filter((pattern) => pattern.length > 0)
       .map(normalizeGlobPattern);
-    const isMatch = picomatch(asset.glob ? normalizeGlobPattern(asset.glob) : [], {
+    const isMatch = picomatch(asset.glob ? path.posix.normalize(asset.glob) : [], {
       dot: true,
       windows: false,
       ignore,
@@ -108,28 +108,16 @@ export async function collectAssetsToEmit(
 
       if (!emittedAssets.has(file) && emittedAssets.size > 0) {
         const dirPrefix = file.endsWith('/') ? file : `${file}/`;
-        let checkedDir = false;
-        let isDirectory = false;
-
+        let isDeletedDir: boolean | undefined;
         for (const emittedFile of emittedAssets.keys()) {
-          if (!emittedFile.startsWith(dirPrefix)) {
-            continue;
-          }
-
-          if (!checkedDir) {
-            checkedDir = true;
-            const stats = statSync(file, { throwIfNoEntry: false });
-            isDirectory = stats?.isDirectory() ?? false;
-            isFileStat = stats?.isFile() ?? false;
-            if (isDirectory) {
+          if (emittedFile.startsWith(dirPrefix)) {
+            if (!(isDeletedDir ??= !statSync(file, { throwIfNoEntry: false })?.isDirectory())) {
               break;
             }
+            filesToDelete.add(emittedFile);
           }
-
-          filesToDelete.add(emittedFile);
         }
-
-        if (checkedDir && (isDirectory || !isFileStat)) {
+        if (isDeletedDir !== undefined) {
           continue;
         }
       }
