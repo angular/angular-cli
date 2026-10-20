@@ -12,13 +12,11 @@ import { MemoryCache } from '../../../utils/cache';
 import { createContentHash } from '../../../utils/hash';
 import { BundleContextResult, BundlerContext } from '../bundler-context';
 import { type BuildOutputFile, BuildOutputFileType } from '../bundler-files';
-import { type LoadResultCache, MemoryLoadResultCache } from '../load-result-cache';
-import { PersistentLoadResultCache } from '../persistent-load-result-cache';
+import { MemoryLoadResultCache } from '../load-result-cache';
 import {
   BundleStylesheetOptions,
   createStylesheetBundleOptions,
 } from '../stylesheets/bundle-options';
-import { calculateGlobalStylesheetConfigHash } from '../stylesheets/stylesheet-cache-key';
 
 export type ComponentStylesheetResult = BundleContextResult & {
   contents: string;
@@ -33,29 +31,18 @@ export type ComponentStylesheetResult = BundleContextResult & {
 export class ComponentStylesheetBundler {
   readonly #fileContexts = new MemoryCache<BundlerContext>();
   readonly #inlineContexts = new MemoryCache<BundlerContext>();
-  readonly #loadCache: LoadResultCache;
+  readonly #loadCache = new MemoryLoadResultCache();
 
   /**
    * @param options An object containing the stylesheet bundling options.
    * @param defaultInlineLanguage The default language to use for inline component styles.
    * @param incremental True if incremental watch mode is enabled.
-   * @param loadCache Optional cache instance to use for stylesheet load results.
    */
   constructor(
     private readonly options: BundleStylesheetOptions,
     private readonly defaultInlineLanguage: string,
     private readonly incremental: boolean,
-    loadCache?: LoadResultCache,
-  ) {
-    this.#loadCache =
-      loadCache ??
-      (options.cacheOptions.enabled && options.cacheOptions.path
-        ? new PersistentLoadResultCache(
-            options.cacheOptions.path,
-            calculateGlobalStylesheetConfigHash(options),
-          )
-        : new MemoryLoadResultCache());
-  }
+  ) {}
 
   /**
    * Bundle a file-based component stylesheet for use within an AOT compiled Angular application.
@@ -270,12 +257,9 @@ export class ComponentStylesheetBundler {
     const contexts = [...this.#fileContexts.values(), ...this.#inlineContexts.values()];
     this.#fileContexts.clear();
     this.#inlineContexts.clear();
-    this.#loadCache.clear?.();
+    this.#loadCache.clear();
 
-    await Promise.allSettled([
-      ...contexts.map((context) => context.dispose()),
-      this.#loadCache.dispose?.(),
-    ]);
+    await Promise.allSettled(contexts.map((context) => context.dispose()));
   }
 
   private extractResult(

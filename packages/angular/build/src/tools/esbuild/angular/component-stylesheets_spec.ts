@@ -7,9 +7,8 @@
  */
 
 import assert from 'node:assert';
-import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { createComponentStylesheetBundlerForLibrary } from '../../../builders/library/pipeline/stylesheet-bundler';
 import { initializeHash } from '../../../utils/hash';
 import { MemoryLoadResultCache } from '../load-result-cache';
 import { resetSassWorkerPoolCaches, shutdownSassWorkerPool } from '../stylesheets/sass-language';
@@ -34,7 +33,6 @@ describe('ComponentStylesheetBundler', () => {
     const testDir = await mkdtemp(join(tempRoot, 'inline-error-recovery-'));
     const componentFile = join(testDir, 'comp.ts');
     const partialFile = join(testDir, '_missing.scss');
-    const loadCache = new MemoryLoadResultCache();
 
     const bundler = new ComponentStylesheetBundler(
       {
@@ -48,7 +46,6 @@ describe('ComponentStylesheetBundler', () => {
       },
       'scss',
       true,
-      loadCache,
     );
 
     try {
@@ -77,11 +74,11 @@ describe('ComponentStylesheetBundler', () => {
     }
   });
 
-  it('evicts angular:styles/component loadCache entries when the containing component .ts file is invalidated', async () => {
+  it('should evict #loadCache entries when invalidating inline component stylesheets', async () => {
     const testDir = await mkdtemp(join(tempRoot, 'inline-evict-'));
     const componentFile = join(testDir, 'comp.ts');
-    const loadCache = new MemoryLoadResultCache();
-    const putSpy = spyOn(loadCache, 'put').and.callThrough();
+    const putSpy = spyOn(MemoryLoadResultCache.prototype, 'put').and.callThrough();
+    const invalidateSpy = spyOn(MemoryLoadResultCache.prototype, 'invalidate').and.callThrough();
 
     const bundler = new ComponentStylesheetBundler(
       {
@@ -95,7 +92,6 @@ describe('ComponentStylesheetBundler', () => {
       },
       'scss',
       true,
-      loadCache,
     );
 
     try {
@@ -105,54 +101,21 @@ describe('ComponentStylesheetBundler', () => {
 
       const cacheKey = putSpy.calls.mostRecent().args[0];
       expect(cacheKey).toMatch(/^angular:styles\/component:scss;/);
-      expect(loadCache.get(cacheKey)).toBeDefined();
 
       bundler.invalidate([componentFile]);
 
-      expect(loadCache.get(cacheKey)).toBeUndefined();
+      expect(invalidateSpy).toHaveBeenCalledWith(cacheKey);
+      expect(invalidateSpy).toHaveBeenCalledWith(componentFile);
+
+      const secondResult = await bundler.bundleInline(
+        '.btn { color: red; }',
+        componentFile,
+        'scss',
+      );
+      expect(secondResult.errors).toBeUndefined();
+      expect(putSpy).toHaveBeenCalledTimes(2);
     } finally {
       await bundler.dispose();
-    }
-  });
-
-  it('persists and reuses stylesheet load results across builds when persistent cache is enabled', async () => {
-    const testDir = await mkdtemp(join(tempRoot, 'persistent-cache-'));
-    const cacheDir = join(testDir, '.angular', 'cache');
-    await mkdir(testDir, { recursive: true });
-    const styleFile = join(testDir, 'comp.scss');
-    await writeFile(styleFile, '$primary: blue;\n.card { color: $primary; }\n');
-
-    const options = {
-      workspaceRoot: testDir,
-      preserveSymlinks: false,
-      styleIncludePaths: [],
-      sass: undefined,
-      cacheOptions: {
-        enabled: true,
-        path: cacheDir,
-        basePath: cacheDir,
-      },
-      inlineStyleLanguage: 'scss' as const,
-      postcssConfiguration: undefined,
-      tailwindConfiguration: undefined,
-    };
-
-    const firstBundler = createComponentStylesheetBundlerForLibrary(options, false, ['es2022']);
-    try {
-      const firstResult = await firstBundler.bundleFile(styleFile);
-      expect(firstResult.errors).toBeUndefined();
-      expect(firstResult.contents).toContain('.card{color:#00f}');
-    } finally {
-      await firstBundler.dispose();
-    }
-
-    const secondBundler = createComponentStylesheetBundlerForLibrary(options, false, ['es2022']);
-    try {
-      const secondResult = await secondBundler.bundleFile(styleFile);
-      expect(secondResult.errors).toBeUndefined();
-      expect(secondResult.contents).toContain('.card{color:#00f}');
-    } finally {
-      await secondBundler.dispose();
     }
   });
 });

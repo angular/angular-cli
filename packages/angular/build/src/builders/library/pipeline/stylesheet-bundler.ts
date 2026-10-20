@@ -7,9 +7,7 @@
  */
 
 import { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
-import { PersistentLoadResultCache } from '../../../tools/esbuild/persistent-load-result-cache';
 import type { BundleStylesheetOptions } from '../../../tools/esbuild/stylesheets/bundle-options';
-import { calculateGlobalStylesheetConfigHash } from '../../../tools/esbuild/stylesheets/stylesheet-cache-key';
 import type { NormalizedLibraryOptions } from '../types';
 
 /**
@@ -67,13 +65,5 @@ export function createComponentStylesheetBundlerForLibrary(
     tailwindConfiguration,
   };
 
-  const loadCache =
-    cacheOptions.enabled && cacheOptions.path
-      ? new PersistentLoadResultCache(
-          cacheOptions.path,
-          calculateGlobalStylesheetConfigHash(bundleOptions),
-        )
-      : undefined;
-
-  return new ComponentStylesheetBundler(bundleOptions, inlineStyleLanguage, incremental, loadCache);
+  return new ComponentStylesheetBundler(bundleOptions, inlineStyleLanguage, incremental);
 }

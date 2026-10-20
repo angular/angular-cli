@@ -13,8 +13,6 @@ export interface LoadResultCache {
   get(path: string): OnLoadResult | Promise<OnLoadResult | undefined> | undefined;
   put(path: string, result: OnLoadResult): Promise<void>;
   invalidate(path: string): boolean;
-  clear?(): void;
-  dispose?(): Promise<void> | void;
   readonly watchFiles: ReadonlyArray<string>;
 }
 
