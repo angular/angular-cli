@@ -25,6 +25,11 @@ export default function () {
             "description": "Fake schematic",
             "schema": "./fake-schema.json"
           },
+          "fake-reversed": {
+            "factory": "./fake",
+            "description": "Fake schematic",
+            "schema": "./fake-reversed-schema.json"
+          },
         }
       }`,
           [join(genRoot, 'fake-schema.json')]: `
@@ -64,6 +69,31 @@ export default function () {
           }
         }
       }`,
+          [join(genRoot, 'fake-reversed-schema.json')]: `
+      {
+        "$id": "FakeReversedSchema",
+        "title": "Fake Reversed Schema",
+        "type": "object",
+        "required": ["b"],
+        "properties": {
+          "b": {
+            "type": "string",
+            "description": "b.",
+            "$default": {
+              "$source": "argv",
+              "index": 0
+            }
+          },
+          "a": {
+            "type": "string",
+            "description": "a.",
+            "$default": {
+              "$source": "argv",
+              "index": 1
+            }
+          }
+        }
+      }`,
           [join(genRoot, 'fake.js')]: `
       function def(options) {
         return (host, context) => {
@@ -78,6 +108,10 @@ export default function () {
       .then(({ stdout }) => {
         assert.match(stdout, /ng generate fake-schematics:fake <a> \[b\]/);
         assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
+      })
+      .then(() => ng('generate', 'fake-schematics:fake-reversed', '--help'))
+      .then(({ stdout }) => {
+        assert.match(stdout, /ng generate fake-schematics:fake-reversed <b> \[a\]/);
       })
       // set up default collection.
       .then(() =>
