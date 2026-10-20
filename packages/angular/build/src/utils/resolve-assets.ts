@@ -15,7 +15,7 @@ import { isSubDirectory } from './path';
 /**
  * Default glob ignore patterns for assets.
  */
-export const DEFAULT_ASSET_IGNORE = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
+export const DEFAULT_ASSET_IGNORE = ['**/.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
 
 export async function resolveAssets(
   entries: {
@@ -63,10 +63,17 @@ export async function resolveAssets(
       followSymbolicLinks: entry.followSymlinks ?? false,
     });
 
-    return files.map((file) => ({
-      source: path.join(cwd, file),
-      destination: path.join(entry.output, entry.flatten ? path.basename(file) : file),
-    }));
+    return files.map((file) => {
+      const destination = path.join(entry.output, entry.flatten ? path.basename(file) : file);
+      if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
+        throw new Error('An asset cannot be written to a location outside of the output path.');
+      }
+
+      return {
+        source: path.join(cwd, file),
+        destination,
+      };
+    });
   });
 
   return resolvedEntries.flat();

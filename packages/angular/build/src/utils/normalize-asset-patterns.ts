@@ -55,11 +55,11 @@ export function normalizeAssetPatterns(
       let root: string;
 
       // Check if the string asset is within sourceRoot.
-      if (resolvedAssetPath.startsWith(resolvedSourceRoot)) {
+      if (isSubDirectory(resolvedSourceRoot, resolvedAssetPath)) {
         root = resolvedSourceRoot;
-      } else if (resolvedAssetPath.startsWith(resolvedProjectRoot)) {
+      } else if (isSubDirectory(resolvedProjectRoot, resolvedAssetPath)) {
         root = resolvedProjectRoot;
-      } else if (resolvedAssetPath.startsWith(resolvedWorkspaceRoot)) {
+      } else if (isSubDirectory(resolvedWorkspaceRoot, resolvedAssetPath)) {
         root = resolvedWorkspaceRoot;
       } else {
         throw new Error(`The ${assetPattern} asset path must be within the workspace root.`);
