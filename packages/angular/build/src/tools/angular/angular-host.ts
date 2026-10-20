@@ -19,6 +19,7 @@ export interface AngularHostOptions {
   fileReplacements?: Record<string, string>;
   modifiedFiles?: Set<string>;
   externalStylesheets?: Map<string, string>;
+  missingResourceFiles?: Map<string, Set<string>>;
   transformStylesheet(
     data: string,
     containingFile: string,
@@ -215,13 +216,22 @@ export function createAngularCompilerHost(
 
   host.resourceNameToFileName = function (resourceName, containingFile) {
     const resolvedPath = nodePath.join(nodePath.dirname(containingFile), resourceName);
-    if (!this.fileExists(resolvedPath)) {
-      return null;
-    }
-
     // Reject TypeScript files used as component resources (e.g., styleUrl pointing to a .ts file).
     // Processing a TypeScript file as a stylesheet or template causes confusing downstream errors.
     if (hasTypeScriptExtension(resolvedPath)) {
+      return null;
+    }
+
+    if (!this.fileExists(resolvedPath)) {
+      if (hostOptions.missingResourceFiles) {
+        let missing = hostOptions.missingResourceFiles.get(containingFile);
+        if (!missing) {
+          missing = new Set();
+          hostOptions.missingResourceFiles.set(containingFile, missing);
+        }
+        missing.add(resolvedPath);
+      }
+
       return null;
     }
 

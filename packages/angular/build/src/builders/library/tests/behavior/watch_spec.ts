@@ -847,5 +847,53 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
+
+    it('should recover from NG2008 when missing component templateUrl and styleUrl files are created in watch mode', async () => {
+      await harness.writeFile(
+        'projects/lib/src/lib/lib.component.ts',
+        `
+        import { Component } from '@angular/core';
+
+        @Component({
+          selector: 'lib-missing-resources',
+          templateUrl: './missing.component.html',
+          styleUrl: './missing.component.css',
+        })
+        export class LibComponent {}
+        `,
+      );
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases(
+        [
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expect(logs).toContain(
+              jasmine.objectContaining({
+                level: 'error',
+                message: jasmine.stringContaining('NG2008'),
+              }),
+            );
+
+            // Create the missing template and stylesheet files without touching lib.component.ts
+            await harness.writeFiles({
+              'projects/lib/src/lib/missing.component.html': '<p>Created Template</p>',
+              'projects/lib/src/lib/missing.component.css': ':host { color: purple; }',
+            });
+          },
+          ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const content = harness.readFile('dist/lib/fesm2022/lib.mjs');
+            expect(content).toContain('Created Template');
+            expect(content).toContain('purple');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
   });
 });

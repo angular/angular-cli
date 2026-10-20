@@ -11,6 +11,7 @@ import assert from 'node:assert';
 import { relative } from 'node:path';
 import ts from 'typescript';
 import { useTypeChecking } from '../../../utils/environment-options';
+import { toPosixPath } from '../../../utils/path';
 import { profileAsync, profileSync } from '../../../utils/profiling';
 import {
   AngularHostOptions,
@@ -82,6 +83,7 @@ class AngularCompilationState {
     public readonly diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>(),
     public readonly filesWithoutDtsSignature = new Set<string>(),
     public readonly useFallbackRootNames = false,
+    public readonly missingResourceDependencies = new Map<string, Set<string>>(),
   ) {}
 
   get angularCompiler() {
@@ -134,9 +136,30 @@ export class AotCompilation extends TypeScriptCompilation {
       hostOptions.modifiedFiles &&
       hostOptions.modifiedFiles.size <= HMR_MODIFIED_FILE_LIMIT;
 
+    const missingResourceDependencies =
+      this.#state?.missingResourceDependencies ?? new Map<string, Set<string>>();
+    hostOptions.missingResourceFiles = missingResourceDependencies;
+
     let staleSourceFiles;
     let clearPackageJsonCache = false;
     if (hostOptions.modifiedFiles) {
+      for (const [containingFile, missingFiles] of missingResourceDependencies) {
+        for (const missingFile of missingFiles) {
+          if (
+            hostOptions.modifiedFiles.has(missingFile) ||
+            hostOptions.modifiedFiles.has(toPosixPath(missingFile))
+          ) {
+            hostOptions.modifiedFiles.add(containingFile);
+            break;
+          }
+        }
+      }
+
+      for (const modifiedFile of hostOptions.modifiedFiles) {
+        missingResourceDependencies.delete(modifiedFile);
+        missingResourceDependencies.delete(toPosixPath(modifiedFile));
+      }
+
       this.invalidateFiles(hostOptions.modifiedFiles);
 
       if (this.#state && hostOptions.modifiedFiles.size > 0) {
@@ -316,7 +339,15 @@ export class AotCompilation extends TypeScriptCompilation {
         continue;
       }
 
-      const resourceDependencies = angularCompiler.getResourceDependencies(sourceFile);
+      const resourceDependencies = [...angularCompiler.getResourceDependencies(sourceFile)];
+      const missingResources = missingResourceDependencies.get(sourceFile.fileName);
+      if (missingResources) {
+        for (const missingFile of missingResources) {
+          if (!resourceDependencies.includes(missingFile)) {
+            resourceDependencies.push(missingFile);
+          }
+        }
+      }
       componentResourcesDependencies.set(sourceFile.fileName, resourceDependencies);
 
       if (resourceDependencies.length === 0) {
@@ -360,6 +391,7 @@ export class AotCompilation extends TypeScriptCompilation {
       this.#state?.diagnosticCache,
       filesWithoutDtsSignature,
       useFallbackRootNames,
+      missingResourceDependencies,
     );
 
     return {

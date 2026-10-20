@@ -114,20 +114,27 @@ export async function compileLibrary(
       processWebWorker: () => '',
     };
 
-    const { referencedFiles, compilerOptions } = await compilationInstance.initialize(
-      tsConfigPath,
-      hostOptions,
-      {
-        sourcemap: true,
-        preserveSymlinks,
-        rootFiles,
-        declarationMap,
-        compilationMode,
-        paths: entryPathsMap,
-        cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
-      },
-      'library',
-    );
+    const { referencedFiles, compilerOptions, componentResourcesDependencies } =
+      await compilationInstance.initialize(
+        tsConfigPath,
+        hostOptions,
+        {
+          sourcemap: true,
+          preserveSymlinks,
+          rootFiles,
+          declarationMap,
+          compilationMode,
+          paths: entryPathsMap,
+          cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
+        },
+        'library',
+      );
+
+    if (componentResourcesDependencies) {
+      for (const [containingFile, resourceFiles] of componentResourcesDependencies) {
+        buildState.addFileReferences(containingFile, resourceFiles);
+      }
+    }
 
     const hasStylesheetErrors = stylesheetErrors.length > 0;
     const emittedFiles = hasStylesheetErrors ? [] : await compilationInstance.emitAffectedFiles();

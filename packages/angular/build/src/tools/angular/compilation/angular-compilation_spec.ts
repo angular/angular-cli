@@ -7,7 +7,7 @@
  */
 
 import ts from 'typescript';
-import type { AngularHostOptions } from '../angular-host';
+import { type AngularHostOptions, createAngularCompilerHost } from '../angular-host';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
 import {
@@ -478,6 +478,33 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.supportJitMode).toBe(true);
       expect(compilerOptions.noEmitOnError).toBe(false);
       expect(compilerOptions.composite).toBe(false);
+    });
+  });
+
+  describe('createAngularCompilerHost', () => {
+    it('records missing non-TypeScript component resources in missingResourceFiles', () => {
+      const missingResourceFiles = new Map<string, Set<string>>();
+      const hostOptions: AngularHostOptions = {
+        missingResourceFiles,
+        transformStylesheet: async () => null,
+        processWebWorker: (workerFile) => workerFile,
+      };
+
+      const host = createAngularCompilerHost(ts, {}, hostOptions, undefined);
+      spyOn(host, 'fileExists').and.returnValue(false);
+
+      expect(
+        host.resourceNameToFileName?.('./missing.component.html', '/src/app/my.component.ts'),
+      ).toBeNull();
+      expect(
+        host.resourceNameToFileName?.('./missing.component.scss', '/src/app/my.component.ts'),
+      ).toBeNull();
+      expect(host.resourceNameToFileName?.('./ignored.ts', '/src/app/my.component.ts')).toBeNull();
+
+      expect(Array.from(missingResourceFiles.get('/src/app/my.component.ts') ?? [])).toEqual([
+        '/src/app/missing.component.html',
+        '/src/app/missing.component.scss',
+      ]);
     });
   });
 });
