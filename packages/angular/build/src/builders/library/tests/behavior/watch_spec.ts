@@ -905,41 +905,5 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
-
-    it('should recompile bundles when compilationMode and declarationMap change in tsconfig in watch mode', async () => {
-      harness.useTarget('build', {
-        ...BASE_OPTIONS,
-        watch: true,
-      });
-
-      await harness.executeWithCases([
-        async ({ result }) => {
-          expect(result?.success).toBeTrue();
-          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain('ɵɵngDeclareComponent');
-          expect(harness.hasFile('dist/lib/types/lib.d.ts.map')).toBeFalse();
-
-          await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
-            const tsconfig = JSON.parse(content);
-            tsconfig.compilerOptions = {
-              ...tsconfig.compilerOptions,
-              declarationMap: true,
-            };
-            tsconfig.angularCompilerOptions = {
-              ...tsconfig.angularCompilerOptions,
-              compilationMode: 'full',
-            };
-
-            return JSON.stringify(tsconfig, null, 2);
-          });
-        },
-        ({ result }) => {
-          expect(result?.success).toBeTrue();
-          const mjs = harness.readFile('dist/lib/fesm2022/lib.mjs');
-          expect(mjs).toContain('ɵɵdefineComponent');
-          expect(mjs).not.toContain('ɵɵngDeclareComponent');
-          expect(harness.hasFile('dist/lib/types/lib.d.ts.map')).toBeTrue();
-        },
-      ]);
-    });
   });
 });
