@@ -80,6 +80,7 @@ class AngularCompilationState {
     public readonly webWorkerTransform: ts.TransformerFactory<ts.SourceFile>,
     public readonly useTypeScriptTranspilation: boolean,
     public readonly diagnosticCache = new WeakMap<ts.SourceFile, ts.Diagnostic[]>(),
+    public readonly declarationDiagnostics = new WeakMap<ts.SourceFile, readonly ts.Diagnostic[]>(),
     public readonly filesWithoutDtsSignature = new Set<string>(),
     public readonly useFallbackRootNames = false,
   ) {}
@@ -358,6 +359,7 @@ export class AotCompilation extends TypeScriptCompilation {
       createWorkerTransformer(hostOptions.processWebWorker.bind(hostOptions)),
       useTypeScriptTranspilation,
       this.#state?.diagnosticCache,
+      this.#state?.declarationDiagnostics,
       filesWithoutDtsSignature,
       useFallbackRootNames,
     );
@@ -377,6 +379,7 @@ export class AotCompilation extends TypeScriptCompilation {
     const {
       affectedFiles,
       angularCompiler,
+      declarationDiagnostics,
       diagnosticCache,
       templateDiagnosticsOptimization,
       typeScriptProgram,
@@ -422,9 +425,14 @@ export class AotCompilation extends TypeScriptCompilation {
           true,
         );
 
-        // Declaration files cannot have template diagnostics
+        // Declaration files cannot have template or declaration emit diagnostics
         if (sourceFile.isDeclarationFile) {
           continue;
+        }
+
+        const fileDeclarationDiagnostics = declarationDiagnostics.get(sourceFile);
+        if (fileDeclarationDiagnostics) {
+          yield* fileDeclarationDiagnostics;
         }
 
         // Only request Angular template diagnostics for affected files to avoid
@@ -493,6 +501,7 @@ export class AotCompilation extends TypeScriptCompilation {
       affectedFiles,
       angularCompiler,
       compilerHost,
+      declarationDiagnostics,
       typeScriptProgram,
       webWorkerTransform,
       useTypeScriptTranspilation,
@@ -548,15 +557,22 @@ export class AotCompilation extends TypeScriptCompilation {
     // Emit is handled in write file callback when using TypeScript
     if (useTypeScriptTranspilation) {
       // TypeScript will loop until there are no more affected files in the program
-      while (
-        typeScriptProgram.emitNextAffectedFile(
+      while (true) {
+        const affectedEmitResult = typeScriptProgram.emitNextAffectedFile(
           writeFileCallback,
           undefined,
           undefined,
           transformers,
-        )
-      ) {
-        /* empty */
+        );
+        if (!affectedEmitResult) {
+          break;
+        }
+        if ('kind' in affectedEmitResult.affected) {
+          declarationDiagnostics.set(
+            affectedEmitResult.affected,
+            affectedEmitResult.result.diagnostics,
+          );
+        }
       }
     } else if (compilerOptions.tsBuildInfoFile) {
       // Manually get the builder state for the persistent cache
@@ -589,10 +605,18 @@ export class AotCompilation extends TypeScriptCompilation {
       }
 
       if (useTypeScriptTranspilation) {
-        const emitOnly = emittedDtsSourceFiles.has(sourceFile)
-          ? (EmitOnly.Js as unknown as boolean)
-          : undefined;
-        typeScriptProgram.emit(sourceFile, writeFileCallback, undefined, emitOnly, transformers);
+        const hasEmittedDts = emittedDtsSourceFiles.has(sourceFile);
+        const emitOnly = hasEmittedDts ? (EmitOnly.Js as unknown as boolean) : undefined;
+        const emitResult = typeScriptProgram.emit(
+          sourceFile,
+          writeFileCallback,
+          undefined,
+          emitOnly,
+          transformers,
+        );
+        if (!hasEmittedDts) {
+          declarationDiagnostics.set(sourceFile, emitResult.diagnostics);
+        }
         continue;
       }
 

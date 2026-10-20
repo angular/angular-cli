@@ -278,5 +278,45 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(dtsContent).toContain('LibComponent');
       expect(dtsContent).toContain('CACHED_BUILD');
     });
+
+    it('should report TypeScript declaration emit diagnostics', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/internal.ts': `
+          interface PrivateData {
+            value: number;
+          }
+
+          export const internalData: PrivateData = { value: 42 };
+        `,
+        'projects/lib/src/lib/feature.ts': `
+          import { internalData } from './internal';
+
+          export const data = internalData;
+        `,
+        'projects/lib/src/public-api.ts': `
+          export * from './lib/feature';
+          export * from './lib/lib.service';
+          export * from './lib/lib.component';
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result, logs } = await harness.executeOnce({ outputLogsOnFailure: false });
+      expect(result?.success).toBeFalse();
+      expect(logs).toContain(
+        jasmine.objectContaining({
+          level: 'error',
+          message: jasmine.stringMatching(/TS4023:.*PrivateData/),
+        }),
+      );
+      expect(logs).not.toContain(
+        jasmine.objectContaining({
+          message: jasmine.stringContaining('UNRESOLVED_IMPORT'),
+        }),
+      );
+    });
   });
 });

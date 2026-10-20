@@ -905,5 +905,84 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
+
+    it('should preserve and recover from TypeScript declaration emit diagnostics in watch mode', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/internal.ts': `
+          interface PrivateData {
+            value: number;
+          }
+
+          export const internalData: PrivateData = { value: 42 };
+        `,
+        'projects/lib/src/lib/feature.ts': `
+          import { internalData } from './internal';
+
+          export const data = internalData;
+        `,
+        'projects/lib/src/public-api.ts': `
+          export * from './lib/feature';
+          export * from './lib/lib.service';
+          export * from './lib/lib.component';
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases(
+        [
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expect(logs).toContain(
+              jasmine.objectContaining({
+                level: 'error',
+                message: jasmine.stringMatching(/TS4023:.*PrivateData/),
+              }),
+            );
+
+            // Modify an unrelated file so feature.ts is not re-emitted
+            await harness.writeFile(
+              'projects/lib/src/lib/lib.service.ts',
+              `
+              import { Injectable } from '@angular/core';
+
+              @Injectable({ providedIn: 'root' })
+              export class LibService {
+                updated = true;
+              }
+              `,
+            );
+          },
+          async ({ result, logs }) => {
+            expect(result?.success).toBeFalse();
+            expect(logs).toContain(
+              jasmine.objectContaining({
+                level: 'error',
+                message: jasmine.stringMatching(/TS4023:.*PrivateData/),
+              }),
+            );
+
+            // Fix the declaration error in feature.ts by adding an explicit type annotation
+            await harness.writeFile(
+              'projects/lib/src/lib/feature.ts',
+              `
+              import { internalData } from './internal';
+
+              export const data: { value: number } = internalData;
+              `,
+            );
+          },
+          ({ result }) => {
+            expect(result?.success).toBeTrue();
+            const dtsContent = harness.readFile('dist/lib/types/lib.d.ts');
+            expect(dtsContent).toContain('data');
+          },
+        ],
+        { outputLogsOnFailure: false },
+      );
+    });
   });
 });
