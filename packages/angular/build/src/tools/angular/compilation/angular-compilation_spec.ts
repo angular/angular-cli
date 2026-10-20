@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import path from 'node:path';
 import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
@@ -476,8 +477,36 @@ describe('AngularCompilation', () => {
       expect(compilerOptions['_useTypeScriptTranspilation']).toBe(true);
       expect(compilerOptions.supportTestBed).toBe(true);
       expect(compilerOptions.supportJitMode).toBe(true);
+      expect(compilerOptions.noEmit).toBe(false);
       expect(compilerOptions.noEmitOnError).toBe(false);
+      expect(compilerOptions.emitDeclarationOnly).toBe(false);
       expect(compilerOptions.composite).toBe(false);
+    });
+
+    it('enforces library compiler options and skips app-only target warning', () => {
+      const { compilerOptions, warnings } = transformCompilerOptions(
+        ts,
+        {
+          target: ts.ScriptTarget.ES2020,
+          noEmit: true,
+          emitDeclarationOnly: true,
+          isolatedModules: true,
+        },
+        {
+          cachePath: '/tmp/cache',
+        },
+        'tsconfig.lib.json',
+        'library',
+      );
+
+      expect(compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(compilerOptions.module).toBe(ts.ModuleKind.Preserve);
+      expect(compilerOptions.useDefineForClassFields).toBeUndefined();
+      expect(compilerOptions.noEmit).toBe(false);
+      expect(compilerOptions.emitDeclarationOnly).toBe(false);
+      expect(compilerOptions.incremental).toBe(true);
+      expect(compilerOptions.tsBuildInfoFile).toBe(path.join('/tmp/cache', '.tsbuildinfo'));
+      expect(warnings).toEqual([]);
     });
   });
 });
