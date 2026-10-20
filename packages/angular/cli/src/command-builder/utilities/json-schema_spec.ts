@@ -382,9 +382,10 @@ describe('parseJsonSchemaToOptions', () => {
       const registry = new schema.CoreSchemaRegistry();
       const options = await parseJsonSchemaToOptions(registry, jsonSchema, /* interactive= */ true);
 
-      expect(options.filter((opt) => opt.positional !== undefined)).toEqual([
+      expect(options).toEqual([
         jasmine.objectContaining({ name: 'preset', positional: 0, required: false }),
         jasmine.objectContaining({ name: 'name', positional: 1, required: false }),
+        jasmine.objectContaining({ name: 'path', positional: undefined, required: false }),
       ]);
     });
   });
