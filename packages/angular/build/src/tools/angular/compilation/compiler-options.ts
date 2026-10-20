@@ -37,7 +37,7 @@ export function transformCompilerOptions(
 ): { compilerOptions: ng.CompilerOptions; warnings: PartialMessage[] } {
   const compilerOptions = { ...baseCompilerOptions };
   const warnings: PartialMessage[] = [];
-  const isLibrary = buildType === 'library' || !!baseCompilerOptions.declaration;
+  const isLibrary = buildType === 'library';
 
   if (
     !isLibrary &&
