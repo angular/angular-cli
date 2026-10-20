@@ -17,6 +17,15 @@ import { isSubDirectory } from './path';
  */
 export const DEFAULT_ASSET_IGNORE = ['**/.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
 
+function resolveDestination(output: string, file: string, flatten?: boolean): string {
+  const destination = path.join(output, flatten ? path.basename(file) : file);
+  if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
+    throw new Error('An asset cannot be written to a location outside of the output path.');
+  }
+
+  return destination;
+}
+
 export async function resolveAssets(
   entries: {
     glob: string;
@@ -47,13 +56,12 @@ export async function resolveAssets(
         }
 
         if (stats.isFile()) {
-          const filePath = entry.flatten ? path.basename(entry.glob) : entry.glob;
-          const destination = path.join(entry.output, filePath);
-          if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
-            throw new Error('An asset cannot be written to a location outside of the output path.');
-          }
-
-          return [{ source: src, destination }];
+          return [
+            {
+              source: src,
+              destination: resolveDestination(entry.output, entry.glob, entry.flatten),
+            },
+          ];
         }
 
         if (!stats.isSymbolicLink()) {
@@ -69,17 +77,10 @@ export async function resolveAssets(
       followSymbolicLinks: entry.followSymlinks ?? false,
     });
 
-    return files.map((file) => {
-      const destination = path.join(entry.output, entry.flatten ? path.basename(file) : file);
-      if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
-        throw new Error('An asset cannot be written to a location outside of the output path.');
-      }
-
-      return {
-        source: path.join(cwd, file),
-        destination,
-      };
-    });
+    return files.map((file) => ({
+      source: path.join(cwd, file),
+      destination: resolveDestination(entry.output, file, entry.flatten),
+    }));
   });
 
   return resolvedEntries.flat();
