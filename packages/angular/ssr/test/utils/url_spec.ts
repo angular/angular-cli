@@ -189,7 +189,7 @@ describe('URL Utils', () => {
     });
 
     it('should replace a positional placeholder followed by a query or fragment', () => {
-      expect(buildPathWithParams('/user/*1?tab=1', '/a')).toBe('/user/a?tab=1');
+      expect(buildPathWithParams('/user/*1?returnTo=/a//b/', '/a')).toBe('/user/a?returnTo=/a//b/');
       expect(buildPathWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
     });
 

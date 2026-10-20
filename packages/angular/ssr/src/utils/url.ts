@@ -153,10 +153,9 @@ export function stripIndexHtmlFromURL(url: URL): URL {
 }
 
 /**
- * Matches a `*<n>` placeholder that makes up a whole path segment, which may be followed by
- * the query or fragment of the URL.
+ * Matches a `*<n>` placeholder that makes up a whole path segment.
  */
-const POSITIONAL_PLACEHOLDER_REGEXP = /^\*(\d+)(?=[?#]|$)/;
+const POSITIONAL_PLACEHOLDER_REGEXP = /^\*(\d+)$/;
 
 /**
  * Resolves `*` placeholders in a path template by mapping them to corresponding segments
@@ -201,19 +200,20 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
     throw new Error(`Invalid fromPath: The string must start with a '/'. Received: '${fromPath}'`);
   }
 
-  if (!toPath.includes('/*')) {
+  const [path] = toPath.split(/[?#]/, 1);
+  if (!path.includes('/*')) {
     return toPath;
   }
 
   const fromPathParts = fromPath.split('/');
-  const toPathParts = toPath.split('/');
+  const toPathParts = path.split('/');
   const resolvedParts = toPathParts.map((part, index) =>
     part === '*'
       ? fromPathParts[index]
       : part.replace(POSITIONAL_PLACEHOLDER_REGEXP, (_, position) => fromPathParts[position]),
   );
 
-  return joinUrlParts(...resolvedParts);
+  return joinUrlParts(...resolvedParts) + toPath.slice(path.length);
 }
 
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;

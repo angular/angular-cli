@@ -714,6 +714,22 @@ describe('extractRoutesAndCreateRouteTree', () => {
     ]);
   });
 
+  it('should error when a redirect target uses a parameter not defined by the route', async () => {
+    setAngularAppTestingManifest(
+      [
+        {
+          path: ':lang',
+          children: [{ path: 'user/:id', redirectTo: 'profile/:lang' }],
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(1);
+    expect(errors[0]).toContain(`Cannot redirect to 'profile/:lang'. Cannot find ':lang'.`);
+  });
+
   it('should resolve multi-segment relative redirects against the parent route', async () => {
     setAngularAppTestingManifest(
       [
