@@ -262,7 +262,7 @@ describe('generatePackageManifests', () => {
           './styles.css': './styles.css',
           './scss/*': './scss/*',
           '.': {
-            development: './src/index.ts',
+            development: './fesm2022/my-lib-dev.mjs',
           },
         },
       },
@@ -277,10 +277,150 @@ describe('generatePackageManifests', () => {
       './package.json': { default: './package.json' },
       '.': {
         types: './types/my-lib.d.ts',
-        development: './src/index.ts',
+        development: './fesm2022/my-lib-dev.mjs',
         default: './fesm2022/my-lib.mjs',
       },
     });
+  });
+
+  it('should handle root conditional exports without spreading condition keys at top level', async () => {
+    const options = createOptions({
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+        exports: {
+          default: './src/public-api.ts',
+          custom: './custom.mjs',
+        },
+      },
+    });
+
+    const files = await generatePackageManifests(options, false);
+    const result = getRootPackageJson(files);
+
+    expect(result.exports).toEqual({
+      '.': {
+        types: './types/my-lib.d.ts',
+        custom: './custom.mjs',
+        default: './fesm2022/my-lib.mjs',
+      },
+      './package.json': { default: './package.json' },
+    });
+  });
+
+  it('should normalize subpath keys in user exports and merge conditions for secondary entry points', async () => {
+    const options1 = createOptions(
+      {
+        packageJson: {
+          name: 'my-lib',
+          version: '1.0.0',
+          exports: {
+            '.': './src/public-api.ts',
+            testing: './testing/src/public-api.ts',
+          },
+        },
+      },
+      true,
+    );
+
+    const result1 = getRootPackageJson(await generatePackageManifests(options1, false));
+    expect(result1.exports).toEqual({
+      '.': {
+        types: './types/my-lib.d.ts',
+        default: './fesm2022/my-lib.mjs',
+      },
+      './package.json': { default: './package.json' },
+      './testing': {
+        types: './types/my-lib-testing.d.ts',
+        default: './fesm2022/my-lib-testing.mjs',
+      },
+    });
+
+    const options2 = createOptions(
+      {
+        packageJson: {
+          name: 'my-lib',
+          version: '1.0.0',
+          exports: {
+            './': './src/public-api.ts',
+            './testing/': {
+              custom: './testing/custom.mjs',
+              default: './testing/src/public-api.ts',
+            },
+          },
+        },
+      },
+      true,
+    );
+
+    const result2 = getRootPackageJson(await generatePackageManifests(options2, false));
+    expect(result2.exports).toEqual({
+      '.': {
+        types: './types/my-lib.d.ts',
+        default: './fesm2022/my-lib.mjs',
+      },
+      './package.json': { default: './package.json' },
+      './testing': {
+        types: './types/my-lib-testing.d.ts',
+        custom: './testing/custom.mjs',
+        default: './fesm2022/my-lib-testing.mjs',
+      },
+    });
+  });
+
+  it('should omit user export conditions pointing to .ts or .mts source files', async () => {
+    const options = createOptions({
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+        exports: {
+          '.': {
+            import: './src/public-api.ts',
+            module: './src/public-api.mts',
+            development: './src/index.ts',
+            customTypes: './custom.d.ts',
+            custom: './custom.mjs',
+            default: './src/public-api.ts',
+          },
+        },
+      },
+    });
+
+    const files = await generatePackageManifests(options, false);
+    const result = getRootPackageJson(files);
+
+    expect(result.exports).toEqual({
+      '.': {
+        types: './types/my-lib.d.ts',
+        customTypes: './custom.d.ts',
+        custom: './custom.mjs',
+        default: './fesm2022/my-lib.mjs',
+      },
+      './package.json': { default: './package.json' },
+    });
+  });
+
+  it('should ensure "." and "./package.json" appear first in exports even if "./package.json" is listed before "."', async () => {
+    const options = createOptions({
+      packageJson: {
+        name: 'my-lib',
+        version: '1.0.0',
+        exports: {
+          './styles.css': './styles.css',
+          './package.json': './package.json',
+          '.': './src/public-api.ts',
+        },
+      },
+    });
+
+    const files = await generatePackageManifests(options, false);
+    const result = getRootPackageJson(files);
+
+    expect(Object.keys(result.exports as Record<string, unknown>)).toEqual([
+      '.',
+      './package.json',
+      './styles.css',
+    ]);
   });
 
   it('should default sideEffects to false if not specified, and preserve when set', async () => {
@@ -306,6 +446,18 @@ describe('generatePackageManifests', () => {
       false,
     );
     expect(getRootPackageJson(files2).sideEffects).toEqual(['*.css']);
+
+    const files3 = await generatePackageManifests(
+      createOptions({
+        packageJson: {
+          name: 'my-lib',
+          version: '1.0.0',
+          sideEffects: true,
+        },
+      }),
+      false,
+    );
+    expect(getRootPackageJson(files3).sideEffects).toBeTrue();
   });
 
   it('should conditionally inject tslib into dependencies only when hasTslibImport is true', async () => {

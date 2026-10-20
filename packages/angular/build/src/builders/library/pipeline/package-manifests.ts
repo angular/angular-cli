@@ -8,6 +8,7 @@
 
 import { createRequire } from 'node:module';
 import path from 'node:path';
+import { toPosixPath } from '../../../utils/path';
 import type { NormalizedLibraryOptions, PackageJsonData } from '../types';
 import {
   FESM_OUTPUT_DIR,
@@ -16,6 +17,25 @@ import {
   createMemoryOutputFile,
   loadPackageJson,
 } from './utils';
+
+const TS_SOURCE_FILE_REGEX = /(?<!\.d)\.m?ts$/;
+
+/**
+ * Normalizes an export subpath key to a canonical relative subpath (e.g., `'.'` or `'./testing'`).
+ *
+ * @param key Raw export subpath key from `package.json`.
+ * @returns The normalized POSIX subpath key.
+ */
+function normalizeExportSubpathKey(key: string): string {
+  const posixKey = toPosixPath(key);
+  if (posixKey === '.') {
+    return '.';
+  }
+
+  const normalized = (posixKey.startsWith('./') ? posixKey : `./${posixKey}`).replace(/\/+$/, '');
+
+  return normalized || '.';
+}
 
 /**
  * Generates the APF package.json and secondary entry point package.json manifests.
@@ -42,13 +62,6 @@ export async function generatePackageManifests(
     ...restPackageJson
   } = rawPackageJson;
 
-  const exportsMap: Record<string, unknown> = {
-    ...(typeof userExports === 'object' && userExports !== null && !Array.isArray(userExports)
-      ? userExports
-      : {}),
-    './package.json': { default: './package.json' },
-  };
-
   const primaryEntryPoint = options.entryPoints.get('.');
   if (!primaryEntryPoint) {
     throw new Error(`Primary entry point '.' was not found in entryPoints.`);
@@ -60,7 +73,29 @@ export async function generatePackageManifests(
   const primaryFesm = `./${FESM_OUTPUT_DIR}/${primaryName}.mjs`;
   const primaryDts = `./${TYPES_OUTPUT_DIR}/${primaryName}.d.ts`;
 
-  exportsMap['.'] = createExportConditions(exportsMap['.'], primaryDts, primaryFesm);
+  const normalizedUserExports: Record<string, unknown> = {};
+  if (typeof userExports === 'object' && userExports !== null && !Array.isArray(userExports)) {
+    const keys = Object.keys(userExports);
+    if (keys.length > 0 && !keys.some((k) => k.startsWith('.'))) {
+      normalizedUserExports['.'] = userExports;
+    } else {
+      for (const [key, value] of Object.entries(userExports)) {
+        normalizedUserExports[normalizeExportSubpathKey(key)] = value;
+      }
+    }
+  }
+
+  const {
+    '.': primaryUserExport,
+    './package.json': _pkgJsonExport,
+    ...otherUserExports
+  } = normalizedUserExports;
+
+  const exportsMap: Record<string, unknown> = {
+    '.': createExportConditions(primaryUserExport, primaryDts, primaryFesm),
+    './package.json': { default: './package.json' },
+    ...otherUserExports,
+  };
 
   const distPackageJson: PackageJsonData = {
     ...restPackageJson,
@@ -174,11 +209,22 @@ function createExportConditions(
       ? (existingConditions as Record<string, unknown>)
       : {};
 
-  const { types: _types, default: _default, ...otherConditions } = existing;
+  const customConditions: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(existing)) {
+    if (key === 'types' || key === 'default') {
+      continue;
+    }
+
+    if (typeof value === 'string' && TS_SOURCE_FILE_REGEX.test(value)) {
+      continue;
+    }
+
+    customConditions[key] = value;
+  }
 
   return {
     types: dtsPath,
-    ...otherConditions,
+    ...customConditions,
     default: fesmPath,
   };
 }
