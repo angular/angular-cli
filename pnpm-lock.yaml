@@ -366,7 +366,7 @@ importers:
         version: 5.1.14(@types/node@24.9.1)
       '@vitejs/plugin-basic-ssl':
         specifier: 2.1.0
-        version: 2.1.0(vite@7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1))
+        version: 2.1.0(vite@7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1))
       beasties:
         specifier: 0.3.5
         version: 0.3.5
@@ -419,8 +419,8 @@ importers:
         specifier: 0.2.14
         version: 0.2.14
       vite:
-        specifier: 7.3.6
-        version: 7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
+        specifier: 7.3.7
+        version: 7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
       watchpack:
         specifier: 2.4.4
         version: 2.4.4
@@ -9273,8 +9273,8 @@ packages:
       yaml:
         optional: true
 
-  vite@7.3.6:
-    resolution: {integrity: sha512-4XP60spRGjSZFf1qYH+dJIkK2znL3zQfl9KkOV9MkkRR/3Dls0dxaBsQPTloEc5BLXWPL9vsOxopxyKoMmDueg==}
+  vite@7.3.7:
+    resolution: {integrity: sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==}
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
@@ -13263,9 +13263,9 @@ snapshots:
       lodash: 4.17.21
       minimatch: 7.4.6
 
-  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1))':
+  '@vitejs/plugin-basic-ssl@2.1.0(vite@7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1))':
     dependencies:
-      vite: 7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
+      vite: 7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
 
   '@vitest/expect@3.2.4':
     dependencies:
@@ -19364,7 +19364,7 @@ snapshots:
       debug: 4.4.3(supports-color@10.2.2)
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
+      vite: 7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -19397,7 +19397,7 @@ snapshots:
       tsx: 4.20.6
       yaml: 2.8.1
 
-  vite@7.3.6(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1):
+  vite@7.3.7(@types/node@24.9.1)(jiti@1.21.7)(less@4.9.0)(sass@1.90.0)(terser@5.51.2)(tsx@4.20.6)(yaml@2.8.1):
     dependencies:
       esbuild: 0.28.1
       fdir: 6.5.0(picomatch@4.0.4)
