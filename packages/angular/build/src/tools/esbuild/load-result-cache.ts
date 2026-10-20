@@ -7,7 +7,7 @@
  */
 
 import type { OnLoadResult, PluginBuild } from 'esbuild';
-import { normalize } from 'node:path';
+import { dirname, normalize } from 'node:path';
 
 export interface LoadResultCache {
   get(path: string): OnLoadResult | Promise<OnLoadResult | undefined> | undefined;
@@ -108,16 +108,27 @@ export class MemoryLoadResultCache implements LoadResultCache {
   }
 
   invalidate(path: string): boolean {
-    const affectedPaths = this.#fileDependencies.get(path);
-    if (!affectedPaths) {
-      return false;
+    let invalid = false;
+
+    // Check parent directories to support directory dependencies (PostCSS `dir-dependency`)
+    let current = normalize(path);
+    while (true) {
+      const affectedPaths = this.#fileDependencies.get(current);
+      if (affectedPaths) {
+        for (const affected of affectedPaths) {
+          this.#loadResults.delete(affected);
+        }
+        invalid = true;
+      }
+
+      const parent = dirname(current);
+      if (parent === current) {
+        break;
+      }
+      current = parent;
     }
 
-    for (const affected of affectedPaths) {
-      this.#loadResults.delete(affected);
-    }
-
-    return true;
+    return invalid;
   }
 
   get watchFiles(): string[] {

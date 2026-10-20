@@ -55,6 +55,22 @@ describe('MemoryLoadResultCache', () => {
     expect(cache.get('file:/test/styles.css')).toBeUndefined();
   });
 
+  it('should invalidate cached results when a file inside a dependency directory changes', async () => {
+    const result = {
+      contents: 'body { color: red; }',
+      loader: 'css' as const,
+      watchFiles: ['/test/styles.css', '/test/src'],
+    };
+
+    await cache.put('file:/test/styles.css', result);
+
+    expect(cache.invalidate('/test/other/a.ts')).toBeFalse();
+    expect(cache.get('file:/test/styles.css')).toBe(result);
+
+    expect(cache.invalidate('/test/src/app/new/a.ts')).toBeTrue();
+    expect(cache.get('file:/test/styles.css')).toBeUndefined();
+  });
+
   it('should preserve previous watch files when caching an error result', async () => {
     const successResult = {
       contents: 'body { color: red; }',

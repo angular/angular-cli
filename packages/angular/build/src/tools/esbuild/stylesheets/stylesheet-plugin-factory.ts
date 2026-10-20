@@ -401,6 +401,8 @@ async function compileString(
         typeof resultMessage['glob'] === 'string'
       ) {
         loadResult.watchFiles ??= [];
+        // Watch the directory itself so files added or moved into it later also cause a rebuild
+        loadResult.watchFiles.push(resultMessage['dir']);
         const dependencies = await glob(resultMessage['glob'], {
           absolute: true,
           cwd: resultMessage['dir'],
