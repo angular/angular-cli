@@ -15,7 +15,7 @@ import { isSubDirectory } from './path';
 /**
  * Default glob ignore patterns for assets.
  */
-export const DEFAULT_ASSET_IGNORE = ['.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
+export const DEFAULT_ASSET_IGNORE = ['**/.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
 
 export async function resolveAssets(
   entries: {
@@ -38,19 +38,25 @@ export async function resolveAssets(
     if (!entry.ignore?.length && !isDynamicPattern(entry.glob)) {
       const src = path.join(cwd, entry.glob);
       if (isSubDirectory(cwd, src)) {
+        let stats;
         try {
-          const stats = await (entry.followSymlinks ? stat(src) : lstat(src));
-          if (stats.isFile()) {
-            const filePath = entry.flatten ? path.basename(entry.glob) : entry.glob;
-
-            return [{ source: src, destination: path.join(entry.output, filePath) }];
-          }
-
-          if (!stats.isSymbolicLink()) {
-            return [];
-          }
+          stats = await (entry.followSymlinks ? stat(src) : lstat(src));
         } catch {
           // File does not exist or cannot be accessed.
+          return [];
+        }
+
+        if (stats.isFile()) {
+          const filePath = entry.flatten ? path.basename(entry.glob) : entry.glob;
+          const destination = path.join(entry.output, filePath);
+          if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
+            throw new Error('An asset cannot be written to a location outside of the output path.');
+          }
+
+          return [{ source: src, destination }];
+        }
+
+        if (!stats.isSymbolicLink()) {
           return [];
         }
       }
@@ -63,10 +69,17 @@ export async function resolveAssets(
       followSymbolicLinks: entry.followSymlinks ?? false,
     });
 
-    return files.map((file) => ({
-      source: path.join(cwd, file),
-      destination: path.join(entry.output, entry.flatten ? path.basename(file) : file),
-    }));
+    return files.map((file) => {
+      const destination = path.join(entry.output, entry.flatten ? path.basename(file) : file);
+      if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
+        throw new Error('An asset cannot be written to a location outside of the output path.');
+      }
+
+      return {
+        source: path.join(cwd, file),
+        destination,
+      };
+    });
   });
 
   return resolvedEntries.flat();
