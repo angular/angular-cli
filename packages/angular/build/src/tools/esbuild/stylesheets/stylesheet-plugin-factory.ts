@@ -111,14 +111,54 @@ export interface StylesheetLanguage {
  */
 const postcssProcessors = new Map<string, WeakRef<PostcssProcessor>>();
 
+/**
+ * Cached PostCSS `dir-dependency` glob results keyed by `LoadResultCache` instance, allowing
+ * multiple `StylesheetPluginFactory` instances sharing a load cache to deduplicate directory scans.
+ */
+const dirDependencyCaches = new WeakMap<LoadResultCache, Map<string, Promise<string[]>>>();
+
+function getDirDependencyCache(cache?: LoadResultCache): Map<string, Promise<string[]>> {
+  if (!cache) {
+    return new Map();
+  }
+
+  let dirDependencyCache = dirDependencyCaches.get(cache);
+  if (!dirDependencyCache) {
+    dirDependencyCache = new Map();
+    dirDependencyCaches.set(cache, dirDependencyCache);
+
+    const originalInvalidate = cache.invalidate.bind(cache);
+    cache.invalidate = (path: string) => {
+      dirDependencyCache?.clear();
+
+      return originalInvalidate(path);
+    };
+
+    if ('clear' in cache && typeof cache.clear === 'function') {
+      const originalClear = cache.clear.bind(cache);
+      cache.clear = () => {
+        dirDependencyCache?.clear();
+        originalClear();
+      };
+    }
+  }
+
+  return dirDependencyCache;
+}
+
 export class StylesheetPluginFactory {
+  readonly #dirDependencyCache: Map<string, Promise<string[]>>;
+
   constructor(
     private readonly options: StylesheetPluginOptions,
     private readonly cache?: LoadResultCache,
-  ) {}
+  ) {
+    this.#dirDependencyCache = getDirDependencyCache(cache);
+  }
 
   create(language: Readonly<StylesheetLanguage>): Plugin {
     const { cache, options, setupPostcss } = this;
+    const dirDependencyCache = this.#dirDependencyCache;
 
     // Return a noop plugin if no load actions are required
     if (!language.process && !options.postcssConfiguration && !options.tailwindConfiguration) {
@@ -134,6 +174,10 @@ export class StylesheetPluginFactory {
         // Setup postcss if needed
         let postcssProcessor: PostcssProcessor | undefined;
         build.onStart(async () => {
+          if (!cache) {
+            dirDependencyCache.clear();
+          }
+
           try {
             postcssProcessor = await setupPostcss;
           } catch {
@@ -175,6 +219,7 @@ export class StylesheetPluginFactory {
               options,
               build,
               postcssProcessor,
+              dirDependencyCache,
             );
           }),
         );
@@ -193,6 +238,7 @@ export class StylesheetPluginFactory {
               options,
               build,
               postcssProcessor,
+              dirDependencyCache,
             );
           }),
         );
@@ -264,6 +310,7 @@ async function processStylesheet(
   options: StylesheetPluginOptions,
   build: PluginBuild,
   postcssProcessor: PostcssProcessor | undefined,
+  dirDependencyCache: Map<string, Promise<string[]>>,
 ) {
   let result: OnLoadResult;
 
@@ -292,6 +339,7 @@ async function processStylesheet(
       filename,
       postcssProcessor,
       options,
+      dirDependencyCache,
     );
 
     // Merge results
@@ -348,6 +396,7 @@ async function compileString(
   filename: string,
   postcssProcessor: import('postcss').Processor,
   options: StylesheetPluginOptions,
+  dirDependencyCache: Map<string, Promise<string[]>>,
 ): Promise<OnLoadResult> {
   try {
     const postcssResult = await postcssProcessor.process(data, {
@@ -401,10 +450,21 @@ async function compileString(
         typeof resultMessage['glob'] === 'string'
       ) {
         loadResult.watchFiles ??= [];
-        const dependencies = await glob(resultMessage['glob'], {
-          absolute: true,
-          cwd: resultMessage['dir'],
-        });
+        const dir = resultMessage['dir'];
+        const globPattern = resultMessage['glob'];
+        const cacheKey = `${dir}\0${globPattern}`;
+        let dependenciesPromise = dirDependencyCache.get(cacheKey);
+        if (!dependenciesPromise) {
+          dependenciesPromise = glob(globPattern, {
+            absolute: true,
+            cwd: dir,
+          }).catch((error) => {
+            dirDependencyCache.delete(cacheKey);
+            throw error;
+          });
+          dirDependencyCache.set(cacheKey, dependenciesPromise);
+        }
+        const dependencies = await dependenciesPromise;
         loadResult.watchFiles.push(...dependencies);
       }
     }
