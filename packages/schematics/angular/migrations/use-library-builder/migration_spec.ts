@@ -281,6 +281,7 @@ describe('Migration to use the library builder', () => {
   });
 
   it('should migrate assets, styleIncludePaths, and sass options from ng-package.json', async () => {
+    tree.create('/projects/my-lib/CHANGELOG.md', '# Changelog');
     tree.overwrite(
       '/projects/my-lib/ng-package.json',
       JSON.stringify(
@@ -322,6 +323,48 @@ describe('Migration to use the library builder', () => {
         silenceDeprecations: ['import'],
       },
     });
+  });
+
+  it('should migrate ng-packagr glob string assets to glob objects', async () => {
+    tree.create('/projects/my-lib/docs/guide.md', '# Guide');
+    tree.create('/projects/my-lib/CHANGELOG.md', '# Changelog');
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({
+        assets: ['CHANGELOG.md', 'docs', 'docs/**/*.md'],
+        lib: { entryFile: 'src/public-api.ts' },
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.assets).toEqual([
+      'projects/my-lib/CHANGELOG.md',
+      'projects/my-lib/docs',
+      { glob: 'docs/**/*.md', input: 'projects/my-lib' },
+    ]);
+  });
+
+  it('should keep ng-packagr assets outside the project root as paths', async () => {
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({
+        assets: ['../../../shared-assets'],
+        lib: { entryFile: 'src/public-api.ts' },
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.assets).toEqual(['../shared-assets']);
   });
 
   it('should preserve existing stylePreprocessorOptions.includePaths when migrating styleIncludePaths', async () => {
