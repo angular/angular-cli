@@ -111,7 +111,7 @@ export class MemoryLoadResultCache implements LoadResultCache {
     let invalid = false;
 
     // Check parent directories to support directory dependencies (PostCSS `dir-dependency`)
-    let current = path;
+    let current = normalize(path);
     while (true) {
       const affectedPaths = this.#fileDependencies.get(current);
       if (affectedPaths) {
