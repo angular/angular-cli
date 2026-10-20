@@ -303,7 +303,7 @@ function* extractFilesFromStack(stack: string): Iterable<string> {
     let path = '';
     let index = 0;
     while (index < segments.length && !segments[index].match(/\d+:\d+/)) {
-      path += segments[index++];
+      path += (path ? ' ' : '') + segments[index++];
     }
 
     if (path && index < segments.length) {
