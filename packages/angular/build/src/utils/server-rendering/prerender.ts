@@ -62,7 +62,6 @@ export async function prerenderPages(
   outputFiles: Readonly<BuildOutputFile[]>,
   assets: Readonly<BuildOutputAsset[]>,
   outputMode: OutputMode | undefined,
-  format: PrerenderFormat,
   sourcemap = false,
   maxThreads = 1,
 ): Promise<{
@@ -201,7 +200,7 @@ export async function prerenderPages(
     outputFilesForWorker,
     assetsReversed,
     outputMode,
-    format,
+    prerenderOptions?.format,
     appShellRoute ?? appShellOptions?.route,
   );
 
@@ -211,7 +210,11 @@ export async function prerenderPages(
   const baseHrefPathnameWithLeadingSlash = new URL(baseHref, 'http://localhost').pathname;
 
   for (const metadata of serializableRouteTreeNodeForPrerender) {
-    const outPath = getRouteOutPath(metadata.route, baseHrefPathnameWithLeadingSlash, format);
+    const outPath = getRouteOutPath(
+      metadata.route,
+      baseHrefPathnameWithLeadingSlash,
+      prerenderOptions?.format,
+    );
 
     if (output[outPath]) {
       prerenderedRoutes[metadata.route] = { headers: metadata.headers };
@@ -236,7 +239,7 @@ async function renderPages(
   outputFilesForWorker: Record<string, Uint8Array>,
   assetFilesForWorker: Record<string, string>,
   outputMode: OutputMode | undefined,
-  format: PrerenderFormat,
+  format: PrerenderFormat | undefined,
   appShellRoute: string | undefined,
 ): Promise<{
   output: PrerenderOutput;
@@ -459,7 +462,11 @@ function getRouteWithoutBaseHref(route: string, baseHrefPathname: string): strin
     : route;
 }
 
-function getRouteOutPath(route: string, baseHrefPathname: string, format: PrerenderFormat): string {
+function getRouteOutPath(
+  route: string,
+  baseHrefPathname: string,
+  format: PrerenderFormat | undefined,
+): string {
   const routeWithoutBaseHref = getRouteWithoutBaseHref(route, baseHrefPathname);
 
   if (format === PrerenderFormat.File && routeWithoutBaseHref !== '/') {

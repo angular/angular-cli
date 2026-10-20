@@ -80,7 +80,7 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expectNoLog(logs, 'The "prerender" option is not considered');
+      expectNoLog(logs, 'The "prerender" option has no effect');
 
       harness.expectFile('dist/browser/index.html').content.toContain('home works!');
       harness.expectFile('dist/browser/foo.html').content.toContain('foo works!');
