@@ -158,16 +158,17 @@ export class StylesheetPluginFactory {
         // Add a load callback to support inline Component styles
         build.onLoad(
           { filter: language.componentFilter, namespace: 'angular:styles/component' },
-          createCachedLoad(cache, (args) => {
+          createCachedLoad(cache, async (args) => {
             const data = options.inlineComponentData?.[args.path];
             assert(
               typeof data === 'string',
               `component style name should always be found [${args.path}]`,
             );
 
-            const [format, , filename] = args.path.split(';', 3);
+            const [format, , ...rest] = args.path.split(';');
+            const filename = rest.join(';');
 
-            return processStylesheet(
+            const result = await processStylesheet(
               language,
               data,
               filename,
@@ -176,6 +177,9 @@ export class StylesheetPluginFactory {
               build,
               postcssProcessor,
             );
+            result.resolveDir ??= dirname(filename);
+
+            return result;
           }),
         );
 
