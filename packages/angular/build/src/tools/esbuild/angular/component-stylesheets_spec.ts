@@ -38,7 +38,7 @@ describe('ComponentStylesheetBundler', () => {
         cacheOptions: { enabled: false, path: '', basePath: tempRoot },
       },
       'css',
-      false,
+      true,
     );
 
     const componentFile = join(tempRoot, 'src', 'lib', 'lib.component.ts');
@@ -52,7 +52,6 @@ describe('ComponentStylesheetBundler', () => {
       assert(result.errors, 'Expected bundleInline to report a resolution error');
       expect(result.errors.length).toBeGreaterThan(0);
       expect(result.errors[0].location?.file).toBe(componentFile);
-      expect(result.errors[0].location?.file).not.toContain('angular:styles/component:');
       expect(result.referencedFiles).toContain(componentFile);
     } finally {
       await bundler.dispose();
@@ -81,7 +80,6 @@ describe('ComponentStylesheetBundler', () => {
 
       expect(result.warnings.length).toBeGreaterThan(0);
       expect(result.warnings[0].location?.file).toBe(componentFile);
-      expect(result.warnings[0].location?.file).not.toContain('angular:styles/component:');
     } finally {
       await bundler.dispose();
     }

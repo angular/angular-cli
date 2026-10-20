@@ -177,21 +177,16 @@ export class ComponentStylesheetBundler {
     });
 
     const result = await bundlerContext.bundle();
-    const watchFile = path.isAbsolute(filename)
-      ? filename
-      : path.join(this.options.workspaceRoot, filename);
-    for (const message of [...(result.errors ?? []), ...(result.warnings ?? [])]) {
-      if (message.location?.file?.startsWith('angular:styles/component:')) {
-        message.location.file = filename;
-        if (result.errors) {
-          bundlerContext.watchFiles.add(watchFile);
-        }
+    if (result.errors || result.warnings.length > 0) {
+      if (this.incremental && result.errors) {
+        bundlerContext.watchFiles.add(
+          path.isAbsolute(filename) ? filename : path.join(this.options.workspaceRoot, filename),
+        );
       }
-      for (const note of message.notes ?? []) {
-        if (note.location?.file?.startsWith('angular:styles/component:')) {
-          note.location.file = filename;
-          if (result.errors) {
-            bundlerContext.watchFiles.add(watchFile);
+      for (const message of [...(result.errors ?? []), ...result.warnings]) {
+        for (const item of [message, ...(message.notes ?? [])]) {
+          if (item.location?.file?.startsWith('angular:styles/component:')) {
+            item.location.file = filename;
           }
         }
       }
