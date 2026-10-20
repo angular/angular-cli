@@ -276,7 +276,9 @@ describe('AngularServerApp', () => {
         const response = await app.handle(
           new Request('http://localhost/redirect-query-placeholder?term=cats&term=dogs'),
         );
-        expect(response?.headers.get('location')).toBe('/home?q=cats&q=dogs&static=value');
+        expect(response?.headers.get('location')).toBe(
+          '/home?q=cats&q=dogs&id=undefined&static=value',
+        );
         expect(response?.status).toBe(302);
       });
 

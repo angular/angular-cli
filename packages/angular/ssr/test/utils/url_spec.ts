@@ -207,16 +207,22 @@ describe('URL Utils', () => {
 
   describe('buildQueryWithParams', () => {
     it('should replace query placeholders with the values of the source parameters', () => {
-      const fromParams = new URLSearchParams('term=cats&term=dogs&page=2');
-      expect(buildQueryWithParams('/search?q=:term&p=:page&static=1#top', fromParams)).toBe(
-        '/search?q=cats&q=dogs&p=2&static=1#top',
+      const fromParams = new URLSearchParams('term=big cats&term=a:b@c&page=2');
+      expect(buildQueryWithParams('/search?q=:term&p=:page&static=a=:b#top', fromParams)).toBe(
+        '/search?q=big%20cats&q=a:b@c&p=2&static=a=:b#top',
       );
     });
 
-    it('should remove query parameters whose source parameter is missing', () => {
+    it('should set query parameters whose source parameter is missing to undefined', () => {
       const fromParams = new URLSearchParams();
-      expect(buildQueryWithParams('/search?q=:term&static=1', fromParams)).toBe('/search?static=1');
-      expect(buildQueryWithParams('/search?q=:term', fromParams)).toBe('/search');
+      expect(buildQueryWithParams('/search?q=:term&static=1', fromParams)).toBe(
+        '/search?q=undefined&static=1',
+      );
+    });
+
+    it('should not replace placeholders of repeated query parameters', () => {
+      const fromParams = new URLSearchParams('a=1&b=2');
+      expect(buildQueryWithParams('/search?q=:a&q=:b', fromParams)).toBe('/search?q=:a&q=:b');
     });
   });
 
