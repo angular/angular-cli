@@ -401,6 +401,7 @@ export class VitestExecutor implements TestExecutor {
       plugins: [
         await createVitestConfigPlugin({
           browser: browserOptions.browser,
+          cacheOptions,
           coverage,
           projectName,
           projectSourceRoot,
