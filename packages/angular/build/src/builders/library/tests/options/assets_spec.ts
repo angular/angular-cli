@@ -53,5 +53,76 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       expect(harness.readFile('dist/lib/docs/README.md')).toBe('# Library Docs');
     });
+
+    it('should not copy root README.md into secondary entry point output when secondary entry point is in projectRoot', async () => {
+      await harness.writeFiles({
+        'projects/lib/README.md': '# Root Library README',
+        'projects/lib/testing.ts': 'export const TESTING = true;',
+      });
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './testing': './testing.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expect(harness.readFile('dist/lib/README.md')).toBe('# Root Library README');
+      expect(harness.hasFile('dist/lib/testing/README.md')).toBeFalse();
+    });
+
+    it('should not copy README.md into secondary entry point output when sharing directory with primary entry point', async () => {
+      await harness.writeFiles({
+        'projects/lib/README.md': '# Root Library README',
+        'projects/lib/src/README.md': '# Src README',
+        'projects/lib/src/testing.ts': 'export const TESTING = true;',
+      });
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './testing': './src/testing.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expect(harness.readFile('dist/lib/README.md')).toBe('# Root Library README');
+      expect(harness.hasFile('dist/lib/testing/README.md')).toBeFalse();
+    });
+
+    it('should copy secondary entry point README.md when located in its own directory', async () => {
+      await harness.writeFiles({
+        'projects/lib/README.md': '# Root Library README',
+        'projects/lib/testing/README.md': '# Testing Entry Point README',
+        'projects/lib/testing/public-api.ts': 'export const TESTING = true;',
+      });
+
+      await harness.modifyFile('projects/lib/package.json', (content) => {
+        const pkg = JSON.parse(content);
+        pkg.exports = {
+          '.': './src/public-api.ts',
+          './testing': './testing/public-api.ts',
+        };
+
+        return JSON.stringify(pkg, null, 2);
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expect(harness.readFile('dist/lib/README.md')).toBe('# Root Library README');
+      expect(harness.readFile('dist/lib/testing/README.md')).toBe('# Testing Entry Point README');
+    });
   });
 });

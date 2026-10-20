@@ -32,5 +32,58 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       harness.expectFile('dist/custom-output/fesm2022/lib.mjs').toExist();
       harness.expectFile('dist/custom-output/package.json').toExist();
     });
+
+    it('should reject outputPath equal to projectRoot', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputPath: 'projects/lib',
+      });
+
+      const { result, error } = await harness.executeOnce({
+        outputLogsOnException: false,
+        outputLogsOnFailure: false,
+      });
+      expect(result).toBeUndefined();
+      expect(error).toBeDefined();
+      expect((error as Error).message).toMatch(
+        /The 'outputPath' option .* cannot be the workspace root, project root, or a parent directory of the project root/,
+      );
+      harness.expectFile('projects/lib/package.json').toExist();
+    });
+
+    it('should reject outputPath equal to workspaceRoot', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputPath: '.',
+      });
+
+      const { result, error } = await harness.executeOnce({
+        outputLogsOnException: false,
+        outputLogsOnFailure: false,
+      });
+      expect(result).toBeUndefined();
+      expect(error).toBeDefined();
+      expect((error as Error).message).toMatch(
+        /The 'outputPath' option .* cannot be the workspace root, project root, or a parent directory of the project root/,
+      );
+    });
+
+    it('should reject outputPath when it is a parent directory of projectRoot', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        outputPath: 'projects',
+      });
+
+      const { result, error } = await harness.executeOnce({
+        outputLogsOnException: false,
+        outputLogsOnFailure: false,
+      });
+      expect(result).toBeUndefined();
+      expect(error).toBeDefined();
+      expect((error as Error).message).toMatch(
+        /The 'outputPath' option .* cannot be the workspace root, project root, or a parent directory of the project root/,
+      );
+      harness.expectFile('projects/lib/package.json').toExist();
+    });
   });
 });

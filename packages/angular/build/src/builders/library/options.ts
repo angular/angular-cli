@@ -13,7 +13,7 @@ import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
 import { normalizeAssetPatterns } from '../../utils/normalize-asset-patterns';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { toPosixPath } from '../../utils/path';
+import { canonicalizePath, isSubDirectory, toPosixPath } from '../../utils/path';
 import {
   generateSearchDirectories,
   getTailwindConfig,
@@ -39,7 +39,7 @@ export async function normalizeLibraryOptions(
   projectName: string,
   options: LibraryBuilderOptions,
 ): Promise<NormalizedLibraryOptions> {
-  const workspaceRoot = toPosixPath(context.workspaceRoot);
+  const workspaceRoot = toPosixPath(canonicalizePath(context.workspaceRoot));
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRootPaths = getProjectRootPaths(workspaceRoot, projectMetadata);
   const projectRoot = toPosixPath(projectRootPaths.projectRoot);
@@ -47,6 +47,7 @@ export async function normalizeLibraryOptions(
 
   const {
     tsConfig,
+    outputPath: rawOutputPath,
     assets: rawAssets,
     stylePreprocessorOptions,
     inlineStyleLanguage = 'css',
@@ -61,6 +62,19 @@ export async function normalizeLibraryOptions(
     progress = true,
     clearScreen,
   } = options;
+
+  const outputPath = toPosixPath(
+    path.resolve(workspaceRoot, rawOutputPath ?? path.posix.join('dist', projectName)),
+  );
+  if (
+    outputPath === workspaceRoot ||
+    outputPath === projectRoot ||
+    isSubDirectory(outputPath, projectRoot)
+  ) {
+    throw new Error(
+      `The 'outputPath' option ('${outputPath}') cannot be the workspace root, project root, or a parent directory of the project root.`,
+    );
+  }
 
   const resolvedTsConfigPath = toPosixPath(path.resolve(workspaceRoot, tsConfig));
   const packageJsonPath = path.posix.join(projectRoot, 'package.json');
@@ -105,13 +119,31 @@ export async function normalizeLibraryOptions(
     { glob: 'README.md', input: projectRoot, output: '.' },
   ];
 
+  const primaryEntryPoint = entryPoints.get('.');
+  const primaryEntryDir = primaryEntryPoint
+    ? path.posix.dirname(primaryEntryPoint.entryFilePath)
+    : undefined;
+  const seenReadmeAssets = new Set<string>();
+
   for (const entryPoint of entryPoints.values()) {
     if (entryPoint.isPrimary) {
       continue;
     }
+
+    const entryDir = path.posix.dirname(entryPoint.entryFilePath);
+    if (entryDir === projectRoot || entryDir === primaryEntryDir) {
+      continue;
+    }
+
+    const readmeKey = `${entryDir}:${entryPoint.name}`;
+    if (seenReadmeAssets.has(readmeKey)) {
+      continue;
+    }
+    seenReadmeAssets.add(readmeKey);
+
     defaultAssets.push({
       glob: 'README.md',
-      input: path.posix.dirname(entryPoint.entryFilePath),
+      input: entryDir,
       output: entryPoint.name,
     });
   }
@@ -149,9 +181,7 @@ export async function normalizeLibraryOptions(
     projectRoot,
     packageName,
     packageJson,
-    outputPath: toPosixPath(
-      path.resolve(workspaceRoot, options.outputPath ?? path.posix.join('dist', projectName)),
-    ),
+    outputPath,
     deleteOutputPath,
     packageJsonPath,
     tsConfigPath: resolvedTsConfigPath,
