@@ -8,7 +8,6 @@
 
 import type { PartialMessage } from 'esbuild';
 import assert from 'node:assert';
-import { randomUUID } from 'node:crypto';
 import { type MessagePort, receiveMessageOnPort } from 'node:worker_threads';
 import { initializeHash } from '../../../utils/hash';
 import { getAndClearCumulativeDurations } from '../../../utils/profiling';
@@ -29,8 +28,8 @@ export interface InitRequest {
   compilerOptionOverrides?: CompilerOptionOverrides;
   buildType?: 'application' | 'library';
   stylesheetPort: MessagePort;
-  webWorkerPort: MessagePort;
-  webWorkerSignal: Int32Array;
+  webWorkerPort?: MessagePort;
+  webWorkerSignal?: Int32Array;
 }
 
 let compilation: AngularCompilation | undefined;
@@ -52,8 +51,9 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
       ? new JitCompilation(request.browserOnlyBuild)
       : new AotCompilation(request.browserOnlyBuild);
 
+    let nextRequestId = 0;
     const stylesheetRequests = new Map<
-      string,
+      number,
       [(value: string) => void, (reason: Error) => void]
     >();
     request.stylesheetPort.on('message', ({ requestId, value, error }) => {
@@ -81,7 +81,7 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
         fileReplacements: request.fileReplacements,
         modifiedFiles: currentModifiedFiles,
         transformStylesheet(data, containingFile, stylesheetFile, order, className) {
-          const requestId = randomUUID();
+          const requestId = ++nextRequestId;
           const resultPromise = new Promise<string>((resolve, reject) =>
             stylesheetRequests.set(requestId, [resolve, reject]),
           );
@@ -98,6 +98,10 @@ export async function initialize(request: InitRequest): Promise<AngularCompilati
           return resultPromise;
         },
         processWebWorker(workerFile, containingFile) {
+          if (!request.webWorkerPort || !request.webWorkerSignal) {
+            return workerFile;
+          }
+
           Atomics.store(request.webWorkerSignal, 0, 0);
           request.webWorkerPort.postMessage({ workerFile, containingFile });
 

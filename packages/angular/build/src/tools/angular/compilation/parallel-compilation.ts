@@ -8,7 +8,7 @@
 
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
-import { MessageChannel } from 'node:worker_threads';
+import { MessageChannel, type MessagePort } from 'node:worker_threads';
 import { mergeCumulativeDurations } from '../../../utils/profiling';
 import { WorkerPool } from '../../../utils/worker-pool';
 import type { AngularHostOptions } from '../angular-host';
@@ -67,23 +67,30 @@ export class ParallelCompilation extends AngularCompilation {
     );
 
     this.#webWorkerChannel?.port1.close();
+    this.#webWorkerChannel = undefined;
 
-    // The web worker processing is a synchronous operation and uses shared memory combined with
-    // the Atomics API to block execution here until a response is received.
-    const webWorkerChannel = new MessageChannel();
-    this.#webWorkerChannel = webWorkerChannel;
-    const webWorkerSignal = new Int32Array(new SharedArrayBuffer(4));
-    webWorkerChannel.port1.on('message', ({ workerFile, containingFile }) => {
-      try {
-        const workerCodeFile = hostOptions.processWebWorker(workerFile, containingFile);
-        webWorkerChannel.port1.postMessage({ workerCodeFile });
-      } catch (error) {
-        webWorkerChannel.port1.postMessage({ error });
-      } finally {
-        Atomics.store(webWorkerSignal, 0, 1);
-        Atomics.notify(webWorkerSignal, 0);
-      }
-    });
+    let webWorkerPort: MessagePort | undefined;
+    let webWorkerSignal: Int32Array | undefined;
+    if (buildType !== 'library') {
+      // The web worker processing is a synchronous operation and uses shared memory combined with
+      // the Atomics API to block execution here until a response is received.
+      const webWorkerChannel = new MessageChannel();
+      this.#webWorkerChannel = webWorkerChannel;
+      const signal = new Int32Array(new SharedArrayBuffer(4));
+      webWorkerPort = webWorkerChannel.port2;
+      webWorkerSignal = signal;
+      webWorkerChannel.port1.on('message', ({ workerFile, containingFile }) => {
+        try {
+          const workerCodeFile = hostOptions.processWebWorker(workerFile, containingFile);
+          webWorkerChannel.port1.postMessage({ workerCodeFile });
+        } catch (error) {
+          webWorkerChannel.port1.postMessage({ error });
+        } finally {
+          Atomics.store(signal, 0, 1);
+          Atomics.notify(signal, 0);
+        }
+      });
+    }
 
     let success = false;
     try {
@@ -97,12 +104,14 @@ export class ParallelCompilation extends AngularCompilation {
           compilerOptionOverrides,
           buildType,
           stylesheetPort: stylesheetChannel.port2,
-          webWorkerPort: webWorkerChannel.port2,
+          webWorkerPort,
           webWorkerSignal,
         },
         {
           name: 'initialize',
-          transferList: [stylesheetChannel.port2, webWorkerChannel.port2],
+          transferList: webWorkerPort
+            ? [stylesheetChannel.port2, webWorkerPort]
+            : [stylesheetChannel.port2],
         },
       );
       success = true;
