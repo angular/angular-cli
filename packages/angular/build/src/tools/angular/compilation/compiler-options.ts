@@ -78,17 +78,13 @@ export function transformCompilerOptions(
     compilerOptions.compilationMode ??= 'partial';
   }
 
-  // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled.
-  // Library compilation does not reuse on-disk .tsbuildinfo files across builds because all JS and .d.ts
-  // outputs must be emitted into in-memory maps on every cold build, while watch mode uses in-memory
-  // BuilderProgram state directly.
-  if (!isLibrary && compilerOptions.incremental !== false && overrides?.cachePath) {
+  // Enable incremental compilation by default if caching is enabled and incremental is not explicitly disabled
+  if (compilerOptions.incremental !== false && overrides?.cachePath) {
     compilerOptions.incremental = true;
     // Set the build info file location to the configured cache directory
     compilerOptions.tsBuildInfoFile = path.join(overrides.cachePath, '.tsbuildinfo');
   } else {
     compilerOptions.incremental = false;
-    compilerOptions.tsBuildInfoFile = undefined;
   }
 
   if (isLibrary) {

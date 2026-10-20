@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import path from 'node:path';
 import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
@@ -480,7 +481,7 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.composite).toBe(false);
     });
 
-    it('enforces library compiler options and skips app-only target warning and .tsbuildinfo', () => {
+    it('enforces library compiler options and skips app-only target warning', () => {
       const { compilerOptions, warnings } = transformCompilerOptions(
         ts,
         {
@@ -502,8 +503,8 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.noEmit).toBe(false);
       expect(compilerOptions.emitDeclarationOnly).toBe(false);
       expect(compilerOptions.emitDecoratorMetadata).toBe(false);
-      expect(compilerOptions.incremental).toBe(false);
-      expect(compilerOptions.tsBuildInfoFile).toBeUndefined();
+      expect(compilerOptions.incremental).toBe(true);
+      expect(compilerOptions.tsBuildInfoFile).toBe(path.join('/tmp/cache', '.tsbuildinfo'));
       expect(warnings).toEqual([]);
     });
   });

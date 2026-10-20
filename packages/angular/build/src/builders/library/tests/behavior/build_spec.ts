@@ -237,7 +237,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
-    it('should succeed without emitting .tsbuildinfo in the persistent cache directory when cache is enabled', async () => {
+    it('should write and reuse .tsbuildinfo in the persistent cache directory when cache is enabled', async () => {
       harness.useProject('lib', {
         root: 'projects/lib',
         sourceRoot: 'projects/lib/src',
@@ -258,7 +258,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(firstBuild.result?.success).toBeTrue();
       harness
         .expectFile('.angular/cache/0.0.0-PLACEHOLDER/lib/angular-build-library/.tsbuildinfo')
-        .toNotExist();
+        .toExist();
 
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
