@@ -37,7 +37,7 @@ function convertTypeScriptDiagnosticInfo(
     };
 
     // Calculate the line/column location and extract the full line text that has the diagnostic
-    if (info.start) {
+    if (info.start !== undefined) {
       const { line, character } = typescript.getLineAndCharacterOfPosition(info.file, info.start);
       note.location.line = line + 1;
       note.location.column = character;
@@ -50,7 +50,7 @@ function convertTypeScriptDiagnosticInfo(
       // will error if a nonexistent line is passed).
       const { line: lastLineOfFile } = typescript.getLineAndCharacterOfPosition(
         info.file,
-        info.file.text.length - 1,
+        Math.max(0, info.file.text.length - 1),
       );
       const lineEndPosition =
         line < lastLineOfFile
