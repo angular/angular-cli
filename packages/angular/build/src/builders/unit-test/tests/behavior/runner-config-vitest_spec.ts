@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { readdirSync } from 'node:fs';
 import { execute } from '../../index';
 import {
   BASE_OPTIONS,
@@ -650,7 +651,100 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
 
       const secondRun = await harness.executeOnce();
       expect(secondRun.result?.success).toBeTrue();
-      harness.expectDirectory('.vitest-cache').toNotExist();
+      harness.expectDirectory('.vitest-cache').toExist();
+    });
+
+    it('should reuse the cached modules across runs when nothing changes', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.mts',
+      });
+
+      await harness.writeFiles({
+        'vitest.config.mts': `
+          import { defineConfig } from 'vitest/config';
+          export default defineConfig({
+            test: {
+              fsModuleCache: true,
+              fsModuleCachePath: './.vitest-cache',
+            },
+          });
+        `,
+        'src/app/value.ts': `export const VALUE = 'initial';`,
+        'src/app/app.component.spec.ts': `
+          import { test, expect } from 'vitest';
+          import { VALUE } from './value';
+
+          test('should use the value from imported module', () => {
+            expect(VALUE).toBe('initial');
+          });
+        `,
+      });
+      const cacheEntries = () =>
+        readdirSync(harness.resolvePath('.vitest-cache'), { recursive: true }).sort();
+
+      const firstRun = await harness.executeOnce();
+      expect(firstRun.result?.success).toBeTrue();
+      const entriesAfterFirstRun = cacheEntries();
+      expect(entriesAfterFirstRun.length).toBeGreaterThan(0);
+
+      // An unchanged build produces the same bundles, so no new cache entry is written.
+      const secondRun = await harness.executeOnce();
+      expect(secondRun.result?.success).toBeTrue();
+      expect(cacheEntries()).toEqual(entriesAfterFirstRun);
+    });
+
+    it('should not write the module cache when the Angular CLI cache is disabled', async () => {
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+      harness.expectDirectory('node_modules/.vitest-cache').toNotExist();
+    });
+
+    it('should not serve the cached bundle of a test entry point once coverage is enabled', async () => {
+      await harness.writeFiles({
+        'vitest.config.mts': `
+          import { defineConfig } from 'vitest/config';
+          export default defineConfig({
+            test: {
+              fsModuleCache: true,
+              fsModuleCachePath: './.vitest-cache',
+            },
+          });
+        `,
+        'src/app/value.ts': `export const VALUE = 'initial';`,
+        'src/app/app.component.spec.ts': `
+          import { test, expect } from 'vitest';
+          import { VALUE } from './value';
+
+          test('should use the value from imported module', () => {
+            expect(VALUE).toBe('initial');
+          });
+        `,
+      });
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.mts',
+      });
+      const firstRun = await harness.executeOnce();
+      expect(firstRun.result?.success).toBeTrue();
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest.config.mts',
+        coverage: true,
+        coverageReporters: ['json'] as any,
+      });
+      const secondRun = await harness.executeOnce();
+      expect(secondRun.result?.success).toBeTrue();
+
+      // The application code is only reported when the spec is served as the coverage redirect stub.
+      const coverageMap = JSON.parse(harness.readFile('coverage/test/coverage-final.json'));
+      expect(Object.keys(coverageMap).some((file) => file.endsWith('value.ts'))).toBeTrue();
     });
   });
 });
