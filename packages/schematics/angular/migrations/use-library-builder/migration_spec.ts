@@ -345,7 +345,7 @@ describe('Migration to use the library builder', () => {
     expect(lib.architect['build'].options.assets).toEqual([
       'projects/my-lib/CHANGELOG.md',
       'projects/my-lib/docs',
-      { glob: 'docs/**/*.md', input: 'projects/my-lib', output: '/' },
+      { glob: 'docs/**/*.md', input: 'projects/my-lib' },
     ]);
   });
 
