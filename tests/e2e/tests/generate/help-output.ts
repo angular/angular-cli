@@ -25,54 +25,12 @@ export default function () {
             "description": "Fake schematic",
             "schema": "./fake-schema.json"
           },
-          "fake-reversed": {
-            "factory": "./fake",
-            "description": "Fake schematic",
-            "schema": "./fake-reversed-schema.json"
-          },
         }
       }`,
           [join(genRoot, 'fake-schema.json')]: `
       {
         "$id": "FakeSchema",
         "title": "Fake Schema",
-        "type": "object",
-        "required": ["a"],
-        "properties": {
-          "b": {
-            "type": "string",
-            "description": "b.",
-            "$default": {
-              "$source": "argv",
-              "index": 1
-            }
-          },
-          "a": {
-            "type": "string",
-            "description": "a.",
-            "$default": {
-              "$source": "argv",
-              "index": 0
-            }
-          },
-          "optC": {
-            "type": "string",
-            "description": "optC"
-          },
-          "optA": {
-            "type": "string",
-            "description": "optA"
-          },
-          "optB": {
-            "type": "string",
-            "description": "optB"
-          }
-        }
-      }`,
-          [join(genRoot, 'fake-reversed-schema.json')]: `
-      {
-        "$id": "FakeReversedSchema",
-        "title": "Fake Reversed Schema",
         "type": "object",
         "required": ["b"],
         "properties": {
@@ -91,6 +49,18 @@ export default function () {
               "$source": "argv",
               "index": 1
             }
+          },
+          "optC": {
+            "type": "string",
+            "description": "optC"
+          },
+          "optA": {
+            "type": "string",
+            "description": "optA"
+          },
+          "optB": {
+            "type": "string",
+            "description": "optB"
           }
         }
       }`,
@@ -106,12 +76,8 @@ export default function () {
       )
       .then(() => ng('generate', 'fake-schematics:fake', '--help'))
       .then(({ stdout }) => {
-        assert.match(stdout, /ng generate fake-schematics:fake <a> \[b\]/);
+        assert.match(stdout, /ng generate fake-schematics:fake <b> \[a\]/);
         assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
-      })
-      .then(() => ng('generate', 'fake-schematics:fake-reversed', '--help'))
-      .then(({ stdout }) => {
-        assert.match(stdout, /ng generate fake-schematics:fake-reversed <b> \[a\]/);
       })
       // set up default collection.
       .then(() =>
@@ -123,7 +89,7 @@ export default function () {
       .then(() => ng('generate', 'fake', '--help'))
       // verify same output
       .then(({ stdout }) => {
-        assert.match(stdout, /ng generate fake <a> \[b\]/);
+        assert.match(stdout, /ng generate fake <b> \[a\]/);
         assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
       })
 
