@@ -105,17 +105,6 @@ export async function normalizeLibraryOptions(
     { glob: 'README.md', input: projectRoot, output: '.' },
   ];
 
-  for (const entryPoint of entryPoints.values()) {
-    if (entryPoint.isPrimary) {
-      continue;
-    }
-    defaultAssets.push({
-      glob: 'README.md',
-      input: path.posix.dirname(entryPoint.entryFilePath),
-      output: entryPoint.name,
-    });
-  }
-
   const assets = normalizeAssetPatterns(
     [...defaultAssets, ...(rawAssets ?? [])],
     workspaceRoot,
