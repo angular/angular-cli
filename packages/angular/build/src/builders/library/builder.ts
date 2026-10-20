@@ -260,11 +260,11 @@ async function* runWatchLoop(
     stylesheetBundler.invalidate(rawChangedFiles);
     const changedFiles = buildState.getAffectedFiles(rawChangedFiles);
 
-    const hasStyleChanges = Array.from(changedFiles).some((file) =>
-      /\.(?:scss|sass|css)$/i.test(file),
-    );
-    if (hasStyleChanges) {
-      resetSassWorkerPoolCaches();
+    for (const posixFile of changedFiles) {
+      if (/\.(?:scss|sass|css)$/i.test(posixFile)) {
+        resetSassWorkerPoolCaches();
+        break;
+      }
     }
 
     // Check if package.json was modified or failed to reload on a previous iteration
