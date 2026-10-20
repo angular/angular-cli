@@ -248,9 +248,9 @@ async function compileString(
     };
   } catch (error) {
     if (isSassException(error)) {
-      const location = error.span && spanToLocation(error.span);
+      const location = spanToLocation(error.span);
       const watchFiles = [filePath, ...extractFilesFromStack(error.sassStack)];
-      if (location?.file) {
+      if (location.file) {
         watchFiles.push(location.file);
       }
 
@@ -291,24 +291,12 @@ function* extractFilesFromStack(stack: string): Iterable<string> {
   const lines = stack.split('\n');
   const cwd = process.cwd();
 
-  // Stack line has format of "<file> <location> <identifier>"
+  // Stack line has format of `<file> <line>:<column>  <identifier>`
   for (const line of lines) {
-    const segments = line.split(' ');
-    if (segments.length < 3) {
-      break;
-    }
-
-    // Extract path from stack line.
-    // Paths may contain spaces. All segments before location are part of the file path.
-    let path = '';
-    let index = 0;
-    while (index < segments.length && !segments[index].match(/\d+:\d+/)) {
-      path += (path ? ' ' : '') + segments[index++];
-    }
-
-    if (path && index < segments.length) {
+    const match = line.trim().match(/^(.+?)\s+\d+:\d+/);
+    if (match) {
       // Stack paths from sass are relative to the current working directory (not input file or workspace root)
-      yield join(cwd, path);
+      yield join(cwd, match[1]);
     }
   }
 }
