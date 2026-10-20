@@ -83,6 +83,7 @@ class AngularCompilationState {
     public readonly declarationDiagnostics = new WeakMap<ts.SourceFile, readonly ts.Diagnostic[]>(),
     public readonly filesWithoutDtsSignature = new Set<string>(),
     public readonly useFallbackRootNames = false,
+    public readonly emittedDtsSourceFiles = new WeakSet<ts.SourceFile>(),
   ) {}
 
   get angularCompiler() {
@@ -362,6 +363,7 @@ export class AotCompilation extends TypeScriptCompilation {
       this.#state?.declarationDiagnostics,
       filesWithoutDtsSignature,
       useFallbackRootNames,
+      this.#state?.emittedDtsSourceFiles,
     );
 
     return {
@@ -498,10 +500,10 @@ export class AotCompilation extends TypeScriptCompilation {
   override emitAffectedFiles(): Iterable<EmitFileResult> {
     assert(this.#state, 'Angular compilation must be initialized prior to emitting files.');
     const {
-      affectedFiles,
       angularCompiler,
       compilerHost,
       declarationDiagnostics,
+      emittedDtsSourceFiles,
       typeScriptProgram,
       webWorkerTransform,
       useTypeScriptTranspilation,
@@ -512,7 +514,6 @@ export class AotCompilation extends TypeScriptCompilation {
 
     const emittedFiles = new Map<string, EmitFileResult>();
     const emittedSourceFiles = new Set<ts.SourceFile>();
-    const emittedDtsSourceFiles = new Set<ts.SourceFile>();
     const writeFileCallback: ts.WriteFileCallback = (filename, contents, _a, _b, sourceFiles) => {
       if (!sourceFiles?.length && filename.endsWith(buildInfoFilename)) {
         // Save builder info contents to specified location
