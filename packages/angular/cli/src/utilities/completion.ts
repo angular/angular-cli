@@ -240,7 +240,7 @@ export async function initializeAutocomplete(): Promise<string> {
   try {
     await fs.appendFile(
       rcFile,
-      '\n\n# Load Angular CLI autocompletion.\nsource <(ng completion script)\n',
+      '\n\n# Load Angular CLI autocompletion for interactive shells.\nif [[ $- == *i* ]]; then\n  source <(ng completion script)\nfi\n',
     );
   } catch (err) {
     assertIsError(err);

@@ -11,6 +11,13 @@ import {
 
 const testRegistry = getGlobalVariable('package-registry');
 
+const AUTOCOMPLETION_SNIPPET = `
+# Load Angular CLI autocompletion for interactive shells.
+if [[ $- == *i* ]]; then
+  source <(ng completion script)
+fi
+`.trim();
+
 export default async function () {
   // Windows Cmd and Powershell do not support autocompletion. Run a different set of tests to
   // confirm autocompletion fails gracefully.
@@ -33,11 +40,7 @@ export default async function () {
     );
 
     const rcContents = await fs.readFile(path.join(home, '.bashrc'), 'utf-8');
-    const expected = `
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-    `.trim();
-    if (!rcContents.includes(expected)) {
+    if (!rcContents.includes(AUTOCOMPLETION_SNIPPET)) {
       throw new Error(`~/.bashrc does not contain autocompletion script. Contents:\n${rcContents}`);
     }
   });
@@ -55,11 +58,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(path.join(home, '.zshrc'), 'utf-8');
-    const expected = `
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-    `.trim();
-    if (!rcContents.includes(expected)) {
+    if (!rcContents.includes(AUTOCOMPLETION_SNIPPET)) {
       throw new Error(`~/.zshrc does not contain autocompletion script. Contents:\n${rcContents}`);
     }
   });
@@ -79,11 +78,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(bashrc, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.bashrc does not match expectation. Contents:\n${rcContents}`);
     }
@@ -104,11 +99,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(bashProfile, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.bash_profile does not match expectation. Contents:\n${rcContents}`);
     }
@@ -129,11 +120,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(profile, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.profile does not match expectation. Contents:\n${rcContents}`);
     }
@@ -159,11 +146,7 @@ source <(ng completion script)
     );
 
     const bashrcContents = await fs.readFile(bashrc, 'utf-8');
-    const bashrcExpected = `# \`.bashrc\` commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const bashrcExpected = `# \`.bashrc\` commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (bashrcContents !== bashrcExpected) {
       throw new Error(`~/.bashrc does not match expectation. Contents:\n${bashrcContents}`);
     }
@@ -194,11 +177,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(zshrc, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.zshrc does not match expectation. Contents:\n${rcContents}`);
     }
@@ -219,11 +198,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(zshProfile, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.zsh_profile does not match expectation. Contents:\n${rcContents}`);
     }
@@ -244,11 +219,7 @@ source <(ng completion script)
     );
 
     const rcContents = await fs.readFile(profile, 'utf-8');
-    const expected = `# Other commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const expected = `# Other commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (rcContents !== expected) {
       throw new Error(`~/.profile does not match expectation. Contents:\n${rcContents}`);
     }
@@ -274,11 +245,7 @@ source <(ng completion script)
     );
 
     const zshrcContents = await fs.readFile(zshrc, 'utf-8');
-    const zshrcExpected = `# \`.zshrc\` commands...
-
-# Load Angular CLI autocompletion.
-source <(ng completion script)
-`;
+    const zshrcExpected = `# \`.zshrc\` commands...\n\n${AUTOCOMPLETION_SNIPPET}\n`;
     if (zshrcContents !== zshrcExpected) {
       throw new Error(`~/.zshrc does not match expectation. Contents:\n${zshrcContents}`);
     }
