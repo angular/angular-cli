@@ -861,15 +861,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           // Break package.json with invalid JSON
           await harness.writeFile('projects/lib/package.json', '{ invalid json');
         },
-        async ({ result, logs }) => {
+        async ({ result }) => {
           expect(result?.success).toBeFalse();
           expect(result?.error).toContain("Failed to reload 'package.json'");
-          expect(logs).toContain(
-            jasmine.objectContaining({
-              level: 'error',
-              message: jasmine.stringContaining("Failed to reload 'package.json'"),
-            }),
-          );
 
           // Modify a source file while package.json is still broken
           await harness.writeFile(
@@ -885,15 +879,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
             `,
           );
         },
-        async ({ result, logs }) => {
+        async ({ result }) => {
           expect(result?.success).toBeFalse();
           expect(result?.error).toContain("Failed to reload 'package.json'");
-          expect(logs).toContain(
-            jasmine.objectContaining({
-              level: 'error',
-              message: jasmine.stringContaining("Failed to reload 'package.json'"),
-            }),
-          );
 
           // Fix package.json
           await harness.writeFile(

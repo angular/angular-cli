@@ -8,7 +8,6 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
-import { existsSync } from 'node:fs';
 import type { ComponentStylesheetBundler } from '../../tools/esbuild/angular/component-stylesheets';
 import {
   resetSassWorkerPoolCaches,
@@ -211,7 +210,6 @@ async function executeBuild(
     return output;
   } catch (error) {
     assertIsError(error);
-    logger.error(error.message);
     logBuildResult(logger, startTime, false);
 
     return { success: false, error: error.message };
@@ -262,16 +260,10 @@ async function* runWatchLoop(
     stylesheetBundler.invalidate(rawChangedFiles);
     const changedFiles = buildState.getAffectedFiles(rawChangedFiles);
 
-    const shouldResetSassCache =
-      changedFiles.has(packageJsonPath) ||
-      rawChangedFiles.some((file) => file.endsWith('/package.json')) ||
-      Array.from(changes.added).some((file) => /\.(?:scss|sass|css)$/i.test(file)) ||
-      Array.from(changes.removed).some((file) => /\.(?:scss|sass|css)$/i.test(file)) ||
-      Array.from(changes.modified).some(
-        (file) => /\.(?:scss|sass|css)$/i.test(file) && !existsSync(file),
-      );
-
-    if (shouldResetSassCache) {
+    const hasStyleChanges = Array.from(changedFiles).some((file) =>
+      /\.(?:scss|sass|css)$/i.test(file),
+    );
+    if (hasStyleChanges) {
       resetSassWorkerPoolCaches();
     }
 
@@ -290,12 +282,9 @@ async function* runWatchLoop(
           buildState.hasCompilationError = true;
         }
 
-        const message = `Failed to reload 'package.json': ${error.message}`;
-        logger.error(message);
-
         yield {
           success: false,
-          error: message,
+          error: `Failed to reload 'package.json': ${error.message}`,
         };
         continue;
       }
