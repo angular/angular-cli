@@ -180,27 +180,19 @@ export class ComponentStylesheetBundler {
     const watchFile = path.isAbsolute(filename)
       ? filename
       : path.join(this.options.workspaceRoot, filename);
-    if (result.errors) {
-      for (const error of result.errors) {
-        if (error.location?.file.startsWith('angular:styles/component:')) {
-          error.location.file = filename;
+    for (const message of [...(result.errors ?? []), ...(result.warnings ?? [])]) {
+      if (message.location?.file?.startsWith('angular:styles/component:')) {
+        message.location.file = filename;
+        if (result.errors) {
           bundlerContext.watchFiles.add(watchFile);
         }
-        for (const note of error.notes) {
-          if (note.location?.file.startsWith('angular:styles/component:')) {
-            note.location.file = filename;
+      }
+      for (const note of message.notes ?? []) {
+        if (note.location?.file?.startsWith('angular:styles/component:')) {
+          note.location.file = filename;
+          if (result.errors) {
             bundlerContext.watchFiles.add(watchFile);
           }
-        }
-      }
-    }
-    for (const warning of result.warnings) {
-      if (warning.location?.file.startsWith('angular:styles/component:')) {
-        warning.location.file = filename;
-      }
-      for (const note of warning.notes) {
-        if (note.location?.file.startsWith('angular:styles/component:')) {
-          note.location.file = filename;
         }
       }
     }
