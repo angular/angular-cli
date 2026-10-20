@@ -8,6 +8,7 @@
 
 import type { BuilderContext, BuilderOutput } from '@angular-devkit/architect';
 import type { logging } from '@angular-devkit/core';
+import { existsSync } from 'node:fs';
 import type { ComponentStylesheetBundler } from '../../tools/esbuild/angular/component-stylesheets';
 import {
   resetSassWorkerPoolCaches,
@@ -119,6 +120,7 @@ export async function* executeLibraryBuilder(
         signal,
         watchFiles: [
           ...buildState.watchedCompilationFiles,
+          ...normalizedOptions.styleIncludePaths,
           ...normalizedOptions.assets.map((asset) => asset.input),
         ],
       });
@@ -209,6 +211,7 @@ async function executeBuild(
     return output;
   } catch (error) {
     assertIsError(error);
+    logger.error(error.message);
     logBuildResult(logger, startTime, false);
 
     return { success: false, error: error.message };
@@ -243,6 +246,7 @@ async function* runWatchLoop(
   signal: AbortSignal,
 ): AsyncIterableIterator<BuilderOutput> {
   const { packageJsonPath, clearScreen } = options;
+  let hasPackageJsonError = false;
 
   for await (const changes of watcher) {
     if (signal.aborted) {
@@ -258,29 +262,40 @@ async function* runWatchLoop(
     stylesheetBundler.invalidate(rawChangedFiles);
     const changedFiles = buildState.getAffectedFiles(rawChangedFiles);
 
-    for (const posixFile of changedFiles) {
-      if (/\.(?:scss|sass)$/i.test(posixFile)) {
-        resetSassWorkerPoolCaches();
-        break;
-      }
+    const shouldResetSassCache =
+      changedFiles.has(packageJsonPath) ||
+      rawChangedFiles.some((file) => file.endsWith('/package.json')) ||
+      Array.from(changes.added).some((file) => /\.(?:scss|sass|css)$/i.test(file)) ||
+      Array.from(changes.removed).some((file) => /\.(?:scss|sass|css)$/i.test(file)) ||
+      Array.from(changes.modified).some(
+        (file) => /\.(?:scss|sass|css)$/i.test(file) && !existsSync(file),
+      );
+
+    if (shouldResetSassCache) {
+      resetSassWorkerPoolCaches();
     }
 
-    // Check if package.json was modified
-    if (changedFiles.has(packageJsonPath)) {
+    // Check if package.json was modified or failed to reload on a previous iteration
+    if (hasPackageJsonError || changedFiles.has(packageJsonPath)) {
       buildState.hasEmittedManifests = false;
       try {
         const packageJson = await loadPackageJson(packageJsonPath);
         updateWatchedEntryPoints(packageJson, options, buildState);
+        hasPackageJsonError = false;
       } catch (error) {
         assertIsError(error);
+        hasPackageJsonError = true;
         await buildState.singleProgramCache?.compilationInstance.update?.(changedFiles);
         if (buildState.shouldCompileEntryPoints(packageJsonPath, changedFiles)) {
           buildState.hasCompilationError = true;
         }
 
+        const message = `Failed to reload 'package.json': ${error.message}`;
+        logger.error(message);
+
         yield {
           success: false,
-          error: `Failed to reload 'package.json': ${error.message}`,
+          error: message,
         };
         continue;
       }

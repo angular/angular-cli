@@ -54,7 +54,7 @@ export async function compileLibrary(
     rootFiles.push(ep.entryFilePath);
   }
 
-  const compilationInstance =
+  let compilationInstance =
     cached?.compilationInstance ?? (await createAngularCompilation('aot', false));
 
   try {
@@ -114,21 +114,45 @@ export async function compileLibrary(
       processWebWorker: () => '',
     };
 
-    const { referencedFiles, compilerOptions } = await compilationInstance.initialize(
+    const compilerOptionOverrides = {
+      sourcemap: true,
+      preserveSymlinks,
+      rootFiles,
+      declarationMap,
+      compilationMode,
+      paths: entryPathsMap,
+      cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
+    };
+
+    let { referencedFiles, compilerOptions } = await compilationInstance.initialize(
       tsConfigPath,
       hostOptions,
-      {
-        sourcemap: true,
-        preserveSymlinks,
-        rootFiles,
-        declarationMap,
-        compilationMode,
-        paths: entryPathsMap,
-        cachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
-      },
+      compilerOptionOverrides,
       'library',
     );
 
+    const effectiveCompilationMode =
+      compilerOptions.compilationMode === 'full' ? 'full' : 'partial';
+    const hasCompilationModeChanged =
+      buildState.compilationMode !== undefined &&
+      buildState.compilationMode !== effectiveCompilationMode;
+
+    if (hasCompilationModeChanged && cached) {
+      await compilationInstance.close?.();
+      compilationInstance = await createAngularCompilation('aot', false);
+      hostOptions.modifiedFiles = undefined;
+      stylesheetWarnings.length = 0;
+      stylesheetErrors.length = 0;
+      failedFiles.clear();
+      ({ referencedFiles, compilerOptions } = await compilationInstance.initialize(
+        tsConfigPath,
+        hostOptions,
+        compilerOptionOverrides,
+        'library',
+      ));
+    }
+
+    const effectiveDeclarationMap = !!compilerOptions.declarationMap;
     const hasStylesheetErrors = stylesheetErrors.length > 0;
     const emittedFiles = hasStylesheetErrors ? [] : await compilationInstance.emitAffectedFiles();
     const diagnosePromise = runDiagnosticsAndFormat(
@@ -141,11 +165,26 @@ export async function compileLibrary(
 
     const esmFiles = cached?.esmFiles ?? new Map<string, string>();
     const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
+    if (hasCompilationModeChanged) {
+      esmFiles.clear();
+      dtsFiles.clear();
+    } else if (
+      buildState.declarationMap !== undefined &&
+      buildState.declarationMap !== effectiveDeclarationMap &&
+      !effectiveDeclarationMap
+    ) {
+      for (const key of dtsFiles.keys()) {
+        if (key.endsWith('.map')) {
+          dtsFiles.delete(key);
+        }
+      }
+    }
+
     const changedEsmFiles = new Set<string>();
     const changedDtsFiles = new Set<string>();
     const posixReferencedFiles = new Set(referencedFiles.map(toPosixPath));
 
-    if (cached && effectiveModifiedFiles) {
+    if (cached && !hasCompilationModeChanged && effectiveModifiedFiles) {
       for (const modifiedFile of effectiveModifiedFiles) {
         if (posixReferencedFiles.has(modifiedFile)) {
           continue;
@@ -199,11 +238,11 @@ export async function compileLibrary(
       },
       hasStylesheetErrors,
       diagnosePromise,
-      declarationMap: !!compilerOptions.declarationMap,
-      compilationMode: compilerOptions.compilationMode === 'full' ? 'full' : 'partial',
+      declarationMap: effectiveDeclarationMap,
+      compilationMode: effectiveCompilationMode,
     };
   } catch (error) {
-    if (!cached) {
+    if (!cached || compilationInstance !== cached.compilationInstance) {
       await compilationInstance.close?.();
     }
     throw error;
