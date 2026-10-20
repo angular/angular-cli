@@ -13,7 +13,7 @@ import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
 import { normalizeAssetPatterns } from '../../utils/normalize-asset-patterns';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { canonicalizePath, toPosixPath } from '../../utils/path';
+import { toPosixPath } from '../../utils/path';
 import {
   generateSearchDirectories,
   getTailwindConfig,
@@ -39,7 +39,7 @@ export async function normalizeLibraryOptions(
   projectName: string,
   options: LibraryBuilderOptions,
 ): Promise<NormalizedLibraryOptions> {
-  const workspaceRoot = toPosixPath(canonicalizePath(context.workspaceRoot));
+  const workspaceRoot = toPosixPath(context.workspaceRoot);
   const projectMetadata = await context.getProjectMetadata(projectName);
   const projectRootPaths = getProjectRootPaths(workspaceRoot, projectMetadata);
   const projectRoot = toPosixPath(projectRootPaths.projectRoot);
