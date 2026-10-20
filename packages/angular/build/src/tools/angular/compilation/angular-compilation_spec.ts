@@ -477,7 +477,9 @@ describe('AngularCompilation', () => {
       expect(compilerOptions['_useTypeScriptTranspilation']).toBe(true);
       expect(compilerOptions.supportTestBed).toBe(true);
       expect(compilerOptions.supportJitMode).toBe(true);
+      expect(compilerOptions.noEmit).toBe(false);
       expect(compilerOptions.noEmitOnError).toBe(false);
+      expect(compilerOptions.emitDeclarationOnly).toBe(false);
       expect(compilerOptions.composite).toBe(false);
     });
 
@@ -498,6 +500,7 @@ describe('AngularCompilation', () => {
       );
 
       expect(compilerOptions.target).toBe(ts.ScriptTarget.ES2022);
+      expect(compilerOptions.module).toBe(ts.ModuleKind.Preserve);
       expect(compilerOptions.useDefineForClassFields).toBeUndefined();
       expect(compilerOptions.noEmit).toBe(false);
       expect(compilerOptions.emitDeclarationOnly).toBe(false);

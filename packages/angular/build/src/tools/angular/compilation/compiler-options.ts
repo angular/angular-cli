@@ -41,15 +41,13 @@ export function transformCompilerOptions(
 
   if (isLibrary) {
     compilerOptions.target = typeScript.ScriptTarget.ES2022;
-    compilerOptions.module = typeScript.ModuleKind.ES2022;
+    compilerOptions.module = typeScript.ModuleKind.Preserve;
     compilerOptions.importHelpers = true;
     compilerOptions.declaration = true;
     compilerOptions.declarationMap = !!(
       overrides?.declarationMap ?? compilerOptions.declarationMap
     );
     compilerOptions.declarationDir = undefined;
-    compilerOptions.noEmit = false;
-    compilerOptions.emitDeclarationOnly = false;
   }
 
   if (
@@ -138,7 +136,9 @@ export function transformCompilerOptions(
     compilerOptions: {
       ...compilerOptions,
       basePath: overrides?.basePath ? toPosixPath(overrides.basePath) : compilerOptions.basePath,
+      noEmit: false,
       noEmitOnError: false,
+      emitDeclarationOnly: false,
       composite: false,
       inlineSources: !!overrides?.sourcemap,
       inlineSourceMap: !isLibrary && !!overrides?.sourcemap,
