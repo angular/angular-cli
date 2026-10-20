@@ -119,6 +119,7 @@ export async function* executeLibraryBuilder(
         signal,
         watchFiles: [
           ...buildState.watchedCompilationFiles,
+          ...normalizedOptions.styleIncludePaths,
           ...normalizedOptions.assets.map((asset) => asset.input),
         ],
       });
@@ -243,6 +244,7 @@ async function* runWatchLoop(
   signal: AbortSignal,
 ): AsyncIterableIterator<BuilderOutput> {
   const { packageJsonPath, clearScreen } = options;
+  let hasPackageJsonError = false;
 
   for await (const changes of watcher) {
     if (signal.aborted) {
@@ -259,20 +261,22 @@ async function* runWatchLoop(
     const changedFiles = buildState.getAffectedFiles(rawChangedFiles);
 
     for (const posixFile of changedFiles) {
-      if (/\.(?:scss|sass)$/i.test(posixFile)) {
+      if (/\.(?:scss|sass|css)$/i.test(posixFile)) {
         resetSassWorkerPoolCaches();
         break;
       }
     }
 
-    // Check if package.json was modified
-    if (changedFiles.has(packageJsonPath)) {
+    // Check if package.json was modified or failed to reload on a previous iteration
+    if (hasPackageJsonError || changedFiles.has(packageJsonPath)) {
       buildState.hasEmittedManifests = false;
       try {
         const packageJson = await loadPackageJson(packageJsonPath);
         updateWatchedEntryPoints(packageJson, options, buildState);
+        hasPackageJsonError = false;
       } catch (error) {
         assertIsError(error);
+        hasPackageJsonError = true;
         await buildState.singleProgramCache?.compilationInstance.update?.(changedFiles);
         if (buildState.shouldCompileEntryPoints(packageJsonPath, changedFiles)) {
           buildState.hasCompilationError = true;

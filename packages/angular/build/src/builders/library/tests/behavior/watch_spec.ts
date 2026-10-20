@@ -847,5 +847,63 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
+
+    it('should retry reloading broken package.json when another file changes and recover once fixed', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+
+          // Break package.json with invalid JSON
+          await harness.writeFile('projects/lib/package.json', '{ invalid json');
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeFalse();
+          expect(result?.error).toContain("Failed to reload 'package.json'");
+
+          // Modify a source file while package.json is still broken
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.ts',
+            `
+            import { Component } from '@angular/core';
+
+            @Component({
+              selector: 'lib-after-pkg-error',
+              template: '<span>After Pkg Error</span>',
+            })
+            export class LibComponent {}
+            `,
+          );
+        },
+        async ({ result }) => {
+          expect(result?.success).toBeFalse();
+          expect(result?.error).toContain("Failed to reload 'package.json'");
+
+          // Fix package.json
+          await harness.writeFile(
+            'projects/lib/package.json',
+            JSON.stringify(
+              {
+                name: 'lib',
+                version: '0.0.1',
+                exports: {
+                  '.': './src/public-api.ts',
+                },
+              },
+              null,
+              2,
+            ),
+          );
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          expect(harness.readFile('dist/lib/fesm2022/lib.mjs')).toContain('lib-after-pkg-error');
+        },
+      ]);
+    });
   });
 });

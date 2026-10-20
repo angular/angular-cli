@@ -305,7 +305,7 @@ describe('BuilderState', () => {
           workspaceRoot: tempRoot,
           assets: [{ glob: 'README.md', input: tempRoot, output: '.' }],
         };
-        const state = new BuilderState(options);
+        const state = new BuilderState();
 
         // Initial build emits README.md
         const initialAssets = await state.collectAssets(options);
@@ -327,6 +327,51 @@ describe('BuilderState', () => {
         state.recordEmittedOutputs(recoveryAssets);
         const subsequentAssets = await state.collectAssets(options, new Set([unrelatedFile]));
         expect(subsequentAssets.filesToEmit).toHaveSize(0);
+      } finally {
+        await rm(tempRoot, { recursive: true, force: true });
+      }
+    });
+
+    it('should lazily create asset matchers only on incremental watch asset collection', async () => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      const tempRoot = await mkdtemp(join(baseTmpDir, 'angular-cli-builder-state-lazy-'));
+
+      try {
+        const readmePath = join(tempRoot, 'README.md');
+        await writeFile(readmePath, '# Initial');
+
+        let globAccessCount = 0;
+        const asset = {
+          get glob() {
+            globAccessCount++;
+
+            return 'README.md';
+          },
+          input: tempRoot,
+          output: '.',
+        };
+        const options = {
+          workspaceRoot: tempRoot,
+          assets: [asset],
+        };
+
+        // Constructing BuilderState should not compile asset matchers
+        const state = new BuilderState();
+        expect(globAccessCount).toBe(0);
+
+        state.recordEmittedOutputs({ filesToEmit: [], filesToDelete: [] });
+        expect(globAccessCount).toBe(0);
+
+        // First incremental watch collection initializes asset matchers once
+        const firstCollect = await state.collectAssets(options, new Set([readmePath]));
+        expect(firstCollect.filesToEmit).toHaveSize(1);
+        expect(globAccessCount).toBe(1);
+
+        // Subsequent incremental watch collections reuse cached asset matchers
+        const secondCollect = await state.collectAssets(options, new Set([readmePath]));
+        expect(secondCollect.filesToEmit).toHaveSize(1);
+        expect(globAccessCount).toBe(1);
       } finally {
         await rm(tempRoot, { recursive: true, force: true });
       }

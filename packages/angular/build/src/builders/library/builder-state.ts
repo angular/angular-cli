@@ -32,7 +32,7 @@ export class BuilderState {
   readonly #watchedCompilationFiles = new Set<string>();
   readonly #pendingCompilationFiles = new Set<string>();
   readonly #pendingAssetFiles = new Set<string>();
-  readonly #assetMatchers?: readonly AssetMatcher[];
+  #assetMatchers?: readonly AssetMatcher[];
 
   #emittedBundleFiles = new Set<string>();
   #emittedManifestFiles = new Set<string>();
@@ -66,7 +66,7 @@ export class BuilderState {
 
   constructor(
     options?: Partial<
-      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints' | 'assets'>
+      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints'>
     >,
   ) {
     if (options?.tsConfigPath) {
@@ -80,8 +80,6 @@ export class BuilderState {
         this.#watchedCompilationFiles.add(entryPoint.entryFilePath);
       }
     }
-
-    this.#assetMatchers = options?.assets ? createAssetMatchers(options.assets) : undefined;
   }
 
   /** Cached unified TypeScript and Angular compilation state. */
@@ -356,6 +354,10 @@ export class BuilderState {
       effectiveModifiedFiles = this.#pendingAssetFiles;
     }
 
+    if (effectiveModifiedFiles?.size && options.assets.length > 0) {
+      this.#assetMatchers ??= createAssetMatchers(options.assets);
+    }
+
     return collectAssetsToEmit(
       options.assets,
       options.workspaceRoot,
@@ -460,6 +462,7 @@ export class BuilderState {
     await this.#singleProgramCache?.compilationInstance.close?.();
     this.#singleProgramCache = undefined;
     this.#compilationMode = undefined;
+    this.#assetMatchers = undefined;
     this.#hasEmittedTslib = false;
     this.#hasEmittedAssets = false;
     this.hasCompilationError = false;
