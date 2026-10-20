@@ -103,11 +103,17 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
       let bundleOutput: BundleEntryPointsOutput;
       try {
         [bundleOutput] = await Promise.all([
-          bundleEntryPoints(itemsToBundle, esmFiles, dtsFiles, {
-            ...options,
-            declarationMap,
-            compilationMode,
-          }),
+          bundleEntryPoints(
+            itemsToBundle,
+            esmFiles,
+            dtsFiles,
+            {
+              ...options,
+              declarationMap,
+              compilationMode,
+            },
+            buildState.previousBundleResults,
+          ),
           diagnosePromise,
         ]);
       } catch (error) {
