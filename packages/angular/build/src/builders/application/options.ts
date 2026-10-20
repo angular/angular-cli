@@ -32,6 +32,7 @@ import {
   OutputMode,
   OutputPathClass,
   Platform,
+  Format as PrerenderFormat,
 } from './schema';
 
 /**
@@ -261,14 +262,21 @@ export async function normalizeOptions(
     }
   }
 
+  const prerenderFormat =
+    (typeof options.prerender === 'object' && options.prerender.format) ||
+    PrerenderFormat.Directory;
+
   if (options.outputMode) {
     if (!options.server) {
       options.ssr = false;
     }
 
-    if (options.prerender !== undefined) {
+    if (
+      options.prerender !== undefined &&
+      (typeof options.prerender === 'boolean' || !('format' in options.prerender))
+    ) {
       context.logger.warn(
-        'The "prerender" option is not considered when "outputMode" is specified.',
+        'The "prerender" option has no effect when "outputMode" is specified (only "format" is supported).',
       );
     }
 
@@ -306,6 +314,7 @@ export async function normalizeOptions(
     prerenderOptions = {
       discoverRoutes,
       routesFile: routesFile && path.join(workspaceRoot, routesFile),
+      format: prerenderFormat,
     };
   }
 
@@ -345,6 +354,15 @@ export async function normalizeOptions(
         options.outputMode === undefined) ||
       options.outputMode === OutputMode.Static,
   };
+
+  if (prerenderOptions?.format === PrerenderFormat.File && !outputOptions.ignoreServer) {
+    // The server runtime of '@angular/ssr' looks up prerendered pages as '<route>/index.html'.
+    context.logger.warn(
+      'The "prerender.format" option is not considered when the build produces a server.',
+    );
+
+    prerenderOptions.format = PrerenderFormat.Directory;
+  }
 
   const outputNames = {
     bundles:
