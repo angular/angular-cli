@@ -44,7 +44,6 @@ export class BuilderState {
 
   #singleProgramCache?: SingleProgramCache;
   #compilationMode?: 'partial' | 'full';
-  #declarationMap?: boolean;
   #hasEmittedTslib = false;
 
   /** Map of entry point names to their previous bundle results. */
@@ -67,7 +66,7 @@ export class BuilderState {
 
   constructor(
     options?: Partial<
-      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints' | 'assets'>
+      Pick<NormalizedLibraryOptions, 'tsConfigPath' | 'packageJsonPath' | 'entryPoints'>
     >,
   ) {
     if (options?.tsConfigPath) {
@@ -91,11 +90,6 @@ export class BuilderState {
   /** Effective compilation mode resolved from builder options and tsconfig. */
   get compilationMode(): 'partial' | 'full' | undefined {
     return this.#compilationMode;
-  }
-
-  /** Effective declarationMap setting resolved from builder options and tsconfig. */
-  get declarationMap(): boolean | undefined {
-    return this.#declarationMap;
   }
 
   /** Whether the last emitted root package.json included a tslib dependency. */
@@ -302,49 +296,10 @@ export class BuilderState {
    */
   recordCompilationOutput(output: LibraryCompilationOutput): void {
     this.#pendingCompilationFiles.clear();
-    const lastCache = this.#singleProgramCache;
-    const lastCompilationMode = this.#compilationMode;
-    const lastDeclarationMap = this.#declarationMap;
     this.#singleProgramCache = output.cache;
-    this.#compilationMode = output.compilationMode;
-    this.#declarationMap = output.declarationMap;
-
-    if (lastCompilationMode !== output.compilationMode) {
+    if (this.#compilationMode !== output.compilationMode) {
+      this.#compilationMode = output.compilationMode;
       this.hasEmittedManifests = false;
-      if (lastCompilationMode !== undefined) {
-        if (lastCache && lastCache.esmFiles !== output.esmFiles) {
-          lastCache.esmFiles.clear();
-        }
-        if (lastCache && lastCache.dtsFiles !== output.dtsFiles) {
-          lastCache.dtsFiles.clear();
-        }
-        for (const prev of this.previousBundleResults.values()) {
-          for (const file of prev.esmModuleIds) {
-            this.pendingChangedEsmFiles.add(file);
-          }
-          for (const file of prev.dtsModuleIds) {
-            this.pendingChangedDtsFiles.add(file);
-          }
-        }
-        this.previousBundleResults.clear();
-        for (const file of output.esmFiles.keys()) {
-          this.pendingChangedEsmFiles.add(file.endsWith('.map') ? file.slice(0, -4) : file);
-        }
-        for (const file of output.dtsFiles.keys()) {
-          this.pendingChangedDtsFiles.add(file.endsWith('.map') ? file.slice(0, -4) : file);
-        }
-      }
-    }
-
-    if (lastDeclarationMap !== undefined && lastDeclarationMap !== output.declarationMap) {
-      for (const prev of this.previousBundleResults.values()) {
-        for (const file of prev.dtsModuleIds) {
-          this.pendingChangedDtsFiles.add(file);
-        }
-      }
-      for (const file of output.dtsFiles.keys()) {
-        this.pendingChangedDtsFiles.add(file.endsWith('.map') ? file.slice(0, -4) : file);
-      }
     }
 
     for (const file of output.referencedFiles) {
@@ -387,7 +342,7 @@ export class BuilderState {
    * @param modifiedFiles Optional set of modified POSIX file paths in watch mode.
    * @returns The collected asset files to emit and delete.
    */
-  async collectAssets(
+  collectAssets(
     options: Pick<NormalizedLibraryOptions, 'assets' | 'workspaceRoot'>,
     modifiedFiles?: ReadonlySet<string>,
   ): Promise<CollectedAssets> {
@@ -399,29 +354,17 @@ export class BuilderState {
       effectiveModifiedFiles = this.#pendingAssetFiles;
     }
 
-    if (effectiveModifiedFiles && effectiveModifiedFiles.size > 0 && options.assets.length > 0) {
+    if (effectiveModifiedFiles?.size && options.assets.length > 0) {
       this.#assetMatchers ??= createAssetMatchers(options.assets);
     }
 
-    const result = await collectAssetsToEmit(
+    return collectAssetsToEmit(
       options.assets,
       options.workspaceRoot,
       this.#emittedAssets,
       effectiveModifiedFiles,
       this.#assetMatchers,
     );
-
-    if (effectiveModifiedFiles) {
-      this.#pendingAssetFiles.clear();
-      for (const file of result.filesToEmit) {
-        this.#pendingAssetFiles.add(file.source);
-      }
-      for (const file of result.filesToDelete) {
-        this.#pendingAssetFiles.add(file);
-      }
-    }
-
-    return result;
   }
 
   /**
@@ -519,7 +462,6 @@ export class BuilderState {
     await this.#singleProgramCache?.compilationInstance.close?.();
     this.#singleProgramCache = undefined;
     this.#compilationMode = undefined;
-    this.#declarationMap = undefined;
     this.#assetMatchers = undefined;
     this.#hasEmittedTslib = false;
     this.#hasEmittedAssets = false;

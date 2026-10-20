@@ -170,9 +170,6 @@ export async function compileLibrary(
       posixReferencedFiles,
       effectiveModifiedFiles,
       hasCompilationModeChanged,
-      buildState.declarationMap !== undefined &&
-        buildState.declarationMap !== effectiveDeclarationMap &&
-        !effectiveDeclarationMap,
     );
 
     return {
@@ -209,7 +206,6 @@ function updateEmittedFileMaps(
   posixReferencedFiles: ReadonlySet<string>,
   effectiveModifiedFiles: ReadonlySet<string> | undefined,
   hasCompilationModeChanged: boolean,
-  removeDtsMaps: boolean,
 ): {
   esmFiles: Map<string, string>;
   dtsFiles: Map<string, string>;
@@ -221,12 +217,6 @@ function updateEmittedFileMaps(
   if (hasCompilationModeChanged) {
     esmFiles.clear();
     dtsFiles.clear();
-  } else if (removeDtsMaps) {
-    for (const key of dtsFiles.keys()) {
-      if (key.endsWith('.map')) {
-        dtsFiles.delete(key);
-      }
-    }
   }
 
   const changedEsmFiles = new Set<string>();

@@ -172,106 +172,18 @@ describe('BuilderState', () => {
       ).toBeFalse();
     });
 
-    it('should invalidate hasEmittedManifests and compiled bundle state when compilationMode changes', () => {
+    it('should invalidate hasEmittedManifests when compilationMode changes', () => {
       const state = new BuilderState();
       state.hasEmittedManifests = true;
-      const firstCache = createMockCache();
-      firstCache.esmFiles.set('/src/index.js', 'export const a = 1;');
-      firstCache.dtsFiles.set('/src/index.d.ts', 'export declare const a: number;');
-
-      state.recordCompilationOutput(
-        createMockCompilationOutput({
-          compilationMode: 'partial',
-          cache: firstCache,
-          esmFiles: firstCache.esmFiles,
-          dtsFiles: firstCache.dtsFiles,
-        }),
-      );
+      state.recordCompilationOutput(createMockCompilationOutput({ compilationMode: 'partial' }));
       expect(state.hasEmittedManifests).toBeFalse();
 
-      state.recordBundleOutput(
-        new Map([
-          [
-            '.',
-            {
-              esmModuleIds: new Set(['/src/index.js']),
-              dtsModuleIds: new Set(['/src/index.d.ts']),
-              esmOutputFiles: new Set(['fesm2022/my-lib.mjs']),
-              dtsOutputFiles: new Set(['types/my-lib.d.ts']),
-              hasTslibImport: false,
-            },
-          ],
-        ]),
-      );
       state.hasEmittedManifests = true;
-
-      state.recordCompilationOutput(
-        createMockCompilationOutput({
-          compilationMode: 'partial',
-          cache: firstCache,
-          esmFiles: firstCache.esmFiles,
-          dtsFiles: firstCache.dtsFiles,
-        }),
-      );
+      state.recordCompilationOutput(createMockCompilationOutput({ compilationMode: 'partial' }));
       expect(state.hasEmittedManifests).toBeTrue();
-      expect(state.previousBundleResults.size).toBe(1);
 
-      const secondCache = createMockCache();
-      secondCache.esmFiles.set('/src/index.js', 'export const a = 2;');
-      secondCache.dtsFiles.set('/src/index.d.ts', 'export declare const a: number;');
-
-      state.recordCompilationOutput(
-        createMockCompilationOutput({
-          compilationMode: 'full',
-          cache: secondCache,
-          esmFiles: secondCache.esmFiles,
-          dtsFiles: secondCache.dtsFiles,
-        }),
-      );
+      state.recordCompilationOutput(createMockCompilationOutput({ compilationMode: 'full' }));
       expect(state.hasEmittedManifests).toBeFalse();
-      expect(state.previousBundleResults.size).toBe(0);
-      expect(firstCache.esmFiles.size).toBe(0);
-      expect(firstCache.dtsFiles.size).toBe(0);
-      expect(state.pendingChangedEsmFiles).toEqual(new Set(['/src/index.js']));
-      expect(state.pendingChangedDtsFiles).toEqual(new Set(['/src/index.d.ts']));
-    });
-
-    it('should mark entry point DTS files dirty when declarationMap changes', () => {
-      const state = new BuilderState();
-      state.recordCompilationOutput(
-        createMockCompilationOutput({
-          declarationMap: false,
-          dtsFiles: new Map([['/src/index.d.ts', 'export declare const a: number;']]),
-        }),
-      );
-      state.recordBundleOutput(
-        new Map([
-          [
-            '.',
-            {
-              esmModuleIds: new Set(['/src/index.js']),
-              dtsModuleIds: new Set(['/src/index.d.ts']),
-              esmOutputFiles: new Set(['fesm2022/my-lib.mjs']),
-              dtsOutputFiles: new Set(['types/my-lib.d.ts']),
-              hasTslibImport: false,
-            },
-          ],
-        ]),
-      );
-      expect(state.pendingChangedDtsFiles.size).toBe(0);
-
-      state.recordCompilationOutput(
-        createMockCompilationOutput({
-          declarationMap: true,
-          dtsFiles: new Map([
-            ['/src/index.d.ts', 'export declare const a: number;'],
-            ['/src/index.d.ts.map', '{}'],
-          ]),
-        }),
-      );
-      expect(state.declarationMap).toBeTrue();
-      expect(state.pendingChangedDtsFiles).toEqual(new Set(['/src/index.d.ts']));
-      expect(state.pendingChangedEsmFiles.size).toBe(0);
     });
   });
 
@@ -393,7 +305,7 @@ describe('BuilderState', () => {
           workspaceRoot: tempRoot,
           assets: [{ glob: 'README.md', input: tempRoot, output: '.' }],
         };
-        const state = new BuilderState(options);
+        const state = new BuilderState();
 
         // Initial build emits README.md
         const initialAssets = await state.collectAssets(options);
@@ -445,7 +357,7 @@ describe('BuilderState', () => {
         };
 
         // Constructing BuilderState should not compile asset matchers
-        const state = new BuilderState(options);
+        const state = new BuilderState();
         expect(globAccessCount).toBe(0);
 
         state.recordEmittedOutputs({ filesToEmit: [], filesToDelete: [] });
@@ -460,35 +372,6 @@ describe('BuilderState', () => {
         const secondCollect = await state.collectAssets(options, new Set([readmePath]));
         expect(secondCollect.filesToEmit).toHaveSize(1);
         expect(globAccessCount).toBe(1);
-      } finally {
-        await rm(tempRoot, { recursive: true, force: true });
-      }
-    });
-
-    it('should prune non-asset paths from pendingAssetFiles after collectAssets', async () => {
-      const baseTmpDir = process.env['TEST_TMPDIR'];
-      assert(baseTmpDir, 'TEST_TMPDIR is not set');
-      const tempRoot = await mkdtemp(join(baseTmpDir, 'angular-cli-builder-state-prune-'));
-
-      try {
-        const options = {
-          workspaceRoot: tempRoot,
-          assets: [{ glob: '**/*.txt', input: tempRoot, output: '.' }],
-        };
-        const state = new BuilderState(options);
-        state.recordEmittedOutputs({ filesToEmit: [], filesToDelete: [] });
-
-        // Pass a path that does not exist on disk yet, so it produces no asset output on iteration 1
-        const transientPath = join(tempRoot, 'transient.txt');
-        const firstCollect = await state.collectAssets(options, new Set([transientPath]));
-        expect(firstCollect.filesToEmit).toHaveSize(0);
-
-        // Now create transientPath on disk, but trigger collectAssets with only a non-asset .ts file.
-        // Because transientPath was pruned after the first collectAssets call, it should not be emitted.
-        await writeFile(transientPath, 'created later');
-        const nonAssetFile = join(tempRoot, 'src/index.ts');
-        const secondCollect = await state.collectAssets(options, new Set([nonAssetFile]));
-        expect(secondCollect.filesToEmit).toHaveSize(0);
       } finally {
         await rm(tempRoot, { recursive: true, force: true });
       }
