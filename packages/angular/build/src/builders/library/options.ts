@@ -13,7 +13,7 @@ import { supportColor } from '../../utils/color';
 import { assertIsError } from '../../utils/error';
 import { normalizeAssetPatterns } from '../../utils/normalize-asset-patterns';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
-import { canonicalizePath, isSubDirectory, toPosixPath } from '../../utils/path';
+import { canonicalizePath, toPosixPath } from '../../utils/path';
 import {
   generateSearchDirectories,
   getTailwindConfig,
@@ -47,7 +47,6 @@ export async function normalizeLibraryOptions(
 
   const {
     tsConfig,
-    outputPath: rawOutputPath,
     assets: rawAssets,
     stylePreprocessorOptions,
     inlineStyleLanguage = 'css',
@@ -62,19 +61,6 @@ export async function normalizeLibraryOptions(
     progress = true,
     clearScreen,
   } = options;
-
-  const outputPath = toPosixPath(
-    path.resolve(workspaceRoot, rawOutputPath ?? path.posix.join('dist', projectName)),
-  );
-  if (
-    outputPath === workspaceRoot ||
-    outputPath === projectRoot ||
-    isSubDirectory(outputPath, projectRoot)
-  ) {
-    throw new Error(
-      `The 'outputPath' option ('${outputPath}') cannot be the workspace root, project root, or a parent directory of the project root.`,
-    );
-  }
 
   const resolvedTsConfigPath = toPosixPath(path.resolve(workspaceRoot, tsConfig));
   const packageJsonPath = path.posix.join(projectRoot, 'package.json');
@@ -181,7 +167,9 @@ export async function normalizeLibraryOptions(
     projectRoot,
     packageName,
     packageJson,
-    outputPath,
+    outputPath: toPosixPath(
+      path.resolve(workspaceRoot, options.outputPath ?? path.posix.join('dist', projectName)),
+    ),
     deleteOutputPath,
     packageJsonPath,
     tsConfigPath: resolvedTsConfigPath,
