@@ -201,6 +201,79 @@ export async function compileLibrary(
 }
 
 /**
+ * Updates cached in-memory ESM and DTS maps with newly emitted files and prunes deleted files.
+ */
+function updateEmittedFileMaps(
+  emittedFiles: Iterable<{ filename: string; contents: string }>,
+  cached: BuilderState['singleProgramCache'],
+  posixReferencedFiles: ReadonlySet<string>,
+  effectiveModifiedFiles: ReadonlySet<string> | undefined,
+  hasCompilationModeChanged: boolean,
+  removeDtsMaps: boolean,
+): {
+  esmFiles: Map<string, string>;
+  dtsFiles: Map<string, string>;
+  changedEsmFiles: Set<string>;
+  changedDtsFiles: Set<string>;
+} {
+  const esmFiles = cached?.esmFiles ?? new Map<string, string>();
+  const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
+  if (hasCompilationModeChanged) {
+    esmFiles.clear();
+    dtsFiles.clear();
+  } else if (removeDtsMaps) {
+    for (const key of dtsFiles.keys()) {
+      if (key.endsWith('.map')) {
+        dtsFiles.delete(key);
+      }
+    }
+  }
+
+  const changedEsmFiles = new Set<string>();
+  const changedDtsFiles = new Set<string>();
+
+  if (cached && !hasCompilationModeChanged && effectiveModifiedFiles) {
+    for (const modifiedFile of effectiveModifiedFiles) {
+      if (posixReferencedFiles.has(modifiedFile)) {
+        continue;
+      }
+
+      const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
+      if (basePathWithoutExt === modifiedFile || existsSync(modifiedFile)) {
+        continue;
+      }
+
+      for (const ext of EMITTED_EXTENSIONS) {
+        const outputPath = `${basePathWithoutExt}${ext}`;
+        const mapPath = `${outputPath}.map`;
+        if (esmFiles.delete(outputPath)) {
+          changedEsmFiles.add(outputPath);
+        }
+        if (dtsFiles.delete(outputPath)) {
+          changedDtsFiles.add(outputPath);
+        }
+        esmFiles.delete(mapPath);
+        dtsFiles.delete(mapPath);
+      }
+    }
+  }
+
+  for (const { filename, contents } of emittedFiles) {
+    const normalized = toPosixPath(filename);
+    const isMap = normalized.endsWith('.map');
+    const isDts = isMap ? isDeclarationSourceMapFile(normalized) : isDeclarationFile(normalized);
+    const targetFiles = isDts ? dtsFiles : esmFiles;
+
+    if (targetFiles.get(normalized) !== contents) {
+      targetFiles.set(normalized, contents);
+      (isDts ? changedDtsFiles : changedEsmFiles).add(isMap ? normalized.slice(0, -4) : normalized);
+    }
+  }
+
+  return { esmFiles, dtsFiles, changedEsmFiles, changedDtsFiles };
+}
+
+/**
  * Formats stylesheet bundling diagnostics and TypeScript/Angular diagnostics
  * and records them on the build state's execution result.
  *
@@ -240,76 +313,4 @@ async function runDiagnosticsAndFormat(
   if (warnings.length > 0) {
     executionResult.addWarnings(await formatMessages(warnings, { kind: 'warning', color: colors }));
   }
-}
-
-function updateEmittedFileMaps(
-  emittedFiles: Iterable<{ filename: string; contents: string }>,
-  cached: BuilderState[singleProgramCache],
-  posixReferencedFiles: ReadonlySet<string>,
-  effectiveModifiedFiles: ReadonlySet<string> | undefined,
-  hasCompilationModeChanged: boolean,
-  removeDtsMaps: boolean,
-): {
-  esmFiles: Map<string, string>;
-  dtsFiles: Map<string, string>;
-  changedEsmFiles: Set<string>;
-  changedDtsFiles: Set<string>;
-} {
-  const esmFiles = cached?.esmFiles ?? new Map<string, string>();
-  const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
-  if (hasCompilationModeChanged) {
-    esmFiles.clear();
-    dtsFiles.clear();
-  } else if (removeDtsMaps) {
-    for (const key of dtsFiles.keys()) {
-      if (key.endsWith(.map)) {
-        dtsFiles.delete(key);
-      }
-    }
-  }
-
-  const changedEsmFiles = new Set<string>();
-  const changedDtsFiles = new Set<string>();
-
-  if (cached && !hasCompilationModeChanged && effectiveModifiedFiles) {
-    for (const modifiedFile of effectiveModifiedFiles) {
-      if (posixReferencedFiles.has(modifiedFile)) {
-        continue;
-      }
-
-      const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, );
-      if (basePathWithoutExt === modifiedFile || existsSync(modifiedFile)) {
-        continue;
-      }
-
-      for (const ext of EMITTED_EXTENSIONS) {
-        const outputPath = `${basePathWithoutExt}${ext}`;
-        const mapPath = `${outputPath}.map`;
-        if (esmFiles.delete(outputPath)) {
-          changedEsmFiles.add(outputPath);
-        }
-        if (dtsFiles.delete(outputPath)) {
-          changedDtsFiles.add(outputPath);
-        }
-        esmFiles.delete(mapPath);
-        dtsFiles.delete(mapPath);
-      }
-    }
-  }
-
-  for (const { filename, contents } of emittedFiles) {
-    const normalized = toPosixPath(filename);
-    const isMap = normalized.endsWith(.map);
-    const isDts = isMap ? isDeclarationSourceMapFile(normalized) : isDeclarationFile(normalized);
-    const targetFiles = isDts ? dtsFiles : esmFiles;
-
-    if (targetFiles.get(normalized) !== contents) {
-      targetFiles.set(normalized, contents);
-      (isDts ? changedDtsFiles : changedEsmFiles).add(
-        isMap ? normalized.slice(0, -4) : normalized,
-      );
-    }
-  }
-
-  return { esmFiles, dtsFiles, changedEsmFiles, changedDtsFiles };
 }
