@@ -47,7 +47,7 @@ export interface AssetMatcher {
  */
 function normalizeGlobPattern(pattern: string): string {
   let result = pattern.endsWith('/') ? pattern.slice(0, -1) : pattern;
-  if (!picomatch.isGlob(result)) {
+  if (pattern.endsWith('/') || !picomatch.scan(result).isGlob) {
     result += '/**';
   }
 
