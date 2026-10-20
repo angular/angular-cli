@@ -665,6 +665,20 @@ export function ensurePreDeclarationTransformers(transformers: ts.CustomTransfor
   const beforeTransformers = transformers.before as ts.TransformerFactory<ts.SourceFile>[];
   const seenSourceFiles = new Set<ts.SourceFile>();
   const preTransformedSourceFiles = new Map<ts.SourceFile, ts.SourceFile>();
+  const runBefore = (
+    beforeTransforms: ts.Transformer<ts.SourceFile>[],
+    sourceFile: ts.SourceFile,
+    originalSourceFile: ts.SourceFile,
+  ): ts.SourceFile => {
+    seenSourceFiles.add(originalSourceFile);
+    let current = sourceFile;
+    for (const transform of beforeTransforms) {
+      current = transform(current);
+    }
+
+    return current;
+  };
+
   transformers.before = [
     (context) => {
       let beforeTransforms: ts.Transformer<ts.SourceFile>[] | undefined;
@@ -678,14 +692,9 @@ export function ensurePreDeclarationTransformers(transformers: ts.CustomTransfor
           return preTransformed;
         }
 
-        seenSourceFiles.add(originalSourceFile);
         beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
-        let current = sourceFile;
-        for (const transform of beforeTransforms) {
-          current = transform(current);
-        }
 
-        return current;
+        return runBefore(beforeTransforms, sourceFile, originalSourceFile);
       };
     },
   ];
@@ -697,13 +706,11 @@ export function ensurePreDeclarationTransformers(transformers: ts.CustomTransfor
         if (!ts.isBundle(fileOrBundle)) {
           const originalSourceFile = ts.getOriginalNode(fileOrBundle, ts.isSourceFile);
           if (!seenSourceFiles.has(originalSourceFile)) {
-            seenSourceFiles.add(originalSourceFile);
             beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
-            let current = originalSourceFile;
-            for (const transform of beforeTransforms) {
-              current = transform(current);
-            }
-            preTransformedSourceFiles.set(originalSourceFile, current);
+            preTransformedSourceFiles.set(
+              originalSourceFile,
+              runBefore(beforeTransforms, originalSourceFile, originalSourceFile),
+            );
           }
         }
 
