@@ -31,7 +31,7 @@ import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
 import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
-import { joinUrlParts, stripLeadingSlash } from '../utils/url';
+import { addLeadingSlash, joinUrlParts, stripLeadingSlash } from '../utils/url';
 import {
   PrerenderFallback,
   RenderMode,
@@ -202,7 +202,7 @@ async function* handleRoute(options: {
       } else if (typeof redirectTo === 'string') {
         parentRoutes.set(metadata.route, {
           ...metadata,
-          redirectTo: resolveRedirectTo(parentRoute, redirectTo),
+          redirectTo: resolveRedirectTo(parentRoute, redirectTo, currentRoutePath),
           relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
         });
       } else {
@@ -452,7 +452,7 @@ async function* handleSSGRoute(
   }
 
   if (redirectTo !== undefined) {
-    meta.redirectTo = resolveRedirectTo(parentRoute, redirectTo);
+    meta.redirectTo = resolveRedirectTo(parentRoute, redirectTo, currentRoutePath);
     meta.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
   }
 
@@ -513,7 +513,10 @@ async function* handleSSGRoute(
               ? undefined
               : resolveRedirectTo(
                   parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
-                  redirectTo,
+                  redirectTo.replace(URL_PARAMETER_GLOBAL_REGEXP, (match) =>
+                    Object.hasOwn(params, match.slice(1)) ? replacer(match) : match,
+                  ),
+                  currentRoutePath,
                 ),
         };
       }
@@ -570,23 +573,53 @@ function handlePrerenderParamsReplacement(
  *
  * This function processes the `redirectTo` property to ensure that it correctly
  * resolves relative to the parent route path. If `redirectTo` is an absolute path,
- * it is returned as is. If it is a relative path, it is resolved based on the parent route path,
+ * it is used as is. If it is a relative path, it is resolved based on the parent route path,
  * and, like in the Angular router, its query and fragment are ignored.
+ *
+ * Like in the Angular router, route parameters (e.g. `:id`) used in `redirectTo` take the value
+ * they have in the matched URL. They are emitted as `*` placeholders, or `*<n>` when the value
+ * comes from a different segment position than the one it is used in.
  *
  * @param parentRoute - The path of the parent route.
  * @param redirectTo - The target path for redirection.
+ * @param currentRoutePath - The full path of the route that redirects, including its parent route.
  * @returns The resolved redirect path as a string.
  */
-function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
+function resolveRedirectTo(
+  parentRoute: string,
+  redirectTo: string,
+  currentRoutePath: string,
+): string {
+  let target: string;
   if (redirectTo[0] === '/') {
-    // If the redirectTo path is absolute, return it as is.
-    return redirectTo;
+    target = redirectTo;
+  } else {
+    // Match Angular router behavior: replace all segments matched by the route.
+    const [path] = redirectTo.split(/[?#]/, 1);
+    target = joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
   }
 
-  // Match Angular router behavior: replace all segments matched by the route.
-  const [path] = redirectTo.split(/[?#]/, 1);
+  if (!URL_PARAMETER_REGEXP.test(target)) {
+    return target;
+  }
 
-  return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
+  const sourceSegments = addLeadingSlash(currentRoutePath).split('/');
+
+  return target
+    .split('/')
+    .map((segment, index) => {
+      if (segment[0] !== ':') {
+        return segment;
+      }
+
+      const sourceIndex = sourceSegments.indexOf(segment);
+      if (sourceIndex === -1) {
+        return segment;
+      }
+
+      return sourceIndex === index ? '*' : `*${sourceIndex}`;
+    })
+    .join('/');
 }
 
 /**

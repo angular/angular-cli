@@ -157,7 +157,8 @@ export function stripIndexHtmlFromURL(url: URL): URL {
  * from a base path. This is useful for constructing paths dynamically based on a given base path.
  *
  * The function processes the `toPath` string, replacing each `*` placeholder with
- * the corresponding segment from the `fromPath`. If the `toPath` contains no placeholders,
+ * the corresponding segment from the `fromPath`. A `*<n>` placeholder (e.g. `*3`) takes the
+ * segment at position `n` of the `fromPath` instead of the one at its own position. If the `toPath` contains no placeholders,
  * it is returned as-is. Invalid `toPath` formats (not starting with `/`) will throw an error.
  *
  * @param toPath - A path template string that may contain `*` placeholders. Each `*` is replaced
@@ -196,9 +197,15 @@ export function buildPathWithParams(toPath: string, fromPath: string): string {
 
   const fromPathParts = fromPath.split('/');
   const toPathParts = toPath.split('/');
-  const resolvedParts = toPathParts.map((part, index) =>
-    toPathParts[index] === '*' ? fromPathParts[index] : part,
-  );
+  const resolvedParts = toPathParts.map((part, index) => {
+    // `*` takes the segment at the same position, `*<n>` the segment at position `n`.
+    const match = /^\*(\d*)$/.exec(part);
+    if (!match) {
+      return part;
+    }
+
+    return fromPathParts[match[1] ? Number(match[1]) : index];
+  });
 
   return joinUrlParts(...resolvedParts);
 }

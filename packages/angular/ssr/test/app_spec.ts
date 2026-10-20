@@ -90,6 +90,12 @@ describe('AngularServerApp', () => {
         { path: 'redirect/absolute', redirectTo: '/home' },
         { path: 'redirect-with-query', redirectTo: 'home?param=value' },
         { path: 'redirect-nested/:param', children: [{ path: 'old', redirectTo: 'new' }] },
+        { path: 'redirect-param/:id', redirectTo: 'redirect-target/:id' },
+        { path: 'redirect-param-deep/:id', redirectTo: 'redirect-target/deep/:id' },
+        {
+          path: 'redirect-nested-param/:parent',
+          children: [{ path: 'old/:id', redirectTo: 'new/:id/:parent' }],
+        },
         {
           path: 'redirect-to-function',
           redirectTo: () => 'home',
@@ -446,6 +452,24 @@ describe('AngularServerApp', () => {
     });
 
     describe('SSR pages', () => {
+      it('substitutes route parameters used in `redirectTo`', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-param/5'));
+        expect(response?.headers.get('location')).toBe('/redirect-target/5');
+        expect(response?.status).toBe(302);
+      });
+
+      it('substitutes route parameters used at a different position in `redirectTo`', async () => {
+        const response = await app.handle(new Request('http://localhost/redirect-param-deep/5'));
+        expect(response?.headers.get('location')).toBe('/redirect-target/deep/5');
+      });
+
+      it('substitutes parameters of parent routes used in `redirectTo`', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/redirect-nested-param/a/old/b'),
+        );
+        expect(response?.headers.get('location')).toBe('/redirect-nested-param/a/new/b/a');
+      });
+
       it('returns a 302 status and redirects to the correct location when `redirectTo` is a function', async () => {
         const response = await app.handle(new Request('http://localhost/redirect-to-function'));
         expect(response?.headers.get('location')).toBe('/home');

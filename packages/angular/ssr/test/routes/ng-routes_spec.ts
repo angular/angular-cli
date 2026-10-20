@@ -448,6 +448,48 @@ describe('extractRoutesAndCreateRouteTree', () => {
       ]);
     });
 
+    it('should substitute route parameters used in the `redirectTo` of prerendered routes', async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'old/:id', redirectTo: 'new/:id' },
+          { path: 'new/:id', component: DummyComponent },
+        ],
+        [
+          {
+            path: 'old/:id',
+            renderMode: RenderMode.Prerender,
+            async getPrerenderParams() {
+              return [{ id: '5' }];
+            },
+          },
+          { path: '**', renderMode: RenderMode.Server },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+        includePrerenderFallbackRoutes: true,
+      });
+
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        {
+          route: '/old/5',
+          renderMode: RenderMode.Prerender,
+          redirectTo: '/new/5',
+          relativeRedirect: true,
+        },
+        {
+          route: '/old/*',
+          renderMode: RenderMode.Server,
+          redirectTo: '/new/*',
+          relativeRedirect: true,
+        },
+        { route: '/new/*', renderMode: RenderMode.Server },
+      ]);
+    });
+
     it('should resolve relative redirects of prerendered catch-all routes', async () => {
       setAngularAppTestingManifest(
         [

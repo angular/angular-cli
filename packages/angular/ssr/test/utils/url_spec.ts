@@ -184,6 +184,15 @@ describe('URL Utils', () => {
       expect(result.toString()).toBe('/base/path/details');
     });
 
+    it('should take the segment at position `n` for `*<n>` placeholders', () => {
+      const fromPath = '/old/5';
+      const toPath = '/new/deep/*2';
+
+      const result = buildPathWithParams(toPath, fromPath);
+
+      expect(result.toString()).toBe('/new/deep/5');
+    });
+
     it('should throw an error if the toPath does not start with "/"', () => {
       const fromPath = '/base/path';
       const toPath = 'details';
