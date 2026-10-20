@@ -44,5 +44,28 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         `The "browsers" option requires either "@vitest/browser-playwright", "@vitest/browser-webdriverio", or "@vitest/browser-preview" to be installed`,
       );
     });
+
+    it('should name the provider packages when a runner config skips the dependency check', async () => {
+      await harness.writeFile(
+        'vitest-base.config.mts',
+        `
+          import { defineConfig } from 'vitest/config';
+          export default defineConfig({});
+        `,
+      );
+
+      harness.useTarget('test', {
+        ...BASE_OPTIONS,
+        runnerConfig: 'vitest-base.config.mts',
+        browsers: ['chrome'],
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeFalse();
+      expectLog(
+        logs,
+        `The "browsers" option requires either "@vitest/browser-playwright", "@vitest/browser-webdriverio", or "@vitest/browser-preview" to be installed`,
+      );
+    });
   });
 });
