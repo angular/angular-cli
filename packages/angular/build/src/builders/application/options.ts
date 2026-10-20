@@ -267,12 +267,9 @@ export async function normalizeOptions(
       options.ssr = false;
     }
 
-    // Values are compared, as schema defaults are added to the "prerender" object.
     if (
       options.prerender !== undefined &&
-      (typeof options.prerender !== 'object' ||
-        options.prerender.routesFile !== undefined ||
-        options.prerender.discoverRoutes === false)
+      (typeof options.prerender === 'boolean' || !('format' in options.prerender))
     ) {
       context.logger.warn(
         'The "prerender" option has no effect when "outputMode" is specified (only "format" is supported).',

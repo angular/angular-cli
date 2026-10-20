@@ -96,6 +96,21 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       );
     });
 
+    it(`should warn when 'prerender' is an object without 'format' and 'outputMode' is specified`, async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        server: 'src/main.server.ts',
+        polyfills: ['zone.js'],
+        outputMode: OutputMode.Static,
+        prerender: { routesFile: 'routes.txt' },
+      });
+
+      const { result, logs } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      expectLog(logs, 'The "prerender" option has no effect when "outputMode" is specified');
+    });
+
     it(`should write routes to '<route>/index.html' by default`, async () => {
       harness.useTarget('build', {
         ...BASE_OPTIONS,
