@@ -346,4 +346,47 @@ describe('parseJsonSchemaToOptions', () => {
       );
     });
   });
+
+  describe('with positional arguments not in alphabetical order', () => {
+    it('sorts positional arguments by their index', async () => {
+      const jsonSchema = {
+        '$id': 'FakeSchema',
+        'title': 'Fake Schema',
+        'type': 'object',
+        'required': ['preset'],
+        'properties': {
+          'preset': {
+            'type': 'string',
+            'enum': ['form', 'table'],
+            'description': 'preset.',
+            '$default': {
+              '$source': 'argv',
+              'index': 0,
+            },
+            'x-prompt': 'Which preset?',
+          },
+          'name': {
+            'type': 'string',
+            'description': 'name.',
+            '$default': {
+              '$source': 'argv',
+              'index': 1,
+            },
+          },
+          'path': {
+            'type': 'string',
+            'description': 'path.',
+          },
+        },
+      };
+      const registry = new schema.CoreSchemaRegistry();
+      const options = await parseJsonSchemaToOptions(registry, jsonSchema, /* interactive= */ true);
+
+      expect(options).toEqual([
+        jasmine.objectContaining({ name: 'preset', positional: 0, required: false }),
+        jasmine.objectContaining({ name: 'name', positional: 1, required: false }),
+        jasmine.objectContaining({ name: 'path', positional: undefined, required: false }),
+      ]);
+    });
+  });
 });

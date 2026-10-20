@@ -32,14 +32,14 @@ export default function () {
         "$id": "FakeSchema",
         "title": "Fake Schema",
         "type": "object",
-        "required": ["a"],
+        "required": ["b"],
         "properties": {
           "b": {
             "type": "string",
             "description": "b.",
             "$default": {
               "$source": "argv",
-              "index": 1
+              "index": 0
             }
           },
           "a": {
@@ -47,7 +47,7 @@ export default function () {
             "description": "a.",
             "$default": {
               "$source": "argv",
-              "index": 0
+              "index": 1
             }
           },
           "optC": {
@@ -76,7 +76,7 @@ export default function () {
       )
       .then(() => ng('generate', 'fake-schematics:fake', '--help'))
       .then(({ stdout }) => {
-        assert.match(stdout, /ng generate fake-schematics:fake <a> \[b\]/);
+        assert.match(stdout, /ng generate fake-schematics:fake <b> \[a\]/);
         assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
       })
       // set up default collection.
@@ -89,7 +89,7 @@ export default function () {
       .then(() => ng('generate', 'fake', '--help'))
       // verify same output
       .then(({ stdout }) => {
-        assert.match(stdout, /ng generate fake <a> \[b\]/);
+        assert.match(stdout, /ng generate fake <b> \[a\]/);
         assert.match(stdout, /opt-a[\s\S]*opt-b[\s\S]*opt-c/);
       })
 
