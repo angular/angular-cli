@@ -105,35 +105,6 @@ export async function normalizeLibraryOptions(
     { glob: 'README.md', input: projectRoot, output: '.' },
   ];
 
-  const primaryEntryPoint = entryPoints.get('.');
-  const primaryEntryDir = primaryEntryPoint
-    ? path.posix.dirname(primaryEntryPoint.entryFilePath)
-    : undefined;
-  const seenReadmeAssets = new Set<string>();
-
-  for (const entryPoint of entryPoints.values()) {
-    if (entryPoint.isPrimary) {
-      continue;
-    }
-
-    const entryDir = path.posix.dirname(entryPoint.entryFilePath);
-    if (entryDir === projectRoot || entryDir === primaryEntryDir) {
-      continue;
-    }
-
-    const readmeKey = `${entryDir}:${entryPoint.name}`;
-    if (seenReadmeAssets.has(readmeKey)) {
-      continue;
-    }
-    seenReadmeAssets.add(readmeKey);
-
-    defaultAssets.push({
-      glob: 'README.md',
-      input: entryDir,
-      output: entryPoint.name,
-    });
-  }
-
   const assets = normalizeAssetPatterns(
     [...defaultAssets, ...(rawAssets ?? [])],
     workspaceRoot,

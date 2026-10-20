@@ -101,7 +101,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(harness.hasFile('dist/lib/testing/README.md')).toBeFalse();
     });
 
-    it('should copy secondary entry point README.md when located in its own directory', async () => {
+    it('should only copy the root README.md by default and not secondary entry point README.md files', async () => {
       await harness.writeFiles({
         'projects/lib/README.md': '# Root Library README',
         'projects/lib/testing/README.md': '# Testing Entry Point README',
@@ -122,7 +122,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(result?.success).toBeTrue();
 
       expect(harness.readFile('dist/lib/README.md')).toBe('# Root Library README');
-      expect(harness.readFile('dist/lib/testing/README.md')).toBe('# Testing Entry Point README');
+      expect(harness.hasFile('dist/lib/testing/README.md')).toBeFalse();
     });
   });
 });
