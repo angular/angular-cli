@@ -17,13 +17,9 @@ import { isSubDirectory } from './path';
  */
 export const DEFAULT_ASSET_IGNORE = ['**/.gitkeep', '**/.DS_Store', '**/Thumbs.db'] as const;
 
-function resolveDestination(output: string, file: string, flatten?: boolean): string {
-  const destination = path.join(output, flatten ? path.basename(file) : file);
-  if (
-    path.isAbsolute(destination) ||
-    destination === '..' ||
-    destination.startsWith(`..${path.sep}`)
-  ) {
+function resolveDestination(output: string, filePath: string, flatten?: boolean): string {
+  const destination = path.join(output, flatten ? path.basename(filePath) : filePath);
+  if (destination === '..' || destination.startsWith(`..${path.sep}`)) {
     throw new Error('An asset cannot be written to a location outside of the output path.');
   }
 
