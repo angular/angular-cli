@@ -120,9 +120,14 @@ export class ComponentStylesheetBundler {
     hasher.update(data);
     hasher.update(externalId ?? '');
     const id = hasher.digest();
-    const entry = [language, id, filename].join(';');
+    const cacheKey = [
+      language,
+      id,
+      this.options.sourcemap ? filename : path.dirname(filename),
+    ].join(';');
 
-    const bundlerContext = await this.#inlineContexts.getOrCreate(entry, () => {
+    const bundlerContext = await this.#inlineContexts.getOrCreate(cacheKey, () => {
+      const entry = [language, id, filename].join(';');
       const namespace = 'angular:styles/component';
 
       return new BundlerContext(
@@ -212,17 +217,8 @@ export class ComponentStylesheetBundler {
         entries.push(entry);
       }
     }
-    for (const [entry, bundler] of this.#inlineContexts.entries()) {
-      // Entry is format: [language, id, filename].join(';')
-      const firstSemi = entry.indexOf(';');
-      const secondSemi = firstSemi !== -1 ? entry.indexOf(';', firstSemi + 1) : -1;
-      const filename = secondSemi !== -1 ? entry.slice(secondSemi + 1) : '';
-      if (filename && normalizedFiles.has(path.normalize(filename))) {
-        this.#inlineContexts.delete(entry);
-        void bundler.dispose().catch(() => {});
-      } else {
-        bundler.invalidate(normalizedFiles);
-      }
+    for (const bundler of this.#inlineContexts.values()) {
+      bundler.invalidate(normalizedFiles);
     }
 
     return entries;
