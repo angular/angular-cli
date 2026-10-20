@@ -510,6 +510,25 @@ describe('Component Schematic', () => {
       expect(appModule).toMatch(/import { FooComponent } from '.\/foo\/foo.component'/);
     });
 
+    it('should declare the class name without the type when addTypeToClassName is false', async () => {
+      const options = {
+        ...defaultNonStandaloneOptions,
+        module: 'app-module.ts',
+        addTypeToClassName: false,
+        export: true,
+      };
+
+      const tree = await schematicRunner.runSchematic('component', options, appTree);
+      const component = tree.readContent('/projects/baz/src/app/foo/foo.component.ts');
+      const appModule = tree.readContent('/projects/baz/src/app/app-module.ts');
+
+      expect(component).toContain('export class Foo {');
+      expect(appModule).toMatch(/import { Foo } from '.\/foo\/foo.component'/);
+      expect(appModule).toMatch(/declarations: \[\n\s*App,\n\s*Foo\n/);
+      expect(appModule).toMatch(/exports: \[\n(\s*) {2}Foo\n/);
+      expect(appModule).not.toContain('FooComponent');
+    });
+
     it('should respect the sourceRoot value', async () => {
       const config = JSON.parse(appTree.readContent('/angular.json'));
       config.projects.baz.sourceRoot = 'projects/baz/custom';
