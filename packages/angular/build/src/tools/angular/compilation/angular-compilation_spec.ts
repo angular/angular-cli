@@ -8,6 +8,7 @@
 
 import ts from 'typescript';
 import type { AngularHostOptions } from '../angular-host';
+import { ensurePreDeclarationTransformers } from './aot-compilation';
 import { CompilerOptionOverrides, transformCompilerOptions } from './compiler-options';
 import { TypeScriptCompilation } from './typescript-compilation';
 import {
@@ -478,6 +479,143 @@ describe('AngularCompilation', () => {
       expect(compilerOptions.supportJitMode).toBe(true);
       expect(compilerOptions.noEmitOnError).toBe(false);
       expect(compilerOptions.composite).toBe(false);
+    });
+  });
+
+  describe('ensurePreDeclarationTransformers', () => {
+    function createTestProgram(
+      fileName: string,
+      content: string,
+    ): {
+      program: ts.Program;
+      sourceFile: ts.SourceFile;
+    } {
+      const options: ts.CompilerOptions = {
+        target: ts.ScriptTarget.ES2022,
+        module: ts.ModuleKind.ES2022,
+        declaration: true,
+        noLib: true,
+      };
+      const sourceFile = ts.createSourceFile(fileName, content, ts.ScriptTarget.ES2022, true);
+      const host = ts.createCompilerHost(options);
+      host.getSourceFile = (name) => (name === fileName ? sourceFile : undefined);
+      host.fileExists = (name) => name === fileName;
+      host.readFile = (name) => (name === fileName ? content : undefined);
+      host.writeFile = () => {};
+
+      const program = ts.createProgram([fileName], options, host);
+
+      return { program, sourceFile };
+    }
+
+    it('transforms each SourceFile only once when emitting .d.ts followed by .js and reuses the cached SourceFile', () => {
+      const { program, sourceFile } = createTestProgram('/index.ts', 'export const value = 1;');
+
+      let preDeclStatePopulated = false;
+      const beforeSpy1 = jasmine
+        .createSpy('beforeTransformer1')
+        .and.callFake((sf: ts.SourceFile) => {
+          preDeclStatePopulated = true;
+          const addedStmt = ts.factory.createVariableStatement(
+            [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+            ts.factory.createVariableDeclarationList(
+              [
+                ts.factory.createVariableDeclaration(
+                  'fromBefore1',
+                  undefined,
+                  undefined,
+                  ts.factory.createNumericLiteral(2),
+                ),
+              ],
+              ts.NodeFlags.Const,
+            ),
+          );
+
+          return ts.factory.updateSourceFile(sf, [...sf.statements, addedStmt]);
+        });
+
+      const beforeSpy2 = jasmine
+        .createSpy('beforeTransformer2')
+        .and.callFake((sf: ts.SourceFile) => {
+          const addedStmt = ts.factory.createVariableStatement(
+            [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+            ts.factory.createVariableDeclarationList(
+              [
+                ts.factory.createVariableDeclaration(
+                  'fromBefore2',
+                  undefined,
+                  undefined,
+                  ts.factory.createNumericLiteral(3),
+                ),
+              ],
+              ts.NodeFlags.Const,
+            ),
+          );
+
+          return ts.factory.updateSourceFile(sf, [...sf.statements, addedStmt]);
+        });
+
+      let sawPopulatedPreDeclState = false;
+      const afterDeclSpy = jasmine
+        .createSpy('afterDeclarationsTransformer')
+        .and.callFake((sf: ts.SourceFile) => {
+          sawPopulatedPreDeclState = preDeclStatePopulated;
+
+          return sf;
+        });
+
+      const transformers: ts.CustomTransformers = {
+        before: [() => beforeSpy1, () => beforeSpy2],
+        afterDeclarations: [() => afterDeclSpy],
+      };
+
+      ensurePreDeclarationTransformers(transformers);
+
+      const emittedFiles = new Map<string, string>();
+      const writeFile: ts.WriteFileCallback = (fileName, text) => {
+        emittedFiles.set(fileName, text);
+      };
+
+      // Emit .d.ts first (emitOnlyDtsFiles = true)
+      program.emit(sourceFile, writeFile, undefined, true, transformers);
+
+      expect(sawPopulatedPreDeclState).toBeTrue();
+      expect(beforeSpy1).toHaveBeenCalledTimes(1);
+      expect(beforeSpy2).toHaveBeenCalledTimes(1);
+      expect(afterDeclSpy).toHaveBeenCalledTimes(1);
+      expect(emittedFiles.has('/index.d.ts')).toBeTrue();
+      expect(emittedFiles.has('/index.js')).toBeFalse();
+
+      // Emit .js second; before transformers must not execute again and cached AST must be emitted
+      program.emit(sourceFile, writeFile, undefined, 0 as unknown as boolean, transformers);
+
+      expect(beforeSpy1).toHaveBeenCalledTimes(1);
+      expect(beforeSpy2).toHaveBeenCalledTimes(1);
+      expect(emittedFiles.get('/index.js')).toContain('export const fromBefore1 = 2;');
+      expect(emittedFiles.get('/index.js')).toContain('export const fromBefore2 = 3;');
+    });
+
+    it('transforms each SourceFile only once when emitting .js and .d.ts together', () => {
+      const { program, sourceFile } = createTestProgram('/index.ts', 'export const value = 1;');
+
+      const beforeSpy = jasmine
+        .createSpy('beforeTransformer')
+        .and.callFake((sf: ts.SourceFile) => sf);
+      const afterDeclSpy = jasmine
+        .createSpy('afterDeclarationsTransformer')
+        .and.callFake((sf: ts.SourceFile) => sf);
+
+      const transformers: ts.CustomTransformers = {
+        before: [() => beforeSpy],
+        afterDeclarations: [() => afterDeclSpy],
+      };
+
+      ensurePreDeclarationTransformers(transformers);
+
+      program.emit(sourceFile, () => {}, undefined, false, transformers);
+
+      expect(beforeSpy).toHaveBeenCalledTimes(1);
+      expect(afterDeclSpy).toHaveBeenCalledTimes(1);
     });
   });
 });
