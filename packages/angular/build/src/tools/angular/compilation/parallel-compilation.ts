@@ -8,7 +8,7 @@
 
 import type { PartialMessage } from 'esbuild';
 import { createRequire } from 'node:module';
-import { MessageChannel, type MessagePort } from 'node:worker_threads';
+import { MessageChannel } from 'node:worker_threads';
 import { mergeCumulativeDurations } from '../../../utils/profiling';
 import { WorkerPool } from '../../../utils/worker-pool';
 import type { AngularHostOptions } from '../angular-host';
@@ -69,7 +69,6 @@ export class ParallelCompilation extends AngularCompilation {
     this.#webWorkerChannel?.port1.close();
     this.#webWorkerChannel = undefined;
 
-    let webWorkerPort: MessagePort | undefined;
     let webWorkerSignal: Int32Array | undefined;
     if (buildType !== 'library') {
       // The web worker processing is a synchronous operation and uses shared memory combined with
@@ -77,7 +76,6 @@ export class ParallelCompilation extends AngularCompilation {
       const webWorkerChannel = new MessageChannel();
       this.#webWorkerChannel = webWorkerChannel;
       const signal = new Int32Array(new SharedArrayBuffer(4));
-      webWorkerPort = webWorkerChannel.port2;
       webWorkerSignal = signal;
       webWorkerChannel.port1.on('message', ({ workerFile, containingFile }) => {
         try {
@@ -104,13 +102,13 @@ export class ParallelCompilation extends AngularCompilation {
           compilerOptionOverrides,
           buildType,
           stylesheetPort: stylesheetChannel.port2,
-          webWorkerPort,
+          webWorkerPort: this.#webWorkerChannel?.port2,
           webWorkerSignal,
         },
         {
           name: 'initialize',
-          transferList: webWorkerPort
-            ? [stylesheetChannel.port2, webWorkerPort]
+          transferList: this.#webWorkerChannel
+            ? [stylesheetChannel.port2, this.#webWorkerChannel.port2]
             : [stylesheetChannel.port2],
         },
       );
