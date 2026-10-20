@@ -10,7 +10,7 @@ import ts from 'typescript';
 import { type AngularHostOptions, createAngularCompilerHost } from './angular-host';
 
 describe('createAngularCompilerHost', () => {
-  function createHost(overrides?: Partial<AngularHostOptions>) {
+  function createHost() {
     const transformStylesheet = jasmine
       .createSpy<AngularHostOptions['transformStylesheet']>('transformStylesheet')
       .and.resolveTo('.compiled {}');
@@ -24,7 +24,6 @@ describe('createAngularCompilerHost', () => {
       {
         transformStylesheet,
         processWebWorker,
-        ...overrides,
       },
       undefined,
     );
