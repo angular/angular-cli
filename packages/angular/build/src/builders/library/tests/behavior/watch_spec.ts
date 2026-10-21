@@ -1058,5 +1058,105 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
         },
       ]);
     });
+
+    it('should preserve template diagnostics across watch rebuilds after a stylesheet error', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.angularCompilerOptions = {
+          ...tsconfig.angularCompilerOptions,
+          strictTemplates: true,
+        };
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
+
+      await harness.writeFiles({
+        'projects/lib/src/lib/other.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-other',
+            template: '<span>{{ validProp }}</span>',
+          })
+          export class OtherComponent {
+            validProp = 'ok';
+          }
+        `,
+        'projects/lib/src/lib/lib.component.scss': '.valid { color: blue; }',
+        'projects/lib/src/lib/lib.component.ts': `
+          import { Component } from '@angular/core';
+
+          @Component({
+            selector: 'lib-primary',
+            template: '<span>Primary</span>',
+            styleUrl: './lib.component.scss',
+          })
+          export class LibComponent {}
+        `,
+        'projects/lib/src/public-api.ts': `
+          export * from './lib/lib.component';
+          export * from './lib/other.component';
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+
+          // Introduce both a stylesheet error in LibComponent and a template error in OtherComponent
+          await harness.writeFiles({
+            'projects/lib/src/lib/lib.component.scss': '.broken { color: $undefined_var; }',
+            'projects/lib/src/lib/other.component.ts': `
+              import { Component } from '@angular/core';
+
+              @Component({
+                selector: 'lib-other',
+                template: '<span>{{ unknownProp }}</span>',
+              })
+              export class OtherComponent {}
+            `,
+          });
+        },
+        async ({ result, logs }) => {
+          expect(result?.success).toBeFalse();
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              level: 'error',
+              message: jasmine.stringContaining('Undefined variable'),
+            }),
+          );
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              level: 'error',
+              message: jasmine.stringContaining(
+                "Property 'unknownProp' does not exist on type 'OtherComponent'",
+              ),
+            }),
+          );
+
+          // Fix only the stylesheet error in LibComponent while OtherComponent still has the template error
+          await harness.writeFile(
+            'projects/lib/src/lib/lib.component.scss',
+            '.valid { color: green; }',
+          );
+        },
+        ({ result, logs }) => {
+          expect(result?.success).toBeFalse();
+          expect(logs).toContain(
+            jasmine.objectContaining({
+              level: 'error',
+              message: jasmine.stringContaining(
+                "Property 'unknownProp' does not exist on type 'OtherComponent'",
+              ),
+            }),
+          );
+        },
+      ]);
+    });
   });
 });
