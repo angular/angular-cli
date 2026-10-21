@@ -512,6 +512,14 @@ describe('Watcher', () => {
       expect(result.done).toBeTrue();
     });
 
+    it('should not throw if add() or remove() is called after close()', async () => {
+      const watcher = await createWatcher({ polling: true, interval: 50, cwd: tempDir });
+      await watcher.close();
+
+      expect(() => watcher.add(path.join(tempDir, 'main.ts'))).not.toThrow();
+      expect(() => watcher.remove(path.join(tempDir, 'main.ts'))).not.toThrow();
+    });
+
     it('should ignore stale modifications before initTime and emit changes after initTime (@parcel/watcher)', async () => {
       const testFile = path.join(tempDir, 'test.txt');
       fs.writeFileSync(testFile, 'initial');
