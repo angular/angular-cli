@@ -399,6 +399,42 @@ describe('Migration to use the library builder', () => {
     });
   });
 
+  it('should migrate styleIncludePaths and sass options from secondary entry points', async () => {
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({
+        lib: {
+          entryFile: 'src/public-api.ts',
+          styleIncludePaths: ['styles'],
+          sass: { silenceDeprecations: ['import'] },
+        },
+      }),
+    );
+    tree.create(
+      '/projects/my-lib/testing/ng-package.json',
+      JSON.stringify({
+        lib: {
+          entryFile: 'src/public-api.ts',
+          styleIncludePaths: ['../styles', 'styles'],
+          sass: { silenceDeprecations: ['import', 'global-builtin'] },
+        },
+      }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.stylePreprocessorOptions).toEqual({
+      includePaths: ['projects/my-lib/styles', 'projects/my-lib/testing/styles'],
+      sass: {
+        silenceDeprecations: ['import', 'global-builtin'],
+      },
+    });
+  });
+
   it('should throw an error when entry file is not configured and no default candidate exists', async () => {
     tree.overwrite('/projects/my-lib/ng-package.json', JSON.stringify({}, undefined, 2));
 
