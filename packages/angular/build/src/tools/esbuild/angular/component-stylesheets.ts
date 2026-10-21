@@ -176,13 +176,24 @@ export class ComponentStylesheetBundler {
       );
     });
 
+    const result = await bundlerContext.bundle();
+    if (result.errors || result.warnings.length > 0) {
+      if (this.incremental && result.errors) {
+        bundlerContext.watchFiles.add(
+          path.isAbsolute(filename) ? filename : path.join(this.options.workspaceRoot, filename),
+        );
+      }
+      for (const message of [...(result.errors ?? []), ...result.warnings]) {
+        for (const item of [message, ...(message.notes ?? [])]) {
+          if (item.location?.file?.startsWith('angular:styles/component:')) {
+            item.location.file = filename;
+          }
+        }
+      }
+    }
+
     // Extract the result of the bundling from the output files
-    return this.extractResult(
-      await bundlerContext.bundle(),
-      bundlerContext.watchFiles,
-      !!externalId,
-      false,
-    );
+    return this.extractResult(result, bundlerContext.watchFiles, !!externalId, false);
   }
 
   /**
