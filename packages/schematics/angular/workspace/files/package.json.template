@@ -23,7 +23,7 @@
   "devDependencies": {
     "@angular/cli": "<%= '^' + version %>",
     "@angular/compiler-cli": "<%= latestVersions.Angular %>",
-    "prettier": "<%= latestVersions['prettier'] %>",
+    "oxfmt": "<%= latestVersions['oxfmt'] %>",
     "typescript": "<%= latestVersions['typescript'] %>"
   }
 }
