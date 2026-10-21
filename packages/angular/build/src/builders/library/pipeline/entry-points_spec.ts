@@ -240,12 +240,46 @@ describe('entry-points pipeline', () => {
       );
     });
 
-    it('should ignore non-TypeScript exports for secondary subpaths', () => {
+    it('should preserve casing in displayName while lowercasing bundleName', () => {
+      const rawExports = {
+        '.': './src/public-api.ts',
+        './myFeature': './my-feature/src/public-api.ts',
+      };
+
+      const entryPoints = normalizeEntryPoints(
+        rawExports,
+        projectRoot,
+        packageJsonPath,
+        '@My-Scope/My-Lib',
+      );
+
+      expect(entryPoints.get('.')).toEqual({
+        subpath: '.',
+        name: '.',
+        displayName: '@My-Scope/My-Lib',
+        bundleName: 'my-scope-my-lib',
+        entryFilePath: join(projectRoot, 'src/public-api.ts'),
+        isPrimary: true,
+      });
+
+      expect(entryPoints.get('myFeature')).toEqual({
+        subpath: './myFeature',
+        name: 'myFeature',
+        displayName: '@My-Scope/My-Lib/myFeature',
+        bundleName: 'my-scope-my-lib-myfeature',
+        entryFilePath: join(projectRoot, 'my-feature/src/public-api.ts'),
+        isPrimary: false,
+      });
+    });
+
+    it('should ignore non-TypeScript exports and static declaration files for secondary subpaths', () => {
       const rawExports = {
         '.': './src/public-api.ts',
         './package.json': './package.json',
         './styles.css': './styles.css',
         './theme': { sass: './theme.scss' },
+        './custom-types': './src/custom-types.d.ts',
+        './custom-esm-types': { default: './src/custom-types.d.mts' },
       };
 
       const entryPoints = normalizeEntryPoints(
@@ -260,6 +294,31 @@ describe('entry-points pipeline', () => {
       expect(entryPoints.has('package.json')).toBeFalse();
       expect(entryPoints.has('styles.css')).toBeFalse();
       expect(entryPoints.has('theme')).toBeFalse();
+      expect(entryPoints.has('custom-types')).toBeFalse();
+      expect(entryPoints.has('custom-esm-types')).toBeFalse();
+    });
+
+    it('should throw when entry point file path escapes projectRoot', () => {
+      expect(() =>
+        normalizeEntryPoints(
+          { '.': '../other-lib/src/public-api.ts' },
+          projectRoot,
+          packageJsonPath,
+          packageName,
+        ),
+      ).toThrowError(/is outside the project root/);
+
+      expect(() =>
+        normalizeEntryPoints(
+          {
+            '.': './src/public-api.ts',
+            './testing': '../../outside/public-api.ts',
+          },
+          projectRoot,
+          packageJsonPath,
+          packageName,
+        ),
+      ).toThrowError(/is outside the project root/);
     });
 
     it('should throw when exports is missing or not an object/string', () => {

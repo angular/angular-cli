@@ -7,7 +7,7 @@
  */
 
 import path from 'node:path';
-import { toPosixPath } from '../../../utils/path';
+import { isSubDirectory, toPosixPath } from '../../../utils/path';
 import type { BuilderState } from '../builder-state';
 import type { NormalizedEntryPoint, NormalizedLibraryOptions, PackageJsonData } from '../types';
 import type { BundleEntryPointInput } from './bundler';
@@ -55,11 +55,17 @@ function normalizeEntryPoint(
   }
 
   const subpath = isPrimary ? '.' : `./${name}`;
-  const displayName = (isPrimary ? packageName : `${packageName}/${name}`).toLowerCase();
+  const displayName = isPrimary ? packageName : `${packageName}/${name}`;
   const bundleName = getEntryPointBundleName(packageName, name);
   const entryFilePath = toPosixPath(path.resolve(projectRoot, targetPath));
 
-  if (!/(?<!\.d)\.(?:ts|mts)$/.test(entryFilePath)) {
+  if (!isSubDirectory(projectRoot, entryFilePath)) {
+    throw new Error(
+      `Entry point '${key}' file path '${entryFilePath}' is outside the project root '${projectRoot}'.`,
+    );
+  }
+
+  if (!/(?<!\.d)\.m?ts$/.test(entryFilePath)) {
     throw new Error(
       `Entry point '${key}' file path must be a TypeScript file ('.ts' or '.mts'): '${entryFilePath}'.`,
     );
@@ -157,8 +163,8 @@ export function normalizeEntryPoints(
       continue;
     }
 
-    if (!isPrimary && !/\.m?ts$/.test(target)) {
-      // Static asset, stylesheet, or package.json export; preserve in package.json without compiling.
+    if (!isPrimary && !/(?<!\.d)\.m?ts$/.test(target)) {
+      // Static asset, stylesheet, declaration file, or package.json export; preserve in package.json without compiling.
       continue;
     }
 
