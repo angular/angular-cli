@@ -219,16 +219,20 @@ export function getDirectoryPath(posixPath: string): string {
   return dir;
 }
 
+function isNodeModulesSegment(lookupKey: string): boolean {
+  return lookupKey === NODE_MODULES || lookupKey.endsWith(`/${NODE_MODULES}`);
+}
+
 /**
  * Determines whether a file path lookup key or any of its parent directories are present in watchedFiles.
  */
-function isPathWatched(fileLookupKey: string, watchedFiles: Set<string>): boolean {
+function isPathWatched(fileLookupKey: string, watchedFiles: ReadonlySet<string>): boolean {
   if (watchedFiles.has(fileLookupKey)) {
     return true;
   }
 
   let current = fileLookupKey;
-  while (true) {
+  while (!isNodeModulesSegment(current)) {
     const parent = getDirectoryPath(current);
     if (parent === current) {
       break;
@@ -1111,8 +1115,8 @@ function createChokidarIgnored(
       }) ?? [];
 
   // When watching a directory (e.g. projectRoot via NG_BUILD_WATCH_ROOT), prune `node_modules`
-  // directories unless explicitly added to `watchedFiles`. Explicitly added files inside
-  // `node_modules` do not end with `/node_modules` and remain watchable.
+  // directories and any unwatched descendants inside `node_modules` (since Chokidar 6 keeps
+  // ancestor directories of explicitly watched package files un-ignored to traverse to them).
   return [
     ...customIgnored,
     (filePath: string) => {
@@ -1122,11 +1126,15 @@ function createChokidarIgnored(
 
       const posixPath = toPosixPathNormalized(filePath);
       const lookupKey = toLookupKey(posixPath, isCaseSensitive);
+      if (
+        !isNodeModulesSegment(lookupKey) &&
+        !lookupKey.includes(`/${NODE_MODULES}/`) &&
+        !lookupKey.startsWith(`${NODE_MODULES}/`)
+      ) {
+        return false;
+      }
 
-      return (
-        (lookupKey === NODE_MODULES || lookupKey.endsWith(`/${NODE_MODULES}`)) &&
-        !watchedFiles.has(lookupKey)
-      );
+      return !isPathWatched(lookupKey, watchedFiles);
     },
   ];
 }
