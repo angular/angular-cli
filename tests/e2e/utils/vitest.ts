@@ -1,11 +1,20 @@
-import { installPackage } from './packages';
+import { installWorkspacePackages } from './packages';
 import { updateJsonFile } from './project';
 
 /** Updates the `test` builder in the current workspace to use Vitest. */
-export async function applyVitestBuilder(): Promise<void> {
+export async function applyVitestBuilder(options?: { webdriver?: boolean }): Promise<void> {
   // These deps matches the deps in `@schematics/angular`
-  await installPackage('vitest@^4.0.8');
-  await installPackage('jsdom@^27.1.0');
+  await updateJsonFile('package.json', (json) => {
+    json.devDependencies['vitest'] = '^4.0.8';
+    json.devDependencies['jsdom'] = '^27.1.0';
+
+    if (options?.webdriver) {
+      json.devDependencies['webdriverio'] = '^9.0.0';
+      json.devDependencies['@vitest/browser-webdriverio'] = '^4.0.8';
+    }
+  });
+
+  await installWorkspacePackages();
 
   await updateJsonFile('angular.json', (json) => {
     const projects = Object.values(json['projects']);

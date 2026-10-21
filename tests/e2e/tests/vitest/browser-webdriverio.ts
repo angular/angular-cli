@@ -1,14 +1,13 @@
 import assert from 'node:assert/strict';
 import { applyVitestBuilder } from '../../utils/vitest';
 import { ng } from '../../utils/process';
-import { installPackage } from '../../utils/packages';
 import { writeFile } from '../../utils/fs';
 import { updateJsonFile } from '../../utils/project';
 
 export default async function (): Promise<void> {
-  await applyVitestBuilder();
-  await installPackage('webdriverio@9');
-  await installPackage('@vitest/browser-webdriverio@4');
+  await applyVitestBuilder({
+    webdriver: true,
+  });
 
   await ng('generate', 'component', 'my-comp');
 
