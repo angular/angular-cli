@@ -34,12 +34,16 @@ async function processTestTargetOptions(
     const configKey = configName || '';
 
     if (!customBuildOptions[configKey]) {
-      // Match Karma behavior where AOT was disabled by default
-      customBuildOptions[configKey] = {
-        aot: false,
-        optimization: false,
-        extractLicenses: false,
-      };
+      // Match Karma behavior where AOT was disabled by default. Configurations inherit these
+      // from the base options when present, so seeding them would override explicit base values.
+      customBuildOptions[configKey] =
+        configKey && testTarget.options
+          ? {}
+          : {
+              aot: false,
+              optimization: false,
+              extractLicenses: false,
+            };
     }
 
     // Collect custom build options
@@ -308,9 +312,10 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
 
         // A test configuration inherits the base test options, so its build configuration must
         // include the build options moved from them, with the configuration's own values on top.
-        const mergedOptions = configKey && customBuildOptions['']
-          ? { ...customBuildOptions[''], ...configOptions }
-          : configOptions;
+        const mergedOptions =
+          configKey && customBuildOptions['']
+            ? { ...customBuildOptions[''], ...configOptions }
+            : configOptions;
 
         // Omit options that already have the same value in the base build options.
         // Using isDeepStrictEqual for a deep comparison of arrays and objects.

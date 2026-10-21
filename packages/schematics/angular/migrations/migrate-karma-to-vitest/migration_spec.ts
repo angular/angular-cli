@@ -150,6 +150,39 @@ describe('Migration from Karma to Vitest unit-test builder', () => {
     ]);
   });
 
+  it('should keep explicit base Karma build defaults in per configuration testing configurations', async () => {
+    const { projects } = tree.readJson('/angular.json') as any;
+    projects.app.targets.test.options.styles = ['src/test-styles.scss'];
+    projects.app.targets.test.options.aot = true;
+    projects.app.targets.test.configurations = {
+      ci: {
+        watch: false,
+      },
+    };
+    tree.overwrite('/angular.json', JSON.stringify({ version: 1, projects }));
+
+    const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    const { projects: newProjects } = newTree.readJson('/angular.json') as any;
+
+    expect(newProjects.app.targets.build.configurations.testing.aot).toBeTrue();
+    expect(newProjects.app.targets.build.configurations['testing-ci'].aot).toBeTrue();
+  });
+
+  it('should apply Karma build defaults to testing configurations without base test options', async () => {
+    const { projects } = tree.readJson('/angular.json') as any;
+    projects.app.targets.test.configurations = {
+      ci: projects.app.targets.test.options,
+    };
+    delete projects.app.targets.test.options;
+    tree.overwrite('/angular.json', JSON.stringify({ version: 1, projects }));
+
+    const newTree = await schematicRunner.runSchematic('migrate-karma-to-vitest', {}, tree);
+    const { projects: newProjects } = newTree.readJson('/angular.json') as any;
+
+    expect(newProjects.app.targets.test.configurations.ci.buildTarget).toBe(':build:testing-ci');
+    expect(newProjects.app.targets.build.configurations['testing-ci'].aot).toBeFalse();
+  });
+
   it('should omit testing configuration if options match base build options', async () => {
     const { projects } = tree.readJson('/angular.json') as any;
     projects.app.targets.build.options.aot = false;
