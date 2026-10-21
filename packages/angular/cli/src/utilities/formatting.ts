@@ -13,7 +13,7 @@ import { dirname, join } from 'node:path';
 import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
-let prettierCliPath: string | null | undefined;
+let formatter: { name: string; cliPath: string } | null | undefined;
 
 /**
  * Conservative upper bound for the length of a single spawned command line.
@@ -60,7 +60,7 @@ export function batchFilesByArgumentLength(
 }
 
 /**
- * Formats files using Prettier.
+ * Formats files using the workspace's Prettier installation, falling back to Oxfmt.
  * @param cwd The current working directory.
  * @param files The files to format.
  */
@@ -69,40 +69,46 @@ export async function formatFiles(cwd: string, files: Set<string>): Promise<void
     return;
   }
 
-  if (prettierCliPath === undefined) {
-    try {
-      const prettierPath = createRequire(cwd + '/').resolve('prettier/package.json');
-      const prettierPackageJson = JSON.parse(await readFile(prettierPath, 'utf-8')) as {
-        bin: string;
-      };
-      prettierCliPath = join(dirname(prettierPath), prettierPackageJson.bin);
-    } catch {
-      // Prettier is not installed.
-      prettierCliPath = null;
+  if (formatter === undefined) {
+    const workspaceRequire = createRequire(cwd + '/');
+    formatter = null;
+    for (const name of ['prettier', 'oxfmt']) {
+      try {
+        const packageJsonPath = workspaceRequire.resolve(`${name}/package.json`);
+        const { bin } = JSON.parse(await readFile(packageJsonPath, 'utf-8')) as {
+          bin: string | Record<string, string>;
+        };
+        formatter = {
+          name,
+          cliPath: join(dirname(packageJsonPath), typeof bin === 'string' ? bin : bin[name]),
+        };
+        break;
+      } catch {
+        continue;
+      }
     }
   }
 
-  if (!prettierCliPath) {
+  if (!formatter) {
     return;
   }
 
-  const baseArgs = [
-    prettierCliPath,
-    '--write',
-    '--no-error-on-unmatched-pattern',
-    '--ignore-unknown',
-  ];
+  const { cliPath: formatterCliPath } = formatter;
+  const baseArgs = [formatterCliPath, '--write', '--no-error-on-unmatched-pattern'];
+  if (formatter.name === 'prettier') {
+    baseArgs.push('--ignore-unknown');
+  }
   // `process.execPath` is spawned as the first argument and also counts toward the
-  // command-line limit; it and `prettierCliPath` are absolute paths that may contain
+  // command-line limit; it and `formatterCliPath` are absolute paths that may contain
   // spaces and therefore be quoted.
   const baseLength = [process.execPath, ...baseArgs].reduce(
     (total, arg) => total + arg.length + (arg.includes(' ') ? 3 : 1),
     0,
   );
 
-  // Spawn Prettier once per batch so repositories with many changed files do not
+  // Spawn the formatter once per batch so repositories with many changed files do not
   // overflow the OS command-line length limit. A failure in one batch (e.g. a file
-  // Prettier cannot parse) must not stop the remaining batches, matching the previous
+  // the formatter cannot parse) must not stop the remaining batches, matching the previous
   // single-invocation behavior, so errors are collected and reported together.
   const errors: string[] = [];
   for (const batch of batchFilesByArgumentLength(files, baseLength, MAX_COMMAND_LINE_LENGTH)) {
