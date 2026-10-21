@@ -144,8 +144,8 @@ export async function normalizeOptions(
     servePath,
     publicHost,
     ssl,
-    sslCert,
-    sslKey,
+    sslCert: sslCert && path.resolve(workspaceRoot, sslCert),
+    sslKey: sslKey && path.resolve(workspaceRoot, sslKey),
     forceEsbuild,
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && !optimization.scripts && (prebundle ?? true),
