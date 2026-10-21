@@ -47,11 +47,36 @@ export interface AssetMatcher {
  */
 function normalizeGlobPattern(pattern: string): string {
   let result = pattern.endsWith('/') ? pattern.slice(0, -1) : pattern;
-  if (pattern.endsWith('/') || !picomatch.scan(result).isGlob) {
+  if (pattern.endsWith('/') || !result.endsWith('*')) {
     result += '/**';
   }
 
   return path.posix.normalize(result);
+}
+
+/**
+ * Resolves the candidate POSIX source file path within `matcher` that would map to `outputPath`,
+ * or `undefined` if `outputPath` is outside `matcher.asset.output` or does not match `matcher`.
+ */
+function getCandidateSourceForOutput(
+  matcher: AssetMatcher,
+  outputPath: string,
+): string | undefined {
+  const relative = path.posix.relative(matcher.asset.output, outputPath);
+  if (!relative || relative.startsWith('..') || path.posix.isAbsolute(relative)) {
+    return undefined;
+  }
+
+  return matcher.isMatch(relative) ? `${matcher.prefix}${relative}` : undefined;
+}
+
+/**
+ * Checks whether a POSIX path exists on disk as a file, respecting `followSymlinks`.
+ */
+function isMatchingAssetFile(file: string, followSymlinks: boolean | undefined): boolean {
+  return followSymlinks
+    ? (statSync(file, { throwIfNoEntry: false })?.isFile() ?? false)
+    : (lstatSync(file, { throwIfNoEntry: false })?.isFile() ?? false);
 }
 
 /**
@@ -62,15 +87,16 @@ function normalizeGlobPattern(pattern: string): string {
  */
 export function createAssetMatchers(assets: NormalizedAssetsPattern[]): readonly AssetMatcher[] {
   return assets.map((asset) => {
-    const ignore = [...DEFAULT_ASSET_IGNORE, ...(asset.ignore ?? [])]
+    const { glob: rawGlob, ignore: rawIgnore, input } = asset;
+    const ignore = [...DEFAULT_ASSET_IGNORE, ...(rawIgnore ?? [])]
       .filter((pattern) => pattern.length > 0)
       .map(normalizeGlobPattern);
-    const isMatch = picomatch(asset.glob ? path.posix.normalize(asset.glob) : [], {
+    const isMatch = picomatch(rawGlob ? path.posix.normalize(rawGlob) : [], {
       dot: true,
       windows: false,
       ignore,
     });
-    const prefix = asset.input.endsWith('/') ? asset.input : `${asset.input}/`;
+    const prefix = input.endsWith('/') ? input : `${input}/`;
 
     return { asset, prefix, isMatch };
   });
@@ -89,7 +115,7 @@ export function createAssetMatchers(assets: NormalizedAssetsPattern[]): readonly
 export async function collectAssetsToEmit(
   assets: NormalizedAssetsPattern[],
   workspaceRoot: string,
-  emittedAssets: ReadonlyMap<string, unknown>,
+  emittedAssets: ReadonlyMap<string, ReadonlySet<string>>,
   modifiedFiles?: ReadonlySet<string>,
   assetMatchers?: readonly AssetMatcher[],
 ): Promise<CollectedAssets> {
@@ -108,16 +134,21 @@ export async function collectAssetsToEmit(
 
       if (!emittedAssets.has(file) && emittedAssets.size > 0) {
         const dirPrefix = file.endsWith('/') ? file : `${file}/`;
-        let isDeletedDir: boolean | undefined;
+        let isDirectory: boolean | undefined;
         for (const emittedFile of emittedAssets.keys()) {
           if (emittedFile.startsWith(dirPrefix)) {
-            if (!(isDeletedDir ??= !statSync(file, { throwIfNoEntry: false })?.isDirectory())) {
-              break;
+            if (isDirectory === undefined) {
+              const stats = statSync(file, { throwIfNoEntry: false });
+              isDirectory = stats?.isDirectory() ?? false;
+              isFileStat = stats?.isFile() ?? false;
+              if (isDirectory) {
+                break;
+              }
             }
             filesToDelete.add(emittedFile);
           }
         }
-        if (isDeletedDir !== undefined) {
+        if (isDirectory !== undefined && !isFileStat) {
           continue;
         }
       }
@@ -151,6 +182,84 @@ export async function collectAssetsToEmit(
 
       if (emittedAssets.has(file) && !matched) {
         filesToDelete.add(file);
+      }
+    }
+
+    if (matchers.length > 1) {
+      // Ensure lower-priority modified assets do not overwrite existing higher-priority assets on disk.
+      for (const [outputPath, { file, matcherIndex }] of filesToEmit) {
+        for (let laterIndex = matchers.length - 1; laterIndex > matcherIndex; laterIndex--) {
+          const laterMatcher = matchers[laterIndex];
+          const candidateFile = getCandidateSourceForOutput(laterMatcher, outputPath);
+          if (!candidateFile || candidateFile === file.source) {
+            continue;
+          }
+
+          if (isMatchingAssetFile(candidateFile, laterMatcher.asset.followSymlinks)) {
+            if (emittedAssets.get(candidateFile)?.has(outputPath)) {
+              filesToEmit.delete(outputPath);
+            } else {
+              filesToEmit.set(outputPath, {
+                file: createDiskOutputFile(candidateFile, outputPath),
+                matcherIndex: laterIndex,
+              });
+            }
+            break;
+          } else if (emittedAssets.get(candidateFile)?.has(outputPath)) {
+            filesToDelete.add(candidateFile);
+          }
+        }
+      }
+
+      // Restore lower-priority fallback assets when a higher-priority overriding asset is deleted.
+      for (const deletedFile of filesToDelete) {
+        for (
+          let deletedMatcherIndex = 0;
+          deletedMatcherIndex < matchers.length;
+          deletedMatcherIndex++
+        ) {
+          const { asset, prefix, isMatch } = matchers[deletedMatcherIndex];
+          if (!deletedFile.startsWith(prefix)) {
+            continue;
+          }
+
+          const relative = deletedFile.slice(prefix.length);
+          if (!isMatch(relative)) {
+            continue;
+          }
+
+          const outputPath = path.posix.join(asset.output, relative);
+          if (filesToEmit.has(outputPath)) {
+            continue;
+          }
+
+          for (let candidateIndex = matchers.length - 1; candidateIndex >= 0; candidateIndex--) {
+            if (candidateIndex === deletedMatcherIndex) {
+              continue;
+            }
+
+            const candidateMatcher = matchers[candidateIndex];
+            const candidateFile = getCandidateSourceForOutput(candidateMatcher, outputPath);
+            if (!candidateFile || filesToDelete.has(candidateFile)) {
+              continue;
+            }
+
+            if (isMatchingAssetFile(candidateFile, candidateMatcher.asset.followSymlinks)) {
+              if (
+                candidateIndex < deletedMatcherIndex ||
+                !emittedAssets.get(candidateFile)?.has(outputPath)
+              ) {
+                filesToEmit.set(outputPath, {
+                  file: createDiskOutputFile(candidateFile, outputPath),
+                  matcherIndex: candidateIndex,
+                });
+              }
+              break;
+            } else if (emittedAssets.get(candidateFile)?.has(outputPath)) {
+              filesToDelete.add(candidateFile);
+            }
+          }
+        }
       }
     }
 

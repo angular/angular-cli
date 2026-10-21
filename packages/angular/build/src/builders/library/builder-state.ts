@@ -417,6 +417,21 @@ export class BuilderState {
 
     for (const emittedAsset of toEmit) {
       let outputs = this.#emittedAssets.get(emittedAsset.source);
+      if (outputs?.has(emittedAsset.path)) {
+        continue;
+      }
+
+      if (this.#hasEmittedAssets) {
+        for (const [source, prevOutputs] of this.#emittedAssets) {
+          if (prevOutputs.delete(emittedAsset.path)) {
+            if (prevOutputs.size === 0) {
+              this.#emittedAssets.delete(source);
+            }
+            break;
+          }
+        }
+      }
+
       if (!outputs) {
         outputs = new Set();
         this.#emittedAssets.set(emittedAsset.source, outputs);
@@ -424,26 +439,13 @@ export class BuilderState {
       outputs.add(emittedAsset.path);
     }
 
-    if (toDelete.length) {
-      const candidateDeletes = new Set<string>();
-      for (const source of toDelete) {
-        const outputs = this.#emittedAssets.get(source);
-        if (outputs) {
-          for (const output of outputs) {
-            candidateDeletes.add(output);
-          }
-          this.#emittedAssets.delete(source);
-        }
-      }
-
-      for (const outputs of this.#emittedAssets.values()) {
+    for (const source of toDelete) {
+      const outputs = this.#emittedAssets.get(source);
+      if (outputs) {
         for (const output of outputs) {
-          candidateDeletes.delete(output);
+          filesToDelete.add(output);
         }
-      }
-
-      for (const output of candidateDeletes) {
-        filesToDelete.add(output);
+        this.#emittedAssets.delete(source);
       }
     }
 

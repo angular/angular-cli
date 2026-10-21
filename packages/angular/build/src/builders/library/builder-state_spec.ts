@@ -261,24 +261,43 @@ describe('BuilderState', () => {
       );
     });
 
-    it('should not delete an asset output path when another source still emits to it', () => {
+    it('should evict overridden asset sources and not delete an output path when a fallback source is re-emitted', async () => {
       const state = new BuilderState();
 
       const sourceA = '/workspace/projects/my-lib/README.md';
       const sourceB = '/workspace/docs/README.md';
 
+      // Initial build emits sourceA
       state.recordEmittedOutputs({
-        filesToEmit: [
-          createDiskOutputFile(sourceA, 'README.md'),
-          createDiskOutputFile(sourceB, 'README.md'),
-        ],
+        filesToEmit: [createDiskOutputFile(sourceA, 'README.md')],
         filesToDelete: [],
       });
 
-      // Delete sourceB while sourceA remains active
+      // Subsequent watch iteration overrides 'README.md' with sourceB, evicting sourceA
+      state.resetExecutionResult();
+      state.recordEmittedOutputs({
+        filesToEmit: [createDiskOutputFile(sourceB, 'README.md')],
+        filesToDelete: [],
+      });
+
+      // Deleting the now-shadowed sourceA is a no-op
+      const shadowedCollected = await state.collectAssets(
+        {
+          workspaceRoot: '/workspace',
+          assets: [
+            { glob: 'README.md', input: '/workspace/projects/my-lib', output: '.' },
+            { glob: 'README.md', input: '/workspace/docs', output: '.' },
+          ],
+        },
+        new Set([sourceA]),
+      );
+      expect(shadowedCollected.filesToEmit).toEqual([]);
+      expect(shadowedCollected.filesToDelete).toEqual([]);
+
+      // Delete sourceB while fallback sourceA is re-emitted
       state.resetExecutionResult();
       const firstDeletes = state.recordEmittedOutputs({
-        filesToEmit: [],
+        filesToEmit: [createDiskOutputFile(sourceA, 'README.md')],
         filesToDelete: [sourceB],
       });
       expect(firstDeletes.has('README.md')).toBeFalse();
