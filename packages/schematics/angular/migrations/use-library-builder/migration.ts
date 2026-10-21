@@ -60,6 +60,7 @@ interface SecondaryEntryPoint {
   subpath: string;
   entryPoint: string;
   configFile: string;
+  config: NgPackageConfig | undefined;
 }
 
 /**
@@ -176,6 +177,7 @@ function findSecondaryEntryPoints(
           subpath,
           entryPoint: join(currentPath, entryFile),
           configFile: ngPackageJsonPath,
+          config,
         });
       } else if (
         current.subfiles.some((f) => f === 'package.json') &&
@@ -189,6 +191,7 @@ function findSecondaryEntryPoints(
             subpath,
             entryPoint: join(currentPath, entryFile),
             configFile: packageJsonPath,
+            config,
           });
         }
       }
@@ -296,12 +299,19 @@ function migrateTargetOptions(
         join(projectDir, p),
       );
       existingPreprocessorOptions['includePaths'] = [
-        ...existingIncludePaths,
-        ...migratedIncludePaths,
+        ...new Set([...existingIncludePaths, ...migratedIncludePaths]),
       ];
     }
     if (ngPackageConfig.lib.sass) {
-      existingPreprocessorOptions['sass'] = ngPackageConfig.lib.sass;
+      const existingSass = existingPreprocessorOptions['sass'];
+      const sass: JsonObject = isJsonObject(existingSass) ? { ...existingSass } : {};
+      for (const [key, value] of Object.entries(ngPackageConfig.lib.sass)) {
+        if (Array.isArray(value)) {
+          const existing = Array.isArray(sass[key]) ? (sass[key] as string[]) : [];
+          sass[key] = [...new Set([...existing, ...value])];
+        }
+      }
+      existingPreprocessorOptions['sass'] = sass;
     }
 
     buildTarget.options['stylePreprocessorOptions'] = existingPreprocessorOptions;
@@ -400,7 +410,7 @@ function updateLibraryTarget(
     return false;
   }
 
-  const ngPackageConfig = primaryProjectFile
+  let ngPackageConfig = primaryProjectFile
     ? parseNgPackageFile(tree, primaryProjectFile)
     : undefined;
 
@@ -430,6 +440,31 @@ function updateLibraryTarget(
         ? secondary.subpath
         : `./${secondary.subpath}`;
     entryPointExports[exportKey] = toRelativeExportPath(secondary.entryPoint);
+
+    if (secondary.config?.lib) {
+      ngPackageConfig ??= {};
+      ngPackageConfig.lib ??= {};
+
+      if (secondary.config.lib.styleIncludePaths?.length) {
+        const secondaryDir = dirname(secondary.configFile);
+        ngPackageConfig.lib.styleIncludePaths ??= [];
+        for (const includePath of secondary.config.lib.styleIncludePaths) {
+          ngPackageConfig.lib.styleIncludePaths.push(
+            relative(projectDir, join(secondaryDir, includePath)),
+          );
+        }
+      }
+
+      if (secondary.config.lib.sass) {
+        const sass: Record<string, unknown> = (ngPackageConfig.lib.sass ??= {});
+        for (const [key, value] of Object.entries(secondary.config.lib.sass)) {
+          if (Array.isArray(value)) {
+            const existing = Array.isArray(sass[key]) ? (sass[key] as string[]) : [];
+            sass[key] = [...new Set([...existing, ...value])];
+          }
+        }
+      }
+    }
   }
 
   migrateTargetOptions(normalizedProjectRoot, projectDir, buildTarget, ngPackageConfig, tree);
