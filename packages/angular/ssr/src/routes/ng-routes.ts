@@ -178,12 +178,22 @@ async function* handleRoute(options: {
 
     const parentRoutes = new Map<string, RouteTreeNodeMetadata>();
 
+    if (typeof redirectTo === 'string') {
+      let routeSegments: string[] | undefined;
+      // Reference the route parameters by their position in the URL (see `buildUrlWithParams`).
+      metadata.redirectTo = resolveRedirectTo(parentRoute, route, redirectTo, (parameter) => {
+        routeSegments ??= joinUrlParts(baseHref, currentRoutePath).split('/');
+
+        return `*${routeSegments.lastIndexOf(parameter)}`;
+      });
+      metadata.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
+    }
+
     if (metadata.renderMode === RenderMode.Prerender) {
       for await (const result of handleSSGRoute(
         serverConfigRouteTree,
         route,
         parentRoute,
-        baseHref,
         metadata,
         parentInjector,
         invokeGetPrerenderParams,
@@ -195,31 +205,16 @@ async function* handleRoute(options: {
           parentRoutes.set(result.route, result);
         }
       }
-    } else if (redirectTo !== undefined) {
-      if (metadata.status && !isValidRedirectResponseCode(metadata.status)) {
-        yield {
-          error:
-            `The '${metadata.status}' status code is not a valid redirect response code. ` +
-            `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
-        };
-      } else if (typeof redirectTo === 'string') {
-        // Reference the route parameters by their position in the URL (see `buildPathWithParams`).
-        const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
-        parentRoutes.set(metadata.route, {
-          ...metadata,
-          redirectTo: resolveRedirectTo(
-            parentRoute,
-            replaceRedirectParams(
-              route,
-              redirectTo,
-              (parameter) => `*${routeSegments.lastIndexOf(parameter)}`,
-            ),
-          ),
-          relativeRedirect: redirectTo[0] !== '/' ? true : undefined,
-        });
-      } else {
-        parentRoutes.set(metadata.route, metadata);
-      }
+    } else if (
+      redirectTo !== undefined &&
+      metadata.status &&
+      !isValidRedirectResponseCode(metadata.status)
+    ) {
+      yield {
+        error:
+          `The '${metadata.status}' status code is not a valid redirect response code. ` +
+          `Please use one of the following redirect response codes: ${[...VALID_REDIRECT_RESPONSE_CODES.values()].join(', ')}.`,
+      };
     } else {
       parentRoutes.set(metadata.route, metadata);
     }
@@ -436,7 +431,6 @@ function appendPreloadToMetadata(
  * @param serverConfigRouteTree - The tree representing the server's routing setup.
  * @param route - The route configuration.
  * @param parentRoute - The path of the parent route.
- * @param baseHref - The base href of the application.
  * @param metadata - The metadata associated with the route tree node.
  * @param parentInjector - The dependency injection container for the parent route.
  * @param invokeGetPrerenderParams - A flag indicating whether to invoke the `getPrerenderParams` function.
@@ -447,7 +441,6 @@ async function* handleSSGRoute(
   serverConfigRouteTree: RouteTree<ServerConfigRouteTreeAdditionalMetadata> | undefined,
   route: Route,
   parentRoute: string,
-  baseHref: string,
   metadata: ServerConfigRouteTreeNodeMetadata,
   parentInjector: Injector,
   invokeGetPrerenderParams: boolean,
@@ -464,21 +457,6 @@ async function* handleSSGRoute(
 
   if ('getPrerenderParams' in meta) {
     delete meta['getPrerenderParams'];
-  }
-
-  const redirectTo = typeof route.redirectTo === 'string' ? route.redirectTo : undefined;
-  if (redirectTo !== undefined) {
-    // Reference the route parameters by their position in the URL (see `buildPathWithParams`).
-    const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
-    meta.redirectTo = resolveRedirectTo(
-      parentRoute,
-      replaceRedirectParams(
-        route,
-        redirectTo,
-        (parameter) => `*${routeSegments.lastIndexOf(parameter)}`,
-      ),
-    );
-    meta.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
   }
 
   const isCatchAllRoute = CATCH_ALL_REGEXP.test(currentRoutePath);
@@ -522,6 +500,7 @@ async function* handleSSGRoute(
       }
     }
 
+    const redirectTo = typeof route.redirectTo === 'string' ? route.redirectTo : undefined;
     const parameters = await runInInjectionContext(parentInjector, () => getPrerenderParams());
     try {
       for (const params of parameters) {
@@ -538,11 +517,9 @@ async function* handleSSGRoute(
               ? undefined
               : resolveRedirectTo(
                   parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
-                  replaceRedirectParams(
-                    route,
-                    redirectTo,
-                    (parameter) => params[parameter.slice(1)],
-                  ),
+                  route,
+                  redirectTo,
+                  (parameter) => params[parameter.slice(1)],
                 ),
         };
       }
@@ -595,69 +572,55 @@ function handlePrerenderParamsReplacement(
 }
 
 /**
- * Resolves the `redirectTo` property for a given route.
+ * Resolves the `redirectTo` property for a given route, replacing any `:id` route parameters
+ * in its path and resolving relative paths against `parentRoute`.
  *
- * This function processes the `redirectTo` property to ensure that it correctly
- * resolves relative to the parent route path. If `redirectTo` is an absolute path,
- * it is returned as is. If it is a relative path, it is resolved based on the parent route path,
- * and, like in the Angular router, its query and fragment are ignored.
+ * Like in the Angular router, only whole path segments starting with `:` are parameters, only
+ * parameters defined in the path of the redirecting route itself can be used, and the query and
+ * fragment of relative redirects are ignored.
  *
  * @param parentRoute - The path of the parent route.
- * @param redirectTo - The target path for redirection.
- * @returns The resolved redirect path as a string.
- */
-function resolveRedirectTo(parentRoute: string, redirectTo: string): string {
-  if (redirectTo[0] === '/') {
-    // If the redirectTo path is absolute, return it as is.
-    return redirectTo;
-  }
-
-  // Match Angular router behavior: replace all segments matched by the route.
-  const [path] = redirectTo.split(/[?#]/, 1);
-
-  return joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), path);
-}
-
-/**
- * Replaces the route parameters, such as `:id`, in the path of `redirectTo`.
- *
- * Like in the Angular router, only whole path segments starting with `:` are parameters, and only
- * the parameters defined in the path of the redirecting route itself can be used.
- *
  * @param route - The redirecting route.
  * @param redirectTo - The target path for redirection.
- * @param resolve - A function that returns the replacement for a parameter, such as `:id`.
- * @returns The redirect path with its route parameters replaced.
+ * @param resolveParam - A function that returns the replacement for a parameter, such as `:id`.
+ * @returns The resolved redirect path as a string.
  * @throws If `redirectTo` uses a parameter that is not defined in the path of the route.
  */
-function replaceRedirectParams(
+function resolveRedirectTo(
+  parentRoute: string,
   route: Route,
   redirectTo: string,
-  resolve: (parameter: string) => string,
+  resolveParam: (parameter: string) => string,
 ): string {
-  if (route.matcher) {
-    // The parameters of a custom matcher are only known at runtime.
+  if (redirectTo[0] === '/' && (route.matcher || !redirectTo.includes('/:'))) {
     return redirectTo;
   }
 
-  const routeSegments = route.path?.split('/') ?? [];
   const [path] = redirectTo.split(/[?#]/, 1);
-  const resolvedPath = path
-    .split('/')
-    .map((segment) => {
-      if (segment[0] !== ':') {
-        return segment;
-      }
+  let resolvedPath = path;
 
-      if (!routeSegments.includes(segment)) {
-        throw new Error(`Cannot redirect to '${redirectTo}'. Cannot find '${segment}'.`);
-      }
+  // The parameters of a custom matcher are only known at runtime.
+  if (!route.matcher && path.includes(':')) {
+    const routeSegments = route.path?.split('/') ?? [];
+    resolvedPath = path
+      .split('/')
+      .map((segment) => {
+        if (segment[0] !== ':') {
+          return segment;
+        }
 
-      return resolve(segment);
-    })
-    .join('/');
+        if (!routeSegments.includes(segment)) {
+          throw new Error(`Cannot redirect to '${redirectTo}'. Cannot find '${segment}'.`);
+        }
 
-  return resolvedPath + redirectTo.slice(path.length);
+        return resolveParam(segment);
+      })
+      .join('/');
+  }
+
+  return redirectTo[0] === '/'
+    ? resolvedPath + redirectTo.slice(path.length)
+    : joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), resolvedPath);
 }
 
 /**

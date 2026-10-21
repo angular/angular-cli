@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { DefaultUrlSerializer } from '@angular/router';
+
 /**
  * Removes the trailing slash from a URL if it exists.
  *
@@ -153,123 +155,78 @@ export function stripIndexHtmlFromURL(url: URL): URL {
 }
 
 /**
- * Matches a `*<n>` placeholder that makes up a whole path segment.
+ * Cached instance of `DefaultUrlSerializer` used for query parameter parsing and serialization.
  */
-const POSITIONAL_PLACEHOLDER_REGEXP = /^\*(\d+)$/;
+let urlSerializer: DefaultUrlSerializer | undefined;
 
 /**
- * Resolves `*` placeholders in a path template by mapping them to corresponding segments
- * from a base path. This is useful for constructing paths dynamically based on a given base path.
+ * Resolves `*` and `*<n>` placeholders in the path of `toUrl` from `fromPath`, and `:name`
+ * placeholders in the query of `toUrl` from `fromSearch`, matching Angular router redirect semantics.
  *
- * The function processes the `toPath` string, replacing each `*` placeholder with
- * the corresponding segment from the `fromPath`, and each `*<n>` placeholder with the
- * segment at position `n` of the `fromPath`. If the `toPath` contains no placeholders,
- * it is returned as-is. Invalid `toPath` formats (not starting with `/`) will throw an error.
+ * - Each `*` path segment is replaced with the segment at the same index in `fromPath`.
+ * - Each `*<n>` path segment is replaced with the 1-based segment at position `n` in `fromPath`.
+ * - When `fromSearch` is provided, each query parameter whose value is `:name` is replaced with the
+ *   values of `name` from `fromSearch`, or `undefined` if missing. Repeated query parameters are not
+ *   resolved, matching the Angular router.
  *
- * @param toPath - A path template string that may contain `*` placeholders. Each `*` is replaced
- * by the corresponding segment from the `fromPath`. Static paths (e.g., `/static/path`) are returned
- * directly without placeholder replacement.
- * @param fromPath - A base path string, split into segments, that provides values for
- * replacing `*` placeholders in the `toPath`.
- * @returns A resolved path string with `*` placeholders replaced by segments from the `fromPath`,
- * or the `toPath` returned unchanged if it contains no placeholders.
- *
- * @throws If the `toPath` does not start with a `/`, indicating an invalid path format.
+ * @param toUrl - A URL template string starting with `/`.
+ * @param fromPath - A base path string starting with `/` that provides segments for path placeholders.
+ * @param fromSearch - Optional query string (e.g. `url.search`) that provides values for query placeholders.
+ * @returns The URL with its path and query placeholders resolved.
  *
  * @example
- * ```typescript
- * // Example with placeholders resolved
- * const resolvedPath = buildPathWithParams('/*\/details', '/123/abc');
- * console.log(resolvedPath); // Outputs: '/123/details'
- *
- * // Example with a positional placeholder
- * const positionalPath = buildPathWithParams('/user/*1', '/123/abc');
- * console.log(positionalPath); // Outputs: '/user/123'
- *
- * // Example with a static path
- * const staticPath = buildPathWithParams('/static/path', '/base/unused');
- * console.log(staticPath); // Outputs: '/static/path'
+ * ```ts
+ * buildUrlWithParams('/*\/details', '/123/abc'); // '/123/details'
+ * buildUrlWithParams('/user/*2/*1', '/a/b'); // '/user/b/a'
+ * buildUrlWithParams('/find?q=:x', '/search', '?x=cats'); // '/find?q=cats'
  * ```
  */
-export function buildPathWithParams(toPath: string, fromPath: string): string {
-  if (toPath[0] !== '/') {
-    throw new Error(`Invalid toPath: The string must start with a '/'. Received: '${toPath}'`);
+export function buildUrlWithParams(toUrl: string, fromPath: string, fromSearch?: string): string {
+  if (toUrl[0] !== '/') {
+    throw new Error(`Invalid toUrl: The string must start with a '/'. Received: '${toUrl}'`);
   }
 
   if (fromPath[0] !== '/') {
     throw new Error(`Invalid fromPath: The string must start with a '/'. Received: '${fromPath}'`);
   }
 
-  const [path] = toPath.split(/[?#]/, 1);
-  if (!path.includes('/*')) {
-    return toPath;
-  }
-
-  const fromPathParts = fromPath.split('/');
-  const toPathParts = path.split('/');
-  const resolvedParts = toPathParts.map((part, index) =>
-    part === '*'
-      ? fromPathParts[index]
-      : part.replace(POSITIONAL_PLACEHOLDER_REGEXP, (_, position) => fromPathParts[position]),
-  );
-
-  return joinUrlParts(...resolvedParts) + toPath.slice(path.length);
-}
-
-/**
- * Resolves `:name` placeholders in the query of a URL, like the Angular router does for redirects.
- *
- * Each query parameter whose value is a `:name` placeholder gets the values of the `name`
- * query parameter of `fromParams`, or `undefined` if `fromParams` has no such parameter.
- * Like in the Angular router, placeholders of repeated query parameters are not resolved.
- *
- * @param toUrl - A URL whose query may contain `:name` placeholders.
- * @param fromParams - The query parameters that provide the values for the placeholders.
- * @returns The URL with its query placeholders resolved.
- *
- * @example
- * ```typescript
- * buildQueryWithParams('/find?q=:x', new URLSearchParams('x=cats')); // returns '/find?q=cats'
- * ```
- */
-export function buildQueryWithParams(toUrl: string, fromParams: URLSearchParams): string {
-  const [, path, query, fragment] = /^([^?#]*)\?([^#]*)(.*)$/.exec(toUrl) ?? [];
-  if (query === undefined) {
+  if (!toUrl.includes('/*') && (fromSearch === undefined || !toUrl.includes('=:'))) {
     return toUrl;
   }
 
-  const params = query.split('&');
-  const names = params.map((param) => param.split('=', 1)[0]);
-  const resolvedQuery = params
-    .map((param, index) => {
-      const name = names[index];
-      const value = param.slice(name.length + 1);
-      if (value[0] !== ':' || names.indexOf(name) !== names.lastIndexOf(name)) {
-        return param;
+  const [path] = toUrl.split(/[?#]/, 1);
+  let resolvedPath = path;
+  let suffix = toUrl.slice(path.length);
+
+  if (path.includes('/*')) {
+    const fromPathParts = fromPath.split('/');
+    resolvedPath = joinUrlParts(
+      ...path
+        .split('/')
+        .map((part, index) =>
+          part[0] === '*'
+            ? (fromPathParts[part.length === 1 ? index : +part.slice(1)] ?? part)
+            : part,
+        ),
+    );
+  }
+
+  if (fromSearch !== undefined && suffix[0] === '?' && suffix.includes('=:')) {
+    urlSerializer ??= new DefaultUrlSerializer();
+    const toTree = urlSerializer.parse(suffix);
+    const actualParams = fromSearch ? urlSerializer.parse(fromSearch).queryParams : {};
+
+    for (const [key, value] of Object.entries(toTree.queryParams)) {
+      if (typeof value === 'string' && value[0] === ':') {
+        toTree.queryParams[key] = actualParams[value.slice(1)];
       }
+    }
 
-      const sourceValues = fromParams.getAll(value.slice(1));
+    // `serialize(toTree)` returns `/?...#...` because `toTree.root` is empty.
+    suffix = urlSerializer.serialize(toTree).slice(1);
+  }
 
-      return (sourceValues.length ? sourceValues : ['undefined'])
-        .map((sourceValue) => `${name}=${encodeQueryValue(sourceValue)}`)
-        .join('&');
-    })
-    .join('&');
-
-  return `${path}?${resolvedQuery}${fragment}`;
-}
-
-/**
- * Encodes a query parameter value like the Angular router (`DefaultUrlSerializer`), which keeps
- * `@`, `:`, `$`, `,` and `;` as is.
- *
- * @param value - The query parameter value to encode.
- * @returns The encoded query parameter value.
- */
-function encodeQueryValue(value: string): string {
-  return encodeURIComponent(value).replace(/%(40|3A|24|2C|3B)/g, (match) =>
-    decodeURIComponent(match),
-  );
+  return resolvedPath + suffix;
 }
 
 const MATRIX_PARAMS_REGEX = /;[^/]+/g;

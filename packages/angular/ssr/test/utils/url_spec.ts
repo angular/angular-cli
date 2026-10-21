@@ -9,8 +9,7 @@
 import {
   addLeadingSlash,
   addTrailingSlash,
-  buildPathWithParams,
-  buildQueryWithParams,
+  buildUrlWithParams,
   joinUrlParts,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
@@ -165,12 +164,12 @@ describe('URL Utils', () => {
     });
   });
 
-  describe('buildPathWithParams', () => {
-    it('should return the same URL when there are no placeholders in the toPath', () => {
+  describe('buildUrlWithParams', () => {
+    it('should return the same URL when there are no placeholders in the toUrl', () => {
       const fromPath = '/base/path';
-      const toPath = '/static/path';
+      const toUrl = '/static/path';
 
-      const result = buildPathWithParams(toPath, fromPath);
+      const result = buildUrlWithParams(toUrl, fromPath);
 
       // Since there are no placeholders, the URL remains the same.
       expect(result.toString()).toBe('/static/path');
@@ -178,51 +177,52 @@ describe('URL Utils', () => {
 
     it('should replace placeholders with corresponding segments from the base URL path', () => {
       const fromPath = '/base/path';
-      const toPath = '/*/*/details';
+      const toUrl = '/*/*/details';
 
-      const result = buildPathWithParams(toPath, fromPath);
+      const result = buildUrlWithParams(toUrl, fromPath);
 
       expect(result.toString()).toBe('/base/path/details');
     });
 
     it('should replace positional placeholders with the segments at those positions', () => {
-      expect(buildPathWithParams('/user/*2/*1', '/a/b')).toBe('/user/b/a');
+      expect(buildUrlWithParams('/user/*2/*1', '/a/b')).toBe('/user/b/a');
     });
 
     it('should replace a positional placeholder followed by a query or fragment', () => {
-      expect(buildPathWithParams('/user/*1?returnTo=/a//b/', '/a')).toBe('/user/a?returnTo=/a//b/');
-      expect(buildPathWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
+      expect(buildUrlWithParams('/user/*1?returnTo=/a//b/', '/a')).toBe('/user/a?returnTo=/a//b/');
+      expect(buildUrlWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
     });
 
-    it('should throw an error if the toPath does not start with "/"', () => {
+    it('should throw an error if the toUrl does not start with "/"', () => {
       const fromPath = '/base/path';
-      const toPath = 'details';
+      const toUrl = 'details';
 
-      // This should throw an error because toPath doesn't start with "/"
+      // This should throw an error because toUrl doesn't start with "/"
       expect(() => {
-        buildPathWithParams(toPath, fromPath);
-      }).toThrowError(`Invalid toPath: The string must start with a '/'. Received: 'details'`);
+        buildUrlWithParams(toUrl, fromPath);
+      }).toThrowError(`Invalid toUrl: The string must start with a '/'. Received: 'details'`);
     });
-  });
 
-  describe('buildQueryWithParams', () => {
     it('should replace query placeholders with the values of the source parameters', () => {
-      const fromParams = new URLSearchParams('term=big cats&term=a:b@c&page=2');
-      expect(buildQueryWithParams('/search?q=:term&p=:page&static=a=:b#top', fromParams)).toBe(
-        '/search?q=big%20cats&q=a:b@c&p=2&static=a=:b#top',
-      );
+      expect(
+        buildUrlWithParams(
+          '/search?q=:term&p=:page&static=a=:b#top',
+          '/from',
+          '?term=big+cats&term=a:b@c&page=2',
+        ),
+      ).toBe('/search?q=big%20cats&q=a:b@c&p=2&static=a%3D:b#top');
     });
 
     it('should set query parameters whose source parameter is missing to undefined', () => {
-      const fromParams = new URLSearchParams();
-      expect(buildQueryWithParams('/search?q=:term&static=1', fromParams)).toBe(
+      expect(buildUrlWithParams('/search?q=:term&static=1', '/from', '')).toBe(
         '/search?q=undefined&static=1',
       );
     });
 
     it('should not replace placeholders of repeated query parameters', () => {
-      const fromParams = new URLSearchParams('a=1&b=2');
-      expect(buildQueryWithParams('/search?q=:a&q=:b', fromParams)).toBe('/search?q=:a&q=:b');
+      expect(buildUrlWithParams('/search?q=:a&q=:b', '/from', '?a=1&b=2')).toBe(
+        '/search?q=:a&q=:b',
+      );
     });
   });
 
