@@ -6,10 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import type { OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
+import type { Location, OnLoadResult, PartialMessage, PartialNote, ResolveResult } from 'esbuild';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import type { CompileResult, Exception, Syntax } from 'sass-embedded';
+import type { CompileResult, Exception, SourceSpan, Syntax } from 'sass-embedded';
 import { MemoryCache } from '../../../utils/cache';
 import type { SassCompiler } from '../../sass/sass-service';
 import { StylesheetLanguage, StylesheetPluginOptions } from './stylesheet-plugin-factory';
@@ -233,13 +233,7 @@ async function compileString(
 
           warnings.push({
             text: deprecation ? 'Deprecation' : text,
-            location: span && {
-              file: span.url && fileURLToPath(span.url),
-              lineText: span.context,
-              // Sass line numbers are 0-based while esbuild's are 1-based
-              line: span.start.line + 1,
-              column: span.start.column,
-            },
+            location: span && spanToLocation(span),
             notes,
           });
         },
@@ -254,11 +248,10 @@ async function compileString(
     };
   } catch (error) {
     if (isSassException(error)) {
-      const fileWithError = error.span.url ? fileURLToPath(error.span.url) : undefined;
-
+      const location = spanToLocation(error.span);
       const watchFiles = [filePath, ...extractFilesFromStack(error.sassStack)];
-      if (fileWithError) {
-        watchFiles.push(fileWithError);
+      if (location.file) {
+        watchFiles.push(location.file);
       }
 
       return {
@@ -266,6 +259,7 @@ async function compileString(
         errors: [
           {
             text: error.message,
+            location,
           },
         ],
         warnings,
@@ -275,6 +269,16 @@ async function compileString(
 
     throw error;
   }
+}
+
+function spanToLocation(span: SourceSpan): Partial<Location> {
+  return {
+    file: span.url && fileURLToPath(span.url),
+    lineText: span.context,
+    // Sass line numbers are 0-based while esbuild's are 1-based
+    line: span.start.line + 1,
+    column: span.start.column,
+  };
 }
 
 function sourceMapToUrlComment(sourceMap: Exclude<CompileResult['sourceMap'], undefined>): string {
@@ -287,24 +291,12 @@ function* extractFilesFromStack(stack: string): Iterable<string> {
   const lines = stack.split('\n');
   const cwd = process.cwd();
 
-  // Stack line has format of "<file> <location> <identifier>"
+  // Stack line has format of `<file> <line>:<column>  <identifier>`
   for (const line of lines) {
-    const segments = line.split(' ');
-    if (segments.length < 3) {
-      break;
-    }
-
-    // Extract path from stack line.
-    // Paths may contain spaces. All segments before location are part of the file path.
-    let path = '';
-    let index = 0;
-    while (!segments[index].match(/\d+:\d+/)) {
-      path += segments[index++];
-    }
-
-    if (path) {
+    const match = line.trim().match(/^(.+?)\s+\d+:\d+/);
+    if (match) {
       // Stack paths from sass are relative to the current working directory (not input file or workspace root)
-      yield join(cwd, path);
+      yield join(cwd, match[1]);
     }
   }
 }

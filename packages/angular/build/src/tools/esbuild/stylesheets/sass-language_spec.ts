@@ -351,4 +351,75 @@ describe('sass-language', () => {
       }
     });
   });
+
+  describe('error handling', () => {
+    const buildStub = {
+      initialOptions: { absWorkingDir: '/app' },
+      resolve: async () => ({ path: undefined, errors: [], warnings: [] }),
+    } as unknown as PluginBuild;
+
+    afterAll(() => {
+      shutdownSassWorkerPool();
+    });
+
+    it('should populate structured location on Sass compilation errors', async () => {
+      const result = await SassStylesheetLanguage.process?.(
+        'body {\n  color: $undefined-var;\n}',
+        '/app/src/styles.scss',
+        'scss',
+        { sourcemap: false },
+        buildStub,
+      );
+
+      expect(result?.errors?.length).toBe(1);
+      expect(result?.errors?.[0].text).toContain('Undefined variable.');
+      expect(result?.errors?.[0].location).toEqual({
+        file: '/app/src/styles.scss',
+        line: 2,
+        column: 9,
+        lineText: jasmine.stringContaining('color: $undefined-var;'),
+      });
+      expect(result?.watchFiles).toContain('/app/src/styles.scss');
+    });
+
+    it('should skip stack trace lines without line:col and extract valid stack files', async () => {
+      spyOn(SassCompiler.prototype, 'compileStringAsync').and.rejectWith({
+        message: 'Custom Sass error',
+        sassMessage: 'Custom Sass error',
+        sassStack: 'malformed stack line without location\nsrc/partials/_vars.scss 3:5  @use\n',
+        span: {
+          url: pathToFileURL('/app/src/partials/_vars.scss'),
+          context: '$bad: ;',
+          start: { line: 2, column: 4, offset: 10 },
+          end: { line: 2, column: 5, offset: 11 },
+          text: ';',
+        },
+      });
+
+      const result = await SassStylesheetLanguage.process?.(
+        '@use "partials/vars";',
+        '/app/src/styles.scss',
+        'scss',
+        { sourcemap: false },
+        buildStub,
+      );
+
+      expect(result?.errors).toEqual([
+        {
+          text: 'Custom Sass error',
+          location: {
+            file: '/app/src/partials/_vars.scss',
+            lineText: '$bad: ;',
+            line: 3,
+            column: 4,
+          },
+        },
+      ]);
+      expect(result?.watchFiles).toEqual([
+        '/app/src/styles.scss',
+        join(process.cwd(), 'src/partials/_vars.scss'),
+        '/app/src/partials/_vars.scss',
+      ]);
+    });
+  });
 });
