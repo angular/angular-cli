@@ -220,7 +220,6 @@ function findSecondaryEntryPoints(
  * @param projectDir The directory containing the primary `ng-packagr` configuration file.
  * @param buildTarget The library's `build` target definition in `angular.json`.
  * @param ngPackageConfig The parsed `NgPackageConfig`, if available.
- * @param secondaryEntryPoints The discovered secondary entry points of the library.
  * @param tree The virtual file system tree.
  */
 function migrateTargetOptions(
@@ -228,7 +227,6 @@ function migrateTargetOptions(
   projectDir: string,
   buildTarget: TargetDefinition,
   ngPackageConfig: NgPackageConfig | undefined,
-  secondaryEntryPoints: SecondaryEntryPoint[],
   tree: Tree,
 ): void {
   buildTarget.builder = Builders.BuildLibrary;
@@ -286,40 +284,31 @@ function migrateTargetOptions(
     buildTarget.options['assets'] = [...existingAssets, ...migratedAssets];
   }
 
-  // The library builder applies style options to all entry points, so the options of
-  // secondary entry points are merged with the primary ones.
-  const styleConfigs = [
-    { dir: projectDir, lib: ngPackageConfig?.lib },
-    ...secondaryEntryPoints.map(({ configFile, config }) => ({
-      dir: dirname(configFile),
-      lib: config?.lib,
-    })),
-  ];
-  const migratedIncludePaths = styleConfigs.flatMap(({ dir, lib }) =>
-    (lib?.styleIncludePaths ?? []).map((p) => join(dir, p)),
-  );
-  const migratedSassOptions = styleConfigs.flatMap(({ lib }) => (lib?.sass ? [lib.sass] : []));
-
-  if (migratedIncludePaths.length || migratedSassOptions.length) {
+  if (ngPackageConfig?.lib?.styleIncludePaths?.length || ngPackageConfig?.lib?.sass) {
     const stylePreprocessorOptions = buildTarget.options['stylePreprocessorOptions'];
     const existingPreprocessorOptions: JsonObject =
       stylePreprocessorOptions && isJsonObject(stylePreprocessorOptions)
         ? { ...stylePreprocessorOptions }
         : {};
 
-    if (migratedIncludePaths.length) {
+    if (ngPackageConfig.lib.styleIncludePaths?.length) {
       const existingIncludePaths = Array.isArray(existingPreprocessorOptions['includePaths'])
         ? (existingPreprocessorOptions['includePaths'] as string[])
         : [];
+      const migratedIncludePaths = ngPackageConfig.lib.styleIncludePaths.map((p) =>
+        join(projectDir, p),
+      );
       existingPreprocessorOptions['includePaths'] = [
         ...new Set([...existingIncludePaths, ...migratedIncludePaths]),
       ];
     }
-    if (migratedSassOptions.length) {
-      const sass: Record<string, string[]> = {};
-      for (const options of migratedSassOptions) {
-        for (const [key, value] of Object.entries(options)) {
-          sass[key] = [...new Set([...(sass[key] ?? []), ...(value ?? [])])];
+    if (ngPackageConfig.lib.sass) {
+      const existingSass = existingPreprocessorOptions['sass'];
+      const sass: JsonObject = isJsonObject(existingSass) ? { ...existingSass } : {};
+      for (const [key, value] of Object.entries(ngPackageConfig.lib.sass)) {
+        if (Array.isArray(value)) {
+          const existing = Array.isArray(sass[key]) ? (sass[key] as string[]) : [];
+          sass[key] = [...new Set([...existing, ...value])];
         }
       }
       existingPreprocessorOptions['sass'] = sass;
@@ -421,7 +410,7 @@ function updateLibraryTarget(
     return false;
   }
 
-  const ngPackageConfig = primaryProjectFile
+  let ngPackageConfig = primaryProjectFile
     ? parseNgPackageFile(tree, primaryProjectFile)
     : undefined;
 
@@ -451,16 +440,34 @@ function updateLibraryTarget(
         ? secondary.subpath
         : `./${secondary.subpath}`;
     entryPointExports[exportKey] = toRelativeExportPath(secondary.entryPoint);
+
+    if (secondary.config?.lib) {
+      ngPackageConfig ??= {};
+      ngPackageConfig.lib ??= {};
+
+      if (secondary.config.lib.styleIncludePaths?.length) {
+        const secondaryDir = dirname(secondary.configFile);
+        ngPackageConfig.lib.styleIncludePaths ??= [];
+        for (const includePath of secondary.config.lib.styleIncludePaths) {
+          ngPackageConfig.lib.styleIncludePaths.push(
+            relative(projectDir, join(secondaryDir, includePath)),
+          );
+        }
+      }
+
+      if (secondary.config.lib.sass) {
+        const sass: Record<string, unknown> = (ngPackageConfig.lib.sass ??= {});
+        for (const [key, value] of Object.entries(secondary.config.lib.sass)) {
+          if (Array.isArray(value)) {
+            const existing = Array.isArray(sass[key]) ? (sass[key] as string[]) : [];
+            sass[key] = [...new Set([...existing, ...value])];
+          }
+        }
+      }
+    }
   }
 
-  migrateTargetOptions(
-    normalizedProjectRoot,
-    projectDir,
-    buildTarget,
-    ngPackageConfig,
-    secondaryEntryPoints,
-    tree,
-  );
+  migrateTargetOptions(normalizedProjectRoot, projectDir, buildTarget, ngPackageConfig, tree);
 
   const packageJsonPath = join(normalizedProjectRoot, 'package.json');
 

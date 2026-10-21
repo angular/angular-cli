@@ -399,6 +399,38 @@ describe('Migration to use the library builder', () => {
     });
   });
 
+  it('should merge existing stylePreprocessorOptions.sass when migrating sass options', async () => {
+    const angularJson = JSON.parse(tree.readContent('/angular.json'));
+    angularJson.projects['my-lib'].architect.build.options.stylePreprocessorOptions = {
+      sass: { silenceDeprecations: ['mixed-decls'] },
+    };
+    tree.overwrite('/angular.json', JSON.stringify(angularJson, undefined, 2));
+
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify(
+        {
+          lib: {
+            entryFile: 'src/public-api.ts',
+            sass: { silenceDeprecations: ['import'] },
+          },
+        },
+        undefined,
+        2,
+      ),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.architect['build'].options.stylePreprocessorOptions).toEqual({
+      sass: { silenceDeprecations: ['mixed-decls', 'import'] },
+    });
+  });
+
   it('should migrate styleIncludePaths and sass options from secondary entry points', async () => {
     tree.overwrite(
       '/projects/my-lib/ng-package.json',
