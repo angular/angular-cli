@@ -681,26 +681,47 @@ export class AotCompilation extends TypeScriptCompilation {
  * `afterDeclarations`, and caches the transformed `SourceFile` so a subsequent `.js` emit for the
  * same file does not re-execute `before` transformers.
  */
-function ensurePreDeclarationTransformers(transformers: ts.CustomTransformers): void {
+export function ensurePreDeclarationTransformers(transformers: ts.CustomTransformers): void {
   if (!transformers.before?.length || !transformers.afterDeclarations?.length) {
     return;
   }
 
   const beforeTransformers = transformers.before as ts.TransformerFactory<ts.SourceFile>[];
-  const transformedSourceFiles = new Set<ts.SourceFile>();
-  transformers.before = beforeTransformers.map((factory, index) =>
-    index === 0
-      ? (context) => {
-          const transform = factory(context);
+  const seenSourceFiles = new Set<ts.SourceFile>();
+  const preTransformedSourceFiles = new Map<ts.SourceFile, ts.SourceFile>();
+  const runBefore = (
+    beforeTransforms: ts.Transformer<ts.SourceFile>[],
+    sourceFile: ts.SourceFile,
+    originalSourceFile: ts.SourceFile,
+  ): ts.SourceFile => {
+    seenSourceFiles.add(originalSourceFile);
+    let current = sourceFile;
+    for (const transform of beforeTransforms) {
+      current = transform(current);
+    }
 
-          return (sourceFile) => {
-            transformedSourceFiles.add(ts.getOriginalNode(sourceFile, ts.isSourceFile));
+    return current;
+  };
 
-            return transform(sourceFile);
-          };
+  transformers.before = [
+    (context) => {
+      let beforeTransforms: ts.Transformer<ts.SourceFile>[] | undefined;
+
+      return (sourceFile) => {
+        const originalSourceFile = ts.getOriginalNode(sourceFile, ts.isSourceFile);
+        const preTransformed = preTransformedSourceFiles.get(originalSourceFile);
+        if (preTransformed !== undefined) {
+          preTransformedSourceFiles.delete(originalSourceFile);
+
+          return preTransformed;
         }
-      : factory,
-  );
+
+        beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
+
+        return runBefore(beforeTransforms, sourceFile, originalSourceFile);
+      };
+    },
+  ];
   transformers.afterDeclarations = [
     (context) => {
       let beforeTransforms: ts.Transformer<ts.SourceFile>[] | undefined;
@@ -708,13 +729,12 @@ function ensurePreDeclarationTransformers(transformers: ts.CustomTransformers): 
       return (fileOrBundle) => {
         if (!ts.isBundle(fileOrBundle)) {
           const originalSourceFile = ts.getOriginalNode(fileOrBundle, ts.isSourceFile);
-          if (!transformedSourceFiles.has(originalSourceFile)) {
-            transformedSourceFiles.add(originalSourceFile);
+          if (!seenSourceFiles.has(originalSourceFile)) {
             beforeTransforms ??= beforeTransformers.map((factory) => factory(context));
-            let current = originalSourceFile;
-            for (const transform of beforeTransforms) {
-              current = transform(current);
-            }
+            preTransformedSourceFiles.set(
+              originalSourceFile,
+              runBefore(beforeTransforms, originalSourceFile, originalSourceFile),
+            );
           }
         }
 
