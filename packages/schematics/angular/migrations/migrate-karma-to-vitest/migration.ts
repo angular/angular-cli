@@ -308,7 +308,7 @@ function updateProjects(tree: Tree, context: SchematicContext): Rule {
 
         // A test configuration inherits the base test options, so its build configuration must
         // include the build options moved from them, with the configuration's own values on top.
-        const mergedOptions = configKey
+        const mergedOptions = configKey && customBuildOptions['']
           ? { ...customBuildOptions[''], ...configOptions }
           : configOptions;
 
