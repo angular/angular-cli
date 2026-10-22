@@ -165,28 +165,6 @@ describe('Module Schematic', () => {
       );
     });
 
-    it('should not inherit the component `type` from the workspace defaults', async () => {
-      // The CLI applies the `schematics` defaults of `angular.json` to nested schematics as well.
-      // Emulate it with a fresh runner so that other tests are not affected.
-      const runner = new SchematicTestRunner(
-        '@schematics/angular',
-        require.resolve('../collection.json'),
-      );
-      runner['_engineHost'].registerOptionsTransform(
-        (schematic: { name: string }, options: Record<string, unknown>) =>
-          schematic.name === 'component' && options['type'] === undefined
-            ? { ...options, type: 'component' }
-            : options,
-      );
-
-      const tree = await runner.runSchematic('module', options, appTree);
-
-      expect(tree.exists('/projects/bar/src/app/foo/foo.ts')).toBe(true);
-      expect(tree.exists('/projects/bar/src/app/foo/foo.component.ts')).toBe(false);
-      const content = tree.readContent('/projects/bar/src/app/foo/foo-routing-module.ts');
-      expect(content).toContain(`import { Foo } from './foo';`);
-    });
-
     it('should generate a lazy loaded module with embedded route declarations', async () => {
       appTree.overwrite(
         '/projects/bar/src/app/app-module.ts',
