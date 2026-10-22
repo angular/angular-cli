@@ -11,19 +11,19 @@ import { updateJsonFile } from '../../../utils/project';
 export default async function () {
   await writeMultipleFiles({
     'src/styles.sass': `
-      @import './imported-styles.sass'
-      body
-        background-color: blue
-    `,
+@import './imported-styles.sass'
+body
+  background-color: blue
+`,
     'src/imported-styles.sass': `
-      p
-        background-color: red
-    `,
+p
+  background-color: red
+`,
     'src/app/app.sass': `
-      .outer
-        .inner
-          background: #fff
-      `,
+.outer
+  .inner
+    background: #fff
+`,
   });
 
   await updateJsonFile('angular.json', (workspaceJson) => {
