@@ -74,6 +74,14 @@ describe('Class Schematic', () => {
     expect(tree.files).toContain('/projects/bar/src/app/foo.model.ts');
   });
 
+  it('should import the class from the typed file in the spec file', async () => {
+    const options = { ...defaultOptions, type: 'model', skipTests: false };
+
+    const tree = await schematicRunner.runSchematic('class', options, appTree);
+    const specContent = tree.readContent('/projects/bar/src/app/foo.model.spec.ts');
+    expect(specContent).toContain("import { Foo } from './foo.model';");
+  });
+
   it('should split the name to name & type with split on "."', async () => {
     const options = { ...defaultOptions, name: 'foo.model' };
     const tree = await schematicRunner.runSchematic('class', options, appTree);
