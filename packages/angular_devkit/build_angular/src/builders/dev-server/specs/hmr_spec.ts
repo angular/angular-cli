@@ -85,15 +85,14 @@ describe('Dev Server Builder HMR', () => {
           switch (buildCount) {
             case 0:
               await page.goto(url);
-              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
               host.writeMultipleFiles({
                 'src/styles.css': 'p { color: rgb(255, 255, 0) }',
               });
               break;
             case 1:
-              expect(logs).toContain('[HMR] Updated modules:');
+              expect(logs).toContain('[webpack-dev-server] Hot updated 1 modules.');
               expect(logs).toContain(`[HMR] css reload %s ${url}styles.css`);
-              expect(logs).toContain('[HMR] App is up to date.');
+              expect(logs).toContain('[webpack-dev-server] App is up to date.');
 
               const pTagColor = await page.evaluate(() => {
                 const el = document.querySelector('p');
@@ -128,12 +127,11 @@ describe('Dev Server Builder HMR', () => {
           switch (buildCount) {
             case 0:
               await page.goto(url);
-              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-hmr'`);
               break;
             case 1:
-              expect(logs).toContain('[HMR] Updated modules:');
-              expect(logs).toContain('[HMR] App is up to date.');
+              expect(logs).toContain('[webpack-dev-server] Hot updated 3 modules.');
+              expect(logs).toContain('[webpack-dev-server] App is up to date.');
 
               const innerText = await page.evaluate(() => document.querySelector('p').innerText);
               expect(innerText).toBe('app-hmr');
@@ -162,7 +160,6 @@ describe('Dev Server Builder HMR', () => {
           switch (buildCount) {
             case 0:
               await page.goto(url);
-              expect(logs).toContain('[HMR] Waiting for update signal from WDS...');
               await page.evaluate(() => {
                 document.querySelector('input.visible').value = 'input value';
                 document.querySelector('select').value = 'two';
@@ -171,8 +168,8 @@ describe('Dev Server Builder HMR', () => {
               host.replaceInFile('src/app/app.component.ts', `'app'`, `'app-hmr'`);
               break;
             case 1:
-              expect(logs).toContain('[HMR] Updated modules:');
-              expect(logs).toContain('[HMR] App is up to date.');
+              expect(logs).toContain('[webpack-dev-server] Hot updated 3 modules.');
+              expect(logs).toContain('[webpack-dev-server] App is up to date.');
               expect(logs).toContain('[NG HMR] Restoring input/textarea values.');
               expect(logs).toContain('[NG HMR] Restoring selected options.');
 
