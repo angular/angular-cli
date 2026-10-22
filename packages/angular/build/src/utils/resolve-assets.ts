@@ -17,7 +17,7 @@ const DEFAULT_ASSET_IGNORE_FILES: ReadonlySet<string> = new Set([
   '.DS_Store',
   'Thumbs.db',
 ]);
-const DEFAULT_ASSET_IGNORE_PATTERNS: string[] = Array.from(
+const DEFAULT_ASSET_IGNORE_PATTERNS: readonly string[] = Array.from(
   DEFAULT_ASSET_IGNORE_FILES,
   (file) => `**/${file}`,
 );
@@ -62,7 +62,7 @@ function normalizeIgnorePattern(pattern: string): string[] {
  */
 export function normalizeAssetIgnorePatterns(ignore?: readonly string[]): string[] {
   if (!ignore?.length) {
-    return DEFAULT_ASSET_IGNORE_PATTERNS;
+    return [...DEFAULT_ASSET_IGNORE_PATTERNS];
   }
 
   return [
