@@ -7,13 +7,16 @@
  */
 
 import { type PartialMessage, formatMessages } from 'esbuild';
-import { existsSync } from 'node:fs';
+import { access, constants } from 'node:fs/promises';
 import {
   type AngularCompilation,
+  DiagnosticModes,
+  type EmitFileResult,
   createAngularCompilation,
 } from '../../../tools/angular/compilation';
 import type { ComponentStylesheetBundler } from '../../../tools/esbuild/angular/component-stylesheets';
 import { useTypeChecking } from '../../../utils/environment-options';
+import { assertIsError } from '../../../utils/error';
 import { toPosixPath } from '../../../utils/path';
 import type { BuilderState } from '../builder-state';
 import type { LibraryCompilationOutput, NormalizedLibraryOptions } from '../types';
@@ -70,12 +73,22 @@ export async function compileLibrary(
 
     if (effectiveModifiedFiles && effectiveModifiedFiles.size > 0) {
       await compilationInstance.update?.(effectiveModifiedFiles);
-      buildState.clearFileReferences(effectiveModifiedFiles);
     }
 
     const stylesheetWarnings: PartialMessage[] = [];
     const stylesheetErrors: PartialMessage[] = [];
     const failedFiles = new Set<string>();
+    const clearedReferenceFiles = new Set<string>();
+    const clearPreviousReferencesOnce = (targetFile: string): void => {
+      if (!cached) {
+        return;
+      }
+      const posixTarget = toPosixPath(targetFile);
+      if (!clearedReferenceFiles.has(posixTarget)) {
+        clearedReferenceFiles.add(posixTarget);
+        buildState.clearFileReferences([posixTarget]);
+      }
+    };
 
     const hostOptions = {
       modifiedFiles: effectiveModifiedFiles,
@@ -86,17 +99,23 @@ export async function compileLibrary(
       ): Promise<string> {
         const result = stylesheetFile
           ? await stylesheetBundler.bundleFile(stylesheetFile)
-          : await stylesheetBundler.bundleInline(data, containingFile);
-
-        if (result.referencedFiles) {
-          buildState.addFileReferences(stylesheetFile ?? containingFile, result.referencedFiles);
-        }
+          : await stylesheetBundler.bundleInline(
+              data,
+              containingFile,
+              containingFile.endsWith('.html') ? 'css' : undefined,
+            );
 
         if (result.warnings.length > 0) {
           stylesheetWarnings.push(...result.warnings);
         }
 
+        const referenceTarget = stylesheetFile ?? containingFile;
+
         if (result.errors?.length) {
+          if (result.referencedFiles) {
+            buildState.addFileReferences(referenceTarget, result.referencedFiles);
+          }
+
           stylesheetErrors.push(...result.errors);
           failedFiles.add(toPosixPath(containingFile));
           if (stylesheetFile) {
@@ -106,12 +125,22 @@ export async function compileLibrary(
           return '';
         }
 
+        clearPreviousReferencesOnce(referenceTarget);
+
+        if (result.referencedFiles) {
+          buildState.addFileReferences(referenceTarget, result.referencedFiles);
+        }
+
         return result.contents;
       },
       processWebWorker: () => '',
     };
 
-    const { referencedFiles, compilerOptions } = await compilationInstance.initialize(
+    const {
+      referencedFiles,
+      compilerOptions,
+      warnings: initWarnings,
+    } = await compilationInstance.initialize(
       tsConfigPath,
       hostOptions,
       {
@@ -126,6 +155,10 @@ export async function compileLibrary(
       'library',
     );
 
+    if (initWarnings?.length) {
+      stylesheetWarnings.unshift(...initWarnings);
+    }
+
     const hasStylesheetErrors = stylesheetErrors.length > 0;
     const emittedFiles = hasStylesheetErrors ? [] : await compilationInstance.emitAffectedFiles();
     const diagnosePromise = runDiagnosticsAndFormat(
@@ -138,49 +171,14 @@ export async function compileLibrary(
 
     const esmFiles = cached?.esmFiles ?? new Map<string, string>();
     const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
-    const changedEsmFiles = new Set<string>();
-    const changedDtsFiles = new Set<string>();
     const posixReferencedFiles = new Set(referencedFiles.map(toPosixPath));
-
-    if (cached && effectiveModifiedFiles) {
-      for (const modifiedFile of effectiveModifiedFiles) {
-        if (posixReferencedFiles.has(modifiedFile)) {
-          continue;
-        }
-
-        const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
-        if (basePathWithoutExt === modifiedFile || existsSync(modifiedFile)) {
-          continue;
-        }
-
-        for (const ext of EMITTED_EXTENSIONS) {
-          const outputPath = `${basePathWithoutExt}${ext}`;
-          const mapPath = `${outputPath}.map`;
-          if (esmFiles.delete(outputPath)) {
-            changedEsmFiles.add(outputPath);
-          }
-          if (dtsFiles.delete(outputPath)) {
-            changedDtsFiles.add(outputPath);
-          }
-          esmFiles.delete(mapPath);
-          dtsFiles.delete(mapPath);
-        }
-      }
-    }
-
-    for (const { filename, contents } of emittedFiles) {
-      const normalized = toPosixPath(filename);
-      const isMap = normalized.endsWith('.map');
-      const isDts = isMap ? isDeclarationSourceMapFile(normalized) : isDeclarationFile(normalized);
-      const targetFiles = isDts ? dtsFiles : esmFiles;
-
-      if (targetFiles.get(normalized) !== contents) {
-        targetFiles.set(normalized, contents);
-        (isDts ? changedDtsFiles : changedEsmFiles).add(
-          isMap ? normalized.slice(0, -4) : normalized,
-        );
-      }
-    }
+    const { changedEsmFiles, changedDtsFiles } = await updateEmittedFileCaches(
+      emittedFiles,
+      esmFiles,
+      dtsFiles,
+      posixReferencedFiles,
+      cached ? effectiveModifiedFiles : undefined,
+    );
 
     return {
       esmFiles,
@@ -208,12 +206,83 @@ export async function compileLibrary(
 }
 
 /**
+ * Updates the in-memory ESM and DTS file maps with newly emitted files and prunes deleted
+ * source files, returning the sets of changed ESM and DTS file paths.
+ *
+ * @param emittedFiles Newly emitted files from the Angular compilation.
+ * @param esmFiles In-memory map of POSIX ESM file paths to contents.
+ * @param dtsFiles In-memory map of POSIX declaration file paths to contents.
+ * @param posixReferencedFiles Set of POSIX file paths currently referenced by the program.
+ * @param modifiedFiles Optional set of modified POSIX file paths in incremental builds.
+ * @returns A promise resolving to the sets of changed ESM and DTS file paths.
+ */
+async function updateEmittedFileCaches(
+  emittedFiles: Iterable<EmitFileResult>,
+  esmFiles: Map<string, string>,
+  dtsFiles: Map<string, string>,
+  posixReferencedFiles: ReadonlySet<string>,
+  modifiedFiles?: ReadonlySet<string>,
+): Promise<{ changedEsmFiles: Set<string>; changedDtsFiles: Set<string> }> {
+  const changedEsmFiles = new Set<string>();
+  const changedDtsFiles = new Set<string>();
+
+  const removalChecks: Promise<void>[] = [];
+  for (const modifiedFile of modifiedFiles ?? []) {
+    if (posixReferencedFiles.has(modifiedFile)) {
+      continue;
+    }
+
+    const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
+    if (basePathWithoutExt === modifiedFile) {
+      continue;
+    }
+
+    removalChecks.push(
+      access(modifiedFile, constants.F_OK).then(
+        () => {},
+        () => {
+          for (const ext of EMITTED_EXTENSIONS) {
+            const outputPath = `${basePathWithoutExt}${ext}`;
+            const mapPath = `${outputPath}.map`;
+            if (esmFiles.delete(outputPath)) {
+              changedEsmFiles.add(outputPath);
+            }
+            if (dtsFiles.delete(outputPath)) {
+              changedDtsFiles.add(outputPath);
+            }
+            esmFiles.delete(mapPath);
+            dtsFiles.delete(mapPath);
+          }
+        },
+      ),
+    );
+  }
+  if (removalChecks.length > 0) {
+    await Promise.all(removalChecks);
+  }
+
+  for (const { filename, contents } of emittedFiles) {
+    const normalized = toPosixPath(filename);
+    const isMap = normalized.endsWith('.map');
+    const isDts = isMap ? isDeclarationSourceMapFile(normalized) : isDeclarationFile(normalized);
+    const targetFiles = isDts ? dtsFiles : esmFiles;
+
+    if (targetFiles.get(normalized) !== contents) {
+      targetFiles.set(normalized, contents);
+      (isDts ? changedDtsFiles : changedEsmFiles).add(isMap ? normalized.slice(0, -4) : normalized);
+    }
+  }
+
+  return { changedEsmFiles, changedDtsFiles };
+}
+
+/**
  * Formats stylesheet bundling diagnostics and TypeScript/Angular diagnostics
  * and records them on the build state's execution result.
  *
  * @param compilationInstance The active Angular compilation instance.
  * @param stylesheetErrors List of stylesheet bundling errors.
- * @param stylesheetWarnings List of stylesheet bundling warnings.
+ * @param stylesheetWarnings List of initialization and stylesheet bundling warnings.
  * @param colors Whether diagnostic messages should be formatted with ANSI colors.
  * @param buildState The build state whose execution result receives the formatted diagnostics.
  */
@@ -228,23 +297,38 @@ async function runDiagnosticsAndFormat(
   const errors = [...stylesheetErrors];
   const warnings: PartialMessage[] = [];
 
-  if (errors.length === 0 && useTypeChecking) {
-    const diagnostics = await compilationInstance.diagnoseFiles();
+  try {
+    const diagnostics = await compilationInstance.diagnoseFiles(
+      useTypeChecking ? DiagnosticModes.All : DiagnosticModes.All & ~DiagnosticModes.Semantic,
+    );
     if (diagnostics.errors?.length) {
       errors.push(...diagnostics.errors);
     }
     if (diagnostics.warnings?.length) {
       warnings.push(...diagnostics.warnings);
     }
+  } catch (error) {
+    assertIsError(error);
+    errors.push({
+      text: error.message,
+      location: null,
+    });
   }
 
   warnings.push(...stylesheetWarnings);
 
-  if (errors.length > 0) {
-    executionResult.addErrors(await formatMessages(errors, { kind: 'error', color: colors }));
-  }
+  try {
+    if (errors.length > 0) {
+      executionResult.addErrors(await formatMessages(errors, { kind: 'error', color: colors }));
+    }
 
-  if (warnings.length > 0) {
-    executionResult.addWarnings(await formatMessages(warnings, { kind: 'warning', color: colors }));
+    if (warnings.length > 0) {
+      executionResult.addWarnings(
+        await formatMessages(warnings, { kind: 'warning', color: colors }),
+      );
+    }
+  } catch (error) {
+    assertIsError(error);
+    executionResult.addError(error.message);
   }
 }

@@ -141,5 +141,32 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       const fesm = harness.readFile('dist/lib/fesm2022/lib.mjs');
       expect(fesm).toContain('data:image/svg+xml');
     });
+
+    it('should compile inline <style> tags in external .html templates as CSS even when inlineStyleLanguage is sass', async () => {
+      await harness.writeFiles({
+        'projects/lib/src/lib/lib.component.html':
+          '<style>.html-style { color: #ff5722; }</style><div class="html-style">Styled</div>',
+        'projects/lib/src/lib/lib.component.ts': `
+        import { Component } from "@angular/core";
+
+        @Component({
+          selector: "lib-html-style",
+          templateUrl: "./lib.component.html",
+        })
+        export class LibComponent {}
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        inlineStyleLanguage: InlineStyleLanguage.Sass,
+      });
+
+      const { result } = await harness.executeOnce();
+      expect(result?.success).toBeTrue();
+
+      const fesm = harness.readFile('dist/lib/fesm2022/lib.mjs');
+      expect(fesm).toMatch(/color:\s*#ff5722/);
+    });
   });
 });

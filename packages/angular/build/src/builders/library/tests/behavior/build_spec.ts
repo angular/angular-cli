@@ -75,6 +75,12 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
     });
 
     it('should not log EMPTY_BUNDLE warnings for type-only entry points', async () => {
+      await harness.modifyFile('projects/lib/tsconfig.lib.json', (content) => {
+        const tsconfig = JSON.parse(content);
+        tsconfig.compilerOptions.target = 'ES2022';
+
+        return JSON.stringify(tsconfig, null, 2);
+      });
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
         `export interface OnlyType { id: string; }`,
