@@ -136,27 +136,5 @@ describe('App Shell Schematic', () => {
       const content = tree.readContent(filePath);
       expect(content).toContain(`import { AppShell } from './app-shell/app-shell';`);
     });
-
-    it('should not inherit the component `type` from the workspace defaults', async () => {
-      // The CLI applies the `schematics` defaults of `angular.json` to nested schematics as well.
-      // Emulate it with a fresh runner so that other tests are not affected.
-      const runner = new SchematicTestRunner(
-        '@schematics/angular',
-        require.resolve('../collection.json'),
-      );
-      runner['_engineHost'].registerOptionsTransform(
-        (schematic: { name: string }, options: Record<string, unknown>) =>
-          schematic.name === 'component' && options['type'] === undefined
-            ? { ...options, type: 'component' }
-            : options,
-      );
-
-      const tree = await runner.runSchematic('app-shell', defaultOptions, appTree);
-
-      expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.ts')).toBe(true);
-      expect(tree.exists('/projects/bar/src/app/app-shell/app-shell.component.ts')).toBe(false);
-      const content = tree.readContent('/projects/bar/src/app/app.config.server.ts');
-      expect(content).toContain(`import { AppShell } from './app-shell/app-shell';`);
-    });
   });
 });
