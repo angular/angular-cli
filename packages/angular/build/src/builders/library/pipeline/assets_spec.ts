@@ -84,6 +84,21 @@ describe('library pipeline assets', () => {
       expect(matchers).toHaveSize(1);
       expect(matchers[0].isMatch('any.txt')).toBeFalse();
     });
+
+    it('should not match files when glob has a trailing slash', () => {
+      const matchers = createAssetMatchers([
+        {
+          glob: 'sub/',
+          input: `${tempRoot}/assets`,
+          output: 'assets',
+          ignore: ['ignored.txt'],
+        },
+      ]);
+
+      expect(matchers).toHaveSize(1);
+      expect(matchers[0].isMatch('sub')).toBeFalse();
+      expect(matchers[0].isMatch('sub/file.txt')).toBeFalse();
+    });
   });
 
   describe('collectAssetsToEmit', () => {
