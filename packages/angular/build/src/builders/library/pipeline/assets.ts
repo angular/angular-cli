@@ -39,19 +39,27 @@ export interface AssetMatcher {
 }
 
 /**
- * Normalizes a glob pattern to match `tinyglobby` semantics by stripping trailing slashes,
- * expanding directory patterns with `/**`, and normalizing POSIX segments.
+ * Normalizes an ignore glob pattern for `picomatch` to match `tinyglobby` directory-exclusion
+ * semantics by stripping trailing slashes, normalizing POSIX segments, and expanding patterns
+ * with `/**` (returning both `normalized` and `${normalized}/**` for single-wildcard suffixes
+ * because `picomatch` does not make trailing `/**` optional after `*`).
  *
- * @param pattern The raw glob pattern string.
- * @returns The normalized POSIX glob pattern.
+ * @param pattern The raw ignore glob pattern string.
+ * @returns The normalized POSIX glob patterns.
  */
-function normalizeGlobPattern(pattern: string): string {
-  let result = pattern.endsWith('/') ? pattern.slice(0, -1) : pattern;
-  if (pattern.endsWith('/') || !result.endsWith('*')) {
-    result += '/**';
+function normalizeGlobPattern(pattern: string): string[] {
+  const trimmed = pattern.endsWith('/') ? pattern.slice(0, -1) : pattern;
+  const normalized = path.posix.normalize(trimmed);
+
+  if (!normalized.endsWith('*')) {
+    return [`${normalized}/**`];
   }
 
-  return path.posix.normalize(result);
+  if (normalized.endsWith('/**')) {
+    return [normalized];
+  }
+
+  return [normalized, `${normalized}/**`];
 }
 
 /**
@@ -90,7 +98,7 @@ export function createAssetMatchers(assets: NormalizedAssetsPattern[]): readonly
     const { glob: rawGlob, ignore: rawIgnore, input } = asset;
     const ignore = [...DEFAULT_ASSET_IGNORE, ...(rawIgnore ?? [])]
       .filter((pattern) => pattern.length > 0)
-      .map(normalizeGlobPattern);
+      .flatMap(normalizeGlobPattern);
     const isMatch = picomatch(rawGlob ? path.posix.normalize(rawGlob) : [], {
       dot: true,
       windows: false,
@@ -186,58 +194,36 @@ export async function collectAssetsToEmit(
     }
 
     if (matchers.length > 1) {
-      // Ensure lower-priority modified assets do not overwrite existing higher-priority assets on disk.
+      // Ensure lower-priority modified assets do not overwrite existing higher-priority assets.
       for (const [outputPath, { file, matcherIndex }] of filesToEmit) {
         for (let laterIndex = matchers.length - 1; laterIndex > matcherIndex; laterIndex--) {
-          const laterMatcher = matchers[laterIndex];
-          const candidateFile = getCandidateSourceForOutput(laterMatcher, outputPath);
-          if (!candidateFile || candidateFile === file.source) {
-            continue;
-          }
-
-          if (isMatchingAssetFile(candidateFile, laterMatcher.asset.followSymlinks)) {
-            if (emittedAssets.get(candidateFile)?.has(outputPath)) {
-              filesToEmit.delete(outputPath);
-            } else {
-              filesToEmit.set(outputPath, {
-                file: createDiskOutputFile(candidateFile, outputPath),
-                matcherIndex: laterIndex,
-              });
-            }
+          const candidateFile = getCandidateSourceForOutput(matchers[laterIndex], outputPath);
+          if (
+            candidateFile &&
+            candidateFile !== file.source &&
+            !filesToDelete.has(candidateFile) &&
+            emittedAssets.get(candidateFile)?.has(outputPath)
+          ) {
+            filesToEmit.delete(outputPath);
             break;
-          } else if (emittedAssets.get(candidateFile)?.has(outputPath)) {
-            filesToDelete.add(candidateFile);
           }
         }
       }
 
       // Restore lower-priority fallback assets when a higher-priority overriding asset is deleted.
       for (const deletedFile of filesToDelete) {
-        for (
-          let deletedMatcherIndex = 0;
-          deletedMatcherIndex < matchers.length;
-          deletedMatcherIndex++
-        ) {
-          const { asset, prefix, isMatch } = matchers[deletedMatcherIndex];
-          if (!deletedFile.startsWith(prefix)) {
-            continue;
-          }
+        const deletedOutputs = emittedAssets.get(deletedFile);
+        if (!deletedOutputs) {
+          continue;
+        }
 
-          const relative = deletedFile.slice(prefix.length);
-          if (!isMatch(relative)) {
-            continue;
-          }
-
-          const outputPath = path.posix.join(asset.output, relative);
-          if (filesToEmit.has(outputPath)) {
-            continue;
-          }
-
-          for (let candidateIndex = matchers.length - 1; candidateIndex >= 0; candidateIndex--) {
-            if (candidateIndex === deletedMatcherIndex) {
-              continue;
-            }
-
+        for (const outputPath of deletedOutputs) {
+          const minCandidateIndex = (filesToEmit.get(outputPath)?.matcherIndex ?? -1) + 1;
+          for (
+            let candidateIndex = matchers.length - 1;
+            candidateIndex >= minCandidateIndex;
+            candidateIndex--
+          ) {
             const candidateMatcher = matchers[candidateIndex];
             const candidateFile = getCandidateSourceForOutput(candidateMatcher, outputPath);
             if (!candidateFile || filesToDelete.has(candidateFile)) {
@@ -245,18 +231,11 @@ export async function collectAssetsToEmit(
             }
 
             if (isMatchingAssetFile(candidateFile, candidateMatcher.asset.followSymlinks)) {
-              if (
-                candidateIndex < deletedMatcherIndex ||
-                !emittedAssets.get(candidateFile)?.has(outputPath)
-              ) {
-                filesToEmit.set(outputPath, {
-                  file: createDiskOutputFile(candidateFile, outputPath),
-                  matcherIndex: candidateIndex,
-                });
-              }
+              filesToEmit.set(outputPath, {
+                file: createDiskOutputFile(candidateFile, outputPath),
+                matcherIndex: candidateIndex,
+              });
               break;
-            } else if (emittedAssets.get(candidateFile)?.has(outputPath)) {
-              filesToDelete.add(candidateFile);
             }
           }
         }
