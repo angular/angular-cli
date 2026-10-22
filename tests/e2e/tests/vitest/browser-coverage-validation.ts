@@ -67,6 +67,11 @@ export default async function (): Promise<void> {
       /Code coverage is enabled, but the following configured browsers do not support the V8 coverage provider: firefox/,
       'Expected validation error for unsupported browser with coverage (config name).',
     );
+    assert.match(
+      output2,
+      /Please use the "istanbul" coverage provider/,
+      'Expected the error to suggest the istanbul coverage provider.',
+    );
 
     // === Case 3: Browser configured via vitest.config.mts (instances) ===
     await writeFile(
