@@ -212,7 +212,6 @@ describe('compileLibrary pipeline', () => {
 
     const errorsText = state.executionResult.errors.join('\n');
     expect(errorsText).toContain('Sass syntax error');
-    expect(errorsText).toContain('Angular compilation diagnostics failed.');
     expect(errorsText).toContain('Diagnostic crash');
   });
 

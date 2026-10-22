@@ -7,7 +7,7 @@
  */
 
 import { type PartialMessage, formatMessages } from 'esbuild';
-import { existsSync } from 'node:fs';
+import { access, constants } from 'node:fs/promises';
 import {
   type AngularCompilation,
   DiagnosticModes,
@@ -172,7 +172,7 @@ export async function compileLibrary(
     const esmFiles = cached?.esmFiles ?? new Map<string, string>();
     const dtsFiles = cached?.dtsFiles ?? new Map<string, string>();
     const posixReferencedFiles = new Set(referencedFiles.map(toPosixPath));
-    const { changedEsmFiles, changedDtsFiles } = updateEmittedFileCaches(
+    const { changedEsmFiles, changedDtsFiles } = await updateEmittedFileCaches(
       emittedFiles,
       esmFiles,
       dtsFiles,
@@ -216,40 +216,49 @@ export async function compileLibrary(
  * @param modifiedFiles Optional set of modified POSIX file paths in incremental builds.
  * @returns Sets of changed ESM and DTS file paths.
  */
-function updateEmittedFileCaches(
+async function updateEmittedFileCaches(
   emittedFiles: Iterable<EmitFileResult>,
   esmFiles: Map<string, string>,
   dtsFiles: Map<string, string>,
   posixReferencedFiles: ReadonlySet<string>,
   modifiedFiles?: ReadonlySet<string>,
-): { changedEsmFiles: Set<string>; changedDtsFiles: Set<string> } {
+): Promise<{ changedEsmFiles: Set<string>; changedDtsFiles: Set<string> }> {
   const changedEsmFiles = new Set<string>();
   const changedDtsFiles = new Set<string>();
 
-  if (modifiedFiles) {
-    for (const modifiedFile of modifiedFiles) {
-      if (posixReferencedFiles.has(modifiedFile)) {
-        continue;
-      }
-
-      const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
-      if (basePathWithoutExt === modifiedFile || existsSync(modifiedFile)) {
-        continue;
-      }
-
-      for (const ext of EMITTED_EXTENSIONS) {
-        const outputPath = `${basePathWithoutExt}${ext}`;
-        const mapPath = `${outputPath}.map`;
-        if (esmFiles.delete(outputPath)) {
-          changedEsmFiles.add(outputPath);
-        }
-        if (dtsFiles.delete(outputPath)) {
-          changedDtsFiles.add(outputPath);
-        }
-        esmFiles.delete(mapPath);
-        dtsFiles.delete(mapPath);
-      }
+  const removalChecks: Promise<void>[] = [];
+  for (const modifiedFile of modifiedFiles ?? []) {
+    if (posixReferencedFiles.has(modifiedFile)) {
+      continue;
     }
+
+    const basePathWithoutExt = modifiedFile.replace(/(?:\.d\.[cm]?ts|\.[cm]?[jt]sx?)$/i, '');
+    if (basePathWithoutExt === modifiedFile) {
+      continue;
+    }
+
+    removalChecks.push(
+      access(modifiedFile, constants.F_OK).then(
+        () => {},
+        () => {
+          for (const ext of EMITTED_EXTENSIONS) {
+            const outputPath = `${basePathWithoutExt}${ext}`;
+            const mapPath = `${outputPath}.map`;
+            if (esmFiles.delete(outputPath)) {
+              changedEsmFiles.add(outputPath);
+            }
+            if (dtsFiles.delete(outputPath)) {
+              changedDtsFiles.add(outputPath);
+            }
+            esmFiles.delete(mapPath);
+            dtsFiles.delete(mapPath);
+          }
+        },
+      ),
+    );
+  }
+  if (removalChecks.length > 0) {
+    await Promise.all(removalChecks);
   }
 
   for (const { filename, contents } of emittedFiles) {
@@ -301,9 +310,8 @@ async function runDiagnosticsAndFormat(
   } catch (error) {
     assertIsError(error);
     errors.push({
-      text: 'Angular compilation diagnostics failed.',
+      text: error.message,
       location: null,
-      notes: [{ text: error.stack ?? error.message, location: null }],
     });
   }
 
