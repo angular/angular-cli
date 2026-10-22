@@ -6,92 +6,93 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { logging, workspaces } from '@angular-devkit/core';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
-import { join } from 'node:path';
-import { PackageManager } from '../package-managers';
+import { JsonObject, workspaces } from '@angular-devkit/core';
 import { AngularWorkspace } from '../utilities/config';
-import { CommandContext } from './definitions';
-import { SchematicsCommandModule } from './schematics-command-module';
+import { getMissingProjectMessage } from './schematics-command-module';
 
-class TestCommandModule extends SchematicsCommandModule {
-  command = 'test';
-  describe = false as const;
+describe('getMissingProjectMessage', () => {
+  const projectOption = { type: 'string', $default: { $source: 'projectName' } };
+  const schemaJson: JsonObject = {
+    type: 'object',
+    properties: { name: { type: 'string' }, project: projectOption },
+    required: ['name', 'project'],
+  };
 
-  run(): Promise<number> {
-    return this.runSchematic({
-      collectionName: './collection.json',
-      schematicName: 'test',
-      schematicOptions: {},
-      executionOptions: { interactive: false, defaults: false, force: false, dryRun: true },
-    });
-  }
-}
-
-describe('SchematicsCommandModule', () => {
-  let root: string;
-
-  beforeAll(() => {
-    root = mkdtempSync(join(tmpdir(), 'angular-cli-schematics-command-'));
-    writeFileSync(
-      join(root, 'collection.json'),
-      JSON.stringify({
-        schematics: { test: { description: 'Test', factory: './index', schema: './schema.json' } },
-      }),
-    );
-    writeFileSync(
-      join(root, 'schema.json'),
-      JSON.stringify({
-        type: 'object',
-        properties: { project: { type: 'string', $default: { $source: 'projectName' } } },
-        required: ['project'],
-      }),
-    );
-    writeFileSync(join(root, 'index.js'), 'exports.default = () => (tree) => tree;');
-  });
-
-  afterAll(() => {
-    rmSync(root, { recursive: true, force: true });
-  });
-
-  async function runWithProjects(projectNames: string[]): Promise<[number, string]> {
+  function createWorkspace(...projectNames: string[]): AngularWorkspace {
     const projects = new workspaces.ProjectDefinitionCollection();
     for (const name of projectNames) {
       projects.add({ name, root: `projects/${name}` });
     }
 
-    const logger = new logging.Logger('test');
-    const messages: string[] = [];
-    logger.subscribe(({ message }) => messages.push(message));
-
-    const command = new TestCommandModule({
-      root,
-      logger,
-      workspace: new AngularWorkspace({ extensions: {}, projects }, join(root, 'angular.json')),
-      packageManager: { name: 'npm' } as PackageManager,
-    } as CommandContext);
-
-    const exitCode = await command.run();
-
-    return [exitCode, messages.join('\n')];
+    return new AngularWorkspace({ extensions: {}, projects }, '/angular.json');
   }
 
-  it('should explain how to pick a project when it cannot be determined from the cwd', async () => {
-    const [exitCode, output] = await runWithProjects(['second-app', 'first-app']);
-
-    expect(exitCode).toBe(1);
-    expect(output).toContain('Cannot determine project for command.');
-    expect(output).toContain('Use the "--project" option to specify a project');
-    expect(output).toContain('Available projects are:\n- first-app\n- second-app');
-    expect(output).not.toContain(`must have required property 'project'`);
+  it('should list the available projects when the project cannot be determined', () => {
+    expect(getMissingProjectMessage(createWorkspace('second', 'first'), schemaJson, {})).toBe(
+      'Cannot determine project for command.\n' +
+        'This is a multi-project workspace and the current working directory is not inside a ' +
+        'single project. Use the "--project" option to specify a project or change the current ' +
+        'working directory to a project directory.\n\n' +
+        'Available projects are:\n- first\n- second',
+    );
   });
 
-  it('should explain that the workspace has no projects', async () => {
-    const [exitCode, output] = await runWithProjects([]);
+  it('should explain how to create a project when the workspace has none', () => {
+    expect(getMissingProjectMessage(createWorkspace(), schemaJson, {})).toBe(
+      'Cannot determine project for command.\n' +
+        'This workspace does not contain any projects. ' +
+        'Run "ng generate application" or "ng generate library" to create one.',
+    );
+  });
 
-    expect(exitCode).toBe(1);
-    expect(output).toContain('This workspace does not contain any projects.');
-    expect(output).not.toContain('Available projects are:');
+  it('should use the name of the option that relies on the smart default', () => {
+    const message = getMissingProjectMessage(
+      createWorkspace('first', 'second'),
+      { properties: { targetProject: projectOption }, required: ['targetProject'] },
+      {},
+    );
+
+    expect(message).toContain('Use the "--target-project" option');
+  });
+
+  it('should not return a message when the option has a value', () => {
+    expect(
+      getMissingProjectMessage(createWorkspace('first', 'second'), schemaJson, {
+        project: 'first',
+      }),
+    ).toBeUndefined();
+  });
+
+  it('should not return a message when the option is not required', () => {
+    expect(
+      getMissingProjectMessage(
+        createWorkspace('first', 'second'),
+        { ...schemaJson, required: ['name'] },
+        {},
+      ),
+    ).toBeUndefined();
+  });
+
+  it('should not return a message when the option does not use the smart default', () => {
+    expect(
+      getMissingProjectMessage(
+        createWorkspace('first', 'second'),
+        { ...schemaJson, properties: { project: { type: 'string' } } },
+        {},
+      ),
+    ).toBeUndefined();
+  });
+
+  it('should not return a message when the option can be prompted for', () => {
+    expect(
+      getMissingProjectMessage(
+        createWorkspace('first', 'second'),
+        {
+          ...schemaJson,
+          properties: { project: { ...projectOption, 'x-prompt': 'Which project?' } },
+        },
+        {},
+      ),
+    ).toBeUndefined();
   });
 });

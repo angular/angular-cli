@@ -6,7 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { JsonValue, normalize as devkitNormalize, schema } from '@angular-devkit/core';
+import {
+  JsonObject,
+  JsonValue,
+  normalize as devkitNormalize,
+  isJsonArray,
+  isJsonObject,
+  schema,
+  strings,
+} from '@angular-devkit/core';
 import { Collection, UnsuccessfulWorkflowExecution, formats } from '@angular-devkit/schematics';
 import {
   FileSystemCollectionDescription,
@@ -17,13 +25,14 @@ import { relative } from 'node:path';
 import { Argv } from 'yargs';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension } from '../analytics/analytics-parameters';
-import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
+import { AngularWorkspace, getProjectByCwd, getSchematicDefaults } from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { memoize } from '../utilities/memoize';
 import { formatFiles } from '../utilities/prettier';
 import { isTTY } from '../utilities/tty';
 import {
   CommandModule,
+  CommandModuleError,
   CommandModuleImplementation,
   CommandScope,
   Options,
@@ -130,6 +139,20 @@ export abstract class SchematicsCommandModule
             ...(await getSchematicDefaults(schematic.collection.name, schematic.name, projectName)),
             ...current,
           };
+        },
+        // Fail before smart defaults and prompts are applied when a required option relies on the
+        // `projectName` smart default and the project cannot be determined.
+        (schematic, current) => {
+          const { workspace } = this.context;
+          const message =
+            workspace && this.getProjectName() === undefined
+              ? getMissingProjectMessage(workspace, schematic.schemaJson, current)
+              : undefined;
+          if (message) {
+            throw new CommandModuleError(message);
+          }
+
+          return current ?? {};
         },
       ],
       engineHostCreator: (options) => new SchematicEngineHost(options.resolvePaths),
@@ -387,51 +410,13 @@ export abstract class SchematicsCommandModule
         logger.fatal('The Schematic workflow failed. See above.');
       } else {
         assertIsError(err);
-        logger.fatal(this.getMissingProjectMessage(err) ?? err.message);
+        logger.fatal(err.message);
       }
 
       return 1;
     } finally {
       unsubscribe();
     }
-  }
-
-  /**
-   * Explains how to select a project when a schematic requires one and the project cannot be
-   * determined from the current working directory.
-   */
-  private getMissingProjectMessage(error: Error): string | undefined {
-    const { workspace } = this.context;
-    if (
-      !workspace ||
-      this.getProjectName() !== undefined ||
-      !(error instanceof schema.SchemaValidationException) ||
-      !error.errors.some(
-        ({ keyword, instancePath, params }) =>
-          keyword === 'required' && instancePath === '' && params?.missingProperty === 'project',
-      )
-    ) {
-      return undefined;
-    }
-
-    if (workspace.projects.size === 0) {
-      return (
-        'Cannot determine project for command.\n' +
-        'This workspace does not contain any projects. ' +
-        'Run "ng generate application" or "ng generate library" to create one.'
-      );
-    }
-
-    return (
-      'Cannot determine project for command.\n' +
-      'This is a multi-project workspace and the current working directory is not inside a single ' +
-      'project. Use the "--project" option to specify a project or change the current working ' +
-      'directory to a project directory.\n\n' +
-      `Available projects are:\n${[...workspace.projects.keys()]
-        .sort()
-        .map((p) => `- ${p}`)
-        .join('\n')}`
-    );
   }
 
   private getProjectName(): string | undefined {
@@ -464,4 +449,61 @@ export abstract class SchematicsCommandModule
       : // Global
         [import.meta.dirname, process.cwd()];
   }
+}
+
+/**
+ * Returns an error message when a schematic requires an option that uses the `projectName` smart
+ * default, the option has no value and the project cannot be determined from the current working
+ * directory. Otherwise schema validation fails later with a generic "must have required property"
+ * error, after prompting for other options.
+ */
+export function getMissingProjectMessage(
+  workspace: AngularWorkspace,
+  schemaJson: JsonObject | undefined,
+  options: Record<string, unknown> | null,
+): string | undefined {
+  if (!schemaJson) {
+    return undefined;
+  }
+
+  const { properties, required } = schemaJson;
+  if (!isJsonObject(properties) || !isJsonArray(required)) {
+    return undefined;
+  }
+
+  const optionName = Object.keys(properties).find((name) => {
+    const property = properties[name];
+
+    return (
+      required.includes(name) &&
+      options?.[name] === undefined &&
+      isJsonObject(property) &&
+      isJsonObject(property.$default) &&
+      property.$default.$source === 'projectName' &&
+      property['x-prompt'] === undefined
+    );
+  });
+
+  if (optionName === undefined) {
+    return undefined;
+  }
+
+  if (workspace.projects.size === 0) {
+    return (
+      'Cannot determine project for command.\n' +
+      'This workspace does not contain any projects. ' +
+      'Run "ng generate application" or "ng generate library" to create one.'
+    );
+  }
+
+  return (
+    'Cannot determine project for command.\n' +
+    'This is a multi-project workspace and the current working directory is not inside a single ' +
+    `project. Use the "--${strings.dasherize(optionName)}" option to specify a project or change ` +
+    'the current working directory to a project directory.\n\n' +
+    `Available projects are:\n${[...workspace.projects.keys()]
+      .sort()
+      .map((p) => `- ${p}`)
+      .join('\n')}`
+  );
 }
