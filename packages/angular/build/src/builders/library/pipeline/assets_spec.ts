@@ -38,6 +38,9 @@ describe('library pipeline assets', () => {
             './ignored-dir-2/',
             '**/ignored-subdir',
             '{brace-dir-a,brace-dir-b}',
+            'wildcard-parent/*/',
+            'wildcard-rel/*/sub/..',
+            'explicit-globstar/**',
             'specific.txt',
           ],
         },
@@ -58,6 +61,13 @@ describe('library pipeline assets', () => {
       expect(matcher.isMatch('nested/ignored-subdir/deep/file.txt')).toBeFalse();
       expect(matcher.isMatch('brace-dir-a/file.txt')).toBeFalse();
       expect(matcher.isMatch('brace-dir-b/sub/file.txt')).toBeFalse();
+      expect(matcher.isMatch('wildcard-parent/file.txt')).toBeFalse();
+      expect(matcher.isMatch('wildcard-parent/sub/file.txt')).toBeFalse();
+      expect(matcher.isMatch('wildcard-parent/sub/deep/file.txt')).toBeFalse();
+      expect(matcher.isMatch('wildcard-rel/file.txt')).toBeFalse();
+      expect(matcher.isMatch('wildcard-rel/sub/file.txt')).toBeFalse();
+      expect(matcher.isMatch('explicit-globstar/file.txt')).toBeFalse();
+      expect(matcher.isMatch('explicit-globstar/sub/file.txt')).toBeFalse();
       expect(matcher.isMatch('.gitkeep')).toBeFalse();
       expect(matcher.isMatch('nested/.DS_Store')).toBeFalse();
     });
@@ -121,17 +131,22 @@ describe('library pipeline assets', () => {
 
     it('should not overwrite a higher-priority emitted asset when only a lower-priority asset is modified in watch mode', async () => {
       const defaultDir = `${tempRoot}/lib`;
+      const fallbackDir = `${tempRoot}/fallback`;
       const customDir = `${tempRoot}/docs`;
       await mkdir(defaultDir, { recursive: true });
+      await mkdir(fallbackDir, { recursive: true });
       await mkdir(customDir, { recursive: true });
 
       const defaultReadme = `${defaultDir}/README.md`;
+      const fallbackReadme = `${fallbackDir}/README.md`;
       const customReadme = `${customDir}/README.md`;
       await writeFile(defaultReadme, '# Default updated');
+      await writeFile(fallbackReadme, '# Fallback');
       await writeFile(customReadme, '# Custom');
 
       const assets = [
         { glob: 'README.md', input: defaultDir, output: '.' },
+        { glob: 'README.md', input: fallbackDir, output: '.' },
         { glob: 'README.md', input: customDir, output: '.' },
       ];
 
@@ -146,35 +161,20 @@ describe('library pipeline assets', () => {
       expect(resultWithEmitted.filesToEmit).toEqual([]);
       expect(resultWithEmitted.filesToDelete).toEqual([]);
 
-      // When customReadme was not yet recorded in emittedAssets, modifying defaultReadme should emit customReadme.
-      const resultWithoutEmitted = await collectAssetsToEmit(
-        assets,
-        tempRoot,
-        new Map(),
-        new Set([defaultReadme]),
-      );
-      expect(resultWithoutEmitted.filesToEmit).toEqual([
-        {
-          origin: 'disk',
-          source: customReadme,
-          path: 'README.md',
-        },
-      ]);
-
-      // When customReadme was recorded in emittedAssets but no longer exists on disk,
-      // modifying defaultReadme should queue customReadme for deletion and emit defaultReadme.
+      // When customReadme is deleted in the same watch iteration while defaultReadme is modified,
+      // customReadme should be queued for deletion and higher-priority fallbackReadme should be emitted.
       await rm(customReadme);
-      const resultWithMissingHigherPriority = await collectAssetsToEmit(
+      const resultWithDeletedHigherPriority = await collectAssetsToEmit(
         assets,
         tempRoot,
         emittedAssets,
-        new Set([defaultReadme]),
+        new Set([defaultReadme, customReadme]),
       );
-      expect(resultWithMissingHigherPriority.filesToDelete).toEqual([customReadme]);
-      expect(resultWithMissingHigherPriority.filesToEmit).toEqual([
+      expect(resultWithDeletedHigherPriority.filesToDelete).toEqual([customReadme]);
+      expect(resultWithDeletedHigherPriority.filesToEmit).toEqual([
         {
           origin: 'disk',
-          source: defaultReadme,
+          source: fallbackReadme,
           path: 'README.md',
         },
       ]);

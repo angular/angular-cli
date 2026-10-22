@@ -37,6 +37,7 @@ export class BuilderState {
   #emittedBundleFiles = new Set<string>();
   #emittedManifestFiles = new Set<string>();
   readonly #emittedAssets = new Map<string, Set<string>>();
+  readonly #emittedAssetSources = new Map<string, string>();
   #hasEmittedAssets = false;
 
   #executionResult = new ExecutionResult();
@@ -421,13 +422,13 @@ export class BuilderState {
         continue;
       }
 
-      if (this.#hasEmittedAssets) {
-        for (const [source, prevOutputs] of this.#emittedAssets) {
-          if (prevOutputs.delete(emittedAsset.path)) {
-            if (prevOutputs.size === 0) {
-              this.#emittedAssets.delete(source);
-            }
-            break;
+      const prevSource = this.#emittedAssetSources.get(emittedAsset.path);
+      if (prevSource !== undefined) {
+        const prevOutputs = this.#emittedAssets.get(prevSource);
+        if (prevOutputs) {
+          prevOutputs.delete(emittedAsset.path);
+          if (prevOutputs.size === 0) {
+            this.#emittedAssets.delete(prevSource);
           }
         }
       }
@@ -437,12 +438,14 @@ export class BuilderState {
         this.#emittedAssets.set(emittedAsset.source, outputs);
       }
       outputs.add(emittedAsset.path);
+      this.#emittedAssetSources.set(emittedAsset.path, emittedAsset.source);
     }
 
     for (const source of toDelete) {
       const outputs = this.#emittedAssets.get(source);
       if (outputs) {
         for (const output of outputs) {
+          this.#emittedAssetSources.delete(output);
           filesToDelete.add(output);
         }
         this.#emittedAssets.delete(source);
@@ -481,6 +484,7 @@ export class BuilderState {
     this.#emittedBundleFiles.clear();
     this.#emittedManifestFiles.clear();
     this.#emittedAssets.clear();
+    this.#emittedAssetSources.clear();
     this.#hasUpdatedBundles = false;
   }
 }
