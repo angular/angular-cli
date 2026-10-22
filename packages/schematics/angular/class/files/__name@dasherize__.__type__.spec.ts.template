@@ -1,4 +1,4 @@
-import { <%= classify(name) %> } from './<%= dasherize(name) %><%= type %>';
+import { <%= classify(name) %> } from './<%= dasherize(name) %><%= type ? '.' + type : '' %>';
 
 describe('<%= classify(name) %>', () => {
   it('should create an instance', () => {
