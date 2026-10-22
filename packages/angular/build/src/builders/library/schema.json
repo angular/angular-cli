@@ -71,7 +71,7 @@
     },
     "declarationMap": {
       "type": "boolean",
-      "description": "Generates a sourcemap for each corresponding '.d.ts' file. Defaults to the `declarationMap` value in the TypeScript configuration file."
+      "description": "Generates a sourcemap for each corresponding '.d.ts' file. Defaults to the `compilerOptions.declarationMap` value in the TypeScript configuration file."
     },
     "compilationMode": {
       "type": "string",
