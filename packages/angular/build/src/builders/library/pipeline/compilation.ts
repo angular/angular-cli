@@ -214,7 +214,7 @@ export async function compileLibrary(
  * @param dtsFiles In-memory map of POSIX declaration file paths to contents.
  * @param posixReferencedFiles Set of POSIX file paths currently referenced by the program.
  * @param modifiedFiles Optional set of modified POSIX file paths in incremental builds.
- * @returns Sets of changed ESM and DTS file paths.
+ * @returns A promise resolving to the sets of changed ESM and DTS file paths.
  */
 async function updateEmittedFileCaches(
   emittedFiles: Iterable<EmitFileResult>,
