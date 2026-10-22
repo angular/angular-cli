@@ -387,13 +387,51 @@ export abstract class SchematicsCommandModule
         logger.fatal('The Schematic workflow failed. See above.');
       } else {
         assertIsError(err);
-        logger.fatal(err.message);
+        logger.fatal(this.getMissingProjectMessage(err) ?? err.message);
       }
 
       return 1;
     } finally {
       unsubscribe();
     }
+  }
+
+  /**
+   * Explains how to select a project when a schematic requires one and the project cannot be
+   * determined from the current working directory.
+   */
+  private getMissingProjectMessage(error: Error): string | undefined {
+    const { workspace } = this.context;
+    if (
+      !workspace ||
+      this.getProjectName() !== undefined ||
+      !(error instanceof schema.SchemaValidationException) ||
+      !error.errors.some(
+        ({ keyword, instancePath, params }) =>
+          keyword === 'required' && instancePath === '' && params?.missingProperty === 'project',
+      )
+    ) {
+      return undefined;
+    }
+
+    if (workspace.projects.size === 0) {
+      return (
+        'Cannot determine project for command.\n' +
+        'This workspace does not contain any projects. ' +
+        'Run "ng generate application" or "ng generate library" to create one.'
+      );
+    }
+
+    return (
+      'Cannot determine project for command.\n' +
+      'This is a multi-project workspace and the current working directory is not inside a single ' +
+      'project. Use the "--project" option to specify a project or change the current working ' +
+      'directory to a project directory.\n\n' +
+      `Available projects are:\n${[...workspace.projects.keys()]
+        .sort()
+        .map((p) => `- ${p}`)
+        .join('\n')}`
+    );
   }
 
   private getProjectName(): string | undefined {

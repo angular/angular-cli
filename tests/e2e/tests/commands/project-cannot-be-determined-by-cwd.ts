@@ -23,6 +23,13 @@ export default async function () {
     const { message } = await expectToFail(() => ng('build'));
     assert.match(message, new RegExp(errorMessage));
 
+    // Schematics that require a project should explain how to select one
+    const { message: generateMessage } = await expectToFail(() =>
+      ng('generate', 'component', 'foo'),
+    );
+    assert.match(generateMessage, /Use the "--project" option to specify a project/);
+    assert.match(generateMessage, /Available projects are:\n- second-app\n- third-app/);
+
     // Help should still work
     await execAndWaitForOutputToMatch('ng', ['build', '--help'], /--configuration/);
 
