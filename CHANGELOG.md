@@ -1,3 +1,52 @@
+<a name="22.2.4"></a>
+
+# 22.2.4 (2026-10-22)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                        |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
+| [63e45bcfe](https://github.com/angular/angular-cli/commit/63e45bcfe711b6e2320db7ee24caba898bb90347) | fix  | keep schematic positional arguments in index order |
+| [6053771cb](https://github.com/angular/angular-cli/commit/6053771cba3c29a481d21ea6a2f2b9dd279b6db2) | fix  | only load autocompletion in interactive shells     |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------- |
+| [eec8dc049](https://github.com/angular/angular-cli/commit/eec8dc049a21e8ee685dd07ed365e43d04802cf5) | fix  | apply `viewEncapsulation` to generated application components |
+| [3a549925e](https://github.com/angular/angular-cli/commit/3a549925e2adf2101ae635da1e4a9cf0217c13d2) | fix  | correct error and warning messages in environments schematic  |
+| [fe119a7c7](https://github.com/angular/angular-cli/commit/fe119a7c717db7a50d92073dd8d3a2f4726bbd6f) | fix  | show routing module suffixes in `findModule` error            |
+| [36d988001](https://github.com/angular/angular-cli/commit/36d988001e1d36d02a759f2580bd251fff175e07) | fix  | skip `webWorkerTsConfig` for unit-test builder test targets   |
+| [460167cd3](https://github.com/angular/angular-cli/commit/460167cd335b6b4addb9c92d60f56a04ddf9ed5e) | fix  | use the generated class name when declaring in an NgModule    |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                                   |
+| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
+| [c235a9554](https://github.com/angular/angular-cli/commit/c235a9554fb1f5cad734a3fb2df7c4f7e4283f91) | fix  | add integrity metadata for all initial chunks beyond the module preload limit |
+| [80c7480b4](https://github.com/angular/angular-cli/commit/80c7480b4d574ef2cd178e315288d9bfe821a5ac) | fix  | align lazy route entry names with workspace root for SSR modulepreload        |
+| [b94627706](https://github.com/angular/angular-cli/commit/b9462770643465bd1bf33bc7cdaf2386d0bf9d41) | fix  | attach location to Sass errors and guard stack parsing                        |
+| [0dc103735](https://github.com/angular/angular-cli/commit/0dc103735e9cd42007a0b81cf1c2a563f80b94e6) | fix  | correct typos and spacing in error and warning messages                       |
+| [3e464c3f5](https://github.com/angular/angular-cli/commit/3e464c3f55d4aa2b7f1cb3d62ee3104c62029a5e) | fix  | invalidate Vite module cache for removed dev server output files              |
+| [7d9ba6280](https://github.com/angular/angular-cli/commit/7d9ba628034866a2ec51a6357f05c9ce426cbb76) | fix  | match proxy glob patterns against URL pathname only                           |
+| [3aa7e93cc](https://github.com/angular/angular-cli/commit/3aa7e93ccf898d84d620ff0b46e5a718fa9c3a90) | fix  | name the provider packages in the unit-test `browsers` error                  |
+| [e78cf0ae9](https://github.com/angular/angular-cli/commit/e78cf0ae9676e77245de3cae7ae86b42a48a6322) | fix  | preserve diagnostic locations at offset 0 and guard empty files               |
+| [b3baa20c6](https://github.com/angular/angular-cli/commit/b3baa20c6cb5b00c9df4d3d4d072435b324566e2) | fix  | support quotes in `styles` and `polyfills` paths                              |
+| [648aff9eb](https://github.com/angular/angular-cli/commit/648aff9ebb54735fab5cc4265200a06c4d531f35) | fix  | use component file path in inline stylesheet diagnostic locations             |
+| [a9bec13b5](https://github.com/angular/angular-cli/commit/a9bec13b58550fc757612c3617aa33eefb776041) | fix  | use distinct chunk naming for web worker bundles                              |
+| [a05723948](https://github.com/angular/angular-cli/commit/a057239486e42ec7189f03a61b09e3b0761150c9) | fix  | watch only explicitly added paths in chokidar watcher                         |
+| [35702a598](https://github.com/angular/angular-cli/commit/35702a5986dc7ea4f2f2d7f18ef9f8f3b4fd33c2) | perf | avoid reading external component stylesheets twice                            |
+
+### @angular/ssr
+
+| Commit                                                                                              | Type | Description                                                                                                            |
+| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------- |
+| [3beb2551c](https://github.com/angular/angular-cli/commit/3beb2551cc784ed0714070bbd23c1a8bb70e2938) | fix  | resolve query parameter placeholders in redirect targets ([#34321](https://github.com/angular/angular-cli/pull/34321)) |
+| [ff3f3727a](https://github.com/angular/angular-cli/commit/ff3f3727a9eb18f0b7714646a04b7d3e172c18d7) | fix  | resolve route parameters in redirect targets ([#34321](https://github.com/angular/angular-cli/pull/34321))             |
+| [d365b0008](https://github.com/angular/angular-cli/commit/d365b0008f0c5bb8bca92e83066999253f409b64) | fix  | use only the first value of the `X-Forwarded-Prefix` header                                                            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.3.0-next.2"></a>
 
 # 22.3.0-next.2 (2026-10-15)
