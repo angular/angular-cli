@@ -10,7 +10,7 @@ import { lstatSync, statSync } from 'node:fs';
 import path from 'node:path';
 import picomatch from 'picomatch';
 import type { NormalizedAssetsPattern } from '../../../utils';
-import { DEFAULT_ASSET_IGNORE, resolveAssets } from '../../../utils/resolve-assets';
+import { normalizeAssetIgnorePatterns, resolveAssets } from '../../../utils/resolve-assets';
 import { type DiskOutputFile, createDiskOutputFile } from './utils';
 
 /**
@@ -36,30 +36,6 @@ export interface AssetMatcher {
 
   /** Compiled picomatch matcher function for the asset glob. */
   isMatch: picomatch.Matcher;
-}
-
-/**
- * Normalizes an ignore glob pattern for `picomatch` to match `tinyglobby` directory-exclusion
- * semantics by stripping trailing slashes, normalizing POSIX segments, and expanding patterns
- * with `/**` (returning both `normalized` and `${normalized}/**` for single-wildcard suffixes
- * because `picomatch` does not make trailing `/**` optional after `*`).
- *
- * @param pattern The raw ignore glob pattern string.
- * @returns The normalized POSIX glob patterns.
- */
-function normalizeGlobPattern(pattern: string): string[] {
-  const trimmed = pattern.endsWith('/') ? pattern.slice(0, -1) : pattern;
-  const normalized = path.posix.normalize(trimmed);
-
-  if (!normalized.endsWith('*')) {
-    return [`${normalized}/**`];
-  }
-
-  if (normalized.endsWith('/**')) {
-    return [normalized];
-  }
-
-  return [normalized, `${normalized}/**`];
 }
 
 /**
@@ -96,14 +72,14 @@ function isMatchingAssetFile(file: string, followSymlinks: boolean | undefined):
 export function createAssetMatchers(assets: NormalizedAssetsPattern[]): readonly AssetMatcher[] {
   return assets.map((asset) => {
     const { glob: rawGlob, ignore: rawIgnore, input } = asset;
-    const ignore = [...DEFAULT_ASSET_IGNORE, ...(rawIgnore ?? [])]
-      .filter((pattern) => pattern.length > 0)
-      .flatMap(normalizeGlobPattern);
-    const isMatch = picomatch(rawGlob ? path.posix.normalize(rawGlob) : [], {
-      dot: true,
-      windows: false,
-      ignore,
-    });
+    const isMatch = picomatch(
+      rawGlob && !rawGlob.endsWith('/') ? path.posix.normalize(rawGlob) : [],
+      {
+        dot: true,
+        windows: false,
+        ignore: normalizeAssetIgnorePatterns(rawIgnore),
+      },
+    );
     const prefix = input.endsWith('/') ? input : `${input}/`;
 
     return { asset, prefix, isMatch };
