@@ -1,3 +1,27 @@
+<a name="20.3.41"></a>
+
+# 20.3.41 (2026-10-22)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [36fbb892b4](https://github.com/angular/angular-cli/commit/36fbb892b48f6313de1946cf32bc6fb4140eb959) | fix  | bump @modelcontextprotocol/sdk to 1.32.1 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description               |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [f905af981b](https://github.com/angular/angular-cli/commit/f905af981bb1f812944dfa31a623b7fcbb08f8e9) | fix  | update webpack to 5.112.0 |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------ |
+| [a1e3016f1e](https://github.com/angular/angular-cli/commit/a1e3016f1efe65b49b9d6affd13e6fe1d95607e4) | fix  | bump vite to 7.3.7 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.40"></a>
 
 # 20.3.40 (2026-10-14)
