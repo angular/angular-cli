@@ -7,6 +7,7 @@
  */
 
 import { execute } from '../../index';
+import { CoverageReporterEnum } from '../../schema';
 import {
   BASE_OPTIONS,
   describeBuilder,
@@ -29,7 +30,7 @@ describeBuilder(execute, UNIT_TEST_BUILDER_INFO, (harness) => {
         harness.useTarget('test', {
           ...BASE_OPTIONS,
           coverage: true,
-          coverageReporters: ['html'] as any,
+          coverageReporters: [CoverageReporterEnum.Html],
           coverageWatermarks: {
             statements: [...watermark],
             branches: [...watermark],
