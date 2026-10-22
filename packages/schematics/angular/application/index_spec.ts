@@ -157,6 +157,17 @@ describe('Application Schematic', () => {
     );
   });
 
+  it('should not create tsconfig.spec.json with "skipTests" enabled', async () => {
+    const tree = await schematicRunner.runSchematic(
+      'application',
+      { ...defaultOptions, skipTests: true },
+      workspaceTree,
+    );
+
+    expect(tree.exists('/projects/foo/tsconfig.app.json')).toBeTrue();
+    expect(tree.exists('/projects/foo/tsconfig.spec.json')).toBeFalse();
+  });
+
   it('should not add spec project reference in the root tsconfig.json with "minimal" enabled', async () => {
     const tree = await schematicRunner.runSchematic(
       'application',

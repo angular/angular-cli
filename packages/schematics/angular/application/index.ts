@@ -121,7 +121,7 @@ export default function (options: ApplicationOptions): Rule {
       ),
       mergeWith(
         apply(url('./files/common-files'), [
-          options.minimal
+          options.skipTests || options.minimal
             ? filter((path) => !path.endsWith('tsconfig.spec.json.template'))
             : noop(),
           componentOptions.inlineTemplate
