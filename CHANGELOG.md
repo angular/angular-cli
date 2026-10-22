@@ -1,3 +1,27 @@
+<a name="21.2.28"></a>
+
+# 21.2.28 (2026-10-22)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------- |
+| [225d00adb4](https://github.com/angular/angular-cli/commit/225d00adb469a23a8b14bb33dff9a14595f8ca8c) | fix  | bump @modelcontextprotocol/sdk to 1.32.1 |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description               |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------- |
+| [651d1d293d](https://github.com/angular/angular-cli/commit/651d1d293dd47454d76f2f7ddbc70f7a5607366b) | fix  | update webpack to 5.112.0 |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------ |
+| [a081d8b6db](https://github.com/angular/angular-cli/commit/a081d8b6dbef26d33cb22b4b40c9a843a2b87047) | fix  | bump vite to 7.3.7 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.27"></a>
 
 # 21.2.27 (2026-10-14)
