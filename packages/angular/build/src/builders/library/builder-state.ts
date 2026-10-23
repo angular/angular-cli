@@ -256,10 +256,8 @@ export class BuilderState {
       return true;
     }
 
-    for (const file of this.#pendingCompilationFiles) {
-      if (this.#watchedCompilationFiles.has(file)) {
-        return true;
-      }
+    if (!this.#pendingCompilationFiles.isDisjointFrom(this.#watchedCompilationFiles)) {
+      return true;
     }
 
     this.#pendingCompilationFiles.clear();
@@ -281,12 +279,7 @@ export class BuilderState {
       return undefined;
     }
 
-    const files = new Set(modifiedFiles);
-    for (const file of this.#pendingCompilationFiles) {
-      files.add(file);
-    }
-
-    return files;
+    return modifiedFiles.union(this.#pendingCompilationFiles);
   }
 
   /**
@@ -380,7 +373,7 @@ export class BuilderState {
     collectedAssets: CollectedAssets,
     manifestFiles?: readonly OutputFile[],
   ): ReadonlySet<string> {
-    const filesToDelete = new Set<string>();
+    let filesToDelete = new Set<string>();
 
     if (this.#hasUpdatedBundles) {
       this.#hasUpdatedBundles = false;
@@ -394,21 +387,14 @@ export class BuilderState {
         }
       }
 
-      for (const prevFile of this.#emittedBundleFiles) {
-        if (!nextBundleFiles.has(prevFile)) {
-          filesToDelete.add(prevFile);
-        }
-      }
-
+      filesToDelete = this.#emittedBundleFiles.difference(nextBundleFiles);
       this.#emittedBundleFiles = nextBundleFiles;
     }
 
     if (manifestFiles) {
       const nextManifestFiles = new Set(manifestFiles.map((file) => file.path));
-      for (const prevFile of this.#emittedManifestFiles) {
-        if (!nextManifestFiles.has(prevFile)) {
-          filesToDelete.add(prevFile);
-        }
+      for (const prevFile of this.#emittedManifestFiles.difference(nextManifestFiles)) {
+        filesToDelete.add(prevFile);
       }
 
       this.#emittedManifestFiles = nextManifestFiles;
