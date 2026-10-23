@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { batchFilesByArgumentLength } from './prettier';
+import { batchFilesByArgumentLength } from './formatting';
 
 describe('batchFilesByArgumentLength', () => {
   it('returns no batches when there are no files', () => {
