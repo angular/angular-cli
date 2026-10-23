@@ -179,10 +179,9 @@ async function* handleRoute(options: {
     const parentRoutes = new Map<string, RouteTreeNodeMetadata>();
 
     if (typeof redirectTo === 'string') {
-      let routeSegments: string[] | undefined;
       // Reference the route parameters by their position in the URL (see `buildUrlWithParams`).
       metadata.redirectTo = resolveRedirectTo(parentRoute, route, redirectTo, (parameter) => {
-        routeSegments ??= joinUrlParts(baseHref, currentRoutePath).split('/');
+        const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
 
         return `*${routeSegments.lastIndexOf(parameter)}`;
       });

@@ -205,7 +205,7 @@ export function buildUrlWithParams(toUrl: string, fromPath: string, fromSearch?:
         .split('/')
         .map((part, index) =>
           part[0] === '*'
-            ? (fromPathParts[part.length === 1 ? index : +part.slice(1)] ?? part)
+            ? (fromPathParts[part.length === 1 ? index : Number(part.slice(1))] ?? part)
             : part,
         ),
     );
