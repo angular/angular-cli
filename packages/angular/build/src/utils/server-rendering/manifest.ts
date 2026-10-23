@@ -18,7 +18,6 @@ import {
   BuildOutputFileType,
   createOutputFile,
 } from '../../tools/esbuild/bundler-files';
-import { calculateHash } from '../hash';
 import { findNonce } from '../index-file/nonce';
 import { joinUrlParts } from '../url';
 
@@ -59,37 +58,6 @@ const UNSAFE_CHAR_MAP: Record<string, string> = {
  */
 function escapeUnsafeChars(str: string): string {
   return str.replace(/[$`\\]/g, (c) => UNSAFE_CHAR_MAP[c]);
-}
-
-/**
- * Matches every character which is not safe in the name of a generated server asset chunk.
- */
-const UNSAFE_CHUNK_NAME_CHARACTER_REGEXP = /[^a-zA-Z0-9_-]/g;
-
-/**
- * The maximum number of characters of an asset path kept in the name of its generated chunk.
- * The appended digest is what makes the name unique, so the readable part can be truncated to
- * stay well within the file name length limits of all supported platforms.
- */
-const MAX_CHUNK_NAME_LENGTH = 128;
-
-/**
- * Builds the path of the generated chunk which holds the content of a server asset.
- *
- * Asset paths are derived from route paths and can therefore contain characters which are unusable
- * in a file name (`?`, `:` and `*` are invalid on Windows) or which change how the generated
- * dynamic import is resolved (`?`, `#` and `%` are URL syntax). Those characters are replaced, and
- * a digest of the asset path is appended so that two asset paths never share a chunk.
- *
- * @param assetPath - The path of the asset, for example `store/summer sale/index.html`.
- * @returns The path of the chunk to generate for the asset.
- */
-function generateServerAssetChunkPath(assetPath: string): string {
-  const name = assetPath
-    .replace(UNSAFE_CHUNK_NAME_CHARACTER_REGEXP, '_')
-    .slice(0, MAX_CHUNK_NAME_LENGTH);
-
-  return `assets-chunks/${name}-${calculateHash(assetPath)}.mjs`;
 }
 
 /**
@@ -202,7 +170,7 @@ export async function generateAngularServerAppManifest(
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
     if (extension === '.html') {
-      const jsChunkFilePath = generateServerAssetChunkPath(file.path);
+      const jsChunkFilePath = `assets-chunks/${file.path.replace(/[./]/g, '_')}.mjs`;
       const escapedContent = escapeUnsafeChars(file.text);
 
       serverAssetsChunks.push(
