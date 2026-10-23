@@ -82,24 +82,6 @@ interface MultiBundleOutput {
 }
 
 /**
- * Checks whether two sets share at least one common element.
- * TODO: Replace with `!a.isDisjointFrom(b)` once the repository TypeScript `lib` targets ES2025+.
- */
-function hasSetIntersection(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
-  if (a.size > b.size) {
-    return hasSetIntersection(b, a);
-  }
-
-  for (const item of a) {
-    if (b.has(item)) {
-      return true;
-    }
-  }
-
-  return false;
-}
-
-/**
  * Expands the selected entry points to include any available entry points whose module IDs
  * transitively overlap with the selected set.
  */
@@ -130,7 +112,7 @@ function expandOverlappingEntryPoints(
       }
 
       const candidateIds = getModuleIds(candidate);
-      if (candidateIds && hasSetIntersection(moduleIds, candidateIds)) {
+      if (candidateIds && !moduleIds.isDisjointFrom(candidateIds)) {
         selected.add(candidate);
       }
     }
