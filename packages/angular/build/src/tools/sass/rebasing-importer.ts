@@ -209,8 +209,8 @@ export class RelativeUrlRebasingImporter extends UrlRebasingImporter {
       // If there is a preprocessed cache of the directory, perform an intersection of the potentials
       // and the directory files.
       const { files, directories } = cachedEntries;
-      foundDefaults = [...defaultPotentials].filter((potential) => files.has(potential));
-      foundImports = [...importPotentials].filter((potential) => files.has(potential));
+      foundDefaults = [...defaultPotentials.intersection(files)];
+      foundImports = [...importPotentials.intersection(files)];
       hasPotentialIndex = checkDirectory && !hasStyleExtension && directories.has(filename);
     } else {
       // If no preprocessed cache exists, get the entries from the file system and, while searching,
