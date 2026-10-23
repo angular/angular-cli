@@ -138,7 +138,6 @@ describe('Tailwind Schematic', () => {
     }
 
     it('should create a tailwind stylesheet when the only CSS entry is a package theme', async () => {
-      appTree = await createTestApp(schematicRunner, appOptions, Style.Scss);
       setStyles(appTree, [
         '@angular/material/prebuilt-themes/azure-blue.css',
         'projects/bar/src/styles.scss',
