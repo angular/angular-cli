@@ -7,14 +7,22 @@
  */
 
 // Generates synthetic Angular Package Format (APF) library fixtures for benchmarking
-// `@angular/build:library`, and converts them into the builder's project shape (a flat
-// `exports` map in one root package.json, rather than the per-entry-point `ng-package.json`
-// convention used by third-party tools such as ng-packagr).
+// `@angular/build:library` and `@angular/build:ng-packagr`. The same synthetic sources are emitted
+// in either builder's project shape: a flat `exports` map in one root package.json for the native
+// builder, or the per-entry-point `ng-package.json` convention for ng-packagr.
 
 import fs from 'node:fs';
 import path from 'node:path';
 
 export type Layout = 'flat' | 'deep';
+
+/** Which Architect builder the generated project targets. */
+export type LibraryBuilder = 'library' | 'ng-packagr';
+
+/** All library builders, in A/B order (native builder first, legacy builder second). */
+export const LIBRARY_BUILDERS: readonly LibraryBuilder[] = ['library', 'ng-packagr'];
+
+export const DEFAULT_LIBRARY_BUILDER: LibraryBuilder = 'library';
 
 /**
  * Style-flavor matrix: crosses template location (inline vs. external `templateUrl`) with
@@ -49,6 +57,9 @@ export interface FixtureOptions {
 
   /** Template/stylesheet flavor for every entry point in the fixture. Defaults to `inline`. */
   styleFlavor?: StyleFlavor;
+
+  /** Builder the generated project targets. Defaults to `library`. */
+  builder?: LibraryBuilder;
 }
 
 /** Per-entry CSS/SCSS content, varied by `id` like the template so entries aren't byte-identical. */
@@ -106,8 +117,21 @@ export class ${className} {}
 }
 
 /** Writes one secondary entry point's source files (component + public-api.ts) into `entryDir`. */
-function writeEntryPointSource(entryDir: string, id: string, styleFlavor: StyleFlavor): void {
+function writeEntryPointSource(
+  entryDir: string,
+  id: string,
+  styleFlavor: StyleFlavor,
+  builder: LibraryBuilder,
+): void {
   fs.mkdirSync(entryDir, { recursive: true });
+
+  if (builder === 'ng-packagr') {
+    // ng-packagr discovers secondary entry points by the presence of a per-directory ng-package.json.
+    fs.writeFileSync(
+      path.join(entryDir, 'ng-package.json'),
+      JSON.stringify({ lib: { entryFile: 'public-api.ts' } }, null, 2) + '\n',
+    );
+  }
 
   const className = `RefComponent${id}`;
   const selector = `ref-comp-${id}`;
@@ -150,13 +174,18 @@ function writeEntryPointSource(entryDir: string, id: string, styleFlavor: StyleF
 }
 
 /** Generates `count` flat secondary entry points as direct siblings, returning their relative dirs. */
-function generateFlatEntries(outDir: string, count: number, styleFlavor: StyleFlavor): string[] {
+function generateFlatEntries(
+  outDir: string,
+  count: number,
+  styleFlavor: StyleFlavor,
+  builder: LibraryBuilder,
+): string[] {
   const width = String(count).length;
   const dirs: string[] = [];
   for (let i = 1; i <= count; i++) {
     const id = String(i).padStart(width, '0');
     const relDir = `comp-${id}`;
-    writeEntryPointSource(path.join(outDir, relDir), id, styleFlavor);
+    writeEntryPointSource(path.join(outDir, relDir), id, styleFlavor, builder);
     dirs.push(relDir);
   }
 
@@ -167,7 +196,12 @@ function generateFlatEntries(outDir: string, count: number, styleFlavor: StyleFl
  * Generates a binary tree `depth` levels deep (`sub-a`/`sub-b` at each level), placing one
  * secondary entry point at each of the 2^depth leaves. Returns their relative dirs.
  */
-function generateDeepEntries(outDir: string, depth: number, styleFlavor: StyleFlavor): string[] {
+function generateDeepEntries(
+  outDir: string,
+  depth: number,
+  styleFlavor: StyleFlavor,
+  builder: LibraryBuilder,
+): string[] {
   const total = 2 ** depth;
   const width = String(total).length;
   const dirs: string[] = [];
@@ -177,7 +211,7 @@ function generateDeepEntries(outDir: string, depth: number, styleFlavor: StyleFl
     if (level === depth) {
       counter++;
       const id = String(counter).padStart(width, '0');
-      writeEntryPointSource(path.join(outDir, currentRelDir), id, styleFlavor);
+      writeEntryPointSource(path.join(outDir, currentRelDir), id, styleFlavor, builder);
       dirs.push(currentRelDir);
 
       return;
@@ -207,6 +241,7 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
   fs.mkdirSync(outDir, { recursive: true });
 
   const styleFlavor = options.styleFlavor ?? DEFAULT_STYLE_FLAVOR;
+  const builder = options.builder ?? DEFAULT_LIBRARY_BUILDER;
 
   fs.writeFileSync(
     path.join(outDir, 'public-api.ts'),
@@ -215,12 +250,16 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
 
   const secondaryDirs =
     options.layout === 'flat'
-      ? generateFlatEntries(outDir, options.count ?? 10, styleFlavor)
-      : generateDeepEntries(outDir, options.depth ?? 2, styleFlavor);
+      ? generateFlatEntries(outDir, options.count ?? 10, styleFlavor, builder)
+      : generateDeepEntries(outDir, options.depth ?? 2, styleFlavor, builder);
 
+  // Only the native builder reads an `exports` map; ng-packagr derives (and writes) it itself from
+  // the per-entry-point ng-package.json files.
   const exportsMap: Record<string, string> = { '.': './public-api.ts' };
-  for (const relDir of secondaryDirs) {
-    exportsMap[`./${entryKey(relDir)}`] = `./${relDir.split(path.sep).join('/')}/public-api.ts`;
+  if (builder === 'library') {
+    for (const relDir of secondaryDirs) {
+      exportsMap[`./${entryKey(relDir)}`] = `./${relDir.split(path.sep).join('/')}/public-api.ts`;
+    }
   }
 
   // Fallback to a hardcoded version if the path lookup fails in the sandbox/environment.
@@ -247,7 +286,7 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
           '@angular/core': peerRange,
           '@angular/common': peerRange,
         },
-        exports: exportsMap,
+        ...(builder === 'library' ? { exports: exportsMap } : {}),
       },
       null,
       2,
@@ -298,15 +337,36 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
     ) + '\n',
   );
 
-  const buildOptions: Record<string, unknown> = {
-    tsConfig: './tsconfig.lib.json',
-    outputPath: 'dist',
-  };
-  if (styleFlavor === 'inline-scss') {
-    // Inline style language is a project-wide builder option, not per-component -- this is the
-    // only flavor that needs it set, since external .scss files are detected by extension and
-    // 'css' (the default) already covers the other flavors.
-    buildOptions['inlineStyleLanguage'] = 'scss';
+  let buildTarget: { builder: string; options: Record<string, unknown> };
+  if (builder === 'library') {
+    const buildOptions: Record<string, unknown> = {
+      tsConfig: './tsconfig.lib.json',
+      outputPath: 'dist',
+    };
+    if (styleFlavor === 'inline-scss') {
+      // Inline style language is a project-wide builder option, not per-component -- this is the
+      // only flavor that needs it set, since external .scss files are detected by extension and
+      // 'css' (the default) already covers the other flavors.
+      buildOptions['inlineStyleLanguage'] = 'scss';
+    }
+    buildTarget = { builder: '@angular/build:library', options: buildOptions };
+  } else {
+    const ngPackage: Record<string, unknown> = {
+      dest: 'dist',
+      lib: { entryFile: 'public-api.ts' },
+    };
+    if (styleFlavor === 'inline-scss') {
+      // For ng-packagr the inline style language is configured in ng-package.json, not the builder.
+      ngPackage['inlineStyleLanguage'] = 'scss';
+    }
+    fs.writeFileSync(
+      path.join(outDir, 'ng-package.json'),
+      JSON.stringify(ngPackage, null, 2) + '\n',
+    );
+    buildTarget = {
+      builder: '@angular/build:ng-packagr',
+      options: { project: './ng-package.json', tsConfig: './tsconfig.lib.json' },
+    };
   }
 
   fs.writeFileSync(
@@ -320,12 +380,7 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
             root: '.',
             projectType: 'library',
             sourceRoot: '.',
-            targets: {
-              build: {
-                builder: '@angular/build:library',
-                options: buildOptions,
-              },
-            },
+            targets: { build: buildTarget },
           },
         },
       },

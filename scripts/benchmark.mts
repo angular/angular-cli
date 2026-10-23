@@ -9,7 +9,12 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
-import { STYLE_FLAVORS, type StyleFlavor } from './benchmarks/library-builder/fixtures.mts';
+import {
+  LIBRARY_BUILDERS,
+  STYLE_FLAVORS,
+  type LibraryBuilder,
+  type StyleFlavor,
+} from './benchmarks/library-builder/fixtures.mts';
 import {
   type LibraryBuilderBenchmarkOptions,
   runLibraryBuilderBenchmarks,
@@ -62,6 +67,7 @@ function parseStringList(raw: string | undefined): string[] | undefined {
 async function runLibraryBuilderSubsystem(
   options: {
     layout?: string;
+    builder?: string;
     count?: string;
     depth?: string;
     'style-flavor'?: string;
@@ -119,6 +125,21 @@ async function runLibraryBuilderSubsystem(
     return 1;
   }
 
+  const builder = parseStringList(options.builder);
+  const validBuilders: readonly string[] = LIBRARY_BUILDERS;
+  if (builder !== undefined && builder.some((b) => !validBuilders.includes(b))) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --builder must be a comma-separated list of: ' +
+        LIBRARY_BUILDERS.join(', ') +
+        '. Got "' +
+        options.builder +
+        '".',
+    );
+
+    return 1;
+  }
+
   const styleFlavor = parseStringList(options['style-flavor']);
   const validStyleFlavors: readonly string[] = STYLE_FLAVORS;
   if (styleFlavor !== undefined && styleFlavor.some((f) => !validStyleFlavors.includes(f))) {
@@ -136,6 +157,7 @@ async function runLibraryBuilderSubsystem(
 
   const cliOptions: LibraryBuilderBenchmarkOptions = {
     layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
+    builder: builder as LibraryBuilder[] | undefined,
     count,
     depth,
     styleFlavor: styleFlavor as StyleFlavor[] | undefined,
@@ -165,6 +187,7 @@ export default async function (
     compareBaseline?: string;
     'compare-baseline'?: string;
     layout?: string;
+    builder?: string;
     count?: string;
     depth?: string;
     'style-flavor'?: string;
@@ -186,7 +209,7 @@ Usage:
 
 Subsystems:
   i18n               Run i18n inliner performance benchmarks (default)
-  library-builder    Run @angular/build:library scaling benchmarks
+  library-builder    Run @angular/build:library (and :ng-packagr) scaling benchmarks
 
 Options (i18n):
   --scenario=<name>          Run a specific scenario (e.g. standard-app, enterprise-multilingual)
@@ -201,6 +224,8 @@ Options (i18n):
 
 Options (library-builder):
   --layout=<flat|deep>       Fixture layout (default: flat)
+  --builder=<b,b,...>        Builders to benchmark, one or more of: library, ng-packagr.
+                             Pass both for an A/B run (default: library)
   --count=<n,n,...>          Entry-point count targets, drives both layouts
                              (default: 10,20,50,100,200,300,400,500,1000,2000)
   --depth=<n,n,...>          Explicit tree depths, layout=deep only. Overrides the depths

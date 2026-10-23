@@ -6,16 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-// Runs and measures a single `@angular/build:library` cold build via Architect's standalone CLI.
+// Runs and measures a single `@angular/build:library` or `@angular/build:ng-packagr` cold build via Architect's standalone CLI.
 // `fixtures.mts` owns generating the on-disk project; this module owns spawning the builder
 // against it and reporting what happened. Kept separate so each file has one job.
 
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import type { Layout, StyleFlavor } from './fixtures.mts';
+import type { Layout, LibraryBuilder, StyleFlavor } from './fixtures.mts';
 
 export interface BuildMeasurement {
+  builder: LibraryBuilder;
   layout: Layout;
   styleFlavor: StyleFlavor;
   entryPoints: number;

@@ -60,6 +60,20 @@ Each entry point consists of a `public-api.ts` and a component file with a bit o
 content derived from the entry's id (e.g. `<h2>Component no. 0042</h2>`), so entries aren't
 byte-identical copies of each other.
 
+### Builder axis (A/B)
+
+`--builder=<list>` selects which Architect builder each fixture targets. The same synthetic sources
+are emitted in either builder's project shape:
+
+| Builder      | Architect builder           | Project shape                                                                                                            |
+| :----------- | :-------------------------- | :----------------------------------------------------------------------------------------------------------------------- |
+| `library`    | `@angular/build:library`    | One root `package.json` with a flat `exports` map; no `ng-package.json`.                                                 |
+| `ng-packagr` | `@angular/build:ng-packagr` | Root `ng-package.json` (`dest`, `lib.entryFile`) plus one `ng-package.json` per secondary entry point; no `exports` map. |
+
+Defaults to `library` only. Pass `--builder=library,ng-packagr` for an A/B run: the builder is the
+innermost loop, so the two builds of an identical fixture size run back to back. `inline-scss`
+sets `inlineStyleLanguage` on the builder for `library` and in `ng-package.json` for `ng-packagr`.
+
 ### Style-flavor matrix
 
 `--style-flavor` is a second, independent sweep axis (crossed with `--layout` and the
@@ -113,6 +127,7 @@ pnpm admin benchmark library-builder [options]
 | Option                     | Description                                                                                                                                               | Default                                  |
 | :------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------- |
 | `--layout=<flat\|deep>`    | Fixture layout                                                                                                                                            | `flat`                                   |
+| `--builder=<b,b,...>`      | Builders to benchmark, one or more of `library`, `ng-packagr`. Pass both for an A/B run                                                                   | `library`                                |
 | `--count=<n,n,...>`        | Entry-point count targets, drives both layouts                                                                                                            | `10,20,50,100,200,300,400,500,1000,2000` |
 | `--depth=<n,n,...>`        | **`layout=deep` only.** Explicit tree depths, overriding the depths otherwise derived from `--count`                                                      | derived from `--count`                   |
 | `--style-flavor=<f,f,...>` | Style-flavor targets (see "Style-flavor matrix" above), one or more of `inline`, `inline-css`, `inline-scss`, `external`, `external-css`, `external-scss` | `inline`                                 |
@@ -131,6 +146,12 @@ Sweep the flat layout at a single size:
 
 ```sh
 pnpm admin benchmark library-builder --layout=flat --count=500
+```
+
+A/B run of both builders at a few sizes:
+
+```sh
+pnpm admin benchmark library-builder --builder=library,ng-packagr --layout=flat --count=10,50,200
 ```
 
 Sweep the full style-flavor matrix at a single size, both layouts:
@@ -219,9 +240,30 @@ Verification performed:
 - Verified `--style-flavor` rejects an unrecognized flavor name with a clear error listing the
   valid set, consistent with existing `--layout`/`--count`/`--depth` validation.
 
+### 2026-10-22: Fixtures and harness prepared for A/B runs (no results yet)
+
+Added the `--builder` axis (see "Builder axis (A/B)" above): the fixture generator can now emit
+`ng-packagr`-shaped projects (per-entry-point `ng-package.json`) next to the native builder's
+`exports`-map projects, and `builder` is part of the JSON/CSV output.
+
+This entry is preparation only -- **no benchmark results are recorded here**. Verification performed:
+
+- `--count=5` with both layouts, all 6 style flavors, both builders, `--iterations=1`: all 24
+  builds completed with `status: "ok"`.
+- Inspected `ng-packagr` output for a `deep`/`external-scss` fixture: every secondary entry point
+  was built and bundled, and the per-entry SCSS variable compiled to a literal color, i.e. the
+  fixtures exercise the same work on both builders.
+- `--builder` rejects an unrecognized name with a clear error listing the valid set.
+- A reduced, throwaway sweep (flat, counts 10/50/200, 2 iterations, once per builder) ran cleanly
+  on both builders. Those numbers are deliberately not recorded: they are a smoke test, not a
+  measurement.
+
+We now have a basis for a first real A/B run. The full sweep takes hours and needs proper
+preparation (quiet machine, fixed environment, enough iterations) before it is worth running.
+
 ## Future Work
 
-- A/B comparison against `ng-packagr` (both are already registered Architect builders — `@angular/build:ng-packagr` and `@angular/build:library` — so this is a same-builder-package comparison, not a separate tool invocation).
+- First real A/B run against `ng-packagr` (`--builder=library,ng-packagr`; the fixture generation and harness support are in place, see 2026-10-22). Needs a quiet machine and the full default sweep.
 - Full style-flavor matrix sweep (default `--count` sweep x 6 flavors x 2 layouts) to quantify the actual performance impact of stylesheet processing and external file reads, now that the matrix is implemented.
 - Dependencies between entry points.
 - Shared stylesheet tokens imported by multiple components.
