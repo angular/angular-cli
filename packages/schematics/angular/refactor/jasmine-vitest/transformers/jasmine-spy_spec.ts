@@ -60,9 +60,19 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
     },
     {
       description:
-        'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop").mockReturnValue(undefined)',
+        'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop", "get").mockReturnValue(undefined)',
       input: `spyOnProperty(service, 'myProp');`,
-      expected: `vi.spyOn(service, 'myProp').mockReturnValue(undefined);`,
+      expected: `vi.spyOn(service, 'myProp', 'get').mockReturnValue(undefined);`,
+    },
+    {
+      description: 'should default the access type of a chained spyOnProperty to "get"',
+      input: `spyOnProperty(service, 'myProp').and.returnValue(42);`,
+      expected: `vi.spyOn(service, 'myProp', 'get').mockReturnValue(42);`,
+    },
+    {
+      description: 'should keep an explicit spyOnProperty access type',
+      input: `spyOnProperty(service, 'myProp', 'set');`,
+      expected: `vi.spyOn(service, 'myProp', 'set').mockReturnValue(undefined);`,
     },
     {
       description: 'should transform .and.stub() to .mockImplementation(() => {})',
