@@ -59,7 +59,7 @@ export function getTypesOfSchema(schema: JsonSchema): Set<string> {
   if (Array.isArray(schema.allOf)) {
     for (const sub of schema.allOf) {
       const types = getTypesOfSchema(sub as JsonObject);
-      potentials = potentials.intersection(types);
+      potentials = new Set([...types].filter((t) => potentials.has(t)));
     }
   }
 
@@ -69,7 +69,7 @@ export function getTypesOfSchema(schema: JsonSchema): Set<string> {
       const types = getTypesOfSchema(sub as JsonObject);
       options = options.union(types);
     }
-    potentials = potentials.intersection(options);
+    potentials = new Set([...options].filter((o) => potentials.has(o)));
   }
 
   if (Array.isArray(schema.anyOf)) {
@@ -78,7 +78,7 @@ export function getTypesOfSchema(schema: JsonSchema): Set<string> {
       const types = getTypesOfSchema(sub as JsonObject);
       options = options.union(types);
     }
-    potentials = potentials.intersection(options);
+    potentials = new Set([...options].filter((o) => potentials.has(o)));
   }
 
   if (schema.properties) {
