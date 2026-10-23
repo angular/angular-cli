@@ -52,7 +52,7 @@ function addTailwindStyles(options: { project: string }, project: ProjectDefinit
       // (`@angular/material/prebuilt-themes/...`) or files within `node_modules` must not be modified.
       stylesheetPath = styles
         .map((s) => (typeof s === 'string' ? s : s.input))
-        .find((p) => p.endsWith('.css') && !p.startsWith('node_modules/') && tree.exists(p));
+        .find((p) => p.endsWith('.css') && !/(?:^|\/)node_modules\//.test(p) && tree.exists(p));
     }
 
     if (!stylesheetPath) {
