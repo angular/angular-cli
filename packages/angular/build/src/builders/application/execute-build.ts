@@ -43,6 +43,25 @@ import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundl
 /** The esbuild error text prefix used to detect top-level await errors. */
 const TOP_LEVEL_AWAIT_ERROR_TEXT =
   'Top-level await is not available in the configured target environment';
+/**
+ * Serializes a metafile with object keys sorted so the stats file is identical across builds.
+ * Arrays keep their order.
+ */
+function stableStringify(value: unknown): string {
+  return JSON.stringify(
+    value,
+    (_key, current: unknown) =>
+      current && typeof current === 'object' && !Array.isArray(current)
+        ? Object.fromEntries(
+            Object.keys(current)
+              .sort()
+              .map((key) => [key, (current as Record<string, unknown>)[key]]),
+          )
+        : current,
+    2,
+  );
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
@@ -394,14 +413,14 @@ export async function executeBuild(
     if (options.stats) {
       executionResult.addOutputFile(
         'browser-stats.json',
-        JSON.stringify(browserMetafile, null, 2),
+        stableStringify(browserMetafile),
         BuildOutputFileType.Root,
       );
 
       if (serverEntryPoint) {
         executionResult.addOutputFile(
           'server-stats.json',
-          JSON.stringify(serverMetafile, null, 2),
+          stableStringify(serverMetafile),
           BuildOutputFileType.Root,
         );
       }
