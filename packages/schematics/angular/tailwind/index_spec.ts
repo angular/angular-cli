@@ -129,4 +129,40 @@ describe('Tailwind Schematic', () => {
       expect(tree.exists('/projects/bar/.postcssrc.json')).toBe(false);
     });
   });
+
+  describe('with non-workspace stylesheets', () => {
+    function setStyles(tree: UnitTestTree, styles: string[]): void {
+      const workspace = getWorkspace(tree);
+      workspace.projects.bar.architect.build.options.styles = styles;
+      tree.overwrite('/angular.json', JSON.stringify(workspace, null, 2));
+    }
+
+    it('should create a tailwind stylesheet when the only CSS entry is a package theme', async () => {
+      setStyles(appTree, [
+        '@angular/material/prebuilt-themes/azure-blue.css',
+        'projects/bar/src/styles.scss',
+      ]);
+
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+
+      expect(tree.exists('/projects/bar/src/tailwind.css')).toBe(true);
+      const workspace = getWorkspace(tree);
+      expect(workspace.projects.bar.architect.build.options.styles).toEqual([
+        'projects/bar/src/tailwind.css',
+        '@angular/material/prebuilt-themes/azure-blue.css',
+        'projects/bar/src/styles.scss',
+      ]);
+    });
+
+    it('should not modify a stylesheet inside node_modules', async () => {
+      const vendorStylesheet = 'node_modules/bootstrap/dist/css/bootstrap.min.css';
+      appTree.create(`/${vendorStylesheet}`, 'body { margin: 0; }');
+      setStyles(appTree, [vendorStylesheet, 'projects/bar/src/styles.css']);
+
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+
+      expect(tree.readContent(`/${vendorStylesheet}`)).not.toContain('tailwindcss');
+      expect(tree.readContent('/projects/bar/src/styles.css')).toContain(`@import 'tailwindcss';`);
+    });
+  });
 });
