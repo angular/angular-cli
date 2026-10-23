@@ -323,6 +323,16 @@ describe('transformSpyCallInspection', () => {
       expected: `const firstCall = vi.mocked(mySpy).mock.calls[0];`,
     },
     {
+      description: 'should transform spy.calls.first().args',
+      input: `const firstArgs = mySpy.calls.first().args;`,
+      expected: `const firstArgs = vi.mocked(mySpy).mock.calls[0];`,
+    },
+    {
+      description: 'should transform spy.calls.first().args[i]',
+      input: `expect(mySpy.calls.first().args[0]).toBe(1);`,
+      expected: `expect(vi.mocked(mySpy).mock.calls[0][0]).toBe(1);`,
+    },
+    {
       description: 'should add a TODO for spy.calls.mostRecent() without .args',
       input: `const mostRecent = mySpy.calls.mostRecent();`,
       expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall. See: https://vitest.dev/api/mocked.html#mock-lastcall
