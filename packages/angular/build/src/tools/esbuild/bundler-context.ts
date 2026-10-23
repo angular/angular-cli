@@ -473,9 +473,12 @@ export class BundlerContext {
   }
 
   async #addLoadCacheFilesToWatch(): Promise<void> {
-    if (this.incremental && this.#loadCache && this.#loadCacheKeys) {
-      for (const key of this.#loadCacheKeys) {
-        const cachedResult = await this.#loadCache.get(key);
+    const loadCache = this.#loadCache;
+    if (this.incremental && loadCache && this.#loadCacheKeys) {
+      const results = await Promise.all(
+        Array.from(this.#loadCacheKeys, (key) => loadCache.get(key)),
+      );
+      for (const cachedResult of results) {
         if (cachedResult?.watchFiles) {
           for (const file of cachedResult.watchFiles) {
             if (!isInternalAngularFile(file)) {
