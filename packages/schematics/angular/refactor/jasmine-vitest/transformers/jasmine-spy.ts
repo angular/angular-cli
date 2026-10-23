@@ -527,11 +527,11 @@ function transformMostRecentArgs(
     return node;
   }
 
-  // Check 3: Is it a call to `.mostRecent`?
+  // Check 3: Is it a call to `.mostRecent` or `.first`?
   const mostRecentPae = mostRecentCall.expression;
   if (
     !ts.isIdentifier(mostRecentPae.name) ||
-    mostRecentPae.name.text !== 'mostRecent' ||
+    (mostRecentPae.name.text !== 'mostRecent' && mostRecentPae.name.text !== 'first') ||
     !ts.isPropertyAccessExpression(mostRecentPae.expression)
   ) {
     return node;
@@ -541,6 +541,17 @@ function transformMostRecentArgs(
   const spyIdentifier = getSpyIdentifierFromCalls(mostRecentPae.expression);
   if (!spyIdentifier) {
     return node;
+  }
+
+  if (mostRecentPae.name.text === 'first') {
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      'Transformed `spy.calls.first().args` to `vi.mocked(spy).mock.calls[0]`.',
+    );
+    const mockProperty = createMockedSpyMockProperty(spyIdentifier, pendingVitestValueImports);
+
+    return ts.factory.createElementAccessExpression(createPropertyAccess(mockProperty, 'calls'), 0);
   }
 
   // If all checks pass, perform the transformation.
