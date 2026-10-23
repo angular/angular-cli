@@ -9,6 +9,16 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { type BenchmarkCliOptions, runI18nBenchmarks } from './benchmarks/i18n/index.mts';
+import {
+  LIBRARY_BUILDERS,
+  STYLE_FLAVORS,
+  type LibraryBuilder,
+  type StyleFlavor,
+} from './benchmarks/library-builder/fixtures.mts';
+import {
+  type LibraryBuilderBenchmarkOptions,
+  runLibraryBuilderBenchmarks,
+} from './benchmarks/library-builder/index.mts';
 
 function checkBuildStatus(logger: Console): boolean {
   const distFile = 'dist/@angular/build/src/tools/i18n/i18n-inliner.js';
@@ -36,6 +46,131 @@ function checkBuildStatus(logger: Console): boolean {
   return true;
 }
 
+function parseIntList(raw: string | number | undefined): number[] | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  return String(raw)
+    .split(',')
+    .map((s) => Number(s.trim()));
+}
+
+function parseStringList(raw: string | undefined): string[] | undefined {
+  if (raw === undefined) {
+    return undefined;
+  }
+
+  return raw.split(',').map((s) => s.trim());
+}
+
+async function runLibraryBuilderSubsystem(
+  options: {
+    layout?: string;
+    builder?: string;
+    count?: string;
+    depth?: string;
+    'style-flavor'?: string;
+    iterations?: string | number;
+    json?: boolean;
+    csv?: string | boolean;
+  },
+  cwd: string,
+): Promise<number> {
+  if (options.layout !== undefined && options.layout !== 'flat' && options.layout !== 'deep') {
+    // eslint-disable-next-line no-console
+    console.error('Error: --layout must be "flat" or "deep", got "' + options.layout + '".');
+
+    return 1;
+  }
+
+  const count = parseIntList(options.count);
+  if (count !== undefined && count.some((n) => !Number.isInteger(n) || n < 1)) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --count must be a comma-separated list of positive integers, got "' +
+        options.count +
+        '".',
+    );
+
+    return 1;
+  }
+
+  const depth = parseIntList(options.depth);
+  if (depth !== undefined && depth.some((n) => !Number.isInteger(n) || n < 1)) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --depth must be a comma-separated list of positive integers, got "' +
+        options.depth +
+        '".',
+    );
+
+    return 1;
+  }
+
+  const iterations = options.iterations !== undefined ? Number(options.iterations) : undefined;
+  if (iterations !== undefined && (!Number.isInteger(iterations) || iterations < 1)) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --iterations must be a positive integer, got "' + options.iterations + '".',
+    );
+
+    return 1;
+  }
+
+  if (options.csv !== undefined && (typeof options.csv !== 'string' || options.csv.length === 0)) {
+    // eslint-disable-next-line no-console
+    console.error('Error: --csv requires a file path, got "' + options.csv + '".');
+
+    return 1;
+  }
+
+  const builder = parseStringList(options.builder);
+  const validBuilders: readonly string[] = LIBRARY_BUILDERS;
+  if (builder !== undefined && builder.some((b) => !validBuilders.includes(b))) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --builder must be a comma-separated list of: ' +
+        LIBRARY_BUILDERS.join(', ') +
+        '. Got "' +
+        options.builder +
+        '".',
+    );
+
+    return 1;
+  }
+
+  const styleFlavor = parseStringList(options['style-flavor']);
+  const validStyleFlavors: readonly string[] = STYLE_FLAVORS;
+  if (styleFlavor !== undefined && styleFlavor.some((f) => !validStyleFlavors.includes(f))) {
+    // eslint-disable-next-line no-console
+    console.error(
+      'Error: --style-flavor must be a comma-separated list of: ' +
+        STYLE_FLAVORS.join(', ') +
+        '. Got "' +
+        options['style-flavor'] +
+        '".',
+    );
+
+    return 1;
+  }
+
+  const cliOptions: LibraryBuilderBenchmarkOptions = {
+    layout: options.layout as LibraryBuilderBenchmarkOptions['layout'],
+    builder: builder as LibraryBuilder[] | undefined,
+    count,
+    depth,
+    styleFlavor: styleFlavor as StyleFlavor[] | undefined,
+    iterations,
+    json: Boolean(options.json),
+    csv: options.csv !== undefined ? path.resolve(cwd, options.csv as string) : undefined,
+  };
+
+  const { exitCode } = await runLibraryBuilderBenchmarks(cliOptions);
+
+  return exitCode;
+}
+
 export default async function (
   options: {
     _?: string[];
@@ -51,6 +186,11 @@ export default async function (
     'save-baseline'?: string;
     compareBaseline?: string;
     'compare-baseline'?: string;
+    layout?: string;
+    builder?: string;
+    count?: string;
+    depth?: string;
+    'style-flavor'?: string;
     help?: boolean;
     [key: string]: unknown;
   },
@@ -69,8 +209,9 @@ Usage:
 
 Subsystems:
   i18n               Run i18n inliner performance benchmarks (default)
+  library-builder    Run @angular/build:library (and :ng-packagr) scaling benchmarks
 
-Options:
+Options (i18n):
   --scenario=<name>          Run a specific scenario (e.g. standard-app, enterprise-multilingual)
   --iterations=<n>           Number of measured iterations (default: 5)
   --warmup=<n>               Number of warmup iterations (default: 2)
@@ -80,15 +221,38 @@ Options:
   --json                     Output results in machine-readable JSON
   --save-baseline=<file>     Save run results to a baseline JSON file
   --compare-baseline=<file>  Compare run results against an existing baseline JSON file
+
+Options (library-builder):
+  --layout=<flat|deep>       Fixture layout (default: flat)
+  --builder=<b,b,...>        Builders to benchmark, one or more of: library, ng-packagr.
+                             Pass both for an A/B run (default: library)
+  --count=<n,n,...>          Entry-point count targets, drives both layouts
+                             (default: 10,20,50,100,200,300,400,500,1000,2000)
+  --depth=<n,n,...>          Explicit tree depths, layout=deep only. Overrides the depths
+                             that would otherwise be derived from --count (the smallest
+                             depth with 2^depth >= each target count).
+  --style-flavor=<f,f,...>   Style-flavor targets, one or more of: inline, inline-css,
+                             inline-scss, external, external-css, external-scss
+                             (default: inline)
+  --iterations=<n>           Measured iterations (default: 3)
+  --json                     Output raw measurements as JSON to stdout
+  --csv=<path>               Write raw per-iteration measurements as CSV to <path>
+
   --help                     Show this help message
 `);
 
     return 0;
   }
 
+  if (targetSubsystem === 'library-builder') {
+    return runLibraryBuilderSubsystem(options, _cwd);
+  }
+
   if (targetSubsystem !== 'i18n') {
     // eslint-disable-next-line no-console
-    console.error(`Unknown benchmark subsystem: "${targetSubsystem}". Supported subsystems: i18n`);
+    console.error(
+      `Unknown benchmark subsystem: "${targetSubsystem}". Supported subsystems: i18n, library-builder`,
+    );
 
     return 1;
   }
