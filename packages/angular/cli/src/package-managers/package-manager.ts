@@ -12,7 +12,7 @@
  * a flexible and secure abstraction over the various package managers.
  */
 
-import { join, relative, resolve } from 'node:path';
+import { dirname, join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
 import { maxSatisfying, valid } from 'semver';
 import { PackageManagerError } from './error';
@@ -154,7 +154,61 @@ export class PackageManager {
       this.descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
     );
 
+    // `bun pm ls` has no per-workspace-member output. Run from a member, it lists the workspace
+    // root's dependencies, which are the members themselves (e.g. `app@workspace:app`).
+    if (
+      this.descriptor.binary === 'bun' &&
+      workspacePackageName &&
+      dependencies?.get(workspacePackageName)?.version.startsWith('workspace:')
+    ) {
+      return (this.#dependencyCache = await this.#readDependenciesFromManifests());
+    }
+
     return (this.#dependencyCache = dependencies ?? new Map());
+  }
+
+  /**
+   * Builds the dependency map of the project in the working directory from its `package.json`
+   * and the manifests of the packages installed in `node_modules`.
+   * @returns A map of the declared dependencies that are installed to their installed details.
+   */
+  async #readDependenciesFromManifests(): Promise<Map<string, InstalledPackage>> {
+    const dependencies = new Map<string, InstalledPackage>();
+
+    let declared: Record<string, Record<string, string> | undefined>;
+    try {
+      declared = JSON.parse(await this.host.readFile(join(this.cwd, 'package.json')));
+    } catch {
+      return dependencies;
+    }
+
+    const names = new Set<string>();
+    for (const field of ['dependencies', 'devDependencies', 'optionalDependencies']) {
+      Object.keys(declared[field] ?? {}).forEach((name) => names.add(name));
+    }
+
+    for (const name of names) {
+      // Resolve the package like Node.js does: look in the `node_modules` of the project, then in
+      // those of its parent directories (hoisted workspace installs).
+      for (let dir = this.cwd; ; dir = dirname(dir)) {
+        const path = join(dir, 'node_modules', name);
+        try {
+          const { version } = JSON.parse(await this.host.readFile(join(path, 'package.json')));
+          if (typeof version === 'string') {
+            dependencies.set(name, { name, version, path });
+          }
+          break;
+        } catch {
+          // Not installed at this level.
+        }
+
+        if (dirname(dir) === dir) {
+          break;
+        }
+      }
+    }
+
+    return dependencies;
   }
 
   /**

@@ -445,6 +445,38 @@ describe('PackageManager', () => {
       expect([...dependencies.keys()]).toEqual(['@angular/core']);
       expect(dependencies.get('@angular/core')?.version).toBe('22.0.0');
     });
+
+    it('should list the dependencies of a bun workspace member', async () => {
+      const pm = new PackageManager(host, '/repo/app', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      // `bun pm ls` run from a member prints the root's dependencies, i.e. the members themselves.
+      runCommandSpy.and.resolveTo({
+        stdout: '/repo node_modules (405 installed)\n└── app@workspace:app',
+        stderr: '',
+      });
+      const files: Record<string, string> = {
+        '/repo/app/package.json': JSON.stringify({
+          name: 'app',
+          dependencies: { '@angular/core': '^22.0.0' },
+          devDependencies: { typescript: '~5.9.0' },
+        }),
+        '/repo/node_modules/@angular/core/package.json':
+          '{"name":"@angular/core","version":"22.2.3"}',
+        '/repo/node_modules/typescript/package.json': '{"name":"typescript","version":"5.9.3"}',
+      };
+      spyOn(host, 'readFile').and.callFake((path: string) => {
+        const content = files[path.replace(/\\/g, '/')];
+
+        return content === undefined
+          ? Promise.reject(new Error('ENOENT'))
+          : Promise.resolve(content);
+      });
+
+      const dependencies = await pm.getProjectDependencies();
+
+      expect([...dependencies.keys()].sort()).toEqual(['@angular/core', 'typescript']);
+      expect(dependencies.get('@angular/core')?.version).toBe('22.2.3');
+      expect(dependencies.get('typescript')?.version).toBe('5.9.3');
+    });
   });
 
   describe('initializationError', () => {
