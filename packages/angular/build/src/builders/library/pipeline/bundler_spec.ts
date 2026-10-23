@@ -485,4 +485,136 @@ export declare const SECONDARY: SharedItem;`,
       );
     });
   });
+
+  describe('tree-shaking and comment preservation', () => {
+    it('should tree-shake unexported internal types in .d.ts when using export *', async () => {
+      const primaryEntry = createEntryPoint('.', 'my-lib', `${projectRoot}/src/public-api.ts`);
+      const secondaryEntry = createEntryPoint(
+        'secondary',
+        'my-lib-secondary',
+        `${projectRoot}/secondary/src/public-api.ts`,
+      );
+
+      const esmFiles = new Map<string, string>([
+        [`${projectRoot}/src/public-api.js`, 'export const a = 1;'],
+        [`${projectRoot}/secondary/src/public-api.js`, 'export const b = 2;'],
+      ]);
+
+      const dtsFiles = new Map<string, string>([
+        [
+          `${projectRoot}/src/internal.d.ts`,
+          'export interface PublicA { id: string; }\ninterface UnexportedInternalA { secret: number; }',
+        ],
+        [
+          `${projectRoot}/src/public-api.d.ts`,
+          'export * from "./internal.js";\nexport declare const a = 1;',
+        ],
+        [
+          `${projectRoot}/secondary/src/internal.d.ts`,
+          'export interface PublicB { flag: boolean; }\ninterface UnexportedInternalB { hidden: string; }',
+        ],
+        [
+          `${projectRoot}/secondary/src/public-api.d.ts`,
+          'export * from "./internal.js";\nexport declare const b = 2;',
+        ],
+      ]);
+
+      const output = await bundleEntryPoints(
+        [
+          { entryPoint: primaryEntry, hasEsmChanges: true, hasDtsChanges: true },
+          { entryPoint: secondaryEntry, hasEsmChanges: true, hasDtsChanges: true },
+        ],
+        esmFiles,
+        dtsFiles,
+        createOptions([primaryEntry, secondaryEntry]),
+      );
+
+      expect(output.filesToEmit).toContain(
+        jasmine.objectContaining({
+          path: 'types/my-lib.d.ts',
+          contents: jasmine.stringContaining('PublicA'),
+        }),
+      );
+      expect(output.filesToEmit).not.toContain(
+        jasmine.objectContaining({
+          path: 'types/my-lib.d.ts',
+          contents: jasmine.stringContaining('UnexportedInternalA'),
+        }),
+      );
+
+      expect(output.filesToEmit).toContain(
+        jasmine.objectContaining({
+          path: 'types/my-lib-secondary.d.ts',
+          contents: jasmine.stringContaining('PublicB'),
+        }),
+      );
+      expect(output.filesToEmit).not.toContain(
+        jasmine.objectContaining({
+          path: 'types/my-lib-secondary.d.ts',
+          contents: jasmine.stringContaining('UnexportedInternalB'),
+        }),
+      );
+    });
+
+    it('should preserve declare global and module augmentations in side-effect .d.ts imports', async () => {
+      const primaryEntry = createEntryPoint();
+
+      const esmFiles = new Map<string, string>([
+        [`${projectRoot}/src/public-api.js`, 'export const a = 1;'],
+      ]);
+      const dtsFiles = new Map<string, string>([
+        [
+          `${projectRoot}/src/globals.d.ts`,
+          'export {};\ndeclare global {\n  interface Window {\n    myCustomGlobal: boolean;\n  }\n}\n',
+        ],
+        [
+          `${projectRoot}/src/augment.d.ts`,
+          "declare module '@angular/core' {\n  interface Component {\n    augmentedProp?: string;\n  }\n}\nexport {};\n",
+        ],
+        [
+          `${projectRoot}/src/public-api.d.ts`,
+          'import "./globals.js";\nexport * from "./augment.js";\nexport declare const a = 1;\n',
+        ],
+      ]);
+
+      const output = await bundleEntryPoints(
+        [{ entryPoint: primaryEntry, hasEsmChanges: true, hasDtsChanges: true }],
+        esmFiles,
+        dtsFiles,
+        createOptions([primaryEntry]),
+      );
+
+      const dtsFile = output.filesToEmit.find((f) => f.path === 'types/my-lib.d.ts');
+      expect(dtsFile?.contents).toContain('myCustomGlobal');
+      expect(dtsFile?.contents).toContain('augmentedProp');
+    });
+
+    it('should preserve legal comments in emitted FESM2022 .mjs bundles', async () => {
+      const primaryEntry = createEntryPoint();
+
+      const esmFiles = new Map<string, string>([
+        [
+          `${projectRoot}/src/public-api.js`,
+          '/*! @license MIT Custom Header */\nexport const VALUE = 42;',
+        ],
+      ]);
+      const dtsFiles = new Map<string, string>([
+        [`${projectRoot}/src/public-api.d.ts`, 'export declare const VALUE = 42;'],
+      ]);
+
+      const output = await bundleEntryPoints(
+        [{ entryPoint: primaryEntry, hasEsmChanges: true, hasDtsChanges: true }],
+        esmFiles,
+        dtsFiles,
+        createOptions([primaryEntry]),
+      );
+
+      expect(output.filesToEmit).toContain(
+        jasmine.objectContaining({
+          path: 'fesm2022/my-lib.mjs',
+          contents: jasmine.stringContaining('/*! @license MIT Custom Header */'),
+        }),
+      );
+    });
+  });
 });

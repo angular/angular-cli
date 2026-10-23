@@ -19,6 +19,28 @@ import {
   createMemoryOutputFile,
 } from './utils';
 
+type RolldownPluginDtsModule = typeof import('rolldown-plugin-dts', {
+  with: { 'resolution-mode': 'import' },
+});
+
+let rolldownPluginDtsPromise: Promise<RolldownPluginDtsModule> | undefined;
+
+/**
+ * Dynamically loads the `rolldown-plugin-dts` module after ensuring that
+ * Rolldown's native binding has been initialized via `loadRolldown()`.
+ *
+ * @returns A promise resolving to the `rolldown-plugin-dts` module namespace.
+ */
+function loadRolldownPluginDts(): Promise<RolldownPluginDtsModule> {
+  return (rolldownPluginDtsPromise ??= (async () => {
+    // Ensure Rolldown's native binding is initialized via `loadRolldown()` before evaluating
+    // `rolldown-plugin-dts`, which has top-level imports of `rolldown/experimental`.
+    await loadRolldown();
+
+    return import('rolldown-plugin-dts' as string) as Promise<RolldownPluginDtsModule>;
+  })());
+}
+
 /**
  * Output of the entry point bundling process.
  */
@@ -137,14 +159,8 @@ function hasNewlyAddedModules(
     assert(bundle, `Expected bundle output for entry point "${ep.bundleName}".`);
 
     const prevIds = getPreviousModuleIds(ep);
-    if (!prevIds) {
+    if (!prevIds || !bundle.moduleIds.isSubsetOf(prevIds)) {
       return true;
-    }
-
-    for (const id of bundle.moduleIds) {
-      if (!prevIds.has(id)) {
-        return true;
-      }
     }
   }
 
@@ -519,10 +535,11 @@ async function executeMultiBundle(
     context: 'this',
     input,
     cwd: workspaceRoot,
+    tsconfig: false,
     plugins,
-    treeshake: false,
+    treeshake: isDts,
     resolve: { symlinks: !preserveSymlinks },
-    checks: { circularDependency: false },
+    checks: { circularDependency: false, bundlerTimings: false },
     onLog(level, log) {
       // Ignore specified warning codes
       if (level === 'warn') {
@@ -608,39 +625,22 @@ async function bundleAllDts(
     };
   }
 
-  // Ensure Rolldown's native binding is initialized via `loadRolldown()` before evaluating
-  // `rolldown-plugin-dts`, which has top-level imports of `rolldown/experimental`.
-  await loadRolldown();
-  const { dts } = (await import('rolldown-plugin-dts' as string)) as typeof import(
-    'rolldown-plugin-dts',
-    { with: { 'resolution-mode': 'import' } }
-  );
+  const { createFakeJsPlugin } = await loadRolldownPluginDts();
 
   const dtsSourcemap = !!options.declarationMap;
-  // Filter out `rolldown-plugin-dts:resolver` because all `.d.ts` files are already emitted
-  // in-memory by the Angular/TypeScript compilation and resolved via `createMemoryFileLoaderPlugin`.
-  // The default `rolldown-plugin-dts:resolver` plugin performs filesystem resolution (`oxc-resolver`)
-  // and calls `this.load()` on on-disk `.ts` source files, which is unnecessary and causes a
-  // significant performance regression across multi-entry builds.
-  const rawDtsPlugins = dts({
-    dtsInput: true,
-    tsconfig: false,
+  // Directly instantiate `createFakeJsPlugin` instead of calling `dts({ dtsInput: true, ... })`
+  // to avoid `createDtsResolvePlugin` unconditionally instantiating a native `oxc-resolver`
+  // (`ResolverFactory`) on every build. All `.d.ts` files are already emitted in-memory by the
+  // Angular/TypeScript compilation and resolved via `createMemoryFileLoaderPlugin`.
+  const fakeJsPlugin = createFakeJsPlugin({
     sourcemap: dtsSourcemap,
-    generator: 'oxc',
+    cjsDefault: false,
+    sideEffects: false,
   });
-
-  const dtsPlugins = rawDtsPlugins.filter(
-    (plugin) => plugin.name !== 'rolldown-plugin-dts:resolver',
-  );
-
-  assert(
-    dtsPlugins.length < rawDtsPlugins.length,
-    'Expected "rolldown-plugin-dts:resolver" plugin to be present in rolldown-plugin-dts.',
-  );
 
   return executeMultiBundle(
     resolveEntryInputMap(entryPoints, true),
-    [createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap), ...dtsPlugins],
+    [createMemoryFileLoaderPlugin(dtsFiles, DTS_EXTENSIONS, dtsSourcemap), fakeJsPlugin],
     'd.ts',
     options,
   );
