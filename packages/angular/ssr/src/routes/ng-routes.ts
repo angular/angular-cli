@@ -188,8 +188,8 @@ async function* handleRoute(options: {
 
     if (typeof redirectTo === 'string') {
       // Reference the route parameters by their 0-based position in the URL (see `buildUrlWithParams`).
+      const routeSegments = parsePathSegments(joinUrlParts(baseHref, currentRoutePath));
       metadata.redirectTo = resolveRedirectTo(parentRoute, route, redirectTo, (paramName) => {
-        const routeSegments = parsePathSegments(joinUrlParts(baseHref, currentRoutePath));
         for (let i = routeSegments.length - 1; i >= 0; i--) {
           const segment = routeSegments[i];
           if (segment.type === 'param' && segment.name === paramName) {
