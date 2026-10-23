@@ -40,6 +40,24 @@ describe('Workspace Schematic', () => {
     );
   });
 
+  it('should enable npm `engine-strict` in .npmrc when using npm', async () => {
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      packageManager: 'npm',
+    });
+    expect(tree.readContent('/.npmrc')).toBe('engine-strict=true\n');
+  });
+
+  for (const packageManager of ['yarn', 'pnpm', 'bun', undefined] as const) {
+    it(`should not create an .npmrc when the package manager is ${packageManager}`, async () => {
+      const tree = await schematicRunner.runSchematic('workspace', {
+        ...defaultOptions,
+        packageManager,
+      });
+      expect(tree.exists('/.npmrc')).toBeFalse();
+    });
+  }
+
   it('should set the name in package.json', async () => {
     const tree = await schematicRunner.runSchematic('workspace', defaultOptions);
     const pkg = JSON.parse(tree.readContent('/package.json'));

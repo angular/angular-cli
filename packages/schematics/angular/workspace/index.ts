@@ -48,6 +48,8 @@ export default function (options: WorkspaceOptions): Rule {
     return mergeWith(
       apply(url('./files'), [
         options.minimal ? filter((path) => !path.endsWith('editorconfig.template')) : noop(),
+        // Unlike other package managers, npm only warns about unsupported `engines` by default.
+        packageManager !== 'npm' ? filter((path) => !path.endsWith('npmrc.template')) : noop(),
         applyTemplates({
           utils: strings,
           ...options,
