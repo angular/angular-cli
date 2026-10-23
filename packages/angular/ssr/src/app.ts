@@ -24,12 +24,7 @@ import { ServerRouter } from './routes/router';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
-import {
-  buildPathWithParams,
-  buildQueryWithParams,
-  joinUrlParts,
-  stripLeadingSlash,
-} from './utils/url';
+import { buildUrlWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 import { getFirstHeaderValue } from './utils/validation';
 
 /**
@@ -174,12 +169,12 @@ export class AngularServerApp {
     if (redirectTo !== undefined) {
       const location = joinUrlParts(
         getFirstHeaderValue(request.headers.get('X-Forwarded-Prefix')) ?? '',
-        buildPathWithParams(redirectTo, url.pathname),
+        buildUrlWithParams(redirectTo, url.pathname, relativeRedirect ? undefined : url.search),
       );
 
       // Match Angular router behavior: relative redirects keep the query string.
       return createRedirectResponse(
-        relativeRedirect ? location + url.search : buildQueryWithParams(location, url.searchParams),
+        relativeRedirect ? location + url.search : location,
         status,
         headers,
       );
