@@ -539,7 +539,7 @@ async function executeMultiBundle(
     plugins,
     treeshake: isDts,
     resolve: { symlinks: !preserveSymlinks },
-    checks: { circularDependency: false, pluginTimings: false },
+    checks: { circularDependency: false, bundlerTimings: false },
     onLog(level, log) {
       // Ignore specified warning codes
       if (level === 'warn') {
