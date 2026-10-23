@@ -85,7 +85,7 @@ export function generateAngularServerAppEngineManifest(
     for (const locale of i18nOptions.inlineLocales) {
       const { subPath } = i18nOptions.locales[locale];
       const importPath = `${subPath ? `${subPath}/` : ''}${MAIN_SERVER_OUTPUT_FILENAME}`;
-      entryPoints[subPath] = `() => import('./${importPath}')`;
+      entryPoints[subPath] = `() => import(${JSON.stringify(`./${importPath}`)})`;
       supportedLocales[locale] = subPath;
     }
   } else {
@@ -101,12 +101,12 @@ export function generateAngularServerAppEngineManifest(
 
   const manifestContent = `
 export default {
-  basePath: '${basePath}',
+  basePath: ${JSON.stringify(basePath)},
   allowedHosts: ${JSON.stringify(allowedHosts, undefined, 2)},
   supportedLocales: ${JSON.stringify(supportedLocales, undefined, 2)},
   entryPoints: {
     ${Object.entries(entryPoints)
-      .map(([key, value]) => `'${key}': ${value}`)
+      .map(([key, value]) => `${JSON.stringify(key)}: ${value}`)
       .join(',\n    ')}
   },
 };
@@ -190,8 +190,11 @@ export async function generateAngularServerAppManifest(
         pos = file.text.indexOf('\r\n', pos + 2);
       }
 
+      // Asset paths are derived from route paths and can contain arbitrary characters, so they are
+      // serialized rather than interpolated into the generated executable manifest.
       serverAssets[file.path] =
-        `{size: ${size}, hash: '${file.hash}', text: () => import('./${jsChunkFilePath}').then(m => m.default)}`;
+        `{size: ${size}, hash: ${JSON.stringify(file.hash)}, ` +
+        `text: () => import(${JSON.stringify(`./${jsChunkFilePath}`)}).then(m => m.default)}`;
     } else if (inlineCriticalCss && extension === '.css') {
       const sheet = compileSheet(file.text, {
         href: joinUrlParts(publicPath ?? '', file.path),
@@ -213,7 +216,7 @@ export async function generateAngularServerAppManifest(
   const manifestContent = `
 export default {
   bootstrap: () => import('./main.server.mjs').then(m => m.default),
-  baseHref: '${baseHref}',
+  baseHref: ${JSON.stringify(baseHref)},
 ${criticalCssPlans.length ? `  criticalCssPlans: ${JSON.stringify(criticalCssPlans)},\n` : ''}${
     nonce ? `  nonce: ${JSON.stringify(nonce)},\n` : ''
   }  locale: ${JSON.stringify(locale)},
@@ -221,7 +224,7 @@ ${criticalCssPlans.length ? `  criticalCssPlans: ${JSON.stringify(criticalCssPla
   entryPointToBrowserMapping: ${JSON.stringify(entryPointToBrowserMapping, undefined, 2)},
   assets: {
     ${Object.entries(serverAssets)
-      .map(([key, value]) => `'${key}': ${value}`)
+      .map(([key, value]) => `${JSON.stringify(key)}: ${value}`)
       .join(',\n    ')}
   },
 };
