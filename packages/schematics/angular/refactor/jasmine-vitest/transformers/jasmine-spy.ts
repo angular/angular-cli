@@ -224,6 +224,16 @@ function transformSpyStrategy(node: ts.CallExpression, refactorCtx: RefactorCont
           newMethodName = 'mockImplementation';
           break;
         case 'callThrough':
+          if (!ts.isCallExpression(unwrapExpression(spyCall))) {
+            // On an existing spy, `.and.callThrough()` restores the original implementation,
+            // so it is not redundant and cannot be dropped.
+            const category = 'callThrough-on-existing-spy';
+            reporter.recordTodo(category, sourceFile, node);
+            addTodoComment(node, category);
+
+            return node;
+          }
+
           reporter.reportTransformation(
             sourceFile,
             node,

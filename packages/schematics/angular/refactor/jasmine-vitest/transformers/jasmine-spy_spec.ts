@@ -49,6 +49,17 @@ describe('Jasmine to Vitest Transformer - transformSpies', () => {
       expected: `vi.spyOn(service, 'myMethod');`,
     },
     {
+      description: 'should remove .and.callThrough() on a wrapped spyOn call',
+      input: `(spyOn(service, 'myMethod')!).and.callThrough();`,
+      expected: `(vi.spyOn(service, 'myMethod')!);`,
+    },
+    {
+      description: 'should add a TODO for .and.callThrough() on an existing spy',
+      input: `mySpy.and.callThrough();`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for .and.callThrough() on an existing spy. Please migrate this manually, for example with spy.mockReset(), which restores the original implementation but also clears the recorded calls. See: https://vitest.dev/api/mock.html#mockreset
+mySpy.and.callThrough();`,
+    },
+    {
       description: 'should transform jasmine.createSpy("name") to vi.fn().mockName("name")',
       input: `const mySpy = jasmine.createSpy('mySpy');`,
       expected: `const mySpy = vi.fn().mockName('mySpy');`,

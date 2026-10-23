@@ -158,6 +158,13 @@ export const TODO_NOTES = {
       `Unsupported spy strategy ".and.${context.name}()" found. Please migrate this manually.`,
     url: 'https://vitest.dev/api/mocked.html#mock',
   },
+  'callThrough-on-existing-spy': {
+    message:
+      'Vitest does not have a direct equivalent for .and.callThrough() on an existing spy.' +
+      ' Please migrate this manually, for example with spy.mockReset(), which restores' +
+      ' the original implementation but also clears the recorded calls.',
+    url: 'https://vitest.dev/api/mock.html#mockreset',
+  },
   'mostRecent-without-args': {
     message:
       'Direct usage of mostRecent() is not supported.' +
