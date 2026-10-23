@@ -150,6 +150,46 @@ describe(`Migration to add trustProxyHeaders to server.ts`, () => {
     expect(content).toContain(`[trustProxyHeaders]: true`);
   });
 
+  it(`should add trustProxyHeaders to the server file set in the 'ssr.entry' option`, async () => {
+    tree.overwrite(
+      '/angular.json',
+      JSON.stringify({
+        version: 1,
+        projects: {
+          app: {
+            root: '',
+            sourceRoot: 'src',
+            projectType: 'application',
+            architect: {
+              build: {
+                options: {
+                  server: 'src/main.server.ts',
+                  outputMode: 'server',
+                  ssr: { entry: 'src/server.ts' },
+                },
+              },
+            },
+          },
+        },
+      }),
+    );
+    const mainServerContent =
+      `import { bootstrapApplication } from '@angular/platform-browser';\n` +
+      `export default (context) => bootstrapApplication(App, config, context);`;
+    tree.create('/src/main.server.ts', mainServerContent);
+    tree.create(
+      '/src/server.ts',
+      `import { AngularNodeAppEngine } from '@angular/ssr/node';\nconst angularApp = new AngularNodeAppEngine();`,
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const content = newTree.readText('/src/server.ts');
+    expect(content).toContain(`const angularApp = new AngularNodeAppEngine({`);
+    expect(content).toContain(TODO_COMMENT);
+    expect(content).toContain(`trustProxyHeaders: ['x-forwarded-host', 'x-forwarded-proto'],`);
+    expect(newTree.readText('/src/main.server.ts')).toBe(mainServerContent);
+  });
+
   it(`should skip files with parse errors without throwing`, async () => {
     const malformedContent = `import { AngularAppEngine } from '@angular/ssr';\nconst angularApp = new AngularAppEngine(;`;
     tree.create('/server.ts', malformedContent);

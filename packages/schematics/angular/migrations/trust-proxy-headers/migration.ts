@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { isJsonObject } from '@angular-devkit/core';
 import type { Rule } from '@angular-devkit/schematics';
 import { Visitor, parseSync } from 'oxc-parser';
 import { allTargetOptions, allWorkspaceTargets, getWorkspace } from '../../utility/workspace';
@@ -27,6 +28,13 @@ export default function (): Rule {
       for (const [, options] of allTargetOptions(target)) {
         if (typeof options?.['server'] === 'string') {
           serverFiles.add(options['server']);
+        }
+
+        // With the application builder, `server` is the server bootstrap file (`main.server.ts`).
+        // The app engine is created in the `ssr.entry` file (`server.ts`).
+        const ssr = options?.['ssr'];
+        if (ssr && isJsonObject(ssr) && typeof ssr['entry'] === 'string') {
+          serverFiles.add(ssr['entry']);
         }
       }
     }
