@@ -517,7 +517,7 @@ describe('extractRoutesAndCreateRouteTree', () => {
       expect(errors).toHaveSize(0);
       expect(routeTree.toObject()).toEqual([
         { route: '/user/7', renderMode: RenderMode.Prerender, redirectTo: '/profile/7' },
-        { route: '/user/*', renderMode: RenderMode.Server, redirectTo: '/profile/*2' },
+        { route: '/user/*', renderMode: RenderMode.Server, redirectTo: '/profile/*1' },
         { route: '/profile/*', renderMode: RenderMode.Server },
       ]);
     });
@@ -706,11 +706,11 @@ describe('extractRoutesAndCreateRouteTree', () => {
       {
         route: '/*/user/*',
         renderMode: RenderMode.Server,
-        redirectTo: '/*/profile/*3',
+        redirectTo: '/*/profile/*2',
         relativeRedirect: true,
       },
       { route: '/*/profile/*', renderMode: RenderMode.Server },
-      { route: '/search/*', renderMode: RenderMode.Server, redirectTo: '/find/*2' },
+      { route: '/search/*', renderMode: RenderMode.Server, redirectTo: '/find/*1' },
     ]);
   });
 
