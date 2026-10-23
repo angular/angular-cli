@@ -172,7 +172,7 @@ Each entry below is one benchmark run, with its own summary and conclusions.
 First full run of the default sweep against `@angular/build:library` only &mdash; no `ng-packagr` A/B comparison yet (still Future Work).
 Fixtures use inline HTML templates only, no stylesheets.
 Default `--count` sweep, `--iterations=3`, both layouts.
-Environment: 4-core / 16 GiB sandbox, NVMe SSD.
+Environment: 4 vCPU (a CFS quota on 48 cores @ 2.4Ghz base / 3.5Ghz burst), 16 GiB cgroup limit, NVMe SSD.
 Raw log: `tmp/benchmark-run-1791795379.log` (gitignored; not included in this commit).
 
 #### Flat layout (inline templates only)
@@ -240,30 +240,52 @@ Verification performed:
 - Verified `--style-flavor` rejects an unrecognized flavor name with a clear error listing the
   valid set, consistent with existing `--layout`/`--count`/`--depth` validation.
 
-### 2026-10-22: Fixtures and harness prepared for A/B runs (no results yet)
+### 2026-10-23: First A/B benchmark library builder vs. ng-packagr
 
-Added the `--builder` axis (see "Builder axis (A/B)" above): the fixture generator can now emit
-`ng-packagr`-shaped projects (per-entry-point `ng-package.json`) next to the native builder's
-`exports`-map projects, and `builder` is part of the JSON/CSV output.
-
-This entry is preparation only -- **no benchmark results are recorded here**. Verification performed:
-
-- `--count=5` with both layouts, all 6 style flavors, both builders, `--iterations=1`: all 24
-  builds completed with `status: "ok"`.
-- Inspected `ng-packagr` output for a `deep`/`external-scss` fixture: every secondary entry point
-  was built and bundled, and the per-entry SCSS variable compiled to a literal color, i.e. the
-  fixtures exercise the same work on both builders.
-- `--builder` rejects an unrecognized name with a clear error listing the valid set.
-- A reduced, throwaway sweep (flat, counts 10/50/200, 2 iterations, once per builder) ran cleanly
-  on both builders. Those numbers are deliberately not recorded: they are a smoke test, not a
-  measurement.
+Added the `--builder` axis: the fixture generator can now emit `ng-packagr`-shaped projects
+(per-entry-point `ng-package.json`) next to the native builder's `exports`-map projects,
+and `builder` is part of the JSON/CSV output.
 
 We now have a basis for a first real A/B run. The full sweep takes hours and needs proper
-preparation (quiet machine, fixed environment, enough iterations) before it is worth running.
+preparation, so we decided to reduce the scope of a first A/B benchmark run:
+
+- First A/B run of `@angular/build:library` against `@angular/build:ng-packagr`, using the fixtures above:
+  - flat layout,
+  - inline templates only (no stylesheets),
+  - `--iterations=3`,
+  - sizes 10 to 1000 (reduced from the default sweep to fit a ~30 minute timw window; no 2000-entry run).
+- Environment: 4 vCPU (a CFS quota on 48 cores @ 2.4Ghz base / 3.5Ghz burst), 16 GiB cgroup limit, NVMe SSD, Linux, Node v24.15.0, `ng-packagr` 22.3.0-next.2
+- Result:All 36 builds completed with `status: "ok"`.
+
+```sh
+pnpm admin benchmark library-builder --builder=library,ng-packagr --layout=flat \
+  --count=10,50,100,200,500,1000 --iterations=3 --csv=<path>
+```
+
+| Entries | `library` median | `ng-packagr` median | Speedup | `library` ms/entry | `ng-packagr` ms/entry |
+| ------: | ---------------: | ------------------: | ------: | -----------------: | --------------------: |
+|      10 |            3.33s |               5.10s |    1.5x |              333.2 |                 510.3 |
+|      50 |            3.54s |              14.20s |    4.0x |               70.8 |                 283.9 |
+|     100 |            3.93s |              25.21s |    6.4x |               39.3 |                 252.1 |
+|     200 |            4.47s |              48.16s |   10.8x |               22.3 |                 240.8 |
+|     500 |            6.03s |             122.58s |   20.3x |               12.1 |                 245.2 |
+|    1000 |           10.01s |             269.98s |   27.0x |               10.0 |                 270.0 |
+
+**Conclusion:** `library` costs ~3s fixed plus 5-8ms per additional entry point, so ms/entry keeps
+falling to ~10 at N=1000. `ng-packagr` costs ~225ms per additional entry up to N=200, then 248ms
+(200-500) and 295ms (500-1000). The speedup grows from 1.5x (N=10) to 27x (N=1000).
+
+Caveats:
+
+- The `ng-packagr` rise past N=500 is a trend on medians of 3 runs (N=1000 runs span 256-274s), not yet the U-curve reported in earlier benchmarks.
+- Output equivalence (bundles, declarations) of the two builders is not verified.
+- Not measured: `deep` layout, stylesheets, N>=2000, other machine shapes.
+
+Per-iteration CSV and the raw log are kept outside the repository (`tmp/benchmark-2026-10-23.md`).
 
 ## Future Work
 
-- First real A/B run against `ng-packagr` (`--builder=library,ng-packagr`; the fixture generation and harness support are in place, see 2026-10-22). Needs a quiet machine and the full default sweep.
+- Extend the A/B run against `ng-packagr` (first run: 2026-10-23, flat/inline, N up to 1000): `deep` layout, the style-flavor matrix, N=2000, more iterations, and an output-equivalence check of the two builders.
 - Full style-flavor matrix sweep (default `--count` sweep x 6 flavors x 2 layouts) to quantify the actual performance impact of stylesheet processing and external file reads, now that the matrix is implemented.
 - Dependencies between entry points.
 - Shared stylesheet tokens imported by multiple components.
