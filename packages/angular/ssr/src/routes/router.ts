@@ -7,7 +7,7 @@
  */
 
 import { AngularAppManifest } from '../manifest';
-import { stripIndexHtmlFromURL, stripMatrixParams } from '../utils/url';
+import { normalizeUrlPath, stripIndexHtmlFromURL, stripMatrixParams } from '../utils/url';
 import { extractRoutesAndCreateRouteTree } from './ng-routes';
 import { RouteTree, RouteTreeNodeMetadata } from './route-tree';
 
@@ -86,7 +86,9 @@ export class ServerRouter {
     // Strip 'index.html' from URL if present.
     // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
     let { pathname } = stripIndexHtmlFromURL(url);
-    pathname = stripMatrixParams(pathname);
+    // Resolve the path through the router's own grammar before tokenising it, so the
+    // route selected here is the route `@angular/router` will render.
+    pathname = stripMatrixParams(normalizeUrlPath(pathname));
 
     return this.routeTree.match(pathname);
   }
