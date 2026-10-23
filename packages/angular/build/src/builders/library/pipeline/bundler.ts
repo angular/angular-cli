@@ -159,14 +159,8 @@ function hasNewlyAddedModules(
     assert(bundle, `Expected bundle output for entry point "${ep.bundleName}".`);
 
     const prevIds = getPreviousModuleIds(ep);
-    if (!prevIds) {
+    if (!prevIds || !bundle.moduleIds.isSubsetOf(prevIds)) {
       return true;
-    }
-
-    for (const id of bundle.moduleIds) {
-      if (!prevIds.has(id)) {
-        return true;
-      }
     }
   }
 
