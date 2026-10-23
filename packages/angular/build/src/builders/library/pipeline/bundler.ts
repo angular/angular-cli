@@ -83,6 +83,7 @@ interface MultiBundleOutput {
 
 /**
  * Checks whether two sets share at least one common element.
+ * TODO: Replace with `!a.isDisjointFrom(b)` once the repository TypeScript `lib` targets ES2025+.
  */
 function hasSetIntersection(a: ReadonlySet<string>, b: ReadonlySet<string>): boolean {
   if (a.size > b.size) {
@@ -108,67 +109,35 @@ function expandOverlappingEntryPoints(
   isAvailable: (ep: NormalizedEntryPoint) => boolean,
   getModuleIds: (ep: NormalizedEntryPoint) => ReadonlySet<string> | undefined,
 ): readonly NormalizedEntryPoint[] {
-  if (selectedEntryPoints.length >= allEntryPoints.length) {
+  assert(
+    selectedEntryPoints.length <= allEntryPoints.length,
+    'Selected entry points cannot exceed all entry points.',
+  );
+  if (selectedEntryPoints.length === allEntryPoints.length) {
     return selectedEntryPoints;
   }
 
-  let trackedModuleIds: ReadonlySet<string> | undefined;
-  let mutableTrackedIds: Set<string> | undefined;
-
-  if (selectedEntryPoints.length === 1) {
-    trackedModuleIds = getModuleIds(selectedEntryPoints[0]);
-  } else {
-    mutableTrackedIds = new Set<string>();
-    for (const ep of selectedEntryPoints) {
-      const ids = getModuleIds(ep);
-      if (ids) {
-        for (const id of ids) {
-          mutableTrackedIds.add(id);
-        }
-      }
+  const selected = new Set(selectedEntryPoints);
+  for (const ep of selected) {
+    const moduleIds = getModuleIds(ep);
+    if (!moduleIds?.size) {
+      continue;
     }
-    trackedModuleIds = mutableTrackedIds;
-  }
 
-  if (!trackedModuleIds || trackedModuleIds.size === 0) {
-    return selectedEntryPoints;
-  }
-
-  let selectedNames: Set<string> | undefined;
-  const singleSelectedName =
-    selectedEntryPoints.length === 1 ? selectedEntryPoints[0].name : undefined;
-
-  let added = true;
-  while (added) {
-    added = false;
-    for (const ep of allEntryPoints) {
-      if (singleSelectedName !== undefined && !selectedNames) {
-        if (ep.name === singleSelectedName) {
-          continue;
-        }
-      } else {
-        selectedNames ??= new Set(selectedEntryPoints.map((item) => item.name));
-        if (selectedNames.has(ep.name)) {
-          continue;
-        }
+    for (const candidate of allEntryPoints) {
+      if (selected.has(candidate) || !isAvailable(candidate)) {
+        continue;
       }
 
-      const ids = getModuleIds(ep);
-      if (ids && hasSetIntersection(ids, trackedModuleIds) && isAvailable(ep)) {
-        selectedNames ??= new Set(selectedEntryPoints.map((item) => item.name));
-        selectedNames.add(ep.name);
-        mutableTrackedIds ??= new Set(trackedModuleIds);
-        trackedModuleIds = mutableTrackedIds;
-        for (const id of ids) {
-          mutableTrackedIds.add(id);
-        }
-        added = true;
+      const candidateIds = getModuleIds(candidate);
+      if (candidateIds && hasSetIntersection(moduleIds, candidateIds)) {
+        selected.add(candidate);
       }
     }
   }
 
-  return selectedNames && selectedNames.size > selectedEntryPoints.length
-    ? allEntryPoints.filter((ep) => selectedNames.has(ep.name))
+  return selected.size > selectedEntryPoints.length
+    ? allEntryPoints.filter((ep) => selected.has(ep))
     : selectedEntryPoints;
 }
 
@@ -182,17 +151,15 @@ function hasNewlyAddedModules(
   getPreviousModuleIds: (ep: NormalizedEntryPoint) => ReadonlySet<string> | undefined,
 ): boolean {
   for (const ep of bundledEntryPoints) {
-    const newIds = output.bundles.get(ep.bundleName)?.moduleIds;
-    if (!newIds || newIds.size === 0) {
-      continue;
-    }
+    const bundle = output.bundles.get(ep.bundleName);
+    assert(bundle, `Expected bundle output for entry point "${ep.bundleName}".`);
 
     const prevIds = getPreviousModuleIds(ep);
     if (!prevIds) {
       return true;
     }
 
-    for (const id of newIds) {
+    for (const id of bundle.moduleIds) {
       if (!prevIds.has(id)) {
         return true;
       }
@@ -223,7 +190,7 @@ async function bundleModeWithSharedModules(
     return { filesToEmit: [], bundles: new Map(), warnings: [] };
   }
 
-  if (dirtyEntryPoints.length >= allEntryPoints.length) {
+  if (dirtyEntryPoints.length === allEntryPoints.length) {
     return bundleFn(dirtyEntryPoints, files, options);
   }
 
