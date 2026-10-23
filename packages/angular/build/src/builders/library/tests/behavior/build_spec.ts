@@ -92,7 +92,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
 
       const { result, logs } = await harness.executeOnce();
       expect(result?.success).toBeTrue();
-      expect(logs.some((l) => l.level === 'warn')).toBeFalse();
+      expect(logs).not.toContain(jasmine.objectContaining({ level: 'warn' }));
     });
 
     it('should preserve JSDoc comments in .d.ts and annotation comments in .mjs bundles', async () => {
@@ -210,10 +210,13 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
-    it('should log failure on build error', async () => {
+    it('should log failure on build error without secondary bundler warnings', async () => {
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
-        `export const title: number = 'invalid type';`,
+        `
+        export const title: number = 'invalid type';
+        export function runDynamic(code: string) { return eval(code); }
+        `,
       );
 
       harness.useTarget('build', {
@@ -236,6 +239,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           ),
         }),
       );
+      expect(logs).not.toContain(jasmine.objectContaining({ level: 'warn' }));
       expect(logs).not.toContain(
         jasmine.objectContaining({
           message: jasmine.stringMatching(/Output location:/),

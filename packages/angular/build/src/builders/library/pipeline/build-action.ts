@@ -71,6 +71,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
       return result;
     }
 
+    let collectedAssets = actionContext.collectedAssets;
     const filesToEmit: OutputFile[] = [];
 
     if (shouldCompileEntryPoints) {
@@ -102,7 +103,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
       const itemsToBundle = collectEntryPointsToBundle(options, buildState);
       let bundleOutput: BundleEntryPointsOutput;
       try {
-        [bundleOutput] = await Promise.all([
+        [bundleOutput, , collectedAssets] = await Promise.all([
           bundleEntryPoints(
             itemsToBundle,
             esmFiles,
@@ -115,6 +116,7 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
             buildState.previousBundleResults,
           ),
           diagnosePromise,
+          collectedAssets ?? buildState.collectAssets(options, modifiedFiles),
         ]);
       } catch (error) {
         assertIsError(error);
@@ -127,10 +129,10 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
         return result;
       }
 
-      result.addWarnings(bundleOutput.warnings);
       if (result.hasErrors) {
         return result;
       }
+      result.addWarnings(bundleOutput.warnings);
 
       filesToEmit.push(...bundleOutput.filesToEmit);
       buildState.recordBundleOutput(bundleOutput.bundleResults);
@@ -151,19 +153,17 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
       filesToEmit.push(...manifestFiles);
     }
 
-    const collectedAssets =
-      actionContext.collectedAssets ?? (await buildState.collectAssets(options, modifiedFiles));
+    collectedAssets ??= await buildState.collectAssets(options, modifiedFiles);
     filesToEmit.push(...collectedAssets.filesToEmit);
 
-    await emitFilesToDisk(filesToEmit, (file) => path.posix.join(options.outputPath, file.path));
-
     const filesToDelete = buildState.recordEmittedOutputs(collectedAssets, manifestFiles);
-
     if (filesToDelete.size) {
       await deleteFilesFromDisk(
         Array.from(filesToDelete, (file) => path.posix.join(options.outputPath, file)),
       );
     }
+
+    await emitFilesToDisk(filesToEmit, (file) => path.posix.join(options.outputPath, file.path));
   } catch (error) {
     assertIsError(error);
     result.addError(error.message);
@@ -184,7 +184,7 @@ function verifyAllowedDependencies(
   options: NormalizedLibraryOptions,
   result: ExecutionResult,
 ): boolean {
-  const { packageJson, allowedNonPeerDependencies } = options;
+  const { packageJson, packageJsonPath, allowedNonPeerDependencies } = options;
   const dependencies = {
     ...(packageJson.dependencies ?? {}),
     ...(packageJson.optionalDependencies ?? {}),
@@ -195,7 +195,7 @@ function verifyAllowedDependencies(
     if (!allowedNonPeerDependencies.some((regex) => regex.test(dep))) {
       result.addError(
         `Dependency '${dep}' must be explicitly allowed using the 'allowedNonPeerDependencies' option, ` +
-          `or moved to 'peerDependencies' in 'package.json'.`,
+          `or moved to 'peerDependencies' in '${packageJsonPath}'.`,
       );
       isValid = false;
     }
