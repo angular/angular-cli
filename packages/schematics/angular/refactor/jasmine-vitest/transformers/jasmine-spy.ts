@@ -103,11 +103,18 @@ function transformPrimarySpy(node: ts.CallExpression, refactorCtx: RefactorConte
   ) {
     addVitestValueImport(pendingVitestValueImports, 'vi');
 
+    // `spyOnProperty` defaults to the getter while `vi.spyOn` needs the access type to spy on
+    // a property instead of a method.
+    const args =
+      node.expression.text === 'spyOnProperty' && node.arguments.length === 2
+        ? [...node.arguments, ts.factory.createStringLiteral('get', true)]
+        : node.arguments;
+
     const viSpyOnCall = ts.factory.updateCallExpression(
       node,
       createPropertyAccess('vi', 'spyOn'),
       node.typeArguments,
-      node.arguments,
+      args,
     );
 
     if (isChainedWithAnd(node)) {
