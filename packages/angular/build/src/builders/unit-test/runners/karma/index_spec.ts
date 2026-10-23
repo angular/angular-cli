@@ -41,16 +41,14 @@ describe('KarmaTestRunner', () => {
       }
     });
 
-    it('does not require karma-coverage when coverage is disabled', async () => {
-      await expectAsync(
-        Promise.resolve().then(() => KarmaTestRunner.validateDependencies?.(createOptions(false))),
-      ).toBeResolved();
+    it('does not require karma-coverage when coverage is disabled', () => {
+      expect(() => KarmaTestRunner.validateDependencies?.(createOptions(false))).not.toThrow();
     });
 
-    it('requires karma-coverage when coverage is enabled', async () => {
-      await expectAsync(
-        Promise.resolve().then(() => KarmaTestRunner.validateDependencies?.(createOptions(true))),
-      ).toBeRejectedWithError(/karma-coverage/);
+    it('requires karma-coverage when coverage is enabled', () => {
+      expect(() => KarmaTestRunner.validateDependencies?.(createOptions(true))).toThrowError(
+        /karma-coverage/,
+      );
     });
   });
 });
