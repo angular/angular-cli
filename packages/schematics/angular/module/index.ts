@@ -184,8 +184,9 @@ const moduleSchematic: RuleFactory<ModuleOptions> = createProjectSchematic(
       project: options.project,
       standalone: false,
       // The route templates reference the component by its default file and class name, so the
-      // component must not inherit a `type` from the workspace.
+      // component must not inherit a `type` or `exportDefault` from the workspace.
       type: '',
+      exportDefault: false,
     };
 
     return chain([
