@@ -57,6 +57,7 @@ describe('Workspace Schematic', () => {
     const pkg = JSON.parse(tree.readContent('/package.json'));
     expect(pkg.dependencies['@angular/core']).toEqual(latestVersions.Angular);
     expect(pkg.dependencies['rxjs']).toEqual(latestVersions['rxjs']);
+    expect(pkg.devDependencies['oxfmt']).toEqual(latestVersions['oxfmt']);
     expect(pkg.devDependencies['typescript']).toEqual(latestVersions['typescript']);
   });
 
@@ -79,6 +80,7 @@ describe('Workspace Schematic', () => {
       ]),
     );
 
+    expect(files).toContain('/.oxfmtrc.json');
     expect(files).not.toContain('/.editorconfig');
   });
 
