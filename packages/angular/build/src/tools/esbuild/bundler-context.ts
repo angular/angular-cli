@@ -545,22 +545,7 @@ export class BundlerContext {
       }
     }
 
-    let invalid = false;
-    if (this.watchFiles.size < candidateFiles.size) {
-      for (const file of this.watchFiles) {
-        if (candidateFiles.has(file)) {
-          invalid = true;
-          break;
-        }
-      }
-    } else {
-      for (const file of candidateFiles) {
-        if (this.watchFiles.has(file)) {
-          invalid = true;
-          break;
-        }
-      }
-    }
+    const invalid = !this.watchFiles.isDisjointFrom(candidateFiles);
 
     if (invalid) {
       this.#invalidationEpoch++;
