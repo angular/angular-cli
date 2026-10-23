@@ -53,13 +53,13 @@ export function getTypesOfSchema(schema: JsonSchema): Set<string> {
 
   if (isJsonObject(schema.not)) {
     const notTypes = getTypesOfSchema(schema.not);
-    potentials = new Set([...potentials].filter((p) => !notTypes.has(p)));
+    potentials = potentials.difference(notTypes);
   }
 
   if (Array.isArray(schema.allOf)) {
     for (const sub of schema.allOf) {
       const types = getTypesOfSchema(sub as JsonObject);
-      potentials = new Set([...types].filter((t) => potentials.has(t)));
+      potentials = potentials.intersection(types);
     }
   }
 
@@ -67,18 +67,18 @@ export function getTypesOfSchema(schema: JsonSchema): Set<string> {
     let options = new Set<string>();
     for (const sub of schema.oneOf) {
       const types = getTypesOfSchema(sub as JsonObject);
-      options = new Set([...options, ...types]);
+      options = options.union(types);
     }
-    potentials = new Set([...options].filter((o) => potentials.has(o)));
+    potentials = potentials.intersection(options);
   }
 
   if (Array.isArray(schema.anyOf)) {
     let options = new Set<string>();
     for (const sub of schema.anyOf) {
       const types = getTypesOfSchema(sub as JsonObject);
-      options = new Set([...options, ...types]);
+      options = options.union(types);
     }
-    potentials = new Set([...options].filter((o) => potentials.has(o)));
+    potentials = potentials.intersection(options);
   }
 
   if (schema.properties) {
