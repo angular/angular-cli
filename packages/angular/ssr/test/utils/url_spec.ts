@@ -123,6 +123,9 @@ describe('URL Utils', () => {
       expect(joinUrlParts('/base/', '/?next=/a/')).toBe('/base?next=/a/');
       expect(joinUrlParts('/', '/?next=/a/')).toBe('/?next=/a/');
       expect(joinUrlParts('', '///evil.com?a=/')).toBe('/evil.com?a=/');
+      expect(joinUrlParts('/login/?next=/a/', '')).toBe('/login?next=/a/');
+      expect(joinUrlParts('/base/', '/login/?next=/a/', '', '')).toBe('/base/login?next=/a/');
+      expect(joinUrlParts('/login/#section/', '')).toBe('/login#section/');
     });
   });
 

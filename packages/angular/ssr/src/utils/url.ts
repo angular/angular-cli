@@ -101,7 +101,12 @@ export function joinUrlParts(...parts: string[]): string {
   const normalizedParts: string[] = [];
   let suffix = '';
 
-  for (let i = 0, len = parts.length; i < len; i++) {
+  let lastIndex = parts.length - 1;
+  while (lastIndex >= 0 && parts[lastIndex] === '') {
+    lastIndex--;
+  }
+
+  for (let i = 0; i <= lastIndex; i++) {
     const part = parts[i];
     if (part === '') {
       // Skip any empty parts
@@ -111,7 +116,7 @@ export function joinUrlParts(...parts: string[]): string {
     let start = 0;
     let end = part.length;
 
-    if (i === len - 1) {
+    if (i === lastIndex) {
       const queryIndex = part.indexOf('?');
       const hashIndex = part.indexOf('#');
       const suffixIndex =
