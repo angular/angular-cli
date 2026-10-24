@@ -129,10 +129,10 @@ export async function buildAction(actionContext: BuildActionContext): Promise<Ex
         return result;
       }
 
+      result.addWarnings(bundleOutput.warnings);
       if (result.hasErrors) {
         return result;
       }
-      result.addWarnings(bundleOutput.warnings);
 
       filesToEmit.push(...bundleOutput.filesToEmit);
       buildState.recordBundleOutput(bundleOutput.bundleResults);

@@ -210,7 +210,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       );
     });
 
-    it('should log failure on build error without secondary bundler warnings', async () => {
+    it('should log failure on build error with bundler warnings', async () => {
       await harness.writeFile(
         'projects/lib/src/public-api.ts',
         `
@@ -239,7 +239,7 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
           ),
         }),
       );
-      expect(logs).not.toContain(jasmine.objectContaining({ level: 'warn' }));
+      expect(logs).toContain(jasmine.objectContaining({ level: 'warn' }));
       expect(logs).not.toContain(
         jasmine.objectContaining({
           message: jasmine.stringMatching(/Output location:/),
