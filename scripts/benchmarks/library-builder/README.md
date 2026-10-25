@@ -283,6 +283,347 @@ Caveats:
 
 Per-iteration CSV and the raw log are kept outside the repository (`tmp/benchmark-2026-10-23.md`).
 
+### 2026-10-24: A/B Benchmark across `--style-flavor` and `--count` axis
+
+For the fixtures in `flat` layout:
+
+```sh
+$ pnpm admin benchmark library-builder \
+  --builder=library,ng-packagr \
+  --layout=flat \
+  --style-flavor=inline,inline-css,inline-scss,external,external-css,external-scss \
+  --count=10,50,100 --iterations=5 \
+  --csv=./tmp/benchmark-2026-10-24.csv
+```
+
+Environment: GitHub Codespace (2 cores, 8 GB):
+
+```sh
+$ cat /proc/meminfo
+MemTotal:        8131876 kB
+MemFree:          260780 kB
+MemAvailable:    2296448 kB
+
+$ cat /proc/cpuinfo
+processor       : 0
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 106
+model name      : Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+cpu MHz         : 3393.038
+
+processor       : 1
+vendor_id       : GenuineIntel
+cpu family      : 6
+model           : 106
+model name      : Intel(R) Xeon(R) Platinum 8370C CPU @ 2.80GHz
+cpu MHz         : 3472.520
+```
+
+Results:
+
+- `@angular/build:library` beats `@angular/build:ng-packagr` in all sweep axis, starting from the small N <= 100 entry point counts
+- Build times of `@angular/build:library` stay consistent across the `--style-flavor` axis, indicating roughly x-y ms per entry point:
+  - build time per entry point stays roughly flat regardless of inline/external templates and stylesheet language
+  - the primary driver of total build time (for the full library) is the number of entry points (`count` axis)
+- Total build time (for the full library) `@angular/build:library`
+
+Build log:
+
+```log
+$ node --no-warnings=ExperimentalWarning --experimental-transform-types ./scripts/devkit-admin.mts benchmark library-builder --builder=library,ng-packagr --layout=flat --style-flavor=inline,inline-css,inline-scss,external,external-css,external-scss --count=10,50,100 --iterations=5 --csv=./tmp/benchmark-2026-10-24.csv
+
+[library-builder] library-flat-10-inline (10 entry points)
+  run 1/5: done in 10.63s
+  run 2/5: done in 4.11s
+  run 3/5: done in 4.08s
+  run 4/5: done in 4.08s
+  run 5/5: done in 4.28s
+  median: 4.11s  (410.52ms/entry)
+
+[library-builder] ng-packagr-flat-10-inline (10 entry points)
+  run 1/5: done in 7.57s
+  run 2/5: done in 6.12s
+  run 3/5: done in 6.18s
+  run 4/5: done in 6.44s
+  run 5/5: done in 6.30s
+  median: 6.30s  (630.33ms/entry)
+
+[library-builder] library-flat-50-inline (50 entry points)
+  run 1/5: done in 4.58s
+  run 2/5: done in 4.52s
+  run 3/5: done in 4.54s
+  run 4/5: done in 4.70s
+  run 5/5: done in 4.52s
+  median: 4.54s  (90.88ms/entry)
+
+[library-builder] ng-packagr-flat-50-inline (50 entry points)
+  run 1/5: done in 16.46s
+  run 2/5: done in 17.38s
+  run 3/5: done in 17.73s
+  run 4/5: done in 18.60s
+  run 5/5: done in 16.53s
+  median: 17.38s  (347.50ms/entry)
+
+[library-builder] library-flat-100-inline (100 entry points)
+  run 1/5: done in 5.23s
+  run 2/5: done in 5.11s
+  run 3/5: done in 5.54s
+  run 4/5: done in 5.14s
+  run 5/5: done in 5.30s
+  median: 5.23s  (52.27ms/entry)
+
+[library-builder] ng-packagr-flat-100-inline (100 entry points)
+  run 1/5: done in 31.45s
+  run 2/5: done in 30.15s
+  run 3/5: done in 31.59s
+  run 4/5: done in 30.58s
+  run 5/5: done in 29.47s
+  median: 30.58s  (305.78ms/entry)
+
+[library-builder] library-flat-10-inline-css (10 entry points)
+  run 1/5: done in 4.91s
+  run 2/5: done in 3.98s
+  run 3/5: done in 4.28s
+  run 4/5: done in 4.11s
+  run 5/5: done in 4.12s
+  median: 4.12s  (412.22ms/entry)
+
+[library-builder] ng-packagr-flat-10-inline-css (10 entry points)
+  run 1/5: done in 6.05s
+  run 2/5: done in 6.41s
+  run 3/5: done in 6.13s
+  run 4/5: done in 6.19s
+  run 5/5: done in 6.29s
+  median: 6.19s  (619.22ms/entry)
+
+[library-builder] library-flat-50-inline-css (50 entry points)
+  run 1/5: done in 4.69s
+  run 2/5: done in 5.00s
+  run 3/5: done in 5.02s
+  run 4/5: done in 5.58s
+  run 5/5: done in 5.39s
+  median: 5.02s  (100.46ms/entry)
+
+[library-builder] ng-packagr-flat-50-inline-css (50 entry points)
+  run 1/5: done in 18.59s
+  run 2/5: done in 17.77s
+  run 3/5: done in 16.63s
+  run 4/5: done in 17.64s
+  run 5/5: done in 16.26s
+  median: 17.64s  (352.87ms/entry)
+
+[library-builder] library-flat-100-inline-css (100 entry points)
+  run 1/5: done in 5.21s
+  run 2/5: done in 5.57s
+  run 3/5: done in 5.15s
+  run 4/5: done in 5.25s
+  run 5/5: done in 5.15s
+  median: 5.21s  (52.12ms/entry)
+
+[library-builder] ng-packagr-flat-100-inline-css (100 entry points)
+  run 1/5: done in 28.20s
+  run 2/5: done in 27.88s
+  run 3/5: done in 27.33s
+  run 4/5: done in 28.18s
+  run 5/5: done in 27.30s
+  median: 27.88s  (278.84ms/entry)
+
+[library-builder] library-flat-10-inline-scss (10 entry points)
+  run 1/5: done in 5.94s
+  run 2/5: done in 4.45s
+  run 3/5: done in 4.34s
+  run 4/5: done in 4.37s
+  run 5/5: done in 4.18s
+  median: 4.37s  (436.70ms/entry)
+
+[library-builder] ng-packagr-flat-10-inline-scss (10 entry points)
+  run 1/5: done in 7.37s
+  run 2/5: done in 6.54s
+  run 3/5: done in 6.29s
+  run 4/5: done in 6.32s
+  run 5/5: done in 6.54s
+  median: 6.54s  (653.80ms/entry)
+
+[library-builder] library-flat-50-inline-scss (50 entry points)
+  run 1/5: done in 4.84s
+  run 2/5: done in 4.77s
+  run 3/5: done in 4.81s
+  run 4/5: done in 4.72s
+  run 5/5: done in 4.98s
+  median: 4.81s  (96.29ms/entry)
+
+[library-builder] ng-packagr-flat-50-inline-scss (50 entry points)
+  run 1/5: done in 16.12s
+  run 2/5: done in 17.95s
+  run 3/5: done in 15.98s
+  run 4/5: done in 15.99s
+  run 5/5: done in 16.54s
+  median: 16.12s  (322.37ms/entry)
+
+[library-builder] library-flat-100-inline-scss (100 entry points)
+  run 1/5: done in 5.48s
+  run 2/5: done in 5.42s
+  run 3/5: done in 5.40s
+  run 4/5: done in 5.38s
+  run 5/5: done in 5.43s
+  median: 5.42s  (54.18ms/entry)
+
+[library-builder] ng-packagr-flat-100-inline-scss (100 entry points)
+  run 1/5: done in 28.00s
+  run 2/5: done in 28.23s
+  run 3/5: done in 28.66s
+  run 4/5: done in 27.14s
+  run 5/5: done in 25.12s
+  median: 28.00s  (279.99ms/entry)
+
+[library-builder] library-flat-10-external (10 entry points)
+  run 1/5: done in 3.59s
+  run 2/5: done in 3.65s
+  run 3/5: done in 3.93s
+  run 4/5: done in 3.65s
+  run 5/5: done in 3.66s
+  median: 3.65s  (365.17ms/entry)
+
+[library-builder] ng-packagr-flat-10-external (10 entry points)
+  run 1/5: done in 6.10s
+  run 2/5: done in 5.66s
+  run 3/5: done in 5.49s
+  run 4/5: done in 5.71s
+  run 5/5: done in 5.88s
+  median: 5.71s  (570.85ms/entry)
+
+[library-builder] library-flat-50-external (50 entry points)
+  run 1/5: done in 4.15s
+  run 2/5: done in 4.10s
+  run 3/5: done in 4.13s
+  run 4/5: done in 4.12s
+  run 5/5: done in 4.16s
+  median: 4.13s  (82.62ms/entry)
+
+[library-builder] ng-packagr-flat-50-external (50 entry points)
+  run 1/5: done in 16.06s
+  run 2/5: done in 15.63s
+  run 3/5: done in 14.68s
+  run 4/5: done in 17.45s
+  run 5/5: done in 17.25s
+  median: 16.06s  (321.17ms/entry)
+
+[library-builder] library-flat-100-external (100 entry points)
+  run 1/5: done in 4.52s
+  run 2/5: done in 4.71s
+  run 3/5: done in 4.67s
+  run 4/5: done in 4.57s
+  run 5/5: done in 4.51s
+  median: 4.57s  (45.68ms/entry)
+
+[library-builder] ng-packagr-flat-100-external (100 entry points)
+  run 1/5: done in 27.89s
+  run 2/5: done in 28.68s
+  run 3/5: done in 29.08s
+  run 4/5: done in 26.58s
+  run 5/5: done in 27.23s
+  median: 27.89s  (278.87ms/entry)
+
+[library-builder] library-flat-10-external-css (10 entry points)
+  run 1/5: done in 3.74s
+  run 2/5: done in 3.82s
+  run 3/5: done in 3.72s
+  run 4/5: done in 3.91s
+  run 5/5: done in 3.80s
+  median: 3.80s  (379.65ms/entry)
+
+[library-builder] ng-packagr-flat-10-external-css (10 entry points)
+  run 1/5: done in 5.63s
+  run 2/5: done in 5.86s
+  run 3/5: done in 5.66s
+  run 4/5: done in 5.50s
+  run 5/5: done in 5.98s
+  median: 5.66s  (565.62ms/entry)
+
+[library-builder] library-flat-50-external-css (50 entry points)
+  run 1/5: done in 4.13s
+  run 2/5: done in 4.35s
+  run 3/5: done in 4.17s
+  run 4/5: done in 4.22s
+  run 5/5: done in 4.34s
+  median: 4.22s  (84.47ms/entry)
+
+[library-builder] ng-packagr-flat-50-external-css (50 entry points)
+  run 1/5: done in 14.36s
+  run 2/5: done in 14.75s
+  run 3/5: done in 14.42s
+  run 4/5: done in 15.15s
+  run 5/5: done in 15.48s
+  median: 14.75s  (295.02ms/entry)
+
+[library-builder] library-flat-100-external-css (100 entry points)
+  run 1/5: done in 4.87s
+  run 2/5: done in 4.90s
+  run 3/5: done in 4.87s
+  run 4/5: done in 4.66s
+  run 5/5: done in 4.77s
+  median: 4.87s  (48.71ms/entry)
+
+[library-builder] ng-packagr-flat-100-external-css (100 entry points)
+  run 1/5: done in 26.43s
+  run 2/5: done in 26.93s
+  run 3/5: done in 27.01s
+  run 4/5: done in 26.46s
+  run 5/5: done in 24.85s
+  median: 26.46s  (264.56ms/entry)
+
+[library-builder] library-flat-10-external-scss (10 entry points)
+  run 1/5: done in 3.87s
+  run 2/5: done in 3.98s
+  run 3/5: done in 3.85s
+  run 4/5: done in 3.92s
+  run 5/5: done in 3.83s
+  median: 3.87s  (387.06ms/entry)
+
+[library-builder] ng-packagr-flat-10-external-scss (10 entry points)
+  run 1/5: done in 5.81s
+  run 2/5: done in 5.89s
+  run 3/5: done in 5.97s
+  run 4/5: done in 5.91s
+  run 5/5: done in 6.05s
+  median: 5.91s  (591.38ms/entry)
+
+[library-builder] library-flat-50-external-scss (50 entry points)
+  run 1/5: done in 4.59s
+  run 2/5: done in 4.49s
+  run 3/5: done in 4.42s
+  run 4/5: done in 4.34s
+  run 5/5: done in 4.48s
+  median: 4.48s  (89.69ms/entry)
+
+[library-builder] ng-packagr-flat-50-external-scss (50 entry points)
+  run 1/5: done in 16.15s
+  run 2/5: done in 16.11s
+  run 3/5: done in 15.45s
+  run 4/5: done in 16.25s
+  run 5/5: done in 16.53s
+  median: 16.15s  (323.04ms/entry)
+
+[library-builder] library-flat-100-external-scss (100 entry points)
+  run 1/5: done in 5.68s
+  run 2/5: done in 5.58s
+  run 3/5: done in 5.46s
+  run 4/5: done in 5.49s
+  run 5/5: done in 6.03s
+  median: 5.58s  (55.81ms/entry)
+
+[library-builder] ng-packagr-flat-100-external-scss (100 entry points)
+  run 1/5: done in 29.19s
+  run 2/5: done in 28.73s
+  run 3/5: done in 30.11s
+  run 4/5: done in 25.30s
+  run 5/5: done in 25.74s
+  median: 28.73s  (287.26ms/entry)
+```
+
+Results CSV: because of human mistake, the csv output was not written.
+
 ## Future Work
 
 - Extend the A/B run against `ng-packagr` (first run: 2026-10-23, flat/inline, N up to 1000): `deep` layout, the style-flavor matrix, N=2000, more iterations, and an output-equivalence check of the two builders.
