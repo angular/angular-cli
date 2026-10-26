@@ -90,6 +90,17 @@ export interface PackageManagerDescriptor {
   /** The command to list all installed dependencies. */
   readonly listDependenciesCommand: readonly string[];
 
+  /**
+   * Whether declared dependencies in the current directory's `package.json` should be
+   * resolved from `node_modules` to supplement `listDependenciesCommand`.
+   *
+   * When enabled, this lookup runs for every project using the package manager (not only
+   * workspace members). Resolved entries take precedence over the command output and include
+   * the installed package path. This is required when `listDependenciesCommand` does not
+   * report a workspace member's own dependencies (e.g., `bun pm ls`).
+   */
+  readonly requiresManifestDependencyLookup?: boolean;
+
   /** The command to get the release age configuration value. */
   readonly getReleaseAgeConfigCommand?: readonly string[];
 
@@ -297,6 +308,10 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     getRegistryOptions: (registry: string) => ({ args: ['--registry', registry] }),
     versionCommand: ['--version'],
     listDependenciesCommand: ['pm', 'ls'],
+    // `bun pm ls` only outputs root workspace dependencies when run in a workspace member.
+    // See: https://github.com/oven-sh/bun/issues/10008
+    requiresManifestDependencyLookup: true,
+    getPackageNameCommand: ['pm', 'pkg', 'get', 'name'],
     getManifestCommand: ['pm', 'view', '--json'],
     getRegistryMetadata: async (packageName, fetchAndParse) => {
       const [distTags, versions] = await Promise.all([

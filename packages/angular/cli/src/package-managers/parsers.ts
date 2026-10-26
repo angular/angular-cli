@@ -681,6 +681,9 @@ export function parseBunDependencies(
     if (match) {
       const name = match[1];
       const version = match[2];
+      if (version.startsWith('workspace:')) {
+        continue;
+      }
       dependencies.set(name, { name, version });
     }
   }
