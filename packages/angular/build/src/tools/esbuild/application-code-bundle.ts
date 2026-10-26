@@ -30,6 +30,10 @@ import { createExternalPackagesPlugin } from './external-packages-plugin';
 import { createAngularLocaleDataPlugin } from './i18n-locale-plugin';
 import type { LoadResultCache } from './load-result-cache';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
+import {
+  createPlatformServerDominoExposePlugin,
+  createPlatformServerDominoRedirectPlugin,
+} from './platform-server-domino-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createServerBundleMetadata } from './server-bundle-metadata-plugin';
 import { createSourcemapIgnorelistPlugin } from './sourcemap-ignorelist-plugin';
@@ -237,7 +241,7 @@ export function createServerPolyfillBundleOptions(
   };
 
   buildOptions.plugins ??= [];
-  buildOptions.plugins.push(createServerBundleMetadata());
+  buildOptions.plugins.push(createServerBundleMetadata(), createPlatformServerDominoExposePlugin());
 
   return () => buildOptions;
 }
@@ -321,6 +325,7 @@ export function createServerMainCodeBundleOptions(
 
     buildOptions.plugins.push(
       createServerBundleMetadata(),
+      createPlatformServerDominoRedirectPlugin(),
       createVirtualModulePlugin({
         namespace: mainServerInjectManifestNamespace,
         cache: loadResultCache,
