@@ -8,6 +8,7 @@
 
 import {
   parseBunDependencies,
+  parseBunError,
   parseNpmBeforeDate,
   parseNpmLikeDependencies,
   parseNpmLikeError,
@@ -551,6 +552,92 @@ project node_modules
       const deps = parseBunDependencies(stdout);
       expect(deps.size).toBe(1);
       expect(deps.get('typescript')).toEqual({ name: 'typescript', version: '5.9.3' });
+    });
+  });
+
+  describe('parseBunError', () => {
+    it('should parse JSON missing version error as E404', () => {
+      const stdout = JSON.stringify({
+        error: 'No matching version found',
+        version: '@angular/core@99.99.99',
+      });
+      expect(parseBunError(stdout)).toEqual({
+        code: 'E404',
+        summary: 'No matching version found: @angular/core@99.99.99',
+      });
+    });
+
+    it('should parse JSON missing dist-tag error as E404', () => {
+      const stdout = JSON.stringify({
+        error: 'Dist-tag not found',
+        version: '@angular/core@nonexistent-tag',
+      });
+      expect(parseBunError(stdout)).toEqual({
+        code: 'E404',
+        summary: 'Dist-tag not found: @angular/core@nonexistent-tag',
+      });
+    });
+
+    it('should parse plain-text 404 Not Found output from bun pm view as E404', () => {
+      const stderr = `
+404 Not Found: https://registry.npmjs.org/@angular%2fnon-existent
+
+ - '@angular/non-existent@latest' does not exist in this registry
+`.trim();
+      expect(parseBunError(stderr)).toEqual({
+        code: 'E404',
+        summary: '404 Not Found: https://registry.npmjs.org/@angular%2fnon-existent',
+      });
+    });
+
+    it('should parse plain-text 401 Unauthorized output from bun pm view as E401', () => {
+      const stderr = '401 Unauthorized: https://registry.npmjs.org/@private%2fpkg';
+      expect(parseBunError(stderr)).toEqual({
+        code: 'E401',
+        summary: '401 Unauthorized: https://registry.npmjs.org/@private%2fpkg',
+      });
+    });
+
+    it('should parse unrecognized JSON error messages as UNKNOWN_ERROR', () => {
+      const stdout = JSON.stringify({ error: 'Authentication token not found' });
+      expect(parseBunError(stdout)).toEqual({
+        code: 'UNKNOWN_ERROR',
+        summary: 'Authentication token not found',
+      });
+    });
+
+    it('should fall back to npm-compatible JSON error objects', () => {
+      const stdout = JSON.stringify({ error: { code: 'E403', summary: 'Forbidden' } });
+      expect(parseBunError(stdout)).toEqual({
+        code: 'E403',
+        summary: 'Forbidden',
+        detail: undefined,
+      });
+    });
+
+    it('should not treat successful bun pm view JSON output as an error', () => {
+      // A dist-tags object that happens to contain an `error` tag.
+      expect(parseBunError(JSON.stringify({ latest: '1.0.0', error: '0.0.1' }))).toBeNull();
+      expect(parseBunError(JSON.stringify(['1.0.0', '1.1.0']))).toBeNull();
+      expect(parseBunError(JSON.stringify({ name: 'foo', version: '1.0.0' }))).toBeNull();
+    });
+
+    it('should not treat successful bun pm ls output as an error', () => {
+      const stdout = `
+/workspace node_modules (350)
+├── @angular/core@21.2.4
+└── typescript@5.9.3
+`.trim();
+      expect(parseBunError(stdout)).toBeNull();
+    });
+
+    it('should ignore non-error HTTP status lines', () => {
+      expect(parseBunError('304 Not Modified: https://registry.npmjs.org/foo')).toBeNull();
+    });
+
+    it('should return null for empty or unrecognized output', () => {
+      expect(parseBunError('')).toBeNull();
+      expect(parseBunError('some unrelated output')).toBeNull();
     });
   });
 
