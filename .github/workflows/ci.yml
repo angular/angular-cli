@@ -78,7 +78,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
+        # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
+        # See: https://github.com/actions/runner-images/issues/14777
+        os: [ubuntu-24.04]
         node: [20, 22, 24]
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
@@ -160,7 +163,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
+        # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
+        # See: https://github.com/actions/runner-images/issues/14777
+        os: [ubuntu-24.04]
         node: [22]
         subset: [yarn, pnpm]
         shard: [0, 1, 2]
@@ -185,7 +191,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest]
+        # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
+        # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
+        # See: https://github.com/actions/runner-images/issues/14777
+        os: [ubuntu-24.04]
         node: [22]
         subset: [npm, esbuild]
         shard: [0, 1, 2, 3, 4, 5]
