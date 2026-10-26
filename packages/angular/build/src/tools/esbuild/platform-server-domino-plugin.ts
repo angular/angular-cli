@@ -12,7 +12,7 @@ import { toPosixPath } from '../../utils/path';
 /**
  * Filter matching the Domino bundle import inside `@angular/platform-server`.
  */
-const BUNDLED_DOMINO_FILTER = /(?:^|[\\/])bundled-domino(?:\.[cm]?js)?$/;
+const BUNDLED_DOMINO_FILTER = /[\\/]third_party[\\/]domino[\\/]bundled-domino\.mjs$/;
 
 /**
  * The property name on `globalThis` where the Domino instance is stored.
