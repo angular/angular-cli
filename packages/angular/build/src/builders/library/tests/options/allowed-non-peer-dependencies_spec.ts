@@ -29,7 +29,9 @@ describeLibraryBuilder(executeLibraryBuilder, LIBRARY_BUILDER_INFO, (harness) =>
       expect(logs).toContain(
         jasmine.objectContaining({
           level: 'error',
-          message: jasmine.stringMatching(/lodash-es.*allowedNonPeerDependencies/),
+          message: jasmine.stringMatching(
+            /lodash-es.*allowedNonPeerDependencies.*projects\/lib\/package\.json/,
+          ),
         }),
       );
     });
