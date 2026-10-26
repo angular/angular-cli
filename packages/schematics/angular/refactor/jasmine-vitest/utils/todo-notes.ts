@@ -161,7 +161,8 @@ export const TODO_NOTES = {
   'mostRecent-without-args': {
     message:
       'Direct usage of mostRecent() is not supported.' +
-      ' Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall.',
+      ' Please refactor to access .args, .returnValue, or .object directly' +
+      ' or use vi.mocked(spy).mock.lastCall.',
     url: 'https://vitest.dev/api/mocked.html#mock-lastcall',
   },
   'saveArgumentsByValue': {

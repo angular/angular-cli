@@ -333,9 +333,94 @@ describe('transformSpyCallInspection', () => {
       expected: `expect(vi.mocked(mySpy).mock.calls[0][0]).toBe(1);`,
     },
     {
+      description: 'should transform spy.calls.first().returnValue',
+      input: `const firstResult = mySpy.calls.first().returnValue;`,
+      expected: `const firstResult = vi.mocked(mySpy).mock.results[0].value;`,
+    },
+    {
+      description: 'should transform spy.calls.first().object',
+      input: `const firstThis = mySpy.calls.first().object;`,
+      expected: `const firstThis = vi.mocked(mySpy).mock.contexts[0];`,
+    },
+    {
+      description: 'should transform spy.calls.mostRecent().returnValue',
+      input: `const recentResult = mySpy.calls.mostRecent().returnValue;`,
+      expected: `const recentResult = vi.mocked(mySpy).mock.results.at(-1)?.value;`,
+    },
+    {
+      description: 'should transform spy.calls.mostRecent().object',
+      input: `const recentThis = mySpy.calls.mostRecent().object;`,
+      expected: `const recentThis = vi.mocked(mySpy).mock.contexts.at(-1);`,
+    },
+    {
+      description: 'should transform spy.calls.all()[i].returnValue',
+      input: `expect(mySpy.calls.all()[1].returnValue).toBe(42);`,
+      expected: `expect(vi.mocked(mySpy).mock.results[1].value).toBe(42);`,
+    },
+    {
+      description: 'should transform spy.calls.all()[i].object',
+      input: `expect(mySpy.calls.all()[1].object).toBe(service);`,
+      expected: `expect(vi.mocked(mySpy).mock.contexts[1]).toBe(service);`,
+    },
+    {
+      description: 'should transform CallInfo properties with non-null assertions',
+      input: `
+        const recentArgs = mySpy.calls.mostRecent()!.args;
+        const firstResult = mySpy.calls.first()!.returnValue;
+        const indexedThis = mySpy.calls.all()[1]!.object;
+      `,
+      expected: `
+        const recentArgs = vi.mocked(mySpy).mock.lastCall;
+        const firstResult = vi.mocked(mySpy).mock.results[0].value;
+        const indexedThis = vi.mocked(mySpy).mock.contexts[1];
+      `,
+    },
+    {
+      description: 'should transform CallInfo properties with parenthesized expressions',
+      input: `const firstResult = (mySpy.calls.first()).returnValue;`,
+      expected: `const firstResult = vi.mocked(mySpy).mock.results[0].value;`,
+    },
+    {
+      description: 'should transform CallInfo properties with type assertions',
+      input: `
+        const recentArgs = (mySpy.calls.mostRecent() as jasmine.CallInfo).args;
+        const firstResult = (<jasmine.CallInfo>mySpy.calls.first()).returnValue;
+        const indexedThis = (mySpy.calls.all()[1] satisfies jasmine.CallInfo).object;
+      `,
+      expected: `
+        const recentArgs = vi.mocked(mySpy).mock.lastCall;
+        const firstResult = vi.mocked(mySpy).mock.results[0].value;
+        const indexedThis = vi.mocked(mySpy).mock.contexts[1];
+      `,
+    },
+    {
+      description: 'should transform spy.calls.all()[i] properties when the all() call is wrapped',
+      input: `
+        const parenthesizedArgs = (mySpy.calls.all())[1].args;
+        const assertedArgs = mySpy.calls.all()![1].args;
+      `,
+      expected: `
+        const parenthesizedArgs = vi.mocked(mySpy).mock.calls[1];
+        const assertedArgs = vi.mocked(mySpy).mock.calls[1];
+      `,
+    },
+    {
+      description: 'should preserve optional chaining on CallInfo returnValue accesses',
+      input: `
+        const firstResult = mySpy.calls.first()?.returnValue;
+        const indexedResult = mySpy.calls.all()[1]?.returnValue;
+        const recentResult = mySpy.calls.mostRecent()?.returnValue;
+      `,
+      expected: `
+        const firstResult = vi.mocked(mySpy).mock.results[0]?.value;
+        const indexedResult = vi.mocked(mySpy).mock.results[1]?.value;
+        const recentResult = vi.mocked(mySpy).mock.results.at(-1)?.value;
+      `,
+    },
+    {
       description: 'should add a TODO for spy.calls.mostRecent() without .args',
       input: `const mostRecent = mySpy.calls.mostRecent();`,
-      expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args directly or use vi.mocked(spy).mock.lastCall. See: https://vitest.dev/api/mocked.html#mock-lastcall
+      expected: `// TODO: vitest-migration: Direct usage of mostRecent() is not supported. Please refactor to access .args, .returnValue, or .object directly or use vi.mocked(spy).mock.lastCall. See: https://vitest.dev/api/mocked.html#mock-lastcall
 const mostRecent = mySpy.calls.mostRecent();`,
     },
     {
