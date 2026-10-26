@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { PackageManagerError } from './error';
 import { MANIFEST_FIELDS, PackageManager } from './package-manager';
 import { SUPPORTED_PACKAGE_MANAGERS } from './package-manager-descriptor';
 import { MockHost } from './testing/mock-host';
@@ -52,6 +53,37 @@ describe('PackageManager', () => {
         descriptor.binary,
         [...descriptor.getManifestCommand, 'foo@>=1.0.0 <2.0.0', ...MANIFEST_FIELDS],
         jasmine.anything(),
+      );
+    });
+
+    it('should return null when bun pm view fails with No matching version found', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      runCommandSpy.and.rejectWith(
+        new PackageManagerError(
+          'Process exited with code 1.',
+          JSON.stringify({ error: 'No matching version found', version: 'foo@99.99.99' }),
+          '',
+          1,
+        ),
+      );
+
+      expect(await pm.getRegistryManifest('foo', '99.99.99')).toBeNull();
+    });
+
+    it('should throw when bun pm view fails with an unrecognized JSON error', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      runCommandSpy.and.rejectWith(
+        new PackageManagerError(
+          'Process exited with code 1.',
+          JSON.stringify({ error: 'Authentication token not found' }),
+          '',
+          1,
+        ),
+      );
+
+      await expectAsync(pm.getRegistryManifest('foo', '1.0.0')).toBeRejectedWithError(
+        PackageManagerError,
+        'Authentication token not found',
       );
     });
   });
@@ -375,6 +407,20 @@ describe('PackageManager', () => {
         ['pm', 'view', '--json', 'foo', 'versions'],
         jasmine.anything(),
       );
+    });
+
+    it('should return null when bun pm view fails with 404 Not Found', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      runCommandSpy.and.rejectWith(
+        new PackageManagerError(
+          'Process exited with code 1.',
+          '',
+          "404 Not Found: https://registry.npmjs.org/non-existent\n\n - 'non-existent@latest' does not exist in this registry",
+          1,
+        ),
+      );
+
+      expect(await pm.getRegistryMetadata('non-existent')).toBeNull();
     });
   });
 

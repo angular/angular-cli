@@ -513,7 +513,7 @@ export function parseNpmLikeError(output: string, logger?: Logger): ErrorInfo | 
     return null;
   }
 
-  // Attempt to parse as JSON first (common for pnpm, modern yarn, bun, npm 12)
+  // Attempt to parse as JSON first (common for pnpm, modern yarn, npm 12)
   try {
     let jsonError = JSON.parse(output);
     if (Array.isArray(jsonError)) {
@@ -632,6 +632,92 @@ export function parseYarnClassicError(output: string, logger?: Logger): ErrorInf
   }
 
   logger?.debug('  Failed to parse yarn classic error. No structured error found.');
+
+  return null;
+}
+
+/**
+ * Known Bun JSON error messages that indicate a requested version or dist-tag does not exist.
+ */
+const BUN_NOT_FOUND_ERROR_PATTERN = /^(?:no matching version found|dist-tag not found)\b/i;
+
+/**
+ * Parses the `stdout` or `stderr` output of `bun` commands to extract structured error information.
+ *
+ * Handles flat JSON error payloads emitted on `stdout` by `bun pm view` (e.g., when a requested
+ * version or dist-tag does not exist) as well as plain-text HTTP status errors emitted on `stderr`
+ * (e.g., 404 Not Found). Other JSON error shapes are delegated to `parseNpmLikeError`.
+ *
+ * Example JSON error output:
+ * ```json
+ * { "error": "No matching version found", "version": "@angular/core@99.99.99" }
+ * ```
+ *
+ * Example plain-text error output:
+ * ```
+ * 404 Not Found: https://registry.npmjs.org/@angular%2fnon-existent
+ * ```
+ *
+ * @param output The standard output or standard error of the command.
+ * @param logger An optional logger instance.
+ * @returns An `ErrorInfo` object if parsing is successful, otherwise `null`.
+ */
+export function parseBunError(output: string, logger?: Logger): ErrorInfo | null {
+  logger?.debug('Parsing Bun error output...');
+  logStdout(output, logger);
+
+  if (!output) {
+    logger?.debug('  output is empty. No error found.');
+
+    return null;
+  }
+
+  // 1. JSON output. Valid JSON is never a plain-text status line, so text matching is skipped.
+  let parsed: unknown;
+  let isJson = false;
+  try {
+    parsed = JSON.parse(output);
+    isJson = true;
+  } catch {
+    // Not JSON. Fall back to plain-text error matching.
+  }
+
+  if (isJson) {
+    // Only accept Bun's exact flat error shape (`error` with an optional `version`) to avoid
+    // misinterpreting successful output, such as a dist-tags object containing an `error` tag.
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      const { error, version, ...rest } = parsed as Record<string, unknown>;
+      if (
+        typeof error === 'string' &&
+        (version === undefined || typeof version === 'string') &&
+        Object.keys(rest).length === 0
+      ) {
+        const code = BUN_NOT_FOUND_ERROR_PATTERN.test(error) ? 'E404' : 'UNKNOWN_ERROR';
+        const summary = version ? `${error}: ${version}` : error;
+        logger?.debug(`  Successfully parsed Bun JSON error with code '${code}'.`);
+
+        return { code, summary };
+      }
+    }
+
+    // Fall back to npm-compatible JSON error objects (e.g., `{ "error": { "code": "E404", ... } }`).
+    return parseNpmLikeError(output, logger);
+  }
+
+  // 2. Plain-text HTTP error status lines from `bun pm view`
+  // (e.g., `404 Not Found: https://registry.npmjs.org/...`).
+  const httpStatusMatch = output.match(/^([45]\d{2})\s+[^\r\n:]+:.+$/m);
+  if (httpStatusMatch) {
+    const code = `E${httpStatusMatch[1]}`;
+    logger?.debug(`  Detected HTTP error status code '${httpStatusMatch[1]}' in Bun output.`);
+
+    return {
+      code,
+      summary: httpStatusMatch[0].trim(),
+    };
+  }
+
+  logger?.debug('  Failed to parse Bun error. No structured error found.');
 
   return null;
 }
