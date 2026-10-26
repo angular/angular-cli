@@ -18,6 +18,38 @@ describe('generateAngularServerAppManifest', () => {
 
   const dummyMetafile = { inputs: {}, outputs: {} } as unknown as Metafile;
 
+  /**
+   * Evaluates a generated manifest, which both asserts that it is syntactically valid JavaScript and
+   * gives access to the values it declares. The dynamic imports it contains are never invoked.
+   */
+  function evaluateManifest(manifestContent: string): unknown {
+    return new Function(manifestContent.replace('export default', 'return'))();
+  }
+
+  function generateManifest(
+    htmlOutputFiles: Record<string, string>,
+    baseHref = '/',
+  ): ReturnType<typeof generateAngularServerAppManifest> {
+    const additionalHtmlOutputFiles = new Map(
+      Object.entries(htmlOutputFiles).map(([path, content]) => [
+        path,
+        createOutputFile(path, content, BuildOutputFileType.Browser),
+      ]),
+    );
+
+    return generateAngularServerAppManifest(
+      additionalHtmlOutputFiles,
+      [],
+      false,
+      undefined,
+      undefined,
+      baseHref,
+      new Set(),
+      dummyMetafile,
+      undefined,
+    );
+  }
+
   it('should include criticalCssPlans when inlineCriticalCss is true', async () => {
     const additionalHtml = new Map([
       [
@@ -138,6 +170,38 @@ describe('generateAngularServerAppManifest', () => {
     );
 
     expect(serverAssetsChunks.some((chunk) => chunk.path.includes('styles'))).toBeFalse();
-    expect(manifestContent).not.toContain("'styles.css':");
+    expect(manifestContent).not.toContain('"styles.css":');
+  });
+
+  it('should serialize asset paths which contain JavaScript string delimiters', async () => {
+    const assetPath = "catalog/customer's-choice/index.html";
+    const { manifestContent } = await generateManifest({
+      [assetPath]: '<main>Featured</main>',
+    });
+
+    expect(evaluateManifest(manifestContent)).toEqual(
+      jasmine.objectContaining({
+        assets: {
+          [assetPath]: jasmine.objectContaining({
+            size: 21,
+            hash: jasmine.any(String),
+            text: jasmine.any(Function),
+          }),
+        },
+      }),
+    );
+  });
+
+  it('should serialize a base href which contains JavaScript string delimiters', async () => {
+    const { manifestContent } = await generateManifest(
+      { 'index.html': '<main></main>' },
+      "/o'brien/",
+    );
+
+    expect(evaluateManifest(manifestContent)).toEqual(
+      jasmine.objectContaining({
+        baseHref: "/o'brien/",
+      }),
+    );
   });
 });
