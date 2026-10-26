@@ -11,6 +11,9 @@ import {
   addTrailingSlash,
   buildUrlWithParams,
   joinUrlParts,
+  parsePathSegments,
+  parseUrl,
+  serializePathSegments,
   stripIndexHtmlFromURL,
   stripLeadingSlash,
   stripMatrixParams,
@@ -200,12 +203,12 @@ describe('URL Utils', () => {
     });
 
     it('should replace positional placeholders with the segments at those positions', () => {
-      expect(buildUrlWithParams('/user/*2/*1', '/a/b')).toBe('/user/b/a');
+      expect(buildUrlWithParams('/user/*1/*0', '/a/b')).toBe('/user/b/a');
     });
 
     it('should replace a positional placeholder followed by a query or fragment', () => {
-      expect(buildUrlWithParams('/user/*1?returnTo=/a//b/', '/a')).toBe('/user/a?returnTo=/a//b/');
-      expect(buildUrlWithParams('/user/*1#top', '/a')).toBe('/user/a#top');
+      expect(buildUrlWithParams('/user/*0?returnTo=/a//b/', '/a')).toBe('/user/a?returnTo=/a//b/');
+      expect(buildUrlWithParams('/user/*0#top', '/a')).toBe('/user/a#top');
     });
 
     it('should throw an error if the toUrl does not start with "/"', () => {
@@ -264,6 +267,40 @@ describe('URL Utils', () => {
 
     it('should handle an empty string', () => {
       expect(stripMatrixParams('')).toBe('');
+    });
+  });
+
+  describe('parseUrl and serializePathSegments', () => {
+    it('should parse path segments and query parameters into discriminated unions', () => {
+      const parsed = parseUrl('/user/:id/*/details/*0/**?q=:term&q2=:a&q2=:b&static=1#section');
+
+      expect(parsed.isAbsolute).toBeTrue();
+      expect(parsed.hasDynamicSegments).toBeTrue();
+      expect(parsed.hasDynamicQueryParams).toBeTrue();
+      expect(parsed.fragment).toBe('section');
+      expect(parsed.segments).toEqual([
+        { type: 'static', value: 'user' },
+        { type: 'param', name: 'id' },
+        { type: 'wildcard' },
+        { type: 'static', value: 'details' },
+        { type: 'wildcard', index: 0 },
+        { type: 'static', value: '**' },
+      ]);
+      expect(parsed.queryParams).toEqual([
+        { type: 'param', name: 'q', param: 'term' },
+        { type: 'static', name: 'q2', value: [':a', ':b'] },
+        { type: 'static', name: 'static', value: '1' },
+      ]);
+      expect(serializePathSegments(parsed.segments)).toBe('/user/:id/*/details/*0/**');
+    });
+
+    it('should normalize leading, trailing, and consecutive slashes in parsePathSegments', () => {
+      expect(parsePathSegments('///a//b/:c//')).toEqual([
+        { type: 'static', value: 'a' },
+        { type: 'static', value: 'b' },
+        { type: 'param', name: 'c' },
+      ]);
+      expect(serializePathSegments([])).toBe('/');
     });
   });
 });

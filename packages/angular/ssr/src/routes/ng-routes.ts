@@ -31,7 +31,15 @@ import { AngularAppManifest, getAngularAppManifest } from '../manifest';
 import { AngularBootstrap, isNgModule } from '../utils/ng';
 import { promiseWithAbort } from '../utils/promise';
 import { VALID_REDIRECT_RESPONSE_CODES, isValidRedirectResponseCode } from '../utils/redirect';
-import { joinUrlParts, stripLeadingSlash } from '../utils/url';
+import {
+  type PathSegment,
+  WILDCARD_SEGMENT,
+  joinUrlParts,
+  parsePathSegments,
+  parseUrl,
+  serializePathSegments,
+  stripLeadingSlash,
+} from '../utils/url';
 import {
   PrerenderFallback,
   RenderMode,
@@ -179,11 +187,17 @@ async function* handleRoute(options: {
     const parentRoutes = new Map<string, RouteTreeNodeMetadata>();
 
     if (typeof redirectTo === 'string') {
-      // Reference the route parameters by their position in the URL (see `buildUrlWithParams`).
-      metadata.redirectTo = resolveRedirectTo(parentRoute, route, redirectTo, (parameter) => {
-        const routeSegments = joinUrlParts(baseHref, currentRoutePath).split('/');
+      // Reference the route parameters by their 0-based position in the URL (see `buildUrlWithParams`).
+      const routeSegments = parsePathSegments(joinUrlParts(baseHref, currentRoutePath));
+      metadata.redirectTo = resolveRedirectTo(parentRoute, route, redirectTo, (paramName) => {
+        for (let i = routeSegments.length - 1; i >= 0; i--) {
+          const segment = routeSegments[i];
+          if (segment.type === 'param' && segment.name === paramName) {
+            return { type: 'wildcard', index: i };
+          }
+        }
 
-        return `*${routeSegments.lastIndexOf(parameter)}`;
+        return WILDCARD_SEGMENT;
       });
       metadata.relativeRedirect = redirectTo[0] !== '/' ? true : undefined;
     }
@@ -518,7 +532,7 @@ async function* handleSSGRoute(
                   parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, replacer),
                   route,
                   redirectTo,
-                  (parameter) => params[parameter.slice(1)],
+                  (paramName) => ({ type: 'static', value: params[paramName] }),
                 ),
         };
       }
@@ -581,7 +595,7 @@ function handlePrerenderParamsReplacement(
  * @param parentRoute - The path of the parent route.
  * @param route - The redirecting route.
  * @param redirectTo - The target path for redirection.
- * @param resolveParam - A function that returns the replacement for a parameter, such as `:id`.
+ * @param resolveParam - A function that returns the replacement `PathSegment` for a parameter name.
  * @returns The resolved redirect path as a string.
  * @throws If `redirectTo` uses a parameter that is not defined in the path of the route.
  */
@@ -589,37 +603,40 @@ function resolveRedirectTo(
   parentRoute: string,
   route: Route,
   redirectTo: string,
-  resolveParam: (parameter: string) => string,
+  resolveParam: (paramName: string) => PathSegment,
 ): string {
   if (redirectTo[0] === '/' && (route.matcher || !redirectTo.includes('/:'))) {
     return redirectTo;
   }
 
-  const [path] = redirectTo.split(/[?#]/, 1);
-  let resolvedPath = path;
+  const parsedRedirect = parseUrl(redirectTo);
+  let resolvedSegments = parsedRedirect.segments;
 
   // The parameters of a custom matcher are only known at runtime.
-  if (!route.matcher && path.includes(':')) {
-    const routeSegments = route.path?.split('/') ?? [];
-    resolvedPath = path
-      .split('/')
-      .map((segment) => {
-        if (segment[0] !== ':') {
-          return segment;
-        }
+  if (!route.matcher && parsedRedirect.hasDynamicSegments) {
+    const routeSegments = parsePathSegments(route.path ?? '');
+    resolvedSegments = resolvedSegments.map((segment) => {
+      if (segment.type !== 'param') {
+        return segment;
+      }
 
-        if (!routeSegments.includes(segment)) {
-          throw new Error(`Cannot redirect to '${redirectTo}'. Cannot find '${segment}'.`);
-        }
+      if (!routeSegments.some((s) => s.type === 'param' && s.name === segment.name)) {
+        throw new Error(`Cannot redirect to '${redirectTo}'. Cannot find ':${segment.name}'.`);
+      }
 
-        return resolveParam(segment);
-      })
-      .join('/');
+      return resolveParam(segment.name);
+    });
   }
 
-  return redirectTo[0] === '/'
-    ? resolvedPath + redirectTo.slice(path.length)
-    : joinUrlParts(parentRoute.replace(URL_PARAMETER_GLOBAL_REGEXP, '*'), resolvedPath);
+  if (parsedRedirect.isAbsolute) {
+    return serializePathSegments(resolvedSegments) + parsedRedirect.rawSuffix;
+  }
+
+  const parentSegments = parsePathSegments(parentRoute).map((segment) =>
+    segment.type === 'param' ? WILDCARD_SEGMENT : segment,
+  );
+
+  return serializePathSegments([...parentSegments, ...resolvedSegments]);
 }
 
 /**
