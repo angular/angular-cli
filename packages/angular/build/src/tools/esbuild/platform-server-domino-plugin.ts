@@ -7,7 +7,6 @@
  */
 
 import type { Plugin } from 'esbuild';
-import { dirname, resolve } from 'node:path';
 import { toPosixPath } from '../../utils/path';
 
 /**
@@ -33,21 +32,32 @@ export function createPlatformServerDominoExposePlugin(): Plugin {
       build.onResolve({ filter: BUNDLED_DOMINO_FILTER }, (args) =>
         args.namespace !== 'angular:domino-expose' && args.kind === 'import-statement'
           ? {
-              path: resolve(args.resolveDir, args.path),
+              path: 'angular:platform-server-domino',
               namespace: 'angular:domino-expose',
+              pluginData: {
+                importPath: args.path,
+                resolveDir: args.resolveDir,
+              },
             }
           : null,
       );
 
-      build.onLoad({ filter: /./, namespace: 'angular:domino-expose' }, (args) => ({
-        contents: [
-          `import domino from ${JSON.stringify(toPosixPath(args.path))};`,
-          `globalThis['${DOMINO_GLOBAL_PROPERTY}'] = domino;`,
-          `export default domino;`,
-        ].join('\n'),
-        loader: 'js',
-        resolveDir: dirname(args.path),
-      }));
+      build.onLoad({ filter: /./, namespace: 'angular:domino-expose' }, (args) => {
+        const { importPath, resolveDir } = args.pluginData as {
+          importPath: string;
+          resolveDir: string;
+        };
+
+        return {
+          contents: [
+            `import domino from ${JSON.stringify(toPosixPath(importPath))};`,
+            `globalThis['${DOMINO_GLOBAL_PROPERTY}'] = domino;`,
+            `export default domino;`,
+          ].join('\n'),
+          loader: 'js',
+          resolveDir,
+        };
+      });
     },
   };
 }
@@ -58,9 +68,9 @@ export function createPlatformServerDominoExposePlugin(): Plugin {
  *
  * @returns An esbuild plugin.
  */
-export function createPlatformServerDominoPlugin(): Plugin {
+export function createPlatformServerDominoRedirectPlugin(): Plugin {
   return {
-    name: 'angular-platform-server-domino-consume',
+    name: 'angular-platform-server-domino-redirect',
     setup(build) {
       build.onResolve({ filter: BUNDLED_DOMINO_FILTER }, (args) =>
         args.kind === 'import-statement'

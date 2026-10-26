@@ -32,7 +32,7 @@ import type { LoadResultCache } from './load-result-cache';
 import { createLoaderImportAttributePlugin } from './loader-import-attribute-plugin';
 import {
   createPlatformServerDominoExposePlugin,
-  createPlatformServerDominoPlugin,
+  createPlatformServerDominoRedirectPlugin,
 } from './platform-server-domino-plugin';
 import { createRxjsEsmResolutionPlugin } from './rxjs-esm-resolution-plugin';
 import { createServerBundleMetadata } from './server-bundle-metadata-plugin';
@@ -325,7 +325,7 @@ export function createServerMainCodeBundleOptions(
 
     buildOptions.plugins.push(
       createServerBundleMetadata(),
-      createPlatformServerDominoPlugin(),
+      createPlatformServerDominoRedirectPlugin(),
       createVirtualModulePlugin({
         namespace: mainServerInjectManifestNamespace,
         cache: loadResultCache,
