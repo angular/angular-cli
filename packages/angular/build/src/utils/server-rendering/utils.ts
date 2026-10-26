@@ -7,7 +7,9 @@
  */
 
 import type { createRequestHandler } from '@angular/ssr';
-import type { createNodeRequestHandler } from '@angular/ssr/node' with { 'resolution-mode': 'import' };
+import type { createNodeRequestHandler } from '@angular/ssr/node' with {
+  'resolution-mode': 'import',
+};
 
 export function isSsrNodeRequestHandler(
   value: unknown,
