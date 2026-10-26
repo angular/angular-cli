@@ -812,6 +812,31 @@ describe('extractRoutesAndCreateRouteTree', () => {
     ]);
   });
 
+  it('should preserve trailing slashes in query parameters and fragments of absolute redirect targets', async () => {
+    setAngularAppTestingManifest(
+      [
+        { path: 'query-slash', redirectTo: '/login?next=/a/' },
+        { path: 'fragment-slash', redirectTo: '/login#section/' },
+        { path: 'path-and-query-slash', redirectTo: '/login/?next=/a/' },
+        { path: 'login', component: DummyComponent },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([
+      { route: '/query-slash', renderMode: RenderMode.Server, redirectTo: '/login?next=/a/' },
+      { route: '/fragment-slash', renderMode: RenderMode.Server, redirectTo: '/login#section/' },
+      {
+        route: '/path-and-query-slash',
+        renderMode: RenderMode.Server,
+        redirectTo: '/login?next=/a/',
+      },
+      { route: '/login', renderMode: RenderMode.Server },
+    ]);
+  });
+
   it('should not resolve parameterized routes for SSG when `invokeGetPrerenderParams` is false', async () => {
     setAngularAppTestingManifest(
       [

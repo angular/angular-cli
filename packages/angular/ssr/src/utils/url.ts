@@ -93,13 +93,21 @@ export function addTrailingSlash(url: string): string {
  * ```js
  * joinUrlParts('path/', '/to/resource'); // '/path/to/resource'
  * joinUrlParts('/path/', 'to/resource'); // '/path/to/resource'
+ * joinUrlParts('/base/', '/login/?next=/a/'); // '/base/login?next=/a/'
  * joinUrlParts('', ''); // '/'
  * ```
  */
 export function joinUrlParts(...parts: string[]): string {
   const normalizedParts: string[] = [];
+  let suffix = '';
 
-  for (const part of parts) {
+  let lastIndex = parts.length - 1;
+  while (lastIndex >= 0 && parts[lastIndex] === '') {
+    lastIndex--;
+  }
+
+  for (let i = 0; i <= lastIndex; i++) {
+    const part = parts[i];
     if (part === '') {
       // Skip any empty parts
       continue;
@@ -107,6 +115,22 @@ export function joinUrlParts(...parts: string[]): string {
 
     let start = 0;
     let end = part.length;
+
+    if (i === lastIndex) {
+      const queryIndex = part.indexOf('?');
+      const hashIndex = part.indexOf('#');
+      const suffixIndex =
+        queryIndex === -1
+          ? hashIndex
+          : hashIndex === -1
+            ? queryIndex
+            : Math.min(queryIndex, hashIndex);
+
+      if (suffixIndex !== -1) {
+        suffix = part.slice(suffixIndex);
+        end = suffixIndex;
+      }
+    }
 
     // Use "Pointers" to avoid intermediate slices
     while (start < end && part[start] === '/') {
@@ -122,7 +146,7 @@ export function joinUrlParts(...parts: string[]): string {
     }
   }
 
-  return addLeadingSlash(normalizedParts.join('/'));
+  return addLeadingSlash(normalizedParts.join('/')) + suffix;
 }
 
 /**
