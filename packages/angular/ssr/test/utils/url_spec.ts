@@ -112,6 +112,21 @@ describe('URL Utils', () => {
     it('should handle parts containing only slashes', () => {
       expect(joinUrlParts('//', '///')).toBe('/');
     });
+
+    it('should preserve trailing slashes in query parameters and fragments', () => {
+      expect(joinUrlParts('/', '/login?next=/a/')).toBe('/login?next=/a/');
+      expect(joinUrlParts('/', '/login#section/')).toBe('/login#section/');
+      expect(joinUrlParts('/base/', '/foo/?next=/a/#section/')).toBe('/base/foo?next=/a/#section/');
+      expect(joinUrlParts('/base/', '/login/#section?next=/a/')).toBe(
+        '/base/login#section?next=/a/',
+      );
+      expect(joinUrlParts('/base/', '/?next=/a/')).toBe('/base?next=/a/');
+      expect(joinUrlParts('/', '/?next=/a/')).toBe('/?next=/a/');
+      expect(joinUrlParts('', '///evil.com?a=/')).toBe('/evil.com?a=/');
+      expect(joinUrlParts('/login/?next=/a/', '')).toBe('/login?next=/a/');
+      expect(joinUrlParts('/base/', '/login/?next=/a/', '', '')).toBe('/base/login?next=/a/');
+      expect(joinUrlParts('/login/#section/', '')).toBe('/login#section/');
+    });
   });
 
   describe('stripIndexHtmlFromURL', () => {

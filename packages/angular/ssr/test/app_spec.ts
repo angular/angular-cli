@@ -97,6 +97,14 @@ describe('AngularServerApp', () => {
           redirectTo: '/home?q=:term&id=:missing&static=value',
         },
         {
+          path: 'redirect-query-trailing-slash',
+          redirectTo: '/home?next=/a/',
+        },
+        {
+          path: 'redirect-fragment-trailing-slash',
+          redirectTo: '/home#section/',
+        },
+        {
           path: 'redirect-to-function',
           redirectTo: () => 'home',
           pathMatch: 'full',
@@ -280,6 +288,20 @@ describe('AngularServerApp', () => {
           '/home?q=cats&q=dogs&id=undefined&static=value',
         );
         expect(response?.status).toBe(302);
+      });
+
+      it('should preserve trailing slashes in query parameters and fragments of redirect targets', async () => {
+        const queryResponse = await app.handle(
+          new Request('http://localhost/redirect-query-trailing-slash'),
+        );
+        expect(queryResponse?.headers.get('location')).toBe('/home?next=/a/');
+        expect(queryResponse?.status).toBe(302);
+
+        const fragmentResponse = await app.handle(
+          new Request('http://localhost/redirect-fragment-trailing-slash'),
+        );
+        expect(fragmentResponse?.headers.get('location')).toBe('/home#section/');
+        expect(fragmentResponse?.status).toBe(302);
       });
 
       it('should handle request abortion gracefully', async () => {
