@@ -18,6 +18,7 @@ import { maxSatisfying, valid } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
+import { resolveManifestDependencies } from './manifest-dependencies';
 import { PackageManagerDescriptor } from './package-manager-descriptor';
 import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
@@ -150,11 +151,26 @@ export class PackageManager {
     const args = this.descriptor.listDependenciesCommand;
 
     const workspacePackageName = await this.getCurrentPackageName();
-    const dependencies = await this.#fetchAndParse(args, (stdout, logger) =>
-      this.descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
-    );
+    const dependencies =
+      (await this.#fetchAndParse(args, (stdout, logger) =>
+        this.descriptor.outputParsers.listDependencies(stdout, logger, { workspacePackageName }),
+      )) ?? new Map<string, InstalledPackage>();
 
-    return (this.#dependencyCache = dependencies ?? new Map());
+    if (this.descriptor.requiresManifestDependencyLookup) {
+      const manifestDependencies = await resolveManifestDependencies(
+        this.host,
+        this.cwd,
+        this.descriptor.lockfiles,
+      );
+      // Entries resolved from disk intentionally override the command output. In a workspace
+      // member, they reflect the member's actual installed version (which may be nested and
+      // differ from the hoisted root version) and also provide the package path.
+      for (const [name, pkg] of manifestDependencies) {
+        dependencies.set(name, pkg);
+      }
+    }
+
+    return (this.#dependencyCache = dependencies);
   }
 
   /**
