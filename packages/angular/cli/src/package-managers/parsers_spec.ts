@@ -540,6 +540,18 @@ project node_modules
 `.trim();
       expect(parseBunDependencies(stdout).size).toBe(0);
     });
+
+    it('should skip workspace: protocol entries', () => {
+      const stdout = `
+/workspace node_modules (350)
+├── @scope/pkg@workspace:packages/pkg
+├── app@workspace:app
+└── typescript@5.9.3
+`.trim();
+      const deps = parseBunDependencies(stdout);
+      expect(deps.size).toBe(1);
+      expect(deps.get('typescript')).toEqual({ name: 'typescript', version: '5.9.3' });
+    });
   });
 
   describe('parseYarnModernDependencies', () => {

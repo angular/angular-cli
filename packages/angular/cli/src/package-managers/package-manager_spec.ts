@@ -420,6 +420,19 @@ describe('PackageManager', () => {
 
       expect(await pm.getCurrentPackageName()).toBeUndefined();
     });
+
+    it('should fall back to bun pm pkg get name when package.json cannot be read', async () => {
+      const pm = new PackageManager(host, '/repo/apps/app/src', SUPPORTED_PACKAGE_MANAGERS['bun']);
+      spyOn(host, 'readFile').and.rejectWith(new Error('ENOENT'));
+      runCommandSpy.and.resolveTo({ stdout: '"my-bun-app"', stderr: '' });
+
+      expect(await pm.getCurrentPackageName()).toBe('my-bun-app');
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'bun',
+        ['pm', 'pkg', 'get', 'name'],
+        jasmine.objectContaining({ cwd: '/repo/apps/app/src' }),
+      );
+    });
   });
 
   describe('getProjectDependencies', () => {
@@ -444,6 +457,144 @@ describe('PackageManager', () => {
 
       expect([...dependencies.keys()]).toEqual(['@angular/core']);
       expect(dependencies.get('@angular/core')?.version).toBe('22.0.0');
+    });
+
+    it('should resolve dependencies of a bun workspace member from local and hoisted node_modules', async () => {
+      const testHost = new MockHost({
+        '/outside/node_modules': true,
+        '/outside/repo/bun.lock': [],
+        '/outside/repo/node_modules': true,
+        '/outside/repo/apps/app/node_modules': true,
+      });
+      const pm = new PackageManager(
+        testHost,
+        '/outside/repo/apps/app',
+        SUPPORTED_PACKAGE_MANAGERS['bun'],
+      );
+      spyOn(testHost, 'runCommand').and.resolveTo({
+        stdout: [
+          '/outside/repo node_modules (350)',
+          '├── app@workspace:apps/app',
+          '├── prettier@3.5.0',
+          '└── typescript@5.9.3',
+        ].join('\n'),
+        stderr: '',
+      });
+
+      const files: Record<string, string> = {
+        '/outside/repo/apps/app/package.json': JSON.stringify({
+          name: 'app',
+          dependencies: {
+            '@angular/core': '^21.2.0',
+            '@repo/shared': 'workspace:*',
+            'uninstalled-pkg': '^1.0.0',
+          },
+          devDependencies: {
+            '@angular/cli': '^21.2.0',
+            typescript: '~5.8.0',
+          },
+        }),
+        '/outside/repo/node_modules/@angular/core/package.json': JSON.stringify({
+          name: '@angular/core',
+          version: '21.2.4',
+        }),
+        '/outside/repo/node_modules/@angular/cli/package.json': JSON.stringify({
+          name: '@angular/cli',
+          version: '21.2.5',
+        }),
+        '/outside/repo/apps/app/node_modules/typescript/package.json': JSON.stringify({
+          name: 'typescript',
+          version: '5.8.3',
+        }),
+        '/outside/repo/node_modules/typescript/package.json': JSON.stringify({
+          name: 'typescript',
+          version: '5.9.3',
+        }),
+        '/outside/node_modules/uninstalled-pkg/package.json': JSON.stringify({
+          name: 'uninstalled-pkg',
+          version: '1.0.0',
+        }),
+      };
+
+      const readFileSpy = spyOn(testHost, 'readFile').and.callFake(async (filePath: string) => {
+        const normalized = filePath.replace(/\\/g, '/');
+        if (normalized in files) {
+          return files[normalized];
+        }
+        throw new Error(`ENOENT: ${filePath}`);
+      });
+
+      const dependencies = await pm.getProjectDependencies();
+
+      expect(dependencies.has('app')).toBeFalse();
+      expect(dependencies.has('@repo/shared')).toBeFalse();
+      // Should stop searching at the workspace root (bun.lock) and not resolve from /outside/node_modules
+      expect(dependencies.has('uninstalled-pkg')).toBeFalse();
+      expect(readFileSpy).not.toHaveBeenCalledWith(
+        jasmine.stringMatching(/\/outside\/node_modules\//),
+      );
+      expect(dependencies.get('prettier')).toEqual({ name: 'prettier', version: '3.5.0' });
+      expect(dependencies.get('@angular/core')).toEqual({
+        name: '@angular/core',
+        version: '21.2.4',
+        path: '/outside/repo/node_modules/@angular/core',
+      });
+      expect(dependencies.get('@angular/cli')).toEqual({
+        name: '@angular/cli',
+        version: '21.2.5',
+        path: '/outside/repo/node_modules/@angular/cli',
+      });
+      expect(dependencies.get('typescript')).toEqual({
+        name: 'typescript',
+        version: '5.8.3',
+        path: '/outside/repo/apps/app/node_modules/typescript',
+      });
+    });
+
+    it('should stop searching for node_modules at a git root where .git is a file', async () => {
+      const testHost = new MockHost({
+        '/outside/node_modules': true,
+        // A `.git` file is used by git worktrees and submodules.
+        '/outside/repo/.git': [],
+        '/outside/repo/apps/app/node_modules': true,
+      });
+      const pm = new PackageManager(
+        testHost,
+        '/outside/repo/apps/app',
+        SUPPORTED_PACKAGE_MANAGERS['bun'],
+      );
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      const files: Record<string, string> = {
+        '/outside/repo/apps/app/package.json': JSON.stringify({
+          name: 'app',
+          dependencies: {
+            'local-pkg': '^1.0.0',
+            'outside-pkg': '^1.0.0',
+          },
+        }),
+        '/outside/repo/apps/app/node_modules/local-pkg/package.json': JSON.stringify({
+          name: 'local-pkg',
+          version: '1.2.3',
+        }),
+        '/outside/node_modules/outside-pkg/package.json': JSON.stringify({
+          name: 'outside-pkg',
+          version: '1.0.0',
+        }),
+      };
+
+      spyOn(testHost, 'readFile').and.callFake(async (filePath: string) => {
+        const normalized = filePath.replace(/\\/g, '/');
+        if (normalized in files) {
+          return files[normalized];
+        }
+        throw new Error(`ENOENT: ${filePath}`);
+      });
+
+      const dependencies = await pm.getProjectDependencies();
+
+      expect(dependencies.get('local-pkg')?.version).toBe('1.2.3');
+      expect(dependencies.has('outside-pkg')).toBeFalse();
     });
   });
 
