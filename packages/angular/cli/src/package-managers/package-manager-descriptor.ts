@@ -18,6 +18,7 @@ import { PackageManifest, PackageMetadata } from './package-metadata';
 import { InstalledPackage } from './package-tree';
 import {
   parseBunDependencies,
+  parseBunError,
   parseNpmBeforeDate,
   parseNpmLikeDependencies,
   parseNpmLikeError,
@@ -349,7 +350,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       listDependencies: parseBunDependencies,
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
-      getError: parseNpmLikeError,
+      getError: parseBunError,
     },
     isNotFound: isKnownNotFound,
   },
