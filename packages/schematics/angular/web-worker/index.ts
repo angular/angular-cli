@@ -37,12 +37,12 @@ function addSnippet(options: WebWorkerOptions): Rule {
       return;
     }
 
-    const fileRegExp = new RegExp(`^${options.name}.*\\.ts`);
+    const fileRegExp = new RegExp(`^${options.name}(?:\\..+)?\\.ts$`);
     const siblingModules = host
       .getDir(options.path)
       .subfiles // Find all files that start with the same name, are ts files,
-      // and aren't spec or module files.
-      .filter((f) => fileRegExp.test(f) && !/(module|spec|config|routes)\.ts$/.test(f))
+      // and aren't spec, module, declaration, or configuration files (including their server variants).
+      .filter((f) => fileRegExp.test(f) && !/\.(module|spec|config|routes|server|d)\.ts$/.test(f))
       // Sort alphabetically for consistency.
       .sort();
 
