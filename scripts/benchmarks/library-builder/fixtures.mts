@@ -271,7 +271,8 @@ export function generateFixture(outDir: string, options: FixtureOptions): number
         'utf8',
       ),
     ).version as string;
-    peerRange = `^${angularCoreVersion.replace(/\.\d+$/, '')}`;
+    const match = angularCoreVersion.match(/^(\d+\.\d+)/);
+    peerRange = match ? '^' + match[1] + '.0' : '^' + angularCoreVersion;
   } catch {
     // Ignore error, use fallback
   }

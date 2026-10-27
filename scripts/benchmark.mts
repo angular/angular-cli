@@ -85,10 +85,10 @@ async function runLibraryBuilderSubsystem(
   }
 
   const count = parseIntList(options.count);
-  if (count !== undefined && count.some((n) => !Number.isInteger(n) || n < 1)) {
+  if (count !== undefined && count.some((n) => !Number.isInteger(n) || n < 1 || n > 5000)) {
     // eslint-disable-next-line no-console
     console.error(
-      'Error: --count must be a comma-separated list of positive integers, got "' +
+      'Error: --count must be a comma-separated list of positive integers up to 5000, got "' +
         options.count +
         '".',
     );
@@ -97,10 +97,10 @@ async function runLibraryBuilderSubsystem(
   }
 
   const depth = parseIntList(options.depth);
-  if (depth !== undefined && depth.some((n) => !Number.isInteger(n) || n < 1)) {
+  if (depth !== undefined && depth.some((n) => !Number.isInteger(n) || n < 1 || n > 13)) {
     // eslint-disable-next-line no-console
     console.error(
-      'Error: --depth must be a comma-separated list of positive integers, got "' +
+      'Error: --depth must be a comma-separated list of positive integers up to 13, got "' +
         options.depth +
         '".',
     );

@@ -134,7 +134,7 @@ export function buildOnce(
   const result = spawnSync(process.execPath, [architectCli, 'lib:build'], {
     cwd: projectDir,
     stdio: 'pipe',
-    maxBuffer: Infinity,
+    maxBuffer: 128 * 1024 * 1024,
     env: { ...process.env, NODE_PATH: mergedNodePath },
   });
   const durationMs = performance.now() - start;
