@@ -9,6 +9,7 @@
 import { concat, lastValueFrom, map, mapTo, toArray } from 'rxjs';
 import { FileOperator, Rule, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
+import { DelegateTree } from '../tree/delegate';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import { ScopedTree } from '../tree/scoped';
@@ -74,6 +75,10 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return (tree: Tree) => {
+    if (tree instanceof DelegateTree) {
+      tree = tree.branch();
+    }
+
     if (HostTree.isHostTree(tree)) {
       return new FilterHostTree(tree, predicate);
     } else {

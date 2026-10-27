@@ -8,11 +8,12 @@
 
 import { Path, virtualFs } from '@angular-devkit/core';
 import { lastValueFrom, of as observableOf } from 'rxjs';
+import { UnitTestTree } from '../../testing';
 import { Rule, SchematicContext, Source } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';
 import { MergeStrategy, Tree } from '../tree/interface';
 import { empty } from '../tree/static';
-import { apply, applyToSubtree, chain, partitionApplyMerge } from './base';
+import { apply, applyToSubtree, chain, filter, partitionApplyMerge } from './base';
 import { callRule, callSource } from './call';
 import { move } from './move';
 
@@ -240,5 +241,39 @@ describe('applyToSubtree', () => {
     expect(result.exists('a/b/x/file1')).toBe(true);
     expect(result.exists('a/b/x/file2')).toBe(true);
     expect(result.exists('a/c/file3')).toBe(true);
+  });
+});
+
+describe('filter', () => {
+  it('works with a HostTree', async () => {
+    const tree = new HostTree();
+    tree.create('/file1.ts', '');
+    tree.create('/file2.js', '');
+
+    const result = await lastValueFrom(
+      callRule(
+        filter((path) => path.endsWith('.ts')),
+        observableOf(tree),
+        context,
+      ),
+    );
+    expect(result.exists('/file1.ts')).toBe(true);
+    expect(result.exists('/file2.js')).toBe(false);
+  });
+
+  it('works with a UnitTestTree', async () => {
+    const tree = new HostTree();
+    tree.create('/file1.ts', '');
+    tree.create('/file2.js', '');
+
+    const result = await lastValueFrom(
+      callRule(
+        filter((path) => path.endsWith('.ts')),
+        observableOf(new UnitTestTree(new UnitTestTree(tree))),
+        context,
+      ),
+    );
+    expect(result.exists('/file1.ts')).toBe(true);
+    expect(result.exists('/file2.js')).toBe(false);
   });
 });
