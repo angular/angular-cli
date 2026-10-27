@@ -75,15 +75,12 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return (tree: Tree) => {
-    // Trees such as `UnitTestTree` delegate to a `HostTree`, so filter the tree they wrap.
-    let hostTree = tree;
-    while (hostTree instanceof DelegateTree) {
-      // cast to allow access
-      hostTree = (hostTree as unknown as { _other: Tree })._other;
+    if (tree instanceof DelegateTree) {
+      tree = tree.branch();
     }
 
-    if (HostTree.isHostTree(hostTree)) {
-      return new FilterHostTree(hostTree, predicate);
+    if (HostTree.isHostTree(tree)) {
+      return new FilterHostTree(tree, predicate);
     } else {
       throw new SchematicsException('Tree type is not supported.');
     }
