@@ -210,6 +210,11 @@ const appShellSchematic: RuleFactory<AppShellOptions> = createProjectSchematic(
         module: 'app.module.server.ts',
         project: options.project,
         standalone: isStandalone,
+        // The `AppShell` import added above expects the default file path and a named export, so
+        // the component must not inherit a `type`, `flat` or `exportDefault` from the workspace.
+        type: '',
+        flat: false,
+        exportDefault: false,
       }),
     ]);
   },
