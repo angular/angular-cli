@@ -585,11 +585,11 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     for (const path in answers) {
       const pathFragments = path.split('/').slice(1);
 
-      CoreSchemaRegistry._set(data, pathFragments, answers[path], null, undefined, true);
+      await CoreSchemaRegistry._set(data, pathFragments, answers[path], null, undefined, true);
     }
   }
 
-  private static _set(
+  private static async _set(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     data: any,
     fragments: string[],
@@ -598,7 +598,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     parent: any = null,
     parentProperty?: string,
     force?: boolean,
-  ): void {
+  ): Promise<void> {
     for (let index = 0; index < fragments.length; index++) {
       const fragment = fragments[index];
       if (/^i\d+$/.test(fragment)) {
@@ -607,7 +607,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         }
 
         for (let dataIndex = 0; dataIndex < data.length; dataIndex++) {
-          CoreSchemaRegistry._set(
+          await CoreSchemaRegistry._set(
             data[dataIndex],
             fragments.slice(index + 1),
             value,
@@ -629,7 +629,12 @@ export class CoreSchemaRegistry implements SchemaRegistry {
     }
 
     if (parent && parentProperty && (force || parent[parentProperty] === undefined)) {
-      parent[parentProperty] = value;
+      let resolvedValue = typeof value === 'function' ? value() : value;
+      if (isObservable(resolvedValue)) {
+        resolvedValue = await lastValueFrom(resolvedValue);
+      }
+
+      parent[parentProperty] = resolvedValue;
     }
   }
 
@@ -644,12 +649,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
         continue;
       }
 
-      let value = source(schema);
-      if (isObservable(value)) {
-        value = (await lastValueFrom(value)) as {};
-      }
-
-      CoreSchemaRegistry._set(data, fragments, value);
+      await CoreSchemaRegistry._set(data, fragments, () => source(schema));
     }
   }
 
