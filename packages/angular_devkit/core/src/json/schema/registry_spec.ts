@@ -305,6 +305,29 @@ describe('CoreSchemaRegistry', () => {
     expect(data.obj.deep.arr).toEqual([1, 2, 3]);
   });
 
+  it('does not call smart default provider when value is already defined', async () => {
+    const registry = new CoreSchemaRegistry();
+    const provider = jasmine.createSpy('provider').and.returnValue('default-val');
+    registry.addSmartDefaultProvider('test', provider);
+
+    const validator = await registry.compile({
+      properties: {
+        prop: {
+          type: 'string',
+          $default: {
+            $source: 'test',
+          },
+        },
+      },
+    });
+
+    const data = { prop: 'explicit-val' };
+    const result = await validator(data);
+    expect(result.success).toBe(true);
+    expect(data.prop).toBe('explicit-val');
+    expect(provider).not.toHaveBeenCalled();
+  });
+
   it('works with true as a schema and post-transforms', async () => {
     const registry = new CoreSchemaRegistry();
     registry.addPostTransform(addUndefinedDefaults);
