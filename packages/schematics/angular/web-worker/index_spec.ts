@@ -96,8 +96,8 @@ describe('Web Worker Schematic', () => {
   });
 
   it('should add snippet to the component file and not a server configuration file', async () => {
-    const serverAppTree = await schematicRunner.runSchematic('server', { project: 'bar' }, appTree);
-    const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, serverAppTree);
+    appTree.create('/projects/bar/src/app/app.config.server.ts', 'export const config = {};\n');
+    const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
 
     const appComponent = tree.readContent('/projects/bar/src/app/app.ts');
     expect(appComponent).toContain(`new Worker(new URL('./${defaultOptions.name}.worker`);
@@ -113,6 +113,16 @@ describe('Web Worker Schematic', () => {
 
     const content = tree.readContent('/projects/bar/src/app/observer.ts');
     expect(content).toContain(`new Worker(new URL('./observer.worker`);
+  });
+
+  it('should not add snippet to a file whose name only starts with the worker name', async () => {
+    appTree.create('/projects/bar/src/app/app-header.ts', 'export class AppHeader {}\n');
+    const tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+
+    expect(tree.readContent('/projects/bar/src/app/app-header.ts')).not.toContain('new Worker');
+    expect(tree.readContent('/projects/bar/src/app/app.ts')).toContain(
+      `new Worker(new URL('./${defaultOptions.name}.worker`,
+    );
   });
 
   it('should not add snippet to a declaration file', async () => {
