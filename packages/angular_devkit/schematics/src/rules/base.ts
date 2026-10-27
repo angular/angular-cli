@@ -9,6 +9,7 @@
 import { concat, lastValueFrom, map, mapTo, toArray } from 'rxjs';
 import { FileOperator, Rule, Source } from '../engine/interface';
 import { SchematicsException } from '../exception/exception';
+import { DelegateTree } from '../tree/delegate';
 import { FilterHostTree, HostTree } from '../tree/host-tree';
 import { FileEntry, FilePredicate, MergeStrategy, Tree } from '../tree/interface';
 import { ScopedTree } from '../tree/scoped';
@@ -74,8 +75,15 @@ export function noop(): Rule {
 
 export function filter(predicate: FilePredicate<boolean>): Rule {
   return (tree: Tree) => {
-    if (HostTree.isHostTree(tree)) {
-      return new FilterHostTree(tree, predicate);
+    // Trees such as `UnitTestTree` delegate to a `HostTree`, so filter the tree they wrap.
+    let hostTree = tree;
+    while (hostTree instanceof DelegateTree) {
+      // cast to allow access
+      hostTree = (hostTree as unknown as { _other: Tree })._other;
+    }
+
+    if (HostTree.isHostTree(hostTree)) {
+      return new FilterHostTree(hostTree, predicate);
     } else {
       throw new SchematicsException('Tree type is not supported.');
     }
