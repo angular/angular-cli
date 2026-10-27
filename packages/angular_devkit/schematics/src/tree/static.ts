@@ -7,6 +7,7 @@
  */
 
 import { SchematicsException } from '../exception/exception';
+import { DelegateTree } from './delegate';
 import { FilterHostTree, HostTree } from './host-tree';
 import { FilePredicate, MergeStrategy, Tree } from './interface';
 
@@ -29,6 +30,10 @@ export function merge(
 }
 
 export function partition(tree: Tree, predicate: FilePredicate<boolean>): [Tree, Tree] {
+  if (tree instanceof DelegateTree) {
+    tree = tree.branch();
+  }
+
   if (tree instanceof HostTree) {
     return [
       new FilterHostTree(tree, predicate),

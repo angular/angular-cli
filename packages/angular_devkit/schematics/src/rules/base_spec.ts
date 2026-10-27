@@ -226,6 +226,32 @@ describe('partitionApplyMerge', () => {
     expect(result.exists('/test1')).toBe(false);
     expect(result.exists('/test2')).toBe(false);
   });
+
+  it('works with a UnitTestTree', async () => {
+    const tree = new HostTree();
+    tree.create('/test1', '');
+    tree.create('/test2', '');
+    const predicate = (path: Path) => path.indexOf('1') != -1;
+
+    const ruleYes: Rule = (tree: Tree) => {
+      expect(tree.exists('/test1')).toBe(true);
+      expect(tree.exists('/test2')).toBe(false);
+    };
+    const ruleNo: Rule = (tree: Tree) => {
+      expect(tree.exists('/test1')).toBe(false);
+      expect(tree.exists('/test2')).toBe(true);
+    };
+
+    const result = await lastValueFrom(
+      callRule(
+        partitionApplyMerge(predicate, ruleYes, ruleNo),
+        observableOf(new UnitTestTree(new UnitTestTree(tree))),
+        context,
+      ),
+    );
+    expect(result.exists('/test1')).toBe(true);
+    expect(result.exists('/test2')).toBe(true);
+  });
 });
 
 describe('applyToSubtree', () => {
