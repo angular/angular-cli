@@ -638,7 +638,21 @@ export function createCompilerPlugin(
             // mitigating significant performance overhead for large apps.
             // See: https://bugs.chromium.org/p/v8/issues/detail?id=11536
             Object.assign(result.metafile.inputs, metafile.inputs);
-            Object.assign(result.metafile.outputs, metafile.outputs);
+            for (const [outputPath, output] of Object.entries(metafile.outputs)) {
+              // Two stylesheets can bundle to the same output file. Clone the inputs on first
+              // insert so colliding inputs can be unioned in place with Object.assign, keeping
+              // every input attributed without per-collision spread allocations and leaving the
+              // cached `additionalResults` metafile untouched.
+              const existing = result.metafile.outputs[outputPath];
+              if (existing) {
+                Object.assign(existing.inputs, output.inputs);
+              } else {
+                result.metafile.outputs[outputPath] = {
+                  ...output,
+                  inputs: { ...output.inputs },
+                };
+              }
+            }
           }
         }
 
