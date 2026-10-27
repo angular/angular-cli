@@ -81,6 +81,7 @@ export class BundlerContext {
   #optionsFactory: BundlerOptionsFactory<BuildOptions & { metafile: true; write: false }>;
   #shouldCacheResult: boolean;
   #loadCache?: LoadResultCache;
+  #loadCacheKeys?: Set<string>;
   #invalidationEpoch = 0;
   readonly watchFiles = new Set<string>();
 
@@ -222,16 +223,34 @@ export class BundlerContext {
 
   // eslint-disable-next-line max-lines-per-function
   async #performBundle(): Promise<BundleContextResult> {
+    this.#loadCacheKeys?.clear();
+
     // Create esbuild options if not present
     if (this.#esbuildOptions === undefined) {
       if (this.incremental && !this.#loadCache) {
         this.#loadCache = new MemoryLoadResultCache();
       }
-      this.#esbuildOptions = this.#optionsFactory(this.#loadCache);
-    }
+      const loadCache = this.#loadCache;
+      const scopedLoadCache: LoadResultCache | undefined =
+        this.incremental && loadCache
+          ? {
+              get: (path) => {
+                (this.#loadCacheKeys ??= new Set()).add(path);
 
-    if (this.incremental) {
-      this.watchFiles.clear();
+                return loadCache.get(path);
+              },
+              put: (path, result) => {
+                (this.#loadCacheKeys ??= new Set()).add(path);
+
+                return loadCache.put(path, result);
+              },
+              invalidate: (path) => loadCache.invalidate(path),
+              get watchFiles() {
+                return loadCache.watchFiles;
+              },
+            }
+          : loadCache;
+      this.#esbuildOptions = this.#optionsFactory(scopedLoadCache);
     }
 
     let result: BuildResult<{ metafile: true; write: false }>;
@@ -263,7 +282,7 @@ export class BundlerContext {
       // Build failures will throw an exception which contains errors/warnings
       if (isEsBuildFailure(failure)) {
         this.#addErrorsToWatch(failure);
-        this.#addLoadCacheFilesToWatch();
+        await this.#addLoadCacheFilesToWatch();
 
         return failure;
       } else {
@@ -275,6 +294,8 @@ export class BundlerContext {
     // While this should technically not be linked to incremental mode, incremental is only
     // currently enabled with watch mode where watch files are needed.
     if (this.incremental) {
+      this.watchFiles.clear();
+
       // Add input files except virtual angular files which do not exist on disk
       for (const input of Object.keys(result.metafile.inputs)) {
         const isInternal = isInternalAngularFile(input) || isInternalBundlerFile(input);
@@ -309,7 +330,7 @@ export class BundlerContext {
     // Return if the build encountered any errors
     if (result.errors.length) {
       this.#addErrorsToWatch(result);
-      this.#addLoadCacheFilesToWatch();
+      await this.#addLoadCacheFilesToWatch();
 
       return {
         errors: result.errors,
@@ -425,12 +446,26 @@ export class BundlerContext {
   }
 
   #addErrorsToWatch(result: BuildFailure | BuildResult): void {
+    const entryPoints = this.#esbuildOptions?.entryPoints;
+    if (entryPoints) {
+      const entries = Array.isArray(entryPoints)
+        ? entryPoints.map((entry) => (typeof entry === 'string' ? entry : entry.in))
+        : Object.values(entryPoints);
+      for (const entry of entries) {
+        if (isInternalAngularFile(entry) || isInternalBundlerFile(entry)) {
+          continue;
+        }
+
+        this.watchFiles.add(isAbsolute(entry) ? normalize(entry) : join(this.workspaceRoot, entry));
+      }
+    }
+
     for (const error of result.errors) {
       let file = error.location?.file;
       if (file && !isInternalAngularFile(file)) {
         this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
       }
-      for (const note of error.notes) {
+      for (const note of error.notes ?? []) {
         file = note.location?.file;
         if (file && !isInternalAngularFile(file)) {
           this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
@@ -439,12 +474,24 @@ export class BundlerContext {
     }
   }
 
-  #addLoadCacheFilesToWatch(): void {
-    if (this.incremental && this.#loadCache) {
-      for (const file of this.#loadCache.watchFiles) {
-        if (!isInternalAngularFile(file)) {
-          this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
+  async #addLoadCacheFilesToWatch(): Promise<void> {
+    const loadCache = this.#loadCache;
+    if (!this.incremental || !loadCache || !this.#loadCacheKeys) {
+      return;
+    }
+
+    const results = await Promise.all(Array.from(this.#loadCacheKeys, (key) => loadCache.get(key)));
+    for (const cachedResult of results) {
+      if (!cachedResult?.watchFiles) {
+        continue;
+      }
+
+      for (const file of cachedResult.watchFiles) {
+        if (isInternalAngularFile(file)) {
+          continue;
         }
+
+        this.watchFiles.add(isAbsolute(file) ? normalize(file) : join(this.workspaceRoot, file));
       }
     }
   }
@@ -499,30 +546,13 @@ export class BundlerContext {
       candidateFiles = normalizedFiles;
     }
 
-    let invalid = false;
-    for (const file of candidateFiles) {
-      if (this.#loadCache?.invalidate(file)) {
-        invalid = true;
+    if (this.#loadCache) {
+      for (const file of candidateFiles) {
+        this.#loadCache.invalidate(file);
       }
     }
 
-    if (!invalid) {
-      if (this.watchFiles.size < candidateFiles.size) {
-        for (const file of this.watchFiles) {
-          if (candidateFiles.has(file)) {
-            invalid = true;
-            break;
-          }
-        }
-      } else {
-        for (const file of candidateFiles) {
-          if (this.watchFiles.has(file)) {
-            invalid = true;
-            break;
-          }
-        }
-      }
-    }
+    const invalid = !this.watchFiles.isDisjointFrom(candidateFiles);
 
     if (invalid) {
       this.#invalidationEpoch++;
@@ -544,6 +574,7 @@ export class BundlerContext {
       this.#esbuildResult = undefined;
       this.#activeBundlePromise = undefined;
       this.#loadCache = undefined;
+      this.#loadCacheKeys = undefined;
       await this.#esbuildContext?.dispose();
     } finally {
       this.#esbuildContext = undefined;
