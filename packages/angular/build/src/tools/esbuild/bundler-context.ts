@@ -223,6 +223,8 @@ export class BundlerContext {
 
   // eslint-disable-next-line max-lines-per-function
   async #performBundle(): Promise<BundleContextResult> {
+    this.#loadCacheKeys?.clear();
+
     // Create esbuild options if not present
     if (this.#esbuildOptions === undefined) {
       if (this.incremental && !this.#loadCache) {

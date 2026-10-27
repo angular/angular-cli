@@ -7,7 +7,7 @@
  */
 
 import assert from 'node:assert';
-import { mkdtemp, writeFile } from 'node:fs/promises';
+import { mkdtemp, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { BundlerContext } from './bundler-context';
 import { MemoryLoadResultCache, createCachedLoad } from './load-result-cache';
@@ -125,9 +125,7 @@ describe('BundlerContext', () => {
                   build.onLoad(
                     { filter: /\.css$/ },
                     createCachedLoad(loadCache, async (args) => ({
-                      contents: await import('node:fs/promises').then((f) =>
-                        f.readFile(args.path, 'utf8'),
-                      ),
+                      contents: await readFile(args.path, 'utf8'),
                       loader: 'css',
                       watchFiles: [args.path],
                     })),
