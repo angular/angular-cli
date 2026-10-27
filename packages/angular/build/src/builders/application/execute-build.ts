@@ -7,6 +7,7 @@
  */
 
 import { BuilderContext } from '@angular-devkit/architect';
+import type { Metafile } from 'esbuild';
 import { createAngularCompilation } from '../../tools/angular/compilation';
 import {
   AngularCompilationContext,
@@ -43,6 +44,42 @@ import { createComponentStyleBundler, setupBundlerContexts } from './setup-bundl
 /** The esbuild error text prefix used to detect top-level await errors. */
 const TOP_LEVEL_AWAIT_ERROR_TEXT =
   'Top-level await is not available in the configured target environment';
+
+/** Returns a shallow copy of a record with its keys sorted. */
+function sortObjectKeys<T extends Record<string, unknown>>(value: T): T {
+  const sorted: Record<string, unknown> = {};
+  for (const key of Object.keys(value).sort()) {
+    sorted[key] = value[key];
+  }
+
+  return sorted as T;
+}
+
+/**
+ * Serializes a metafile with its dynamic path keys sorted so the stats file is identical across
+ * builds. Only `inputs`, `outputs`, and each output's `inputs` have dynamic keys; the remaining
+ * fixed-schema objects are left untouched so V8 keeps its native `JSON.stringify` fast path.
+ */
+function stableStringify(metafile: Metafile): string {
+  const outputs: Metafile['outputs'] = {};
+  for (const key of Object.keys(metafile.outputs).sort()) {
+    const output = metafile.outputs[key];
+    outputs[key] = {
+      ...output,
+      inputs: sortObjectKeys(output.inputs),
+    };
+  }
+
+  return JSON.stringify(
+    {
+      inputs: sortObjectKeys(metafile.inputs),
+      outputs,
+    },
+    null,
+    2,
+  );
+}
+
 // eslint-disable-next-line max-lines-per-function
 export async function executeBuild(
   options: NormalizedApplicationBuildOptions,
@@ -394,14 +431,14 @@ export async function executeBuild(
     if (options.stats) {
       executionResult.addOutputFile(
         'browser-stats.json',
-        JSON.stringify(browserMetafile, null, 2),
+        stableStringify(browserMetafile),
         BuildOutputFileType.Root,
       );
 
       if (serverEntryPoint) {
         executionResult.addOutputFile(
           'server-stats.json',
-          JSON.stringify(serverMetafile, null, 2),
+          stableStringify(serverMetafile),
           BuildOutputFileType.Root,
         );
       }
