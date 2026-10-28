@@ -95,6 +95,19 @@ function isChainedWithAnd(node: ts.Node): boolean {
   return false;
 }
 
+function isSpyCreation(node: ts.Expression): boolean {
+  const expression = unwrapExpression(node);
+  if (!ts.isCallExpression(expression)) {
+    return false;
+  }
+
+  if (ts.isIdentifier(expression.expression)) {
+    return expression.expression.text === 'spyOn' || expression.expression.text === 'spyOnProperty';
+  }
+
+  return isJasmineCallExpression(expression, 'createSpy');
+}
+
 function transformPrimarySpy(node: ts.CallExpression, refactorCtx: RefactorContext): ts.Node {
   const { sourceFile, reporter, pendingVitestValueImports } = refactorCtx;
   if (
@@ -224,7 +237,7 @@ function transformSpyStrategy(node: ts.CallExpression, refactorCtx: RefactorCont
           newMethodName = 'mockImplementation';
           break;
         case 'callThrough':
-          if (!ts.isCallExpression(unwrapExpression(spyCall))) {
+          if (!isSpyCreation(spyCall)) {
             // On an existing spy, `.and.callThrough()` restores the original implementation,
             // so it is not redundant and cannot be dropped.
             const category = 'callThrough-on-existing-spy';
