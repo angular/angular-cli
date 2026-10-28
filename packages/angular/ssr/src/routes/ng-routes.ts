@@ -92,6 +92,14 @@ const URL_PARAMETER_REGEXP = /(?<!\\):([^/]+)/;
 const URL_PARAMETER_GLOBAL_REGEXP = new RegExp(URL_PARAMETER_REGEXP, 'g');
 
 /**
+ * Characters that cannot appear in a percent-decoded path segment: path separators (`\` is one in
+ * `http:` URLs), query and fragment delimiters, matrix parameters, route tree wildcards, `%` (route
+ * segments are decoded again when the route tree is restored) and control characters.
+ */
+// eslint-disable-next-line no-control-regex
+const INVALID_PATH_SEGMENT_CHARS_REGEXP = /[/\\?#;*%\x00-\x1f\x7f]/;
+
+/**
  * Additional metadata for a server configuration route tree.
  */
 type ServerConfigRouteTreeAdditionalMetadata = Partial<ServerRoute> & {
@@ -580,15 +588,14 @@ function handlePrerenderParamsReplacement(
       );
     }
 
-    // Route segments are percent-decoded when they are added to the route tree.
-    const segments = parameterName === '**' ? value.split('/').filter(Boolean) : [value];
-    if (!segments.every((segment) => isPathSegment(decodeURIComponent(segment)))) {
+    const segments = parameterName === '**' ? (value ? value.split('/') : []) : [value];
+    if (!segments.every(isPathSegment)) {
       throw new Error(
         `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
           `returned an invalid value '${value}' for parameter '${parameterName}'. ` +
-          `Parameter values must be non-empty path segments other than '.' and '..', and cannot contain ` +
-          `'/' or '\\', even when percent-encoded. ` +
-          `Only '**' values can be empty or use '/' to separate segments.`,
+          `Parameter values must be non-empty path segments other than '.' and '..'. Once ` +
+          `percent-decoded, they cannot start with ':' or contain '/', '\\', '?', '#', ';', '*', '%' ` +
+          `or control characters. Only '**' values can be empty or use '/' to separate segments.`,
       );
     }
 
@@ -599,18 +606,24 @@ function handlePrerenderParamsReplacement(
 /**
  * Checks whether a value is a single, non-empty path segment.
  *
- * The value cannot contain `/`, and the URL parser must keep it as one segment, which rules out `\`
- * (a path separator in `http:` URLs), `.`, `..` and values made only of tabs or newlines. The `/`
- * check is still needed because the URL parser resolves a value such as `../a` to one segment.
- *
- * @param value - The value to check.
+ * @param segment - The percent-encoded segment to check.
  * @returns `true` if the value is a single, non-empty path segment.
  */
-function isPathSegment(value: string): boolean {
-  const url = new URL('http://localhost');
-  url.pathname = `/${value}`;
+function isPathSegment(segment: string): boolean {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(segment);
+  } catch {
+    return false;
+  }
 
-  return !value.includes('/') && url.pathname.length > 1 && url.pathname.indexOf('/', 1) === -1;
+  return (
+    decoded.length > 0 &&
+    decoded !== '.' &&
+    decoded !== '..' &&
+    decoded[0] !== ':' &&
+    !INVALID_PATH_SEGMENT_CHARS_REGEXP.test(decoded)
+  );
 }
 
 /**

@@ -523,107 +523,73 @@ describe('extractRoutesAndCreateRouteTree', () => {
     });
 
     it('should error when a parameter value is not a valid path segment', async () => {
+      const invalidValues: [path: string, value: string][] = [
+        ['slash/:id', 'a/b'],
+        ['encoded-slash/:id', 'a%2Fb'],
+        ['backslash/:id', '\\..\\evil.test'],
+        ['encoded-backslash/:id', '%5Cevil.test'],
+        ['double-encoded-backslash/:id', '%255Cevil.test'],
+        ['malformed/:id', '50%-off'],
+        ['dot/:id', '.'],
+        ['dot-dot/:id', '..'],
+        ['query/:id', '..?'],
+        ['fragment/:id', 'a#b'],
+        ['matrix-param/:id', 'a;b'],
+        ['wildcard/:id', '*'],
+        ['param/:id', ':id'],
+        ['empty/:id', ''],
+        ['empty-segment/**', '//evil.test'],
+        ['tab/**', 'a/\t/b'],
+      ];
       setAngularAppTestingManifest(
-        [
-          { path: 'slash/:id', component: DummyComponent },
-          { path: 'encoded-slash/:id', component: DummyComponent },
-          { path: 'backslash/:id', component: DummyComponent },
-          { path: 'encoded-backslash/:id', component: DummyComponent },
-          { path: 'dot-segment/:id', component: DummyComponent },
-          { path: 'traversal/:id', component: DummyComponent },
-          { path: 'empty/:id', component: DummyComponent },
-          { path: 'tab/**', component: DummyComponent },
-        ],
-        [
-          {
-            path: 'slash/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: 'a/b' }];
-            },
+        invalidValues.map(([path]) => ({ path, component: DummyComponent })),
+        invalidValues.map(([path, value]) => ({
+          path,
+          renderMode: RenderMode.Prerender,
+          async getPrerenderParams() {
+            return [{ [path.endsWith('**') ? '**' : 'id']: value }];
           },
-          {
-            path: 'encoded-slash/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: 'a%2Fb' }];
-            },
-          },
-          {
-            path: 'backslash/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: '\\evil.test' }];
-            },
-          },
-          {
-            path: 'encoded-backslash/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: '%5Cevil.test' }];
-            },
-          },
-          {
-            path: 'dot-segment/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: '..' }];
-            },
-          },
-          {
-            path: 'traversal/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: '../a' }];
-            },
-          },
-          {
-            path: 'empty/:id',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ id: '' }];
-            },
-          },
-          {
-            path: 'tab/**',
-            renderMode: RenderMode.Prerender,
-            async getPrerenderParams() {
-              return [{ '**': 'a/\t/b' }];
-            },
-          },
-        ],
+        })),
       );
 
       const { errors } = await extractRoutesAndCreateRouteTree({
         url,
         invokeGetPrerenderParams: true,
       });
-      expect(errors).toEqual([
-        jasmine.stringContaining(`'slash/:id' route returned an invalid value 'a/b'`),
-        jasmine.stringContaining(`'encoded-slash/:id' route returned an invalid value 'a%2Fb'`),
-        jasmine.stringContaining(`'backslash/:id' route returned an invalid value '\\evil.test'`),
-        jasmine.stringContaining(
-          `'encoded-backslash/:id' route returned an invalid value '%5Cevil.test'`,
+      expect(errors).toEqual(
+        invalidValues.map(([path, value]) =>
+          jasmine.stringContaining(`'${path}' route returned an invalid value '${value}'`),
         ),
-        jasmine.stringContaining(`'dot-segment/:id' route returned an invalid value '..'`),
-        jasmine.stringContaining(`'traversal/:id' route returned an invalid value '../a'`),
-        jasmine.stringContaining(`'empty/:id' route returned an invalid value ''`),
-        jasmine.stringContaining(
-          `'tab/**' route returned an invalid value 'a/\t/b' for parameter '**'.`,
-        ),
-      ]);
+      );
     });
 
     it('should not error when a parameter value contains characters allowed in a path segment', async () => {
       setAngularAppTestingManifest(
-        [{ path: 'user/:id', component: DummyComponent }],
+        [
+          { path: 'user/:id', component: DummyComponent },
+          { path: 'docs/**', component: DummyComponent },
+        ],
         [
           {
             path: 'user/:id',
             renderMode: RenderMode.Prerender,
             fallback: PrerenderFallback.None,
             async getPrerenderParams() {
-              return [{ id: "customer's-choice" }, { id: 'café' }, { id: 'a b' }];
+              return [
+                { id: "customer's-choice" },
+                { id: 'café' },
+                { id: 'a b' },
+                { id: 'a%20c' },
+                { id: 'a:b' },
+              ];
+            },
+          },
+          {
+            path: 'docs/**',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ '**': '' }, { '**': 'a/b' }];
             },
           },
         ],
@@ -638,6 +604,10 @@ describe('extractRoutesAndCreateRouteTree', () => {
         { route: "/user/customer's-choice", renderMode: RenderMode.Prerender },
         { route: '/user/café', renderMode: RenderMode.Prerender },
         { route: '/user/a b', renderMode: RenderMode.Prerender },
+        { route: '/user/a c', renderMode: RenderMode.Prerender },
+        { route: '/user/a:b', renderMode: RenderMode.Prerender },
+        { route: '/docs', renderMode: RenderMode.Prerender },
+        { route: '/docs/a/b', renderMode: RenderMode.Prerender },
       ]);
     });
   });
