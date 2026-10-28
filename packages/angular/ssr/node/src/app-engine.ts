@@ -59,6 +59,9 @@ export class AngularNodeAppEngine {
    * @param requestContext - Optional context for rendering, such as metadata associated with the request.
    * @returns A promise that resolves to the resulting HTTP response object, or `null` if no matching Angular route is found.
    *
+   * @throws {DOMException} With name `'AbortError'` if the request is aborted before rendering completes.
+   * When aborted, the underlying Angular platform is also destroyed to stop any in-progress rendering.
+   *
    * @remarks A request to `https://www.example.com/page/index.html` will serve or render the Angular route
    * corresponding to `https://www.example.com/page`.
    *

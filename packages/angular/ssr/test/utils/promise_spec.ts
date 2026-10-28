@@ -33,4 +33,27 @@ describe('promiseWithAbort', () => {
 
     await expectAsync(promise).toBeResolved();
   });
+
+  it('should reject with an AbortError and handle subsequent promise rejection when signal is already aborted', async () => {
+    const onUnhandledRejection = jasmine.createSpy('unhandledRejection');
+    process.on('unhandledRejection', onUnhandledRejection);
+
+    try {
+      const abortController = new AbortController();
+      abortController.abort('Already aborted');
+
+      const { promise: underlyingPromise, reject } = Promise.withResolvers<void>();
+      const promise = promiseWithAbort(underlyingPromise, abortController.signal, 'Test operation');
+
+      await expectAsync(promise).toBeRejectedWithError(DOMException, /Test operation was aborted/);
+
+      // Rejecting the underlying promise after abort should not cause an unhandled rejection
+      reject(new Error('Late failure'));
+      await setTimeout(0);
+
+      expect(onUnhandledRejection).not.toHaveBeenCalled();
+    } finally {
+      process.off('unhandledRejection', onUnhandledRejection);
+    }
+  });
 });

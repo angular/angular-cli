@@ -47,10 +47,12 @@ export type AngularBootstrap =
  * @param url - The application URL, used for route-based rendering in SSR.
  * @param platformProviders - An array of platform providers for the rendering process.
  * @param serverContext - A string representing the server context, providing additional metadata for SSR.
+ * @param signal - An optional `AbortSignal` to abort the rendering process and destroy the platform.
  * @returns A promise resolving to an object containing:
- *          - `hasNavigationError`: Indicates if a navigation error occurred.
+ *          - `hasNavigationError`: Indicates if a navigation error occurred or if rendering was aborted/destroyed before stability.
  *          - `redirectTo`: (Optional) The redirect URL if a navigation redirect occurred.
- *          - `content`: A function returning a promise that resolves to the rendered HTML string.
+ *          - `content`: (Optional) A function returning a promise that resolves to the rendered HTML string.
+ *          - `destroy`: (Optional) A function to destroy the underlying Angular platform.
  */
 export async function renderAngular(
   html: string,
@@ -58,15 +60,20 @@ export async function renderAngular(
   url: URL,
   platformProviders: StaticProvider[],
   serverContext: string,
+  signal?: AbortSignal,
 ): Promise<
   | { hasNavigationError: true }
   | {
       hasNavigationError: boolean;
       redirectTo?: string;
       content: () => Promise<string>;
-      destroy: () => void;
+      destroy: () => Promise<void>;
     }
 > {
+  if (signal?.aborted) {
+    return { hasNavigationError: true };
+  }
+
   // A request to `http://www.example.com/page/index.html` will render the Angular route corresponding to `http://www.example.com/page`.
   const urlToRender = stripIndexHtmlFromURL(url);
   const platformRef = platformServer([
@@ -94,14 +101,46 @@ export async function renderAngular(
 
   let redirectTo: string | undefined;
   let hasNavigationError = true;
+  let renderTimeoutId: ReturnType<typeof setTimeout> | undefined;
+  let destroyPromise: Promise<void> | undefined;
+  let rejectContent: ((reason?: unknown) => void) | undefined;
+
+  const destroy = (): Promise<void> => {
+    rejectContent?.(
+      new DOMException(
+        `Request for: ${url} was aborted.${signal?.reason ? `\n${signal.reason}` : ''}`,
+        'AbortError',
+      ),
+    );
+    rejectContent = undefined;
+
+    if (!destroyPromise) {
+      clearTimeout(renderTimeoutId);
+      signal?.removeEventListener('abort', abortHandler);
+      destroyPromise = asyncDestroyPlatform(platformRef);
+    }
+
+    return destroyPromise;
+  };
+
+  const abortHandler = () => void destroy();
 
   try {
+    signal?.addEventListener('abort', abortHandler, { once: true });
+
     let applicationRef: ApplicationRef;
     if (isNgModule(bootstrap)) {
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
+      if (platformRef.destroyed || signal?.aborted) {
+        return { hasNavigationError: true };
+      }
+
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
       applicationRef = await bootstrap({ platformRef });
+      if (platformRef.destroyed || signal?.aborted) {
+        return { hasNavigationError: true };
+      }
     }
 
     // Block until application is stable.
@@ -110,7 +149,7 @@ export async function renderAngular(
     // This code protect against app destruction during bootstrapping which is a
     // valid case. We should not assume the `applicationRef` is not in destroyed state.
     // Calling `envInjector.get` would throw `NG0205: Injector has already been destroyed`.
-    if (applicationRef.destroyed) {
+    if (applicationRef.destroyed || signal?.aborted) {
       return { hasNavigationError: true };
     }
 
@@ -123,8 +162,6 @@ export async function renderAngular(
     if (!routerIsProvided) {
       hasNavigationError = false;
     } else if (lastSuccessfulNavigation?.finalUrl) {
-      hasNavigationError = false;
-
       const requestPrefix =
         envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
         getFirstHeaderValue(
@@ -138,30 +175,39 @@ export async function renderAngular(
       if (urlToRenderString !== finalUrl) {
         redirectTo = [pathname, search, hash].join('');
       }
+
+      hasNavigationError = false;
     }
 
     return {
-      destroy: () => void asyncDestroyPlatform(platformRef),
+      destroy,
       hasNavigationError,
       redirectTo,
       content: () =>
         new Promise<string>((resolve, reject) => {
+          rejectContent = reject;
+
           // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
-          setTimeout(() => {
+          renderTimeoutId = setTimeout(() => {
+            if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
+              void destroy();
+
+              return;
+            }
+
             renderInternal(platformRef, applicationRef)
               .then(resolve)
               .catch(reject)
-              .finally(() => void asyncDestroyPlatform(platformRef));
+              .finally(() => {
+                rejectContent = undefined;
+                void destroy();
+              });
           }, 0);
         }),
     };
-  } catch (error) {
-    await asyncDestroyPlatform(platformRef);
-
-    throw error;
   } finally {
     if (hasNavigationError || redirectTo) {
-      void asyncDestroyPlatform(platformRef);
+      void destroy();
     }
   }
 }
