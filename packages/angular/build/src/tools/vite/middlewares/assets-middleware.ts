@@ -50,7 +50,7 @@ export function createAngularAssetsMiddleware(
       // This is a workaround to serve extensionless, CSS, JS and TS files without Vite transformations.
       if (!extension || JS_TS_REGEXP.test(extension) || CSS_PREPROCESSOR_REGEXP.test(extension)) {
         const contents = readFileSync(asset.source);
-        const etag = `W/${calculateHash(contents)}`;
+        const etag = `W/"${calculateHash(contents)}"`;
         if (checkAndHandleEtag(req, res, etag)) {
           return;
         }
@@ -238,7 +238,7 @@ export function createBuildAssetsMiddleware(
         const contents =
           outputFile.origin === 'memory' ? outputFile.contents : readHandler(outputFile.source);
 
-        const etag = `W/${calculateHash(contents)}`;
+        const etag = `W/"${calculateHash(contents)}"`;
         if (checkAndHandleEtag(req, res, etag)) {
           return;
         }

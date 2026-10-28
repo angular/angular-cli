@@ -39,6 +39,7 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(await response?.text()).toContain(javascriptFileContent);
+      expect(response?.headers.get('ETag')).toMatch(/^W\/"[^"]+"$/);
     });
 
     it('serves a project JavaScript asset unmodified', async () => {
