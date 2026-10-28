@@ -314,7 +314,7 @@ function* emitOutputResults(
   }
 
   // Initially assume all previous assets files have been removed
-  const removedAssetFiles = new Map(previousAssetsInfo);
+  const removedAssetFiles = new Set(previousAssetsInfo);
   for (const { source, destination } of assetFiles) {
     removedAssetFiles.delete(destination);
 
@@ -353,7 +353,7 @@ function* emitOutputResults(
       path,
       type,
     })),
-    ...Array.from(removedAssetFiles.keys(), (path) => ({
+    ...Array.from(removedAssetFiles, (path) => ({
       path,
       type: BuildOutputFileType.Browser,
     })),
