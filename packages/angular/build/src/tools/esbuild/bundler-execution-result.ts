@@ -31,7 +31,7 @@ export interface RebuildState {
     string,
     { hash: string; type: BuildOutputFileType; path: string }
   >;
-  previousAssetsInfo: ReadonlyMap<string, string>;
+  previousAssetsInfo: ReadonlySet<string>;
   templateUpdates?: Map<string, string>;
 }
 
@@ -176,9 +176,8 @@ export class ExecutionResult {
       previousOutputInfo: new Map(
         this.outputFiles.map(({ path, hash, type }) => [`${type}:${path}`, { hash, type, path }]),
       ),
-      previousAssetsInfo: new Map(
-        this.assetFiles.map(({ source, destination }) => [source, destination]),
-      ),
+      // Tracked by destination since one source can be copied to several outputs (e.g. per locale).
+      previousAssetsInfo: new Set(this.assetFiles.map(({ destination }) => destination)),
       templateUpdates: this.templateUpdates,
     };
   }
