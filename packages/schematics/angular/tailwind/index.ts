@@ -95,7 +95,7 @@ function addTailwindStyles(options: { project: string }, project: ProjectDefinit
 
 function managePostCssConfiguration(project: ProjectDefinition): Rule {
   return async (tree) => {
-    const searchPaths = Array.from(new Set([join('/', project.root), '/']));
+    const searchPaths = [project.root, '/']; // Project root and workspace root
 
     for (const path of searchPaths) {
       for (const configFile of POSTCSS_CONFIG_FILES) {
