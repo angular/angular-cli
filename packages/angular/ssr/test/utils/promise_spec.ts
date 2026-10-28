@@ -33,4 +33,20 @@ describe('promiseWithAbort', () => {
 
     await expectAsync(promise).toBeResolved();
   });
+
+  it('should reject with an AbortError and handle subsequent promise rejection when signal is already aborted', async () => {
+    const abortController = new AbortController();
+    abortController.abort('Already aborted');
+
+    let reject!: (reason?: unknown) => void;
+    const underlyingPromise = new Promise<void>((_, r) => {
+      reject = r;
+    });
+    const promise = promiseWithAbort(underlyingPromise, abortController.signal, 'Test operation');
+
+    await expectAsync(promise).toBeRejectedWithError(DOMException, /Test operation was aborted/);
+
+    // Rejecting the underlying promise after abort should not cause an unhandled rejection
+    reject(new Error('Late failure'));
+  });
 });

@@ -17,7 +17,7 @@
  * @returns A promise that either resolves with the value of the provided `promise` or rejects with
  *          an `AbortError` if the `AbortSignal` is triggered.
  *
- * @throws {AbortError} If the `AbortSignal` is triggered before the `promise` resolves.
+ * @throws {DOMException} With name `'AbortError'` if the `AbortSignal` is triggered before the `promise` resolves.
  */
 export function promiseWithAbort<T>(
   promise: Promise<T>,
@@ -34,11 +34,9 @@ export function promiseWithAbort<T>(
     // Check for abort signal
     if (signal.aborted) {
       abortHandler();
-
-      return;
+    } else {
+      signal.addEventListener('abort', abortHandler, { once: true });
     }
-
-    signal.addEventListener('abort', abortHandler, { once: true });
 
     promise
       .then(resolve)

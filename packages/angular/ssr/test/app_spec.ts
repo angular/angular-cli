@@ -12,7 +12,15 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { APP_BASE_HREF } from '@angular/common';
-import { Component, PlatformRef, REQUEST, RESPONSE_INIT, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  PendingTasks,
+  PlatformRef,
+  REQUEST,
+  RESPONSE_INIT,
+  inject,
+} from '@angular/core';
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { setTimeout } from 'node:timers/promises';
 import { AngularServerApp } from '../src/app';
@@ -21,6 +29,7 @@ import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
   let app: AngularServerApp;
+  let slowRouteHook: (() => void) | undefined;
 
   @Component({
     selector: 'app-home',
@@ -28,8 +37,12 @@ describe('AngularServerApp', () => {
   })
   class HomeComponent {
     constructor() {
-      if (inject(ActivatedRoute).snapshot.data['destroyApp']) {
+      const data = inject(ActivatedRoute).snapshot.data;
+      if (data['destroyApp']) {
         inject(PlatformRef).destroy();
+      }
+      if (data['slow']) {
+        slowRouteHook?.();
       }
     }
   }
@@ -78,6 +91,7 @@ describe('AngularServerApp', () => {
         { path: 'page-with-headers', component: HomeComponent },
         { path: 'page-with-status', component: HomeComponent },
         { path: 'page-destroy-app', component: HomeComponent, data: { destroyApp: true } },
+        { path: 'page-slow', component: HomeComponent, data: { slow: true } },
         { path: 'redirect', redirectTo: 'home' },
         { path: 'redirect-via-navigate', component: RedirectComponent },
         {
@@ -313,12 +327,104 @@ describe('AngularServerApp', () => {
           controller.abort();
         });
 
+        await expectAsync(app.handle(request)).toBeRejectedWithError(
+          DOMException,
+          /Request for: http:\/\/localhost\/home was aborted/,
+        );
+      });
+
+      it('should destroy the platform and stop rendering when an in-flight request is aborted', async () => {
+        let resolveTaskReady!: () => void;
+        const taskReady = new Promise<void>((resolve) => {
+          resolveTaskReady = resolve;
+        });
+        let appDestroyed = false;
+        let destroySpy: jasmine.Spy | undefined;
+
+        slowRouteHook = () => {
+          destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
+          const pendingTasks = inject(PendingTasks);
+          const removeTask = pendingTasks.add();
+          inject(DestroyRef).onDestroy(() => {
+            appDestroyed = true;
+            removeTask();
+          });
+          resolveTaskReady();
+        };
+
         try {
-          await app.handle(request);
-          throw new Error('Should not be called.');
-        } catch (e) {
-          expect(e).toBeInstanceOf(DOMException);
+          const controller = new AbortController();
+          const request = new Request('http://localhost/page-slow', { signal: controller.signal });
+
+          const handlePromise = app.handle(request);
+
+          // Wait until the component is instantiated and holding a pending task
+          await taskReady;
+          expect(appDestroyed).toBeFalse();
+
+          // Abort the request while `applicationRef.whenStable()` is still pending
+          controller.abort();
+
+          await expectAsync(handlePromise).toBeRejectedWithError(
+            DOMException,
+            /Request for: http:\/\/localhost\/page-slow was aborted/,
+          );
+
+          // Wait for the macrotask queue to clear since platform destruction is scheduled via setTimeout(0)
+          await setTimeout(0);
+          expect(destroySpy).toHaveBeenCalledTimes(1);
+          expect(appDestroyed).toBeTrue();
+        } finally {
+          slowRouteHook = undefined;
         }
+      });
+
+      it('should not bootstrap the platform if the request signal is already aborted', async () => {
+        // Warm up the router so route extraction does not create a PlatformRef during this test
+        const warmupResponse = await app.handle(new Request('http://localhost/home'));
+        await warmupResponse?.text();
+        await setTimeout(0);
+
+        const destroySpy = spyOn(PlatformRef.prototype, 'destroy').and.callThrough();
+        const controller = new AbortController();
+        controller.abort();
+
+        const request = new Request('http://localhost/home', { signal: controller.signal });
+        await expectAsync(app.handle(request)).toBeRejectedWithError(DOMException);
+
+        await setTimeout(0);
+        expect(destroySpy).not.toHaveBeenCalled();
+      });
+
+      it('should clean up the abort event listener on request.signal after rendering completes', async () => {
+        const controller = new AbortController();
+        const request = new Request('http://localhost/home', { signal: controller.signal });
+        const removeEventListenerSpy = spyOn(
+          request.signal,
+          'removeEventListener',
+        ).and.callThrough();
+
+        const response = await app.handle(request);
+        expect(await response?.text()).toContain('Home works');
+        await setTimeout(0);
+
+        expect(removeEventListenerSpy).toHaveBeenCalledWith('abort', jasmine.any(Function));
+      });
+
+      it('should reject reading response body if request is aborted after handle() resolves but before rendering completes', async () => {
+        const controller = new AbortController();
+        const response = await app.handle(
+          new Request('http://localhost/home', { signal: controller.signal }),
+        );
+        expect(response).not.toBeNull();
+
+        controller.abort();
+
+        await expectAsync(response?.text()).toBeRejectedWithError(
+          DOMException,
+          /Request for: http:\/\/localhost\/home was aborted/,
+        );
+        await setTimeout(0);
       });
 
       it('should return configured headers for pages with specific header settings', async () => {
