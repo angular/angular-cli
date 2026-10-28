@@ -128,6 +128,28 @@ describe('Tailwind Schematic', () => {
       expect(postCssConfig.plugins['autoprefixer']).toBeDefined();
       expect(tree.exists('/projects/bar/.postcssrc.json')).toBe(false);
     });
+
+    it('should prefer a project root configuration over a workspace root configuration', async () => {
+      appTree.create('/.postcssrc.json', JSON.stringify({ plugins: {} }));
+      appTree.create('/projects/bar/postcss.config.json', JSON.stringify({ plugins: {} }));
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+
+      const projectConfig = JSON.parse(tree.readContent('/projects/bar/postcss.config.json'));
+      expect(projectConfig.plugins['@tailwindcss/postcss']).toBeDefined();
+      const workspaceConfig = JSON.parse(tree.readContent('/.postcssrc.json'));
+      expect(workspaceConfig.plugins['@tailwindcss/postcss']).toBeUndefined();
+    });
+
+    it('should prefer postcss.config.json over .postcssrc.json in the same directory', async () => {
+      appTree.create('/projects/bar/.postcssrc.json', JSON.stringify({ plugins: {} }));
+      appTree.create('/projects/bar/postcss.config.json', JSON.stringify({ plugins: {} }));
+      const tree = await schematicRunner.runSchematic('tailwind', { project: 'bar' }, appTree);
+
+      const config = JSON.parse(tree.readContent('/projects/bar/postcss.config.json'));
+      expect(config.plugins['@tailwindcss/postcss']).toBeDefined();
+      const rcConfig = JSON.parse(tree.readContent('/projects/bar/.postcssrc.json'));
+      expect(rcConfig.plugins['@tailwindcss/postcss']).toBeUndefined();
+    });
   });
 
   describe('with non-workspace stylesheets', () => {
