@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { rename } from 'node:fs/promises';
 import { buildApplication } from '../../index';
 import { APPLICATION_BUILDER_INFO, BASE_OPTIONS, describeBuilder } from '../setup';
 
@@ -35,6 +36,39 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           harness.expectFile('dist/browser/asset.txt').content.toContain('foo');
 
           await harness.writeFile('public/asset.txt', 'bar');
+        },
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').content.toContain('bar');
+        },
+      ]);
+    });
+
+    it('emits an asset replaced by renaming another file over it', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        assets: [
+          {
+            glob: '**/*',
+            input: 'public',
+          },
+        ],
+        watch: true,
+        // Polling reports a replaced file as modified, while native watchers can report it as added.
+        poll: undefined,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').content.toContain('foo');
+
+          // Editors with atomic save write a temporary file and rename it over the original.
+          await harness.writeFile('asset.txt.tmp', 'bar');
+          await rename(
+            harness.resolvePath('asset.txt.tmp'),
+            harness.resolvePath('public/asset.txt'),
+          );
         },
         ({ result }) => {
           expect(result?.success).toBeTrue();

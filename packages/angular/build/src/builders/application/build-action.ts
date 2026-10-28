@@ -321,7 +321,8 @@ function* emitOutputResults(
     if (!previousAssetsInfo.has(destination)) {
       incrementalResult.added.push(destination);
       incrementalResult.background = false;
-    } else if (changes.modified.has(source)) {
+    } else if (changes.modified.has(source) || changes.added.has(source)) {
+      // A file replaced by a rename (e.g. an atomic save) can be reported as added.
       incrementalResult.modified.push(destination);
       incrementalResult.background = false;
     } else {
