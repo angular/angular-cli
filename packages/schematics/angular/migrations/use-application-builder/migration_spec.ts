@@ -113,6 +113,40 @@ describe(`Migration to use the application builder`, () => {
     });
   });
 
+  it(`should replace 'serviceWorker: true' with the default 'ngsw-config.json' path`, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workspaceContent = tree.readJson('/angular.json') as Record<string, any>;
+    workspaceContent['projects']['app']['architect']['build']['options']['serviceWorker'] = true;
+    tree.overwrite('/angular.json', JSON.stringify(workspaceContent));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { serviceWorker, ngswConfigPath } = app.architect['build'].options;
+    expect(serviceWorker).toBe('/project/app/ngsw-config.json');
+    expect(ngswConfigPath).toBeUndefined();
+  });
+
+  it(`should replace 'serviceWorker: true' in a configuration with the base 'ngswConfigPath'`, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workspaceContent = tree.readJson('/angular.json') as Record<string, any>;
+    const build = workspaceContent['projects']['app']['architect']['build'];
+    build['options']['ngswConfigPath'] = 'src/ngsw-config.json';
+    build['configurations'] = { production: { serviceWorker: true } };
+    tree.overwrite('/angular.json', JSON.stringify(workspaceContent));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    expect(app.architect['build'].configurations.production.serviceWorker).toBe(
+      'src/ngsw-config.json',
+    );
+  });
+
   it(`should remove 'builderMode' from karma options`, async () => {
     addWorkspaceTarget(tree, 'test', {
       'builder': Builders.Karma,

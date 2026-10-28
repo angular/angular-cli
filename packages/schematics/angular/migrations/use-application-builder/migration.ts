@@ -39,6 +39,7 @@ import {
 
 function* updateBuildTarget(
   projectName: string,
+  projectRoot: string,
   buildTarget: TargetDefinition,
   serverTarget: TargetDefinition | undefined,
   tree: Tree,
@@ -46,6 +47,7 @@ function* updateBuildTarget(
 ): Iterable<Rule> {
   // Update builder target and options
   buildTarget.builder = Builders.Application;
+  const baseNgswConfigPath = buildTarget.options?.['ngswConfigPath'];
 
   for (const [, options] of allTargetOptions(buildTarget, false)) {
     if (options['index'] === '') {
@@ -57,7 +59,13 @@ function* updateBuildTarget(
     if (serverTarget && typeof options['browser'] === 'string') {
       options['server'] = dirname(options['browser']) + '/main.server.ts';
     }
-    options['serviceWorker'] = options['ngswConfigPath'] ?? options['serviceWorker'];
+    if (options['serviceWorker'] === true) {
+      // The application builder only accepts a path, while the browser builder defaults it in code.
+      options['serviceWorker'] =
+        options['ngswConfigPath'] ?? baseNgswConfigPath ?? join(projectRoot, 'ngsw-config.json');
+    } else {
+      options['serviceWorker'] = options['ngswConfigPath'] ?? options['serviceWorker'];
+    }
 
     if (typeof options['polyfills'] === 'string') {
       options['polyfills'] = [options['polyfills']];
@@ -197,7 +205,9 @@ function updateProjects(tree: Tree, context: SchematicContext) {
 
       const serverTarget = project.targets.get('server');
 
-      rules.push(...updateBuildTarget(name, buildTarget, serverTarget, tree, context));
+      rules.push(
+        ...updateBuildTarget(name, project.root, buildTarget, serverTarget, tree, context),
+      );
 
       // Delete all redundant targets
       for (const [key, target] of project.targets) {
