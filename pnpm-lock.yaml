@@ -847,8 +847,8 @@ importers:
         specifier: 5.112.0
         version: 5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)
       webpack-dev-middleware:
-        specifier: 8.3.0
-        version: 8.3.0(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
+        specifier: 8.5.0
+        version: 8.5.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
       webpack-dev-server:
         specifier: 6.0.0
         version: 6.0.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
@@ -8363,8 +8363,8 @@ packages:
     resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
     engines: {node: '>=20'}
 
-  webpack-dev-middleware@8.3.0:
-    resolution: {integrity: sha512-jFNNMB29ugmkEUFW9cpWNqcWFQNwuMTMVoRpKVAiz/5nh3gA4x9x6DRPhNHGc/SLre7pEP9yrAPDAmCvdCblKg==}
+  webpack-dev-middleware@8.5.0:
+    resolution: {integrity: sha512-+rXF28E5GKr7VnLH5qJaGIKLNPkthlA0VhqBFp/K6mjjCzOd6q34vYc2/3/ysRTjxmN01S98r1LwTTpWXDzWWA==}
     engines: {node: '>= 20.9.0'}
     peerDependencies:
       webpack: ^5.101.0
@@ -16735,15 +16735,18 @@ snapshots:
 
   webidl-conversions@8.0.1: {}
 
-  webpack-dev-middleware@8.3.0(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)):
+  webpack-dev-middleware@8.5.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)):
     dependencies:
-      ansi-html-community: 0.0.8
       memfs: 4.80.0
-      mime-types: 3.0.2
+      mime-db: 1.54.0
       range-parser: 1.3.0
       schema-utils: 4.8.1(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)
+      ws: 8.22.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
 
   webpack-dev-server@6.0.0(bufferutil@4.1.0)(supports-color@11.0.0)(utf-8-validate@6.0.6)(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)):
     dependencies:
@@ -16770,7 +16773,7 @@ snapshots:
       selfsigned: 5.5.0
       serve-index: 1.9.2(supports-color@11.0.0)
       tinyglobby: 0.2.17
-      webpack-dev-middleware: 8.3.0(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
+      webpack-dev-middleware: 8.5.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)(webpack@5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3))
       ws: 8.22.0(bufferutil@4.1.0)(utf-8-validate@6.0.6)
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.28)(uglify-js@3.19.3)
