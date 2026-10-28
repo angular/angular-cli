@@ -738,8 +738,8 @@ importers:
         specifier: 5.112.0
         version: 5.112.0(esbuild@0.28.1)(postcss@8.5.23)
       webpack-dev-middleware:
-        specifier: 7.4.2
-        version: 7.4.2(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
+        specifier: 7.4.6
+        version: 7.4.6(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
       webpack-dev-server:
         specifier: 5.2.6
         version: 5.2.6(bufferutil@4.0.9)(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
@@ -9389,8 +9389,8 @@ packages:
     resolution: {integrity: sha512-VwddBukDzu71offAQR975unBIGqfKZpM+8ZX6ySk8nYhVoo5CYaZyzt3YBvYtRtO+aoGlqxPg/B87NGVZ/fu6g==}
     engines: {node: '>=12'}
 
-  webpack-dev-middleware@7.4.2:
-    resolution: {integrity: sha512-xOO8n6eggxnwYpy1NlzUKpvrjfJTvae5/D6WOK0S2LSo7vjmo5gCM1DbLUmFqrMTJP+W/0YZNctm7jasWvLuBA==}
+  webpack-dev-middleware@7.4.6:
+    resolution: {integrity: sha512-yBWCMvIfUmuhAE8vdqUKzH0vg9kuWN0KeG4vBnqRplUFHRU7lMQjkiJWxVQzvo2BTewqhPhDlMB41rAt2jVA9A==}
     engines: {node: '>= 18.12.0'}
     peerDependencies:
       webpack: ^5.0.0
@@ -19508,25 +19508,25 @@ snapshots:
 
   webidl-conversions@7.0.0: {}
 
-  webpack-dev-middleware@7.4.2(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23)):
+  webpack-dev-middleware@7.4.6(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23)):
     dependencies:
       colorette: 2.0.20
       memfs: 4.49.0
-      mime-types: 2.1.35
+      mime-types: 3.0.1
       on-finished: 2.4.1
       range-parser: 1.2.1
-      schema-utils: 4.3.3
+      schema-utils: 4.8.1(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.1)(postcss@8.5.23)
 
-  webpack-dev-middleware@7.4.2(webpack@5.112.0(esbuild@0.28.1)):
+  webpack-dev-middleware@7.4.6(webpack@5.112.0(esbuild@0.28.1)):
     dependencies:
       colorette: 2.0.20
       memfs: 4.49.0
-      mime-types: 2.1.35
+      mime-types: 3.0.1
       on-finished: 2.4.1
       range-parser: 1.2.1
-      schema-utils: 4.3.3
+      schema-utils: 4.8.1(webpack@5.112.0(esbuild@0.28.1))
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.1)
 
@@ -19558,7 +19558,7 @@ snapshots:
       serve-index: 1.9.1
       sockjs: 0.3.24
       spdy: 4.0.2
-      webpack-dev-middleware: 7.4.2(webpack@5.112.0(esbuild@0.28.1))
+      webpack-dev-middleware: 7.4.6(webpack@5.112.0(esbuild@0.28.1))
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.1)
@@ -19596,7 +19596,7 @@ snapshots:
       serve-index: 1.9.1
       sockjs: 0.3.24
       spdy: 4.0.2
-      webpack-dev-middleware: 7.4.2(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
+      webpack-dev-middleware: 7.4.6(webpack@5.112.0(esbuild@0.28.1)(postcss@8.5.23))
       ws: 8.18.3(bufferutil@4.0.9)(utf-8-validate@6.0.5)
     optionalDependencies:
       webpack: 5.112.0(esbuild@0.28.1)(postcss@8.5.23)
