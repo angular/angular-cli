@@ -1,3 +1,71 @@
+<a name="22.2.5"></a>
+
+# 22.2.5 (2026-10-28)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                         |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
+| [7efeeb9caa](https://github.com/angular/angular-cli/commit/7efeeb9caa2def8023097d8faab405a5e536cd18) | fix  | explain how to pick a project when a schematic cannot determine one |
+| [ee61e328ac](https://github.com/angular/angular-cli/commit/ee61e328ac8839709ccbcc20d3ecade35e8c05f9) | fix  | handle bun registry error output and 404 detection                  |
+| [0d8898c289](https://github.com/angular/angular-cli/commit/0d8898c289cc2e92a539ad5b5bc053890bd76b3d) | fix  | support resolving subproject dependencies in bun workspaces         |
+
+### @schematics/angular
+
+| Commit                                                                                               | Type | Description                                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [982c3dcbfc](https://github.com/angular/angular-cli/commit/982c3dcbfc248a379d0d5e5549682927bc27a719) | fix  | avoid adding web worker snippet to server configuration files                   |
+| [18e5dc6fe8](https://github.com/angular/angular-cli/commit/18e5dc6fe8f4cf54fe2aceed4c430a94ad1737db) | fix  | ignore non-workspace stylesheet entries when adding Tailwind                    |
+| [dd18bda9db](https://github.com/angular/angular-cli/commit/dd18bda9dbe267dd79ddc1f7ca435222a17733d1) | fix  | include the SSR entry file in the trust-proxy-headers migration                 |
+| [b7e24561e7](https://github.com/angular/angular-cli/commit/b7e24561e71f71a82c82f76267a5f42327d42004) | fix  | include the type separator in the class spec import                             |
+| [7f3840c70c](https://github.com/angular/angular-cli/commit/7f3840c70c11c2cbfdb23b6cfa1c65f1cd819785) | fix  | keep the default getter access type of spyOnProperty in refactor-jasmine-vitest |
+| [eaf2343be4](https://github.com/angular/angular-cli/commit/eaf2343be4c19a84e7525a052de6650115a11a45) | fix  | migrate CallInfo returnValue and object in refactor-jasmine-vitest              |
+| [6680d289cb](https://github.com/angular/angular-cli/commit/6680d289cb88eee720980ce979b384a71f08216a) | fix  | migrate spy.calls.first().args in refactor-jasmine-vitest                       |
+| [9cba0da43f](https://github.com/angular/angular-cli/commit/9cba0da43f71bae7c6b01026843b2f312b25e6a5) | fix  | set explicit type for the `module --route` component                            |
+| [e9ae950364](https://github.com/angular/angular-cli/commit/e9ae95036491f7223a9989f366d17072fa4ba278) | fix  | set explicit type for the app-shell component                                   |
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [0c4bd19ace](https://github.com/angular/angular-cli/commit/0c4bd19ace75539d43cdf3e870fe557c692f382f) | fix  | resolve dev-server `sslKey` and `sslCert` relative to the workspace root ([#34399](https://github.com/angular/angular-cli/pull/34399)) |
+
+### @angular-devkit/core
+
+| Commit                                                                                               | Type | Description                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [ad04d689bb](https://github.com/angular/angular-cli/commit/ad04d689bbcc2778d3a0a006dcf3224da2e08536) | fix  | only invoke smart default provider when value is undefined |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                               | Type | Description                                                                                                 |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
+| [e7fd1bd9cb](https://github.com/angular/angular-cli/commit/e7fd1bd9cb831e82db96f985f8cb64325b7cae3b) | fix  | support delegating trees in `partition` ([#34539](https://github.com/angular/angular-cli/pull/34539))       |
+| [1854c1714d](https://github.com/angular/angular-cli/commit/1854c1714d6c8ec3f66424337a4e8fabb3c30903) | fix  | support delegating trees in the `filter` rule ([#34539](https://github.com/angular/angular-cli/pull/34539)) |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [6d45d1007f](https://github.com/angular/angular-cli/commit/6d45d1007feee82d96cbf8809f20f0481087f5ef) | fix  | escape prerender redirect URLs                                                                                                         |
+| [6298fb89e6](https://github.com/angular/angular-cli/commit/6298fb89e6b4de0c8228dbd9b03dd23e1d816191) | fix  | include the oxc-parser WASI binding as an optional dependency                                                                          |
+| [325f6a0f48](https://github.com/angular/angular-cli/commit/325f6a0f4856d60142fd54abf3bb9849e84e8e71) | fix  | only require karma-coverage when coverage is enabled                                                                                   |
+| [47075bee89](https://github.com/angular/angular-cli/commit/47075bee89bc9df119f0d253f2fbfe97fd4e4725) | fix  | resolve dev-server `sslKey` and `sslCert` relative to the workspace root ([#34399](https://github.com/angular/angular-cli/pull/34399)) |
+| [db45eed631](https://github.com/angular/angular-cli/commit/db45eed631a9b2bbf8c6fa3e6b852cb4a9a989f9) | fix  | serialize server manifest asset paths                                                                                                  |
+| [5ae6a66edb](https://github.com/angular/angular-cli/commit/5ae6a66edb33df529ba598900785f62055c1ead2) | fix  | suggest the istanbul provider in the unit-test V8 browser coverage error                                                               |
+| [e3134b4cbc](https://github.com/angular/angular-cli/commit/e3134b4cbc136a08e2df080ab29ae5eaca608c13) | fix  | warn about unsupported options in the unit-test karma runner                                                                           |
+| [250fae725e](https://github.com/angular/angular-cli/commit/250fae725eb05c5ad10fd02ab8e7b09d3f880f88) | fix  | write the stats file in a stable, deterministic order                                                                                  |
+| [cda246579e](https://github.com/angular/angular-cli/commit/cda246579ea4f0f668d765ef65c9e56dab5884fe) | perf | avoid duplicate Domino bundling in server bundles                                                                                      |
+| [bcdcc09fb7](https://github.com/angular/angular-cli/commit/bcdcc09fb706b60ad8ab0f37a0a79a65e046b6cd) | perf | avoid web worker channel overhead in library parallel compilation                                                                      |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                                      |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
+| [7b9c8d0b5d](https://github.com/angular/angular-cli/commit/7b9c8d0b5d39af7134191d2e2bfd717d375a1eac) | fix  | preserve trailing slashes in query and fragment of redirect URLs |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.29"></a>
 
 # 21.2.29 (2026-10-28)
