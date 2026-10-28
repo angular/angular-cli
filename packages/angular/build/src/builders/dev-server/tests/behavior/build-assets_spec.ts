@@ -39,22 +39,6 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
 
       expect(result?.success).toBeTrue();
       expect(await response?.text()).toContain(javascriptFileContent);
-    });
-
-    it('serves a project extensionless asset with a valid weak ETag', async () => {
-      await harness.writeFile('src/extensionless', javascriptFileContent);
-
-      setupTarget(harness, {
-        assets: ['src/extensionless'],
-      });
-
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-      });
-
-      const { result, response } = await executeOnceAndFetch(harness, 'extensionless');
-
-      expect(result?.success).toBeTrue();
       expect(response?.headers.get('ETag')).toMatch(/^W\/"[^"]+"$/);
     });
 
