@@ -35,7 +35,7 @@ describe('KarmaTestRunner', () => {
     });
 
     it('requires karma-chrome-launcher for Chromium with the built-in configuration', () => {
-      const options = createOptions(false, { browsers: ['ChromiumHeadless'], runnerConfig: false });
+      const options = createOptions(false, { browsers: ['ChromiumHeadless'] });
 
       expect(() => KarmaTestRunner.validateDependencies?.(options)).toThrowError(
         /^(?!.*karma-chromium-launcher).*karma-chrome-launcher/s,
