@@ -65,7 +65,7 @@ export class KarmaExecutor implements TestExecutor {
       );
     }
 
-    if (unitTestOptions.coverage.reporters) {
+    if (unitTestOptions.coverage?.reporters) {
       context.logger.warn(
         'The "karma" test runner does not support the "coverageReporters" option. The option will be ignored.',
       );
