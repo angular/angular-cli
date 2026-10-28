@@ -123,9 +123,7 @@ export async function renderAngular(
     return destroyPromise;
   };
 
-  const abortHandler = () => {
-    void destroy();
-  };
+  const abortHandler = () => void destroy();
 
   try {
     signal?.addEventListener('abort', abortHandler, { once: true });
@@ -164,8 +162,6 @@ export async function renderAngular(
     if (!routerIsProvided) {
       hasNavigationError = false;
     } else if (lastSuccessfulNavigation?.finalUrl) {
-      hasNavigationError = false;
-
       const requestPrefix =
         envInjector.get(APP_BASE_HREF, null, { optional: true }) ??
         getFirstHeaderValue(
@@ -179,6 +175,8 @@ export async function renderAngular(
       if (urlToRenderString !== finalUrl) {
         redirectTo = [pathname, search, hash].join('');
       }
+
+      hasNavigationError = false;
     }
 
     return {
@@ -207,10 +205,6 @@ export async function renderAngular(
           }, 0);
         }),
     };
-  } catch (error) {
-    await destroy();
-
-    throw error;
   } finally {
     if (hasNavigationError || redirectTo) {
       void destroy();
