@@ -13,7 +13,7 @@ The following defines some team policies around what does and does not constitut
   - "A malicious repository can execute untrusted code" is not a viable attack vector.
   - A malicious repository could always rebind `node_modules/.bin/ng` to do something malicious, nothing we do can prevent that.
   - We assume it is always unsafe to run an untrusted repository outside of a sandbox.
-  - Build-time configuration (`angular.json`, `routesFile`, environment variables) and values returned by developer-authored build-time functions (such as `getPrerenderParams()`) are considered trusted inputs. Passing unvalidated, untrusted data from an external source (ex. a CMS or database) into build-time route generation or build configuration is an application-level input validation defect, not a vulnerability in Angular.
+  - Build-time configuration (`angular.json`, `routesFile`, environment variables) and values returned by developer-authored build-time functions (such as `getPrerenderParams()`) are considered trusted inputs. Passing unvalidated, untrusted data from an external source (e.g., a CMS or database) into build-time route generation or build configuration is an application-level input validation defect, not a vulnerability in Angular.
 - DoS attacks which break only the attacker's client are not security issues.
   - Exception: DoS attacks which waste server resources significantly beyond the cost of the attacker's request may be security issues.
 - Memory leaks are considered general bugs, not DoS vulnerabilities.
