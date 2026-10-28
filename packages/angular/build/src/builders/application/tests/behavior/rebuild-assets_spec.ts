@@ -76,5 +76,39 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
         },
       ]);
     });
+
+    it('remove all outputs of a deleted asset copied to multiple destinations', async () => {
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        assets: [
+          {
+            glob: '**/*',
+            input: 'public',
+          },
+          {
+            glob: '**/*',
+            input: 'public',
+            output: 'static',
+          },
+        ],
+        watch: true,
+      });
+
+      await harness.executeWithCases([
+        async ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').toExist();
+          harness.expectFile('dist/browser/static/asset.txt').toExist();
+
+          await harness.removeFile('public/asset.txt');
+        },
+
+        ({ result }) => {
+          expect(result?.success).toBeTrue();
+          harness.expectFile('dist/browser/asset.txt').toNotExist();
+          harness.expectFile('dist/browser/static/asset.txt').toNotExist();
+        },
+      ]);
+    });
   });
 });
