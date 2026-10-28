@@ -145,6 +145,44 @@ describe(`Migration to use the application builder`, () => {
     expect(app.architect['build'].configurations.production.serviceWorker).toBe(
       'src/ngsw-config.json',
     );
+    expect(app.architect['build'].options.serviceWorker).toBeUndefined();
+  });
+
+  it(`should not enable the service worker when 'serviceWorker' is false`, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workspaceContent = tree.readJson('/angular.json') as Record<string, any>;
+    const build = workspaceContent['projects']['app']['architect']['build'];
+    build['options']['serviceWorker'] = false;
+    build['options']['ngswConfigPath'] = 'src/ngsw-config.json';
+    tree.overwrite('/angular.json', JSON.stringify(workspaceContent));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    const { serviceWorker, ngswConfigPath } = app.architect['build'].options;
+    expect(serviceWorker).toBeFalse();
+    expect(ngswConfigPath).toBeUndefined();
+  });
+
+  it(`should use a configuration 'ngswConfigPath' when the base options enable the service worker`, async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const workspaceContent = tree.readJson('/angular.json') as Record<string, any>;
+    const build = workspaceContent['projects']['app']['architect']['build'];
+    build['options']['serviceWorker'] = true;
+    build['configurations'] = { production: { ngswConfigPath: 'src/ngsw-config.prod.json' } };
+    tree.overwrite('/angular.json', JSON.stringify(workspaceContent));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { app },
+    } = JSON.parse(newTree.readContent('/angular.json'));
+
+    expect(app.architect['build'].options.serviceWorker).toBe('/project/app/ngsw-config.json');
+    expect(app.architect['build'].configurations.production.serviceWorker).toBe(
+      'src/ngsw-config.prod.json',
+    );
   });
 
   it(`should remove 'builderMode' from karma options`, async () => {

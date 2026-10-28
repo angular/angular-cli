@@ -47,6 +47,7 @@ function* updateBuildTarget(
 ): Iterable<Rule> {
   // Update builder target and options
   buildTarget.builder = Builders.Application;
+  const baseServiceWorker = buildTarget.options?.['serviceWorker'];
   const baseNgswConfigPath = buildTarget.options?.['ngswConfigPath'];
 
   for (const [, options] of allTargetOptions(buildTarget, false)) {
@@ -63,8 +64,13 @@ function* updateBuildTarget(
       // The application builder only accepts a path, while the browser builder defaults it in code.
       options['serviceWorker'] =
         options['ngswConfigPath'] ?? baseNgswConfigPath ?? join(projectRoot, 'ngsw-config.json');
-    } else {
-      options['serviceWorker'] = options['ngswConfigPath'] ?? options['serviceWorker'];
+    } else if (
+      options['serviceWorker'] === undefined &&
+      baseServiceWorker === true &&
+      typeof options['ngswConfigPath'] === 'string'
+    ) {
+      // A configuration that only changes the config path of the service worker enabled in the base options.
+      options['serviceWorker'] = options['ngswConfigPath'];
     }
 
     if (typeof options['polyfills'] === 'string') {
