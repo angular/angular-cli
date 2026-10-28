@@ -316,9 +316,9 @@ function* emitOutputResults(
   // Initially assume all previous assets files have been removed
   const removedAssetFiles = new Map(previousAssetsInfo);
   for (const { source, destination } of assetFiles) {
-    removedAssetFiles.delete(source);
+    removedAssetFiles.delete(destination);
 
-    if (!previousAssetsInfo.has(source)) {
+    if (!previousAssetsInfo.has(destination)) {
       incrementalResult.added.push(destination);
       incrementalResult.background = false;
     } else if (changes.modified.has(source)) {
@@ -353,7 +353,7 @@ function* emitOutputResults(
       path,
       type,
     })),
-    ...Array.from(removedAssetFiles.values(), (path) => ({
+    ...Array.from(removedAssetFiles.keys(), (path) => ({
       path,
       type: BuildOutputFileType.Browser,
     })),

@@ -176,8 +176,9 @@ export class ExecutionResult {
       previousOutputInfo: new Map(
         this.outputFiles.map(({ path, hash, type }) => [`${type}:${path}`, { hash, type, path }]),
       ),
+      // Keyed by destination since one source can be copied to several outputs (e.g. per locale).
       previousAssetsInfo: new Map(
-        this.assetFiles.map(({ source, destination }) => [source, destination]),
+        this.assetFiles.map(({ source, destination }) => [destination, source]),
       ),
       templateUpdates: this.templateUpdates,
     };
