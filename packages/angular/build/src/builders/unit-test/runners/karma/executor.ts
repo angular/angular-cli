@@ -53,6 +53,24 @@ export class KarmaExecutor implements TestExecutor {
       );
     }
 
+    if (unitTestOptions.providersFile) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "providersFile" option. The option will be ignored.',
+      );
+    }
+
+    if (unitTestOptions.outputFile) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "outputFile" option. The option will be ignored.',
+      );
+    }
+
+    if (unitTestOptions.coverage?.reporters) {
+      context.logger.warn(
+        'The "karma" test runner does not support the "coverageReporters" option. The option will be ignored.',
+      );
+    }
+
     const buildTargetOptions = (await context.validateOptions(
       await context.getTargetOptions(unitTestOptions.buildTarget),
       await context.getBuilderNameForTarget(unitTestOptions.buildTarget),
