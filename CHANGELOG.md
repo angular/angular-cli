@@ -1,3 +1,23 @@
+<a name="21.2.29"></a>
+
+# 21.2.29 (2026-10-28)
+
+### @angular-devkit/build-angular
+
+| Commit                                                                                               | Type | Description                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------ |
+| [3fc679987f](https://github.com/angular/angular-cli/commit/3fc679987f0414a2c490d1a35ffba3f945363c98) | fix  | update `webpack-dev-middleware` to `7.4.6` |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                           |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------- |
+| [aa2ecc154e](https://github.com/angular/angular-cli/commit/aa2ecc154e7fb591afc2e1789a4094644828f246) | fix  | bump undici to 7.30.1                 |
+| [18164667c7](https://github.com/angular/angular-cli/commit/18164667c729cf0f51f027b88a256ce029482112) | fix  | escape prerender redirect URLs        |
+| [8ad2547911](https://github.com/angular/angular-cli/commit/8ad25479115b77347ec6044e03a92dfbf2b05203) | fix  | serialize server manifest asset paths |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.42"></a>
 
 # 20.3.42 (2026-10-28)
