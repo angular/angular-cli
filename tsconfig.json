@@ -14,7 +14,7 @@
     "sourceMap": true,
     "strict": true,
     "target": "es2023",
-    "lib": ["es2023"],
+    "lib": ["es2024", "es2025.collection", "es2025.iterator", "es2025.intl"],
     "rootDirs": [".", "./dist-schema/bin/"],
     "paths": {
       "@angular-devkit/build-webpack": ["./packages/angular_devkit/build_webpack"],
