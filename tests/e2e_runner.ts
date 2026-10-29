@@ -217,7 +217,7 @@ process.env.CHROME_PATH = path.resolve(process.env.CHROME_PATH!);
 process.env.CHROMEDRIVER_BIN = path.resolve(process.env.CHROMEDRIVER_BIN!);
 
 (async () => {
-  const tempRoot = await mktempd('angular-cli-e2e-', process.env.E2E_TEMP);
+  const tempRoot = await mktempd('angular-cli-e2e-');
   setGlobalVariable('tmp-root', tempRoot);
 
   process.on('SIGINT', deleteTemporaryRoot);
