@@ -71,7 +71,17 @@ export function replaceBootstrap(
         if (removals.size > 0) {
           updatedSourceFile = ts.visitEachChild(
             updatedSourceFile,
-            (node) => (removals.has(node) ? undefined : node),
+            function visitForRemoval(node): ts.Node | undefined {
+              if (removals.has(node)) {
+                return undefined;
+              }
+
+              return ts.isImportDeclaration(node) ||
+                ts.isImportClause(node) ||
+                ts.isNamedImports(node)
+                ? ts.visitEachChild(node, visitForRemoval, context)
+                : node;
+            },
             context,
           );
         }
@@ -137,17 +147,30 @@ export function elideImports(
       return;
     }
 
-    // Type reference imports do not need to be emitted when emitDecoratorMetadata is disabled.
-    if (ts.isTypeReferenceNode(node) && !compilerOptions.emitDecoratorMetadata) {
+    // Type nodes do not need to be emitted when `emitDecoratorMetadata` is disabled.
+    // `ExpressionWithTypeArguments` is excluded as it also represents runtime values such as
+    // `class ... extends Base<T>` heritage clauses and instantiation expressions (`Map<string, T>`).
+    if (
+      ts.isTypeNode(node) &&
+      !ts.isExpressionWithTypeArguments(node) &&
+      !compilerOptions.emitDecoratorMetadata
+    ) {
       return;
     }
 
-    // Pure type declarations and type-only exports are erased at runtime.
+    // Pure type declarations, type queries, ambient statements, external re-exports,
+    // and type-only exports are erased or do not reference local imports at runtime.
     if (
       ts.isInterfaceDeclaration(node) ||
       ts.isTypeAliasDeclaration(node) ||
       ts.isTypeParameterDeclaration(node) ||
-      (ts.isExportDeclaration(node) && node.isTypeOnly) ||
+      ts.isTypeQueryNode(node) ||
+      ts.isImportTypeNode(node) ||
+      ts.isIndexSignatureDeclaration(node) ||
+      (ts.isStatement(node) &&
+        ts.canHaveModifiers(node) &&
+        ts.getModifiers(node)?.some((m) => m.kind === ts.SyntaxKind.DeclareKeyword)) ||
+      (ts.isExportDeclaration(node) && (node.isTypeOnly || node.moduleSpecifier !== undefined)) ||
       (ts.isExportSpecifier(node) && node.isTypeOnly)
     ) {
       return;
@@ -184,15 +207,30 @@ export function elideImports(
     return importNodeRemovals;
   }
 
-  const isUnused = (node: ts.Identifier) => {
+  /**
+   * Determines how an imported binding should be handled:
+   * - `keep`: the binding is still referenced.
+   * - `value`: the binding is a runtime value that is no longer referenced.
+   * - `type`: the binding does not exist at runtime and is always elided by TypeScript.
+   */
+  const getRemovalKind = (node: ts.Identifier): 'keep' | 'value' | 'type' => {
     // Do not remove JSX factory imports
     if (node.text === compilerOptions.jsxFactory) {
-      return false;
+      return 'keep';
     }
 
     const symbol = typeChecker.getSymbolAtLocation(node);
+    if (!symbol) {
+      return 'keep';
+    }
 
-    return symbol && !usedSymbols.has(symbol);
+    // Note: with `verbatimModuleSyntax`, TypeScript reports an error for imports of non-value aliases
+    // that do not use a `type` modifier (TS1484/TS1485), so no special handling is needed for it.
+    if ((symbol.flags & ts.SymbolFlags.Alias) !== 0 && !isValueAlias(symbol, typeChecker)) {
+      return 'type';
+    }
+
+    return usedSymbols.has(symbol) ? 'keep' : 'value';
   };
 
   for (const node of imports) {
@@ -205,12 +243,17 @@ export function elideImports(
 
     if (namedBindings && ts.isNamespaceImport(namedBindings)) {
       // "import * as XYZ from 'abc';"
-      if (isUnused(namedBindings.name)) {
+      if (getRemovalKind(namedBindings.name) !== 'keep') {
         importNodeRemovals.add(node);
       }
     } else {
       const specifierNodeRemovals = [];
       let clausesCount = 0;
+      // TypeScript skips its own import elision for declarations replaced by a transformer.
+      // A declaration is therefore only partially rewritten when a runtime value import must be
+      // removed, or when it was already replaced by a previous transformer. Otherwise, it is left
+      // untouched so that TypeScript continues to elide any type-only specifiers itself.
+      let requiresRewrite = !ts.isParseTreeNode(node);
 
       // "import { XYZ, ... } from 'abc';"
       if (namedBindings && ts.isNamedImports(namedBindings)) {
@@ -218,7 +261,9 @@ export function elideImports(
         clausesCount += namedBindings.elements.length;
 
         for (const specifier of namedBindings.elements) {
-          if (specifier.isTypeOnly || isUnused(specifier.name)) {
+          const removalKind = specifier.isTypeOnly ? 'type' : getRemovalKind(specifier.name);
+          if (removalKind !== 'keep') {
+            requiresRewrite ||= removalKind === 'value';
             removedClausesCount++;
             // in case we don't have any more namedImports we should remove the parent ie the {}
             const nodeToRemove =
@@ -233,14 +278,18 @@ export function elideImports(
       if (node.importClause.name) {
         clausesCount++;
 
-        if (node.importClause.isTypeOnly || isUnused(node.importClause.name)) {
+        const removalKind = node.importClause.isTypeOnly
+          ? 'type'
+          : getRemovalKind(node.importClause.name);
+        if (removalKind !== 'keep') {
+          requiresRewrite ||= removalKind === 'value';
           specifierNodeRemovals.push(node.importClause.name);
         }
       }
 
       if (specifierNodeRemovals.length === clausesCount) {
         importNodeRemovals.add(node);
-      } else {
+      } else if (requiresRewrite) {
         for (const specifierNodeRemoval of specifierNodeRemovals) {
           importNodeRemovals.add(specifierNodeRemoval);
         }
@@ -249,4 +298,38 @@ export function elideImports(
   }
 
   return importNodeRemovals;
+}
+
+/**
+ * Determines whether an import alias resolves to a runtime value. Aliases that only resolve to
+ * types, or that pass through a type-only import or export declaration anywhere along the alias
+ * chain, are always elided by TypeScript.
+ */
+function isValueAlias(symbol: ts.Symbol, typeChecker: ts.TypeChecker): boolean {
+  const seen = new Set<ts.Symbol>();
+  let current = symbol;
+
+  while ((current.flags & ts.SymbolFlags.Alias) !== 0) {
+    if (seen.has(current)) {
+      // Circular alias (a TypeScript error) — assume runtime value so we don't over-elide.
+      return true;
+    }
+    seen.add(current);
+
+    if (
+      current.declarations?.length &&
+      current.declarations.every(ts.isTypeOnlyImportOrExportDeclaration)
+    ) {
+      return false;
+    }
+
+    const next = typeChecker.getImmediateAliasedSymbol(current);
+    if (!next) {
+      // Unresolved alias (e.g., missing module) — assume runtime value so we don't over-elide.
+      return true;
+    }
+    current = next;
+  }
+
+  return (current.flags & ts.SymbolFlags.Value) !== 0;
 }
