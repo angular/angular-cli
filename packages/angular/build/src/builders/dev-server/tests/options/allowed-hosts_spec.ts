@@ -65,19 +65,5 @@ describeServeBuilder(executeDevServer, DEV_SERVER_BUILDER_INFO, (harness, setupT
       expect(result?.success).toBeTrue();
       expect(content).toContain('<title>');
     });
-
-    it('allows a host when option is true', async () => {
-      harness.useTarget('serve', {
-        ...BASE_OPTIONS,
-        allowedHosts: true,
-      });
-
-      const { result, content } = await executeOnceAndGet(harness, '/', {
-        request: { headers: FETCH_HEADERS },
-      });
-
-      expect(result?.success).toBeTrue();
-      expect(content).toContain('<title>');
-    });
   });
 });

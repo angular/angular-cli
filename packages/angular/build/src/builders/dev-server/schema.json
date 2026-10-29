@@ -37,21 +37,17 @@
       "description": "SSL certificate to use for serving HTTPS."
     },
     "allowedHosts": {
-      "description": "The hosts that the development server will respond to. This option sets the Vite option of the same name. For further details: https://vite.dev/config/server-options.html#server-allowedhosts",
+      "type": "array",
+      "description": "List of hosts that are allowed to access the dev server.",
       "default": [],
-      "oneOf": [
-        {
-          "type": "array",
-          "description": "A list of hosts that the development server will respond to.",
-          "items": {
-            "type": "string"
-          }
-        },
-        {
-          "type": "boolean",
-          "description": "Indicates that all hosts are allowed. This is not recommended and a security risk."
-        }
-      ]
+      "items": {
+        "type": "string"
+      }
+    },
+    "disableHostCheck": {
+      "type": "boolean",
+      "description": "Don't verify connected clients are part of allowed hosts.",
+      "default": false
     },
     "define": {
       "description": "Defines global identifiers that will be replaced with a specified constant value when found in any JavaScript or TypeScript code including libraries. The value will be used directly. String values must be put in quotes. Identifiers within Angular metadata such as Component Decorators will not be replaced.",

@@ -125,7 +125,15 @@ export async function normalizeOptions(
     sslKey,
     prebundle,
     allowedHosts,
+    disableHostCheck,
   } = options;
+
+  let normalizedAllowedHosts: true | string[];
+  if (disableHostCheck === true) {
+    normalizedAllowedHosts = true;
+  } else {
+    normalizedAllowedHosts = Array.isArray(allowedHosts) ? allowedHosts : [];
+  }
 
   // Return all the normalized options
   return {
@@ -152,6 +160,6 @@ export async function normalizeOptions(
     // Prebundling defaults to true but requires caching to function
     prebundle: cacheOptions.enabled && !optimization.scripts && prebundle,
     inspect,
-    allowedHosts: allowedHosts ? allowedHosts : [],
+    allowedHosts: normalizedAllowedHosts,
   };
 }

@@ -7,6 +7,8 @@
  */
 
 import { JsonObject, schema } from '@angular-devkit/core';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 import type { Argv } from 'yargs';
 import yargs from 'yargs';
 
@@ -387,6 +389,44 @@ describe('parseJsonSchemaToOptions', () => {
         jasmine.objectContaining({ name: 'name', positional: 1, required: false }),
         jasmine.objectContaining({ name: 'path', positional: undefined, required: false }),
       ]);
+    });
+  });
+
+  describe('@angular/build dev-server schema', () => {
+    const devServerSchemaPath = path.join(
+      import.meta.dirname,
+      '../../../../build/src/builders/dev-server/schema.json',
+    );
+
+    const parse = async (args: string[]) => {
+      return localYargs.parseAsync(args);
+    };
+
+    let localYargs: Argv<unknown>;
+
+    beforeEach(async () => {
+      localYargs = yargs().exitProcess(false).strict().fail(false).wrap(1_000);
+
+      const devServerSchema = JSON.parse(readFileSync(devServerSchemaPath, 'utf8')) as JsonObject;
+      const registry = new schema.CoreSchemaRegistry();
+      const options = await parseJsonSchemaToOptions(registry, devServerSchema, false);
+      addSchemaOptionsToCommand(localYargs, options, true);
+    });
+
+    it('parses --allowed-hosts with host names', async () => {
+      expect(await parse(['--allowed-hosts', 'example.com'])).toEqual(
+        jasmine.objectContaining({
+          allowedHosts: ['example.com'],
+        }),
+      );
+    });
+
+    it('parses --disable-host-check', async () => {
+      expect(await parse(['--disable-host-check'])).toEqual(
+        jasmine.objectContaining({
+          disableHostCheck: true,
+        }),
+      );
     });
   });
 });
