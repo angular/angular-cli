@@ -11,13 +11,24 @@ const testFunction: () => Promise<void> | void =
           throw new Error('Invalid test module.');
         };
 
+// 4-minute timeout to prevent hanging tests from blocking the runner indefinitely.
+const TEST_TIMEOUT_MS = 4 * 60 * 1000;
+
 (async () => {
+  let timeoutId: NodeJS.Timeout | undefined;
   try {
-    await testFunction();
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error(`Test "${testScript}" timed out after 4 minutes.`));
+      }, TEST_TIMEOUT_MS);
+    });
+
+    await Promise.race([testFunction(), timeoutPromise]);
   } catch (e) {
     console.error('Test Process error', e);
     process.exitCode = -1;
   } finally {
-    killAllProcesses().finally(() => process.exit());
+    clearTimeout(timeoutId);
+    await killAllProcesses().finally(() => process.exit());
   }
 })();
