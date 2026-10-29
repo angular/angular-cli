@@ -11,10 +11,14 @@ import KarmaTestRunner from './index';
 
 describe('KarmaTestRunner', () => {
   describe('validateDependencies', () => {
-    function createOptions(coverageEnabled: boolean): NormalizedUnitTestBuilderOptions {
+    function createOptions(
+      coverageEnabled: boolean,
+      options: Partial<NormalizedUnitTestBuilderOptions> = {},
+    ): NormalizedUnitTestBuilderOptions {
       return {
         projectSourceRoot: '/non-existent',
         coverage: { enabled: coverageEnabled },
+        ...options,
       } as NormalizedUnitTestBuilderOptions;
     }
 
@@ -27,6 +31,25 @@ describe('KarmaTestRunner', () => {
     it('requires karma-coverage when coverage is enabled', () => {
       expect(() => KarmaTestRunner.validateDependencies?.(createOptions(true))).toThrowError(
         /karma-coverage/,
+      );
+    });
+
+    it('requires karma-chrome-launcher for Chromium with the built-in configuration', () => {
+      const options = createOptions(false, { browsers: ['ChromiumHeadless'] });
+
+      expect(() => KarmaTestRunner.validateDependencies?.(options)).toThrowError(
+        /^(?!.*karma-chromium-launcher).*karma-chrome-launcher/s,
+      );
+    });
+
+    it('does not require launchers for the browsers of a custom configuration', () => {
+      const options = createOptions(false, {
+        browsers: ['ChromeNoSandbox'],
+        runnerConfig: 'karma.conf.js',
+      });
+
+      expect(() => KarmaTestRunner.validateDependencies?.(options)).toThrowError(
+        /^(?!.*-launcher)/s,
       );
     });
   });
