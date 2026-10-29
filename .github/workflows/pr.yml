@@ -114,7 +114,7 @@ jobs:
     # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
     # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
     # See: https://github.com/actions/runner-images/issues/14777
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c0b8d59ecb851e0dd1808f3d00846d5f2c0c8d47 # main
@@ -186,7 +186,7 @@ jobs:
     # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
     # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
     # See: https://github.com/actions/runner-images/issues/14777
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c0b8d59ecb851e0dd1808f3d00846d5f2c0c8d47 # main
@@ -211,7 +211,7 @@ jobs:
     # Pin to ubuntu-24.04 because on ubuntu-26.04 /tmp is mounted as a tmpfs with a 7.8GB quota,
     # causing disk quota exceeded (EDQUOT) errors during E2E package extraction.
     # See: https://github.com/actions/runner-images/issues/14777
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Initialize environment
         uses: angular/dev-infra/github-actions/npm/checkout-and-setup-node@c0b8d59ecb851e0dd1808f3d00846d5f2c0c8d47 # main
