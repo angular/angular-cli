@@ -96,8 +96,7 @@ const URL_PARAMETER_GLOBAL_REGEXP = new RegExp(URL_PARAMETER_REGEXP, 'g');
  * `http:` URLs), query and fragment delimiters, matrix parameters, route tree wildcards, `%` (route
  * segments are decoded again when the route tree is restored) and control characters.
  */
-// eslint-disable-next-line no-control-regex
-const INVALID_PATH_SEGMENT_CHARS_REGEXP = /[/\\?#;*%\x00-\x1f\x7f]/;
+const INVALID_PATH_SEGMENT_CHARS_REGEXP = /[/\\?#;*%\p{Control}]/u;
 
 /**
  * Additional metadata for a server configuration route tree.
@@ -593,9 +592,8 @@ function handlePrerenderParamsReplacement(
       throw new Error(
         `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
           `returned an invalid value '${value}' for parameter '${parameterName}'. ` +
-          `Parameter values must be non-empty path segments other than '.' and '..'. Once ` +
-          `percent-decoded, they cannot start with ':' or contain '/', '\\', '?', '#', ';', '*', '%' ` +
-          `or control characters. Only '**' values can be empty or use '/' to separate segments.`,
+          `Please make sure the value is a valid URL path${parameterName === '**' ? '' : ' segment'} ` +
+          'without dot segments or reserved characters.',
       );
     }
 

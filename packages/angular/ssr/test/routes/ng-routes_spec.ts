@@ -524,43 +524,51 @@ describe('extractRoutesAndCreateRouteTree', () => {
 
     it('should error when a parameter value is not a valid path segment', async () => {
       const invalidValues: [path: string, value: string][] = [
-        ['slash/:id', 'a/b'],
-        ['encoded-slash/:id', 'a%2Fb'],
-        ['backslash/:id', '\\..\\evil.test'],
-        ['encoded-backslash/:id', '%5Cevil.test'],
-        ['double-encoded-backslash/:id', '%255Cevil.test'],
-        ['malformed/:id', '50%-off'],
-        ['dot/:id', '.'],
-        ['dot-dot/:id', '..'],
-        ['query/:id', '..?'],
-        ['fragment/:id', 'a#b'],
-        ['matrix-param/:id', 'a;b'],
-        ['wildcard/:id', '*'],
-        ['param/:id', ':id'],
-        ['empty/:id', ''],
-        ['empty-segment/**', '//evil.test'],
-        ['tab/**', 'a/\t/b'],
+        ['users/:id', 'a/b'],
+        ['users/:id', 'a%2Fb'],
+        ['users/:id', '\\..\\evil.test'],
+        ['users/:id', '%5Cevil.test'],
+        ['users/:id', '%255Cevil.test'],
+        ['users/:id', '50%-off'],
+        ['users/:id', '.'],
+        ['users/:id', '..'],
+        ['users/:id', '..?'],
+        ['users/:id', 'a#b'],
+        ['users/:id', 'a;b'],
+        ['users/:id', '*'],
+        ['users/:id', ':id'],
+        ['users/:id', ''],
+        ['docs/**', '//evil.test'],
+        ['docs/**', 'a/\t/b'],
       ];
-      setAngularAppTestingManifest(
-        invalidValues.map(([path]) => ({ path, component: DummyComponent })),
-        invalidValues.map(([path, value]) => ({
-          path,
-          renderMode: RenderMode.Prerender,
-          async getPrerenderParams() {
-            return [{ [path.endsWith('**') ? '**' : 'id']: value }];
-          },
-        })),
-      );
 
-      const { errors } = await extractRoutesAndCreateRouteTree({
-        url,
-        invokeGetPrerenderParams: true,
-      });
-      expect(errors).toEqual(
-        invalidValues.map(([path, value]) =>
-          jasmine.stringContaining(`'${path}' route returned an invalid value '${value}'`),
-        ),
-      );
+      for (const [path, value] of invalidValues) {
+        const paramName = path.endsWith('**') ? '**' : 'id';
+        setAngularAppTestingManifest(
+          [{ path, component: DummyComponent }],
+          [
+            {
+              path,
+              renderMode: RenderMode.Prerender,
+              async getPrerenderParams() {
+                return [{ [paramName]: value }];
+              },
+            },
+          ],
+        );
+
+        const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+          url,
+          invokeGetPrerenderParams: true,
+        });
+        expect(errors).toEqual([
+          jasmine.stringContaining(
+            `The 'getPrerenderParams' function defined for the '${path}' route ` +
+              `returned an invalid value '${value}' for parameter '${paramName}'.`,
+          ),
+        ]);
+        expect(routeTree.toObject()).toEqual([]);
+      }
     });
 
     it('should not error when a parameter value contains characters allowed in a path segment', async () => {
