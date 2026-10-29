@@ -195,14 +195,6 @@ export async function getVitestBuildOptions(
 
   // Find test files
   const testFiles = await findTests(include, exclude, workspaceRoot, projectSourceRoot);
-  if (testFiles.length === 0) {
-    throw new Error(
-      'No tests found matching the following patterns:\n' +
-        `- Included: ${include.join(', ')}\n` +
-        (exclude.length ? `- Excluded: ${exclude.join(', ')}\n` : '') +
-        `\nPlease check the 'test' target configuration in your project's 'angular.json' file.`,
-    );
-  }
 
   const entryPoints = getTestEntrypoints(testFiles, {
     projectSourceRoot,
