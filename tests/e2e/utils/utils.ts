@@ -19,7 +19,11 @@ export function expectToFail(fn: () => Promise<any>, errorMessage?: string): Pro
 }
 
 export async function mktempd(prefix: string, tempRoot?: string): Promise<string> {
-  return realpath(await mkdtemp(path.join(tempRoot ?? tmpdir(), prefix)));
+  return realpath(
+    await mkdtemp(
+      path.join(tempRoot || process.env.E2E_TEMP || process.env.TEST_TMPDIR || tmpdir(), prefix),
+    ),
+  );
 }
 
 export async function mockHome(cb: (home: string) => Promise<void>): Promise<void> {
