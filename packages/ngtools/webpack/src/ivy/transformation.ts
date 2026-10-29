@@ -149,7 +149,17 @@ export function replaceBootstrap(
         if (removals.size > 0) {
           updatedSourceFile = ts.visitEachChild(
             updatedSourceFile,
-            (node) => (removals.has(node) ? undefined : node),
+            function visitForRemoval(node): ts.Node | undefined {
+              if (removals.has(node)) {
+                return undefined;
+              }
+
+              return ts.isImportDeclaration(node) ||
+                ts.isImportClause(node) ||
+                ts.isNamedImports(node)
+                ? ts.visitEachChild(node, visitForRemoval, context)
+                : node;
+            },
             context,
           );
         }
