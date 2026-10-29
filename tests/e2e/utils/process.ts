@@ -441,19 +441,13 @@ export function silentGit(...args: string[]) {
  * registry (not the test runner or standard global node_modules).
  */
 export async function launchTestProcess(entry: string, ...args: any[]): Promise<void> {
-  // NOTE: do NOT use the bazel TEST_TMPDIR. When sandboxing is not enabled the
-  // TEST_TMPDIR is not sandboxed and has symlinks into the src dir in a
-  // parent directory. Symlinks into the src dir will include package.json,
-  // .git and other files/folders that may effect e2e tests.
-
   const tempRoot: string = getGlobalVariable('tmp-root');
-  const TEMP = process.env.TEMP ?? process.env.TMPDIR ?? tempRoot;
 
   // Extract explicit environment variables for the test process.
   const env: NodeJS.ProcessEnv = {
-    TEMP,
-    TMPDIR: TEMP,
-    HOME: TEMP,
+    TEMP: tempRoot,
+    TMPDIR: tempRoot,
+    HOME: tempRoot,
 
     // Use BAZEL_TARGET as a metadata variable to show it is a
     // process managed by bazel
@@ -469,7 +463,7 @@ export async function launchTestProcess(entry: string, ...args: any[]): Promise<
   // non angular-cli paths such as /usr/bin for generic commands.
   env.PATH = process.env
     .PATH!.split(delimiter)
-    .filter((p) => p.startsWith(tempRoot) || p.startsWith(TEMP) || !p.includes('angular-cli'))
+    .filter((p) => p.startsWith(tempRoot) || !p.includes('angular-cli'))
     .join(delimiter);
 
   const testProcessArgs = [

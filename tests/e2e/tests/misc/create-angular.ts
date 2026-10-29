@@ -1,12 +1,13 @@
 import { equal } from 'node:assert';
-import { join, resolve } from 'node:path';
+import { join } from 'node:path';
 import { expectFileToExist, readFile, rimraf } from '../../utils/fs';
 import { getActivePackageManager } from '../../utils/packages';
 import { silentBun, silentNpm, silentPnpm, silentYarn } from '../../utils/process';
+import { mktempd } from '../../utils/utils';
 
 export default async function () {
   const currentDirectory = process.cwd();
-  const newDirectory = resolve('../');
+  const newDirectory = await mktempd('create-angular-test-');
   const projectName = 'test-project-create';
 
   try {
