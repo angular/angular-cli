@@ -278,6 +278,21 @@ export async function optimizeChunks(
 
           return result;
         },
+        augmentChunkHash(chunk: { moduleIds: string[] }) {
+          if (!sourcemap) {
+            return;
+          }
+
+          let hash = '';
+          for (const id of chunk.moduleIds) {
+            const mapHash = maps[id]?.hash;
+            if (mapHash) {
+              hash += mapHash;
+            }
+          }
+
+          return hash || undefined;
+        },
       },
     ];
 

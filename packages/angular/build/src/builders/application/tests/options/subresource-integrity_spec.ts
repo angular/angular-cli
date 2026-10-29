@@ -11,6 +11,7 @@ import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { buildApplication } from '../../index';
+import { OutputHashing } from '../../schema';
 import {
   APPLICATION_BUILDER_INFO,
   BASE_OPTIONS,
@@ -253,6 +254,83 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
       expect(indexHtml).toMatch(
         /const scripts = \[\[(?:'[^']+', "module", false, false, "sha384-[^"]+", "anonymous"(?:, )?)+\]\];/,
       );
+    });
+
+    it(`updates optimized chunk filename when source map changes cause debugId to change`, async () => {
+      await harness.writeFiles({
+        'src/app/shared-label.ts': `
+          export interface LabelInput {
+            text: string;
+          }
+          export function formatLabel(input: LabelInput): string {
+            return 'SHARED_LABEL:' + input.text;
+          }
+        `,
+        'src/app/lazy-a.ts': `
+          import { formatLabel } from './shared-label';
+          export const a = formatLabel({ text: 'a' });
+        `,
+        'src/app/lazy-b.ts': `
+          import { formatLabel } from './shared-label';
+          export const b = formatLabel({ text: 'b' });
+        `,
+        'src/app/lazy-c.ts': `
+          export const c = 'c';
+        `,
+        'src/main.ts': `
+          console.log(
+            import('./app/lazy-a'),
+            import('./app/lazy-b'),
+            import('./app/lazy-c'),
+          );
+        `,
+      });
+
+      harness.useTarget('build', {
+        ...BASE_OPTIONS,
+        optimization: true,
+        outputHashing: OutputHashing.All,
+        sourceMap: { scripts: true },
+        subresourceIntegrity: true,
+      });
+
+      const firstBuild = await harness.executeOnce();
+      expect(firstBuild.result?.success).toBeTrue();
+
+      const distDir = workspacePath('dist/browser');
+      const findSharedChunk = () => {
+        const files = readdirSync(distDir).filter((f) => f.endsWith('.js'));
+        for (const file of files) {
+          const content = readFileSync(join(distDir, file), 'utf-8');
+          if (content.includes('SHARED_LABEL:')) {
+            return { file, content };
+          }
+        }
+        throw new Error('Shared label chunk not found');
+      };
+
+      const chunk1 = findSharedChunk();
+
+      // Make a type-only change that shifts line numbers in the source map without changing emitted JS code.
+      await harness.writeFile(
+        'src/app/shared-label.ts',
+        `
+          export interface LabelInput {
+            text: string;
+            extra?: number;
+          }
+          export function formatLabel(input: LabelInput): string {
+            return 'SHARED_LABEL:' + input.text;
+          }
+        `,
+      );
+
+      const secondBuild = await harness.executeOnce();
+      expect(secondBuild.result?.success).toBeTrue();
+
+      const chunk2 = findSharedChunk();
+      expect(chunk2.content).not.toBe(chunk1.content);
+      expect(chunk2.file).not.toBe(chunk1.file);
     });
   });
 });
