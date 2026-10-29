@@ -79,6 +79,23 @@ describe('elide_imports', () => {
     'jsx.ts': `
         export function createElement() {}
       `,
+    'mixed.ts': `
+        export class MixedService { }
+        export interface MixedInterface { value: string }
+        export const enum MixedEnum { A = 1 }
+      `,
+    'generic.ts': `
+        export interface Generic<T> { value: T }
+      `,
+    'type-reexport.ts': `
+        export type { Service } from './service';
+        export { promise } from './const';
+      `,
+    'type-import-reexport.ts': `
+        import type { Service2 } from './service';
+        export { Service2 };
+        export { take } from './const';
+      `,
   };
 
   it('should remove unused imports', () => {
@@ -455,6 +472,79 @@ describe('elide_imports', () => {
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('should elide specifiers used only in non-type interface re-exports, type aliases, type parameters, typeof queries, or ambient declarations', () => {
+      const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { OnChanges, SimpleChanges } from './type';
+          import { Service, Service2 } from './service';
+          import { animations, promise, take } from './const';
+
+          export { SimpleChanges };
+          export type ServiceCtor = typeof Service2;
+          export { type take };
+          declare class AmbientSubService extends Service2 {}
+
+          const used = promise;
+
+          @Decorator()
+          export class Foo<T extends OnChanges> {
+            prop?: typeof animations;
+            constructor(param: Service) {
+            }
+          }
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          import { __decorate } from "tslib";
+          import { Decorator } from './decorator';
+          import { promise } from './const';
+
+          const used = promise;
+
+          let Foo = class Foo { constructor(param) { } };
+          Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not retain inlined const enum imports when only non-value specifiers are removed from a declaration', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedInterface } from './mixed';
+
+          export const value = MixedEnum.A;
+          export let other: MixedInterface | undefined;
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          export const value = 1 /* MixedEnum.A */;
+          export let other;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 
   it('keeps jsxFactory imports when configured', () => {
@@ -501,6 +591,87 @@ describe('elide_imports', () => {
       extraCompilerOptions,
       true,
     );
+    const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('should remove non-value specifiers from import declarations replaced by a previous transformer', () => {
+    const input = tags.stripIndent`
+        import { MixedService, MixedInterface } from './mixed';
+
+        export const service = MixedService;
+        export let value: MixedInterface | undefined;
+
+        ${dummyNode}
+      `;
+
+    const output = tags.stripIndent`
+        import { MixedService } from './mixed';
+
+        export const service = MixedService;
+        export let value;
+      `;
+
+    // Simulates a previous transformer replacing the import declarations. TypeScript does not
+    // perform its own import elision for import declarations replaced by a transformer.
+    const replaceImports = (context: ts.TransformationContext) => (sourceFile: ts.SourceFile) =>
+      ts.visitEachChild(
+        sourceFile,
+        (node) => {
+          if (
+            !ts.isImportDeclaration(node) ||
+            !node.importClause?.namedBindings ||
+            !ts.isNamedImports(node.importClause.namedBindings)
+          ) {
+            return node;
+          }
+
+          return context.factory.updateImportDeclaration(
+            node,
+            node.modifiers,
+            context.factory.updateImportClause(
+              node.importClause,
+              node.importClause.phaseModifier,
+              node.importClause.name,
+              context.factory.updateNamedImports(node.importClause.namedBindings, [
+                ...node.importClause.namedBindings.elements,
+              ]),
+            ),
+            node.moduleSpecifier,
+            node.attributes,
+          );
+        },
+        context,
+      );
+
+    const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true);
+    const result = transformTypescript(
+      undefined,
+      [replaceImports, transformer(program)],
+      program,
+      compilerHost,
+    );
+
+    expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+  });
+
+  it('should retain used imports from unresolved modules', () => {
+    const input = tags.stripIndent`
+        import { missing, unused } from './missing';
+
+        const used = missing;
+
+        ${dummyNode}
+      `;
+
+    const output = tags.stripIndent`
+        import { missing } from './missing';
+
+        const used = missing;
+      `;
+
+    const { program, compilerHost } = createTypescriptContext(input, additionalFiles);
     const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
 
     expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
@@ -786,6 +957,179 @@ describe('elide_imports', () => {
           };
 
           Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service]) ], Foo);
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should elide non-value interface imports and typeof queries even when emitDecoratorMetadata is true', () => {
+      const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { Service } from './service';
+          import { OnChanges, SimpleChanges } from './type';
+          import { animations, promise } from './const';
+
+          const used = promise;
+
+          @Decorator()
+          class Foo implements OnChanges {
+            @Decorator()
+            prop?: typeof animations;
+
+            constructor(param: Service, changes: SimpleChanges) { }
+            ngOnChanges(changes: SimpleChanges) { }
+          }
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          import { __decorate, __metadata } from "tslib";
+          import { Decorator } from './decorator';
+          import { Service } from './service';
+          import { promise } from './const';
+
+          const used = promise;
+
+          let Foo = class Foo {
+            constructor(param, changes) { }
+            ngOnChanges(changes) { }
+          };
+
+          __decorate([ Decorator(), __metadata("design:type", Object) ], Foo.prototype, "prop", void 0);
+          Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Service, Object]) ], Foo);
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not retain value imports that TypeScript would elide when only non-value specifiers are removed from a declaration', () => {
+      const input = tags.stripIndent`
+          import { MixedService, MixedInterface } from './mixed';
+
+          export class Foo {
+            service?: MixedService;
+            value?: MixedInterface;
+          }
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          export class Foo { }
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not retain inlined const enum imports when only non-value specifiers are removed from a declaration', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedInterface } from './mixed';
+
+          export const value = MixedEnum.A;
+          export let other: MixedInterface | undefined;
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          export const value = 1 /* MixedEnum.A */;
+          export let other;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should elide imports that resolve through type-only re-exports', () => {
+      const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { Service, promise } from './type-reexport';
+          import { Service2, take } from './type-import-reexport';
+
+          @Decorator()
+          export class Foo {
+            constructor(param: Service, param2: Service2) { }
+          }
+
+          const remove = [promise, take];
+        `;
+
+      const output = tags.stripIndent`
+          import { __decorate, __metadata } from "tslib";
+          import { Decorator } from './decorator';
+
+          let Foo = class Foo { constructor(param, param2) { } };
+          Foo = __decorate([ Decorator(), __metadata("design:paramtypes", [Function, Function]) ], Foo);
+          export { Foo };
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should elide imports only used in import type arguments or index signatures', () => {
+      const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { Service, Service2 } from './service';
+
+          export class IndexSignatureHolder {
+            [key: string]: Service;
+          }
+
+          export class Foo {
+            @Decorator()
+            prop?: import('./generic').Generic<Service>;
+          }
+
+          const remove = Service2;
+        `;
+
+      const output = tags.stripIndent`
+          import { __decorate, __metadata } from "tslib";
+          import { Decorator } from './decorator';
+
+          export class IndexSignatureHolder { }
+          export class Foo { }
+          __decorate([ Decorator(), __metadata("design:type", Object) ], Foo.prototype, "prop", void 0);
         `;
 
       const { program, compilerHost } = createTypescriptContext(
