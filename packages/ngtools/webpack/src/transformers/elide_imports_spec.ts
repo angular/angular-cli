@@ -414,6 +414,47 @@ describe('elide_imports', () => {
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('should remove import when specifiers are only used in type annotations, type-only re-exports, or interface extends', () => {
+      const input = tags.stripIndent`
+          import { Decorator } from './decorator';
+          import { OnChanges, SimpleChanges } from './type';
+          import { Service, Service2 } from './service';
+
+          export type { SimpleChanges };
+          export { type Service2 };
+          export interface ExtendedChanges extends OnChanges {
+            extra: string;
+          }
+
+          @Decorator()
+          export class Foo {
+            constructor(param: Service) {
+            }
+          }
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          import { __decorate } from "tslib";
+          import { Decorator } from './decorator';
+
+          let Foo = class Foo { constructor(param) { } };
+          Foo = __decorate([ Decorator() ], Foo);
+          export { Foo };
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 
   it('keeps jsxFactory imports when configured', () => {
