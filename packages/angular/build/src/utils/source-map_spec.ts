@@ -120,11 +120,37 @@ describe('removeSourceMappingURL', () => {
     expect(removeSourceMappingURL(escapedBracketInClass)).toBe(escapedBracketInClass);
   });
 
-  it('should handle regex literals after keywords', () => {
+  it('should handle regex literals after keywords including default', () => {
     const code =
       'function test() { return /"/; }\nconst text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
     expect(removeSourceMappingURL(code)).toBe(
       'function test() { return /"/; }\nconst text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+
+    const exportDefaultCode =
+      'export default /"/;\nconst text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(exportDefaultCode)).toBe(
+      'export default /"/;\nconst text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+  });
+
+  it('should handle Unicode identifiers before regex literals and division', () => {
+    const regexAfterUnicodeVar =
+      'const à = /"/; const text = "//# sourceMappingURL=not-a-comment";';
+    expect(removeSourceMappingURL(regexAfterUnicodeVar)).toBe(regexAfterUnicodeVar);
+
+    const divisionAfterUnicodeVar =
+      'const x = à / b; const y = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(divisionAfterUnicodeVar)).toBe(
+      'const x = à / b; const y = "//# sourceMappingURL=not-a-comment";\n',
+    );
+  });
+
+  it('should handle postfix increment and decrement before division', () => {
+    const code =
+      'const x = i++ / 2 + j-- / 2; const y = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'const x = i++ / 2 + j-- / 2; const y = "//# sourceMappingURL=not-a-comment";\n',
     );
   });
 
