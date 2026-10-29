@@ -121,6 +121,18 @@ describe('Migration to use the library builder', () => {
     expect(newTree.exists('/projects/my-lib/ng-package.json')).toBe(false);
   });
 
+  it('should keep the default ng-packagr output path when dest is not set', async () => {
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({ lib: { entryFile: 'src/public-api.ts' } }),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { projects } = newTree.readJson('/angular.json') as any;
+    expect(projects['my-lib'].architect['build'].options.outputPath).toBe('projects/my-lib/dist');
+  });
+
   it('should migrate @angular/build:ng-packagr and promote tsConfig from development configuration', async () => {
     const angularJson = JSON.parse(tree.readContent('/angular.json'));
     angularJson.projects['my-lib'].architect.build = {

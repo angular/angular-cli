@@ -244,8 +244,9 @@ function migrateTargetOptions(
     delete buildTarget.configurations?.['development']?.['tsConfig'];
   }
 
-  if (ngPackageConfig?.dest && typeof buildTarget.options['outputPath'] !== 'string') {
-    buildTarget.options['outputPath'] = join(projectDir, ngPackageConfig.dest);
+  if (typeof buildTarget.options['outputPath'] !== 'string') {
+    // `ng-packagr` writes to `dist` within the package directory when `dest` is not set.
+    buildTarget.options['outputPath'] = join(projectDir, ngPackageConfig?.dest ?? 'dist');
   }
 
   if (ngPackageConfig?.assets?.length) {
