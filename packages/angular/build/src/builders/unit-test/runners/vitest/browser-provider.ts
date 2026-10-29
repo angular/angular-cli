@@ -192,7 +192,12 @@ export async function setupBrowserConfiguration(
               if (instance.browser === 'chrome' || instance.browser === 'chromium') {
                 instance.provider = providerFactory({
                   capabilities: {
-                    'goog:chromeOptions': { binary: executablePath },
+                    'goog:chromeOptions': {
+                      binary: executablePath,
+                      args: executablePath.includes('rules_browsers')
+                        ? ['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
+                        : undefined,
+                    },
                   },
                 });
               }

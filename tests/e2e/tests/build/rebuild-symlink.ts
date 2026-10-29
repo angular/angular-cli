@@ -1,5 +1,6 @@
 import { symlink } from 'node:fs/promises';
 import { resolve } from 'node:path';
+import { setTimeout } from 'node:timers/promises';
 import { appendToFile, expectFileToMatch, writeMultipleFiles } from '../../utils/fs';
 import { execAndWaitForOutputToMatch, waitForAnyProcessOutputToMatch } from '../../utils/process';
 import { updateJsonFile } from '../../utils/project';
@@ -10,11 +11,6 @@ const buildReadyRegEx = getGlobalVariable('argv')['esbuild']
   : /Build at: /;
 
 export default async function () {
-  // TODO: Disabled pending investigation. Steps work outside of test
-  if (getGlobalVariable('argv')['esbuild']) {
-    return;
-  }
-
   await updateJsonFile('angular.json', (configJson) => {
     configJson.projects['test-project'].architect.build.options.preserveSymlinks = true;
   });
@@ -32,10 +28,15 @@ export default async function () {
     buildReadyRegEx,
   );
 
+  await setTimeout(200);
+
   // Trigger a rebuild
   await Promise.all([
     waitForAnyProcessOutputToMatch(buildReadyRegEx),
     appendToFile('src/link-source.ts', `\nconsole.log('foo-bar');`),
   ]);
-  await expectFileToMatch('dist/test-project/browser/main.js', `console.log('foo-bar')`);
+
+  await setTimeout(200);
+
+  await expectFileToMatch('dist/test-project/browser/main.js', /console\.log\(["']foo-bar["']\);/);
 }
