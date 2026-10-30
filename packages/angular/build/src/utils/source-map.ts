@@ -169,8 +169,7 @@ function consumeIdentifier(
   ) {
     prevIdx--;
   }
-  const regexAllowed =
-    (prevIdx < 0 || code[prevIdx] !== '.') && REGEX_PRECEDING_KEYWORDS.has(word);
+  const regexAllowed = (prevIdx < 0 || code[prevIdx] !== '.') && REGEX_PRECEDING_KEYWORDS.has(word);
 
   return { nextIndex: i, regexAllowed };
 }
@@ -222,12 +221,8 @@ function removeSourceMappingURLFromString(code: string): string {
   // Stack to track template literal state and curly brace depth for nested interpolations.
   const stack: { type: 'template'; braceDepth: number }[] = [];
   let currentState:
-    | 'normal'
-    | 'string_double'
-    | 'string_single'
-    | 'template'
-    | 'comment_block'
-    | 'comment_line' = 'normal';
+    'normal' | 'string_double' | 'string_single' | 'template' | 'comment_block' | 'comment_line' =
+    'normal';
   let regexAllowed = true;
 
   while (i < len) {
