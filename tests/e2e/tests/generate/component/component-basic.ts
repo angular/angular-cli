@@ -2,19 +2,20 @@ import { join } from 'node:path';
 import { ng } from '../../../utils/process';
 import { expectFileToExist } from '../../../utils/fs';
 
-export default function () {
-  const projectDir = join('src', 'app');
-  const componentDir = join(projectDir, 'test-component');
+export default async function () {
+  const componentDir = 'src/app/test-component';
 
-  return (
-    ng('generate', 'component', 'test-component')
-      .then(() => expectFileToExist(componentDir))
-      .then(() => expectFileToExist(join(componentDir, 'test-component.ts')))
-      .then(() => expectFileToExist(join(componentDir, 'test-component.spec.ts')))
-      .then(() => expectFileToExist(join(componentDir, 'test-component.html')))
-      .then(() => expectFileToExist(join(componentDir, 'test-component.css')))
+  await ng('generate', 'component', 'test-component');
+  await expectFileToExist(componentDir);
+  await expectFileToExist(join(componentDir, 'test-component.ts'));
+  await expectFileToExist(join(componentDir, 'test-component.spec.ts'));
+  await expectFileToExist(join(componentDir, 'test-component.html'));
+  await expectFileToExist(join(componentDir, 'test-component.css'));
 
-      // Try to run the unit tests.
-      .then(() => ng('test', '--watch=false'))
-  );
+  // Try to run the unit tests.
+  await ng('test', '--watch=false');
+
+  // Should generate component that is named "help".
+  await ng('generate', 'component', 'help');
+  await expectFileToExist('src/app/help/help.ts');
 }
