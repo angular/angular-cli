@@ -684,7 +684,11 @@ export function parseYarnModernError(output: string, logger?: Logger): ErrorInfo
   return {
     code,
     summary: first.data.trim(),
-    detail: rest.map(({ data }) => data.trim()).join('\n') || undefined,
+    detail:
+      rest
+        .map(({ data }) => data.trim())
+        .filter(Boolean)
+        .join('\n') || undefined,
   };
 }
 
