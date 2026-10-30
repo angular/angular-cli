@@ -104,6 +104,7 @@ export function createOutputFile(
       set contents(value: Uint8Array) {
         cachedContents = value;
         cachedText = null;
+        cachedHash = null;
       },
       get text(): string {
         cachedText ??= new TextDecoder('utf-8').decode(this.contents);
@@ -134,6 +135,7 @@ export function createOutputFile(
       set contents(value: Uint8Array) {
         cachedContents = value;
         cachedText = null;
+        cachedHash = null;
       },
       path,
       type,
@@ -160,6 +162,7 @@ export function createOutputFile(
 export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile {
   let { contents: cachedContents } = file;
   let cachedText: string | null = null;
+  let cachedHash: string | null = file.hash;
 
   return {
     get contents(): Uint8Array {
@@ -168,8 +171,13 @@ export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): 
     set contents(value: Uint8Array) {
       cachedContents = value;
       cachedText = null;
+      cachedHash = null;
     },
-    hash: file.hash,
+    get hash(): string {
+      cachedHash ??= calculateHash(cachedContents);
+
+      return cachedHash;
+    },
     path: file.path,
     type,
     get size(): number {
