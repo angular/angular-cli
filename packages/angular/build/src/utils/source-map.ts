@@ -59,7 +59,8 @@ export function findTrailingSourceMapComment(
 
 /**
  * Removes `//# sourceMappingURL=` comments safely from the given JavaScript code,
- * ignoring any occurrences that are inside string literals, template literals, or block comments.
+ * ignoring any occurrences that are inside string literals, template literals, regex literals,
+ * or block comments.
  *
  * For raw Uint8Array / Buffer inputs, it optimizes performance by inspecting trailing byte sequences
  * to slice the buffer directly without full string decoding.
@@ -93,6 +94,120 @@ export function removeSourceMappingURL(code: string | Uint8Array): string | Uint
   return stripped === text ? code : Buffer.from(stripped, 'utf-8');
 }
 
+const REGEX_PRECEDING_KEYWORDS = new Set([
+  'await',
+  'case',
+  'default',
+  'delete',
+  'do',
+  'else',
+  'in',
+  'instanceof',
+  'new',
+  'of',
+  'return',
+  'throw',
+  'typeof',
+  'void',
+  'yield',
+]);
+
+const REGEX_PRECEDING_PUNCTUATION = new Set([
+  '(',
+  ',',
+  '=',
+  ':',
+  '[',
+  '!',
+  '&',
+  '|',
+  '?',
+  '{',
+  '}',
+  ';',
+  '+',
+  '-',
+  '*',
+  '%',
+  '~',
+  '^',
+  '<',
+  '>',
+  '/',
+]);
+
+function isIdentifierChar(char: string): boolean {
+  const code = char.charCodeAt(0);
+
+  return (
+    (code >= 97 && code <= 122) || // a-z
+    (code >= 65 && code <= 90) || // A-Z
+    (code >= 48 && code <= 57) || // 0-9
+    code === 95 || // _
+    code === 36 || // $
+    code > 127 // Unicode / non-ASCII
+  );
+}
+
+function consumeIdentifier(
+  code: string,
+  start: number,
+): { nextIndex: number; regexAllowed: boolean } {
+  const len = code.length;
+  let i = start + 1;
+  while (i < len && isIdentifierChar(code[i])) {
+    i++;
+  }
+  const word = code.slice(start, i);
+  let prevIdx = start - 1;
+  while (
+    prevIdx >= 0 &&
+    (code[prevIdx] === ' ' ||
+      code[prevIdx] === '\t' ||
+      code[prevIdx] === '\n' ||
+      code[prevIdx] === '\r')
+  ) {
+    prevIdx--;
+  }
+  const regexAllowed = (prevIdx < 0 || code[prevIdx] !== '.') && REGEX_PRECEDING_KEYWORDS.has(word);
+
+  return { nextIndex: i, regexAllowed };
+}
+
+function consumeRegexLiteral(
+  code: string,
+  start: number,
+): { nextIndex: number; regexAllowed: boolean } {
+  const len = code.length;
+  let i = start;
+  let inCharClass = false;
+
+  while (i < len) {
+    const char = code[i];
+    if (char === '\\') {
+      const nextChar = code[i + 1];
+      if (nextChar === '\n' || nextChar === '\r') {
+        return { nextIndex: i + 2, regexAllowed: true };
+      }
+      i += 2;
+      continue;
+    }
+    if (char === '\n' || char === '\r') {
+      return { nextIndex: i + 1, regexAllowed: true };
+    }
+    if (char === '[') {
+      inCharClass = true;
+    } else if (char === ']' && inCharClass) {
+      inCharClass = false;
+    } else if (char === '/' && !inCharClass) {
+      return { nextIndex: i + 1, regexAllowed: false };
+    }
+    i++;
+  }
+
+  return { nextIndex: len, regexAllowed: false };
+}
+
 function removeSourceMappingURLFromString(code: string): string {
   if (!code.includes(SOURCEMAP_COMMENT_PREFIX)) {
     return code;
@@ -108,6 +223,7 @@ function removeSourceMappingURLFromString(code: string): string {
   let currentState:
     'normal' | 'string_double' | 'string_single' | 'template' | 'comment_block' | 'comment_line' =
     'normal';
+  let regexAllowed = true;
 
   while (i < len) {
     const char = code[i];
@@ -120,24 +236,7 @@ function removeSourceMappingURLFromString(code: string): string {
         continue;
       }
       if (char === '/' && nextChar === '/') {
-        // Detect if the comment is escaped (e.g. inside a regex literal like `/\/\/#/`).
-        let isEscaped = false;
-        let prevIdx = i - 1;
-        while (prevIdx >= 0 && /\s/.test(code[prevIdx])) {
-          prevIdx--;
-        }
-        if (prevIdx >= 0 && code[prevIdx] === '\\') {
-          let bsCount = 0;
-          while (prevIdx >= 0 && code[prevIdx] === '\\') {
-            bsCount++;
-            prevIdx--;
-          }
-          if (bsCount % 2 === 1) {
-            isEscaped = true;
-          }
-        }
-
-        if (!isEscaped && code.startsWith(SOURCEMAP_COMMENT_PREFIX, i)) {
+        if (code.startsWith(SOURCEMAP_COMMENT_PREFIX, i)) {
           if (i > lastCopiedIndex) {
             result.push(code.slice(lastCopiedIndex, i));
           }
@@ -156,17 +255,20 @@ function removeSourceMappingURLFromString(code: string): string {
       }
       if (char === '"') {
         currentState = 'string_double';
+        regexAllowed = false;
         i++;
         continue;
       }
       if (char === "'") {
         currentState = 'string_single';
+        regexAllowed = false;
         i++;
         continue;
       }
       if (char === '`') {
         currentState = 'template';
         stack.push({ type: 'template', braceDepth: 0 });
+        regexAllowed = false;
         i++;
         continue;
       }
@@ -175,6 +277,7 @@ function removeSourceMappingURLFromString(code: string): string {
         if (top) {
           top.braceDepth++;
         }
+        regexAllowed = true;
         i++;
         continue;
       }
@@ -186,14 +289,39 @@ function removeSourceMappingURLFromString(code: string): string {
             // Exiting a template literal interpolation ${ ... }
             stack.pop();
             currentState = 'template';
+            regexAllowed = false;
             i++;
             continue;
           }
         }
+        regexAllowed = true;
         i++;
         continue;
       }
+      if ((char === '+' && nextChar === '+') || (char === '-' && nextChar === '-')) {
+        regexAllowed = false;
+        i += 2;
+        continue;
+      }
+      if (char === '/') {
+        if (regexAllowed) {
+          ({ nextIndex: i, regexAllowed } = consumeRegexLiteral(code, i + 1));
+        } else {
+          regexAllowed = true;
+          i++;
+        }
+        continue;
+      }
+      if (char === ' ' || char === '\t' || char === '\n' || char === '\r') {
+        i++;
+        continue;
+      }
+      if (isIdentifierChar(char)) {
+        ({ nextIndex: i, regexAllowed } = consumeIdentifier(code, i));
+        continue;
+      }
 
+      regexAllowed = REGEX_PRECEDING_PUNCTUATION.has(char);
       i++;
     } else if (currentState === 'string_double') {
       if (char === '\\') {
@@ -202,6 +330,7 @@ function removeSourceMappingURLFromString(code: string): string {
       }
       if (char === '"') {
         currentState = 'normal';
+        regexAllowed = false;
       }
       i++;
     } else if (currentState === 'string_single') {
@@ -211,6 +340,7 @@ function removeSourceMappingURLFromString(code: string): string {
       }
       if (char === "'") {
         currentState = 'normal';
+        regexAllowed = false;
       }
       i++;
     } else if (currentState === 'template') {
@@ -222,12 +352,14 @@ function removeSourceMappingURLFromString(code: string): string {
         // Entering template literal interpolation context
         currentState = 'normal';
         stack.push({ type: 'template', braceDepth: 0 });
+        regexAllowed = true;
         i += 2;
         continue;
       }
       if (char === '`') {
         stack.pop();
         currentState = 'normal';
+        regexAllowed = false;
       }
       i++;
     } else if (currentState === 'comment_block') {

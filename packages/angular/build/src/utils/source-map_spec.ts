@@ -83,9 +83,88 @@ describe('removeSourceMappingURL', () => {
     expect(removeSourceMappingURL(code)).toBe(code);
   });
 
+  it('should not corrupt strings following a regex literal containing a double quote', () => {
+    const code = 'const pattern = /"/; const text = "//# sourceMappingURL=not-a-comment";';
+    expect(removeSourceMappingURL(code)).toBe(code);
+  });
+
+  it('should not corrupt strings following a regex literal containing single quotes or backticks', () => {
+    const singleQuoteCode =
+      "const pattern = /'/; const text = '//# sourceMappingURL=not-a-comment';";
+    expect(removeSourceMappingURL(singleQuoteCode)).toBe(singleQuoteCode);
+
+    const backtickCode = 'const pattern = /`/; const text = `//# sourceMappingURL=not-a-comment`;';
+    expect(removeSourceMappingURL(backtickCode)).toBe(backtickCode);
+  });
+
+  it('should handle regex character classes containing slashes and quotes', () => {
+    const code =
+      'const pattern = /[/"\'`]/; const text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'const pattern = /[/"\'`]/; const text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+
+    const charClassComment = 'const re = /[//# sourceMappingURL=foo.js.map]/;';
+    expect(removeSourceMappingURL(charClassComment)).toBe(charClassComment);
+  });
+
+  it('should handle escaped slashes, brackets, and quotes inside regex literals', () => {
+    const code =
+      'const pattern = /\\/"\\[/; const text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'const pattern = /\\/"\\[/; const text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+
+    const escapedBracketInClass =
+      'const pattern = /[\\]/"\']/; const text = "//# sourceMappingURL=not-a-comment";';
+    expect(removeSourceMappingURL(escapedBracketInClass)).toBe(escapedBracketInClass);
+  });
+
+  it('should handle regex literals after keywords including default', () => {
+    const code =
+      'function test() { return /"/; }\nconst text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'function test() { return /"/; }\nconst text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+
+    const exportDefaultCode =
+      'export default /"/;\nconst text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(exportDefaultCode)).toBe(
+      'export default /"/;\nconst text = "//# sourceMappingURL=not-a-comment";\n',
+    );
+  });
+
+  it('should handle Unicode identifiers before regex literals and division', () => {
+    const regexAfterUnicodeVar =
+      'const à = /"/; const text = "//# sourceMappingURL=not-a-comment";';
+    expect(removeSourceMappingURL(regexAfterUnicodeVar)).toBe(regexAfterUnicodeVar);
+
+    const divisionAfterUnicodeVar =
+      'const x = à / b; const y = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(divisionAfterUnicodeVar)).toBe(
+      'const x = à / b; const y = "//# sourceMappingURL=not-a-comment";\n',
+    );
+  });
+
+  it('should handle postfix increment and decrement before division', () => {
+    const code =
+      'const x = i++ / 2 + j-- / 2; const y = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'const x = i++ / 2 + j-- / 2; const y = "//# sourceMappingURL=not-a-comment";\n',
+    );
+  });
+
   it('should not affect normal division operators', () => {
     const code = 'const ratio = 10 / 2;\n//# sourceMappingURL=main.js.map';
     expect(removeSourceMappingURL(code)).toBe('const ratio = 10 / 2;\n');
+  });
+
+  it('should handle division expressions followed by strings and comments', () => {
+    const code =
+      'const x = a / b; const y = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(code)).toBe(
+      'const x = a / b; const y = "//# sourceMappingURL=not-a-comment";\n',
+    );
   });
 
   it('should only remove exact sourceMappingURL prefix comments', () => {
