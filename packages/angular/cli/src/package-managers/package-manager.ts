@@ -14,7 +14,7 @@
 
 import { join, relative, resolve } from 'node:path';
 import npa from 'npm-package-arg';
-import { maxSatisfying, valid } from 'semver';
+import { maxSatisfying, satisfies, valid, validRange } from 'semver';
 import { PackageManagerError } from './error';
 import { Host } from './host';
 import { Logger } from './logger';
@@ -563,6 +563,15 @@ export class PackageManager {
       (stdout, logger) => this.descriptor.outputParsers.getRegistryManifest(stdout, logger),
       { ...options, cache: this.#manifestCache, cacheKey },
     );
+
+    // Modern yarn returns the latest version instead of an error when the requested one does not exist.
+    if (
+      manifest &&
+      validRange(version) &&
+      !satisfies(manifest.version, version, { includePrerelease: true })
+    ) {
+      return null;
+    }
 
     // If the provided version was not a specific version, also cache the specific fetched version
     if (manifest && manifest.version !== version) {
