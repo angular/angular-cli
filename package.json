@@ -57,7 +57,7 @@
     "@angular/forms": "19.2.22",
     "@angular/localize": "19.2.22",
     "@angular/material": "19.2.0-rc.0",
-    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#252589f7bc8fe6ca13b31e02d506ec52e826cdd2",
+    "@angular/ng-dev": "https://github.com/angular/dev-infra-private-ng-dev-builds.git#37be0b2012ab2d2f58d575689b1bac74eed56e41",
     "@angular/platform-browser": "19.2.22",
     "@angular/platform-browser-dynamic": "19.2.22",
     "@angular/platform-server": "19.2.22",
