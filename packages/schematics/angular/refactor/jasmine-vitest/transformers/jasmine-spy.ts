@@ -532,11 +532,7 @@ function findEnclosingVariableDeclaration(
 function getAssignedSpyObjTypeArguments(
   node: ts.CallExpression,
 ): ts.NodeArray<ts.TypeNode> | undefined {
-  let parent = node.parent;
-  while (parent && ts.isParenthesizedExpression(parent)) {
-    parent = parent.parent;
-  }
-
+  const parent = getUnwrappedParent(node);
   if (!parent) {
     return undefined;
   }
