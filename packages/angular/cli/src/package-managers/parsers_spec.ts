@@ -643,28 +643,99 @@ project node_modules
   });
 
   describe('parseYarnModernError', () => {
-    it('should parse a missing package from yarn npm info as E404', () => {
+    it('should parse a missing package from yarn npm info as E404 with detail', () => {
       const stdout = [
         '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Package not found"}',
         '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Response Code: 404 (Not Found)"}',
         '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Request Method: GET"}',
         '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Request URL: https://registry.yarnpkg.com/@angular%2fnon-existent"}',
       ].join('\n');
-      expect(parseYarnModernError(stdout)).toEqual(
-        jasmine.objectContaining({ code: 'E404', summary: 'Package not found' }),
-      );
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'E404',
+        summary: 'Package not found',
+        detail: [
+          'Response Code: 404 (Not Found)',
+          'Request Method: GET',
+          'Request URL: https://registry.yarnpkg.com/@angular%2fnon-existent',
+        ].join('\n'),
+      });
+    });
+
+    it('should strip ANSI color codes and OSC 8 hyperlinks from error lines', () => {
+      const stdout = [
+        JSON.stringify({
+          type: 'error',
+          name: 35,
+          displayName: 'YN0035',
+          indent: '',
+          data: '\u001b[31mPackage not found\u001b[39m',
+        }),
+        JSON.stringify({
+          type: 'error',
+          name: 35,
+          displayName: 'YN0035',
+          indent: '',
+          data: '  \u001b[38;5;111mResponse Code\u001b[39m: \u001b]8;;https://developer.mozilla.org/en-US/docs/Web/HTTP/Status/404\u0007\u001b[38;5;220m404\u001b[39m (Not Found)\u001b]8;;\u0007',
+        }),
+      ].join('\n');
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'E404',
+        summary: 'Package not found',
+        detail: 'Response Code: 404 (Not Found)',
+      });
     });
 
     it('should use the yarn error code when there is no HTTP status', () => {
       const stdout =
         '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Request timed out"}';
-      expect(parseYarnModernError(stdout)).toEqual(
-        jasmine.objectContaining({ code: 'YN0035', summary: 'Request timed out' }),
-      );
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'YN0035',
+        summary: 'Request timed out',
+        detail: undefined,
+      });
     });
 
-    it('should return null for successful or empty output', () => {
+    it('should omit detail when trailing error lines are empty or whitespace-only', () => {
+      const stdout = [
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Request timed out"}',
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"   "}',
+      ].join('\n');
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'YN0035',
+        summary: 'Request timed out',
+        detail: undefined,
+      });
+    });
+
+    it('should split multi-line exception stack traces into summary and detail', () => {
+      const stdout = JSON.stringify({
+        type: 'error',
+        name: 1,
+        displayName: 'YN0001',
+        indent: '',
+        data: 'RequestError: getaddrinfo ENOTFOUND registry.yarnpkg.com\n    at GetAddrInfoReqWrap.onlookupall (node:dns:120:26)',
+      });
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'YN0001',
+        summary: 'RequestError: getaddrinfo ENOTFOUND registry.yarnpkg.com',
+        detail: 'at GetAddrInfoReqWrap.onlookupall (node:dns:120:26)',
+      });
+    });
+
+    it('should fall back to UNKNOWN_ERROR when displayName is empty or missing', () => {
+      const stdout =
+        '{"type":"error","name":35,"displayName":"","indent":"","data":"Network disabled"}';
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'UNKNOWN_ERROR',
+        summary: 'Network disabled',
+        detail: undefined,
+      });
+    });
+
+    it('should return null for successful, empty, or unrecognized output', () => {
       expect(parseYarnModernError('{"name":"@angular/core","version":"22.2.4"}')).toBeNull();
+      expect(parseYarnModernError('"@angular/core@npm:22.2.4"\n"rxjs@npm:7.8.2"')).toBeNull();
+      expect(parseYarnModernError('some unrelated plain-text output')).toBeNull();
       expect(parseYarnModernError('')).toBeNull();
     });
   });

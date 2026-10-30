@@ -12,6 +12,7 @@
  * into their own file improves modularity and allows for focused testing.
  */
 
+import { stripVTControlCharacters } from 'node:util';
 import { compare, valid } from 'semver';
 import { ErrorInfo } from './error';
 import { Logger } from './logger';
@@ -477,10 +478,11 @@ export function parseYarnClassicMetadata(stdout: string, logger?: Logger): Packa
 }
 
 /**
- * Parses the `stdout` or `stderr` output of npm, pnpm, modern yarn, or bun to extract structured error information.
+ * Parses the `stdout` or `stderr` output of npm or pnpm to extract structured error information.
+ * It is also used by `parseBunError` as a fallback for npm-compatible JSON error objects.
  *
  * This parser uses a multi-stage approach. It first attempts to parse the entire `output` as a
- * single JSON object, which is the standard for modern tools like pnpm, yarn, and bun. If JSON
+ * single JSON object, which is the standard for modern tools like pnpm and npm. If JSON
  * parsing fails, it falls back to a line-by-line regex-based approach to handle the plain
  * text output from older versions of npm.
  *
@@ -513,7 +515,7 @@ export function parseNpmLikeError(output: string, logger?: Logger): ErrorInfo | 
     return null;
   }
 
-  // Attempt to parse as JSON first (common for pnpm, modern yarn, npm 12)
+  // Attempt to parse as JSON first (common for pnpm, npm 12, and the Bun JSON fallback)
   try {
     let jsonError = JSON.parse(output);
     if (Array.isArray(jsonError)) {
@@ -639,9 +641,9 @@ export function parseYarnClassicError(output: string, logger?: Logger): ErrorInf
 /**
  * Parses the `stdout` or `stderr` output of modern yarn (v2+) to extract structured error information.
  *
- * Modern yarn reports errors as JSON lines, one per message line. The first line holds the summary,
- * and registry errors include the HTTP status, which is returned as a standardized error code
- * (`E${statusCode}`). Other output is delegated to `parseNpmLikeError`.
+ * Modern yarn reports errors as JSON lines, one per message line, which may include ANSI color codes
+ * or OSC 8 hyperlinks when colors are enabled (e.g., in CI). The first line holds the summary, and
+ * registry errors include the HTTP status, which is returned as a standardized error code (`E${statusCode}`).
  *
  * Example output (`yarn npm info <missing-package> --json`):
  * ```json
@@ -666,29 +668,55 @@ export function parseYarnModernError(output: string, logger?: Logger): ErrorInfo
   const messages: { code: string; data: string }[] = [];
   for (const json of parseJsonLines(output, logger)) {
     if (json?.type === 'error' && typeof json.data === 'string') {
-      messages.push({ code: String(json.displayName ?? 'UNKNOWN_ERROR'), data: json.data });
+      const displayName =
+        typeof json.displayName === 'string'
+          ? stripVTControlCharacters(json.displayName).trim()
+          : '';
+      messages.push({
+        code: displayName || 'UNKNOWN_ERROR',
+        data: stripVTControlCharacters(json.data),
+      });
     }
   }
 
   if (messages.length === 0) {
-    return parseNpmLikeError(output, logger);
+    logger?.debug('  Failed to parse modern yarn error. No structured error found.');
+
+    return null;
+  }
+
+  let statusCode: string | undefined;
+  for (const { data } of messages) {
+    const match = data.match(/^\s*Response Code:\s*(\d{3})\b/);
+    if (match) {
+      const numericCode = Number(match[1]);
+      if (numericCode < 200 || numericCode >= 300) {
+        statusCode = match[1];
+        break;
+      }
+    }
   }
 
   const [first, ...rest] = messages;
-  const statusCodeMatch = messages
-    .map(({ data }) => data.match(/Response Code: (\d{3})/))
-    .find((match) => match !== null);
-  const code = statusCodeMatch ? `E${statusCodeMatch[1]}` : first.code;
+  const code = statusCode ? `E${statusCode}` : first.code;
   logger?.debug(`  Successfully parsed modern yarn error with code '${code}'.`);
+
+  const [summary = '', ...firstDetailLines] = first.data
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const detailLines = [
+    ...firstDetailLines,
+    ...rest
+      .flatMap(({ data }) => data.split('\n'))
+      .map((line) => line.trim())
+      .filter(Boolean),
+  ];
 
   return {
     code,
-    summary: first.data.trim(),
-    detail:
-      rest
-        .map(({ data }) => data.trim())
-        .filter(Boolean)
-        .join('\n') || undefined,
+    summary,
+    detail: detailLines.join('\n') || undefined,
   };
 }
 
