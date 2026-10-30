@@ -29,12 +29,14 @@ export class CacheCleanModule extends CommandModule implements CommandModuleImpl
 
     // In a Git worktree, `path` is shared with the main checkout and `localPath` holds the
     // development server's Vite cache. Both are the same path outside of a worktree.
-    for (const cachePath of new Set([path, localPath])) {
-      await rm(cachePath, {
-        force: true,
-        recursive: true,
-        maxRetries: 3,
-      });
-    }
+    await Promise.all(
+      Array.from(new Set([path, localPath]), (cachePath) =>
+        rm(cachePath, {
+          force: true,
+          recursive: true,
+          maxRetries: 3,
+        }),
+      ),
+    );
   }
 }

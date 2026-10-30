@@ -6,13 +6,13 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { workspaces } from '@angular-devkit/core';
+import type { workspaces } from '@angular-devkit/core';
 import assert from 'node:assert';
 import { existsSync } from 'node:fs';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { CommandContext } from '../../../command-builder/command-module';
-import { AngularWorkspace } from '../../../utilities/config';
+import type { CommandContext } from '../../../command-builder/command-module';
+import type { AngularWorkspace } from '../../../utilities/config';
 import { CacheCleanModule } from './cli';
 
 describe('CacheCleanModule', () => {
@@ -28,13 +28,13 @@ describe('CacheCleanModule', () => {
     await rm(tempDir, { recursive: true, force: true });
   });
 
-  function runClean(basePath: string): Promise<void> {
+  function runClean(basePath: string, cliExtension?: unknown): Promise<void> {
     const workspace = {
       basePath,
-      extensions: {},
+      extensions: cliExtension ? { cli: cliExtension } : {},
       projects: {} as unknown as workspaces.ProjectDefinitionCollection,
       filePath: join(basePath, 'angular.json'),
-      getCli: () => undefined,
+      getCli: () => cliExtension,
       getProjectCli: () => undefined,
       save: () => Promise.resolve(),
     } as unknown as AngularWorkspace;
@@ -72,5 +72,33 @@ describe('CacheCleanModule', () => {
 
     expect(existsSync(join(mainRepoRoot, '.angular/cache'))).toBeFalse();
     expect(existsSync(join(worktreeRoot, '.angular/cache'))).toBeFalse();
+  });
+
+  it('should succeed when cache directories do not exist', async () => {
+    const workspaceRoot = join(tempDir, 'project');
+    await mkdir(join(workspaceRoot, '.git'), { recursive: true });
+
+    await expectAsync(runClean(workspaceRoot)).toBeResolved();
+  });
+
+  it('should delete both the shared and the worktree-local cache with a custom relative path', async () => {
+    const mainRepoRoot = join(tempDir, 'main-repo');
+    const mainGitDir = join(mainRepoRoot, '.git');
+    const worktreeRoot = join(tempDir, 'worktree');
+    const worktreeMetadataDir = join(mainGitDir, 'worktrees/wt-1');
+
+    await mkdir(worktreeMetadataDir, { recursive: true });
+    await mkdir(worktreeRoot, { recursive: true });
+    await writeFile(join(worktreeRoot, '.git'), `gitdir: ${worktreeMetadataDir}`);
+    await writeFile(join(worktreeMetadataDir, 'commondir'), '../..');
+
+    const customCachePath = 'custom-cache-dir';
+    await mkdir(join(mainRepoRoot, customCachePath, 'app'), { recursive: true });
+    await mkdir(join(worktreeRoot, customCachePath, 'app/dev-server/vite'), { recursive: true });
+
+    await runClean(worktreeRoot, { cache: { path: customCachePath } });
+
+    expect(existsSync(join(mainRepoRoot, customCachePath))).toBeFalse();
+    expect(existsSync(join(worktreeRoot, customCachePath))).toBeFalse();
   });
 });

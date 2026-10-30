@@ -94,6 +94,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(worktreeWorkspaceRoot));
 
     expect(config.path).toBe(resolve(mainWorkspaceRoot, '.angular/cache'));
+    expect(config.localPath).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
   });
 
   it('should fall back to worktree workspace basePath when nested workspace does not exist in main repository', async () => {
@@ -115,6 +116,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(worktreeWorkspaceRoot));
 
     expect(config.path).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
+    expect(config.localPath).toBe(config.path);
   });
 
   it('should resolve custom relative cache path relative to main repository root in a git worktree', async () => {
@@ -158,5 +160,6 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(submoduleRoot));
 
     expect(config.path).toBe(resolve(submoduleRoot, '.angular/cache'));
+    expect(config.localPath).toBe(config.path);
   });
 });
