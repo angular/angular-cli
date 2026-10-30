@@ -22,6 +22,21 @@ describe('PackageManager', () => {
   });
 
   describe('getRegistryManifest', () => {
+    it('should return null when the fetched manifest does not match the requested version', async () => {
+      // Modern yarn falls back to the latest version when the requested version does not exist.
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '2.0.0' }),
+        stderr: '',
+      });
+
+      expect(await pm.getRegistryManifest('foo', '99.99.99')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '^99.0.0')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '^2.0.0')).toEqual(
+        jasmine.objectContaining({ version: '2.0.0' }),
+      );
+    });
+
     it('should quote complex range specifiers when required by the host', async () => {
       // Simulate a quoting host
       Object.assign(host, { requiresQuoting: true });
