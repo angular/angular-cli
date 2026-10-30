@@ -6,7 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { json, workspaces } from '@angular-devkit/core';
+import { json, normalize as devkitNormalize, workspaces } from '@angular-devkit/core';
 import { existsSync, promises as fs } from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
@@ -321,6 +321,35 @@ export function getProjectByCwd(workspace: AngularWorkspace): string | null {
   }
 
   return null;
+}
+
+/**
+ * Resolves the schematic `workingDirectory` smart default relative to the active project root.
+ * When the cwd is the project root, `undefined` is returned so schematics can apply their own
+ * default path (e.g. `src/app`).
+ */
+export function getSchematicWorkingDirectory(
+  workspace: AngularWorkspace,
+  cwd: string = process.cwd(),
+): string | undefined {
+  const projectName =
+    workspace.projects.size === 1
+      ? Array.from(workspace.projects.keys())[0]
+      : findProjectByPath(workspace, cwd);
+
+  if (projectName) {
+    const project = workspace.projects.get(projectName);
+    if (project) {
+      const projectRoot = path.join(workspace.basePath, project.root);
+      const projectRelative = devkitNormalize(path.relative(projectRoot, cwd));
+
+      return projectRelative === '' ? undefined : projectRelative;
+    }
+  }
+
+  const workspaceRelative = devkitNormalize(path.relative(workspace.basePath, cwd));
+
+  return workspaceRelative === '' ? undefined : workspaceRelative;
 }
 
 export async function getConfiguredPackageManager(): Promise<PackageManager | null> {

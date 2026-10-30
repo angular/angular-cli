@@ -17,7 +17,11 @@ import { relative } from 'node:path';
 import { Argv } from 'yargs';
 import { isPackageNameSafeForAnalytics } from '../analytics/analytics';
 import { EventCustomDimension } from '../analytics/analytics-parameters';
-import { getProjectByCwd, getSchematicDefaults } from '../utilities/config';
+import {
+  getProjectByCwd,
+  getSchematicDefaults,
+  getSchematicWorkingDirectory,
+} from '../utilities/config';
 import { assertIsError } from '../utilities/error';
 import { formatFiles } from '../utilities/formatting';
 import { memoize } from '../utilities/memoize';
@@ -138,10 +142,14 @@ export abstract class SchematicsCommandModule
     workflow.registry.useXDeprecatedProvider((msg) => logger.warn(msg));
     workflow.registry.addSmartDefaultProvider('projectName', () => this.getProjectName());
 
-    const workingDir = devkitNormalize(relative(this.context.root, process.cwd()));
-    workflow.registry.addSmartDefaultProvider('workingDirectory', () =>
-      workingDir === '' ? undefined : workingDir,
-    );
+    const workingDirectory = this.context.workspace
+      ? getSchematicWorkingDirectory(this.context.workspace)
+      : (() => {
+          const dir = devkitNormalize(relative(root, process.cwd()));
+
+          return dir === '' ? undefined : dir;
+        })();
+    workflow.registry.addSmartDefaultProvider('workingDirectory', () => workingDirectory);
 
     workflow.engineHost.registerOptionsTransform(async (schematic, options) => {
       const {
