@@ -14,7 +14,7 @@ export default async function () {
     // Generate a component inside the child directory
     await ng('generate', 'component', 'test-component');
 
-    // Move back to the root of the workspacee
+    // Move back to the root of the workspace
     process.chdir(currentDirectory);
 
     // Ensure component is created in the correct location relative to the workspace root
@@ -27,6 +27,7 @@ export default async function () {
     // Ensure unit test execute and pass
     await ng('test', '--watch=false');
   } finally {
+    process.chdir(currentDirectory);
     // Windows CI may fail to clean up the created directory
     // Resolves: "Error: Running "cmd.exe /c git clean -df" returned error code 1"
     await rimraf(childDirectory);

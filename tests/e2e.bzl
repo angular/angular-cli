@@ -59,6 +59,7 @@ WEBPACK_IGNORE_TESTS = [
     "tests/build/chunk-optimizer-heuristic.js",
     "tests/build/chunk-optimizer-env.js",
     "tests/build/chunk-optimizer-animations.js",
+    "tests/build/prerender/error-component-render.js",
 ]
 
 def _to_glob(patterns):

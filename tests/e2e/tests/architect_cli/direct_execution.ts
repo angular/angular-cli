@@ -1,4 +1,4 @@
-import * as assert from 'node:assert/strict';
+import assert from 'node:assert/strict';
 import { exec } from '../../utils/process';
 import { join } from 'node:path';
 
