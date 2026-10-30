@@ -521,6 +521,103 @@ describe('extractRoutesAndCreateRouteTree', () => {
         { route: '/profile/*', renderMode: RenderMode.Server },
       ]);
     });
+
+    it('should error when a parameter value is not a valid path segment', async () => {
+      const invalidValues: [path: string, value: string][] = [
+        ['users/:id', 'a/b'],
+        ['users/:id', 'a%2Fb'],
+        ['users/:id', '\\..\\evil.test'],
+        ['users/:id', '%5Cevil.test'],
+        ['users/:id', '%255Cevil.test'],
+        ['users/:id', '50%-off'],
+        ['users/:id', '.'],
+        ['users/:id', '..'],
+        ['users/:id', '..?'],
+        ['users/:id', 'a#b'],
+        ['users/:id', 'a;b'],
+        ['users/:id', '*'],
+        ['users/:id', ':id'],
+        ['users/:id', ''],
+        ['docs/**', '//evil.test'],
+        ['docs/**', 'a/\t/b'],
+      ];
+
+      for (const [path, value] of invalidValues) {
+        const paramName = path.endsWith('**') ? '**' : 'id';
+        setAngularAppTestingManifest(
+          [{ path, component: DummyComponent }],
+          [
+            {
+              path,
+              renderMode: RenderMode.Prerender,
+              async getPrerenderParams() {
+                return [{ [paramName]: value }];
+              },
+            },
+          ],
+        );
+
+        const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+          url,
+          invokeGetPrerenderParams: true,
+        });
+        expect(errors).toEqual([
+          jasmine.stringContaining(
+            `The 'getPrerenderParams' function defined for the '${path}' route ` +
+              `returned an invalid value '${value}' for parameter '${paramName}'.`,
+          ),
+        ]);
+        expect(routeTree.toObject()).toEqual([]);
+      }
+    });
+
+    it('should not error when a parameter value contains characters allowed in a path segment', async () => {
+      setAngularAppTestingManifest(
+        [
+          { path: 'user/:id', component: DummyComponent },
+          { path: 'docs/**', component: DummyComponent },
+        ],
+        [
+          {
+            path: 'user/:id',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [
+                { id: "customer's-choice" },
+                { id: 'café' },
+                { id: 'a b' },
+                { id: 'a%20c' },
+                { id: 'a:b' },
+              ];
+            },
+          },
+          {
+            path: 'docs/**',
+            renderMode: RenderMode.Prerender,
+            fallback: PrerenderFallback.None,
+            async getPrerenderParams() {
+              return [{ '**': '' }, { '**': 'a/b' }];
+            },
+          },
+        ],
+      );
+
+      const { routeTree, errors } = await extractRoutesAndCreateRouteTree({
+        url,
+        invokeGetPrerenderParams: true,
+      });
+      expect(errors).toHaveSize(0);
+      expect(routeTree.toObject()).toEqual([
+        { route: "/user/customer's-choice", renderMode: RenderMode.Prerender },
+        { route: '/user/café', renderMode: RenderMode.Prerender },
+        { route: '/user/a b', renderMode: RenderMode.Prerender },
+        { route: '/user/a c', renderMode: RenderMode.Prerender },
+        { route: '/user/a:b', renderMode: RenderMode.Prerender },
+        { route: '/docs', renderMode: RenderMode.Prerender },
+        { route: '/docs/a/b', renderMode: RenderMode.Prerender },
+      ]);
+    });
   });
 
   it('should extract routes with a route level matcher', async () => {
