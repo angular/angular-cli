@@ -28,6 +28,7 @@ export default async function () {
     `${MCP_INSPECTOR_PACKAGE_NAME}@${MCP_INSPECTOR_PACKAGE_VERSION}`,
   );
 
+  const initialCwd = process.cwd();
   // Ensure 'list_projects' is registered when inside an Angular workspace
   try {
     const { stdout: stdoutInsideWorkspace } = await runInspector('--method', 'tools/list');
@@ -42,8 +43,9 @@ export default async function () {
 
     assert.match(stdoutOutsideWorkspace, /"list_projects"/);
     assert.match(stdoutOutsideWorkspace, /"get_best_practices"/);
-    assert.match(stdoutInsideWorkspace, /"search_documentation"/);
+    assert.match(stdoutOutsideWorkspace, /"search_documentation"/);
   } finally {
+    chdir(initialCwd);
     await silentNpm('uninstall', '-g', MCP_INSPECTOR_PACKAGE_NAME);
   }
 }

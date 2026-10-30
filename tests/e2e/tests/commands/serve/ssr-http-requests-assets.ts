@@ -88,7 +88,7 @@ export default async function () {
   await killAllProcesses();
 
   // With OpenSSl cert+key
-  writeMultipleFiles({
+  await writeMultipleFiles({
     'server.key': `-----BEGIN PRIVATE KEY-----
 MIIJQwIBADANBgkqhkiG9w0BAQEFAASCCS0wggkpAgEAAoICAQDOyBmVy61zEqfs
 oTPQ9gTX233/nlrVXtaUGJkbDR5actq0X+XQtZuIoO4JgRpiYz5/8XiY8AiaMdt3

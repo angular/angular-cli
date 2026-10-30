@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { homedir } from 'node:os';
-import * as path from 'node:path';
+import { join } from 'node:path';
 import { deleteFile, expectFileToExist } from '../../../utils/fs';
 import { ng, silentNg } from '../../../utils/process';
 import { expectToFail } from '../../../utils/utils';
@@ -22,10 +22,14 @@ export default async function () {
   ngError = await expectToFail(() => silentNg('config', 'cli.completion.prompted'));
   assert.match(ngError.message, /Value cannot be found\./);
 
-  await ng('config', '--global', 'cli.completion.prompted', 'true');
-  const { stdout } = await silentNg('config', '--global', 'cli.completion.prompted');
-  assert.match(stdout, /true/);
+  const globalConfigPath = join(homedir(), '.angular-config.json');
+  try {
+    await ng('config', '--global', 'cli.completion.prompted', 'true');
+    const { stdout } = await silentNg('config', '--global', 'cli.completion.prompted');
+    assert.match(stdout, /true/);
 
-  await expectFileToExist(path.join(homedir(), '.angular-config.json'));
-  await deleteFile(path.join(homedir(), '.angular-config.json'));
+    await expectFileToExist(globalConfigPath);
+  } finally {
+    await deleteFile(globalConfigPath).catch(() => {});
+  }
 }

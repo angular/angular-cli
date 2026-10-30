@@ -1,4 +1,3 @@
-import { chdir } from 'node:process';
 import { exec, ProcessOutput, silentNpm } from '../../utils/process';
 import assert from 'node:assert/strict';
 
@@ -28,16 +27,20 @@ export default async function () {
     `${MCP_INSPECTOR_PACKAGE_NAME}@${MCP_INSPECTOR_PACKAGE_VERSION}`,
   );
 
-  // Ensure `get_best_practices` returns the markdown content
-  const { stdout: stdoutInsideWorkspace } = await runInspector(
-    '--method',
-    'tools/call',
-    '--tool-name',
-    'get_best_practices',
-  );
+  try {
+    // Ensure `get_best_practices` returns the markdown content
+    const { stdout: stdoutInsideWorkspace } = await runInspector(
+      '--method',
+      'tools/call',
+      '--tool-name',
+      'get_best_practices',
+    );
 
-  assert.match(
-    stdoutInsideWorkspace,
-    /You are an expert in TypeScript, Angular, and scalable web application development./,
-  );
+    assert.match(
+      stdoutInsideWorkspace,
+      /You are an expert in TypeScript, Angular, and scalable web application development./,
+    );
+  } finally {
+    await silentNpm('uninstall', '-g', MCP_INSPECTOR_PACKAGE_NAME);
+  }
 }
