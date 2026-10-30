@@ -60,7 +60,6 @@ WEBPACK_IGNORE_TESTS = [
     "tests/build/chunk-optimizer-env.js",
     "tests/build/chunk-optimizer-animations.js",
     "tests/build/prerender/error-component-render.js",
-    "tests/build/unix-esbuild-unsupported.js",
 ]
 
 def _to_glob(patterns):
