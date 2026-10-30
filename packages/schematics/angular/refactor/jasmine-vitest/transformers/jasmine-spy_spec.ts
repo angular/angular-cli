@@ -188,6 +188,71 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
 describe('transformCreateSpyObj', () => {
   const testCases = [
     {
+      description:
+        'should cast jasmine.createSpyObj to MockedObject when assigned to a jasmine.SpyObj variable',
+      input: `
+        let myService: jasmine.SpyObj<MyService>;
+        myService = jasmine.createSpyObj('MyService', ['methodA']);
+      `,
+      expected: `
+        import type { MockedObject } from 'vitest';
+
+        let myService: MockedObject<MyService>;
+        myService = {
+          methodA: vi.fn().mockName('MyService.methodA'),
+        } as MockedObject<MyService>;
+      `,
+    },
+    {
+      description:
+        'should cast jasmine.createSpyObj to MockedObject when it initializes a jasmine.SpyObj variable',
+      input: `const myService: jasmine.SpyObj<MyService> = jasmine.createSpyObj('MyService', ['methodA']);`,
+      expected: `
+        import type { MockedObject } from 'vitest';
+        const myService: MockedObject<MyService> = {
+          methodA: vi.fn().mockName('MyService.methodA'),
+        } as MockedObject<MyService>;
+      `,
+    },
+    {
+      description:
+        'should cast jasmine.createSpyObj to the jasmine.SpyObj type of the variable in the enclosing describe block',
+      input: `
+        describe('Foo', () => {
+          let svc: jasmine.SpyObj<Foo>;
+          beforeEach(() => {
+            svc = jasmine.createSpyObj('Foo', ['a']);
+          });
+        });
+        describe('Bar', () => {
+          let svc: jasmine.SpyObj<Bar>;
+          beforeEach(() => {
+            svc = jasmine.createSpyObj('Bar', ['b']);
+          });
+        });
+      `,
+      expected: `
+        import type { MockedObject } from 'vitest';
+
+        describe('Foo', () => {
+          let svc: MockedObject<Foo>;
+          beforeEach(() => {
+            svc = {
+              a: vi.fn().mockName('Foo.a'),
+            } as MockedObject<Foo>;
+          });
+        });
+        describe('Bar', () => {
+          let svc: MockedObject<Bar>;
+          beforeEach(() => {
+            svc = {
+              b: vi.fn().mockName('Bar.b'),
+            } as MockedObject<Bar>;
+          });
+        });
+      `,
+    },
+    {
       description: 'should transform jasmine.createSpyObj with an array of methods',
       input: `const myService = jasmine.createSpyObj('MyService', ['methodA', 'methodB']);`,
       expected: `const myService = {
