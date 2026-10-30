@@ -162,7 +162,7 @@ export function createOutputFile(
 export function convertOutputFile(file: OutputFile, type: BuildOutputFileType): BuildOutputFile {
   let { contents: cachedContents } = file;
   let cachedText: string | null = null;
-  let cachedHash: string | null = file.hash;
+  let cachedHash: string | null = (file as { hash?: string }).hash ?? null;
 
   return {
     get contents(): Uint8Array {
