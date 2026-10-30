@@ -146,12 +146,14 @@ function resolveEntryFile(tree: Tree, dir: string, configuredEntry?: string): st
  * @param tree The virtual file system tree.
  * @param projectRoot The root directory of the library project.
  * @param primaryProjectFile The workspace-relative path to the primary `ng-packagr` configuration file.
+ * @param projectRoots The normalized root directories of all workspace projects.
  * @returns An array of discovered secondary entry points.
  */
 function findSecondaryEntryPoints(
   tree: Tree,
   projectRoot: string,
   primaryProjectFile: string,
+  projectRoots: ReadonlySet<string>,
 ): SecondaryEntryPoint[] {
   const secondaryEntryPoints: SecondaryEntryPoint[] = [];
   const normalizedRoot = normalizeRelativePath(projectRoot);
@@ -202,7 +204,9 @@ function findSecondaryEntryPoints(
         subdir === 'node_modules' ||
         subdir === 'dist' ||
         subdir === 'out-tsc' ||
-        subdir.startsWith('.')
+        subdir.startsWith('.') ||
+        // Other projects nested in the directory, such as libraries of a workspace root library.
+        projectRoots.has(join(currentPath, subdir))
       ) {
         continue;
       }
@@ -370,6 +374,7 @@ function migrateTargetOptions(
  * @param buildTarget The library's `build` target definition in `angular.json`.
  * @param tree The virtual file system tree.
  * @param context The schematic execution context.
+ * @param projectRoots The normalized root directories of all workspace projects.
  * @returns `true` if the library target was migrated, or `false` if it was skipped.
  */
 function updateLibraryTarget(
@@ -377,6 +382,7 @@ function updateLibraryTarget(
   buildTarget: TargetDefinition,
   tree: Tree,
   context: SchematicContext,
+  projectRoots: ReadonlySet<string>,
 ): boolean {
   const normalizedProjectRoot = normalizeRelativePath(projectRoot);
   let primaryProjectFile =
@@ -423,6 +429,7 @@ function updateLibraryTarget(
     tree,
     normalizedProjectRoot,
     primaryProjectFile,
+    projectRoots,
   );
 
   const toRelativeExportPath = (filePath: string): string => {
@@ -588,6 +595,9 @@ export default function (): Rule {
   return (tree, context) =>
     updateWorkspace((workspace) => {
       let hasMigratedLibrary = false;
+      const projectRoots = new Set(
+        Array.from(workspace.projects.values(), (project) => normalizeRelativePath(project.root)),
+      );
 
       for (const [, project] of workspace.projects) {
         if (project.extensions.projectType !== ProjectType.Library) {
@@ -604,7 +614,7 @@ export default function (): Rule {
           continue;
         }
 
-        if (updateLibraryTarget(project.root, buildTarget, tree, context)) {
+        if (updateLibraryTarget(project.root, buildTarget, tree, context, projectRoots)) {
           hasMigratedLibrary = true;
         }
       }

@@ -280,6 +280,35 @@ describe('Migration to use the library builder', () => {
     });
   });
 
+  it('should not treat other libraries as secondary entry points of a workspace root library', async () => {
+    const angularJson = JSON.parse(tree.readContent('/angular.json'));
+    angularJson.projects = {
+      'root-lib': {
+        root: '',
+        sourceRoot: 'src',
+        projectType: ProjectType.Library,
+        architect: {
+          build: {
+            builder: Builders.NgPackagr,
+            options: { project: 'ng-package.json' },
+          },
+        },
+      },
+      ...angularJson.projects,
+    };
+    tree.overwrite('/angular.json', JSON.stringify(angularJson));
+    tree.create('/ng-package.json', JSON.stringify({ lib: { entryFile: 'src/public-api.ts' } }));
+    tree.create('/projects/my-lib/src/public-api.ts', '');
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    const rootPkg = newTree.readJson('/package.json') as { exports: unknown };
+    expect(rootPkg.exports).toEqual({ '.': './src/public-api.ts' });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { projects } = newTree.readJson('/angular.json') as any;
+    expect(projects['my-lib'].architect['build'].options.outputPath).toBe('dist/my-lib');
+  });
+
   it('should migrate assets, styleIncludePaths, and sass options from ng-package.json', async () => {
     tree.create('/projects/my-lib/CHANGELOG.md', '# Changelog');
     tree.overwrite(
