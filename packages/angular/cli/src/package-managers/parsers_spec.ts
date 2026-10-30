@@ -19,6 +19,7 @@ import {
   parseYarnClassicError,
   parseYarnClassicManifest,
   parseYarnModernDependencies,
+  parseYarnModernError,
   parseYarnReleaseAge,
 } from './parsers';
 
@@ -638,6 +639,33 @@ project node_modules
     it('should return null for empty or unrecognized output', () => {
       expect(parseBunError('')).toBeNull();
       expect(parseBunError('some unrelated output')).toBeNull();
+    });
+  });
+
+  describe('parseYarnModernError', () => {
+    it('should parse a missing package from yarn npm info as E404', () => {
+      const stdout = [
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Package not found"}',
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Response Code: 404 (Not Found)"}',
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Request Method: GET"}',
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Request URL: https://registry.yarnpkg.com/@angular%2fnon-existent"}',
+      ].join('\n');
+      expect(parseYarnModernError(stdout)).toEqual(
+        jasmine.objectContaining({ code: 'E404', summary: 'Package not found' }),
+      );
+    });
+
+    it('should use the yarn error code when there is no HTTP status', () => {
+      const stdout =
+        '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Request timed out"}';
+      expect(parseYarnModernError(stdout)).toEqual(
+        jasmine.objectContaining({ code: 'YN0035', summary: 'Request timed out' }),
+      );
+    });
+
+    it('should return null for successful or empty output', () => {
+      expect(parseYarnModernError('{"name":"@angular/core","version":"22.2.4"}')).toBeNull();
+      expect(parseYarnModernError('')).toBeNull();
     });
   });
 

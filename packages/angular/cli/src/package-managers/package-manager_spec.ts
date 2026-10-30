@@ -422,6 +422,23 @@ describe('PackageManager', () => {
 
       expect(await pm.getRegistryMetadata('non-existent')).toBeNull();
     });
+
+    it('should return null when yarn npm info fails with a missing package', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.rejectWith(
+        new PackageManagerError(
+          'Process exited with code 1.',
+          [
+            '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Package not found"}',
+            '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Response Code: 404 (Not Found)"}',
+          ].join('\n'),
+          '',
+          1,
+        ),
+      );
+
+      expect(await pm.getRegistryMetadata('non-existent')).toBeNull();
+    });
   });
 
   describe('getCurrentPackageName', () => {
