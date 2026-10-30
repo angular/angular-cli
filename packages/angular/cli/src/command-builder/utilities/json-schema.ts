@@ -50,6 +50,11 @@ export interface Option extends YargsOptions {
    * Type of the values in a key/value pair field.
    */
   itemValueType?: 'string';
+
+  /**
+   * The supported types of the option.
+   */
+  types?: ReadonlyArray<'string' | 'number' | 'boolean' | 'array' | 'object'>;
 }
 
 /**
@@ -80,6 +85,41 @@ function checkStringMap(keyValuePairOptions: Set<string>, args: Arguments): bool
   }
 
   return true;
+}
+
+/**
+ * A Yargs coerce function that converts empty or boolean-like values to a boolean
+ * when an option supports both `boolean` and another type (such as `array` or `string`).
+ * @param value The parsed argument value.
+ * @returns A boolean if the value represents a boolean flag, otherwise the original value.
+ */
+function coerceToBoolean(value: unknown): unknown {
+  if (typeof value === 'string') {
+    if (value === '' || value === 'true') {
+      return true;
+    }
+
+    if (value === 'false') {
+      return false;
+    }
+  } else if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return true;
+    }
+
+    if (value.length === 1) {
+      const firstValue = value[0];
+      if (typeof firstValue === 'boolean') {
+        return firstValue;
+      }
+
+      if (firstValue === 'true' || firstValue === 'false') {
+        return firstValue === 'true';
+      }
+    }
+  }
+
+  return value;
 }
 
 /**
@@ -178,6 +218,34 @@ function isSupportedArrayItemSchema(schema: json.JsonObject): boolean {
 }
 
 /**
+ * Checks if a JSON schema node represents a supported array schema,
+ * either directly or within `oneOf`/`anyOf` subschemas.
+ * @param schema The JSON schema node to check.
+ * @returns `true` if the schema represents a supported array, otherwise `false`.
+ */
+function isSupportedArraySchema(schema: json.JsonObject): boolean {
+  if (isJsonObject(schema.items) && isSupportedArrayItemSchema(schema.items)) {
+    return true;
+  }
+
+  if (
+    json.isJsonArray(schema.oneOf) &&
+    schema.oneOf.some((item) => isJsonObject(item) && isSupportedArraySchema(item))
+  ) {
+    return true;
+  }
+
+  if (
+    json.isJsonArray(schema.anyOf) &&
+    schema.anyOf.some((item) => isJsonObject(item) && isSupportedArraySchema(item))
+  ) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
  * Gets the supported types for a JSON schema node.
  * @param current The JSON schema node to get the supported types for.
  * @returns An array of supported types.
@@ -198,7 +266,7 @@ function getSupportedTypes(
       case 'string':
         return true;
       case 'array':
-        return isJsonObject(current.items) && isSupportedArrayItemSchema(current.items);
+        return isSupportedArraySchema(current);
       case 'object':
         return isStringMap(current);
       default:
@@ -372,6 +440,7 @@ export async function parseJsonSchemaToOptions(
         typeof current['x-user-analytics'] === 'string' ? current['x-user-analytics'] : undefined,
       deprecated: xDeprecated === true || typeof xDeprecated === 'string' ? xDeprecated : undefined,
       positional,
+      types,
       ...(type === 'object'
         ? {
             type: 'array',
@@ -424,6 +493,7 @@ export function addSchemaOptionsToCommand<T>(
       alias,
       userAnalytics,
       type,
+      types,
       itemValueType,
       hidden,
       name,
@@ -442,13 +512,20 @@ export function addSchemaOptionsToCommand<T>(
       keyValuePairOptions.add(dashedName);
     }
 
+    let coerce: YargsOptions['coerce'];
+    if (itemValueType) {
+      coerce = coerceToStringMap;
+    } else if (type !== 'boolean' && types?.includes('boolean')) {
+      coerce = coerceToBoolean;
+    }
+
     const sharedOptions: YargsOptions & PositionalOptions = {
       alias,
       hidden,
       description,
       deprecated,
       choices,
-      coerce: itemValueType ? coerceToStringMap : undefined,
+      coerce,
       // This should only be done when `--help` is used otherwise default will override options set in angular.json.
       ...(includeDefaultValues ? { default: defaultVal } : {}),
     };

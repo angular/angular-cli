@@ -48,6 +48,7 @@
           }
         },
         {
+          "const": true,
           "type": "boolean",
           "description": "Indicates that all hosts are allowed. This is not recommended and a security risk."
         }
