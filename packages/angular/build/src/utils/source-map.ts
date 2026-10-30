@@ -8,11 +8,15 @@
 
 import type { EncodedSourceMap } from '@ampproject/remapping';
 import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const SOURCEMAP_COMMENT_PREFIX = '//# sourceMappingURL=';
 export const SOURCEMAP_COMMENT_BYTES = Buffer.from(SOURCEMAP_COMMENT_PREFIX);
+const SOURCEMAP_COMMENT_VALUE_PREFIX = SOURCEMAP_COMMENT_PREFIX.slice(2);
+
+let parseSync: typeof import('oxc-parser').parseSync | undefined;
 
 /**
  * Checks for a single trailing `//# sourceMappingURL=` comment on a raw buffer.
@@ -59,10 +63,11 @@ export function findTrailingSourceMapComment(
 
 /**
  * Removes `//# sourceMappingURL=` comments safely from the given JavaScript code,
- * ignoring any occurrences that are inside string literals, template literals, or block comments.
+ * ignoring any occurrences that are inside string literals, template literals, regex literals,
+ * or block comments.
  *
- * For raw Uint8Array / Buffer inputs, it optimizes performance by inspecting trailing byte sequences
- * to slice the buffer directly without full string decoding.
+ * Single trailing sourcemap comments are sliced directly via a fast path; files with multiple
+ * or non-trailing occurrences lazily fall back to `oxc-parser` comment extraction.
  *
  * @param code The JavaScript source code as a string or Uint8Array.
  * @returns The code with top-level sourcemap comments removed.
@@ -83,177 +88,118 @@ export function removeSourceMappingURL(code: string | Uint8Array): string | Uint
     return trailing.code;
   }
 
-  // Fallback to full decode and state-machine stripping for multiple comments or non-trailing comments
+  // Fallback to full decode and AST lexer comment stripping for multiple or non-trailing comments
   const dataBuffer = Buffer.isBuffer(code)
     ? code
     : Buffer.from(code.buffer, code.byteOffset, code.byteLength);
   const text = dataBuffer.toString('utf-8');
-  const stripped = removeSourceMappingURLFromString(text);
+  const stripped = removeSourceMappingURLFromString(text, true);
 
   return stripped === text ? code : Buffer.from(stripped, 'utf-8');
 }
 
-function removeSourceMappingURLFromString(code: string): string {
-  if (!code.includes(SOURCEMAP_COMMENT_PREFIX)) {
+function removeSourceMappingURLFromString(code: string, skipTrailingCheck = false): string {
+  const firstIndex = code.indexOf(SOURCEMAP_COMMENT_PREFIX);
+  if (firstIndex === -1) {
     return code;
   }
 
+  if (!skipTrailingCheck) {
+    const lastIndex = code.lastIndexOf(SOURCEMAP_COMMENT_PREFIX);
+    let prevIdx = lastIndex - 1;
+    while (prevIdx >= 0 && (code[prevIdx] === ' ' || code[prevIdx] === '\t')) {
+      prevIdx--;
+    }
+    const isLineStart = prevIdx < 0 || code[prevIdx] === '\n' || code[prevIdx] === '\r';
+    if (
+      firstIndex === lastIndex &&
+      isLineStart &&
+      isTrailingSourceMapComment(code.slice(lastIndex + SOURCEMAP_COMMENT_PREFIX.length))
+    ) {
+      return code.slice(0, prevIdx < 0 ? 0 : prevIdx + 1);
+    }
+  }
+
+  parseSync ??= (createRequire(__filename)('oxc-parser') as typeof import('oxc-parser')).parseSync;
+
+  const { comments } = parseSync('source.js', code, {
+    lang: 'js',
+    sourceType: 'unambiguous',
+  });
+
   const result: string[] = [];
   let lastCopiedIndex = 0;
-  let i = 0;
-  const len = code.length;
 
-  // Stack to track template literal state and curly brace depth for nested interpolations.
-  const stack: { type: 'template'; braceDepth: number }[] = [];
-  let currentState:
-    'normal' | 'string_double' | 'string_single' | 'template' | 'comment_block' | 'comment_line' =
-    'normal';
-
-  while (i < len) {
-    const char = code[i];
-    const nextChar = code[i + 1];
-
-    if (currentState === 'normal') {
-      if (char === '/' && nextChar === '*') {
-        currentState = 'comment_block';
-        i += 2;
-        continue;
-      }
-      if (char === '/' && nextChar === '/') {
-        // Detect if the comment is escaped (e.g. inside a regex literal like `/\/\/#/`).
-        let isEscaped = false;
-        let prevIdx = i - 1;
-        while (prevIdx >= 0 && /\s/.test(code[prevIdx])) {
-          prevIdx--;
-        }
-        if (prevIdx >= 0 && code[prevIdx] === '\\') {
-          let bsCount = 0;
-          while (prevIdx >= 0 && code[prevIdx] === '\\') {
-            bsCount++;
-            prevIdx--;
-          }
-          if (bsCount % 2 === 1) {
-            isEscaped = true;
-          }
-        }
-
-        if (!isEscaped && code.startsWith(SOURCEMAP_COMMENT_PREFIX, i)) {
-          if (i > lastCopiedIndex) {
-            result.push(code.slice(lastCopiedIndex, i));
-          }
-          // Skip the rest of the comment line up to the newline
-          i += SOURCEMAP_COMMENT_PREFIX.length;
-          while (i < len && code[i] !== '\n' && code[i] !== '\r') {
-            i++;
-          }
-          lastCopiedIndex = i;
-          continue;
-        } else {
-          currentState = 'comment_line';
-          i += 2;
-          continue;
-        }
-      }
-      if (char === '"') {
-        currentState = 'string_double';
-        i++;
-        continue;
-      }
-      if (char === "'") {
-        currentState = 'string_single';
-        i++;
-        continue;
-      }
-      if (char === '`') {
-        currentState = 'template';
-        stack.push({ type: 'template', braceDepth: 0 });
-        i++;
-        continue;
-      }
-      if (char === '{') {
-        const top = stack[stack.length - 1];
-        if (top) {
-          top.braceDepth++;
-        }
-        i++;
-        continue;
-      }
-      if (char === '}') {
-        const top = stack[stack.length - 1];
-        if (top) {
-          top.braceDepth--;
-          if (top.braceDepth < 0) {
-            // Exiting a template literal interpolation ${ ... }
-            stack.pop();
-            currentState = 'template';
-            i++;
-            continue;
-          }
-        }
-        i++;
-        continue;
-      }
-
-      i++;
-    } else if (currentState === 'string_double') {
-      if (char === '\\') {
-        i += 2;
-        continue;
-      }
-      if (char === '"') {
-        currentState = 'normal';
-      }
-      i++;
-    } else if (currentState === 'string_single') {
-      if (char === '\\') {
-        i += 2;
-        continue;
-      }
-      if (char === "'") {
-        currentState = 'normal';
-      }
-      i++;
-    } else if (currentState === 'template') {
-      if (char === '\\') {
-        i += 2;
-        continue;
-      }
-      if (char === '$' && nextChar === '{') {
-        // Entering template literal interpolation context
-        currentState = 'normal';
-        stack.push({ type: 'template', braceDepth: 0 });
-        i += 2;
-        continue;
-      }
-      if (char === '`') {
-        stack.pop();
-        currentState = 'normal';
-      }
-      i++;
-    } else if (currentState === 'comment_block') {
-      if (char === '*' && nextChar === '/') {
-        currentState = 'normal';
-        i += 2;
-        continue;
-      }
-      i++;
-    } else if (currentState === 'comment_line') {
-      if (char === '\n' || char === '\r') {
-        currentState = 'normal';
-      }
-      i++;
+  for (const comment of comments) {
+    if (comment.type !== 'Line' || !comment.value.startsWith(SOURCEMAP_COMMENT_VALUE_PREFIX)) {
+      continue;
     }
+
+    let start = comment.start;
+    let end = comment.end;
+
+    // Preserve line terminators on non-trailing comments so subsequent line numbers stay aligned
+    // with already-generated sourcemaps (and ASI is unaffected when comments follow code). When a
+    // comment is the only content on its line, strip leading horizontal whitespace—and if only
+    // whitespace follows to EOF, strip to the end of the file to match the trailing fast path.
+    let lineStart = start;
+    while (lineStart > lastCopiedIndex && isHorizontalWhitespace(code.charCodeAt(lineStart - 1))) {
+      lineStart--;
+    }
+    if (lineStart === 0 || isLineTerminator(code.charCodeAt(lineStart - 1))) {
+      start = lineStart;
+      if (isWhitespaceToEnd(code, end)) {
+        end = code.length;
+      }
+    }
+
+    if (start > lastCopiedIndex) {
+      result.push(code.slice(lastCopiedIndex, start));
+    }
+    lastCopiedIndex = end;
   }
 
   if (lastCopiedIndex === 0) {
     return code;
   }
 
-  if (lastCopiedIndex < len) {
+  if (lastCopiedIndex < code.length) {
     result.push(code.slice(lastCopiedIndex));
   }
 
   return result.join('');
+}
+
+function isHorizontalWhitespace(code: number): boolean {
+  return code === 32 || code === 9; // space, tab
+}
+
+function isLineTerminator(code: number): boolean {
+  return code === 10 || code === 13; // \n, \r
+}
+
+function isWhitespaceToEnd(code: string, start: number): boolean {
+  for (let i = start; i < code.length; i++) {
+    const char = code.charCodeAt(i);
+    if (!isHorizontalWhitespace(char) && !isLineTerminator(char)) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+function isBase64Char(code: number): boolean {
+  return (
+    (code >= 65 && code <= 90) || // A-Z
+    (code >= 97 && code <= 122) || // a-z
+    (code >= 48 && code <= 57) || // 0-9
+    code === 43 || // +
+    code === 47 || // /
+    code === 61 || // =
+    code === 45 || // -
+    code === 95 // _
+  );
 }
 
 /**
@@ -274,13 +220,22 @@ function extractTrailingBase64Payload(urlLine: string): string | undefined {
 
   const payloadStart = base64StartIndex + 7;
   let payloadEnd = urlLine.length;
-  // Find the first trailing whitespace character that marks the end of the base64 payload.
+  // Find the first trailing whitespace character that marks the end of the base64 payload,
+  // while ensuring all payload characters are valid base64 (preventing false positives when
+  // closing quotes, backticks, or `*/` immediately follow the payload).
   for (let i = payloadStart; i < urlLine.length; i++) {
     const char = urlLine[i];
     if (char === ' ' || char === '\r' || char === '\n' || char === '\t') {
       payloadEnd = i;
       break;
     }
+    if (!isBase64Char(urlLine.charCodeAt(i))) {
+      return undefined;
+    }
+  }
+
+  if (payloadEnd === payloadStart) {
+    return undefined;
   }
 
   // Verify that everything after the base64 payload is trailing whitespace
@@ -307,7 +262,7 @@ function extractTrailingUrl(urlLine: string): string | undefined {
   }
 
   const urlMatch = /^([^\r\n\s'"`]+)/.exec(urlLine);
-  if (!urlMatch) {
+  if (!urlMatch || urlMatch[1].includes('*/')) {
     return undefined;
   }
 
