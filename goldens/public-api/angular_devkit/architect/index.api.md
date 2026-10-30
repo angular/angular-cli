@@ -215,7 +215,7 @@ interface JobHandlerContext<MinimumArgumentValueT extends JsonValue = JsonValue,
     // (undocumented)
     readonly inboundBus: Observable<JobInboundMessage<MinimumInputValueT>>;
     // (undocumented)
-    readonly scheduler: Scheduler<JsonValue, JsonValue, JsonValue>;
+    readonly scheduler: Scheduler_2<JsonValue, JsonValue, JsonValue>;
 }
 
 // @public (undocumented)
@@ -399,7 +399,7 @@ declare namespace jobs {
         Job,
         ScheduleJobOptions,
         Registry,
-        Scheduler,
+        Scheduler_2 as Scheduler,
         createJobHandler,
         createJobFactory,
         createLoggerJob,
@@ -460,7 +460,7 @@ export interface ScheduleOptions {
 }
 
 // @public
-interface Scheduler<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
+interface Scheduler_2<MinimumArgumentValueT extends JsonValue = JsonValue, MinimumInputValueT extends JsonValue = JsonValue, MinimumOutputValueT extends JsonValue = JsonValue> {
     getDescription(name: JobName): Observable<JobDescription | null>;
     has(name: JobName): Observable<boolean>;
     pause(): () => void;
@@ -500,7 +500,7 @@ class SimpleJobRegistry<MinimumArgumentValueT extends JsonValue = JsonValue, Min
 }
 
 // @public
-class SimpleScheduler<MinimumArgumentT extends JsonValue = JsonValue, MinimumInputT extends JsonValue = JsonValue, MinimumOutputT extends JsonValue = JsonValue> implements Scheduler<MinimumArgumentT, MinimumInputT, MinimumOutputT> {
+class SimpleScheduler<MinimumArgumentT extends JsonValue = JsonValue, MinimumInputT extends JsonValue = JsonValue, MinimumOutputT extends JsonValue = JsonValue> implements Scheduler_2<MinimumArgumentT, MinimumInputT, MinimumOutputT> {
     constructor(_jobRegistry: Registry<MinimumArgumentT, MinimumInputT, MinimumOutputT>, _schemaRegistry?: schema.SchemaRegistry);
     getDescription(name: JobName): Observable<JobDescription | null>;
     has(name: JobName): Observable<boolean>;
