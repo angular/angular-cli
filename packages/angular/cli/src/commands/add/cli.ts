@@ -422,7 +422,7 @@ export default class AddCommandModule
     }
 
     if (!found) {
-      let message = `Unable to find compatible package.`;
+      let message = `Unable to find compatible package. Using 'latest' tag.`;
       if (rejectionReasons.length > 0) {
         message +=
           '\nThis is often because of incompatible peer dependencies.\n' +
