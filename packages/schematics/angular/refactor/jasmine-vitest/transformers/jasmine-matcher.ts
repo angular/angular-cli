@@ -474,14 +474,33 @@ export function transformCalledOnceWith(
     return node;
   }
 
+  const expectCall = call.expression.expression;
+  const args = call.arguments;
+
+  // Splitting a negated assertion would assert that neither condition holds instead of not both.
+  if (ts.isPropertyAccessExpression(expectCall) && expectCall.name.text === 'not') {
+    reporter.reportTransformation(
+      sourceFile,
+      node,
+      'Transformed `.not.toHaveBeenCalledOnceWith()` to `.not.toHaveBeenCalledExactlyOnceWith()`.',
+    );
+
+    return ts.factory.updateExpressionStatement(
+      node,
+      ts.factory.updateCallExpression(
+        call,
+        createPropertyAccess(expectCall, 'toHaveBeenCalledExactlyOnceWith'),
+        call.typeArguments,
+        args,
+      ),
+    );
+  }
+
   reporter.reportTransformation(
     sourceFile,
     node,
     'Transformed `.toHaveBeenCalledOnceWith()` to `.toHaveBeenCalledTimes(1)` and `.toHaveBeenCalledWith()`.',
   );
-
-  const expectCall = call.expression.expression;
-  const args = call.arguments;
 
   const timesCall = ts.factory.createCallExpression(
     createPropertyAccess(expectCall, 'toHaveBeenCalledTimes'),

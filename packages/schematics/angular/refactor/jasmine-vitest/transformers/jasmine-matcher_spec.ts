@@ -113,6 +113,11 @@ describe('transformCalledOnceWith', () => {
           expect(mySpy).toHaveBeenCalledWith('foo', 'bar');
         `,
     },
+    {
+      description: 'should transform a negated toHaveBeenCalledOnceWith(...) into a single call',
+      input: `expect(mySpy).not.toHaveBeenCalledOnceWith('foo');`,
+      expected: `expect(mySpy).not.toHaveBeenCalledExactlyOnceWith('foo');`,
+    },
   ];
 
   testCases.forEach(({ description, input, expected }) => {
