@@ -92,6 +92,13 @@ const URL_PARAMETER_REGEXP = /(?<!\\):([^/]+)/;
 const URL_PARAMETER_GLOBAL_REGEXP = new RegExp(URL_PARAMETER_REGEXP, 'g');
 
 /**
+ * Characters that cannot appear in a percent-decoded path segment: path separators (`\` is one in
+ * `http:` URLs), query and fragment delimiters, matrix parameters, route tree wildcards, `%` (route
+ * segments are decoded again when the route tree is restored) and control characters.
+ */
+const INVALID_PATH_SEGMENT_CHARS_REGEXP = /[/\\?#;*%\p{Control}]/u;
+
+/**
  * Additional metadata for a server configuration route tree.
  */
 type ServerConfigRouteTreeAdditionalMetadata = Partial<ServerRoute> & {
@@ -580,8 +587,41 @@ function handlePrerenderParamsReplacement(
       );
     }
 
+    const segments = parameterName === '**' ? (value ? value.split('/') : []) : [value];
+    if (!segments.every(isPathSegment)) {
+      throw new Error(
+        `The 'getPrerenderParams' function defined for the '${stripLeadingSlash(currentRoutePath)}' route ` +
+          `returned an invalid value '${value}' for parameter '${parameterName}'. ` +
+          `Please make sure the value is a valid URL path${parameterName === '**' ? '' : ' segment'} ` +
+          'without dot segments or reserved characters.',
+      );
+    }
+
     return parameterName === '**' ? `/${value}` : value;
   };
+}
+
+/**
+ * Checks whether a value is a single, non-empty path segment.
+ *
+ * @param segment - The percent-encoded segment to check.
+ * @returns `true` if the value is a single, non-empty path segment.
+ */
+function isPathSegment(segment: string): boolean {
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(segment);
+  } catch {
+    return false;
+  }
+
+  return (
+    decoded.length > 0 &&
+    decoded !== '.' &&
+    decoded !== '..' &&
+    decoded[0] !== ':' &&
+    !INVALID_PATH_SEGMENT_CHARS_REGEXP.test(decoded)
+  );
 }
 
 /**
