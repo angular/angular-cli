@@ -30,6 +30,7 @@ import {
   parseYarnClassicManifest,
   parseYarnClassicMetadata,
   parseYarnModernDependencies,
+  parseYarnModernError,
   parseYarnReleaseAge,
 } from './parsers';
 
@@ -231,7 +232,7 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
       listDependencies: parseYarnModernDependencies,
       getRegistryManifest: parseNpmLikeManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
-      getError: parseNpmLikeError,
+      getError: parseYarnModernError,
       getReleaseAge: parseYarnReleaseAge,
     },
     isNotFound: isKnownNotFound,
