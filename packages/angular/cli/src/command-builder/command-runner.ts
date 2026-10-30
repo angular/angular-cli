@@ -33,22 +33,40 @@ import {
 import { jsonHelpUsage } from './utilities/json-help';
 import { createNormalizeOptionsMiddleware } from './utilities/normalize-options-middleware';
 
-export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
+export function parseInitialCommandArguments(args: string[]) {
   const {
     $0,
     _,
-    help = false,
     dryRun = false,
     jsonHelp = false,
     getYargsCompletions = false,
     ...rest
   } = yargsParser(args, {
-    boolean: ['help', 'json-help', 'get-yargs-completions', 'dry-run'],
+    // Do not treat bare `help` as the help flag; it can be a schematic argument (e.g. `ng g m help`).
+    boolean: ['json-help', 'get-yargs-completions', 'dry-run'],
     alias: { 'collection': 'c' },
   });
 
+  const help =
+    jsonHelp || args.some((arg) => arg === '--help' || arg === '-h' || arg.startsWith('--help='));
+
   // When `getYargsCompletions` is true the scriptName 'ng' at index 0 is not removed.
   const positional = getYargsCompletions ? _.slice(1) : _;
+
+  return {
+    $0,
+    positional,
+    help,
+    dryRun,
+    jsonHelp,
+    getYargsCompletions,
+    rest,
+  };
+}
+
+export async function runCommand(args: string[], logger: logging.Logger): Promise<number> {
+  const { positional, help, dryRun, jsonHelp, getYargsCompletions, rest } =
+    parseInitialCommandArguments(args);
 
   let workspace: AngularWorkspace | undefined;
   let globalConfiguration: AngularWorkspace;
