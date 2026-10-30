@@ -34,7 +34,8 @@ import { createProjectSchematic } from '../utility/project';
 import { Schema as TailwindOptions } from './schema';
 
 const TAILWIND_DEPENDENCIES = ['tailwindcss', '@tailwindcss/postcss', 'postcss'];
-const POSTCSS_CONFIG_FILES = ['.postcssrc.json', 'postcss.config.json'];
+// Same lookup order as the build system, so the configuration that gets updated is the one used.
+const POSTCSS_CONFIG_FILES = ['postcss.config.json', '.postcssrc.json'];
 
 function addTailwindStyles(options: { project: string }, project: ProjectDefinition): Rule {
   return async (tree) => {
@@ -94,7 +95,7 @@ function addTailwindStyles(options: { project: string }, project: ProjectDefinit
 
 function managePostCssConfiguration(project: ProjectDefinition): Rule {
   return async (tree) => {
-    const searchPaths = ['/', project.root]; // Workspace root and project root
+    const searchPaths = new Set([join('/', project.root), '/']);
 
     for (const path of searchPaths) {
       for (const configFile of POSTCSS_CONFIG_FILES) {
