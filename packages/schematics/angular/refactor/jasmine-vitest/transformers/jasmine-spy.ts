@@ -16,6 +16,7 @@
 
 import ts from 'typescript';
 import {
+  addVitestTypeImport,
   addVitestValueImport,
   createPropertyAccess,
   getPromiseResolveRejectMethod,
@@ -459,7 +460,96 @@ export function transformCreateSpyObj(node: ts.Node, ctx: RefactorContext): ts.N
     }
   }
 
-  return ts.factory.createObjectLiteralExpression(properties, true);
+  const spyObjLiteral = ts.factory.createObjectLiteralExpression(properties, true);
+
+  // The literal only has the spied members, so it is not assignable to the `MockedObject<T>`
+  // that a `jasmine.SpyObj<T>` annotation is transformed to. Jasmine's untyped `createSpyObj`
+  // returns `any`, which is why the original assignment compiled.
+  const spyObjTypeArguments = getAssignedSpyObjTypeArguments(node);
+  if (!spyObjTypeArguments) {
+    return spyObjLiteral;
+  }
+
+  addVitestTypeImport(ctx.pendingVitestTypeImports, 'MockedObject');
+
+  return ts.factory.createAsExpression(
+    spyObjLiteral,
+    ts.factory.createTypeReferenceNode('MockedObject', spyObjTypeArguments),
+  );
+}
+
+function getSpyObjTypeArguments(
+  type: ts.TypeNode | undefined,
+): ts.NodeArray<ts.TypeNode> | undefined {
+  if (
+    type &&
+    ts.isTypeReferenceNode(type) &&
+    ts.isQualifiedName(type.typeName) &&
+    ts.isIdentifier(type.typeName.left) &&
+    type.typeName.left.text === 'jasmine' &&
+    type.typeName.right.text === 'SpyObj'
+  ) {
+    return type.typeArguments;
+  }
+
+  return undefined;
+}
+
+/**
+ * Finds the declaration of a variable in the blocks that enclose a node, nearest first,
+ * so that a variable declared in another `describe` block with the same name is not used.
+ */
+function findEnclosingVariableDeclaration(
+  node: ts.Node,
+  name: string,
+): ts.VariableDeclaration | undefined {
+  for (let current = node.parent; current; current = current.parent) {
+    if (!ts.isBlock(current) && !ts.isSourceFile(current)) {
+      continue;
+    }
+
+    for (const statement of current.statements) {
+      if (!ts.isVariableStatement(statement)) {
+        continue;
+      }
+
+      const declaration = statement.declarationList.declarations.find(
+        (d) => ts.isIdentifier(d.name) && d.name.text === name,
+      );
+      if (declaration) {
+        return declaration;
+      }
+    }
+  }
+
+  return undefined;
+}
+
+/**
+ * Finds the `T` of a `jasmine.SpyObj<T>` annotation on the variable that a `createSpyObj` call
+ * initializes (`const spy: jasmine.SpyObj<T> = ...`) or is assigned to (`spy = ...`).
+ */
+function getAssignedSpyObjTypeArguments(
+  node: ts.CallExpression,
+): ts.NodeArray<ts.TypeNode> | undefined {
+  const parent = getUnwrappedParent(node);
+  if (!parent) {
+    return undefined;
+  }
+
+  if (ts.isVariableDeclaration(parent)) {
+    return getSpyObjTypeArguments(parent.type);
+  }
+
+  if (
+    !ts.isBinaryExpression(parent) ||
+    parent.operatorToken.kind !== ts.SyntaxKind.EqualsToken ||
+    !ts.isIdentifier(parent.left)
+  ) {
+    return undefined;
+  }
+
+  return getSpyObjTypeArguments(findEnclosingVariableDeclaration(parent, parent.left.text)?.type);
 }
 
 function createSpyObjWithArray(
