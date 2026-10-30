@@ -45,6 +45,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(workspaceRoot));
 
     expect(config.path).toBe(resolve(workspaceRoot, '.angular/cache'));
+    expect(config.localPath).toBe(config.path);
   });
 
   it('should resolve default cache path relative to main repository root in a git worktree', async () => {
@@ -67,6 +68,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(worktreeRoot));
 
     expect(config.path).toBe(resolve(mainRepoRoot, '.angular/cache'));
+    expect(config.localPath).toBe(resolve(worktreeRoot, '.angular/cache'));
   });
 
   it('should resolve default cache path relative to corresponding nested workspace in main repository for a git worktree', async () => {
@@ -92,6 +94,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(worktreeWorkspaceRoot));
 
     expect(config.path).toBe(resolve(mainWorkspaceRoot, '.angular/cache'));
+    expect(config.localPath).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
   });
 
   it('should fall back to worktree workspace basePath when nested workspace does not exist in main repository', async () => {
@@ -113,6 +116,7 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(worktreeWorkspaceRoot));
 
     expect(config.path).toBe(resolve(worktreeWorkspaceRoot, '.angular/cache'));
+    expect(config.localPath).toBe(config.path);
   });
 
   it('should resolve custom relative cache path relative to main repository root in a git worktree', async () => {
@@ -137,6 +141,7 @@ describe('CLI cache config utilities', () => {
     );
 
     expect(config.path).toBe(resolve(mainRepoRoot, 'custom/cache-dir'));
+    expect(config.localPath).toBe(resolve(worktreeRoot, 'custom/cache-dir'));
   });
 
   it('should resolve cache path relative to workspace basePath in a git submodule', async () => {
@@ -155,5 +160,6 @@ describe('CLI cache config utilities', () => {
     const config = getCacheConfig(mockWorkspace(submoduleRoot));
 
     expect(config.path).toBe(resolve(submoduleRoot, '.angular/cache'));
+    expect(config.localPath).toBe(config.path);
   });
 });
