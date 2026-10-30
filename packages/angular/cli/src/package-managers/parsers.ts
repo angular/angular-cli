@@ -637,6 +637,58 @@ export function parseYarnClassicError(output: string, logger?: Logger): ErrorInf
 }
 
 /**
+ * Parses the `stdout` or `stderr` output of modern yarn (v2+) to extract structured error information.
+ *
+ * Modern yarn reports errors as JSON lines, one per message line. The first line holds the summary,
+ * and registry errors include the HTTP status, which is returned as a standardized error code
+ * (`E${statusCode}`). Other output is delegated to `parseNpmLikeError`.
+ *
+ * Example output (`yarn npm info <missing-package> --json`):
+ * ```json
+ * {"type":"error","name":35,"displayName":"YN0035","indent":"","data":"Package not found"}
+ * {"type":"error","name":35,"displayName":"YN0035","indent":"","data":"  Response Code: 404 (Not Found)"}
+ * ```
+ *
+ * @param output The standard output or standard error of the command.
+ * @param logger An optional logger instance.
+ * @returns An `ErrorInfo` object if parsing is successful, otherwise `null`.
+ */
+export function parseYarnModernError(output: string, logger?: Logger): ErrorInfo | null {
+  logger?.debug(`Parsing modern yarn error output...`);
+  logStdout(output, logger); // Log output for debugging purposes
+
+  if (!output) {
+    logger?.debug('  output is empty. No error found.');
+
+    return null;
+  }
+
+  const messages: { code: string; data: string }[] = [];
+  for (const json of parseJsonLines(output, logger)) {
+    if (json?.type === 'error' && typeof json.data === 'string') {
+      messages.push({ code: String(json.displayName ?? 'UNKNOWN_ERROR'), data: json.data });
+    }
+  }
+
+  if (messages.length === 0) {
+    return parseNpmLikeError(output, logger);
+  }
+
+  const [first, ...rest] = messages;
+  const statusCodeMatch = messages
+    .map(({ data }) => data.match(/Response Code: (\d{3})/))
+    .find((match) => match !== null);
+  const code = statusCodeMatch ? `E${statusCodeMatch[1]}` : first.code;
+  logger?.debug(`  Successfully parsed modern yarn error with code '${code}'.`);
+
+  return {
+    code,
+    summary: first.data.trim(),
+    detail: rest.map(({ data }) => data.trim()).join('\n') || undefined,
+  };
+}
+
+/**
  * Known Bun JSON error messages that indicate a requested version or dist-tag does not exist.
  */
 const BUN_NOT_FOUND_ERROR_PATTERN = /^(?:no matching version found|dist-tag not found)\b/i;
