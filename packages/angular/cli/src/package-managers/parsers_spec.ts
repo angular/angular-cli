@@ -732,6 +732,15 @@ project node_modules
       });
     });
 
+    it('should provide a fallback summary when error data is empty or whitespace-only', () => {
+      const stdout = '{"type":"error","name":35,"displayName":"YN0035","indent":"","data":"   "}';
+      expect(parseYarnModernError(stdout)).toEqual({
+        code: 'YN0035',
+        summary: 'Package manager error: YN0035',
+        detail: undefined,
+      });
+    });
+
     it('should return null for successful, empty, or unrecognized output', () => {
       expect(parseYarnModernError('{"name":"@angular/core","version":"22.2.4"}')).toBeNull();
       expect(parseYarnModernError('"@angular/core@npm:22.2.4"\n"rxjs@npm:7.8.2"')).toBeNull();

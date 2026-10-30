@@ -697,21 +697,14 @@ export function parseYarnModernError(output: string, logger?: Logger): ErrorInfo
     }
   }
 
-  const [first, ...rest] = messages;
+  const [first] = messages;
   const code = statusCode ? `E${statusCode}` : first.code;
   logger?.debug(`  Successfully parsed modern yarn error with code '${code}'.`);
 
-  const [summary = '', ...firstDetailLines] = first.data
-    .split('\n')
+  const [summary = `Package manager error: ${code}`, ...detailLines] = messages
+    .flatMap(({ data }) => data.split('\n'))
     .map((line) => line.trim())
     .filter(Boolean);
-  const detailLines = [
-    ...firstDetailLines,
-    ...rest
-      .flatMap(({ data }) => data.split('\n'))
-      .map((line) => line.trim())
-      .filter(Boolean),
-  ];
 
   return {
     code,
