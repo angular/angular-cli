@@ -69,13 +69,22 @@ function getCacheBasePath(workspaceRoot: string, cachePathSetting: string): stri
   return resolve(workspaceRoot, cachePathSetting);
 }
 
-export function getCacheConfig(workspace: AngularWorkspace | undefined): Required<Cache> {
+export interface CacheConfig extends Required<Cache> {
+  /**
+   * The cache path resolved against the workspace itself. In a Git worktree, `path` is shared
+   * with the main checkout, while the development server keeps its Vite cache in this path.
+   */
+  localPath: string;
+}
+
+export function getCacheConfig(workspace: AngularWorkspace | undefined): CacheConfig {
   if (!workspace) {
     throw new Error(`Cannot retrieve cache configuration as workspace is not defined.`);
   }
 
-  const defaultSettings: Required<Cache> = {
+  const defaultSettings: CacheConfig = {
     path: getCacheBasePath(workspace.basePath, '.angular/cache'),
+    localPath: resolve(workspace.basePath, '.angular/cache'),
     environment: Environment.Local,
     enabled: true,
   };
@@ -99,6 +108,7 @@ export function getCacheConfig(workspace: AngularWorkspace | undefined): Require
 
   return {
     path: getCacheBasePath(workspace.basePath, path),
+    localPath: resolve(workspace.basePath, path),
     environment,
     enabled,
   };

@@ -24,13 +24,17 @@ export class CacheCleanModule extends CommandModule implements CommandModuleImpl
     return localYargs.strict();
   }
 
-  run(): Promise<void> {
-    const { path } = getCacheConfig(this.context.workspace);
+  async run(): Promise<void> {
+    const { path, localPath } = getCacheConfig(this.context.workspace);
 
-    return rm(path, {
-      force: true,
-      recursive: true,
-      maxRetries: 3,
-    });
+    // In a Git worktree, `path` is shared with the main checkout and `localPath` holds the
+    // development server's Vite cache. Both are the same path outside of a worktree.
+    for (const cachePath of new Set([path, localPath])) {
+      await rm(cachePath, {
+        force: true,
+        recursive: true,
+        maxRetries: 3,
+      });
+    }
   }
 }
