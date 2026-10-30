@@ -37,6 +37,9 @@ describe('removeSourceMappingURL', () => {
   it('should not remove sourcemap comments inside block comments', () => {
     const code = '/*\n//# sourceMappingURL=inline.js.map\n*/';
     expect(removeSourceMappingURL(code)).toBe(code);
+
+    const sameLineClose = '/*\n//# sourceMappingURL=inline.js.map*/';
+    expect(removeSourceMappingURL(sameLineClose)).toBe(sameLineClose);
   });
 
   it('should not remove sourcemap comments inside normal single-line comments', () => {
@@ -44,10 +47,37 @@ describe('removeSourceMappingURL', () => {
     expect(removeSourceMappingURL(code)).toBe(code);
   });
 
-  it('should remove multiple top-level sourcemap comments', () => {
+  it('should remove multiple top-level sourcemap comments while preserving subsequent line numbers', () => {
     const code =
-      '//# sourceMappingURL=first.js.map\nconsole.log("mid");\n//# sourceMappingURL=second.js.map';
+      '  //# sourceMappingURL=first.js.map\nconsole.log("mid");\n//# sourceMappingURL=second.js.map';
     expect(removeSourceMappingURL(code)).toBe('\nconsole.log("mid");\n');
+  });
+
+  it('should preserve the line terminator when a sourcemap comment follows code on the same line', () => {
+    const code =
+      'foo(); //# sourceMappingURL=first.js.map\nbar();\n//# sourceMappingURL=second.js.map';
+    expect(removeSourceMappingURL(code)).toBe('foo(); \nbar();\n');
+  });
+
+  it('should strip trailing whitespace consistently between the fast path and the fallback', () => {
+    const trailing = 'a();\n  //# sourceMappingURL=main.js.map  \n\n';
+    // Single trailing comment uses the fast path
+    expect(removeSourceMappingURL(trailing)).toBe('a();\n');
+    // An earlier occurrence forces the oxc fallback while preserving line numbers
+    expect(removeSourceMappingURL('//# sourceMappingURL=first.js.map\n' + trailing)).toBe(
+      '\na();\n',
+    );
+  });
+
+  it('should strip non-trailing sourcemap comments after non-ASCII content', () => {
+    const code =
+      'const s = "héllo 😀 日本";\n//# sourceMappingURL=a.js.map\nconst t = 1;\n//# sourceMappingURL=b.js.map';
+    expect(removeSourceMappingURL(code)).toBe('const s = "héllo 😀 日本";\n\nconst t = 1;\n');
+  });
+
+  it('should strip trailing inline sourcemaps using base64url characters via the fast path', () => {
+    const code = 'a();\n//# sourceMappingURL=data:application/json;base64,eyJ2-_9==\n';
+    expect(removeSourceMappingURL(code)).toBe('a();\n');
   });
 
   it('should not remove sourcemap comments inside strings containing escaped quotes', () => {
@@ -78,14 +108,69 @@ describe('removeSourceMappingURL', () => {
     expect(removeSourceMappingURL(code)).toBe(code);
   });
 
+  it('should not remove inline base64 sourcemap comments inside template literals closing on the same line', () => {
+    const base64 = Buffer.from('{"version":3}').toString('base64');
+    const code = `const str = \`\n//# sourceMappingURL=data:application/json;base64,${base64}\`;`;
+    expect(removeSourceMappingURL(code)).toBe(code);
+  });
+
   it('should not remove sourcemap comments inside regex literals', () => {
     const code = 'const regex = /\\/\\/# sourceMappingURL=inline.js.map/;';
     expect(removeSourceMappingURL(code)).toBe(code);
   });
 
-  it('should not affect normal division operators', () => {
-    const code = 'const ratio = 10 / 2;\n//# sourceMappingURL=main.js.map';
-    expect(removeSourceMappingURL(code)).toBe('const ratio = 10 / 2;\n');
+  it('should not corrupt strings following regex literals containing quotes or backticks', () => {
+    const doubleQuoteCode =
+      'const pattern = /"/; const text = "//# sourceMappingURL=not-a-comment";';
+    expect(removeSourceMappingURL(doubleQuoteCode)).toBe(doubleQuoteCode);
+
+    const singleQuoteCode =
+      "const pattern = /'/; const text = '//# sourceMappingURL=not-a-comment';";
+    expect(removeSourceMappingURL(singleQuoteCode)).toBe(singleQuoteCode);
+
+    const backtickCode = 'const pattern = /`/; const text = `//# sourceMappingURL=not-a-comment`;';
+    expect(removeSourceMappingURL(backtickCode)).toBe(backtickCode);
+  });
+
+  it('should handle regex character classes and escapes containing slashes and quotes', () => {
+    const body =
+      'const pattern = /[/"\'`]/; const escaped = /\\/"\\[/; const text = "//# sourceMappingURL=not-a-comment";\n';
+    expect(removeSourceMappingURL(body + '//# sourceMappingURL=main.js.map')).toBe(body);
+
+    const charClassComment = 'const re = /[//# sourceMappingURL=foo.js.map]/;';
+    expect(removeSourceMappingURL(charClassComment)).toBe(charClassComment);
+  });
+
+  it('should handle regex literals after keywords, control-flow conditions, and spread operators', () => {
+    const code = [
+      'export default /"/;',
+      'if (enabled) /"/.test(val) ? doA() : doB();',
+      'const matches = [.../"/.exec(str) ?? []];',
+      'function* gen() { return [...yield /"/]; }',
+      'const text = "//# sourceMappingURL=not-a-comment";',
+      '//# sourceMappingURL=main.js.map',
+    ].join('\n');
+
+    expect(removeSourceMappingURL(code)).toBe(
+      [
+        'export default /"/;',
+        'if (enabled) /"/.test(val) ? doA() : doB();',
+        'const matches = [.../"/.exec(str) ?? []];',
+        'function* gen() { return [...yield /"/]; }',
+        'const text = "//# sourceMappingURL=not-a-comment";',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('should not affect division expressions including contextual keywords and postfix operators', () => {
+    const ratioCode = 'const ratio = 10 / 2;\n//# sourceMappingURL=main.js.map';
+    expect(removeSourceMappingURL(ratioCode)).toBe('const ratio = 10 / 2;\n');
+
+    const fnBody =
+      'function pct(n, of) { const r = of / 100 + i++ / 2;' +
+      ' const s = "//# sourceMappingURL=not-a-comment"; return r + s; }\n';
+    expect(removeSourceMappingURL(fnBody + '//# sourceMappingURL=main.js.map')).toBe(fnBody);
   });
 
   it('should only remove exact sourceMappingURL prefix comments', () => {
@@ -99,8 +184,11 @@ describe('removeSourceMappingURL', () => {
   });
 
   it('should handle sourcemap comments with CRLF newlines', () => {
-    const code = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\nconst next = 2;';
-    expect(removeSourceMappingURL(code)).toBe('console.log("hello");\r\n\r\nconst next = 2;');
+    const midFile = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\nconst next = 2;';
+    expect(removeSourceMappingURL(midFile)).toBe('console.log("hello");\r\n\r\nconst next = 2;');
+
+    const trailing = 'console.log("hello");\r\n//# sourceMappingURL=main.js.map\r\n';
+    expect(removeSourceMappingURL(trailing)).toBe('console.log("hello");\r\n');
   });
 
   describe('with Uint8Array / Buffer inputs', () => {
@@ -131,11 +219,35 @@ describe('removeSourceMappingURL', () => {
       expect(Buffer.from(result).toString('utf-8')).toBe('\nconsole.log("mid");\n');
     });
 
+    it('should strip non-trailing comments after non-ASCII content in a buffer via fallback', () => {
+      const buffer = Buffer.from(
+        'const s = "héllo 😀 日本";\n//# sourceMappingURL=a.js.map\nconst t = 1;\n//# sourceMappingURL=b.js.map',
+        'utf-8',
+      );
+      const result = removeSourceMappingURL(buffer);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe(
+        'const s = "héllo 😀 日本";\n\nconst t = 1;\n',
+      );
+    });
+
     it('should not strip sourcemap comments inside template strings in a buffer', () => {
       const buffer = Buffer.from('const str = `\n//# sourceMappingURL=inline.js.map\n`;', 'utf-8');
       const result = removeSourceMappingURL(buffer);
 
       expect(Buffer.from(result).toString('utf-8')).toBe(buffer.toString('utf-8'));
+    });
+
+    it('should preserve strings after regex literals with quotes when falling back on a buffer', () => {
+      const buffer = Buffer.from(
+        'const pattern = /"/; const text = "//# sourceMappingURL=not-a-comment";\n//# sourceMappingURL=main.js.map',
+        'utf-8',
+      );
+      const result = removeSourceMappingURL(buffer);
+
+      expect(Buffer.from(result).toString('utf-8')).toBe(
+        'const pattern = /"/; const text = "//# sourceMappingURL=not-a-comment";\n',
+      );
     });
   });
 });
@@ -221,5 +333,19 @@ describe('isTrailingSourceMapComment', () => {
 
   it('should return false for invalid data URI format', () => {
     expect(isTrailingSourceMapComment('data:application/json;utf8,{}')).toBe(false);
+  });
+
+  it('should accept base64url characters in inline data URIs', () => {
+    expect(isTrailingSourceMapComment('data:application/json;base64,eyJ2-_9==\n')).toBe(true);
+  });
+
+  it('should return false when an inline payload is immediately followed by non-base64 characters', () => {
+    expect(isTrailingSourceMapComment('data:application/json;base64,eyJ2`;')).toBe(false);
+    expect(isTrailingSourceMapComment('data:application/json;base64,eyJ2*/')).toBe(false);
+    expect(isTrailingSourceMapComment('data:application/json;base64,')).toBe(false);
+  });
+
+  it('should return false when an external URL contains a block comment terminator', () => {
+    expect(isTrailingSourceMapComment('main.js.map*/')).toBe(false);
   });
 });
