@@ -8,7 +8,7 @@
 
 /* eslint-disable import/no-extraneous-dependencies */
 import { normalize } from '@angular-devkit/core';
-import { of as observableOf } from 'rxjs';
+import { lastValueFrom, of as observableOf } from 'rxjs';
 import { UnitTestTree } from '../../testing';
 import { SchematicContext } from '../engine/interface';
 import { HostTree } from '../tree/host-tree';
@@ -183,6 +183,23 @@ describe('contentTemplate', () => {
 
     expect(applyContentTemplate({})(entry)).toBe(entry);
   });
+
+  it('names the template in errors thrown while applying it', () => {
+    const operator = applyContentTemplate({ foobar: 1 });
+
+    expect(() => operator(_entry('/a/b/file.ts', 'a<%= foobat %>b'))).toThrowError(
+      'Failed to apply content template to "/a/b/file.ts": foobat is not defined',
+    );
+    expect(() => operator(_entry('/a/b/file.ts', 'a<%= foobar unintended %>b'))).toThrowError(
+      /^Failed to apply content template to "\/a\/b\/file\.ts": Unexpected identifier/,
+    );
+  });
+
+  it('keeps the original template error as the cause', () => {
+    expect(() =>
+      applyContentTemplate({})(_entry('/a/b/file.ts', 'a<%= foobat %>b')),
+    ).toThrowMatching((e) => e.cause instanceof ReferenceError);
+  });
 });
 
 describe('applyTemplateFiles', () => {
@@ -211,5 +228,20 @@ describe('applyTemplateFiles', () => {
       '/a/c/file4',
     ]);
     expect(tree.readContent('/a/b/file3')).toBe('hello 1 world');
+  });
+
+  it('names the template file in errors', async () => {
+    const tree = new UnitTestTree(new HostTree());
+    tree.create('a/b/file__a__.template', 'hello <%= a.missing.length %> world');
+
+    const context: SchematicContext = {
+      strategy: MergeStrategy.Default,
+    } as SchematicContext;
+
+    await expectAsync(
+      lastValueFrom(callRule(applyTemplates({ a: 'foo' }), observableOf(tree), context)),
+    ).toBeRejectedWithError(
+      /^Failed to apply content template to "\/a\/b\/file__a__\.template": Cannot read /,
+    );
   });
 });
