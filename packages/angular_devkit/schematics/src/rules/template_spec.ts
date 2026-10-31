@@ -171,6 +171,18 @@ describe('contentTemplate', () => {
     expect(_applyContentTemplate('a<%= \'a\' + "b" %>b', {})).toBe('aabb');
     expect(_applyContentTemplate('a<%= "\\n" + "b" %>b', {})).toBe('a\nbb');
   });
+
+  it('does not ignore type errors thrown by a template', () => {
+    expect(() => _applyContentTemplate('a<%= value.length %>b', { value: undefined })).toThrowError(
+      /Cannot read properties of undefined/,
+    );
+  });
+
+  it('leaves content that is not valid UTF-8 unchanged', () => {
+    const entry = { path: normalize('/a/b/image.png'), content: Buffer.from([0xff, 0xfe, 0xfd]) };
+
+    expect(applyContentTemplate({})(entry)).toBe(entry);
+  });
 });
 
 describe('applyTemplateFiles', () => {
