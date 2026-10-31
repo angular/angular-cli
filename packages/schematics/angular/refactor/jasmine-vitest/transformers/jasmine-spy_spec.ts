@@ -147,6 +147,24 @@ getSpy().and.callThrough();`,
 vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
     },
     {
+      description: 'should add a TODO for a spy strategy configured with .withArgs()',
+      input: `spyOn(service, 'myMethod').withArgs(1).and.returnValue(2);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+vi.spyOn(service, 'myMethod').mockReturnValue(undefined).withArgs(1).and.returnValue(2);`,
+    },
+    {
+      description: 'should add a TODO for .withArgs() on an existing spy',
+      input: `mySpy.withArgs(1).and.returnValue(2);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+mySpy.withArgs(1).and.returnValue(2);`,
+    },
+    {
+      description: 'should add a TODO for a wrapped .withArgs() call',
+      input: `mySpy.withArgs(1)!.and.returnValue(2);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+mySpy.withArgs(1)!.and.returnValue(2);`,
+    },
+    {
       description: 'should correctly identify chained spies with element access (bracket notation)',
       input: `spyOn(service, 'myMethod')['and'].returnValue(42);`,
       expected: `vi.spyOn(service, 'myMethod').mockReturnValue(42);`,
