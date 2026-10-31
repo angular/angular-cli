@@ -70,10 +70,14 @@ export function applyContentTemplate<T>(options: T): FileOperator {
       throw e;
     }
 
-    return {
-      path,
-      content: Buffer.from(templateImpl(decodedContent, {})(options)),
-    };
+    try {
+      return {
+        path,
+        content: Buffer.from(templateImpl(decodedContent, {})(options)),
+      };
+    } catch (e) {
+      throw new Error(`Failed to apply template "${path}": ${String(e)}`, { cause: e });
+    }
   };
 }
 

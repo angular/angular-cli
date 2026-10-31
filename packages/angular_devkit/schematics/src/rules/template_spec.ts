@@ -183,6 +183,23 @@ describe('contentTemplate', () => {
 
     expect(applyContentTemplate({})(entry)).toBe(entry);
   });
+
+  it('names the template in errors thrown while applying it', () => {
+    const operator = applyContentTemplate({ foobar: 1 });
+
+    expect(() => operator(_entry('/a/b/file.ts', 'a<%= foobat %>b'))).toThrowError(
+      'Failed to apply template "/a/b/file.ts": ReferenceError: foobat is not defined',
+    );
+    expect(() => operator(_entry('/a/b/file.ts', 'a<%= foobar unintended %>b'))).toThrowError(
+      /^Failed to apply template "\/a\/b\/file\.ts": SyntaxError: /,
+    );
+  });
+
+  it('keeps the original template error as the cause', () => {
+    expect(() =>
+      applyContentTemplate({})(_entry('/a/b/file.ts', 'a<%= foobat %>b')),
+    ).toThrowMatching((e) => e.cause instanceof ReferenceError);
+  });
 });
 
 describe('applyTemplateFiles', () => {
@@ -211,5 +228,18 @@ describe('applyTemplateFiles', () => {
       '/a/c/file4',
     ]);
     expect(tree.readContent('/a/b/file3')).toBe('hello 1 world');
+  });
+
+  it('names the template file in errors', async () => {
+    const tree = new UnitTestTree(new HostTree());
+    tree.create('a/b/file__a__.template', 'hello <%= a.missing.length %> world');
+
+    const context: SchematicContext = {
+      strategy: MergeStrategy.Default,
+    } as SchematicContext;
+
+    await expectAsync(
+      callRule(applyTemplates({ a: 'foo' }), observableOf(tree), context).toPromise(),
+    ).toBeRejectedWithError(/^Failed to apply template "\/a\/b\/file__a__\.template": TypeError: /);
   });
 });
