@@ -54,13 +54,9 @@ export function applyContentTemplate<T>(options: T): FileOperator {
   return (entry: FileEntry) => {
     const { path, content } = entry;
 
+    let decodedContent: string;
     try {
-      const decodedContent = decoder.decode(content).replace(/\r?\n/g, EOL);
-
-      return {
-        path,
-        content: Buffer.from(templateImpl(decodedContent, {})(options)),
-      };
+      decodedContent = decoder.decode(content).replace(/\r?\n/g, EOL);
     } catch (e) {
       // The second part should not be needed. But Jest does not support instanceof correctly.
       // See: https://github.com/jestjs/jest/issues/2549
@@ -72,6 +68,15 @@ export function applyContentTemplate<T>(options: T): FileOperator {
       }
 
       throw e;
+    }
+
+    try {
+      return {
+        path,
+        content: Buffer.from(templateImpl(decodedContent, {})(options)),
+      };
+    } catch (e) {
+      throw new Error(`Failed to apply template "${path}": ${String(e)}`, { cause: e });
     }
   };
 }
