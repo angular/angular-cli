@@ -182,10 +182,11 @@ function transformSpyStrategy(node: ts.CallExpression, refactorCtx: RefactorCont
 
   if (spyCall) {
     // Vitest mocks have no `withArgs`, so a strategy for specific arguments cannot be converted.
+    const unwrappedSpyCall = unwrapExpression(spyCall);
     if (
-      ts.isCallExpression(spyCall) &&
-      ts.isPropertyAccessExpression(spyCall.expression) &&
-      spyCall.expression.name.text === 'withArgs'
+      ts.isCallExpression(unwrappedSpyCall) &&
+      ts.isPropertyAccessExpression(unwrappedSpyCall.expression) &&
+      unwrappedSpyCall.expression.name.text === 'withArgs'
     ) {
       const category = 'withArgs';
       reporter.recordTodo(category, sourceFile, node);

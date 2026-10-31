@@ -159,6 +159,12 @@ vi.spyOn(service, 'myMethod').mockReturnValue(undefined).withArgs(1).and.returnV
 mySpy.withArgs(1).and.returnValue(2);`,
     },
     {
+      description: 'should add a TODO for a wrapped .withArgs() call',
+      input: `mySpy.withArgs(1)!.and.returnValue(2);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+mySpy.withArgs(1)!.and.returnValue(2);`,
+    },
+    {
       description: 'should correctly identify chained spies with element access (bracket notation)',
       input: `spyOn(service, 'myMethod')['and'].returnValue(42);`,
       expected: `vi.spyOn(service, 'myMethod').mockReturnValue(42);`,
