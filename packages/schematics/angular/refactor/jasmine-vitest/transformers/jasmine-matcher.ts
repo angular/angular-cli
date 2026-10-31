@@ -259,11 +259,27 @@ export function transformExpectAsync(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
+  if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
+    return node;
+  }
+
+  // Negated async matchers have no exact equivalent (e.g. `.not.toBeResolvedTo()` also passes on rejection).
+  const notPae = node.expression.expression;
   if (
-    !ts.isCallExpression(node) ||
-    !ts.isPropertyAccessExpression(node.expression) ||
-    !ts.isCallExpression(node.expression.expression)
+    ts.isPropertyAccessExpression(notPae) &&
+    notPae.name.text === 'not' &&
+    ts.isCallExpression(notPae.expression) &&
+    ts.isIdentifier(notPae.expression.expression) &&
+    notPae.expression.expression.text === 'expectAsync'
   ) {
+    const category = 'unsupported-expect-async-matcher';
+    reporter.recordTodo(category, sourceFile, node);
+    addTodoComment(node, category, { name: `not.${node.expression.name.text}` });
+
+    return node;
+  }
+
+  if (!ts.isCallExpression(node.expression.expression)) {
     return node;
   }
 

@@ -85,6 +85,14 @@ describe('transformExpectAsync', () => {
         `,
     },
     {
+      description: 'should add a TODO for a negated expectAsync matcher',
+      input: `await expectAsync(myPromise).not.toBeResolved();`,
+      expected: `
+          // TODO: vitest-migration: Unsupported expectAsync matcher ".not.toBeResolved()" found. Please migrate this manually.
+          await expectAsync(myPromise).not.toBeResolved();
+        `,
+    },
+    {
       description: 'should add a specific TODO for toBePending',
       input: `await expectAsync(myPromise).toBePending();`,
       /* eslint-disable max-len */
