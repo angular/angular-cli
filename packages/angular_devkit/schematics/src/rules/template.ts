@@ -71,10 +71,16 @@ export function applyContentTemplate<T>(options: T): FileOperator {
     }
     decodedContent = decodedContent.replace(/\r?\n/g, EOL);
 
-    return {
-      path,
-      content: Buffer.from(templateImpl(decodedContent, {})(options)),
-    };
+    try {
+      return {
+        path,
+        content: Buffer.from(templateImpl(decodedContent, {})(options)),
+      };
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+
+      throw new Error(`Failed to apply content template to "${path}": ${message}`, { cause: e });
+    }
   };
 }
 
