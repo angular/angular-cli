@@ -104,7 +104,7 @@ function getImportSpecifiers(
  * @param nodes Array of import specifiers to search through.
  * @param specifierName Name of the specifier to look for.
  */
-export function findImportSpecifier(
+function findImportSpecifier(
   nodes: ts.NodeArray<ts.ImportSpecifier>,
   specifierName: string,
 ): ts.ImportSpecifier | undefined {

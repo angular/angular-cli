@@ -52,7 +52,7 @@ const currentDirectory = import.meta.dirname;
 // In bundled ESM output, files are located in `lib/` directly adjacent to `config/schema.json`
 // whereas in unbundled development/tests, `config.js` is in `src/utilities/`.
 const bundledSchemaPath = path.join(currentDirectory, 'config/schema.json');
-export const workspaceSchemaPath = existsSync(bundledSchemaPath)
+const workspaceSchemaPath = existsSync(bundledSchemaPath)
   ? bundledSchemaPath
   : path.join(currentDirectory, '../../lib/config/schema.json');
 
