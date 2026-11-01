@@ -213,7 +213,7 @@ export async function augmentAppWithServiceWorkerEsbuild(
   );
 }
 
-export async function augmentAppWithServiceWorkerCore(
+async function augmentAppWithServiceWorkerCore(
   config: Config,
   serviceWorkerFilesystem: Filesystem,
   baseHref: string,

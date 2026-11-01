@@ -285,7 +285,7 @@ export function isZonelessApp(polyfills: string[] | undefined): boolean {
   return !polyfills?.some((p) => p === 'zone.js' || /\.[mc]?[jt]s$/.test(p));
 }
 
-export function getEntryPointName(entryPoint: string): string {
+function getEntryPointName(entryPoint: string): string {
   return basename(entryPoint)
     .replace(/(.*:)/, '') // global:bundle.css  -> bundle.css
     .replace(/\.[cm]?[jt]s$/, '')
