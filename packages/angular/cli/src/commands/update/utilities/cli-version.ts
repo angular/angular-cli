@@ -79,7 +79,7 @@ export async function checkCLIVersion(
  * @param next Whether to use the next version.
  * @returns The version or tag to use for the CLI update runner.
  */
-export function getCLIUpdateRunnerVersion(
+function getCLIUpdateRunnerVersion(
   packagesToUpdate: string[] | undefined,
   next: boolean,
 ): string | number {

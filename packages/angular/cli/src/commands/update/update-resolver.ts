@@ -91,7 +91,7 @@ function isReleaseAgeSatisfied(
   return Date.now() - publishTime >= minReleaseAge;
 }
 
-export async function getSatisfyingVersion(
+async function getSatisfyingVersion(
   registryClient: RegistryClient,
   metadata: PackageMetadata,
   range: string,
@@ -368,7 +368,7 @@ function _getUpdateMetadata(
   return result;
 }
 
-export function isPnpActive(workspaceRoot: string): boolean {
+function isPnpActive(workspaceRoot: string): boolean {
   return (
     process.versions.pnp !== undefined ||
     existsSync(path.join(workspaceRoot, '.pnp.cjs')) ||

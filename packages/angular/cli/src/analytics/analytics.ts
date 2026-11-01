@@ -20,7 +20,7 @@ import { isTTY } from '../utilities/tty';
 /**
  * This is the ultimate safelist for checking if a package name is safe to report to analytics.
  */
-export const analyticsPackageSafelist = [
+const analyticsPackageSafelist = [
   /^@angular\//,
   /^@angular-devkit\//,
   /^@nguniversal\//,

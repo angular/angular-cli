@@ -44,7 +44,7 @@ export async function migrateTestFile(
   return createFixResponseForZoneTests(sourceFile);
 }
 
-export async function searchForGlobalZoneless(startPath: string, host: Host): Promise<boolean> {
+async function searchForGlobalZoneless(startPath: string, host: Host): Promise<boolean> {
   const angularJsonDir = findAngularJsonDir(startPath, host);
   if (!angularJsonDir) {
     // Cannot determine project root, fallback to original behavior or assume false.

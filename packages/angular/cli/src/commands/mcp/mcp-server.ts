@@ -48,14 +48,14 @@ const STABLE_TOOLS = [
  * The set of tools that are available but not enabled by default.
  * These tools are considered experimental and may have limitations.
  */
-export const EXPERIMENTAL_TOOLS: readonly AnyMcpToolDeclaration[] = [] as const;
+const EXPERIMENTAL_TOOLS: readonly AnyMcpToolDeclaration[] = [] as const;
 
 /**
  * Experimental tools that are grouped together under a single name.
  *
  * Used for enabling them as a group.
  */
-export const EXPERIMENTAL_TOOL_GROUPS: Record<string, readonly AnyMcpToolDeclaration[]> = {
+const EXPERIMENTAL_TOOL_GROUPS: Record<string, readonly AnyMcpToolDeclaration[]> = {
   'all': EXPERIMENTAL_TOOLS,
   'devserver': [],
 };
@@ -176,7 +176,7 @@ for equivalent actions.
   return server;
 }
 
-export function assembleToolDeclarations(
+function assembleToolDeclarations(
   stableDeclarations: readonly AnyMcpToolDeclaration[],
   experimentalDeclarations: readonly AnyMcpToolDeclaration[],
   options: {

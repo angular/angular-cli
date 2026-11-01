@@ -39,7 +39,7 @@ export async function analyzeForUnsupportedZoneUses(
  * @param ngZoneImport The import specifier for `NgZone`.
  * @returns A list of nodes that are unsupported `NgZone` usages.
  */
-export async function findUnsupportedZoneUsages(
+async function findUnsupportedZoneUsages(
   sourceFile: SourceFile,
   ngZoneImport: ImportSpecifier,
 ): Promise<Node[]> {
