@@ -11,7 +11,7 @@ import { Observable, from, of as observableOf } from 'rxjs';
 import { first, map, mergeMap } from 'rxjs/operators';
 import { FileSystemSchematicContext, FileSystemSchematicDescription } from './description';
 
-export class InvalidInputOptions<T = {}> extends schema.SchemaValidationException {
+class InvalidInputOptions<T = {}> extends schema.SchemaValidationException {
   constructor(options: T, errors: schema.SchemaValidatorError[]) {
     super(
       errors,
