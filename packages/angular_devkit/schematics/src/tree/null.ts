@@ -20,7 +20,7 @@ import { Action } from './action';
 import { DirEntry, MergeStrategy, Tree, TreeSymbol, UpdateRecorder } from './interface';
 import { UpdateRecorderBase } from './recorder';
 
-export class CannotCreateFileException extends BaseException {
+class CannotCreateFileException extends BaseException {
   constructor(path: string) {
     super(`Cannot create file "${path}".`);
   }
