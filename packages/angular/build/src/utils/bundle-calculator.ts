@@ -58,7 +58,7 @@ export interface BudgetStats {
   assets?: BudgetAsset[];
 }
 
-export function* calculateThresholds(budget: BudgetEntry): IterableIterator<Threshold> {
+function* calculateThresholds(budget: BudgetEntry): IterableIterator<Threshold> {
   if (budget.maximumWarning) {
     yield {
       limit: calculateBytes(budget.maximumWarning, budget.baseline, 1),
@@ -354,7 +354,7 @@ export function* checkBudgets(
   }
 }
 
-export function* checkThresholds(
+function* checkThresholds(
   thresholds: Iterable<Threshold>,
   size: number,
   label?: string,
