@@ -47,7 +47,7 @@ const packageManagers: { [name: string]: PackageManagerProfile } = {
   },
 };
 
-export class UnknownPackageManagerException extends BaseException {
+class UnknownPackageManagerException extends BaseException {
   constructor(name: string) {
     super(`Unknown package manager "${name}".`);
   }
