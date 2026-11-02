@@ -534,6 +534,18 @@ export class PackageManager {
   }
 
   /**
+   * Creates the in-memory cache key for a registry manifest.
+   *
+   * The key is intentionally based on the unquoted `name@version` specifier so that it is
+   * stable regardless of whether the host requires shell quoting for command arguments.
+   */
+  #getManifestCacheKey(packageName: string, version: string, registry?: string): string {
+    const specifier = `${packageName}@${version}`;
+
+    return registry ? `${specifier}|${registry}` : specifier;
+  }
+
+  /**
    * Fetches the registry manifest for a specific version of a package.
    * The manifest is similar to the package's `package.json` file.
    * @param packageName The name of the package to fetch the manifest for.
@@ -558,7 +570,7 @@ export class PackageManager {
       commandArgs.push(...formatter(MANIFEST_FIELDS));
     }
 
-    const cacheKey = options.registry ? `${specifier}|${options.registry}` : specifier;
+    const cacheKey = this.#getManifestCacheKey(packageName, version, options.registry);
     const normalizedRange = validRange(version);
 
     const manifest = await this.#fetchAndParse(
@@ -588,11 +600,10 @@ export class PackageManager {
 
     // If the provided version was not a specific version, also cache the specific fetched version
     if (manifest && manifest.version !== version) {
-      const manifestSpecifier = `${manifest.name}@${manifest.version}`;
-      const manifestCacheKey = options.registry
-        ? `${manifestSpecifier}|${options.registry}`
-        : manifestSpecifier;
-      this.#manifestCache.set(manifestCacheKey, manifest);
+      this.#manifestCache.set(
+        this.#getManifestCacheKey(manifest.name, manifest.version, options.registry),
+        manifest,
+      );
     }
 
     return manifest;
