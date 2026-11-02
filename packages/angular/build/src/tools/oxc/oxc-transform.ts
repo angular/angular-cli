@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import './oxc-wasi-shim';
 import type { DecodedSourceMap } from '@ampproject/remapping';
 import { needsLinking } from '@angular/compiler-cli/linker';
 import type { BindingIdentifier, Class, Node } from '@oxc-project/types';

@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import './oxc-wasi-shim';
 import type { Node } from '@oxc-project/types';
 import { visitorKeys } from 'oxc-parser';
 
