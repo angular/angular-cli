@@ -76,7 +76,7 @@ if (typeof Worker !== 'undefined') {
 }
 
 const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic(
-  (options, { project }) => {
+  (options, { project, tree }) => {
     const projectType = project.extensions['projectType'];
     if (projectType !== 'application') {
       throw new SchematicsException(`Web Worker requires a project type of "application".`);
@@ -95,6 +95,7 @@ const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic
     ]);
 
     const root = project.root || '';
+    const workerConfigPath = join(root, 'tsconfig.worker.json');
     const templateSourceWorkerConfig = apply(url('./files/worker-tsconfig'), [
       applyTemplates({
         ...options,
@@ -114,7 +115,6 @@ const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic
           throw new Error(`Build target is not defined for this project.`);
         }
 
-        const workerConfigPath = join(root, 'tsconfig.worker.json');
         (buildTarget.options ??= {}).webWorkerTsConfig ??= workerConfigPath;
         // The unit-test builder has no `webWorkerTsConfig` option and reads it from the build target.
         if (testTarget && testTarget.builder !== Builders.BuildUnitTest) {
@@ -125,7 +125,8 @@ const webWorkerSchematic: RuleFactory<WebWorkerOptions> = createProjectSchematic
       options.snippet ? addSnippet(options) : noop(),
       // Add the worker.
       mergeWith(templateSourceWorkerCode),
-      mergeWith(templateSourceWorkerConfig),
+      // The configuration is shared by all the workers of the project.
+      tree.exists(workerConfigPath) ? noop() : mergeWith(templateSourceWorkerConfig),
     ]);
   },
 );
