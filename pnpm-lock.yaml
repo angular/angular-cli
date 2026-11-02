@@ -208,8 +208,8 @@ importers:
         specifier: 22.3.0-next.4
         version: 22.3.0-next.4(1725db9a6ee8cfe432519dbd17505708)
       '@angular/ng-dev':
-        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#37be0b2012ab2d2f58d575689b1bac74eed56e41
-        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/37be0b2012ab2d2f58d575689b1bac74eed56e41
+        specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#a53423acd0cec521dcd8edd376b7b6b485ace6cd
+        version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a53423acd0cec521dcd8edd376b7b6b485ace6cd
       '@angular/platform-browser':
         specifier: 22.3.0-next.3
         version: 22.3.0-next.3(@angular/animations@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))
@@ -1109,9 +1109,9 @@ packages:
       '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
       rxjs: ^6.5.3 || ^7.4.0
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/37be0b2012ab2d2f58d575689b1bac74eed56e41':
-    resolution: {gitHosted: true, integrity: sha512-f6UJvDceEOzmj5y6+cLLbLNdqULwR7iPRtw7IxHRTMFVhv+tR9C9uericFdX5EZKaid3uv8u4GK/nkeO/gfy/g==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/37be0b2012ab2d2f58d575689b1bac74eed56e41}
-    version: 0.0.0-d45884cba93817d0e1a2be67ca5638227f64e508
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a53423acd0cec521dcd8edd376b7b6b485ace6cd':
+    resolution: {gitHosted: true, integrity: sha512-S9R+TLW26DFNQX/ntfOFTn3Httw5Jr/ubro5vAFz3eaWq2SNqzYn3EdsKvrNgJ9u+HGIFxLoK1e9xhkwAXJ/4A==, tarball: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a53423acd0cec521dcd8edd376b7b6b485ace6cd}
+    version: 0.0.0-5708c4df037871bab3ce15d27e020dbdbe9fe0fc
     hasBin: true
 
   '@angular/platform-browser@22.3.0-next.3':
@@ -8676,7 +8676,7 @@ snapshots:
       rxjs: 7.8.2
       tslib: 2.8.1
 
-  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/37be0b2012ab2d2f58d575689b1bac74eed56e41':
+  '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/a53423acd0cec521dcd8edd376b7b6b485ace6cd':
     dependencies:
       '@actions/core': 3.0.1
       '@conventional-changelog/git-client': 3.2.0(conventional-commits-filter@6.0.1)(conventional-commits-parser@7.1.3)
