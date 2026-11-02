@@ -154,6 +154,42 @@ describe('PackageManager', () => {
   });
 
   describe('acquireTempPackage', () => {
+    it('should pass ignoreScriptsFlag by default when no options are provided', async () => {
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', descriptor);
+      spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      await pm.acquireTempPackage('foo@1.0.0');
+
+      expect(testHost.runCommand).toHaveBeenCalledWith(
+        descriptor.binary,
+        [descriptor.addCommand, 'foo@1.0.0', descriptor.ignoreScriptsFlag],
+        jasmine.any(Object),
+      );
+    });
+
+    it('should not pass ignoreScriptsFlag when ignoreScripts is explicitly false', async () => {
+      const testHost = new MockHost({ '/tmp/project/node_modules': true });
+      const pm = new PackageManager(testHost, '/tmp/project', descriptor);
+      spyOn(testHost, 'createTempDirectory').and.resolveTo(
+        '/tmp/project/node_modules/angular-cli-tmp-packages-abc',
+      );
+      spyOn(testHost, 'writeFile').and.resolveTo();
+      spyOn(testHost, 'runCommand').and.resolveTo({ stdout: '', stderr: '' });
+
+      await pm.acquireTempPackage('foo@1.0.0', { ignoreScripts: false });
+
+      expect(testHost.runCommand).toHaveBeenCalledWith(
+        descriptor.binary,
+        [descriptor.addCommand, 'foo@1.0.0'],
+        jasmine.any(Object),
+      );
+    });
+
     it('should copy and sanitize pnpm-workspace.yaml when package manager is pnpm and workspace file exists', async () => {
       const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
       const testHost = new MockHost({ '/tmp/project/node_modules': true });
