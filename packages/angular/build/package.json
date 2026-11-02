@@ -48,7 +48,6 @@
     "xxhash-wasm": "1.1.0"
   },
   "optionalDependencies": {
-    "@oxc-parser/binding-wasm32-wasi": "0.156.0",
     "lmdb": "3.5.9"
   },
   "devDependencies": {
