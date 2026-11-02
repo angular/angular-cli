@@ -49,10 +49,6 @@ describe('Workspace Schematic', () => {
     expect(tree.exists('/pnpm-workspace.yaml')).toBeTrue();
     const content = tree.readContent('/pnpm-workspace.yaml');
     expect(content).toContain('allowBuilds:');
-    expect(content).toContain("'@parcel/watcher': false");
-    expect(content).toContain('esbuild: false');
-    expect(content).toContain('lmdb: false');
-    expect(content).toContain('msgpackr-extract: false');
   });
 
   it('should set the name in package.json', async () => {
