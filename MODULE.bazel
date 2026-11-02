@@ -19,21 +19,21 @@ bazel_dep(name = "aspect_rules_jasmine", version = "2.0.4")
 bazel_dep(name = "rules_angular")
 git_override(
     module_name = "rules_angular",
-    commit = "7822265c5a0565c8c1fdc254e021178131bfcfa8",
+    commit = "ccb8ce17f3c9ee0b7a752b3b5b9aa0643c081857",
     remote = "https://github.com/angular/rules_angular.git",
 )
 
 bazel_dep(name = "devinfra")
 git_override(
     module_name = "devinfra",
-    commit = "5708c4df037871bab3ce15d27e020dbdbe9fe0fc",
+    commit = "9163c7b18bed28802e04d9c6f9da14e09ee7b79a",
     remote = "https://github.com/angular/dev-infra.git",
 )
 
 bazel_dep(name = "rules_browsers")
 git_override(
     module_name = "rules_browsers",
-    commit = "80ed35fe2809269a0a3be6693bd0a0e47c8a1bc9",
+    commit = "8c45b59758ba9f6141511f1a167e442944b1353b",
     remote = "https://github.com/angular/rules_browsers.git",
 )
 
