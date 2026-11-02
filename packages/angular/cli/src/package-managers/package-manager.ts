@@ -559,21 +559,32 @@ export class PackageManager {
     }
 
     const cacheKey = options.registry ? `${specifier}|${options.registry}` : specifier;
+    const normalizedRange = validRange(version);
 
     const manifest = await this.#fetchAndParse(
       commandArgs,
-      (stdout, logger) => this.descriptor.outputParsers.getRegistryManifest(stdout, logger),
+      (stdout, logger) => {
+        const parsed = this.descriptor.outputParsers.getRegistryManifest(stdout, logger, {
+          version,
+        });
+        // Modern yarn returns the latest version instead of an error when a requested
+        // version or range does not exist. Validating inside the parser ensures the rejected
+        // result is cached as `null`. Dist-tag fallbacks cannot be detected here and are
+        // validated by the descriptor's parser instead (see `parseYarnModernManifest`).
+        if (
+          parsed &&
+          normalizedRange &&
+          !satisfies(parsed.version, normalizedRange, {
+            includePrerelease: normalizedRange === '*',
+          })
+        ) {
+          return null;
+        }
+
+        return parsed;
+      },
       { ...options, cache: this.#manifestCache, cacheKey },
     );
-
-    // Modern yarn returns the latest version instead of an error when the requested one does not exist.
-    if (
-      manifest &&
-      validRange(version) &&
-      !satisfies(manifest.version, version, { includePrerelease: true })
-    ) {
-      return null;
-    }
 
     // If the provided version was not a specific version, also cache the specific fetched version
     if (manifest && manifest.version !== version) {
