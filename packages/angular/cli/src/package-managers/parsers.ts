@@ -13,7 +13,7 @@
  */
 
 import { stripVTControlCharacters } from 'node:util';
-import { compare, valid } from 'semver';
+import { compare, valid, validRange } from 'semver';
 import { ErrorInfo } from './error';
 import { Logger } from './logger';
 import { PackageManifest, PackageMetadata } from './package-metadata';
@@ -434,6 +434,75 @@ export function parseYarnClassicManifest(stdout: string, logger?: Logger): Packa
   if (!isValidManifest(manifest)) {
     logger?.debug(
       '  Parsed JSON is not a valid manifest (missing name, version, or invalid SemVer).',
+    );
+
+    return null;
+  }
+
+  return manifest;
+}
+
+/**
+ * Parses the output of `yarn npm info` (modern yarn) to get a package manifest.
+ *
+ * Modern yarn silently falls back to `latest` when a requested dist-tag does not exist.
+ * When `options.version` is a dist-tag (not a valid SemVer range), this parser verifies
+ * that the tag exists in the `dist-tags` output field and resolves to the returned manifest
+ * version. The `dist-tags` field is always stripped from the returned manifest.
+ *
+ * NOTE: This only handles the dist-tag case. The equivalent fallback for SemVer versions and
+ * ranges is handled for all package managers by `PackageManager.getRegistryManifest`.
+ *
+ * @param stdout The standard output of the command.
+ * @param logger An optional logger instance.
+ * @param options Optional context including the requested version or dist-tag.
+ * @returns The package manifest object, or `null` if not found or if the requested
+ * dist-tag could not be verified.
+ */
+export function parseYarnModernManifest(
+  stdout: string,
+  logger?: Logger,
+  options?: { version?: string },
+): PackageManifest | null {
+  const parsed = parseNpmLikeManifest(stdout, logger);
+  if (!parsed) {
+    return null;
+  }
+
+  // Extract `dist-tags` (requested via `--fields` in the yarn descriptor) and omit it
+  // from the returned `PackageManifest` so packument-level metadata does not leak out.
+  const { 'dist-tags': distTags, ...manifest } = parsed as PackageManifest & {
+    'dist-tags'?: unknown;
+  };
+
+  // SemVer versions and ranges are validated by `PackageManager.getRegistryManifest`.
+  // When `requestedVersion` is not a valid SemVer range, treat it as a dist-tag and verify
+  // that `yarn npm info` resolved that tag rather than silently falling back to `latest`.
+  const requestedVersion = options?.version;
+  if (requestedVersion === undefined || validRange(requestedVersion)) {
+    return manifest;
+  }
+
+  // The yarn descriptor always requests `dist-tags`, so a missing or malformed field is
+  // unexpected. Fail closed since the tag cannot be verified.
+  if (!distTags || typeof distTags !== 'object' || Array.isArray(distTags)) {
+    logger?.debug(
+      `  Cannot verify requested dist-tag '${requestedVersion}': 'dist-tags' is missing or invalid.`,
+    );
+
+    return null;
+  }
+
+  // Use `Object.hasOwn` to avoid matching inherited `Object.prototype` keys (e.g., `toString`).
+  const taggedVersion = Object.hasOwn(distTags, requestedVersion)
+    ? (distTags as Record<string, unknown>)[requestedVersion]
+    : undefined;
+
+  // Reject if the tag does not exist in `dist-tags` or points to a different normalized
+  // SemVer version than the manifest that was returned.
+  if (typeof taggedVersion !== 'string' || valid(taggedVersion) !== valid(manifest.version)) {
+    logger?.debug(
+      `  Requested dist-tag '${requestedVersion}' does not match manifest version '${manifest.version}'.`,
     );
 
     return null;

@@ -20,6 +20,7 @@ import {
   parseYarnClassicManifest,
   parseYarnModernDependencies,
   parseYarnModernError,
+  parseYarnModernManifest,
   parseYarnReleaseAge,
 } from './parsers';
 
@@ -431,6 +432,55 @@ describe('parsers', () => {
         data: { name: 'foo', version: '1.0.0' },
       });
       expect(parseYarnClassicManifest(stdout)).toBeNull();
+    });
+  });
+
+  describe('parseYarnModernManifest', () => {
+    const stdout = JSON.stringify({
+      name: 'foo',
+      version: '2.0.0',
+      'dist-tags': { latest: '2.0.0', next: '2.1.0-next.0' },
+    });
+
+    it('should return manifest with dist-tags stripped when requested dist-tag matches', () => {
+      expect(parseYarnModernManifest(stdout, undefined, { version: 'latest' })).toEqual({
+        name: 'foo',
+        version: '2.0.0',
+      });
+    });
+
+    it('should return null when requested dist-tag does not exist', () => {
+      expect(parseYarnModernManifest(stdout, undefined, { version: 'nonexistent-tag' })).toBeNull();
+    });
+
+    it('should return null when requested dist-tag matches an inherited Object.prototype key', () => {
+      expect(parseYarnModernManifest(stdout, undefined, { version: 'toString' })).toBeNull();
+      expect(parseYarnModernManifest(stdout, undefined, { version: 'constructor' })).toBeNull();
+    });
+
+    it('should return null when requested dist-tag resolves to a different version than the manifest', () => {
+      expect(parseYarnModernManifest(stdout, undefined, { version: 'next' })).toBeNull();
+    });
+
+    it('should return null when a dist-tag is requested but dist-tags is missing or invalid', () => {
+      const withoutDistTags = JSON.stringify({ name: 'foo', version: '2.0.0' });
+      expect(parseYarnModernManifest(withoutDistTags, undefined, { version: 'latest' })).toBeNull();
+
+      const arrayDistTags = JSON.stringify({ name: 'foo', version: '2.0.0', 'dist-tags': [] });
+      expect(parseYarnModernManifest(arrayDistTags, undefined, { version: 'latest' })).toBeNull();
+    });
+
+    it('should skip dist-tag validation for SemVer versions and ranges and still strip dist-tags', () => {
+      expect(parseYarnModernManifest(stdout, undefined, { version: '^2.0.0' })).toEqual({
+        name: 'foo',
+        version: '2.0.0',
+      });
+      expect(parseYarnModernManifest(stdout)).toEqual({ name: 'foo', version: '2.0.0' });
+    });
+
+    it('should return null for empty or invalid stdout', () => {
+      expect(parseYarnModernManifest('')).toBeNull();
+      expect(parseYarnModernManifest(JSON.stringify({ name: 'foo' }))).toBeNull();
     });
   });
 

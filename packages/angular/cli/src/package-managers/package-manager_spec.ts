@@ -32,9 +32,118 @@ describe('PackageManager', () => {
 
       expect(await pm.getRegistryManifest('foo', '99.99.99')).toBeNull();
       expect(await pm.getRegistryManifest('foo', '^99.0.0')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '2.0.0-rc.1')).toBeNull();
       expect(await pm.getRegistryManifest('foo', '^2.0.0')).toEqual(
         jasmine.objectContaining({ version: '2.0.0' }),
       );
+    });
+
+    it('should cache null for mismatched versions without caching the fallback manifest', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '2.0.0' }),
+        stderr: '',
+      });
+
+      expect(await pm.getRegistryManifest('foo', '99.99.99')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '99.99.99')).toBeNull();
+      expect(runCommandSpy).toHaveBeenCalledTimes(1);
+
+      // Ensure the rejected fallback manifest was not cached under `foo@2.0.0`.
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '2.0.0', homepage: 'https://angular.dev' }),
+        stderr: '',
+      });
+      expect(await pm.getRegistryManifest('foo', '2.0.0')).toEqual({
+        name: 'foo',
+        version: '2.0.0',
+        homepage: 'https://angular.dev',
+      });
+      expect(runCommandSpy).toHaveBeenCalledTimes(2);
+    });
+
+    it('should validate dist-tags against fetched dist-tags metadata and strip dist-tags from the manifest', async () => {
+      // Modern yarn falls back to `latest` when a requested dist-tag does not exist.
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({
+          name: 'foo',
+          version: '2.0.0',
+          'dist-tags': { latest: '2.0.0', next: '2.1.0-next.0' },
+        }),
+        stderr: '',
+      });
+
+      expect(await pm.getRegistryManifest('foo', 'nonexistent-tag')).toBeNull();
+      expect(await pm.getManifest('foo@nonexistent-tag')).toBeNull();
+      // If a package manager returned `2.0.0` when `next` (`2.1.0-next.0`) was requested, reject it.
+      expect(await pm.getRegistryManifest('foo', 'next')).toBeNull();
+
+      expect(await pm.getRegistryManifest('foo', 'latest')).toEqual({
+        name: 'foo',
+        version: '2.0.0',
+      });
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'yarn',
+        [
+          'npm',
+          'info',
+          '--json',
+          'foo@latest',
+          '--fields',
+          [...MANIFEST_FIELDS, 'dist-tags'].join(','),
+        ],
+        jasmine.anything(),
+      );
+    });
+
+    it('should handle prerelease manifests accurately for wildcard, prerelease, and stable ranges', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '2.0.0-beta.1' }),
+        stderr: '',
+      });
+
+      // Unmet stable major/x-ranges should not accept a prerelease `latest` fallback.
+      expect(await pm.getRegistryManifest('foo', '2')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '2.x')).toBeNull();
+      expect(await pm.getRegistryManifest('foo', '^2.0.0')).toBeNull();
+
+      // Wildcard (`*`, produced by bare specifiers) and matching prerelease specs should succeed.
+      expect(await pm.getRegistryManifest('foo', '*')).toEqual({
+        name: 'foo',
+        version: '2.0.0-beta.1',
+      });
+      expect(await pm.getRegistryManifest('foo', '2.0.0-beta.1')).toEqual({
+        name: 'foo',
+        version: '2.0.0-beta.1',
+      });
+      expect(await pm.getRegistryManifest('foo', '^2.0.0-beta.0')).toEqual({
+        name: 'foo',
+        version: '2.0.0-beta.1',
+      });
+    });
+
+    it('should apply the same prerelease range handling to non-yarn package managers', async () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '2.0.0-beta.1' }),
+        stderr: '',
+      });
+
+      // A prerelease does not satisfy a stable range without `includePrerelease`.
+      expect(await pm.getRegistryManifest('foo', '^2.0.0')).toBeNull();
+
+      // Wildcard and matching prerelease ranges accept the prerelease.
+      expect(await pm.getRegistryManifest('foo', '*')).toEqual({
+        name: 'foo',
+        version: '2.0.0-beta.1',
+      });
+      expect(await pm.getRegistryManifest('foo', '^2.0.0-beta.0')).toEqual({
+        name: 'foo',
+        version: '2.0.0-beta.1',
+      });
     });
 
     it('should quote complex range specifiers when required by the host', async () => {
@@ -555,6 +664,27 @@ describe('PackageManager', () => {
       await expectAsync(pm.getRegistryMetadata('@private/pkg')).toBeRejectedWithError(
         PackageManagerError,
         'The remote server failed to provide the requested resource',
+      );
+    });
+
+    it('should not duplicate the dist-tags field when fetching yarn metadata', async () => {
+      const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['yarn']);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({
+          name: 'foo',
+          'dist-tags': { latest: '1.0.0' },
+          versions: ['1.0.0'],
+          time: {},
+        }),
+        stderr: '',
+      });
+
+      await pm.getRegistryMetadata('foo');
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        'yarn',
+        ['npm', 'info', '--json', 'foo', '--fields', 'name,dist-tags,versions,time'],
+        jasmine.anything(),
       );
     });
   });
