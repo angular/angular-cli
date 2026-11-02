@@ -120,7 +120,11 @@ function removeSourceMappingURLFromString(code: string, skipTrailingCheck = fals
     }
   }
 
-  parseSync ??= (createRequire(__filename)('oxc-parser') as typeof import('oxc-parser')).parseSync;
+  if (!parseSync) {
+    const localRequire = createRequire(__filename);
+    localRequire('../tools/oxc/oxc-wasi-shim');
+    parseSync = (localRequire('oxc-parser') as typeof import('oxc-parser')).parseSync;
+  }
 
   const { comments } = parseSync('source.js', code, {
     lang: 'js',
