@@ -343,6 +343,39 @@ describe('JavaScriptTransformer sourcemaps', () => {
     expect(text).not.toContain('i0.ɵɵngDeclareDirective');
   });
 
+  it('should link declarations using the Babel linker when NG_BUILD_BABEL_LINKER is enabled', async () => {
+    process.env['NG_BUILD_BABEL_LINKER'] = 'true';
+    try {
+      transformer = new JavaScriptTransformer({
+        sourcemap: false,
+        maxConcurrency: 1,
+      });
+
+      const input = `
+        import * as i0 from "@angular/core";
+        export class MyDirective {}
+        MyDirective.ɵdir = i0.ɵɵngDeclareDirective({
+          minVersion: "12.0.0",
+          version: "14.0.0",
+          ngImport: i0,
+          type: MyDirective,
+          selector: "[my-dir]"
+        });
+      `;
+
+      const result = await transformer.transformData(
+        'node_modules/@angular/compiler-cli/test.js',
+        input,
+        { skipLinker: false },
+      );
+      const text = Buffer.from(result).toString('utf-8');
+
+      expect(text).not.toContain('i0.ɵɵngDeclareDirective');
+    } finally {
+      delete process.env['NG_BUILD_BABEL_LINKER'];
+    }
+  });
+
   describe('advanced optimizations fast-path pre-filter', () => {
     it('should bypass worker and return input buffer directly when no candidate tokens are present', async () => {
       transformer = new JavaScriptTransformer({

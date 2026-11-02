@@ -19,7 +19,6 @@ import {
   loadInputSourceMapFromUrl,
   removeSourceMappingURL,
 } from '../../utils/source-map';
-import { transform as transformWithOxc } from '../oxc/oxc-transform.js';
 import type { JavaScriptTransformerOptions } from './javascript-transformer';
 
 interface JavaScriptTransformRequest {
@@ -53,6 +52,8 @@ let babelLinkerDeps:
   | undefined;
 
 let remapping: typeof import('@ampproject/remapping').default | undefined;
+
+let oxcTransform: typeof import('../oxc/oxc-transform.js').transform | undefined;
 
 const textDecoder = new TextDecoder();
 const textEncoder = new TextEncoder();
@@ -181,7 +182,18 @@ async function transformJavaScriptImpl(
     coverageMap = result.map;
   }
 
-  if (shouldLink && useBabelLinker) {
+  let oxcLink = shouldLink && !useBabelLinker;
+  const shouldRunOxc = oxcLink || (!process.versions.webcontainer && advancedOptimizations);
+
+  if (shouldRunOxc) {
+    try {
+      oxcTransform ??= (await import('../oxc/oxc-transform.js')).transform;
+    } catch {
+      oxcLink = false;
+    }
+  }
+
+  if (shouldLink && (useBabelLinker || !oxcLink)) {
     babelLinkerDeps ??= Promise.all([
       import('@angular/compiler-cli/linker/babel'),
       import('@angular/compiler-cli'),
@@ -222,14 +234,13 @@ async function transformJavaScriptImpl(
   }
 
   // Run Oxc linking and/or advanced optimizations in a single unified AST traversal pass
-  const oxcLink = shouldLink && !useBabelLinker;
-  if (oxcLink || advancedOptimizations) {
+  if (oxcTransform && (oxcLink || advancedOptimizations)) {
     const sideEffectFree = options.sideEffects === false;
     const safeAngularPackage =
       sideEffectFree && /[\\/]node_modules[\\/]@angular[\\/]/.test(filename);
     const topLevelSafeMode = !safeAngularPackage;
 
-    const result = transformWithOxc(filename, code, {
+    const result = oxcTransform(filename, code, {
       link: oxcLink,
       jit,
       advancedOptimizations,

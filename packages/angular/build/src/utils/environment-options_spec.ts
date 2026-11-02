@@ -245,3 +245,60 @@ describe('environment options - maxInlinerWorkers', () => {
     expect(maxInlinerWorkers).toBe(Math.min(8, availableParallelism()));
   });
 });
+
+describe('environment options - useBabelLinker', () => {
+  const originalEnvValue = process.env['NG_BUILD_BABEL_LINKER'];
+  const originalWebcontainer = process.versions.webcontainer;
+
+  function loadEnvironmentOptions(): typeof import('./environment-options') {
+    delete require.cache[require.resolve('./environment-options')];
+
+    return require('./environment-options');
+  }
+
+  afterEach(() => {
+    if (originalEnvValue !== undefined) {
+      process.env['NG_BUILD_BABEL_LINKER'] = originalEnvValue;
+    } else {
+      delete process.env['NG_BUILD_BABEL_LINKER'];
+    }
+    if (originalWebcontainer !== undefined) {
+      process.versions.webcontainer = originalWebcontainer;
+    } else {
+      delete process.versions.webcontainer;
+    }
+    delete require.cache[require.resolve('./environment-options')];
+  });
+
+  it('defaults useBabelLinker to false in a standard environment', () => {
+    delete process.env['NG_BUILD_BABEL_LINKER'];
+    delete process.versions.webcontainer;
+    const { useBabelLinker } = loadEnvironmentOptions();
+
+    expect(useBabelLinker).toBeFalse();
+  });
+
+  it('defaults useBabelLinker to true in a webcontainer environment', () => {
+    delete process.env['NG_BUILD_BABEL_LINKER'];
+    process.versions.webcontainer = '1.0.0';
+    const { useBabelLinker } = loadEnvironmentOptions();
+
+    expect(useBabelLinker).toBeTrue();
+  });
+
+  it('allows disabling Babel linker in a webcontainer environment via NG_BUILD_BABEL_LINKER=false', () => {
+    process.env['NG_BUILD_BABEL_LINKER'] = 'false';
+    process.versions.webcontainer = '1.0.0';
+    const { useBabelLinker } = loadEnvironmentOptions();
+
+    expect(useBabelLinker).toBeFalse();
+  });
+
+  it('allows enabling Babel linker in a standard environment via NG_BUILD_BABEL_LINKER=true', () => {
+    process.env['NG_BUILD_BABEL_LINKER'] = 'true';
+    delete process.versions.webcontainer;
+    const { useBabelLinker } = loadEnvironmentOptions();
+
+    expect(useBabelLinker).toBeTrue();
+  });
+});

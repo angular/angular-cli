@@ -218,11 +218,14 @@ export const useComponentTemplateHmr = parseTristate(process.env['NG_HMR_TEMPLAT
 export const usePartialSsrBuild = parseTristate(process.env['NG_BUILD_PARTIAL_SSR']) === true;
 
 /**
- * When `NG_BUILD_BABEL_LINKER` is enabled (`1` or `true`), the Babel-based
+ * When `NG_BUILD_BABEL_LINKER` is enabled (`1` or `true`), or when running within a
+ * WebContainer environment (unless explicitly disabled), the Babel-based
  * Angular Linker (`@angular/compiler-cli/linker/babel`) will be used instead of the
  * default OXC in-place linker.
  */
-export const useBabelLinker = parseTristate(process.env['NG_BUILD_BABEL_LINKER']) === true;
+export const useBabelLinker = process.versions.webcontainer
+  ? parseTristate(process.env['NG_BUILD_BABEL_LINKER']) !== false
+  : parseTristate(process.env['NG_BUILD_BABEL_LINKER']) === true;
 
 /**
  * When `NG_BUILD_SASS_EMBEDDED` is set to `0` or `false`, or when running within a
