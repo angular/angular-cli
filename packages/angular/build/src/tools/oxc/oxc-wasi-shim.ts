@@ -30,6 +30,14 @@ if (
     get() {
       return (this as { napiModule?: unknown }).napiModule;
     },
+    set(value) {
+      Object.defineProperty(this, 'addonModule', {
+        value,
+        writable: true,
+        configurable: true,
+        enumerable: true,
+      });
+    },
     configurable: true,
     enumerable: false,
   });
