@@ -391,13 +391,15 @@ export class PackageManager {
       registry?: string;
       ignoreScripts?: boolean;
       ignorePeerDependencies?: boolean;
-    } = { ignoreScripts: true },
+    } = {},
   ): Promise<void> {
+    const { force, ignoreScripts = true, ignorePeerDependencies } = options;
     const flags = [
-      options.force ? this.descriptor.forceFlag : '',
-      options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
-      options.ignorePeerDependencies ? (this.descriptor.ignorePeerDependenciesFlag ?? '') : '',
+      force ? this.descriptor.forceFlag : '',
+      ignoreScripts ? this.descriptor.ignoreScriptsFlag : '',
+      ignorePeerDependencies ? (this.descriptor.ignorePeerDependenciesFlag ?? '') : '',
     ].filter((flag) => flag);
+
     const args = [...this.descriptor.installCommand, ...flags];
 
     await this.#run(args, options);
@@ -787,9 +789,8 @@ export class PackageManager {
       }
     }
 
-    const flags = [options.ignoreScripts ? this.descriptor.ignoreScriptsFlag : ''].filter(
-      (flag) => flag,
-    );
+    const { ignoreScripts = true } = options;
+    const flags = [ignoreScripts ? this.descriptor.ignoreScriptsFlag : ''].filter((flag) => flag);
     const args: readonly string[] = [this.descriptor.addCommand, specifier, ...flags];
 
     try {
