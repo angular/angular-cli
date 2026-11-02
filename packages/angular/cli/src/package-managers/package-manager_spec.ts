@@ -180,6 +180,23 @@ describe('PackageManager', () => {
       );
     });
 
+    it('should reuse the resolved version cache entry when the host requires quoting', async () => {
+      Object.assign(host, { requiresQuoting: true });
+
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      runCommandSpy.and.resolveTo({
+        stdout: JSON.stringify({ name: 'foo', version: '1.5.0' }),
+        stderr: '',
+      });
+
+      await pm.getRegistryManifest('foo', '^1.0.0');
+      expect(await pm.getRegistryManifest('foo', '1.5.0')).toEqual({
+        name: 'foo',
+        version: '1.5.0',
+      });
+      expect(runCommandSpy).toHaveBeenCalledTimes(1);
+    });
+
     it('should return null when bun pm view fails with No matching version found', async () => {
       const pm = new PackageManager(host, '/tmp', SUPPORTED_PACKAGE_MANAGERS['bun']);
       runCommandSpy.and.rejectWith(
