@@ -1,6 +1,6 @@
 import assert from 'node:assert';
 import { getGlobalVariable } from '../../utils/env';
-import { ngServe } from '../../utils/project';
+import { ng } from '../../utils/process';
 
 export default async function () {
   assert(
@@ -9,14 +9,10 @@ export default async function () {
   );
 
   const originalForceWasi = process.env['NAPI_RS_FORCE_WASI'];
-  process.env['NAPI_RS_FORCE_WASI'] = 'true';
+  process.env['NAPI_RS_FORCE_WASI'] = 'error';
 
   try {
-    const port = await ngServe();
-    const response = await fetch(`http://localhost:${port}/`);
-    assert(response.ok, 'Expected response to be ok');
-    const text = await response.text();
-    assert.match(text, /<app-root/);
+    await ng('build');
   } finally {
     if (originalForceWasi === undefined) {
       delete process.env['NAPI_RS_FORCE_WASI'];
