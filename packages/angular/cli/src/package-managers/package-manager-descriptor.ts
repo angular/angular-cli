@@ -31,6 +31,7 @@ import {
   parseYarnClassicMetadata,
   parseYarnModernDependencies,
   parseYarnModernError,
+  parseYarnModernManifest,
   parseYarnReleaseAge,
 } from './parsers';
 
@@ -137,7 +138,11 @@ export interface PackageManagerDescriptor {
     ) => Map<string, InstalledPackage>;
 
     /** A function to parse the output of `getManifestCommand` for a specific version. */
-    getRegistryManifest: (stdout: string, logger?: Logger) => PackageManifest | null;
+    getRegistryManifest: (
+      stdout: string,
+      logger?: Logger,
+      options?: { version?: string },
+    ) => PackageManifest | null;
 
     /** A function to parse the output of `getManifestCommand` for the full package metadata. */
     getRegistryMetadata: (stdout: string, logger?: Logger) => PackageMetadata | null;
@@ -227,10 +232,15 @@ export const SUPPORTED_PACKAGE_MANAGERS = {
     listDependenciesCommand: ['info', '--name-only', '--json'],
     getReleaseAgeConfigCommand: ['config', 'get', 'npmMinimalAgeGate'],
     getManifestCommand: ['npm', 'info', '--json'],
-    viewCommandFieldArgFormatter: (fields) => ['--fields', fields.join(',')],
+    // Always include `dist-tags` so `parseYarnModernManifest` can detect when `yarn npm info`
+    // silently falls back to `latest` for a non-existent dist-tag.
+    viewCommandFieldArgFormatter: (fields) => [
+      '--fields',
+      [...new Set([...fields, 'dist-tags'])].join(','),
+    ],
     outputParsers: {
       listDependencies: parseYarnModernDependencies,
-      getRegistryManifest: parseNpmLikeManifest,
+      getRegistryManifest: parseYarnModernManifest,
       getRegistryMetadata: parseNpmLikeMetadata,
       getError: parseYarnModernError,
       getReleaseAge: parseYarnReleaseAge,
