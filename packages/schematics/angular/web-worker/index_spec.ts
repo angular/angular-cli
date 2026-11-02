@@ -147,4 +147,21 @@ describe('Web Worker Schematic', () => {
     const { compilerOptions } = parseJson(tree.readContent(path).toString());
     expect(compilerOptions.outDir).toBe('./out-tsc/worker');
   });
+
+  it(`should keep the existing 'tsconfig.worker.json' when adding another worker`, async () => {
+    let tree = await schematicRunner.runSchematic('web-worker', defaultOptions, appTree);
+    // The file no longer matches the template once it was customized or formatted by the CLI.
+    const path = '/projects/bar/tsconfig.worker.json';
+    const customized = `{ "compilerOptions": { "lib": ["es2022", "webworker"] } }\n`;
+    tree.overwrite(path, customized);
+
+    tree = await schematicRunner.runSchematic(
+      'web-worker',
+      { ...defaultOptions, name: 'other' },
+      tree,
+    );
+
+    expect(tree.exists('/projects/bar/src/app/other.worker.ts')).toBeTrue();
+    expect(tree.readContent(path)).toBe(customized);
+  });
 });
