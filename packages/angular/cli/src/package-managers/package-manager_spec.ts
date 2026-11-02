@@ -118,6 +118,41 @@ describe('PackageManager', () => {
     });
   });
 
+  describe('install', () => {
+    it('should pass ignoreScriptsFlag by default when no options are provided', async () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      await pm.install();
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        descriptor.binary,
+        [...descriptor.installCommand, descriptor.ignoreScriptsFlag],
+        jasmine.objectContaining({ cwd: '/tmp' }),
+      );
+    });
+
+    it('should pass ignoreScriptsFlag by default when other options are provided', async () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      await pm.install({ force: true });
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        descriptor.binary,
+        [...descriptor.installCommand, descriptor.forceFlag, descriptor.ignoreScriptsFlag],
+        jasmine.objectContaining({ cwd: '/tmp' }),
+      );
+    });
+
+    it('should not pass ignoreScriptsFlag when ignoreScripts is explicitly false', async () => {
+      const pm = new PackageManager(host, '/tmp', descriptor);
+      await pm.install({ ignoreScripts: false });
+
+      expect(runCommandSpy).toHaveBeenCalledWith(
+        descriptor.binary,
+        [...descriptor.installCommand],
+        jasmine.objectContaining({ cwd: '/tmp' }),
+      );
+    });
+  });
+
   describe('acquireTempPackage', () => {
     it('should copy and sanitize pnpm-workspace.yaml when package manager is pnpm and workspace file exists', async () => {
       const pnpmDescriptor = SUPPORTED_PACKAGE_MANAGERS['pnpm'];
