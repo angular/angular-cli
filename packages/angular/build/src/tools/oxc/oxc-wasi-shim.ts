@@ -31,12 +31,14 @@ if (
       return (this as { napiModule?: unknown }).napiModule;
     },
     set(value) {
-      Object.defineProperty(this, 'addonModule', {
-        value,
-        writable: true,
-        configurable: true,
-        enumerable: true,
-      });
+      if (this && (typeof this === 'object' || typeof this === 'function')) {
+        Object.defineProperty(this, 'addonModule', {
+          value,
+          writable: true,
+          configurable: true,
+          enumerable: true,
+        });
+      }
     },
     configurable: true,
     enumerable: false,
