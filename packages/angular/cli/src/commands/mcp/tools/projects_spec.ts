@@ -7,8 +7,8 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
+import assert from 'node:assert';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { AngularWorkspace } from '../../../utilities/config';
@@ -23,7 +23,9 @@ describe('List Projects Tool', () => {
   let workspaceDir: string;
 
   beforeEach(() => {
-    tempDir = mkdtempSync(join(tmpdir(), 'mcp-projects-tool-'));
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    tempDir = mkdtempSync(join(baseTmpDir, 'mcp-projects-tool-'));
     allowedRoot = join(tempDir, 'allowed-root');
     workspaceDir = join(allowedRoot, 'workspace');
     mkdirSync(workspaceDir, { recursive: true });

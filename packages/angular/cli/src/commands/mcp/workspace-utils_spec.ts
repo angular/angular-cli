@@ -7,8 +7,8 @@
  */
 
 import { workspaces } from '@angular-devkit/core';
+import assert from 'node:assert';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { AngularWorkspace } from '../../utilities/config';
@@ -114,7 +114,9 @@ describe('MCP Workspace Utils', () => {
     beforeEach(() => {
       mockHost = createMockHost();
       spyOn(process, 'cwd').and.returnValue(cwd);
-      tempDir = mkdtempSync(join(tmpdir(), 'mcp-workspace-utils-'));
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      tempDir = mkdtempSync(join(baseTmpDir, 'mcp-workspace-utils-'));
       allowedRoot = join(tempDir, 'allowed-root');
       allowedWorkspace = join(allowedRoot, 'workspace');
       outsideWorkspace = join(tempDir, 'outside-workspace');
