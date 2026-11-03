@@ -117,7 +117,12 @@ const legacyModules: Record<string, unknown> = {
   },
   '@schematics/angular/utility/project': {
     buildDefaultPath(project: { sourceRoot?: string; root: string; projectType: string }): string {
-      const root = project.sourceRoot ? `/${project.sourceRoot}/` : `/${project.root}/src/`;
+      const isLibraryAtRoot =
+        project.projectType === 'library' && project.sourceRoot === project.root;
+      const root =
+        project.sourceRoot && !isLibraryAtRoot
+          ? `/${project.sourceRoot}/`
+          : `/${project.root}/src/`;
 
       return `${root}${project.projectType === 'application' ? 'app' : 'lib'}`;
     },

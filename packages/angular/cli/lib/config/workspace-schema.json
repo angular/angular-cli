@@ -147,6 +147,9 @@
         "@schematics/angular:directive": {
           "$ref": "../../../../schematics/angular/directive/schema.json"
         },
+        "@schematics/angular:entry-point": {
+          "$ref": "../../../../schematics/angular/entry-point/schema.json"
+        },
         "@schematics/angular:enum": {
           "$ref": "../../../../schematics/angular/enum/schema.json"
         },

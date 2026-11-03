@@ -13,6 +13,7 @@ for generating an Angular application.
 | component      | Creates a new, generic component definition in the given project                                      |
 | directive      | Creates a new, generic directive definition in the given project                                      |
 | enum           | Generates a new, generic enum definition in the given project                                         |
+| entry-point    | Creates a new secondary entry point in an Angular library project                                     |
 | guard          | Generates a new, generic route guard definition in the given project                                  |
 | interceptor    | Creates a new, generic interceptor definition in the given project                                    |
 | interface      | Creates a new, generic interface definition in the given project                                      |
