@@ -7,7 +7,7 @@
  */
 
 import { FatalLinkerError } from '@angular/compiler-cli/linker';
-import { parseSync } from 'oxc-parser';
+import { loadOxcParser } from '../../oxc/load-oxc-parser';
 import { OxcAstHost } from './oxc-ast-host';
 
 describe('OxcAstHost', () => {
@@ -18,14 +18,14 @@ describe('OxcAstHost', () => {
   });
 
   function parseExpression(code: string): unknown {
-    const { program } = parseSync('test.js', `const x = ${code};`, { range: true });
+    const { program } = loadOxcParser().parseSync('test.js', `const x = ${code};`, { range: true });
     const stmt = program.body[0] as { declarations: Array<{ init: unknown }> };
 
     return stmt.declarations[0].init;
   }
 
   function parseStatement(code: string): unknown {
-    const { program } = parseSync('test.js', code, { range: true });
+    const { program } = loadOxcParser().parseSync('test.js', code, { range: true });
 
     return program.body[0];
   }
