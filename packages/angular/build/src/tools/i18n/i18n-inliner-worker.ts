@@ -6,7 +6,6 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import '../oxc/oxc-wasi-shim';
 import { type DecodedSourceMap, type SourceMapInput } from '@ampproject/remapping';
 import {
   type ɵParsedTranslation,
@@ -17,7 +16,7 @@ import {
 } from '@angular/localize';
 import { MagicString } from 'magic-string';
 import { deserialize } from 'node:v8';
-import { parseSync } from 'oxc-parser';
+import { loadOxcParser } from '../oxc/load-oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
 import { loadLocaleData } from './locale-data';
@@ -403,7 +402,7 @@ interface FileLocalizeMetadata {
  * @returns The extracted localization metadata.
  */
 function extractLocalizeMetadata(filename: string, code: string): FileLocalizeMetadata {
-  const { program } = parseSync(filename, code, {
+  const { program } = loadOxcParser().parseSync(filename, code, {
     sourceType: 'unambiguous',
   });
 

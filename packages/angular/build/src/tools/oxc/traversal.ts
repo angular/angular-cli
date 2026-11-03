@@ -6,9 +6,10 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import './oxc-wasi-shim';
 import type { Node } from '@oxc-project/types';
-import { visitorKeys } from 'oxc-parser';
+import { loadOxcParser } from './load-oxc-parser';
+
+let visitorKeys: Record<string, string[]> | undefined;
 
 /**
  * Contextual scope information provided to AST visitor callbacks during traversal.
@@ -276,7 +277,7 @@ function pushChildNodes(node: Node, stack: (Node | null)[]): void {
         break;
       }
 
-      const keys = visitorKeys[node.type];
+      const keys = (visitorKeys ??= loadOxcParser().visitorKeys)[node.type];
       if (!keys) {
         break;
       }
