@@ -174,7 +174,6 @@ ts_project(
         "//:node_modules/@types/less",
         "//:node_modules/@types/loader-utils",
         "//:node_modules/@types/node",
-        "//:node_modules/@types/picomatch",
         "//:node_modules/@types/semver",
         "//:node_modules/esbuild",
         "//:node_modules/esbuild-wasm",
