@@ -6,13 +6,12 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import './oxc-wasi-shim';
 import type { DecodedSourceMap } from '@ampproject/remapping';
 import { needsLinking } from '@angular/compiler-cli/linker';
 import type { BindingIdentifier, Class, Node } from '@oxc-project/types';
 import { MagicString } from 'magic-string';
-import { parseSync } from 'oxc-parser';
 import { OxcLinker } from '../angular/linker/oxc-linker';
+import { loadOxcParser } from './load-oxc-parser';
 import { traversePostOrder } from './traversal';
 
 export interface OxcTransformOptions {
@@ -262,7 +261,7 @@ function analyzeClassStaticProperties(classNode: Node, code: string): boolean {
  */
 // eslint-disable-next-line max-lines-per-function
 export function transform(filename: string, code: string, options: OxcTransformOptions) {
-  const { program } = parseSync(filename, code, { range: true });
+  const { program } = loadOxcParser().parseSync(filename, code, { range: true });
   const source = new MagicString(code);
 
   const shouldLink = options.link && needsLinking(filename, code);
