@@ -89,7 +89,6 @@ ts_project(
         ":node_modules/@angular/ssr",
         ":node_modules/@babel/core",
         ":node_modules/@inquirer/confirm",
-        ":node_modules/@oxc-parser/binding-wasm32-wasi",
         ":node_modules/@oxc-project/types",
         ":node_modules/@parcel/watcher",
         ":node_modules/@vitejs/plugin-basic-ssl",
