@@ -7,8 +7,8 @@
  */
 
 import { logging } from '@angular-devkit/core';
+import assert from 'node:assert';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import * as path from 'node:path';
 import * as semver from 'semver';
 import type { PackageManager, PackageManifest, PackageMetadata } from '../../package-managers';
@@ -43,7 +43,9 @@ describe('UpdateResolver', () => {
   const logger = new logging.NullLogger();
 
   beforeEach(() => {
-    tempRoot = mkdtempSync(path.join(tmpdir(), 'angular-cli-update-resolver-test-'));
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    tempRoot = mkdtempSync(path.join(baseTmpDir, 'angular-cli-update-resolver-test-'));
   });
 
   afterEach(() => {

@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
-import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { LocalWorkspaceHost, createRootRestrictedHost } from './host';
 
@@ -17,9 +17,11 @@ describe('createRootRestrictedHost', () => {
   let outsideDir: string;
 
   beforeEach(() => {
-    root1 = mkdtempSync(join(tmpdir(), 'angular-cli-mcp-root1-'));
-    root2 = mkdtempSync(join(tmpdir(), 'angular-cli-mcp-root2-'));
-    outsideDir = mkdtempSync(join(tmpdir(), 'angular-cli-mcp-outside-'));
+    const baseTmpDir = process.env['TEST_TMPDIR'];
+    assert(baseTmpDir, 'TEST_TMPDIR is not set');
+    root1 = mkdtempSync(join(baseTmpDir, 'angular-cli-mcp-root1-'));
+    root2 = mkdtempSync(join(baseTmpDir, 'angular-cli-mcp-root2-'));
+    outsideDir = mkdtempSync(join(baseTmpDir, 'angular-cli-mcp-outside-'));
 
     writeFileSync(join(root1, 'file1.txt'), 'root 1 content');
     writeFileSync(join(root2, 'file2.txt'), 'root 2 content');
