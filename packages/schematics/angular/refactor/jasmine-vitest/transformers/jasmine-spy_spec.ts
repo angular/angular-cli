@@ -150,7 +150,19 @@ vi.spyOn(service, 'myMethod').and.unknownStrategy();`,
       description: 'should add a TODO for a spy strategy configured with .withArgs()',
       input: `spyOn(service, 'myMethod').withArgs(1).and.returnValue(2);`,
       expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
-vi.spyOn(service, 'myMethod').mockReturnValue(undefined).withArgs(1).and.returnValue(2);`,
+vi.spyOn(service, 'myMethod').withArgs(1).and.returnValue(2);`,
+    },
+    {
+      description: 'should add a single TODO for multiple chained .withArgs() strategies',
+      input: `mySpy.withArgs(1).and.returnValue(10).withArgs(2).and.returnValue(20);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+mySpy.withArgs(1).and.returnValue(10).withArgs(2).and.returnValue(20);`,
+    },
+    {
+      description: 'should not transform a default strategy chained after .withArgs()',
+      input: `mySpy.withArgs(1).and.returnValue(2).and.returnValue(0);`,
+      expected: `// TODO: vitest-migration: Vitest does not have a direct equivalent for spy.withArgs(). Please migrate this manually, for example with mockImplementation() that checks the arguments. See: https://vitest.dev/api/mock.html#mockimplementation
+mySpy.withArgs(1).and.returnValue(2).and.returnValue(0);`,
     },
     {
       description: 'should add a TODO for .withArgs() on an existing spy',
