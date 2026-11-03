@@ -38,17 +38,11 @@ export function subscribeToWorkflow(
         );
         break;
       case 'update':
-        logs.push(
-          // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${colors.cyan('UPDATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
-        );
+        logs.push(`${colors.cyan('UPDATE')} ${eventPath} (${event.content.byteLength} bytes)`);
         files.add(eventPath);
         break;
       case 'create':
-        logs.push(
-          // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${colors.green('CREATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
-        );
+        logs.push(`${colors.green('CREATE')} ${eventPath} (${event.content.byteLength} bytes)`);
         files.add(eventPath);
         break;
       case 'delete':
