@@ -267,7 +267,7 @@ async function createProxyServer() {
   await new Promise<void>((resolve) => proxyServer.listen(0, '127.0.0.1', resolve));
 
   return {
-    address: proxyServer.address() as import('net').AddressInfo,
+    address: proxyServer.address() as import('node:net').AddressInfo,
     close: () => new Promise<void>((resolve) => proxyServer.close(() => resolve())),
   };
 }

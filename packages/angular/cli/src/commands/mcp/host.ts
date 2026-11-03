@@ -13,9 +13,8 @@
  * test-specific implementations.
  */
 
-import { existsSync as nodeExistsSync } from 'fs';
 import { ChildProcess, spawn } from 'node:child_process';
-import { Stats, realpathSync } from 'node:fs';
+import { Stats, existsSync as nodeExistsSync, realpathSync } from 'node:fs';
 import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';

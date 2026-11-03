@@ -9,7 +9,7 @@
 import type { json } from '@angular-devkit/core';
 import { Rule, SchematicContext, Tree, chain } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
-import { isDeepStrictEqual } from 'util';
+import { isDeepStrictEqual } from 'node:util';
 import { DependencyType, ExistingBehavior, addDependency } from '../../utility/dependency';
 import { JSONFile } from '../../utility/json-file';
 import { latestVersions } from '../../utility/latest-versions';

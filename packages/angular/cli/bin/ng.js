@@ -11,7 +11,7 @@
 /* eslint-disable import/no-unassigned-import */
 'use strict';
 
-const path = require('path');
+const path = require('node:path');
 const nodeUtils = require('./version');
 
 // Error if the external CLI appears to be used inside a google3 context.
