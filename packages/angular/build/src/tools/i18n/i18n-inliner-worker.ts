@@ -16,7 +16,7 @@ import {
 } from '@angular/localize';
 import { MagicString } from 'magic-string';
 import { deserialize } from 'node:v8';
-import { loadOxcParser } from '../oxc/load-oxc-parser';
+import { parseSync } from 'oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
 import { loadLocaleData } from './locale-data';
@@ -402,7 +402,7 @@ interface FileLocalizeMetadata {
  * @returns The extracted localization metadata.
  */
 function extractLocalizeMetadata(filename: string, code: string): FileLocalizeMetadata {
-  const { program } = loadOxcParser().parseSync(filename, code, {
+  const { program } = parseSync(filename, code, {
     sourceType: 'unambiguous',
   });
 
