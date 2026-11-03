@@ -6,12 +6,11 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { SchematicTestRunner, UnitTestTree } from '@angular-devkit/schematics/testing';
-import { parse as parseJson } from 'jsonc-parser';
-import { Schema as ComponentOptions } from '../component/schema';
+import { SchematicTestRunner, type UnitTestTree } from '@angular-devkit/schematics/testing';
+import type { Schema as ComponentOptions } from '../component/schema';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions } from '../workspace/schema';
-import { Schema as GenerateLibrarySchema } from './schema';
+import type { Schema as WorkspaceOptions } from '../workspace/schema';
+import type { Schema as GenerateLibrarySchema } from './schema';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function getJsonFileContent(tree: UnitTestTree, path: string): any {
@@ -20,7 +19,7 @@ function getJsonFileContent(tree: UnitTestTree, path: string): any {
 
 describe('Library Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
-    '@schematics/ng_packagr',
+    '@schematics/angular',
     require.resolve('../collection.json'),
   );
   const defaultOptions: GenerateLibrarySchema = {
@@ -48,16 +47,16 @@ describe('Library Schematic', () => {
     const files = tree.files;
     expect(files).toEqual(
       jasmine.arrayContaining([
-        '/projects/foo/ng-package.json',
         '/projects/foo/package.json',
         '/projects/foo/README.md',
         '/projects/foo/tsconfig.lib.json',
-        '/projects/foo/tsconfig.lib.prod.json',
         '/projects/foo/src/my-index.ts',
         '/projects/foo/src/lib/foo.spec.ts',
         '/projects/foo/src/lib/foo.ts',
       ]),
     );
+    expect(files).not.toContain('/projects/foo/ng-package.json');
+    expect(files).not.toContain('/projects/foo/tsconfig.lib.prod.json');
   });
 
   it('should not add reference to module file in entry-file', async () => {
@@ -91,16 +90,16 @@ describe('Library Schematic', () => {
       const files = tree.files;
       expect(files).toEqual(
         jasmine.arrayContaining([
-          '/some/other/directory/bar/ng-package.json',
           '/some/other/directory/bar/package.json',
           '/some/other/directory/bar/README.md',
           '/some/other/directory/bar/tsconfig.lib.json',
-          '/some/other/directory/bar/tsconfig.lib.prod.json',
           '/some/other/directory/bar/src/my-index.ts',
           '/some/other/directory/bar/src/lib/foo.spec.ts',
           '/some/other/directory/bar/src/lib/foo.ts',
         ]),
       );
+      expect(files).not.toContain('/some/other/directory/bar/ng-package.json');
+      expect(files).not.toContain('/some/other/directory/bar/tsconfig.lib.prod.json');
     });
 
     it(`should add library to workspace`, async () => {
@@ -149,15 +148,20 @@ describe('Library Schematic', () => {
 
     const fileContent = getJsonFileContent(tree, '/projects/foo/tsconfig.lib.json');
     expect(fileContent).toBeDefined();
+    expect(fileContent.compilerOptions.declaration).toBe(true);
+    expect(fileContent.compilerOptions.declarationMap).toBeUndefined();
+    expect(fileContent.include).toEqual(['src/**/*.ts']);
+    expect(fileContent.exclude).toEqual(['**/*.spec.ts']);
   });
 
-  it('should create a ng-package.json with ngPackage conf', async () => {
+  it('should configure exports and not include tslib in library package.json', async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
-    const fileContent = getJsonFileContent(tree, '/projects/foo/ng-package.json');
-    expect(fileContent.lib).toBeDefined();
-    expect(fileContent.lib.entryFile).toEqual('src/my-index.ts');
-    expect(fileContent.dest).toEqual('../../dist/foo');
+    const fileContent = getJsonFileContent(tree, '/projects/foo/package.json');
+    expect(fileContent.exports).toEqual({
+      '.': './src/my-index.ts',
+    });
+    expect(fileContent.dependencies).toBeUndefined();
   });
 
   it('should use default value for baseDir and entryFile', async () => {
@@ -170,6 +174,10 @@ describe('Library Schematic', () => {
     );
 
     expect(tree.files).toContain('/projects/foobar/src/public-api.ts');
+    const fileContent = getJsonFileContent(tree, '/projects/foobar/package.json');
+    expect(fileContent.exports).toEqual({
+      '.': './src/public-api.ts',
+    });
   });
 
   it(`should add library to workspace`, async () => {
@@ -209,16 +217,18 @@ describe('Library Schematic', () => {
     const project = config.projects.pascalCasedName;
     expect(project).toBeDefined();
     expect(project.root).toEqual('projects/pascal-cased-name');
+    expect(project.architect.build.options.outputPath).toEqual('dist/pascal-cased-name');
     const svcContent = tree.readContent('/projects/pascal-cased-name/src/lib/pascal-cased-name.ts');
     expect(svcContent).toContain('@Component');
   });
 
   describe(`update package.json`, () => {
-    it(`should add ng-packagr to devDependencies`, async () => {
+    it(`should add @angular/build and not ng-packagr to devDependencies`, async () => {
       const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toBeDefined();
+      expect(packageJson.devDependencies['@angular/build']).toBe(latestVersions.AngularBuild);
+      expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
     });
 
     it('should use the latest known versions in package.json', async () => {
@@ -256,7 +266,7 @@ describe('Library Schematic', () => {
       );
 
       const packageJson = getJsonFileContent(tree, 'package.json');
-      expect(packageJson.devDependencies['ng-packagr']).toBeUndefined();
+      expect(packageJson.devDependencies['@angular/build']).toBeUndefined();
       expect(packageJson.devDependencies['@angular-devkit/build-angular']).toBeUndefined();
     });
   });
@@ -348,6 +358,9 @@ describe('Library Schematic', () => {
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myscope/mylib']).toBeDefined();
+    expect(cfg.projects['@myscope/mylib'].architect.build.options.outputPath).toEqual(
+      'dist/myscope/mylib',
+    );
 
     const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
     expect(rootTsCfg.compilerOptions.paths['@myscope/mylib']).toEqual(['./dist/myscope/mylib']);
@@ -363,14 +376,19 @@ describe('Library Schematic', () => {
     const pkgJsonPath = '/projects/my-scope/my-lib/package.json';
     expect(tree.readContent(pkgJsonPath)).toContain(expectedScopeName);
 
-    const ngPkgJsonPath = '/projects/my-scope/my-lib/ng-package.json';
-    expect(tree.readContent(ngPkgJsonPath)).toContain(expectedFolderName);
-
     const pkgJson = JSON.parse(tree.readContent(pkgJsonPath));
     expect(pkgJson.name).toEqual(expectedScopeName);
 
     const cfg = JSON.parse(tree.readContent('/angular.json'));
     expect(cfg.projects['@myScope/myLib']).toBeDefined();
+    expect(cfg.projects['@myScope/myLib'].architect.build.options.outputPath).toEqual(
+      `dist/${expectedFolderName}`,
+    );
+
+    const rootTsCfg = getJsonFileContent(tree, '/tsconfig.json');
+    expect(rootTsCfg.compilerOptions.paths['@my-scope/my-lib']).toEqual([
+      `./dist/${expectedFolderName}`,
+    ]);
   });
 
   it(`should create correct paths when 'newProjectRoot' is blank`, async () => {
@@ -385,7 +403,9 @@ describe('Library Schematic', () => {
     const project = config.projects.foo;
     expect(project.root).toEqual('foo');
     const { options, configurations } = project.architect.build;
-    expect(configurations.production.tsConfig).toEqual('foo/tsconfig.lib.prod.json');
+    expect(options.tsConfig).toEqual('foo/tsconfig.lib.json');
+    expect(options.outputPath).toBeUndefined();
+    expect(configurations.production).toEqual({});
 
     const libTsConfig = getJsonFileContent(tree, '/foo/tsconfig.lib.json');
     expect(libTsConfig.extends).toEqual('../tsconfig.json');
@@ -397,14 +417,23 @@ describe('Library Schematic', () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.build.configurations.development).toBeDefined();
+    expect(workspace.projects.foo.architect.build.configurations.development).toEqual({
+      compilationMode: 'full',
+      declarationMap: true,
+    });
   });
 
-  it(`should add 'ng-packagr' builder`, async () => {
+  it(`should add '@angular/build:library' builder`, async () => {
     const tree = await schematicRunner.runSchematic('library', defaultOptions, workspaceTree);
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
-    expect(workspace.projects.foo.architect.build.builder).toBe('@angular/build:ng-packagr');
+    expect(workspace.projects.foo.architect.build.builder).toBe('@angular/build:library');
+    expect(workspace.projects.foo.architect.build.defaultConfiguration).toBe('production');
+    expect(workspace.projects.foo.architect.build.options.tsConfig).toBe(
+      'projects/foo/tsconfig.lib.json',
+    );
+    expect(workspace.projects.foo.architect.build.options.outputPath).toBeUndefined();
+    expect(workspace.projects.foo.architect.build.configurations.production).toEqual({});
   });
 
   it(`should add 'unit-test' test builder`, async () => {
@@ -449,11 +478,9 @@ describe('Library Schematic', () => {
       const files = tree.files;
       expect(files).toEqual(
         jasmine.arrayContaining([
-          '/projects/foo/ng-package.json',
           '/projects/foo/package.json',
           '/projects/foo/README.md',
           '/projects/foo/tsconfig.lib.json',
-          '/projects/foo/tsconfig.lib.prod.json',
           '/projects/foo/src/my-index.ts',
           '/projects/foo/src/lib/foo-module.ts',
           '/projects/foo/src/lib/foo.spec.ts',

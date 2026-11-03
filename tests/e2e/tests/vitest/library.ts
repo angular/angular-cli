@@ -1,3 +1,11 @@
+/**
+ * @license
+ * Copyright Google LLC All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.dev/license
+ */
+
 import assert from 'node:assert/strict';
 import { updateJsonFile } from '../../utils/project';
 import { ng } from '../../utils/process';
@@ -12,11 +20,11 @@ export default async function (): Promise<void> {
   await createDir('projects/my-lib/src/styles');
   await writeFile('projects/my-lib/src/styles/_vars.scss', '$primary-color: red;');
 
-  // 2. Update ng-package.json to include the styles directory
-  await updateJsonFile('projects/my-lib/ng-package.json', (json) => {
-    json['lib'] = {
-      ...json['lib'],
-      styleIncludePaths: ['./src/styles'],
+  // 2. Update angular.json to include the styles directory
+  await updateJsonFile('angular.json', (json) => {
+    const buildOptions = (json['projects']['my-lib']['architect']['build']['options'] ??= {});
+    buildOptions.stylePreprocessorOptions = {
+      includePaths: ['projects/my-lib/src/styles'],
     };
   });
 

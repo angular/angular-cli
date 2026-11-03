@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "SchematicsEntryPoint",
+  "title": "Entry Point Options Schema",
+  "type": "object",
+  "description": "Creates a new secondary entry point in an Angular library project.",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the secondary entry point (for example, 'testing' or 'feature/sub').",
+      "pattern": "^(?:\\.|[a-zA-Z0-9-~][a-zA-Z0-9-._~]*(?:/[a-zA-Z0-9-~][a-zA-Z0-9-._~]*)*)$",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What name would you like to use for the secondary entry point?"
+    },
+    "project": {
+      "type": "string",
+      "description": "The name of the library project.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "entryFile": {
+      "type": "string",
+      "format": "path",
+      "description": "The file name at which to create the secondary entry point's public API file, without the `.ts` extension.",
+      "default": "public-api"
+    },
+    "prefix": {
+      "type": "string",
+      "format": "html-selector",
+      "description": "A prefix to apply to generated selectors.",
+      "alias": "p"
+    },
+    "standalone": {
+      "description": "Creates a secondary entry point based upon the standalone API, without NgModules.",
+      "type": "boolean",
+      "default": true,
+      "x-user-analytics": "ep.ng_standalone"
+    },
+    "skipTests": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not create \"spec.ts\" test files for the new secondary entry point."
+    },
+    "skipTsConfig": {
+      "type": "boolean",
+      "default": false,
+      "description": "Do not update \"tsconfig.json\" to add a path mapping for the new secondary entry point."
+    }
+  },
+  "required": ["name", "project"]
+}
