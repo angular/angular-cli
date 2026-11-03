@@ -237,8 +237,9 @@ export function createBuildAssetsMiddleware(
       if (outputFile) {
         const contents =
           outputFile.origin === 'memory' ? outputFile.contents : readHandler(outputFile.source);
+        const hash = outputFile.origin === 'memory' ? outputFile.hash : calculateHash(contents);
 
-        const etag = `W/"${calculateHash(contents)}"`;
+        const etag = `W/"${hash}"`;
         if (checkAndHandleEtag(req, res, etag)) {
           return;
         }
