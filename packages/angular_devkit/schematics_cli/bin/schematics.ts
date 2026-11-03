@@ -335,14 +335,12 @@ export async function main({
         break;
       case 'update':
         loggingQueue.push(
-          // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${styleText(['cyan'], 'UPDATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+          `${styleText(['cyan'], 'UPDATE')} ${eventPath} (${event.content.byteLength} bytes)`,
         );
         break;
       case 'create':
         loggingQueue.push(
-          // TODO: `as unknown` was necessary during TS 5.9 update. Figure out a long-term solution.
-          `${styleText(['green'], 'CREATE')} ${eventPath} (${(event.content as unknown as Buffer).length} bytes)`,
+          `${styleText(['green'], 'CREATE')} ${eventPath} (${event.content.byteLength} bytes)`,
         );
         break;
       case 'delete':
