@@ -216,6 +216,53 @@ describe('transformCreateSpyObj', () => {
     },
     {
       description:
+        'should cast jasmine.createSpyObj to MockedObject when assigned to a jasmine.SpyObj union variable',
+      input: `
+        let myService: jasmine.SpyObj<MyService> | undefined;
+        myService = jasmine.createSpyObj('MyService', ['methodA']);
+      `,
+      expected: `
+        import type { MockedObject } from 'vitest';
+
+        let myService: MockedObject<MyService> | undefined;
+        myService = {
+          methodA: vi.fn().mockName('MyService.methodA'),
+        } as MockedObject<MyService>;
+      `,
+    },
+    {
+      description:
+        'should cast jasmine.createSpyObj with an explicit type argument to MockedObject',
+      input: `const myService = jasmine.createSpyObj<MyService>('MyService', ['methodA']);`,
+      expected: `
+        import type { MockedObject } from 'vitest';
+        const myService = {
+          methodA: vi.fn().mockName('MyService.methodA'),
+        } as MockedObject<MyService>;
+      `,
+    },
+    {
+      description:
+        'should not add a second cast to a jasmine.createSpyObj call that is already cast',
+      input: `
+        let myService: jasmine.SpyObj<MyService>;
+        myService = jasmine.createSpyObj('MyService', ['methodA']) as jasmine.SpyObj<MyService>;
+        const other = jasmine.createSpyObj<Other>('Other', ['methodB']) as any;
+      `,
+      expected: `
+        import type { MockedObject } from 'vitest';
+
+        let myService: MockedObject<MyService>;
+        myService = {
+          methodA: vi.fn().mockName('MyService.methodA'),
+        } as MockedObject<MyService>;
+        const other = {
+          methodB: vi.fn().mockName('Other.methodB'),
+        } as any;
+      `,
+    },
+    {
+      description:
         'should cast jasmine.createSpyObj to the jasmine.SpyObj type of the variable in the enclosing describe block',
       input: `
         describe('Foo', () => {

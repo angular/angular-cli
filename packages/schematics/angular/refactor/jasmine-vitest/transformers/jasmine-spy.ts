@@ -462,10 +462,20 @@ export function transformCreateSpyObj(node: ts.Node, ctx: RefactorContext): ts.N
 
   const spyObjLiteral = ts.factory.createObjectLiteralExpression(properties, true);
 
+  let parent = node.parent;
+  while (parent && ts.isParenthesizedExpression(parent)) {
+    parent = parent.parent;
+  }
+
+  // An existing cast on the call already gives the literal its type.
+  if (parent && (ts.isAsExpression(parent) || ts.isTypeAssertionExpression(parent))) {
+    return spyObjLiteral;
+  }
+
   // The literal only has the spied members, so it is not assignable to the `MockedObject<T>`
   // that a `jasmine.SpyObj<T>` annotation is transformed to. Jasmine's untyped `createSpyObj`
   // returns `any`, which is why the original assignment compiled.
-  const spyObjTypeArguments = getAssignedSpyObjTypeArguments(node);
+  const spyObjTypeArguments = node.typeArguments ?? getAssignedSpyObjTypeArguments(parent);
   if (!spyObjTypeArguments) {
     return spyObjLiteral;
   }
@@ -481,6 +491,18 @@ export function transformCreateSpyObj(node: ts.Node, ctx: RefactorContext): ts.N
 function getSpyObjTypeArguments(
   type: ts.TypeNode | undefined,
 ): ts.NodeArray<ts.TypeNode> | undefined {
+  // `jasmine.SpyObj<T> | undefined` under `strictNullChecks`.
+  if (type && ts.isUnionTypeNode(type)) {
+    for (const member of type.types) {
+      const typeArguments = getSpyObjTypeArguments(member);
+      if (typeArguments) {
+        return typeArguments;
+      }
+    }
+
+    return undefined;
+  }
+
   if (
     type &&
     ts.isTypeReferenceNode(type) &&
@@ -527,12 +549,12 @@ function findEnclosingVariableDeclaration(
 
 /**
  * Finds the `T` of a `jasmine.SpyObj<T>` annotation on the variable that a `createSpyObj` call
- * initializes (`const spy: jasmine.SpyObj<T> = ...`) or is assigned to (`spy = ...`).
+ * initializes (`const spy: jasmine.SpyObj<T> = ...`) or is assigned to (`spy = ...`), given the
+ * call's parent outside any parentheses.
  */
 function getAssignedSpyObjTypeArguments(
-  node: ts.CallExpression,
+  parent: ts.Node | undefined,
 ): ts.NodeArray<ts.TypeNode> | undefined {
-  const parent = getUnwrappedParent(node);
   if (!parent) {
     return undefined;
   }
