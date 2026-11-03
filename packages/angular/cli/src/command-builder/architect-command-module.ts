@@ -18,6 +18,11 @@ import {
   Options,
   OtherOptions,
 } from './command-module';
+import {
+  JsonHelpBuilder,
+  schemaOptionsToJsonHelpOptions,
+  setJsonHelpBuilders,
+} from './utilities/json-help';
 
 export interface ArchitectCommandArgs {
   configuration?: string;
@@ -29,6 +34,16 @@ export abstract class ArchitectCommandModule
   implements CommandModuleImplementation<ArchitectCommandArgs>
 {
   abstract readonly multiTarget: boolean;
+
+  /**
+   * A mapping of human-readable builder names to their corresponding Architect builder
+   * identifiers (for example, `{ Application: '@angular/build:application' }`).
+   *
+   * When defined, `--json-help` resolves the schema options for each builder and includes
+   * them under the `builders` property of the JSON help output instead of flattening
+   * a single project target's builder options into the command's top-level options.
+   */
+  readonly builders?: Readonly<Record<string, string>>;
 
   findDefaultBuilderName?(
     project: workspaces.ProjectDefinition,
@@ -91,6 +106,19 @@ export abstract class ArchitectCommandModule
             : undefined,
       })
       .strict();
+
+    if (jsonHelp && this.builders) {
+      const buildersHelp: JsonHelpBuilder[] = await Promise.all(
+        Object.entries(this.builders).map(async ([name, builderName]) => ({
+          name,
+          options: schemaOptionsToJsonHelpOptions(await this.getOptionsForBuilder(builderName)),
+        })),
+      );
+
+      setJsonHelpBuilders(this.context.yargsInstance, buildersHelp);
+
+      return localYargs;
+    }
 
     if (!project) {
       return localYargs;

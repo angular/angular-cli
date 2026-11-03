@@ -183,6 +183,11 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return [];
     }
 
+    return this.getOptionsForBuilder(builderConf);
+  }
+
+  protected async getOptionsForBuilder(builderConf: string): Promise<Option[]> {
+    const architectHost = this.getArchitectHost();
     let builderDesc: NodeModulesBuilderInfo;
     try {
       builderDesc = await architectHost.resolveBuilder(builderConf);

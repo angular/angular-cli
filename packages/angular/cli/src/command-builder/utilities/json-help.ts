@@ -6,19 +6,29 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { strings } from '@angular-devkit/core';
 import { Argv } from 'yargs';
 import { FullDescribe } from '../command-module';
+import { Option } from './json-schema';
 
-interface JsonHelpOption {
+export interface JsonHelpOption {
   name: string;
   type?: string;
-  deprecated: boolean | string;
+  deprecated?: boolean | string;
   aliases?: string[];
-  default?: string;
+  default?: string | number | boolean | unknown[];
   required?: boolean;
   positional?: number;
-  enum?: string[];
+  enum?: (string | number | boolean)[];
   description?: string;
+}
+
+/**
+ * Represents a builder and its associated CLI options in JSON help output.
+ */
+export interface JsonHelpBuilder {
+  name: string;
+  options: JsonHelpOption[];
 }
 
 interface JsonHelpDescription {
@@ -37,7 +47,54 @@ export interface JsonHelp extends JsonHelpDescription {
   name: string;
   command: string;
   options: JsonHelpOption[];
+  builders?: JsonHelpBuilder[];
   subcommands?: JsonHelpSubcommand[];
+}
+
+const jsonHelpBuilders = new WeakMap<Argv, JsonHelpBuilder[]>();
+
+/**
+ * Associates a list of builder option groups with a yargs instance for `--json-help` serialization.
+ */
+export function setJsonHelpBuilders(localYargs: Argv, builders: JsonHelpBuilder[]): void {
+  jsonHelpBuilders.set(localYargs, builders);
+}
+
+/**
+ * Converts parsed JSON schema options into normalized and sorted `JsonHelpOption` entries.
+ */
+export function schemaOptionsToJsonHelpOptions(options: Option[]): JsonHelpOption[] {
+  const normalizeOptions: JsonHelpOption[] = [];
+
+  for (const option of options) {
+    if (option.hidden) {
+      continue;
+    }
+
+    let dashedName = strings.dasherize(option.name);
+    if (option.type === 'boolean' && dashedName.startsWith('no-')) {
+      dashedName = dashedName.slice(3);
+    }
+
+    const alias = Array.isArray(option.alias)
+      ? option.alias
+      : option.alias
+        ? [option.alias]
+        : undefined;
+
+    normalizeOptions.push({
+      name: dashedName,
+      type: option.type,
+      deprecated: option.deprecated,
+      aliases: alias && alias.length > 0 ? alias : undefined,
+      default: option.default as JsonHelpOption['default'],
+      enum: option.choices?.length ? (option.choices as JsonHelpOption['enum']) : undefined,
+      description: option.description,
+      positional: option.positional,
+    });
+  }
+
+  return normalizeOptions.sort((a, b) => a.name.localeCompare(b.name));
 }
 
 const yargsDefaultCommandRegExp = /^\$0|\*/;
@@ -123,12 +180,14 @@ export function jsonHelpUsage(localYargs: Argv): string {
   const [command, rawDescription] = usageInstance.getUsage()[0] ?? [];
   const defaultSubCommand = subcommands.find((x) => x.default)?.command ?? '';
   const otherSubcommands = subcommands.filter((s) => !s.default);
+  const builders = jsonHelpBuilders.get(localYargs);
 
   const output: JsonHelp = {
     name: [...context.commands].pop(),
     command: `${command?.replace(yargsDefaultCommandRegExp, localYargsInstance['$0'])}${defaultSubCommand}`,
     ...parseDescription(rawDescription),
     options: normalizeOptions.sort((a, b) => a.name.localeCompare(b.name)),
+    builders: builders?.length ? builders : undefined,
     subcommands: otherSubcommands.length ? otherSubcommands : undefined,
   };
 
