@@ -93,6 +93,22 @@ describe('transformExpectAsync', () => {
         `,
     },
     {
+      description: 'should add a TODO for an expectAsync matcher modified with already',
+      input: `await expectAsync(myPromise).already.toBeResolved();`,
+      expected: `
+          // TODO: vitest-migration: Unsupported expectAsync matcher ".already.toBeResolved()" found. Please migrate this manually.
+          await expectAsync(myPromise).already.toBeResolved();
+        `,
+    },
+    {
+      description: 'should add a TODO for an expectAsync matcher modified with withContext',
+      input: `await expectAsync(myPromise).withContext('msg').toBeResolved();`,
+      expected: `
+          // TODO: vitest-migration: Unsupported expectAsync matcher ".withContext.toBeResolved()" found. Please migrate this manually.
+          await expectAsync(myPromise).withContext('msg').toBeResolved();
+        `,
+    },
+    {
       description: 'should add a specific TODO for toBePending',
       input: `await expectAsync(myPromise).toBePending();`,
       /* eslint-disable max-len */

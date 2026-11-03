@@ -263,36 +263,47 @@ export function transformExpectAsync(
     return node;
   }
 
-  // Negated async matchers have no exact equivalent (e.g. `.not.toBeResolvedTo()` also passes on rejection).
-  const notPae = node.expression.expression;
+  // When the chain continues past this call (e.g. the `withContext('msg')` link itself),
+  // the outermost matcher call handles the whole statement.
   if (
-    ts.isPropertyAccessExpression(notPae) &&
-    notPae.name.text === 'not' &&
-    ts.isCallExpression(notPae.expression) &&
-    ts.isIdentifier(notPae.expression.expression) &&
-    notPae.expression.expression.text === 'expectAsync'
+    node.parent &&
+    ts.isPropertyAccessExpression(node.parent) &&
+    node.parent.expression === node
   ) {
-    const category = 'unsupported-expect-async-matcher';
-    reporter.recordTodo(category, sourceFile, node);
-    addTodoComment(node, category, { name: `not.${node.expression.name.text}` });
-
-    return node;
-  }
-
-  if (!ts.isCallExpression(node.expression.expression)) {
     return node;
   }
 
   const matcherCall = node;
   const matcherPae = node.expression;
-  const expectCall = node.expression.expression;
+
+  // Walk down any modifier chain (`.not`, `.already`, `.withContext(...)`) to the root call.
+  // Modifiers have no direct vitest equivalent, so a modified matcher falls through to the
+  // TODO handling below.
+  const modifierNames: string[] = [];
+  let expectCall: ts.CallExpression | undefined;
+  let current: ts.Expression = matcherPae.expression;
+  while (!expectCall) {
+    if (ts.isCallExpression(current)) {
+      if (ts.isIdentifier(current.expression)) {
+        expectCall = current;
+      } else {
+        current = current.expression;
+      }
+    } else if (ts.isPropertyAccessExpression(current) && ts.isIdentifier(current.name)) {
+      modifierNames.unshift(current.name.text);
+      current = current.expression;
+    } else {
+      return node;
+    }
+  }
 
   if (!ts.isIdentifier(expectCall.expression) || expectCall.expression.text !== 'expectAsync') {
     return node;
   }
 
   const matcherName = ts.isIdentifier(matcherPae.name) ? matcherPae.name.text : undefined;
-  const mapping = matcherName ? ASYNC_MATCHER_CHANGES.get(matcherName) : undefined;
+  const mapping =
+    matcherName && modifierNames.length === 0 ? ASYNC_MATCHER_CHANGES.get(matcherName) : undefined;
 
   if (mapping) {
     reporter.reportTransformation(
@@ -314,14 +325,14 @@ export function transformExpectAsync(
   }
 
   if (matcherName) {
-    if (matcherName === 'toBePending') {
+    if (matcherName === 'toBePending' && modifierNames.length === 0) {
       const category = 'toBePending';
       reporter.recordTodo(category, sourceFile, node);
       addTodoComment(node, category);
     } else {
       const category = 'unsupported-expect-async-matcher';
       reporter.recordTodo(category, sourceFile, node);
-      addTodoComment(node, category, { name: matcherName });
+      addTodoComment(node, category, { name: [...modifierNames, matcherName].join('.') });
     }
   }
 
