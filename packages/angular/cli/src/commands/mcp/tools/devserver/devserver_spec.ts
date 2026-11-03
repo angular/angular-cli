@@ -6,8 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { EventEmitter } from 'events';
 import type { ChildProcess } from 'node:child_process';
+import { EventEmitter } from 'node:events';
 import type { MockHost } from '../../testing/mock-host';
 import {
   MockMcpToolContext,

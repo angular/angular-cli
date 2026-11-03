@@ -91,7 +91,7 @@ describe('Serve SSR Builder - Proxy', () => {
 
     try {
       await new Promise<void>((resolve) => proxyServer.listen(0, '127.0.0.1', resolve));
-      const proxyAddress = proxyServer.address() as import('net').AddressInfo;
+      const proxyAddress = proxyServer.address() as import('node:net').AddressInfo;
 
       host.writeMultipleFiles({
         'proxy.config.json': `{ "/api/*": { "logLevel": "debug","target": "http://127.0.0.1:${proxyAddress.port}" } }`,

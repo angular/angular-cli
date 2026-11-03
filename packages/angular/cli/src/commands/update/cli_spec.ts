@@ -8,7 +8,7 @@
 
 import assert from 'node:assert';
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
-import path from 'path';
+import path from 'node:path';
 import { resolveFallbackMigrations } from './cli';
 import type { PackageVersionInfo, UpdatePlan } from './update-resolver';
 
