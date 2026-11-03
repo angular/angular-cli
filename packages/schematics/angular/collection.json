@@ -111,6 +111,11 @@
       "schema": "./library/schema.json",
       "description": "Generate a library project for Angular."
     },
+    "entry-point": {
+      "factory": "./entry-point",
+      "schema": "./entry-point/schema.json",
+      "description": "Generate a secondary entry point for an Angular library."
+    },
     "web-worker": {
       "factory": "./web-worker",
       "schema": "./web-worker/schema.json",

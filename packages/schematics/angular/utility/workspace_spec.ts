@@ -6,8 +6,15 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { workspaces } from '@angular-devkit/core';
 import { EmptyTree, Rule, SchematicContext, Tree, callRule } from '@angular-devkit/schematics';
-import { getWorkspace as readWorkspace, updateWorkspace, writeWorkspace } from './workspace';
+import {
+  buildDefaultPath,
+  getWorkspace as readWorkspace,
+  updateWorkspace,
+  writeWorkspace,
+} from './workspace';
+import { ProjectType } from './workspace-models';
 
 const TEST_WORKSPACE_CONTENT = JSON.stringify({
   version: 1,
@@ -124,5 +131,55 @@ describe('updateWorkspace', () => {
     await testRule(rule, tree);
 
     expect(tree.read('/followup.txt')?.toString()).toContain('12345');
+  });
+});
+
+describe('buildDefaultPath', () => {
+  function createProject(
+    projectType: ProjectType | undefined,
+    root: string,
+    sourceRoot?: string,
+  ): workspaces.ProjectDefinition {
+    return {
+      root,
+      sourceRoot,
+      extensions: projectType ? { projectType } : {},
+      targets: new workspaces.TargetDefinitionCollection(),
+    };
+  }
+
+  it('returns /<sourceRoot>/app for an application with sourceRoot', () => {
+    const project = createProject(ProjectType.Application, 'projects/app', 'projects/app/src');
+    expect(buildDefaultPath(project)).toBe('/projects/app/src/app');
+  });
+
+  it('returns /<sourceRoot>/app for an application with sourceRoot equal to root', () => {
+    const project = createProject(ProjectType.Application, 'projects/app', 'projects/app');
+    expect(buildDefaultPath(project)).toBe('/projects/app/app');
+  });
+
+  it('returns /<root>/src/app for an application without sourceRoot', () => {
+    const project = createProject(ProjectType.Application, 'projects/app');
+    expect(buildDefaultPath(project)).toBe('/projects/app/src/app');
+  });
+
+  it('returns /<root>/src/lib for a library with sourceRoot equal to root', () => {
+    const project = createProject(ProjectType.Library, 'projects/my-lib', 'projects/my-lib');
+    expect(buildDefaultPath(project)).toBe('/projects/my-lib/src/lib');
+  });
+
+  it('returns /<sourceRoot>/lib for a library with a distinct sourceRoot', () => {
+    const project = createProject(ProjectType.Library, 'projects/my-lib', 'projects/my-lib/src');
+    expect(buildDefaultPath(project)).toBe('/projects/my-lib/src/lib');
+  });
+
+  it('returns /<sourceRoot>/lib for a library with a custom sourceRoot', () => {
+    const project = createProject(ProjectType.Library, 'projects/my-lib', 'projects/my-lib/custom');
+    expect(buildDefaultPath(project)).toBe('/projects/my-lib/custom/lib');
+  });
+
+  it('returns /<root>/src/lib for a library without sourceRoot', () => {
+    const project = createProject(ProjectType.Library, 'projects/my-lib');
+    expect(buildDefaultPath(project)).toBe('/projects/my-lib/src/lib');
   });
 });
