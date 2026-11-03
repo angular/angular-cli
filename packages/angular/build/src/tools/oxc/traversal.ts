@@ -7,9 +7,7 @@
  */
 
 import type { Node } from '@oxc-project/types';
-import { loadOxcParser } from './load-oxc-parser';
-
-let visitorKeys: Record<string, string[]> | undefined;
+import { visitorKeys } from 'oxc-parser';
 
 /**
  * Contextual scope information provided to AST visitor callbacks during traversal.
@@ -277,7 +275,7 @@ function pushChildNodes(node: Node, stack: (Node | null)[]): void {
         break;
       }
 
-      const keys = (visitorKeys ??= loadOxcParser().visitorKeys)[node.type];
+      const keys = visitorKeys[node.type];
       if (!keys) {
         break;
       }

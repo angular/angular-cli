@@ -8,13 +8,15 @@
 
 import type { EncodedSourceMap } from '@ampproject/remapping';
 import { existsSync, readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { loadOxcParser } from '../tools/oxc/load-oxc-parser';
 
 export const SOURCEMAP_COMMENT_PREFIX = '//# sourceMappingURL=';
 export const SOURCEMAP_COMMENT_BYTES = Buffer.from(SOURCEMAP_COMMENT_PREFIX);
 const SOURCEMAP_COMMENT_VALUE_PREFIX = SOURCEMAP_COMMENT_PREFIX.slice(2);
+
+let parseSync: typeof import('oxc-parser').parseSync | undefined;
 
 /**
  * Checks for a single trailing `//# sourceMappingURL=` comment on a raw buffer.
@@ -118,7 +120,12 @@ function removeSourceMappingURLFromString(code: string, skipTrailingCheck = fals
     }
   }
 
-  const { comments } = loadOxcParser().parseSync('source.js', code, {
+  if (!parseSync) {
+    const localRequire = createRequire(__filename);
+    parseSync = (localRequire('oxc-parser') as typeof import('oxc-parser')).parseSync;
+  }
+
+  const { comments } = parseSync('source.js', code, {
     lang: 'js',
     sourceType: 'unambiguous',
   });
