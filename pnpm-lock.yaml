@@ -672,24 +672,6 @@ importers:
       '@angular-devkit/schematics':
         specifier: workspace:*
         version: link:../../angular_devkit/schematics
-      '@angular/common':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
-      '@angular/compiler':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3
-      '@angular/core':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)
-      '@angular/platform-browser':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/animations@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))
-      '@angular/platform-server':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/compiler@22.3.0-next.3)(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.3.0-next.3(@angular/animations@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2)
-      '@angular/router':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.3.0-next.3(@angular/animations@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-next.3(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-next.3(@angular/compiler@22.3.0-next.3)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2)
       '@schematics/angular':
         specifier: workspace:*
         version: link:../../schematics/angular
@@ -874,9 +856,6 @@ importers:
       sass:
         specifier: 1.106.1
         version: 1.106.1
-      undici:
-        specifier: 8.12.3
-        version: 8.12.3
     optionalDependencies:
       esbuild:
         specifier: 0.28.2
@@ -964,15 +943,6 @@ importers:
       '@angular-devkit/core':
         specifier: workspace:0.0.0-PLACEHOLDER
         version: link:../../angular_devkit/core
-      '@angular/compiler':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3
-      '@angular/compiler-cli':
-        specifier: 22.3.0-next.3
-        version: 22.3.0-next.3(@angular/compiler@22.3.0-next.3)(typescript@6.0.3)
-      typescript:
-        specifier: 6.0.3
-        version: 6.0.3
       webpack:
         specifier: 5.112.2
         version: 5.112.2(esbuild@0.28.2)(lightningcss@1.33.0)(postcss@8.5.32)(uglify-js@3.19.3)
