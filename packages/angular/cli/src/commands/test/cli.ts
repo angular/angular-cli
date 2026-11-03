@@ -16,6 +16,10 @@ export default class TestCommandModule
   implements CommandModuleImplementation
 {
   multiTarget = true;
+  override readonly builders = {
+    'Unit-test': '@angular/build:unit-test',
+    'Karma': '@angular/build:karma',
+  };
   command = 'test [project]';
   aliases = RootCommands['test'].aliases;
   describe = 'Runs unit tests in a project.';

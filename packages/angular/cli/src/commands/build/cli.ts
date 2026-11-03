@@ -16,6 +16,10 @@ export default class BuildCommandModule
   implements CommandModuleImplementation
 {
   multiTarget = false;
+  override readonly builders = {
+    Application: '@angular/build:application',
+    Library: '@angular/build:library',
+  };
   command = 'build [project]';
   aliases = RootCommands['build'].aliases;
   describe =
