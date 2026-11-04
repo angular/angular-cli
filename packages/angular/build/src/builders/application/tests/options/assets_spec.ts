@@ -508,13 +508,28 @@ describeBuilder(buildApplication, APPLICATION_BUILDER_INFO, (harness) => {
           .content.toBe('shared nested asset');
       });
 
-      it('copies a symlinked file pointing outside the workspace root', async () => {
+      it('does not copy a symlinked file pointing outside the workspace root by default', async () => {
         const symlinkPath = harness.resolvePath('src/external-file.txt');
         await fs.symlink(path.join(externalDir, 'shared-root.txt'), symlinkPath, 'file');
 
         harness.useTarget('build', {
           ...BASE_OPTIONS,
           assets: ['src/external-file.txt'],
+        });
+
+        const { result } = await harness.executeOnce();
+
+        expect(result?.success).toBe(true);
+        harness.expectFile('dist/browser/external-file.txt').toNotExist();
+      });
+
+      it('copies a symlinked file pointing outside the workspace root with followSymlinks: true', async () => {
+        const symlinkPath = harness.resolvePath('src/external-file.txt');
+        await fs.symlink(path.join(externalDir, 'shared-root.txt'), symlinkPath, 'file');
+
+        harness.useTarget('build', {
+          ...BASE_OPTIONS,
+          assets: [{ glob: 'external-file.txt', input: 'src', output: '.', followSymlinks: true }],
         });
 
         const { result } = await harness.executeOnce();
