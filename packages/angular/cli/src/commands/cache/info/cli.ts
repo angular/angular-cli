@@ -32,7 +32,13 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
     const { path, localPath, environment, enabled } = cacheConfig;
 
     const effectiveStatus = this.effectiveEnabledStatus(cacheConfig);
-    const sizeOnDisk = await this.getSizeOfDirectory(path);
+
+    // In a Git worktree, `path` is shared with the main checkout while `localPath` holds the
+    // development server's Vite cache. Both are the same path outside of a worktree.
+    const [sizeOnDisk, localSizeOnDisk] = await Promise.all([
+      this.getSizeOfDirectory(path),
+      localPath !== path ? this.getSizeOfDirectory(localPath) : undefined,
+    ]);
 
     const info: { label: string; value: string }[] = [
       {
@@ -53,9 +59,7 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
       },
     ];
 
-    // In a Git worktree, `path` is shared with the main checkout while `localPath` holds the
-    // development server's Vite cache. Both are the same path outside of a worktree.
-    if (localPath !== path) {
+    if (localSizeOnDisk !== undefined) {
       info.push(
         {
           label: 'Local path',
@@ -63,7 +67,7 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
         },
         {
           label: 'Local size on disk',
-          value: colors.cyan(await this.getSizeOfDirectory(localPath)),
+          value: colors.cyan(localSizeOnDisk),
         },
       );
     }
