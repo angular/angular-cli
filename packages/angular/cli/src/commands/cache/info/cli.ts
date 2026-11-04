@@ -29,7 +29,7 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
 
   async run(): Promise<void> {
     const cacheConfig = getCacheConfig(this.context.workspace);
-    const { path, environment, enabled } = cacheConfig;
+    const { path, localPath, environment, enabled } = cacheConfig;
 
     const effectiveStatus = this.effectiveEnabledStatus(cacheConfig);
     const sizeOnDisk = await this.getSizeOfDirectory(path);
@@ -51,13 +51,28 @@ export class CacheInfoCommandModule extends CommandModule implements CommandModu
         label: 'Size on disk',
         value: colors.cyan(sizeOnDisk),
       },
-      {
-        label: 'Effective Status',
-        value:
-          (effectiveStatus ? colors.green('Enabled') : colors.red('Disabled')) +
-          ' (current machine)',
-      },
     ];
+
+    // In a Git worktree, `path` is shared with the main checkout while `localPath` holds the
+    // development server's Vite cache. Both are the same path outside of a worktree.
+    if (localPath !== path) {
+      info.push(
+        {
+          label: 'Local path',
+          value: colors.cyan(localPath),
+        },
+        {
+          label: 'Local size on disk',
+          value: colors.cyan(await this.getSizeOfDirectory(localPath)),
+        },
+      );
+    }
+
+    info.push({
+      label: 'Effective Status',
+      value:
+        (effectiveStatus ? colors.green('Enabled') : colors.red('Disabled')) + ' (current machine)',
+    });
 
     const maxLabelLength = Math.max(...info.map((l) => l.label.length));
 
