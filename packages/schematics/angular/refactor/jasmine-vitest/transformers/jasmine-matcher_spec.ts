@@ -109,6 +109,19 @@ describe('transformExpectAsync', () => {
         `,
     },
     {
+      description: 'should add a single TODO for an expectAsync matcher with combined modifiers',
+      input: `await expectAsync(myPromise).withContext('msg').not.toBeResolved();`,
+      expected: `
+          // TODO: vitest-migration: Unsupported expectAsync matcher ".withContext.not.toBeResolved()" found. Please migrate this manually.
+          await expectAsync(myPromise).withContext('msg').not.toBeResolved();
+        `,
+    },
+    {
+      description: 'should transform an expectAsync matcher with a chained .then()',
+      input: `await expectAsync(myPromise).toBeResolved().then(() => {});`,
+      expected: `await expect(myPromise).resolves.not.toThrow().then(() => {});`,
+    },
+    {
       description: 'should add a specific TODO for toBePending',
       input: `await expectAsync(myPromise).toBePending();`,
       /* eslint-disable max-len */
