@@ -1,3 +1,61 @@
+<a name="22.2.6"></a>
+
+# 22.2.6 (2026-11-04)
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                       |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
+| [8317b7037a](https://github.com/angular/angular-cli/commit/8317b7037a86108cd7048fc649ed828dc691f8dd) | fix  | allow command arguments named `help`                              |
+| [7de6927af8](https://github.com/angular/angular-cli/commit/7de6927af8093d1dc1ad128e5b6c2276af8fe896) | fix  | also clean the worktree-local cache in a git worktree             |
+| [34d53918e2](https://github.com/angular/angular-cli/commit/34d53918e2fa9f25d571850c5564f50aa161b876) | fix  | default ignoreScripts to true when install options are provided   |
+| [d872eebfad](https://github.com/angular/angular-cli/commit/d872eebfadcb26df32e142847ff3807e63696e38) | fix  | handle modern yarn registry error output and 404 detection        |
+| [0d622f0ebd](https://github.com/angular/angular-cli/commit/0d622f0ebd199a36f60f688b04e1ef7791e13e0b) | fix  | ignore registry manifests that do not match the requested version |
+| [b50147fd3a](https://github.com/angular/angular-cli/commit/b50147fd3af7dd1347fa8e510f5cbb093fab0212) | fix  | strip terminal escape sequences in modern yarn error parser       |
+| [da76a2ef69](https://github.com/angular/angular-cli/commit/da76a2ef69f5c3c17b6628c6e0d411048630e419) | fix  | use unquoted specifier for registry manifest cache keys           |
+| [eda9d64f18](https://github.com/angular/angular-cli/commit/eda9d64f1851dc9bafab65c495d66e6d8b0245df) | fix  | validate dist-tags and manifest caching under modern yarn         |
+
+### @schematics/angular
+
+| Commit                                                                                               | Type | Description                                                                       |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------- |
+| [d1bdea533c](https://github.com/angular/angular-cli/commit/d1bdea533cf99dac276930992fc1c09287b7089b) | fix  | add a TODO for spy strategies configured with withArgs in refactor-jasmine-vitest |
+| [8c8910792c](https://github.com/angular/angular-cli/commit/8c8910792c5c7b6a610d884d88294f645d88bf27) | fix  | do not drop callThrough() on existing spies in refactor-jasmine-vitest            |
+| [3dea2f6b32](https://github.com/angular/angular-cli/commit/3dea2f6b32cb7597c1063ef38b757236db58aa56) | fix  | generate pnpm-workspace.yaml with allowBuilds for pnpm projects                   |
+| [e91c414ce6](https://github.com/angular/angular-cli/commit/e91c414ce6d527ebb917e55aaaba46783008ccb8) | fix  | keep existing worker tsconfig when generating another web worker                  |
+| [a532d0549b](https://github.com/angular/angular-cli/commit/a532d0549b0b23a35dcacb6b97ab45b60d56a461) | fix  | keep the meaning of negated toHaveBeenCalledOnceWith in refactor-jasmine-vitest   |
+| [2aa56cce06](https://github.com/angular/angular-cli/commit/2aa56cce068b2964ca90fed532c8b65ba932dbc4) | fix  | migrate `serviceWorker: true` to a config path in use-application-builder         |
+| [17134ccb77](https://github.com/angular/angular-cli/commit/17134ccb775d212af4231f004d496002b26c44f8) | fix  | update the PostCSS configuration used by the build in tailwind                    |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                                                                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------ |
+| [1931eac4e5](https://github.com/angular/angular-cli/commit/1931eac4e561219e82243cb33f2ac429562c45e9) | fix  | copy assets replaced by a rename in watch mode                                                                           |
+| [a4ce7bf461](https://github.com/angular/angular-cli/commit/a4ce7bf4614499eab36dffdd3e429ba8e61932f2) | fix  | elide non-value aliases and remaining type-only AST constructs                                                           |
+| [b5dd8e2634](https://github.com/angular/angular-cli/commit/b5dd8e2634071c34859517caa08671a2b578f34a) | fix  | enable oxc WASI fallback in WebContainer environments                                                                    |
+| [244a1c7d15](https://github.com/angular/angular-cli/commit/244a1c7d15e97858f9360e4ec5034de0128dd36f) | fix  | include source map hashes in optimized chunk hashes                                                                      |
+| [0f63a03bae](https://github.com/angular/angular-cli/commit/0f63a03baeb83462eb64061b1b44b524b959bde1) | fix  | quote weak ETags of assets served by the dev server                                                                      |
+| [42bdb75f1a](https://github.com/angular/angular-cli/commit/42bdb75f1ae78ed10056c9073e9debfc957a63dd) | fix  | remove every output of a deleted asset in watch mode                                                                     |
+| [76b585fb5a](https://github.com/angular/angular-cli/commit/76b585fb5a16dfbcf2fef399abf2f65619dac1dc) | fix  | require only the launchers the karma configuration loads                                                                 |
+| [631ac8aa66](https://github.com/angular/angular-cli/commit/631ac8aa66669875af156bde9534a756ae915d79) | fix  | use oxc-parser fallback when stripping source-map comments ([#34632](https://github.com/angular/angular-cli/pull/34632)) |
+
+### @angular/ssr
+
+| Commit                                                                                               | Type | Description                                               |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
+| [f8f9f48bfa](https://github.com/angular/angular-cli/commit/f8f9f48bfaa235c686cab2de91e6ea3d9ee3037a) | fix  | destroy platform when request is aborted during rendering |
+| [dcd5029bbd](https://github.com/angular/angular-cli/commit/dcd5029bbdcbe1fe1761f8f7fefa0b83d81f4af3) | fix  | validate prerender parameter values                       |
+
+### @ngtools/webpack
+
+| Commit                                                                                               | Type | Description                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [4b6caacbc7](https://github.com/angular/angular-cli/commit/4b6caacbc7028dfb70df64eb234f7909b6896079) | fix  | elide imports used only in type re-exports or type declarations |
+| [ea46fd855f](https://github.com/angular/angular-cli/commit/ea46fd855f03e4b65b69b0f03dee5adb344de24a) | fix  | elide non-value aliases and remaining type-only AST constructs  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.5"></a>
 
 # 22.2.5 (2026-10-28)
