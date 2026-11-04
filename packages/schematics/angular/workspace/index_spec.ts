@@ -9,7 +9,7 @@
 import { SchematicTestRunner } from '@angular-devkit/schematics/testing';
 import { parse as parseJson } from 'jsonc-parser';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions } from './schema';
+import { PackageManager, Schema as WorkspaceOptions } from './schema';
 
 describe('Workspace Schematic', () => {
   const schematicRunner = new SchematicTestRunner(
@@ -38,6 +38,17 @@ describe('Workspace Schematic', () => {
         '/tsconfig.json',
       ]),
     );
+    expect(files).not.toContain('/pnpm-workspace.yaml');
+  });
+
+  it('should create pnpm-workspace.yaml with allowBuilds when packageManager is pnpm', async () => {
+    const tree = await schematicRunner.runSchematic('workspace', {
+      ...defaultOptions,
+      packageManager: PackageManager.Pnpm,
+    });
+    expect(tree.exists('/pnpm-workspace.yaml')).toBeTrue();
+    const content = tree.readContent('/pnpm-workspace.yaml');
+    expect(content).toContain('allowBuilds:');
   });
 
   it('should set the name in package.json', async () => {

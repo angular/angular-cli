@@ -18,7 +18,7 @@ import {
 } from '@angular-devkit/schematics';
 import { execSync } from 'node:child_process';
 import { latestVersions } from '../utility/latest-versions';
-import { Schema as WorkspaceOptions } from './schema';
+import { PackageManager, Schema as WorkspaceOptions } from './schema';
 
 export default function (options: WorkspaceOptions): Rule {
   return () => {
@@ -48,6 +48,9 @@ export default function (options: WorkspaceOptions): Rule {
     return mergeWith(
       apply(url('./files'), [
         options.minimal ? filter((path) => !path.endsWith('editorconfig.template')) : noop(),
+        packageManager !== PackageManager.Pnpm
+          ? filter((path) => !path.endsWith('pnpm-workspace.yaml.template'))
+          : noop(),
         applyTemplates({
           utils: strings,
           ...options,
