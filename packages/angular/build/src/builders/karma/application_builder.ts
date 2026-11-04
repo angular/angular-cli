@@ -195,6 +195,8 @@ async function setupBuildOptions(
     polyfills,
     webWorkerTsConfig: options.webWorkerTsConfig,
     watch: options.watch,
+    poll: options.poll,
+    progress: options.progress,
     stylePreprocessorOptions: options.stylePreprocessorOptions,
     inlineStyleLanguage: options.inlineStyleLanguage,
     fileReplacements: options.fileReplacements,
