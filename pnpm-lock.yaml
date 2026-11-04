@@ -187,8 +187,8 @@ importers:
         specifier: 22.2.4
         version: 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))
       '@angular/cdk':
-        specifier: 22.2.5
-        version: 22.2.5(8d88c308e9d27ecd03ee043748d660df)
+        specifier: 22.2.6
+        version: 22.2.6(8d88c308e9d27ecd03ee043748d660df)
       '@angular/common':
         specifier: 22.2.4
         version: 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
@@ -205,8 +205,8 @@ importers:
         specifier: 22.2.4
         version: 22.2.4(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(@angular/compiler@22.2.4)
       '@angular/material':
-        specifier: 22.2.5
-        version: 22.2.5(63aa0b61054618fb35f86f9be3d70be0)
+        specifier: 22.2.6
+        version: 22.2.6(d0bfc3d7ae829790929558e23e493aae)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#316b8f89d5da8b8e3b58e646581c31b19c229205
         version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/316b8f89d5da8b8e3b58e646581c31b19c229205
@@ -463,8 +463,8 @@ importers:
         specifier: 30.0.1
         version: 30.0.1(@noble/hashes@1.8.0)
       ng-packagr:
-        specifier: 22.2.5
-        version: 22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.6
+        version: 22.2.6(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -578,8 +578,8 @@ importers:
         specifier: 4.9.1
         version: 4.9.1(supports-color@11.0.0)
       ng-packagr:
-        specifier: 22.2.5
-        version: 22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.6
+        version: 22.2.6(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.28
         version: 8.5.28
@@ -869,8 +869,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.1.0)(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 22.2.5
-        version: 22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
+        specifier: 22.2.6
+        version: 22.2.6(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3)
       sass:
         specifier: 1.104.1
         version: 1.104.1
@@ -1036,8 +1036,8 @@ packages:
     peerDependencies:
       '@angular/core': 22.2.4
 
-  '@angular/cdk@22.2.5':
-    resolution: {integrity: sha512-cqECOwdhi82r2cWFf9QWgtt2rX5dWWaMMxyiYChGS3NX3b7yqWXzWzA39i8igYGqI4PfarBUbVDYqGSmAd8wew==}
+  '@angular/cdk@22.2.6':
+    resolution: {integrity: sha512-BNAEN+NTWneKcWLi6ZSvbHA99O2AcSQjvnKG/Fa7V9eB+WgXhDRTrfa8qSx2zb57NjFnmABgPWIVkvF76VymEQ==}
     peerDependencies:
       '@angular/common': ^22.0.0 || ^23.0.0
       '@angular/core': ^22.0.0 || ^23.0.0
@@ -1097,10 +1097,10 @@ packages:
       '@angular/compiler': 22.2.4
       '@angular/compiler-cli': 22.2.4
 
-  '@angular/material@22.2.5':
-    resolution: {integrity: sha512-ewWa2VDaPdb5iQ5LZGrlvaTXPwAlPKmNL3UhOqzZ/sjrQqyfrNDPrE+Wc71GyNgm7xd+C3/VmZWcjvS4ptk5+A==}
+  '@angular/material@22.2.6':
+    resolution: {integrity: sha512-0omVezTSYPTI3B0bYNqJucx4xBYZWVm/vmkSICqGhy+OTntANX2a4TIdfMYgGh4g4NQ+tbtXa5GJBdW/Qp+jFg==}
     peerDependencies:
-      '@angular/cdk': 22.2.5
+      '@angular/cdk': 22.2.6
       '@angular/common': ^22.0.0 || ^23.0.0
       '@angular/core': ^22.0.0 || ^23.0.0
       '@angular/forms': ^22.0.0 || ^23.0.0
@@ -6749,8 +6749,8 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng-packagr@22.2.5:
-    resolution: {integrity: sha512-AlAruvF6HQa9TIMg17TyLRQ1gxIyTeJgF/KMABWdH0vCkzXE6PatQeTII0ukrkElSgahPRlZZwW/1bm3m7nJQA==}
+  ng-packagr@22.2.6:
+    resolution: {integrity: sha512-nScWmyg2zI+nkGwURWVZQqvaDvW3VmBJJjaCnzuRz/GkwcrsVwN4FN+LnGbl2jjPrB0uStAtPiwBnK/BiZUWNw==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
@@ -8850,7 +8850,7 @@ snapshots:
       '@angular/core': 22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3)
       tslib: 2.8.1
 
-  '@angular/cdk@22.2.5(8d88c308e9d27ecd03ee043748d660df)':
+  '@angular/cdk@22.2.6(8d88c308e9d27ecd03ee043748d660df)':
     dependencies:
       '@angular/common': 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
       '@angular/core': 22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3)
@@ -8910,9 +8910,9 @@ snapshots:
       tinyglobby: 0.2.17
       yargs: 18.2.0
 
-  '@angular/material@22.2.5(63aa0b61054618fb35f86f9be3d70be0)':
+  '@angular/material@22.2.6(d0bfc3d7ae829790929558e23e493aae)':
     dependencies:
-      '@angular/cdk': 22.2.5(8d88c308e9d27ecd03ee043748d660df)
+      '@angular/cdk': 22.2.6(8d88c308e9d27ecd03ee043748d660df)
       '@angular/common': 22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
       '@angular/core': 22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3)
       '@angular/forms': 22.2.4(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.2.4(@angular/animations@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.2.4(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.2.4(@angular/compiler@22.2.4)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2)
@@ -15201,7 +15201,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng-packagr@22.2.5(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
+  ng-packagr@22.2.6(@angular/compiler-cli@22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.8.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 22.2.4(@angular/compiler@22.2.4)(typescript@6.0.3)
