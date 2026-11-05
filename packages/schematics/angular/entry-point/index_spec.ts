@@ -56,14 +56,14 @@ describe('EntryPoint Schematic', () => {
 
     expect(tree.files).toEqual(
       jasmine.arrayContaining([
-        '/projects/foo/src/secondary/public-api.ts',
-        '/projects/foo/src/secondary/lib/secondary.ts',
-        '/projects/foo/src/secondary/lib/secondary.spec.ts',
+        '/projects/foo/secondary/src/public-api.ts',
+        '/projects/foo/secondary/src/secondary.ts',
+        '/projects/foo/secondary/src/secondary.spec.ts',
       ]),
     );
 
-    const publicApiContent = tree.readContent('/projects/foo/src/secondary/public-api.ts');
-    expect(publicApiContent).toContain("export * from './lib/secondary';");
+    const publicApiContent = tree.readContent('/projects/foo/secondary/src/public-api.ts');
+    expect(publicApiContent).toContain("export * from './secondary';");
     expect(publicApiContent).not.toContain('secondary-module');
   });
 
@@ -79,14 +79,14 @@ describe('EntryPoint Schematic', () => {
 
     expect(tree.files).toEqual(
       jasmine.arrayContaining([
-        '/projects/foo/src/feature/sub/public-api.ts',
-        '/projects/foo/src/feature/sub/lib/sub.ts',
-        '/projects/foo/src/feature/sub/lib/sub.spec.ts',
+        '/projects/foo/feature/sub/src/public-api.ts',
+        '/projects/foo/feature/sub/src/sub.ts',
+        '/projects/foo/feature/sub/src/sub.spec.ts',
       ]),
     );
 
     const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
-    expect(pkgJson.exports['./feature/sub']).toBe('./src/feature/sub/public-api.ts');
+    expect(pkgJson.exports['./feature/sub']).toBe('./feature/sub/src/public-api.ts');
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./dist/foo/*']);
@@ -102,9 +102,9 @@ describe('EntryPoint Schematic', () => {
       workspaceTree,
     );
 
-    expect(tree.files).toContain('/projects/foo/src/secondary/my-entry.ts');
+    expect(tree.files).toContain('/projects/foo/secondary/src/my-entry.ts');
     const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
-    expect(pkgJson.exports['./secondary']).toBe('./src/secondary/my-entry.ts');
+    expect(pkgJson.exports['./secondary']).toBe('./secondary/src/my-entry.ts');
   });
 
   it('should strip .ts suffix from entryFile option', async () => {
@@ -117,10 +117,10 @@ describe('EntryPoint Schematic', () => {
       workspaceTree,
     );
 
-    expect(tree.files).toContain('/projects/foo/src/secondary/my-entry.ts');
-    expect(tree.files).not.toContain('/projects/foo/src/secondary/my-entry.ts.ts');
+    expect(tree.files).toContain('/projects/foo/secondary/src/my-entry.ts');
+    expect(tree.files).not.toContain('/projects/foo/secondary/src/my-entry.ts.ts');
     const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
-    expect(pkgJson.exports['./secondary']).toBe('./src/secondary/my-entry.ts');
+    expect(pkgJson.exports['./secondary']).toBe('./secondary/src/my-entry.ts');
   });
 
   it('should update library package.json exports', async () => {
@@ -129,7 +129,7 @@ describe('EntryPoint Schematic', () => {
     const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
     expect(pkgJson.exports).toEqual({
       '.': './src/public-api.ts',
-      './secondary': './src/secondary/public-api.ts',
+      './secondary': './secondary/src/public-api.ts',
     });
     expect(Object.keys(pkgJson)[0]).toBe('name');
   });
@@ -144,7 +144,7 @@ describe('EntryPoint Schematic', () => {
     const updatedPkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
     expect(updatedPkgJson.exports).toEqual({
       '.': './src/public-api.ts',
-      './secondary': './src/secondary/public-api.ts',
+      './secondary': './secondary/src/public-api.ts',
     });
   });
 
@@ -158,7 +158,7 @@ describe('EntryPoint Schematic', () => {
     const updatedPkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
     expect(updatedPkgJson.exports).toEqual({
       '.': ['./src/public-api.ts'],
-      './secondary': './src/secondary/public-api.ts',
+      './secondary': './secondary/src/public-api.ts',
     });
   });
 
@@ -172,7 +172,7 @@ describe('EntryPoint Schematic', () => {
     const updatedPkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
     expect(updatedPkgJson.exports).toEqual({
       '.': { default: './src/public-api.ts' },
-      './secondary': './src/secondary/public-api.ts',
+      './secondary': './secondary/src/public-api.ts',
     });
   });
 
@@ -204,25 +204,6 @@ describe('EntryPoint Schematic', () => {
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./custom-dist/foo/*']);
-  });
-
-  it('should respect custom sourceRoot in angular.json', async () => {
-    const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
-    angularJson.projects.foo.sourceRoot = 'projects/foo/custom-src';
-    workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
-
-    const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
-
-    expect(tree.files).toEqual(
-      jasmine.arrayContaining([
-        '/projects/foo/custom-src/secondary/public-api.ts',
-        '/projects/foo/custom-src/secondary/lib/secondary.ts',
-        '/projects/foo/custom-src/secondary/lib/secondary.spec.ts',
-      ]),
-    );
-
-    const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
-    expect(pkgJson.exports['./secondary']).toBe('./custom-src/secondary/public-api.ts');
   });
 
   it('should not modify root tsconfig.json when skipTsConfig is true', async () => {
@@ -259,9 +240,7 @@ describe('EntryPoint Schematic', () => {
       tree,
     );
 
-    const componentContent = tree.readContent(
-      '/projects/prefixed-lib/src/secondary/lib/secondary.ts',
-    );
+    const componentContent = tree.readContent('/projects/prefixed-lib/secondary/src/secondary.ts');
     expect(componentContent).toContain("selector: 'custom-secondary'");
   });
 
@@ -272,7 +251,7 @@ describe('EntryPoint Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 
-    const componentContent = tree.readContent('/projects/foo/src/secondary/lib/secondary.ts');
+    const componentContent = tree.readContent('/projects/foo/secondary/src/secondary.ts');
     expect(componentContent).toContain("selector: 'lib-secondary'");
   });
 
@@ -286,7 +265,7 @@ describe('EntryPoint Schematic', () => {
       workspaceTree,
     );
 
-    const componentContent = tree.readContent('/projects/foo/src/secondary/lib/secondary.ts');
+    const componentContent = tree.readContent('/projects/foo/secondary/src/secondary.ts');
     expect(componentContent).toContain("selector: 'override-secondary'");
   });
 
@@ -311,16 +290,16 @@ describe('EntryPoint Schematic', () => {
 
     expect(tree.files).toEqual(
       jasmine.arrayContaining([
-        '/projects/my-scope/my-lib/src/secondary/public-api.ts',
-        '/projects/my-scope/my-lib/src/secondary/lib/secondary.ts',
-        '/projects/my-scope/my-lib/src/secondary/lib/secondary.spec.ts',
+        '/projects/my-scope/my-lib/secondary/src/public-api.ts',
+        '/projects/my-scope/my-lib/secondary/src/secondary.ts',
+        '/projects/my-scope/my-lib/secondary/src/secondary.spec.ts',
       ]),
     );
 
     const pkgJson = getJsonFileContent(tree, '/projects/my-scope/my-lib/package.json');
     expect(pkgJson.exports).toEqual({
       '.': './src/public-api.ts',
-      './secondary': './src/secondary/public-api.ts',
+      './secondary': './secondary/src/public-api.ts',
     });
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
@@ -339,8 +318,8 @@ describe('EntryPoint Schematic', () => {
       workspaceTree,
     );
 
-    expect(tree.files).toContain('/projects/foo/src/secondary/lib/secondary.ts');
-    expect(tree.files).not.toContain('/projects/foo/src/secondary/lib/secondary.spec.ts');
+    expect(tree.files).toContain('/projects/foo/secondary/src/secondary.ts');
+    expect(tree.files).not.toContain('/projects/foo/secondary/src/secondary.spec.ts');
   });
 
   it('should not be affected by workspace component schematic type and exportDefault defaults', async () => {
@@ -355,8 +334,8 @@ describe('EntryPoint Schematic', () => {
 
     const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 
-    expect(tree.files).toContain('/projects/foo/src/secondary/lib/secondary.ts');
-    const componentContent = tree.readContent('/projects/foo/src/secondary/lib/secondary.ts');
+    expect(tree.files).toContain('/projects/foo/secondary/src/secondary.ts');
+    const componentContent = tree.readContent('/projects/foo/secondary/src/secondary.ts');
     expect(componentContent).toContain('export class Secondary');
     expect(componentContent).not.toContain('export default');
   });
@@ -374,16 +353,16 @@ describe('EntryPoint Schematic', () => {
 
       expect(tree.files).toEqual(
         jasmine.arrayContaining([
-          '/projects/foo/src/secondary/public-api.ts',
-          '/projects/foo/src/secondary/lib/secondary-module.ts',
-          '/projects/foo/src/secondary/lib/secondary.ts',
-          '/projects/foo/src/secondary/lib/secondary.spec.ts',
+          '/projects/foo/secondary/src/public-api.ts',
+          '/projects/foo/secondary/src/secondary-module.ts',
+          '/projects/foo/secondary/src/secondary.ts',
+          '/projects/foo/secondary/src/secondary.spec.ts',
         ]),
       );
 
-      const publicApiContent = tree.readContent('/projects/foo/src/secondary/public-api.ts');
-      expect(publicApiContent).toContain("export * from './lib/secondary';");
-      expect(publicApiContent).toContain("export * from './lib/secondary-module';");
+      const publicApiContent = tree.readContent('/projects/foo/secondary/src/public-api.ts');
+      expect(publicApiContent).toContain("export * from './secondary';");
+      expect(publicApiContent).toContain("export * from './secondary-module';");
     });
   });
 
@@ -451,8 +430,8 @@ describe('EntryPoint Schematic', () => {
       ).toBeRejectedWithError('Entry point name "package.json" is reserved.');
     });
 
-    it('should throw if the entry-point name is "lib" or contains a "lib" segment', async () => {
-      for (const invalidName of ['lib', 'lib/sub', 'feature/lib', 'feature/lib/sub']) {
+    it('should throw if the entry-point name conflicts with the primary source directory', async () => {
+      for (const invalidName of ['src', 'src/sub']) {
         await expectAsync(
           schematicRunner.runSchematic(
             'entry-point',
@@ -463,8 +442,8 @@ describe('EntryPoint Schematic', () => {
             workspaceTree,
           ),
         ).toBeRejectedWithError(
-          `Entry point name "${invalidName}" cannot be "lib" or contain a "lib" segment ` +
-            'as it conflicts with the entry point source directory.',
+          `Entry point name "${invalidName}" cannot be "src" or start with "src/" ` +
+            'as it conflicts with the primary entry point source directory.',
         );
       }
     });

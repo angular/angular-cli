@@ -150,7 +150,7 @@ describe('Library Schematic', () => {
     expect(fileContent).toBeDefined();
     expect(fileContent.compilerOptions.declaration).toBe(true);
     expect(fileContent.compilerOptions.declarationMap).toBeUndefined();
-    expect(fileContent.include).toEqual(['src/**/*.ts']);
+    expect(fileContent.include).toEqual(['**/*.ts']);
     expect(fileContent.exclude).toEqual(['**/*.spec.ts']);
   });
 
@@ -441,6 +441,10 @@ describe('Library Schematic', () => {
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.architect.test.builder).toBe('@angular/build:unit-test');
+    expect(workspace.projects.foo.architect.test.options.include).toEqual(['../**/*.spec.ts']);
+
+    const specTsConfig = getJsonFileContent(tree, '/projects/foo/tsconfig.spec.json');
+    expect(specTsConfig.include).toEqual(['**/*.d.ts', '**/*.spec.ts']);
   });
 
   it(`should add 'unit-test' test builder when vitest is available`, async () => {

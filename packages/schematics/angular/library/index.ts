@@ -111,6 +111,8 @@ function addLibToWorkspaceFile(
                 builder: Builders.BuildUnitTest,
                 options: {
                   tsConfig: `${projectRoot}/tsconfig.spec.json`,
+                  // Include spec files from secondary entry points located outside of the source root.
+                  include: ['../**/*.spec.ts'],
                 },
               }
             : {

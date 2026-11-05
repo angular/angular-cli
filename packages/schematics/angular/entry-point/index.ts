@@ -56,14 +56,20 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException('Entry point name "package.json" is reserved.');
   }
 
-  if (options.name.split('/').includes('lib')) {
+  const libDir = project.root;
+  const sourceRoot = project.sourceRoot ?? join(libDir, 'src');
+  const relativeSourceRoot = relative(libDir, sourceRoot);
+  if (
+    relativeSourceRoot &&
+    !relativeSourceRoot.startsWith('..') &&
+    (options.name === relativeSourceRoot || options.name.startsWith(`${relativeSourceRoot}/`))
+  ) {
     throw new SchematicsException(
-      `Entry point name "${options.name}" cannot be "lib" or contain a "lib" segment ` +
-        'as it conflicts with the entry point source directory.',
+      `Entry point name "${options.name}" cannot be "${relativeSourceRoot}" or start with "${relativeSourceRoot}/" ` +
+        'as it conflicts with the primary entry point source directory.',
     );
   }
 
-  const libDir = project.root;
   const packageJsonPath = join(libDir, 'package.json');
   if (!tree.exists(packageJsonPath)) {
     throw new SchematicsException(`Could not find package.json at "${packageJsonPath}".`);
@@ -78,8 +84,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
 
   const isPrimary = options.name === '.';
   const entryFile = (options.entryFile ?? 'public-api').replace(/\.ts$/i, '');
-  const sourceRoot = project.sourceRoot ?? join(libDir, 'src');
-  const entryPointDir = join(sourceRoot, options.name);
+  const entryPointDir = isPrimary ? sourceRoot : join(libDir, options.name, 'src');
   const exportKey = isPrimary ? '.' : `./${options.name}`;
   const exportTarget = `./${relative(libDir, join(entryPointDir, `${entryFile}.ts`))}`;
 
@@ -119,7 +124,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
   }
 
   const prefix = (options.prefix ?? project.prefix) || 'lib';
-  const sourceDir = join(entryPointDir, 'lib');
+  const sourceDir = isPrimary ? join(entryPointDir, 'lib') : entryPointDir;
   const artifactName = isPrimary
     ? /^@.*\/.*/.test(options.project)
       ? options.project.split('/')[1]
@@ -141,6 +146,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     applyTemplates({
       ...strings,
       ...options,
+      isPrimary,
       standalone,
       name: artifactName,
       entryFile,
