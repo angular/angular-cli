@@ -117,6 +117,21 @@ describe('PWA Schematic', () => {
     );
   });
 
+  it('should update the index file when it is specified as an object', async () => {
+    const config = JSON.parse(appTree.readContent('/angular.json'));
+    config.projects.bar.architect.build.options.index = {
+      input: 'projects/bar/src/app-index.html',
+      output: 'index.html',
+    };
+    appTree.overwrite('/angular.json', JSON.stringify(config, null, 2));
+    appTree.rename('/projects/bar/src/index.html', '/projects/bar/src/app-index.html');
+
+    const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+    const content = tree.readContent('projects/bar/src/app-index.html');
+
+    expect(content).toMatch(/<link rel="manifest" href="manifest.webmanifest">/);
+  });
+
   it('should not add noscript element to the index file if already present', async () => {
     let index = appTree.readContent('projects/bar/src/index.html');
     index = index.replace('</body>', '<noscript>NO JAVASCRIPT</noscript></body>');

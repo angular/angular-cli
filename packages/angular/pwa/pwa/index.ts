@@ -108,23 +108,32 @@ export default function (options: PwaOptions): Rule {
     // Find all index.html files in build targets
     const indexFiles = new Set<string>();
     let checkForDefaultIndex = false;
-    for (const target of buildTargets) {
-      if (typeof target.options?.index === 'string') {
-        indexFiles.add(target.options.index);
-      } else if (target.options?.index === undefined) {
+    const collectIndexFile = (index: unknown): void => {
+      if (typeof index === 'string') {
+        indexFiles.add(index);
+      } else if (index === undefined) {
         checkForDefaultIndex = true;
+      } else if (
+        typeof index === 'object' &&
+        index !== null &&
+        'input' in index &&
+        typeof index.input === 'string'
+      ) {
+        // The `index` option also accepts an `{ input, output }` object; the manifest
+        // link belongs in the source file referenced by `input`.
+        indexFiles.add(index.input);
       }
+    };
+
+    for (const target of buildTargets) {
+      collectIndexFile(target.options?.index);
 
       if (!target.configurations) {
         continue;
       }
 
       for (const options of Object.values(target.configurations)) {
-        if (typeof options?.index === 'string') {
-          indexFiles.add(options.index);
-        } else if (options?.index === undefined) {
-          checkForDefaultIndex = true;
-        }
+        collectIndexFile(options?.index);
       }
     }
 
