@@ -24,7 +24,7 @@ import {
 import { basename, join, relative } from 'node:path/posix';
 import { JSONFile } from '../utility/json-file';
 import { createProjectSchematic } from '../utility/project';
-import { ProjectType } from '../utility/workspace-models';
+import { Builders, ProjectType } from '../utility/workspace-models';
 import type { Schema as EntryPointOptions } from './schema';
 
 function updateTsConfig(packageName: string, ...paths: string[]): Rule {
@@ -45,10 +45,21 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException(`Project "${options.project}" is not a library project.`);
   }
 
-  if (options.name === 'lib' || options.name.startsWith('lib/')) {
+  const buildTarget = project.targets.get('build');
+  if (buildTarget?.builder !== Builders.BuildLibrary) {
     throw new SchematicsException(
-      `Entry point name "${options.name}" cannot be "lib" or start with "lib/" ` +
-        'as it conflicts with the primary entry point source directory.',
+      `Project "${options.project}" does not use the "${Builders.BuildLibrary}" builder.`,
+    );
+  }
+
+  if (options.name === 'package.json') {
+    throw new SchematicsException('Entry point name "package.json" is reserved.');
+  }
+
+  if (options.name.split('/').includes('lib')) {
+    throw new SchematicsException(
+      `Entry point name "${options.name}" cannot be "lib" or contain a "lib" segment ` +
+        'as it conflicts with the entry point source directory.',
     );
   }
 
@@ -66,7 +77,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
       : strings.dasherize(options.project);
 
   const isPrimary = options.name === '.';
-  const entryFile = (options.entryFile ?? 'public-api').replace(/\.[cm]?ts$/i, '');
+  const entryFile = (options.entryFile ?? 'public-api').replace(/\.ts$/i, '');
   const sourceRoot = project.sourceRoot ?? join(libDir, 'src');
   const entryPointDir = join(sourceRoot, options.name);
   const exportKey = isPrimary ? '.' : `./${options.name}`;
@@ -95,15 +106,19 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     isJsonObject(existingExports) &&
     Object.keys(existingExports).some((k) => k.startsWith('.'))
   ) {
-    packageJson.modify(['exports', exportKey], exportTarget);
+    packageJson.modify(['exports', exportKey], exportTarget, false);
   } else {
-    packageJson.modify(['exports'], {
-      ...exportsObject,
-      [exportKey]: exportTarget,
-    });
+    packageJson.modify(
+      ['exports'],
+      {
+        ...exportsObject,
+        [exportKey]: exportTarget,
+      },
+      false,
+    );
   }
 
-  const prefix = options.prefix ?? project.prefix ?? 'lib';
+  const prefix = (options.prefix ?? project.prefix) || 'lib';
   const sourceDir = join(entryPointDir, 'lib');
   const artifactName = isPrimary
     ? /^@.*\/.*/.test(options.project)
@@ -111,25 +126,22 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
       : options.project
     : basename(options.name);
 
-  const buildOptions = project.targets.get('build')?.options;
-  let distRoot: string;
-  if (typeof buildOptions?.['outputPath'] === 'string') {
-    distRoot = buildOptions['outputPath'];
-  } else {
-    let folderName = options.project.startsWith('@') ? options.project.slice(1) : options.project;
-    if (/[A-Z]/.test(folderName)) {
-      folderName = strings.dasherize(folderName);
-    }
-    distRoot = `dist/${folderName}`;
-  }
+  const buildOptions = buildTarget.options;
+  const distRoot =
+    typeof buildOptions?.['outputPath'] === 'string'
+      ? buildOptions['outputPath']
+      : join('dist', options.project);
 
-  const tsConfigPathKey = isPrimary ? packageName : `${packageName}/${options.name}`;
-  const tsConfigPathTarget = `./${join(distRoot, options.name)}`;
+  const tsConfigPathKey = isPrimary ? packageName : `${packageName}/*`;
+  const tsConfigPathTarget = `./${join(distRoot, isPrimary ? '.' : '*')}`;
 
-  const templateSource = apply(url('./files'), [
+  const standalone = options.standalone ?? true;
+
+  const templateSource = apply(url('../entry-point/files'), [
     applyTemplates({
       ...strings,
       ...options,
+      standalone,
       name: artifactName,
       entryFile,
     }),
@@ -139,7 +151,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
   return chain([
     mergeWith(templateSource),
     options.skipTsConfig ? noop() : updateTsConfig(tsConfigPathKey, tsConfigPathTarget),
-    options.standalone
+    standalone
       ? noop()
       : schematic('module', {
           name: artifactName,
@@ -159,13 +171,14 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
       flat: true,
       path: sourceDir,
       export: true,
-      standalone: options.standalone,
+      standalone,
       skipTests: options.skipTests,
       project: options.project,
-      // Explicitly set an empty `type` since it doesn't necessarily make sense in a library.
-      // This also ensures that the generated files are valid even if the `component` schematic
-      // inherits its `type` from the workspace.
+      // Explicitly set an empty `type` and `exportDefault: false` since they don't necessarily make
+      // sense in a library and ensure that the generated files match the entry-point exports even
+      // if the `component` schematic inherits options from the workspace.
       type: '',
+      exportDefault: false,
     }),
   ]);
 });

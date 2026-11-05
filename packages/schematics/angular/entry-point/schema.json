@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema",
-  "$id": "SchematicsEntryPoint",
-  "title": "Entry Point Options Schema",
+  "$id": "SchematicsAngularEntryPoint",
+  "title": "Angular Entry Point Options Schema",
   "type": "object",
   "description": "Creates a new secondary entry point in an Angular library project.",
   "additionalProperties": false,
@@ -9,7 +9,7 @@
     "name": {
       "type": "string",
       "description": "The name of the secondary entry point (for example, 'testing' or 'feature/sub').",
-      "pattern": "^(?:\\.|[a-zA-Z0-9-~][a-zA-Z0-9-._~]*(?:/[a-zA-Z0-9-~][a-zA-Z0-9-._~]*)*)$",
+      "pattern": "^(?!.*\\.\\.)[a-zA-Z0-9-~][a-zA-Z0-9-._~]*(?:/[a-zA-Z0-9-~][a-zA-Z0-9-._~]*)*$",
       "$default": {
         "$source": "argv",
         "index": 0
@@ -18,7 +18,7 @@
     },
     "project": {
       "type": "string",
-      "description": "The name of the library project.",
+      "description": "The name of the library project where the secondary entry point should be added. If not specified, the CLI will determine the project from the current directory.",
       "$default": {
         "$source": "projectName"
       }
@@ -44,12 +44,12 @@
     "skipTests": {
       "type": "boolean",
       "default": false,
-      "description": "Do not create \"spec.ts\" test files for the new secondary entry point."
+      "description": "Do not create `spec.ts` test files for the new secondary entry point."
     },
     "skipTsConfig": {
       "type": "boolean",
       "default": false,
-      "description": "Do not update \"tsconfig.json\" to add a path mapping for the new secondary entry point."
+      "description": "Do not update `tsconfig.json` to add a path mapping for the new secondary entry point."
     }
   },
   "required": ["name", "project"]

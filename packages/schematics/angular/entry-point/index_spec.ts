@@ -89,9 +89,7 @@ describe('EntryPoint Schematic', () => {
     expect(pkgJson.exports['./feature/sub']).toBe('./src/feature/sub/public-api.ts');
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths['foo/feature/sub']).toEqual([
-      './dist/foo/feature/sub',
-    ]);
+    expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./dist/foo/*']);
   });
 
   it('should support custom entryFile option', async () => {
@@ -133,6 +131,7 @@ describe('EntryPoint Schematic', () => {
       '.': './src/public-api.ts',
       './secondary': './src/secondary/public-api.ts',
     });
+    expect(Object.keys(pkgJson)[0]).toBe('name');
   });
 
   it('should convert string exports in library package.json to an exports object', async () => {
@@ -177,23 +176,23 @@ describe('EntryPoint Schematic', () => {
     });
   });
 
-  it('should add paths mapping to root tsconfig.json', async () => {
+  it('should add wildcard paths mapping to root tsconfig.json', async () => {
     const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
     expect(tsConfigJson.compilerOptions.paths['foo']).toEqual(['./dist/foo']);
-    expect(tsConfigJson.compilerOptions.paths['foo/secondary']).toEqual(['./dist/foo/secondary']);
+    expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./dist/foo/*']);
   });
 
   it('should not duplicate existing paths mapping in root tsconfig.json', async () => {
     const tsConfig = getJsonFileContent(workspaceTree, '/tsconfig.json');
-    tsConfig.compilerOptions.paths['foo/secondary'] = ['./dist/foo/secondary'];
+    tsConfig.compilerOptions.paths['foo/*'] = ['./dist/foo/*'];
     workspaceTree.overwrite('/tsconfig.json', JSON.stringify(tsConfig, null, 2));
 
     const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths['foo/secondary']).toEqual(['./dist/foo/secondary']);
+    expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./dist/foo/*']);
   });
 
   it('should respect custom outputPath in angular.json for tsconfig paths mapping', async () => {
@@ -204,9 +203,7 @@ describe('EntryPoint Schematic', () => {
     const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths['foo/secondary']).toEqual([
-      './custom-dist/foo/secondary',
-    ]);
+    expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./custom-dist/foo/*']);
   });
 
   it('should respect custom sourceRoot in angular.json', async () => {
@@ -239,7 +236,7 @@ describe('EntryPoint Schematic', () => {
     );
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths['foo/secondary']).toBeUndefined();
+    expect(tsConfigJson.compilerOptions.paths['foo/*']).toBeUndefined();
   });
 
   it('should inherit prefix from the library project in angular.json', async () => {
@@ -266,6 +263,17 @@ describe('EntryPoint Schematic', () => {
       '/projects/prefixed-lib/src/secondary/lib/secondary.ts',
     );
     expect(componentContent).toContain("selector: 'custom-secondary'");
+  });
+
+  it('should fallback to "lib" prefix when project prefix is empty in angular.json', async () => {
+    const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
+    angularJson.projects.foo.prefix = '';
+    workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+
+    const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
+
+    const componentContent = tree.readContent('/projects/foo/src/secondary/lib/secondary.ts');
+    expect(componentContent).toContain("selector: 'lib-secondary'");
   });
 
   it('should allow overriding prefix via option', async () => {
@@ -316,8 +324,8 @@ describe('EntryPoint Schematic', () => {
     });
 
     const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
-    expect(tsConfigJson.compilerOptions.paths['@my-scope/my-lib/secondary']).toEqual([
-      './dist/my-scope/my-lib/secondary',
+    expect(tsConfigJson.compilerOptions.paths['@my-scope/my-lib/*']).toEqual([
+      './dist/my-scope/my-lib/*',
     ]);
   });
 
@@ -333,6 +341,24 @@ describe('EntryPoint Schematic', () => {
 
     expect(tree.files).toContain('/projects/foo/src/secondary/lib/secondary.ts');
     expect(tree.files).not.toContain('/projects/foo/src/secondary/lib/secondary.spec.ts');
+  });
+
+  it('should not be affected by workspace component schematic type and exportDefault defaults', async () => {
+    const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
+    angularJson.schematics = {
+      '@schematics/angular:component': {
+        type: 'component',
+        exportDefault: true,
+      },
+    };
+    workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+
+    const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
+
+    expect(tree.files).toContain('/projects/foo/src/secondary/lib/secondary.ts');
+    const componentContent = tree.readContent('/projects/foo/src/secondary/lib/secondary.ts');
+    expect(componentContent).toContain('export class Secondary');
+    expect(componentContent).not.toContain('export default');
   });
 
   describe('standalone=false', () => {
@@ -394,6 +420,16 @@ describe('EntryPoint Schematic', () => {
       ).toBeRejectedWithError('Project "my-app" is not a library project.');
     });
 
+    it('should throw if the library project does not use @angular/build:library', async () => {
+      const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
+      angularJson.projects.foo.architect.build.builder = '@angular/build:ng-packagr';
+      workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+
+      await expectAsync(
+        schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree),
+      ).toBeRejectedWithError('Project "foo" does not use the "@angular/build:library" builder.');
+    });
+
     it('should throw if the library package.json is missing', async () => {
       workspaceTree.delete('/projects/foo/package.json');
 
@@ -402,32 +438,50 @@ describe('EntryPoint Schematic', () => {
       ).toBeRejectedWithError('Could not find package.json at "projects/foo/package.json".');
     });
 
-    it('should throw if the entry-point name is "lib" or starts with "lib/"', async () => {
+    it('should throw if the entry-point name is "package.json"', async () => {
       await expectAsync(
         schematicRunner.runSchematic(
           'entry-point',
           {
-            name: 'lib',
+            name: 'package.json',
             project: 'foo',
           },
           workspaceTree,
         ),
-      ).toBeRejectedWithError(
-        'Entry point name "lib" cannot be "lib" or start with "lib/" as it conflicts with the primary entry point source directory.',
-      );
+      ).toBeRejectedWithError('Entry point name "package.json" is reserved.');
+    });
 
-      await expectAsync(
-        schematicRunner.runSchematic(
-          'entry-point',
-          {
-            name: 'lib/sub',
-            project: 'foo',
-          },
-          workspaceTree,
-        ),
-      ).toBeRejectedWithError(
-        'Entry point name "lib/sub" cannot be "lib" or start with "lib/" as it conflicts with the primary entry point source directory.',
-      );
+    it('should throw if the entry-point name is "lib" or contains a "lib" segment', async () => {
+      for (const invalidName of ['lib', 'lib/sub', 'feature/lib', 'feature/lib/sub']) {
+        await expectAsync(
+          schematicRunner.runSchematic(
+            'entry-point',
+            {
+              name: invalidName,
+              project: 'foo',
+            },
+            workspaceTree,
+          ),
+        ).toBeRejectedWithError(
+          `Entry point name "${invalidName}" cannot be "lib" or contain a "lib" segment ` +
+            'as it conflicts with the entry point source directory.',
+        );
+      }
+    });
+
+    it('should reject invalid entry-point names via schema validation', async () => {
+      for (const invalidName of ['.', '../foo', 'foo..bar', '/secondary', 'secondary/', './sub']) {
+        await expectAsync(
+          schematicRunner.runSchematic(
+            'entry-point',
+            {
+              name: invalidName,
+              project: 'foo',
+            },
+            workspaceTree,
+          ),
+        ).toBeRejected();
+      }
     });
 
     it('should throw if the entry point already exists in package.json exports', async () => {

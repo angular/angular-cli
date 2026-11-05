@@ -15,11 +15,11 @@ import {
   mergeWith,
   move,
   noop,
-  schematic,
   strings,
   url,
 } from '@angular-devkit/schematics';
 import { join } from 'node:path/posix';
+import addEntryPoint from '../entry-point';
 import { addTestRunnerDependencies } from '../utility/dependencies';
 import {
   DependencyType,
@@ -173,7 +173,7 @@ export default function (options: LibraryOptions): Rule {
             './' + join(libDir, 'tsconfig.lib.json'),
             './' + join(libDir, 'tsconfig.spec.json'),
           ),
-      schematic('entry-point', {
+      addEntryPoint({
         name: '.',
         project: packageName,
         entryFile: options.entryFile,
