@@ -86,7 +86,7 @@ function addLibToWorkspaceFile(
     workspace.projects.add({
       name: projectName,
       root: projectRoot,
-      sourceRoot: `${projectRoot}/src`,
+      sourceRoot: projectRoot,
       projectType: ProjectType.Library,
       prefix: options.prefix,
       targets: {
@@ -111,8 +111,6 @@ function addLibToWorkspaceFile(
                 builder: Builders.BuildUnitTest,
                 options: {
                   tsConfig: `${projectRoot}/tsconfig.spec.json`,
-                  // Include spec files from secondary entry points located outside of the source root.
-                  include: ['../**/*.spec.ts'],
                 },
               }
             : {
