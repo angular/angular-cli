@@ -56,20 +56,14 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException('Entry point name "package.json" is reserved.');
   }
 
-  const libDir = project.root;
-  const sourceRoot = project.sourceRoot ?? join(libDir, 'src');
-  const relativeSourceRoot = relative(libDir, sourceRoot);
-  if (
-    relativeSourceRoot &&
-    !relativeSourceRoot.startsWith('..') &&
-    (options.name === relativeSourceRoot || options.name.startsWith(`${relativeSourceRoot}/`))
-  ) {
+  if (options.name === 'src' || options.name.startsWith('src/')) {
     throw new SchematicsException(
-      `Entry point name "${options.name}" cannot be "${relativeSourceRoot}" or start with "${relativeSourceRoot}/" ` +
+      `Entry point name "${options.name}" cannot be "src" or start with "src/" ` +
         'as it conflicts with the primary entry point source directory.',
     );
   }
 
+  const libDir = project.root;
   const packageJsonPath = join(libDir, 'package.json');
   if (!tree.exists(packageJsonPath)) {
     throw new SchematicsException(`Could not find package.json at "${packageJsonPath}".`);
@@ -84,7 +78,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
 
   const isPrimary = options.name === '.';
   const entryFile = (options.entryFile ?? 'public-api').replace(/\.ts$/i, '');
-  const entryPointDir = isPrimary ? sourceRoot : join(libDir, options.name, 'src');
+  const entryPointDir = join(libDir, options.name, 'src');
   const exportKey = isPrimary ? '.' : `./${options.name}`;
   const exportTarget = `./${relative(libDir, join(entryPointDir, `${entryFile}.ts`))}`;
 

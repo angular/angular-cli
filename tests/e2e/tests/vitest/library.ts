@@ -28,6 +28,21 @@ export default async function (): Promise<void> {
     };
   });
 
+  // 3. Update the component to use SCSS and import the shared file
+  // Rename CSS to SCSS
+  await ng('generate', 'component', 'styled-comp', '--project=my-lib', '--style=scss');
+
+  await appendToFile(
+    'projects/my-lib/src/lib/styled-comp/styled-comp.scss',
+    `
+      @use 'vars';
+      p { color: vars.$primary-color; }
+    `,
+  );
+
+  // 4. Generate a secondary entry point and verify its tests are also executed
+  await ng('generate', 'entry-point', 'secondary', '--project=my-lib');
+
   // Run the library tests
   const { stdout } = await ng('test', 'my-lib');
 

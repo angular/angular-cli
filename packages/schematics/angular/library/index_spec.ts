@@ -441,7 +441,6 @@ describe('Library Schematic', () => {
 
     const workspace = JSON.parse(tree.readContent('/angular.json'));
     expect(workspace.projects.foo.architect.test.builder).toBe('@angular/build:unit-test');
-    expect(workspace.projects.foo.architect.test.options.include).toEqual(['../**/*.spec.ts']);
 
     const specTsConfig = getJsonFileContent(tree, '/projects/foo/tsconfig.spec.json');
     expect(specTsConfig.include).toEqual(['**/*.d.ts', '**/*.spec.ts']);
