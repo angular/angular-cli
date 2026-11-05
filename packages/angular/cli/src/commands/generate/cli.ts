@@ -47,7 +47,7 @@ export default class GenerateCommandModule
       builder: (localYargs) =>
         localYargs
           .positional('schematic', {
-            describe: 'The [collection:schematic] to run.',
+            describe: 'The `[collection:schematic]` to run.',
             type: 'string',
             demandOption: true,
           })
