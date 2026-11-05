@@ -81,6 +81,15 @@ describe('Jasmine to Vitest Transformer - addImports option', () => {
     await expectTransformation(input, expected, true);
   });
 
+  it('should add the vi import for toHaveBeenCalledBefore when addImports is true', async () => {
+    const input = `expect(spyA).toHaveBeenCalledBefore(spyB);`;
+    const expected = `
+        import { expect, vi } from 'vitest';
+        expect(Math.min(...vi.mocked(spyA).mock.invocationCallOrder)).toBeLessThan(Math.min(...vi.mocked(spyB).mock.invocationCallOrder));
+      `;
+    await expectTransformation(input, expected, true);
+  });
+
   it('should add imports for beforeEach and afterEach when addImports is true', async () => {
     const input = `
         describe('My Suite', () => {
