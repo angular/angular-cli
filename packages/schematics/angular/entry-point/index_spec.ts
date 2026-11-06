@@ -430,24 +430,6 @@ describe('EntryPoint Schematic', () => {
       ).toBeRejectedWithError('Entry point name "package.json" is reserved.');
     });
 
-    it('should throw if the entry-point name conflicts with the primary source directory', async () => {
-      for (const invalidName of ['src', 'src/sub']) {
-        await expectAsync(
-          schematicRunner.runSchematic(
-            'entry-point',
-            {
-              name: invalidName,
-              project: 'foo',
-            },
-            workspaceTree,
-          ),
-        ).toBeRejectedWithError(
-          `Entry point name "${invalidName}" cannot be "src" or start with "src/" ` +
-            'as it conflicts with the primary entry point source directory.',
-        );
-      }
-    });
-
     it('should reject invalid entry-point names via schema validation', async () => {
       for (const invalidName of ['.', '../foo', 'foo..bar', '/secondary', 'secondary/', './sub']) {
         await expectAsync(

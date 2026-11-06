@@ -56,13 +56,6 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException('Entry point name "package.json" is reserved.');
   }
 
-  if (options.name === 'src' || options.name.startsWith('src/')) {
-    throw new SchematicsException(
-      `Entry point name "${options.name}" cannot be "src" or start with "src/" ` +
-        'as it conflicts with the primary entry point source directory.',
-    );
-  }
-
   const libDir = project.root;
   const packageJsonPath = join(libDir, 'package.json');
   if (!tree.exists(packageJsonPath)) {
