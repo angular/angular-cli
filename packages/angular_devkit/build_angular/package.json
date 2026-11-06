@@ -52,7 +52,7 @@
     "source-map-support": "0.5.21",
     "terser": "5.51.2",
     "tinyglobby": "0.2.17",
-    "tslib": "2.8.1",
+    "tslib": "2.9.1",
     "webpack": "5.112.2",
     "webpack-dev-middleware": "8.5.0",
     "webpack-dev-server": "6.1.0",
