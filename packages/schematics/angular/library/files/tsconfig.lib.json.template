@@ -3,13 +3,11 @@
 {
   "extends": "<%= relativePathToWorkspaceRoot %>/tsconfig.json",
   "compilerOptions": {
-    "outDir": "<%= relativePathToWorkspaceRoot %>/out-tsc/lib",
     "declaration": true,
-    "declarationMap": true,
     "types": []
   },
   "include": [
-    "src/**/*.ts"
+    "**/*.ts"
   ],
   "exclude": [
     "**/*.spec.ts"
