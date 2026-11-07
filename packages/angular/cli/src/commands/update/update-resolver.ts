@@ -832,8 +832,16 @@ async function checkCatalogUpdates(
   }
 
   if (catalogUpdates.length > 0) {
-    const packageManagerName = options.packageManager ?? 'your package manager';
-    const installCmd = packageManagerName === 'yarn' ? 'yarn install' : 'pnpm install';
+    const packageManagerName = options.packageManager;
+    const installCmd = packageManagerName ? `${packageManagerName} install` : 'pnpm install';
+    const catalogLocations: Record<string, string> = {
+      pnpm: 'pnpm-workspace.yaml',
+      yarn: '.yarnrc.yml',
+      bun: `the 'workspaces.catalog' field in the root package.json`,
+    };
+    const catalogLocation =
+      (packageManagerName && catalogLocations[packageManagerName]) ||
+      'e.g., pnpm-workspace.yaml or .yarnrc.yml';
 
     const updatesList = catalogUpdates
       .map((pkg) => `  - ${pkg.name} (${pkg.specifier}) -> Target version: ${pkg.target}`)
@@ -853,7 +861,7 @@ async function checkCatalogUpdates(
         `Because catalogs are shared across the monorepo, 'ng update' cannot modify them directly.\n` +
         `Please perform the following steps to update:\n` +
         `  1. Manually update the versions for these packages in your catalog configuration file ` +
-        `(e.g., pnpm-workspace.yaml or .yarnrc.yml).\n` +
+        `(${catalogLocation}).\n` +
         `  2. Run '${installCmd}' to install the updated versions.\n` +
         `  3. Run the following command(s) from the workspace root to execute the migration schematics:\n` +
         `${migrationCommands}`,

@@ -544,6 +544,33 @@ Please perform the following steps to update:
     ).toBeRejectedWithError(new RegExp(expectedError));
   });
 
+  it('uses the workspace package manager in the catalog update guidance', async () => {
+    createMockWorkspace(
+      {
+        name: 'blah',
+        dependencies: {
+          '@angular/core': 'catalog:',
+        },
+      },
+      {
+        '@angular/core': { version: '5.1.0' },
+      },
+    );
+
+    const expectedError =
+      `  1\\. Manually update the versions for these packages in your catalog configuration ` +
+      `file \\(the 'workspaces\\.catalog' field in the root package\\.json\\)\\.\n` +
+      `  2\\. Run 'bun install' to install the updated versions\\.`;
+
+    await expectAsync(
+      resolvePlan({
+        packages: ['@angular/core'],
+        workspaceRoot: tempRoot,
+        packageManager: 'bun',
+      }),
+    ).toBeRejectedWithError(new RegExp(expectedError));
+  });
+
   it('rejects updates for catalog packages specified with a version suffix', async () => {
     createMockWorkspace(
       {
