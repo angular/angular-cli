@@ -224,7 +224,7 @@ async function runEsbuild(
       entryPoints.set(name, 'angular:karma-specs');
     }
   }
-  buildOptions.rootFiles = specFiles;
+  buildOptions.rootFiles = [...(buildOptions.rootFiles ?? []), ...specFiles];
   const virtualSpecs = createVirtualModulePlugin({
     namespace: 'angular:karma-specs',
     loadContent: () => ({
