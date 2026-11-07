@@ -123,7 +123,7 @@ export function transformAsymmetricMatchers(
 
 export function transformToHaveBeenCalledBefore(
   node: ts.Node,
-  { sourceFile, reporter }: RefactorContext,
+  { sourceFile, reporter, pendingVitestValueImports }: RefactorContext,
 ): ts.Node {
   if (
     !ts.isCallExpression(node) ||
@@ -147,6 +147,7 @@ export function transformToHaveBeenCalledBefore(
     return node;
   }
 
+  addVitestValueImport(pendingVitestValueImports, 'vi');
   reporter.reportTransformation(
     sourceFile,
     node,
