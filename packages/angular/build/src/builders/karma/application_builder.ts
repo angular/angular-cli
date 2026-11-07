@@ -39,6 +39,7 @@ import type { KarmaBuilderTransformsOptions } from './index';
 interface BuildOptions extends ApplicationBuilderInternalOptions {
   // We know that it's always a string since we set it.
   outputPath: string;
+  entryPoints: Map<string, string>;
 }
 
 class ApplicationBuildError extends Error {
@@ -213,6 +214,25 @@ async function runEsbuild(
   context: BuilderContext,
   projectSourceRoot: string,
 ): Promise<[Result & { kind: ResultKind.Full }, AsyncIterator<Result> | null]> {
+  // Keep specs in a single module graph so cross-chunk lazy initialization cannot
+  // expose an uninitialized barrel export. Preserve entry names and shared framework chunks.
+  const specFiles: string[] = [];
+  const entryPoints = buildOptions.entryPoints;
+  for (const [name, file] of entryPoints) {
+    if (name.startsWith('spec-')) {
+      specFiles.push(file);
+      entryPoints.set(name, 'angular:karma-specs');
+    }
+  }
+  buildOptions.rootFiles = specFiles;
+  const virtualSpecs = createVirtualModulePlugin({
+    namespace: 'angular:karma-specs',
+    loadContent: () => ({
+      contents: specFiles.map((file) => `import ${JSON.stringify(file)};`).join('\n'),
+      loader: 'js',
+      resolveDir: projectSourceRoot,
+    }),
+  });
   const usesZoneJS = buildOptions.polyfills?.includes('zone.js');
   let hasLocalize = false;
   try {
@@ -248,7 +268,9 @@ async function runEsbuild(
 
   // Build tests with `application` builder, using test files as entry points.
   const [buildOutput, buildIterator] = await first(
-    buildApplicationInternal(buildOptions, context, { codePlugins: [virtualTestBedInit] }),
+    buildApplicationInternal(buildOptions, context, {
+      codePlugins: [virtualTestBedInit, virtualSpecs],
+    }),
     { cancel: !buildOptions.watch },
   );
   if (buildOutput.kind === ResultKind.Failure) {
