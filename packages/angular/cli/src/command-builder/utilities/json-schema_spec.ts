@@ -116,6 +116,20 @@ describe('parseJsonSchemaToOptions', () => {
               ],
             },
           },
+          'allowedHosts': {
+            'default': [],
+            'oneOf': [
+              {
+                'type': 'array',
+                'items': {
+                  'type': 'string',
+                },
+              },
+              {
+                'type': 'boolean',
+              },
+            ],
+          },
         },
       };
 
@@ -226,6 +240,50 @@ describe('parseJsonSchemaToOptions', () => {
         ).toEqual(
           jasmine.objectContaining({
             'arrayWithComplexAnyOf': ['default', 'something-else'],
+          }),
+        );
+      });
+    });
+
+    describe('type=array in oneOf', () => {
+      it('parses valid option value when specified once', async () => {
+        expect(await parse(['--allowed-hosts', 'a.example.com', 'b.example.com'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': ['a.example.com', 'b.example.com'],
+          }),
+        );
+      });
+
+      it('parses valid option value when specified multiple times', async () => {
+        expect(
+          await parse(['--allowed-hosts', 'a.example.com', '--allowed-hosts', 'b.example.com']),
+        ).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': ['a.example.com', 'b.example.com'],
+          }),
+        );
+      });
+
+      it('parses as boolean true when specified without values', async () => {
+        expect(await parse(['--allowed-hosts'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': true,
+          }),
+        );
+      });
+
+      it('parses as boolean true when specified with =true', async () => {
+        expect(await parse(['--allowed-hosts=true'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': true,
+          }),
+        );
+      });
+
+      it('parses as boolean false when specified with =false', async () => {
+        expect(await parse(['--allowed-hosts=false'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': false,
           }),
         );
       });
