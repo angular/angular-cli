@@ -17,6 +17,7 @@ import {
 } from '../../tools/esbuild/bundler-execution-result';
 import { BuildOutputFileType, InitialFileRecord } from '../../tools/esbuild/bundler-files';
 import { I18nInliner } from '../../tools/i18n';
+import { createLocalizedOutputHasher } from '../../tools/i18n/i18n-output-hashes';
 import { maxInlinerWorkers } from '../../utils/environment-options';
 import { loadTranslations } from '../../utils/i18n-options';
 import { createTranslationLoader } from '../../utils/load-translations';
@@ -44,6 +45,7 @@ export async function inlineI18n(
   errors: string[];
   warnings: string[];
   prerenderedRoutes: PrerenderedRoutesRecord;
+  renamedFiles?: Map<string, string>;
 }> {
   const { i18nOptions, baseHref, cacheOptions } = options;
 
@@ -64,6 +66,7 @@ export async function inlineI18n(
     errors: string[];
     warnings: string[];
     prerenderedRoutes: PrerenderedRoutesRecord;
+    renamedFiles?: Map<string, string>;
   } = {
     errors: [],
     warnings: [],
@@ -98,6 +101,15 @@ export async function inlineI18n(
     });
 
     const inlinedLocales = await inliner.inlineAll(executionResult.outputFiles, localesToInline);
+    const hashLocalizedOutputs = options.i18nContentHashing
+      ? createLocalizedOutputHasher(
+          executionResult.outputFiles,
+          new Set(
+            options.globalScripts.filter(({ initial }) => !initial).map(({ name }) => name + '.js'),
+          ),
+          metafile,
+        )
+      : undefined;
 
     for (const locale of i18nOptions.inlineLocales) {
       const localeInlineResult = inlinedLocales.get(locale);
@@ -105,6 +117,14 @@ export async function inlineI18n(
       const localeOutputFiles = localeInlineResult.outputFiles;
       inlineResult.errors.push(...localeInlineResult.errors);
       inlineResult.warnings.push(...localeInlineResult.warnings);
+      const renamedFiles = hashLocalizedOutputs?.(localeOutputFiles);
+      // As with the pre-localization build summary, report a single set of output names.
+      inlineResult.renamedFiles ??= renamedFiles;
+      const localeInitialFiles = renamedFiles?.size
+        ? new Map(
+            Array.from(initialFiles, ([path, record]) => [renamedFiles.get(path) ?? path, record]),
+          )
+        : initialFiles;
 
       const {
         errors,
@@ -120,7 +140,7 @@ export async function inlineI18n(
         },
         [...unModifiedOutputFiles, ...localeOutputFiles],
         executionResult.assetFiles,
-        initialFiles,
+        localeInitialFiles,
         locale,
       );
 

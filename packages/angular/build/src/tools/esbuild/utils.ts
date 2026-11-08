@@ -30,6 +30,7 @@ export function logBuildStats(
   estimatedTransferSizes?: Map<string, number>,
   ssrOutputEnabled?: boolean,
   verbose?: boolean,
+  displayNames?: ReadonlyMap<string, string>,
 ): string {
   // Remove the i18n subpath in case the build is using i18n.
   // en-US/main.js -> main.js
@@ -69,7 +70,12 @@ export function logBuildStats(
     const name = initial.get(file)?.name ?? getChunkNameFromMetafile(metafiles, file);
     const stat: BundleStats = {
       initial: initial.has(file),
-      stats: [file, name ?? '-', size, estimatedTransferSizes?.get(file) ?? '-'],
+      stats: [
+        displayNames?.get(file) ?? file,
+        name ?? '-',
+        size,
+        estimatedTransferSizes?.get(file) ?? '-',
+      ],
     };
 
     if (isPlatformServer) {

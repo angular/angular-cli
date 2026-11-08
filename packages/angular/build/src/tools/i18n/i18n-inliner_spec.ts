@@ -8,6 +8,7 @@
 
 import type { ɵParsedTranslation } from '@angular/localize';
 import { transform } from 'esbuild';
+import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -20,6 +21,7 @@ import {
   createOutputFile,
 } from '../esbuild/bundler-files';
 import { I18nInliner, type I18nInlinerOptions } from './i18n-inliner';
+import { createLocalizedOutputHasher } from './i18n-output-hashes';
 
 /**
  * A module that uses a `$localize` message with an explicit message identifier so that the
@@ -1183,5 +1185,163 @@ describe('I18nInliner', () => {
       ]);
       expect(findFile(results2.get('es')?.outputFiles ?? [], 'main.js').text).toContain('"Hola"');
     });
+  });
+});
+
+describe('Localized output hashing', () => {
+  beforeAll(initializeHash);
+
+  function renamed(names: ReadonlyMap<string, string>, file: string): string {
+    const result = names.get(file);
+    assert(result, 'Expected renamed output file: ' + file);
+
+    return result;
+  }
+
+  function outputMetadata(
+    ...entries: [string, [string, 'import-statement' | 'dynamic-import', boolean?][]][]
+  ): Parameters<typeof createLocalizedOutputHasher>[2] {
+    return {
+      inputs: {},
+      outputs: Object.fromEntries(
+        entries.map(([file, imports]) => [
+          file,
+          {
+            bytes: 0,
+            inputs: {},
+            exports: [],
+            imports: imports.map(([path, kind, external]) => ({ path, kind, external })),
+          },
+        ]),
+      ),
+    };
+  }
+
+  it('invalidates a cycle and its importers without invalidating a separate cycle', () => {
+    const original = [
+      browserFile('first-AAAAAAAA.js', 'console.log($localize`A`); import "./second-BBBBBBBB.js";'),
+      browserFile('second-BBBBBBBB.js', 'export {} from "./first-AAAAAAAA.js";'),
+      browserFile('third-CCCCCCCC.js', 'import "./fourth-DDDDDDDD.js"; console.log($localize`B`);'),
+      browserFile('fourth-DDDDDDDD.js', 'import "./third-CCCCCCCC.js";'),
+      browserFile('main-EEEEEEEE.js', 'import(`./second-BBBBBBBB.js`);'),
+    ];
+    const hash = createLocalizedOutputHasher(
+      original,
+      new Set(),
+      outputMetadata(
+        ['first-AAAAAAAA.js', [['second-BBBBBBBB.js', 'import-statement']]],
+        ['second-BBBBBBBB.js', [['first-AAAAAAAA.js', 'import-statement']]],
+        ['third-CCCCCCCC.js', [['fourth-DDDDDDDD.js', 'import-statement']]],
+        ['fourth-DDDDDDDD.js', [['third-CCCCCCCC.js', 'import-statement']]],
+        ['main-EEEEEEEE.js', [['second-BBBBBBBB.js', 'dynamic-import']]],
+      ),
+    );
+    const localize = (text: string) =>
+      original.map((file) =>
+        browserFile(
+          file.path,
+          file.text
+            .replace('$localize`A`', JSON.stringify(text))
+            .replace('$localize`B`', '"Other"'),
+        ),
+      );
+
+    const firstFiles = localize('Before');
+    const first = hash(firstFiles);
+    const secondFiles = localize('Après 😀');
+    const second = hash(secondFiles);
+
+    expect(second.size).toBe(5);
+    for (const path of ['first-AAAAAAAA.js', 'second-BBBBBBBB.js', 'main-EEEEEEEE.js']) {
+      expect(second.get(path)).not.toBe(first.get(path));
+    }
+    for (const path of ['third-CCCCCCCC.js', 'fourth-DDDDDDDD.js']) {
+      expect(second.get(path)).toBe(first.get(path));
+    }
+    expect(findFile(secondFiles, renamed(second, 'first-AAAAAAAA.js')).text).toContain(
+      renamed(second, 'second-BBBBBBBB.js'),
+    );
+    expect(findFile(secondFiles, renamed(second, 'second-BBBBBBBB.js')).text).toContain(
+      renamed(second, 'first-AAAAAAAA.js'),
+    );
+    expect(findFile(secondFiles, renamed(second, 'main-EEEEEEEE.js')).text).toContain(
+      renamed(second, 'second-BBBBBBBB.js'),
+    );
+  });
+
+  it('rewrites only actual module specifiers using workspace-relative metadata', () => {
+    const main = 'app/main-AAAAAAAA.js';
+    const leaf = 'chunk-BBBBBBBB.js';
+    const external = 'chunk-CCCCCCCC.js';
+    const source = `export {a, b} from '../${leaf}'; import(\`../${leaf}\`); import('../${external}'); console.log('../${leaf}');`;
+    const files = [
+      browserFile(main, source),
+      browserFile(leaf, 'export const a = $localize`Hello`, b = 1;'),
+      browserFile(external, 'export const a = $localize`Hello`;'),
+    ];
+    const hash = createLocalizedOutputHasher(
+      files,
+      new Set(),
+      outputMetadata(
+        [
+          main,
+          [
+            ['./' + leaf, 'import-statement'],
+            ['./' + leaf, 'dynamic-import'],
+            [external, 'dynamic-import', true],
+          ],
+        ],
+        [leaf, []],
+        [external, []],
+      ),
+    );
+    const localized = files.map((file) =>
+      browserFile(file.path, file.text.replace('$localize`Hello`', '"Bonjour"')),
+    );
+
+    const names = hash(localized);
+    const newLeaf = renamed(names, leaf);
+    expect(renamed(names, external)).not.toBe(external);
+    const mainText = findFile(localized, renamed(names, main)).text;
+    expect(mainText).toBe(
+      `export {a, b} from '../${newLeaf}'; import(\`../${newLeaf}\`); import('../${external}'); console.log('../${leaf}');`,
+    );
+  });
+
+  it('rewrites a worker URL and its source map without rewriting other strings', () => {
+    const worker = 'worker-aB3_-9cD.js';
+    const main = 'main-BBBBBBBB.js';
+    const mainFile = browserFile(
+      main,
+      `console.log("${worker}");
+        new Worker(new URL("${worker}", import.meta.url));
+        new Worker(new URL(\`./${worker}\`, import.meta.url));`,
+    );
+    const sourceMap = browserFile(worker + '.map', JSON.stringify({ version: 3, file: worker }));
+    const hash = createLocalizedOutputHasher(
+      [mainFile, browserFile(worker, 'console.log($localize`Hello`);'), sourceMap],
+      new Set(),
+      outputMetadata([main, []], [worker, []]),
+    );
+    const files = [
+      mainFile.clone(),
+      browserFile(
+        worker,
+        `console.log("Bonjour");
+//# sourceMappingURL=${worker}.map
+`,
+      ),
+      sourceMap.clone(),
+    ];
+
+    const names = hash(files);
+    const newWorker = renamed(names, worker);
+    expect(newWorker).not.toBe(worker);
+    const mainText = findFile(files, renamed(names, main)).text;
+    expect(mainText).toContain(`new URL("${newWorker}"`);
+    expect(mainText).toContain(`new URL(\`./${newWorker}\``);
+    expect(mainText).toContain(`console.log("${worker}")`);
+    expect(findFile(files, newWorker).text).toContain(`sourceMappingURL=${newWorker}.map`);
+    expect(JSON.parse(findFile(files, newWorker + '.map').text).file).toBe(newWorker);
   });
 });

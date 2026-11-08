@@ -544,6 +544,14 @@ export async function normalizeOptions(
     tailwindConfiguration,
     postcssConfiguration,
     i18nOptions,
+    // Server and watch builds still use the names produced by the bundler throughout the build.
+    i18nContentHashing:
+      i18nOptions.shouldInline &&
+      outputNames.bundles.includes('[hash]') &&
+      !serverEntryPoint &&
+      !watch &&
+      !outExtension &&
+      !extensions?.codePlugins?.length,
     namedChunks,
     budgets: budgets?.length ? budgets : undefined,
     publicPath: deployUrl,

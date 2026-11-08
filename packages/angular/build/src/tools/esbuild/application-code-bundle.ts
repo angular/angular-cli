@@ -572,7 +572,7 @@ function getEsBuildCommonOptions(options: NormalizedApplicationBuildOptions): Bu
   // change when translation files have changed. If this is not done the post processed files may have
   // different content but would retain identical production file names which would lead to browser caching problems.
   let footer;
-  if (i18nOptions.shouldInline) {
+  if (i18nOptions.shouldInline && !options.i18nContentHashing) {
     // Update file hashes to include translation file content
     const i18nHash = Object.values(i18nOptions.locales).reduce(
       (data, locale) => data + locale.files.map((file) => file.integrity || '').join('|'),

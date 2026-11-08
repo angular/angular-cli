@@ -393,9 +393,11 @@ export async function executeBuild(
       );
     }
 
+    let localizedNames: Map<string, string> | undefined;
     // Perform i18n translation inlining if enabled
     if (i18nOptions.shouldInline) {
       const result = await inlineI18n(browserMetafile, options, executionResult, initialFiles);
+      localizedNames = result.renamedFiles;
       executionResult.addErrors(result.errors);
       executionResult.addWarnings(result.warnings);
       executionResult.addPrerenderedRoutes(result.prerenderedRoutes);
@@ -427,11 +429,32 @@ export async function executeBuild(
       );
     }
 
+    let statsMetafile = browserMetafile;
+    if (options.stats && localizedNames?.size) {
+      const names = localizedNames;
+      statsMetafile = {
+        ...browserMetafile,
+        outputs: Object.fromEntries(
+          Object.entries(browserMetafile.outputs).map(([path, output]) => [
+            names.get(path) ?? path,
+            {
+              ...output,
+              imports: output.imports.map((entry) => {
+                const renamedPath = !entry.external && names.get(entry.path);
+
+                return renamedPath ? { ...entry, path: renamedPath } : entry;
+              }),
+            },
+          ]),
+        ),
+      };
+    }
+
     // Write metafiles if stats option is enabled
     if (options.stats) {
       executionResult.addOutputFile(
         'browser-stats.json',
-        stableStringify(browserMetafile),
+        stableStringify(statsMetafile),
         BuildOutputFileType.Root,
       );
 
@@ -458,6 +481,7 @@ export async function executeBuild(
           estimatedTransferSizes,
           !!ssrOptions,
           verbose,
+          localizedNames,
         ),
       );
     }
