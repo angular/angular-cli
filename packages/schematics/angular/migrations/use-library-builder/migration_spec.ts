@@ -100,6 +100,7 @@ describe('Migration to use the library builder', () => {
     } = newTree.readJson('/angular.json') as any;
 
     const { builder, options, configurations } = lib.architect['build'];
+    expect(lib.sourceRoot).toBe('projects/my-lib');
     expect(builder).toBe(Builders.BuildLibrary);
     expect(options.project).toBeUndefined();
     expect(options.entryPoints).toBeUndefined();
@@ -549,5 +550,119 @@ describe('Migration to use the library builder', () => {
 
     expect(rootPkg.devDependencies['ng-packagr']).toBeUndefined();
     expect(rootPkg.devDependencies['@angular/build']).toBeDefined();
+  });
+
+  it('should align sourceRoot to root when sourceRoot is omitted', async () => {
+    const angularJson = JSON.parse(tree.readContent('/angular.json'));
+    delete angularJson.projects['my-lib'].sourceRoot;
+    tree.overwrite('/angular.json', JSON.stringify(angularJson, undefined, 2));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.sourceRoot).toBe('projects/my-lib');
+  });
+
+  it('should preserve a custom sourceRoot when migrating', async () => {
+    const angularJson = JSON.parse(tree.readContent('/angular.json'));
+    angularJson.projects['my-lib'].sourceRoot = 'projects/my-lib/custom-src';
+    tree.overwrite('/angular.json', JSON.stringify(angularJson, undefined, 2));
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+    const {
+      projects: { 'my-lib': lib },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } = newTree.readJson('/angular.json') as any;
+
+    expect(lib.sourceRoot).toBe('projects/my-lib/custom-src');
+  });
+
+  it('should update src/** include globs in tsconfig.lib.json and tsconfig.spec.json', async () => {
+    tree.create(
+      '/projects/my-lib/tsconfig.lib.json',
+      JSON.stringify(
+        {
+          extends: '../../tsconfig.json',
+          compilerOptions: {
+            outDir: '../../out-tsc/lib',
+            declaration: true,
+          },
+          include: ['src/**/*.ts'],
+          exclude: ['**/*.spec.ts'],
+        },
+        undefined,
+        2,
+      ),
+    );
+    tree.create(
+      '/projects/my-lib/tsconfig.spec.json',
+      JSON.stringify(
+        {
+          extends: '../../tsconfig.json',
+          compilerOptions: {
+            outDir: '../../out-tsc/spec',
+            types: ['jasmine'],
+          },
+          include: ['src/**/*.d.ts', 'src/**/*.spec.ts', 'src/test-setup.ts'],
+        },
+        undefined,
+        2,
+      ),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tsConfigLib = newTree.readJson('/projects/my-lib/tsconfig.lib.json') as any;
+    expect(tsConfigLib.include).toEqual(['**/*.ts']);
+    expect(tsConfigLib.exclude).toEqual(['**/*.spec.ts']);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tsConfigSpec = newTree.readJson('/projects/my-lib/tsconfig.spec.json') as any;
+    expect(tsConfigSpec.include).toEqual(['**/*.d.ts', '**/*.spec.ts', 'src/test-setup.ts']);
+    expect(tsConfigSpec.exclude).toBeUndefined();
+  });
+
+  it('should exclude internal outputPath when broadening tsconfig include globs', async () => {
+    tree.overwrite(
+      '/projects/my-lib/ng-package.json',
+      JSON.stringify({ lib: { entryFile: 'src/public-api.ts' } }),
+    );
+    tree.create(
+      '/projects/my-lib/tsconfig.lib.json',
+      JSON.stringify(
+        {
+          include: ['src/**/*.ts'],
+          exclude: ['**/*.spec.ts'],
+        },
+        undefined,
+        2,
+      ),
+    );
+    tree.create(
+      '/projects/my-lib/tsconfig.spec.json',
+      JSON.stringify(
+        {
+          include: ['src/**/*.d.ts', 'src/**/*.spec.ts'],
+        },
+        undefined,
+        2,
+      ),
+    );
+
+    const newTree = await schematicRunner.runSchematic(schematicName, {}, tree);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tsConfigLib = newTree.readJson('/projects/my-lib/tsconfig.lib.json') as any;
+    expect(tsConfigLib.include).toEqual(['**/*.ts']);
+    expect(tsConfigLib.exclude).toEqual(['**/*.spec.ts', 'dist']);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const tsConfigSpec = newTree.readJson('/projects/my-lib/tsconfig.spec.json') as any;
+    expect(tsConfigSpec.include).toEqual(['**/*.d.ts', '**/*.spec.ts']);
+    expect(tsConfigSpec.exclude).toEqual(['dist']);
   });
 });
