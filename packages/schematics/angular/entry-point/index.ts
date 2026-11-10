@@ -45,11 +45,13 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException(`Project "${options.project}" is not a library project.`);
   }
 
-  const buildTarget = project.targets.get('build');
-  if (buildTarget?.builder !== Builders.BuildLibrary) {
-    throw new SchematicsException(
-      `Project "${options.project}" does not use the "${Builders.BuildLibrary}" builder.`,
-    );
+  for (const target of project.targets.values()) {
+    if (target.builder === Builders.NgPackagr || target.builder === Builders.BuildNgPackagr) {
+      throw new SchematicsException(
+        `Project "${options.project}" is using the "${target.builder}" builder, which is not supported by the entry-point schematic. ` +
+          `Please migrate to "${Builders.BuildLibrary}" before generating entry points.`,
+      );
+    }
   }
 
   if (options.name === 'package.json') {
@@ -118,7 +120,7 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
       : options.project
     : basename(options.name);
 
-  const buildOptions = buildTarget.options;
+  const buildOptions = project.targets.get('build')?.options;
   const distRoot =
     typeof buildOptions?.['outputPath'] === 'string'
       ? buildOptions['outputPath']
