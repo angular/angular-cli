@@ -399,14 +399,42 @@ describe('EntryPoint Schematic', () => {
       ).toBeRejectedWithError('Project "my-app" is not a library project.');
     });
 
-    it('should throw if the library project does not use @angular/build:library', async () => {
+    for (const builder of [
+      '@angular/build:ng-packagr',
+      '@angular-devkit/build-angular:ng-packagr',
+    ]) {
+      it(`should throw if the library project uses ${builder}`, async () => {
+        const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
+        angularJson.projects.foo.architect.build.builder = builder;
+        workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+
+        await expectAsync(
+          schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree),
+        ).toBeRejectedWithError(
+          `Project "foo" is using the "${builder}" builder, which is not supported by the entry-point schematic. ` +
+            'Please migrate to "@angular/build:library" before generating entry points.',
+        );
+      });
+    }
+
+    it('should allow library projects using a custom builder', async () => {
       const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
-      angularJson.projects.foo.architect.build.builder = '@angular/build:ng-packagr';
+      angularJson.projects.foo.architect.build.builder = '@custom/builders:library';
       workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
 
-      await expectAsync(
-        schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree),
-      ).toBeRejectedWithError('Project "foo" does not use the "@angular/build:library" builder.');
+      const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
+      expect(tree.files).toContain('/projects/foo/secondary/src/public-api.ts');
+    });
+
+    it('should allow library projects with no build target', async () => {
+      const angularJson = getJsonFileContent(workspaceTree, '/angular.json');
+      delete angularJson.projects.foo.architect.build;
+      workspaceTree.overwrite('/angular.json', JSON.stringify(angularJson, null, 2));
+
+      const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
+      expect(tree.files).toContain('/projects/foo/secondary/src/public-api.ts');
+      const tsConfigJson = getJsonFileContent(tree, '/tsconfig.json');
+      expect(tsConfigJson.compilerOptions.paths['foo/*']).toEqual(['./dist/foo/*']);
     });
 
     it('should throw if the library package.json is missing', async () => {
