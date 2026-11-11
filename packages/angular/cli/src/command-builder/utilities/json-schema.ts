@@ -55,6 +55,11 @@ export interface Option extends YargsOptions {
    * The supported types of the option.
    */
   types?: ReadonlyArray<'string' | 'number' | 'boolean' | 'array' | 'object'>;
+
+  /**
+   * Allowed boolean values when `boolean` is one of the supported types.
+   */
+  booleanValues?: ReadonlySet<boolean>;
 }
 
 /**
@@ -87,39 +92,70 @@ function checkStringMap(keyValuePairOptions: Set<string>, args: Arguments): bool
   return true;
 }
 
+const ALL_BOOLEAN_VALUES: ReadonlySet<boolean> = new Set([true, false]);
+
 /**
- * A Yargs coerce function that converts empty or boolean-like values to a boolean
- * when an option supports both `boolean` and another type (such as `array` or `string`).
- * @param value The parsed argument value.
- * @returns A boolean if the value represents a boolean flag, otherwise the original value.
+ * Coerces a scalar string value to a boolean when permitted by the schema's allowed boolean values.
  */
-function coerceToBoolean(value: unknown): unknown {
+function coerceStringToBoolean(value: unknown, allowTrue: boolean, allowFalse: boolean): unknown {
   if (typeof value === 'string') {
-    if (value === '' || value === 'true') {
+    if ((value === '' || value === 'true') && allowTrue) {
       return true;
     }
 
-    if (value === 'false') {
+    if (value === 'false' && allowFalse) {
       return false;
-    }
-  } else if (Array.isArray(value)) {
-    if (value.length === 0) {
-      return true;
-    }
-
-    if (value.length === 1) {
-      const firstValue = value[0];
-      if (typeof firstValue === 'boolean') {
-        return firstValue;
-      }
-
-      if (firstValue === 'true' || firstValue === 'false') {
-        return firstValue === 'true';
-      }
     }
   }
 
   return value;
+}
+
+/**
+ * Creates a Yargs coerce function that converts empty or boolean-like values to a boolean
+ * when an option supports both `boolean` and another type (`array` or `string`).
+ * @param type The primary Yargs option type (`array` or `string`).
+ * @param allowedBooleans The boolean literal values permitted by the option's JSON schema.
+ * @returns A Yargs coerce function.
+ */
+function createCoerceToBoolean(
+  type: 'array' | 'string',
+  allowedBooleans: ReadonlySet<boolean> = ALL_BOOLEAN_VALUES,
+): (value: unknown) => unknown {
+  const allowTrue = allowedBooleans.has(true);
+  const allowFalse = allowedBooleans.has(false);
+
+  if (type === 'string') {
+    return (value: unknown) =>
+      Array.isArray(value)
+        ? value.map((item) => coerceStringToBoolean(item, allowTrue, allowFalse))
+        : coerceStringToBoolean(value, allowTrue, allowFalse);
+  }
+
+  return (value: unknown) => {
+    if (!Array.isArray(value)) {
+      return coerceStringToBoolean(value, allowTrue, allowFalse);
+    }
+
+    if (value.length === 0) {
+      return allowTrue ? true : value;
+    }
+
+    let result: unknown[] | boolean | undefined;
+    for (const item of value) {
+      if (item === true || (item === 'true' && allowTrue)) {
+        result = true;
+      } else if (item === false || (item === 'false' && allowFalse)) {
+        result = false;
+      } else if (Array.isArray(result)) {
+        result.push(item);
+      } else {
+        result = [item];
+      }
+    }
+
+    return result;
+  };
 }
 
 /**
@@ -243,6 +279,58 @@ function isSupportedArraySchema(schema: json.JsonObject): boolean {
   }
 
   return false;
+}
+
+/**
+ * Gets the boolean literal values permitted by a JSON schema node.
+ * @param schema The JSON schema node to inspect.
+ * @returns A set of allowed boolean values (`true`, `false`, or both).
+ */
+function getAllowedBooleanValues(schema: json.JsonObject): ReadonlySet<boolean> {
+  if (!json.schema.getTypesOfSchema(schema).has('boolean')) {
+    return new Set();
+  }
+
+  let allowed = new Set<boolean>(ALL_BOOLEAN_VALUES);
+
+  if (schema.const !== undefined) {
+    if (typeof schema.const === 'boolean') {
+      allowed = new Set([schema.const]);
+    } else {
+      return new Set();
+    }
+  }
+
+  if (json.isJsonArray(schema.enum)) {
+    const enumSet = new Set(schema.enum);
+    allowed = new Set([...allowed].filter((v) => enumSet.has(v)));
+  }
+
+  if (json.isJsonArray(schema.allOf)) {
+    for (const subSchema of schema.allOf) {
+      if (isJsonObject(subSchema)) {
+        const subAllowed = getAllowedBooleanValues(subSchema);
+        allowed = new Set([...allowed].filter((v) => subAllowed.has(v)));
+      }
+    }
+  }
+
+  for (const keyword of ['oneOf', 'anyOf'] as const) {
+    const subSchemas = schema[keyword];
+    if (json.isJsonArray(subSchemas)) {
+      const combined = new Set<boolean>();
+      for (const subSchema of subSchemas) {
+        if (isJsonObject(subSchema)) {
+          for (const value of getAllowedBooleanValues(subSchema)) {
+            combined.add(value);
+          }
+        }
+      }
+      allowed = new Set([...allowed].filter((v) => combined.has(v)));
+    }
+  }
+
+  return allowed;
 }
 
 /**
@@ -411,7 +499,7 @@ export async function parseJsonSchemaToOptions(
       return;
     }
 
-    const [type] = types;
+    const type = types.find((t) => t !== 'boolean') ?? types[0];
     const $default = current.$default;
     const $defaultIndex =
       isJsonObject($default) && $default['$source'] === 'argv' ? $default['index'] : undefined;
@@ -441,6 +529,7 @@ export async function parseJsonSchemaToOptions(
       deprecated: xDeprecated === true || typeof xDeprecated === 'string' ? xDeprecated : undefined,
       positional,
       types,
+      booleanValues: types.includes('boolean') ? getAllowedBooleanValues(current) : undefined,
       ...(type === 'object'
         ? {
             type: 'array',
@@ -494,6 +583,7 @@ export function addSchemaOptionsToCommand<T>(
       userAnalytics,
       type,
       types,
+      booleanValues,
       itemValueType,
       hidden,
       name,
@@ -515,8 +605,12 @@ export function addSchemaOptionsToCommand<T>(
     let coerce: YargsOptions['coerce'];
     if (itemValueType) {
       coerce = coerceToStringMap;
-    } else if (type !== 'boolean' && types?.includes('boolean')) {
-      coerce = coerceToBoolean;
+    } else if (
+      (type === 'array' || type === 'string') &&
+      types?.includes('boolean') &&
+      booleanValues?.size !== 0
+    ) {
+      coerce = createCoerceToBoolean(type, booleanValues);
     }
 
     const sharedOptions: YargsOptions & PositionalOptions = {
@@ -527,7 +621,7 @@ export function addSchemaOptionsToCommand<T>(
       choices,
       coerce,
       // This should only be done when `--help` is used otherwise default will override options set in angular.json.
-      ...(includeDefaultValues ? { default: defaultVal } : {}),
+      ...(includeDefaultValues && defaultVal !== undefined ? { default: defaultVal } : {}),
     };
 
     if (positional === undefined) {

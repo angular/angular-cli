@@ -130,6 +130,33 @@ describe('parseJsonSchemaToOptions', () => {
               },
             ],
           },
+          'localize': {
+            'oneOf': [
+              {
+                'type': 'boolean',
+              },
+              {
+                'type': 'array',
+                'items': {
+                  'type': 'string',
+                },
+              },
+            ],
+          },
+          'browsers': {
+            'oneOf': [
+              {
+                'type': 'string',
+              },
+              {
+                'const': false,
+                'type': 'boolean',
+              },
+            ],
+          },
+          'runnerConfig': {
+            'type': ['string', 'boolean'],
+          },
         },
       };
 
@@ -284,6 +311,112 @@ describe('parseJsonSchemaToOptions', () => {
         expect(await parse(['--allowed-hosts=false'])).toEqual(
           jasmine.objectContaining({
             'allowedHosts': false,
+          }),
+        );
+      });
+
+      it('parses as boolean false when negated with --no-', async () => {
+        expect(await parse(['--no-allowed-hosts'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': false,
+          }),
+        );
+      });
+
+      it('parses as boolean false when array values are followed by negation', async () => {
+        expect(await parse(['--allowed-hosts', 'a.example.com', '--no-allowed-hosts'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': false,
+          }),
+        );
+      });
+
+      it('parses as array when negation is followed by array values', async () => {
+        expect(await parse(['--no-allowed-hosts', '--allowed-hosts', 'a.example.com'])).toEqual(
+          jasmine.objectContaining({
+            'allowedHosts': ['a.example.com'],
+          }),
+        );
+      });
+
+      it('supports oneOf where boolean is listed before array with values', async () => {
+        expect(await parse(['--localize', 'fr', 'de'])).toEqual(
+          jasmine.objectContaining({
+            'localize': ['fr', 'de'],
+          }),
+        );
+      });
+
+      it('supports oneOf where boolean is listed before array without values', async () => {
+        expect(await parse(['--localize'])).toEqual(
+          jasmine.objectContaining({
+            'localize': true,
+          }),
+        );
+      });
+
+      it('supports oneOf where boolean is listed before array with =false', async () => {
+        expect(await parse(['--localize=false'])).toEqual(
+          jasmine.objectContaining({
+            'localize': false,
+          }),
+        );
+      });
+    });
+
+    describe('type=string | boolean', () => {
+      it('does not coerce empty string when boolean branch has const: false', async () => {
+        expect(await parse(['--browsers='])).toEqual(
+          jasmine.objectContaining({
+            'browsers': '',
+          }),
+        );
+      });
+
+      it('does not coerce "true" when boolean branch has const: false', async () => {
+        expect(await parse(['--browsers=true'])).toEqual(
+          jasmine.objectContaining({
+            'browsers': 'true',
+          }),
+        );
+      });
+
+      it('coerces "false" to false when boolean branch has const: false', async () => {
+        expect(await parse(['--browsers=false'])).toEqual(
+          jasmine.objectContaining({
+            'browsers': false,
+          }),
+        );
+      });
+
+      it('parses --no- negation as false when boolean branch has const: false', async () => {
+        expect(await parse(['--no-browsers'])).toEqual(
+          jasmine.objectContaining({
+            'browsers': false,
+          }),
+        );
+      });
+
+      it('preserves non-boolean string values when boolean branch has const: false', async () => {
+        expect(await parse(['--browsers', 'ChromeHeadless'])).toEqual(
+          jasmine.objectContaining({
+            'browsers': 'ChromeHeadless',
+          }),
+        );
+      });
+
+      it('coerces =false in duplicate string | boolean flags', async () => {
+        expect(await parse(['--runner-config=vitest.config.mts', '--runner-config=false'])).toEqual(
+          jasmine.objectContaining({
+            'runnerConfig': ['vitest.config.mts', false],
+          }),
+        );
+      });
+
+      it('coerces bare flag to true in duplicate string | boolean flags', async () => {
+        expect(await parse(['--runner-config=vitest.config.mts', '--runner-config'])).toEqual(
+          jasmine.objectContaining({
+            'runnerConfig': ['vitest.config.mts', true],
           }),
         );
       });
