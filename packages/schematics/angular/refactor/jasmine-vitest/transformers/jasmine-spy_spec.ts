@@ -83,6 +83,11 @@ getSpy().and.callThrough();`,
       expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy');`,
     },
     {
+      description: 'should not stub jasmine.createSpy("name", fn) chained with another strategy',
+      input: `const mySpy = jasmine.createSpy('mySpy', () => 'foo').and.returnValue(true);`,
+      expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy').mockReturnValue(true);`,
+    },
+    {
       description:
         'should transform spyOnProperty(object, "prop") to vi.spyOn(object, "prop", "get").mockReturnValue(undefined)',
       input: `spyOnProperty(service, 'myProp');`,
