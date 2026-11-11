@@ -210,6 +210,34 @@ describe('transformPending', () => {
           });
         `,
     },
+    {
+      description: 'should transform a focused test (fit) with pending() to it.skip()',
+      input: `
+          fit('is a work in progress', () => {
+            pending('Not yet implemented');
+          });
+        `,
+      expected: `
+          it.skip('is a work in progress', () => {
+            // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`). See: https://vitest.dev/api/vi.html#it-skip
+            // pending('Not yet implemented');
+          });
+        `,
+    },
+    {
+      description: 'should comment out pending() in a skipped test (xit)',
+      input: `
+          xit('is a work in progress', () => {
+            pending('Not yet implemented');
+          });
+        `,
+      expected: `
+          it.skip('is a work in progress', () => {
+            // TODO: vitest-migration: The pending() function was converted to a skipped test (\`it.skip\`). See: https://vitest.dev/api/vi.html#it-skip
+            // pending('Not yet implemented');
+          });
+        `,
+    },
   ];
 
   testCases.forEach(({ description, input, expected }) => {
