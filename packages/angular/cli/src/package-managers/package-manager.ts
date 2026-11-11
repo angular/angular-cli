@@ -878,6 +878,8 @@ export class PackageManager {
  *    resolutions which cannot be resolved in a standalone folder.
  * 2. Rewrites the `packages:` block to include only the current directory (`'.'`),
  *    isolating the temporary installation from other projects in the monorepo.
+ * 3. Removes any `patchedDependencies`, as patches are relative paths and
+ *    should not apply to the temporary install.
  *
  * All other settings (such as `minimumReleaseAge`, package extensions, etc.)
  * are preserved intact.
@@ -910,7 +912,11 @@ function sanitizePnpmWorkspace(content: string): string {
     }
 
     // Identify blocks we want to remove or customize (e.g. 'overrides' or 'packages').
-    if (trimmed.startsWith('overrides:') || trimmed.startsWith('packages:')) {
+    if (
+      trimmed.startsWith('overrides:') ||
+      trimmed.startsWith('packages:') ||
+      trimmed.startsWith('patchedDependencies:')
+    ) {
       inBlockToRemove = true;
       blockIndent = indent;
       if (trimmed.startsWith('packages:')) {

@@ -352,6 +352,9 @@ describe('PackageManager', () => {
         '  vitest:',
         '    peerDependencies:',
         "      '@vitest/coverage-v8': '*'",
+        'patchedDependencies:',
+        '  old-package: patches/old-package.patch',
+        "  '@scoped/package': other-path/@scoped__package.patch",
       ].join('\n');
       const readFileSpy = spyOn(testHost, 'readFile').and.resolveTo(mockWorkspaceContent);
       const writeFileSpy = spyOn(testHost, 'writeFile').and.resolveTo();
