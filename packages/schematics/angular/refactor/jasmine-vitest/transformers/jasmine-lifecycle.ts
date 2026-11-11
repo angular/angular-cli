@@ -54,11 +54,19 @@ export function transformPending(
   node: ts.Node,
   { sourceFile, reporter, tsContext }: RefactorContext,
 ): ts.Node {
-  if (
-    !ts.isCallExpression(node) ||
-    !ts.isIdentifier(node.expression) ||
-    node.expression.text !== 'it'
-  ) {
+  if (!ts.isCallExpression(node)) {
+    return node;
+  }
+
+  // `fit`/`xit` have already become `it.only`/`it.skip` when this transformer runs,
+  // as `transformFocusedAndSkippedTests` is applied earlier in the pipeline.
+  const isBareIt = ts.isIdentifier(node.expression) && node.expression.text === 'it';
+  const isFocusedOrSkippedIt =
+    ts.isPropertyAccessExpression(node.expression) &&
+    ts.isIdentifier(node.expression.expression) &&
+    node.expression.expression.text === 'it' &&
+    (node.expression.name.text === 'only' || node.expression.name.text === 'skip');
+  if (!isBareIt && !isFocusedOrSkippedIt) {
     return node;
   }
 
@@ -100,7 +108,9 @@ export function transformPending(
     return node;
   }
 
-  const newExpression = createPropertyAccess(node.expression, 'skip');
+  // A pending spec never runs its body in Jasmine, even when focused, so `it.only`
+  // also becomes `it.skip`.
+  const newExpression = createPropertyAccess('it', 'skip');
   const newTestFn = ts.isArrowFunction(testFn)
     ? ts.factory.updateArrowFunction(
         testFn,
