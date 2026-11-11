@@ -420,6 +420,8 @@ function getComponentOptions(options: ApplicationOptions): Partial<ComponentOpti
   if (options.fileNameStyleGuide === '2016') {
     componentOptions.type = 'component';
     componentOptions.addTypeToClassName = false;
+  } else {
+    componentOptions.type = '';
   }
 
   return componentOptions;
