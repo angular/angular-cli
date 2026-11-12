@@ -447,7 +447,7 @@
     },
     "@@rules_browsers+//browsers:extensions.bzl%browsers": {
       "general": {
-        "bzlTransitiveDigest": "RW0Ymbtb+8rzkVr6mRk7SWmq1dsCFt6AzrbsyG3mC5M=",
+        "bzlTransitiveDigest": "ZDmIf5ppOwTGXoMjIVG/ipZ9kLV1g1XCrAHWrAqDmog=",
         "usagesDigest": "FmXYJVoVJlnfUU8x8gObSvu4qWcco/9Faw61aC/wBF0=",
         "recordedInputs": [],
         "generatedRepoSpecs": {
