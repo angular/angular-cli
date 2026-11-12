@@ -170,7 +170,7 @@ export function executeKarmaBuilder(options: KarmaBuilderOptions, context: Build
     karmaOptions?: (options: KarmaConfigOptions) => KarmaConfigOptions;
 }): Observable<BuilderOutput>;
 
-// @public
+// @public @deprecated
 export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, context: BuilderContext): Observable<BuilderOutput>;
 
 // @public
@@ -236,7 +236,7 @@ export type KarmaConfigOptions = ConfigOptions & {
     configFile?: string;
 };
 
-// @public
+// @public @deprecated
 export type NgPackagrBuilderOptions = {
     poll?: number;
     project: string;

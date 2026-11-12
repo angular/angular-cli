@@ -28,7 +28,7 @@
     "ng-packagr": {
       "implementation": "./src/builders/ng-packagr/index",
       "schema": "./src/builders/ng-packagr/schema.json",
-      "description": "Build a library with ng-packagr."
+      "description": "Build a library with ng-packagr. (Deprecated: Use '@angular/build:library' instead.)"
     },
     "unit-test": {
       "implementation": "./src/builders/unit-test",

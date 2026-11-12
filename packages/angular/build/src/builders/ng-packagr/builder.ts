@@ -22,11 +22,17 @@ import type { Schema as NgPackagrBuilderOptions } from './schema';
  * @returns A BuilderOutput object.
  *
  * @experimental Direct usage of this function is considered experimental.
+ * @deprecated Use the `@angular/build:library` builder instead. Deprecated since v22.3.
  */
 export async function* execute(
   options: NgPackagrBuilderOptions,
   context: BuilderContext,
 ): AsyncIterableIterator<BuilderOutput> {
+  context.logger.warn(
+    'The "@angular/build:ng-packagr" builder is deprecated. ' +
+      'Use "@angular/build:library" instead.',
+  );
+
   // Purge old build disk cache.
   await purgeStaleBuildCache(context);
 

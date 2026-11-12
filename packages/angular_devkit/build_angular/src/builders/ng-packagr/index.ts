@@ -17,6 +17,7 @@ import { Schema as NgPackagrBuilderOptions } from './schema';
 
 /**
  * @experimental Direct usage of this function is considered experimental.
+ * @deprecated Use the `@angular/build:library` builder instead.
  */
 export function execute(
   options: NgPackagrBuilderOptions,
@@ -24,7 +25,7 @@ export function execute(
 ): Observable<BuilderOutput> {
   context.logger.warn(
     'The "@angular-devkit/build-angular:ng-packagr" builder is deprecated as part of Angular\'s Webpack support deprecation. ' +
-      'Use "@angular/build:ng-packagr" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
+      'Use "@angular/build:library" instead. For more information, see https://angular.dev/tools/cli/build-system-migration.',
   );
 
   return from(

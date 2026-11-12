@@ -29,7 +29,11 @@ export enum Builders {
   BuildKarma = '@angular/build:karma',
   BuildUnitTest = '@angular/build:unit-test',
   TsLint = '@angular-devkit/build-angular:tslint',
+
+  /** @deprecated Use `BuildLibrary` instead. */
   NgPackagr = '@angular-devkit/build-angular:ng-packagr',
+
+  /** @deprecated Use `BuildLibrary` instead. */
   BuildNgPackagr = '@angular/build:ng-packagr',
   DevServer = '@angular-devkit/build-angular:dev-server',
   BuildDevServer = '@angular/build:dev-server',
@@ -82,6 +86,7 @@ export interface ServeBuilderOptions {
   buildTarget: string;
 }
 
+/** @deprecated */
 export interface LibraryBuilderOptions {
   tsConfig: string;
   project: string;
@@ -135,6 +140,7 @@ export interface BuilderTarget<TBuilder extends Builders, TOptions> {
   };
 }
 
+/** @deprecated */
 export type LibraryBuilderTarget = BuilderTarget<Builders.NgPackagr, LibraryBuilderOptions>;
 export type BrowserBuilderTarget = BuilderTarget<Builders.Browser, BrowserBuilderOptions>;
 export type ServerBuilderTarget = BuilderTarget<Builders.Server, ServerBuilderOptions>;

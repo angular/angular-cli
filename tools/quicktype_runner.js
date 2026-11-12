@@ -144,6 +144,14 @@ async function generate(inPath) {
  */
 function appendDeprecatedDescription(schema) {
   const content = JSON.parse(schema);
+  const rootDeprecated = content['x-deprecated'] ?? content['deprecated'];
+  if (rootDeprecated) {
+    content.description =
+      (content.description ? content.description + '\n' : '') +
+      '@deprecated' +
+      (typeof rootDeprecated === 'string' ? ` ${rootDeprecated}` : '');
+  }
+
   const props = content.properties;
 
   for (const key in props) {
