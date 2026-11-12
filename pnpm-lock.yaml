@@ -971,9 +971,6 @@ importers:
 
   tests:
     devDependencies:
-      '@angular-devkit/schematics':
-        specifier: workspace:*
-        version: link:../packages/angular_devkit/schematics
       '@types/tar-stream':
         specifier: 3.1.5
         version: 3.1.5
