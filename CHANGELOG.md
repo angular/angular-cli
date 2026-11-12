@@ -1,3 +1,58 @@
+<a name="22.3.0-rc.0"></a>
+
+# 22.3.0-rc.0 (2026-11-12)
+
+## Deprecations
+
+### @schematics/angular
+
+- The `testRunner` option in the `application`, `library`, and `ng-new` schematics is deprecated. New projects will only be configured with Vitest in a future version.
+
+### @angular/build
+
+- The `ng-packagr` builder (`@angular/build:ng-packagr`) and its programmatic APIs (`executeNgPackagrBuilder` and `NgPackagrBuilderOptions`) are deprecated. Use the `@angular/build:library` builder instead.
+
+### @schematics/angular
+
+| Commit                                                                                               | Type     | Description                                                                     |
+| ---------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| [263130530c](https://github.com/angular/angular-cli/commit/263130530cd4af4b856ceb89ba60e475ccd40de1) | feat     | use library builder and add entry-point schematic                               |
+| [d088411806](https://github.com/angular/angular-cli/commit/d088411806eba09466bd0f443a1ff6f580891d86) | fix      | add the missing vi import for toHaveBeenCalledBefore in refactor-jasmine-vitest |
+| [c5d6f9f04d](https://github.com/angular/angular-cli/commit/c5d6f9f04d3a971b453b9189d8a344f8ca5e0fe2) | fix      | align sourceRoot and tsconfig includes in use-library-builder                   |
+| [c4028e8028](https://github.com/angular/angular-cli/commit/c4028e8028406a2b67ecebbf5979805a6082702e) | fix      | reject ng-packagr builders in entry-point schematic                             |
+| [5bfcd660a6](https://github.com/angular/angular-cli/commit/5bfcd660a66f9f8cb41523cc905e24f4ac5eec19) | refactor | deprecate testRunner option                                                     |
+
+### @angular/cli
+
+| Commit                                                                                               | Type | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [892a044859](https://github.com/angular/angular-cli/commit/892a0448599639a32916b9e114c9a588ca8d82f3) | fix  | fix `pnpm-workspace.yaml` sanitization when using pnpm patches |
+| [acb3c8bbce](https://github.com/angular/angular-cli/commit/acb3c8bbce3d7149e7a338923b8215906b1c1b64) | fix  | report the worktree-local cache in `ng cache info`             |
+| [7ee5f905a8](https://github.com/angular/angular-cli/commit/7ee5f905a89bf93fc4857cd90f65b3dde7a2beeb) | fix  | support array options defined in oneOf schemas                 |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                               | Type | Description                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [0d60ebd198](https://github.com/angular/angular-cli/commit/0d60ebd198b4c7be84c04f3e43a5c53a41bcb7bd) | fix  | do not ignore TypeErrors thrown by content templates            |
+| [207265a1a1](https://github.com/angular/angular-cli/commit/207265a1a1e7343e05ce1bb8aa7f9ed9ad7ec048) | fix  | include the template path in errors thrown by content templates |
+
+### @angular/build
+
+| Commit                                                                                               | Type     | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- |
+| [0edb6c646f](https://github.com/angular/angular-cli/commit/0edb6c646fd405ff042a9dc6a00ef3fcd8c21767) | fix      | forward the poll and progress options to the karma build setup |
+| [3123cf2e99](https://github.com/angular/angular-cli/commit/3123cf2e99d914e2f9725ae6340af841245c050a) | fix      | pass an explicit port of 0 through to the dev server           |
+| [2170cffb65](https://github.com/angular/angular-cli/commit/2170cffb650f6d0c0f8a7c376a496071e2b36467) | refactor | deprecate ng-packagr builder and APIs                          |
+
+### @angular/pwa
+
+| Commit                                                                                               | Type | Description                                              |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [0025bd98bf](https://github.com/angular/angular-cli/commit/0025bd98bfcedb24e88323ed03b1cc7a709a688c) | fix  | add the manifest link when the index option is an object |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.2.7"></a>
 
 # 22.2.7 (2026-11-12)
