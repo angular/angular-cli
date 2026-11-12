@@ -24,6 +24,6 @@ ts_project(
     deps = [
         "//:node_modules/@types/jasmine",
         "//:node_modules/@types/node",
-        "//tests:node_modules/@angular-devkit/schematics",
+        "//packages/angular_devkit/schematics",
     ],
 )
