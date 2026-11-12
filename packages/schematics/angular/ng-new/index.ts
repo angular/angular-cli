@@ -51,7 +51,7 @@ export default function (options: NgNewOptions): Rule {
     routing: options.routing,
     style: options.style,
     skipTests: options.skipTests,
-    testRunner: options.testRunner,
+    testRunner: options.testRunner === TestRunner.Karma ? TestRunner.Karma : undefined,
     skipPackageJson: false,
     // always 'skipInstall' here, so that we do it after the move
     skipInstall: true,

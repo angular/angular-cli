@@ -58,7 +58,8 @@
       "description": "The unit testing runner to use.",
       "type": "string",
       "enum": ["vitest", "karma"],
-      "default": "vitest"
+      "default": "vitest",
+      "x-deprecated": "New projects will only be configured with Vitest in a future version."
     }
   },
   "required": ["name"]
