@@ -256,6 +256,16 @@ describe('transformArrayWithExactContents', () => {
           expect(myArray).toEqual(jasmine.arrayWithExactContents(someOtherArray));
         `,
     },
+    {
+      description: 'should add a TODO for a negated toEqual(jasmine.arrayWithExactContents())',
+      input: `expect(myArray).not.toEqual(jasmine.arrayWithExactContents(['a', 'b']));`,
+      /* eslint-disable max-len */
+      expected: `
+          // TODO: vitest-migration: Cannot transform a negated jasmine.arrayWithExactContents. Splitting it would assert that neither condition holds instead of not both. Please migrate this manually.
+          expect(myArray).not.toEqual(jasmine.arrayWithExactContents(['a', 'b']));
+        `,
+      /* eslint-enable max-len */
+    },
   ];
 
   testCases.forEach(({ description, input, expected }) => {

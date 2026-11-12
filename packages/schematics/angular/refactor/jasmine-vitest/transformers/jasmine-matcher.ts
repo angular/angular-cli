@@ -413,6 +413,17 @@ export function transformArrayWithExactContents(
     return node;
   }
 
+  const expectCall = node.expression.expression.expression;
+
+  // Splitting a negated assertion would assert that neither condition holds instead of not both.
+  if (ts.isPropertyAccessExpression(expectCall) && expectCall.name.text === 'not') {
+    const category = 'arrayWithExactContents-negated';
+    reporter.recordTodo(category, sourceFile, node);
+    addTodoComment(node, category);
+
+    return node;
+  }
+
   if (!ts.isArrayLiteralExpression(argument.arguments[0])) {
     const category = 'arrayWithExactContents-dynamic-variable';
     reporter.recordTodo(category, sourceFile, node);
@@ -427,7 +438,6 @@ export function transformArrayWithExactContents(
     'Transformed `jasmine.arrayWithExactContents()` to `.toHaveLength()` and `.toEqual(expect.arrayContaining())`.',
   );
 
-  const expectCall = node.expression.expression.expression;
   const arrayLiteral = argument.arguments[0];
 
   const lengthCall = ts.factory.createCallExpression(
