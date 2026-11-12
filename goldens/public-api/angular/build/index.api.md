@@ -158,7 +158,7 @@ export function executeExtractI18nBuilder(options: ExtractI18nBuilderOptions, co
 // @public
 export function executeKarmaBuilder(options: KarmaBuilderOptions, context: BuilderContext, transforms?: KarmaBuilderTransformsOptions): AsyncIterable<BuilderOutput>;
 
-// @public
+// @public @deprecated
 export function executeNgPackagrBuilder(options: NgPackagrBuilderOptions, context: BuilderContext): AsyncIterableIterator<BuilderOutput>;
 
 // @public
@@ -208,7 +208,7 @@ export type KarmaBuilderOptions = {
     webWorkerTsConfig?: string;
 };
 
-// @public
+// @public @deprecated
 export type NgPackagrBuilderOptions = {
     poll?: number;
     project?: string;
