@@ -1,3 +1,42 @@
+<a name="22.2.7"></a>
+
+# 22.2.7 (2026-11-12)
+
+### @angular/cli
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [74bdc964e](https://github.com/angular/angular-cli/commit/74bdc964e4043edb5c69a5739a5366f0a4b848a5) | fix  | fix `pnpm-workspace.yaml` sanitization when using pnpm patches |
+| [5bf18669b](https://github.com/angular/angular-cli/commit/5bf18669bc7c7d29fae4c907985abf76aa02866a) | fix  | report the worktree-local cache in `ng cache info`             |
+
+### @schematics/angular
+
+| Commit                                                                                              | Type | Description                                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
+| [84050cf50](https://github.com/angular/angular-cli/commit/84050cf50880063740ce5ae76e98dd64d5d8d5df) | fix  | add the missing vi import for toHaveBeenCalledBefore in refactor-jasmine-vitest |
+
+### @angular-devkit/schematics
+
+| Commit                                                                                              | Type | Description                                                     |
+| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [99741e8eb](https://github.com/angular/angular-cli/commit/99741e8eb5458a836445b7163a935f07b4105ec7) | fix  | do not ignore TypeErrors thrown by content templates            |
+| [3ed20d1db](https://github.com/angular/angular-cli/commit/3ed20d1db05a7320d931fec43489ea306306d9a8) | fix  | include the template path in errors thrown by content templates |
+
+### @angular/build
+
+| Commit                                                                                              | Type | Description                                                    |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [e96b935c7](https://github.com/angular/angular-cli/commit/e96b935c7b85f2b9abbc0a4175eb2704033cb1f9) | fix  | forward the poll and progress options to the karma build setup |
+| [699ede453](https://github.com/angular/angular-cli/commit/699ede4535f09ea0a1761a21feed7012c2f7c992) | fix  | pass an explicit port of 0 through to the dev server           |
+
+### @angular/pwa
+
+| Commit                                                                                              | Type | Description                                              |
+| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
+| [4ed04b76c](https://github.com/angular/angular-cli/commit/4ed04b76cf294eca0cbc75e154f4427acc9953f0) | fix  | add the manifest link when the index option is an object |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.3.0-next.5"></a>
 
 # 22.3.0-next.5 (2026-11-04)
