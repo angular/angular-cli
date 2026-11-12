@@ -119,7 +119,7 @@
     "lodash": "^4.17.21",
     "magic-string": "1.4.5",
     "prettier": "^3.0.0",
-    "puppeteer": "25.16.0",
+    "puppeteer": "25.17.0",
     "quicktype-core": "26.0.0",
     "rollup": "4.68.2",
     "rollup-plugin-dts": "6.5.1",
