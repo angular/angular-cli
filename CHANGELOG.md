@@ -1,3 +1,22 @@
+<a name="20.3.43"></a>
+
+# 20.3.43 (2026-11-12)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [25fed48bf1](https://github.com/angular/angular-cli/commit/25fed48bf1ffe7475aff746577dfc955f443b27f) | fix  | elide non-value aliases and remaining type-only AST constructs |
+
+### @ngtools/webpack
+
+| Commit                                                                                               | Type | Description                                                     |
+| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
+| [c2e64e9abe](https://github.com/angular/angular-cli/commit/c2e64e9abe0b0191396cf28e5c6b452c5752a70a) | fix  | elide imports used only in type re-exports or type declarations |
+| [5a9cb8238b](https://github.com/angular/angular-cli/commit/5a9cb8238b86d53dd14690af810091f5ec2e5937) | fix  | elide non-value aliases and remaining type-only AST constructs  |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="20.3.42"></a>
 
 # 20.3.42 (2026-10-28)
