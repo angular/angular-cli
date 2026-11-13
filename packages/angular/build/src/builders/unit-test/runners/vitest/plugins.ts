@@ -346,20 +346,41 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
       toPosixPath(path.isAbsolute(file) ? file : path.join(workspaceRoot, file)),
     ),
   );
-  let vitestConfig: ResolvedConfig;
+  let vitestConfig: ResolvedConfig | undefined;
+
+  const normalizeToWorkspace = (filePath: string): string => {
+    if (vitestConfig?.root && path.isAbsolute(filePath)) {
+      const relativeToVitestRoot = path.relative(vitestConfig.root, filePath);
+      if (!relativeToVitestRoot.startsWith('..') && !path.isAbsolute(relativeToVitestRoot)) {
+        return path.join(workspaceRoot, relativeToVitestRoot);
+      }
+    }
+
+    return filePath;
+  };
 
   /** The build output path served for a module, whether it is a test entry point or a built artifact. */
   const getOutputPath = (id: string): string => {
-    const entryPoint = testFileToEntryPoint.get(id);
+    const normalizedId = toPosixPath(normalizeToWorkspace(id));
+    const entryPoint = testFileToEntryPoint.get(normalizedId);
 
-    return entryPoint ? entryPoint + '.js' : toPosixPath(path.relative(workspaceRoot, id));
+    return entryPoint
+      ? entryPoint + '.js'
+      : toPosixPath(path.relative(workspaceRoot, normalizedId));
   };
 
   // Setup files must not be wrapped in a virtual import stub because Vitest only invalidates
   // the setup file itself between test files; wrapping it would cause the underlying bundle
   // to be cached, preventing per-test hooks from running on subsequent test files.
-  const isCoverageRedirect = (id: string): boolean =>
-    !!vitestConfig?.coverage?.enabled && testFileToEntryPoint.has(id) && !setupFileSet.has(id);
+  const isCoverageRedirect = (id: string): boolean => {
+    const normalizedId = toPosixPath(normalizeToWorkspace(id));
+
+    return (
+      !!vitestConfig?.coverage?.enabled &&
+      testFileToEntryPoint.has(normalizedId) &&
+      !setupFileSet.has(normalizedId)
+    );
+  };
 
   return [
     {
@@ -413,9 +434,12 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
           }
         }
 
+        id = normalizeToWorkspace(id);
+
         // Determine the base directory for resolution.
         let baseDir: string;
         if (importer) {
+          importer = toPosixPath(normalizeToWorkspace(importer));
           // If the importer is a test entry point, resolve relative to the workspace root.
           // Otherwise, resolve relative to the importer's directory.
           baseDir = testFileToEntryPoint.has(importer) ? workspaceRoot : path.dirname(importer);
@@ -473,7 +497,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
 
           const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
           if (map) {
-            adjustSourcemapSources(map, true, workspaceRoot, id);
+            adjustSourcemapSources(map, true, workspaceRoot, toPosixPath(normalizeToWorkspace(id)));
           }
 
           return {
