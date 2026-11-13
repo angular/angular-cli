@@ -11,6 +11,7 @@ import type { TestRunner } from '../api';
 import { DependencyChecker } from '../dependency-checker';
 import { getVitestBuildOptions } from './build-options';
 import { VitestExecutor } from './executor';
+import { type RunnerArgOptions, parseRunnerArgs } from './runner-args';
 
 /**
  * A declarative definition of the Vitest test runner.
@@ -79,7 +80,20 @@ const VitestTestRunner: TestRunner = {
       context.logger.info('Automatically searching for and using Vitest configuration file.');
     }
 
-    return new VitestExecutor(projectName, options, testEntryPointMappings, context.logger);
+    // Parse and validate any additional Vitest arguments prior to the build to fail fast.
+    let runnerArgOptions: RunnerArgOptions | undefined;
+    if (options.runnerArgs) {
+      const { parseCLI } = await import('vitest/node');
+      runnerArgOptions = parseRunnerArgs(options.runnerArgs, parseCLI);
+    }
+
+    return new VitestExecutor(
+      projectName,
+      options,
+      testEntryPointMappings,
+      context.logger,
+      runnerArgOptions,
+    );
   },
 };
 

@@ -72,6 +72,25 @@ describe('createVitestCliOptions', () => {
     expect(options.fileParallelism).toBeFalse();
   });
 
+  it('should include the options from the runner arguments', () => {
+    const options = createVitestCliOptions(baseOptions, 'app', false, { update: true, bail: 1 });
+
+    expect(options.update).toBeTrue();
+    expect(options.bail).toBe(1);
+  });
+
+  it('should prefer the builder options over the options from the runner arguments', () => {
+    const options = createVitestCliOptions({ ...baseOptions, filter: 'builder' }, 'app', false, {
+      root: '/other',
+      watch: true,
+      testNamePattern: 'runner',
+    });
+
+    expect(options.root).toBe('/workspace');
+    expect(options.watch).toBeFalse();
+    expect(options.testNamePattern).toBe('builder');
+  });
+
   it('should not configure the inspector when not debugging', () => {
     const options = createVitestCliOptions(baseOptions, 'app', false);
 

@@ -32,6 +32,7 @@ import { setupBrowserConfiguration } from './browser-provider';
 import { createVitestCliOptions } from './cli-options';
 import { findVitestBaseConfig } from './configuration';
 import { createVitestConfigPlugin, createVitestPlugins } from './plugins';
+import type { RunnerArgOptions } from './runner-args';
 
 enum DebugLogLevel {
   Info = 1,
@@ -44,6 +45,7 @@ export class VitestExecutor implements TestExecutor {
   private readonly projectName: string;
   private readonly options: NormalizedUnitTestBuilderOptions;
   private readonly logger: BuilderContext['logger'];
+  private readonly runnerArgOptions: RunnerArgOptions | undefined;
   private readonly buildResultFiles = new Map<string, ResultFile>();
   private readonly externalMetadata: DevServerExternalResultMetadata = {
     implicitBrowser: [],
@@ -65,6 +67,7 @@ export class VitestExecutor implements TestExecutor {
     options: NormalizedUnitTestBuilderOptions,
     testEntryPointMappings: Map<string, string> | undefined,
     logger: BuilderContext['logger'],
+    runnerArgOptions?: RunnerArgOptions,
   ) {
     const level = parseInt(process.env['NG_TEST_LOG'] ?? '0', 10);
     this.debugLevel = isNaN(level) ? 0 : level;
@@ -72,6 +75,7 @@ export class VitestExecutor implements TestExecutor {
     this.projectName = projectName;
     this.options = options;
     this.logger = logger;
+    this.runnerArgOptions = runnerArgOptions;
 
     this.debugLog(DebugLogLevel.Info, 'VitestExecutor instantiated.');
     this.debugLog(DebugLogLevel.Verbose, 'NormalizedUnitTestBuilderOptions:', options);
@@ -380,7 +384,12 @@ export class VitestExecutor implements TestExecutor {
     }
     this.debugLog(DebugLogLevel.Verbose, 'Included test files (after filtering):', include);
 
-    const vitestConfig = createVitestCliOptions(this.options, project, externalConfigPath);
+    const vitestConfig = createVitestCliOptions(
+      this.options,
+      project,
+      externalConfigPath,
+      this.runnerArgOptions?.cli,
+    );
     const vitestServerConfig = {
       // Note `.vitest` is auto appended to the path.
       cacheDir: cacheOptions.path,
@@ -399,6 +408,7 @@ export class VitestExecutor implements TestExecutor {
           watch,
           isolate: this.options.isolate,
           preserveSymlinks: this.options.preserveSymlinks,
+          runnerArgOptions: this.runnerArgOptions?.project,
         }),
       ],
     };
