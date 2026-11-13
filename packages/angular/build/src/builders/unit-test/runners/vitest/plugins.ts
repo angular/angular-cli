@@ -9,7 +9,7 @@
 import assert from 'node:assert';
 import { readFile } from 'node:fs/promises';
 import { platform } from 'node:os';
-import path from 'node:path';
+import path, { type PlatformPath } from 'node:path';
 import type {
   BrowserConfigOptions,
   InlineConfig,
@@ -338,6 +338,33 @@ async function loadResultFile(file: ResultFile): Promise<string> {
   return readFile(file.source, 'utf-8');
 }
 
+/**
+ * Rebases a file path from `fromRoot` to `toRoot` in POSIX format.
+ *
+ * The path is rebased using its location relative to `fromRoot`. This includes a path outside of
+ * `fromRoot` (reached through `..` segments), which matches how Vitest resolves the root relative
+ * test `include` entries. Only a path that cannot be expressed relative to `fromRoot`, such as a
+ * file on a different Windows drive, is left unchanged (as POSIX).
+ *
+ * @param filePath The absolute file path to rebase.
+ * @param fromRoot The root that `filePath` is currently based on.
+ * @param toRoot The root to rebase `filePath` onto.
+ * @param pathImpl The path implementation to use. Defaults to that of the host platform.
+ * @returns The rebased file path in POSIX format.
+ */
+export function rebasePath(
+  filePath: string,
+  fromRoot: string,
+  toRoot: string,
+  pathImpl: PlatformPath = path,
+): string {
+  const relative = pathImpl.relative(fromRoot, filePath);
+  const rebased = pathImpl.isAbsolute(relative) ? filePath : pathImpl.join(toRoot, relative);
+
+  // Equivalent to `toPosixPath` but follows `pathImpl` instead of the host platform.
+  return pathImpl.sep === '\\' ? rebased.replace(/\\/g, '/') : rebased;
+}
+
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
   const { buildResultFiles, setupFiles } = pluginOptions;
   let { workspaceRoot, testFileToEntryPoint } = pluginOptions;
@@ -370,24 +397,19 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
         vitestConfig = context.vitest.config;
 
         if (vitestConfig.root && vitestConfig.root !== toPosixPath(workspaceRoot)) {
-          const previousRoot = workspaceRoot;
+          const originalRoot = pluginOptions.workspaceRoot;
           workspaceRoot = vitestConfig.root;
           testFileToEntryPoint = new Map(
-            Array.from(testFileToEntryPoint, ([file, entryPoint]) => [
-              file.startsWith('angular:')
-                ? file
-                : toPosixPath(path.join(workspaceRoot, path.relative(previousRoot, file))),
+            Array.from(pluginOptions.testFileToEntryPoint, ([file, entryPoint]) => [
+              file.startsWith('angular:') ? file : rebasePath(file, originalRoot, workspaceRoot),
               entryPoint,
             ]),
           );
           setupFileSet = new Set(
             setupFiles.map((file) =>
-              toPosixPath(
-                path.join(
-                  workspaceRoot,
-                  path.isAbsolute(file) ? path.relative(previousRoot, file) : file,
-                ),
-              ),
+              path.isAbsolute(file)
+                ? rebasePath(file, originalRoot, workspaceRoot)
+                : toPosixPath(path.join(workspaceRoot, file)),
             ),
           );
         }
