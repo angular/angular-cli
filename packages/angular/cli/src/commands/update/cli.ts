@@ -20,7 +20,12 @@ import {
   Options,
 } from '../../command-builder/command-module';
 import { SchematicEngineHost } from '../../command-builder/utilities/schematic-engine-host';
-import type { InstalledPackage, PackageManager, PackageManifest } from '../../package-managers';
+import {
+  type InstalledPackage,
+  type PackageManager,
+  PackageManagerError,
+  type PackageManifest,
+} from '../../package-managers';
 import { colors } from '../../utilities/color';
 import { disableVersionCheck } from '../../utilities/environment-options';
 import { assertIsError } from '../../utilities/error';
@@ -596,7 +601,16 @@ export default class UpdateCommandModule extends CommandModule<UpdateCommandArgs
               ignorePeerDependencies,
             });
           } catch (e) {
-            throw new CommandError('Unable to install packages');
+            assertIsError(e);
+            let message = `Unable to install packages: ${colors.bold(e.message)}`;
+            if (e instanceof PackageManagerError) {
+              const stdout = e.stdout?.trim();
+              const stderr = e.stderr?.trim();
+              if (stdout) message += `\n\n${colors.bold('[STDOUT]')}: ${stdout}`;
+              if (stderr) message += `\n\n${colors.bold('[STDERR]')}: ${stderr}`;
+            }
+
+            throw new CommandError(message);
           }
         },
       },
