@@ -73,17 +73,18 @@ describe('createVitestPlugins', () => {
       id: string,
     ) => Promise<{ code: string; map?: unknown } | undefined>;
 
-    const expectedSetupId = toPosixPath(path.join(workspaceRoot, 'init-compiler.js'));
-    const resolvedSetupId = resolveId(`${physicalRoot}/init-compiler.js`, undefined);
+    const expectedSetupId = `${physicalRoot}/init-compiler.js`;
+    const resolvedSetupId = resolveId(expectedSetupId, undefined);
     expect(resolvedSetupId).toBe(expectedSetupId);
 
     const loadedSetup = await load(expectedSetupId);
     expect(loadedSetup?.code).toBe('console.log("init-compiler");');
 
-    const resolvedSpecId = resolveId(`${physicalRoot}/src/app/app.spec.ts`, undefined);
-    expect(resolvedSpecId).toBe(specFile);
+    const expectedSpecId = `${physicalRoot}/src/app/app.spec.ts`;
+    const resolvedSpecId = resolveId(expectedSpecId, undefined);
+    expect(resolvedSpecId).toBe(expectedSpecId);
 
-    const loadedSpec = await load(specFile);
+    const loadedSpec = await load(expectedSpecId);
     expect(loadedSpec?.code).toBe('console.log("spec");');
   });
 });

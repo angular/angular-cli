@@ -338,6 +338,21 @@ async function loadResultFile(file: ResultFile): Promise<string> {
   return readFile(file.source, 'utf-8');
 }
 
+function rebasePath(filePath: string, fromRoot: string, toRoot: string): string {
+  if (path.isAbsolute(filePath)) {
+    const relativePath = path.relative(fromRoot, filePath);
+    if (
+      relativePath !== '..' &&
+      !relativePath.startsWith('..' + path.sep) &&
+      !path.isAbsolute(relativePath)
+    ) {
+      return path.join(toRoot, relativePath);
+    }
+  }
+
+  return filePath;
+}
+
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
   const { workspaceRoot, buildResultFiles, testFileToEntryPoint, setupFiles } = pluginOptions;
   const isWindows = platform() === 'win32';
@@ -348,20 +363,13 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
   );
   let vitestConfig: ResolvedConfig | undefined;
 
-  const normalizeToWorkspace = (filePath: string): string => {
-    if (vitestConfig?.root && path.isAbsolute(filePath)) {
-      const relativeToVitestRoot = path.relative(vitestConfig.root, filePath);
-      if (
-        relativeToVitestRoot !== '..' &&
-        !relativeToVitestRoot.startsWith('..' + path.sep) &&
-        !path.isAbsolute(relativeToVitestRoot)
-      ) {
-        return path.join(workspaceRoot, relativeToVitestRoot);
-      }
-    }
+  const normalizeToWorkspace = (filePath: string): string =>
+    vitestConfig?.root ? rebasePath(filePath, vitestConfig.root, workspaceRoot) : filePath;
 
-    return filePath;
-  };
+  const normalizeToVitestRoot = (filePath: string): string =>
+    toPosixPath(
+      vitestConfig?.root ? rebasePath(filePath, workspaceRoot, vitestConfig.root) : filePath,
+    );
 
   /** The build output path served for a module, whether it is a test entry point or a built artifact. */
   const getOutputPath = (id: string): string => {
@@ -424,7 +432,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
       resolveId: (id: string, importer: string | undefined) => {
         // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
-          return id;
+          return normalizeToVitestRoot(id);
         }
 
         // Workaround for Vitest in Windows when a fully qualified absolute path is provided with
@@ -466,13 +474,13 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
         fullPath = toPosixPath(fullPath);
 
         if (testFileToEntryPoint.has(fullPath)) {
-          return fullPath;
+          return normalizeToVitestRoot(fullPath);
         }
 
         // Check if the resolved path corresponds to a known build artifact.
         const relativePath = path.relative(workspaceRoot, fullPath);
         if (buildResultFiles.has(toPosixPath(relativePath))) {
-          return fullPath;
+          return normalizeToVitestRoot(fullPath);
         }
 
         // If the module cannot be resolved from the build artifacts, let other plugins handle it.
