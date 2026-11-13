@@ -351,7 +351,11 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
   const normalizeToWorkspace = (filePath: string): string => {
     if (vitestConfig?.root && path.isAbsolute(filePath)) {
       const relativeToVitestRoot = path.relative(vitestConfig.root, filePath);
-      if (!relativeToVitestRoot.startsWith('..') && !path.isAbsolute(relativeToVitestRoot)) {
+      if (
+        relativeToVitestRoot !== '..' &&
+        !relativeToVitestRoot.startsWith('..' + path.sep) &&
+        !path.isAbsolute(relativeToVitestRoot)
+      ) {
         return path.join(workspaceRoot, relativeToVitestRoot);
       }
     }
