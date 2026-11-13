@@ -338,61 +338,29 @@ async function loadResultFile(file: ResultFile): Promise<string> {
   return readFile(file.source, 'utf-8');
 }
 
-function rebasePath(filePath: string, fromRoot: string, toRoot: string): string {
-  if (path.isAbsolute(filePath)) {
-    const relativePath = path.relative(fromRoot, filePath);
-    if (
-      relativePath !== '..' &&
-      !relativePath.startsWith('..' + path.sep) &&
-      !path.isAbsolute(relativePath)
-    ) {
-      return path.join(toRoot, relativePath);
-    }
-  }
-
-  return filePath;
-}
-
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
-  const { workspaceRoot, buildResultFiles, testFileToEntryPoint, setupFiles } = pluginOptions;
+  const { buildResultFiles, setupFiles } = pluginOptions;
+  let { workspaceRoot, testFileToEntryPoint } = pluginOptions;
   const isWindows = platform() === 'win32';
-  const setupFileSet = new Set(
+  let setupFileSet = new Set(
     setupFiles.map((file) =>
       toPosixPath(path.isAbsolute(file) ? file : path.join(workspaceRoot, file)),
     ),
   );
-  let vitestConfig: ResolvedConfig | undefined;
-
-  const normalizeToWorkspace = (filePath: string): string =>
-    vitestConfig?.root ? rebasePath(filePath, vitestConfig.root, workspaceRoot) : filePath;
-
-  const normalizeToVitestRoot = (filePath: string): string =>
-    toPosixPath(
-      vitestConfig?.root ? rebasePath(filePath, workspaceRoot, vitestConfig.root) : filePath,
-    );
+  let vitestConfig: ResolvedConfig;
 
   /** The build output path served for a module, whether it is a test entry point or a built artifact. */
   const getOutputPath = (id: string): string => {
-    const normalizedId = toPosixPath(normalizeToWorkspace(id));
-    const entryPoint = testFileToEntryPoint.get(normalizedId);
+    const entryPoint = testFileToEntryPoint.get(id);
 
-    return entryPoint
-      ? entryPoint + '.js'
-      : toPosixPath(path.relative(workspaceRoot, normalizedId));
+    return entryPoint ? entryPoint + '.js' : toPosixPath(path.relative(workspaceRoot, id));
   };
 
   // Setup files must not be wrapped in a virtual import stub because Vitest only invalidates
   // the setup file itself between test files; wrapping it would cause the underlying bundle
   // to be cached, preventing per-test hooks from running on subsequent test files.
-  const isCoverageRedirect = (id: string): boolean => {
-    const normalizedId = toPosixPath(normalizeToWorkspace(id));
-
-    return (
-      !!vitestConfig?.coverage?.enabled &&
-      testFileToEntryPoint.has(normalizedId) &&
-      !setupFileSet.has(normalizedId)
-    );
-  };
+  const isCoverageRedirect = (id: string): boolean =>
+    !!vitestConfig?.coverage?.enabled && testFileToEntryPoint.has(id) && !setupFileSet.has(id);
 
   return [
     {
@@ -400,6 +368,29 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
       enforce: 'pre',
       configureVitest(context: VitestPluginContext) {
         vitestConfig = context.vitest.config;
+
+        if (vitestConfig.root && vitestConfig.root !== toPosixPath(workspaceRoot)) {
+          const previousRoot = workspaceRoot;
+          workspaceRoot = vitestConfig.root;
+          testFileToEntryPoint = new Map(
+            Array.from(testFileToEntryPoint, ([file, entryPoint]) => [
+              file.startsWith('angular:')
+                ? file
+                : toPosixPath(path.join(workspaceRoot, path.relative(previousRoot, file))),
+              entryPoint,
+            ]),
+          );
+          setupFileSet = new Set(
+            setupFiles.map((file) =>
+              toPosixPath(
+                path.join(
+                  workspaceRoot,
+                  path.isAbsolute(file) ? path.relative(previousRoot, file) : file,
+                ),
+              ),
+            ),
+          );
+        }
 
         // Vitest keys its file system module cache on the file found on disk. A test entry point is
         // served from its bundle instead, which also holds the application code it imports, so the
@@ -432,7 +423,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
       resolveId: (id: string, importer: string | undefined) => {
         // Fast path for test entry points.
         if (testFileToEntryPoint.has(id)) {
-          return normalizeToVitestRoot(id);
+          return id;
         }
 
         // Workaround for Vitest in Windows when a fully qualified absolute path is provided with
@@ -446,12 +437,9 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
           }
         }
 
-        id = normalizeToWorkspace(id);
-
         // Determine the base directory for resolution.
         let baseDir: string;
         if (importer) {
-          importer = toPosixPath(normalizeToWorkspace(importer));
           // If the importer is a test entry point, resolve relative to the workspace root.
           // Otherwise, resolve relative to the importer's directory.
           baseDir = testFileToEntryPoint.has(importer) ? workspaceRoot : path.dirname(importer);
@@ -474,13 +462,13 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
         fullPath = toPosixPath(fullPath);
 
         if (testFileToEntryPoint.has(fullPath)) {
-          return normalizeToVitestRoot(fullPath);
+          return fullPath;
         }
 
         // Check if the resolved path corresponds to a known build artifact.
         const relativePath = path.relative(workspaceRoot, fullPath);
         if (buildResultFiles.has(toPosixPath(relativePath))) {
-          return normalizeToVitestRoot(fullPath);
+          return fullPath;
         }
 
         // If the module cannot be resolved from the build artifacts, let other plugins handle it.
@@ -509,7 +497,7 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
 
           const map = sourceMapText ? JSON.parse(sourceMapText) : undefined;
           if (map) {
-            adjustSourcemapSources(map, true, workspaceRoot, toPosixPath(normalizeToWorkspace(id)));
+            adjustSourcemapSources(map, true, workspaceRoot, id);
           }
 
           return {
