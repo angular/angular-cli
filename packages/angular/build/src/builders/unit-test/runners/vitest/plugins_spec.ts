@@ -7,14 +7,13 @@
  */
 
 import path from 'node:path';
-import type { VitestPluginContext } from 'vitest/node';
 import { BuildOutputFileType } from '../../../../tools/esbuild/bundler-files';
 import { toPosixPath } from '../../../../utils/path';
 import type { ResultFile } from '../../../application/results';
 import { createVitestPlugins } from './plugins';
 
 describe('createVitestPlugins', () => {
-  it('resolves and loads setup files when vitestConfig.root differs from workspaceRoot (e.g., symlink or subst drive)', async () => {
+  it('resolves and loads setup and spec files when vitestConfig.root differs from workspaceRoot', async () => {
     const workspaceRoot = path.resolve('/logical-workspace/test-project');
     const physicalRoot = toPosixPath(path.resolve('/physical-disk/tmp/test-project'));
     const specFile = toPosixPath(path.join(workspaceRoot, 'src/app/app.spec.ts'));
@@ -57,14 +56,14 @@ describe('createVitestPlugins', () => {
     expect(inMemoryPlugin).toBeDefined();
 
     const configureVitest = inMemoryPlugin?.configureVitest as
-      ((context: VitestPluginContext) => void) | undefined;
+      ((context: { vitest: { config: { root: string } } }) => void) | undefined;
     configureVitest?.({
       vitest: {
         config: {
           root: physicalRoot,
         },
       },
-    } as unknown as VitestPluginContext);
+    });
 
     const resolveId = inMemoryPlugin?.resolveId as (
       id: string,
@@ -80,5 +79,11 @@ describe('createVitestPlugins', () => {
 
     const loadedSetup = await load(expectedSetupId);
     expect(loadedSetup?.code).toBe('console.log("init-compiler");');
+
+    const resolvedSpecId = resolveId(`${physicalRoot}/src/app/app.spec.ts`, undefined);
+    expect(resolvedSpecId).toBe(specFile);
+
+    const loadedSpec = await load(specFile);
+    expect(loadedSpec?.code).toBe('console.log("spec");');
   });
 });
