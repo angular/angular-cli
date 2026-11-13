@@ -56,6 +56,12 @@ export const TODO_NOTES = {
     message:
       'Cannot transform jasmine.arrayWithExactContents with a dynamic variable. Please migrate this manually.',
   },
+  'arrayWithExactContents-negated': {
+    message:
+      'Cannot transform a negated jasmine.arrayWithExactContents. ' +
+      'Splitting it would assert that neither condition holds instead of not both. ' +
+      'Please migrate this manually.',
+  },
   'arrayWithExactContents-check': {
     message:
       "Verify this matches strict array content (multiset equality). Vitest's arrayContaining is a subset check.",
