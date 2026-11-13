@@ -29,6 +29,7 @@ import {
 import { NormalizedUnitTestBuilderOptions } from '../../options';
 import type { TestExecutor } from '../api';
 import { setupBrowserConfiguration } from './browser-provider';
+import { createVitestCliOptions } from './cli-options';
 import { findVitestBaseConfig } from './configuration';
 import { createVitestConfigPlugin, createVitestPlugins } from './plugins';
 
@@ -266,13 +267,11 @@ export class VitestExecutor implements TestExecutor {
     const {
       coverage,
       reporters,
-      outputFile,
       workspaceRoot,
       browsers,
       debug,
       watch,
       browserViewport,
-      ui,
       projectRoot,
       runnerConfig,
       projectSourceRoot,
@@ -342,14 +341,6 @@ export class VitestExecutor implements TestExecutor {
       setupFiles: testSetupFiles,
     });
 
-    const debugOptions = debug
-      ? {
-          inspectBrk: true,
-          isolate: false,
-          fileParallelism: false,
-        }
-      : {};
-
     const externalConfigPath =
       runnerConfig === true
         ? await findVitestBaseConfig([projectRoot, workspaceRoot])
@@ -389,17 +380,7 @@ export class VitestExecutor implements TestExecutor {
     }
     this.debugLog(DebugLogLevel.Verbose, 'Included test files (after filtering):', include);
 
-    const vitestConfig = {
-      config: externalConfigPath,
-      root: workspaceRoot,
-      project,
-      watch,
-      ...(outputFile !== undefined ? { outputFile } : {}),
-      ...(cacheOptions.enabled ? {} : { cache: false as const }),
-      ...(this.options.filter !== undefined ? { testNamePattern: this.options.filter } : {}),
-      ...(typeof ui === 'boolean' ? { ui } : {}),
-      ...debugOptions,
-    };
+    const vitestConfig = createVitestCliOptions(this.options, project, externalConfigPath);
     const vitestServerConfig = {
       // Note `.vitest` is auto appended to the path.
       cacheDir: cacheOptions.path,
