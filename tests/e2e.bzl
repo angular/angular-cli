@@ -151,6 +151,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
     args = []
     tests = None
     ignore = None
+    shard_count = TEST_SHARD_COUNT
 
     if toolchain_name:
         toolchain_name = "_" + toolchain_name
@@ -168,6 +169,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         args.append("--esbuild")
         tests = BROWSER_TESTS
         ignore = None
+        shard_count = 1
     elif type == "webpack":
         tests = None
         ignore = BROWSER_TESTS + WEBPACK_IGNORE_TESTS
@@ -179,7 +181,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         size = "enormous",
         data = data,
         toolchain = toolchain,
-        shard_count = TEST_SHARD_COUNT,
+        shard_count = shard_count,
         templated_args = args + [
             "--glob=%s" % _to_glob(tests) if tests else "",
             "--ignore=%s" % _to_glob(ignore) if ignore else "",
@@ -193,7 +195,7 @@ def _e2e_suite(name, runner, type, data, toolchain_name = "", toolchain = None):
         size = "enormous",
         data = data,
         toolchain = toolchain,
-        shard_count = TEST_SHARD_COUNT,
+        shard_count = shard_count,
         templated_args = args + [
             "--ng-snapshots",
             "--glob=%s" % _to_glob(tests) if tests else "",

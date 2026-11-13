@@ -1,5 +1,5 @@
 import { getGlobalVariable } from './env';
-import { ProcessOutput, silentBun, silentNpm, silentPnpm, silentYarn } from './process';
+import { type ProcessOutput, silentBun, silentNpm, silentPnpm, silentYarn } from './process';
 
 export interface PkgInfo {
   readonly name: string;
@@ -32,17 +32,22 @@ export async function installWorkspacePackages(options?: { force?: boolean }): P
   }
 }
 
-export function installPackage(specifier: string, registry?: string): Promise<ProcessOutput> {
+export function installPackage(
+  specifier: string | string[],
+  registry?: string,
+): Promise<ProcessOutput> {
   const registryOption = registry ? [`--registry=${registry}`] : [];
+  const specifiers = Array.isArray(specifier) ? specifier : [specifier];
+
   switch (getActivePackageManager()) {
     case 'npm':
-      return silentNpm('install', specifier, ...registryOption);
+      return silentNpm('install', ...specifiers, ...registryOption);
     case 'yarn':
-      return silentYarn('add', specifier, ...registryOption);
+      return silentYarn('add', ...specifiers, ...registryOption);
     case 'bun':
-      return silentBun('add', specifier, ...registryOption);
+      return silentBun('add', ...specifiers, ...registryOption);
     case 'pnpm':
-      return silentPnpm('add', specifier, ...registryOption);
+      return silentPnpm('add', ...specifiers, ...registryOption);
   }
 }
 
