@@ -19,6 +19,7 @@ import {
   updateExternalMetadata,
 } from '../../../../tools/vite/utils';
 import { assertIsError } from '../../../../utils/error';
+import { toPosixPath } from '../../../../utils/path';
 import {
   type FullResult,
   type IncrementalResult,
@@ -377,11 +378,15 @@ export class VitestExecutor implements TestExecutor {
     // Filter internal entries and setup files from the include list
     const internalEntries = ['angular:'];
     const setupFileSet = new Set(testSetupFiles);
-    const include = [...this.testFileToEntryPoint.keys()].filter((entry) => {
-      return (
-        !internalEntries.some((internal) => entry.startsWith(internal)) && !setupFileSet.has(entry)
-      );
-    });
+    const include: string[] = [];
+    for (const entry of this.testFileToEntryPoint.keys()) {
+      if (
+        !internalEntries.some((internal) => entry.startsWith(internal)) &&
+        !setupFileSet.has(entry)
+      ) {
+        include.push(toPosixPath(path.relative(workspaceRoot, entry)));
+      }
+    }
     this.debugLog(DebugLogLevel.Verbose, 'Included test files (after filtering):', include);
 
     const vitestConfig = {

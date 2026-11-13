@@ -339,9 +339,10 @@ async function loadResultFile(file: ResultFile): Promise<string> {
 }
 
 export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[] {
-  const { workspaceRoot, buildResultFiles, testFileToEntryPoint, setupFiles } = pluginOptions;
+  const { buildResultFiles, setupFiles } = pluginOptions;
+  let { workspaceRoot, testFileToEntryPoint } = pluginOptions;
   const isWindows = platform() === 'win32';
-  const setupFileSet = new Set(
+  let setupFileSet = new Set(
     setupFiles.map((file) =>
       toPosixPath(path.isAbsolute(file) ? file : path.join(workspaceRoot, file)),
     ),
@@ -367,6 +368,29 @@ export function createVitestPlugins(pluginOptions: PluginOptions): Vite.Plugin[]
       enforce: 'pre',
       configureVitest(context: VitestPluginContext) {
         vitestConfig = context.vitest.config;
+
+        if (vitestConfig.root && vitestConfig.root !== toPosixPath(workspaceRoot)) {
+          const previousRoot = workspaceRoot;
+          workspaceRoot = vitestConfig.root;
+          testFileToEntryPoint = new Map(
+            Array.from(testFileToEntryPoint, ([file, entryPoint]) => [
+              file.startsWith('angular:')
+                ? file
+                : toPosixPath(path.join(workspaceRoot, path.relative(previousRoot, file))),
+              entryPoint,
+            ]),
+          );
+          setupFileSet = new Set(
+            setupFiles.map((file) =>
+              toPosixPath(
+                path.join(
+                  workspaceRoot,
+                  path.isAbsolute(file) ? path.relative(previousRoot, file) : file,
+                ),
+              ),
+            ),
+          );
+        }
 
         // Vitest keys its file system module cache on the file found on disk. A test entry point is
         // served from its bundle instead, which also holds the application code it imports, so the
