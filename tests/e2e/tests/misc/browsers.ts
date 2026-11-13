@@ -1,5 +1,5 @@
 import express from 'express';
-import * as path from 'node:path';
+import path from 'node:path';
 import { copyProjectAsset } from '../../utils/assets';
 import { appendToFile, createDir, replaceInFile, writeFile } from '../../utils/fs';
 import { exec, ng } from '../../utils/process';
@@ -21,9 +21,7 @@ export default async function () {
     throw new Error('SauceLabs is not configured.');
   }
 
-  for (const e2eDep of E2E_DEV_DEPENDENCIES) {
-    await installPackage(e2eDep);
-  }
+  await installPackage(E2E_DEV_DEPENDENCIES);
 
   await appendToFile(
     'src/app/app.config.ts',
