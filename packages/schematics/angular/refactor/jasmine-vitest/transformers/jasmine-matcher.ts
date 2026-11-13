@@ -260,24 +260,47 @@ export function transformExpectAsync(
   node: ts.Node,
   { sourceFile, reporter }: RefactorContext,
 ): ts.Node {
-  if (
-    !ts.isCallExpression(node) ||
-    !ts.isPropertyAccessExpression(node.expression) ||
-    !ts.isCallExpression(node.expression.expression)
-  ) {
+  if (!ts.isCallExpression(node) || !ts.isPropertyAccessExpression(node.expression)) {
     return node;
   }
 
   const matcherCall = node;
   const matcherPae = node.expression;
-  const expectCall = node.expression.expression;
-
-  if (!ts.isIdentifier(expectCall.expression) || expectCall.expression.text !== 'expectAsync') {
+  const matcherName = ts.isIdentifier(matcherPae.name) ? matcherPae.name.text : undefined;
+  if (!matcherName || matcherName === 'withContext') {
     return node;
   }
 
-  const matcherName = ts.isIdentifier(matcherPae.name) ? matcherPae.name.text : undefined;
-  const mapping = matcherName ? ASYNC_MATCHER_CHANGES.get(matcherName) : undefined;
+  // Walk down any modifier chain (`.not`, `.already`, `.withContext(...)`) to the root call.
+  // Modifiers have no direct vitest equivalent, so a modified matcher falls through to the
+  // TODO handling below. `withContext` is the only chainable modifier method, so any other
+  // intermediate call (e.g. a `.then(...)` chained on a matcher) is not an `expectAsync` chain.
+  const modifierNames: string[] = [];
+  let expectCall: ts.CallExpression | undefined;
+  let current: ts.Expression = matcherPae.expression;
+  while (!expectCall) {
+    if (ts.isCallExpression(current)) {
+      if (ts.isIdentifier(current.expression) && current.expression.text === 'expectAsync') {
+        expectCall = current;
+      } else if (
+        ts.isPropertyAccessExpression(current.expression) &&
+        ts.isIdentifier(current.expression.name) &&
+        current.expression.name.text === 'withContext'
+      ) {
+        modifierNames.unshift('withContext');
+        current = current.expression.expression;
+      } else {
+        return node;
+      }
+    } else if (ts.isPropertyAccessExpression(current) && ts.isIdentifier(current.name)) {
+      modifierNames.unshift(current.name.text);
+      current = current.expression;
+    } else {
+      return node;
+    }
+  }
+
+  const mapping = modifierNames.length === 0 ? ASYNC_MATCHER_CHANGES.get(matcherName) : undefined;
 
   if (mapping) {
     reporter.reportTransformation(
@@ -298,16 +321,14 @@ export function transformExpectAsync(
     return ts.factory.createCallExpression(newMatcherChain, undefined, newMatcherArgs);
   }
 
-  if (matcherName) {
-    if (matcherName === 'toBePending') {
-      const category = 'toBePending';
-      reporter.recordTodo(category, sourceFile, node);
-      addTodoComment(node, category);
-    } else {
-      const category = 'unsupported-expect-async-matcher';
-      reporter.recordTodo(category, sourceFile, node);
-      addTodoComment(node, category, { name: matcherName });
-    }
+  if (matcherName === 'toBePending' && modifierNames.length === 0) {
+    const category = 'toBePending';
+    reporter.recordTodo(category, sourceFile, node);
+    addTodoComment(node, category);
+  } else {
+    const category = 'unsupported-expect-async-matcher';
+    reporter.recordTodo(category, sourceFile, node);
+    addTodoComment(node, category, { name: [...modifierNames, matcherName].join('.') });
   }
 
   return node;
