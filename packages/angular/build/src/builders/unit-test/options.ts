@@ -79,6 +79,7 @@ export async function normalizeOptions(
     browserViewport,
     ui,
     runnerConfig,
+    runnerArgs,
     isolate,
     splitting = true,
     polyfills,
@@ -90,6 +91,10 @@ export async function normalizeOptions(
 
   if (isolate && runner !== Runner.Vitest) {
     throw new Error('The "isolate" option is only available for the "vitest" runner.');
+  }
+
+  if (runnerArgs?.length && (runner ?? Runner.Vitest) !== Runner.Vitest) {
+    throw new Error('The "runnerArgs" option is only available for the "vitest" runner.');
   }
 
   const [width, height] = browserViewport?.split('x').map(Number) ?? [];
@@ -170,6 +175,7 @@ export async function normalizeOptions(
           ? true
           : path.resolve(workspaceRoot, runnerConfig)
         : runnerConfig,
+    runnerArgs: runnerArgs?.length ? runnerArgs : undefined,
   };
 }
 

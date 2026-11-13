@@ -242,6 +242,7 @@ export type UnitTestBuilderOptions = {
     quiet?: boolean;
     reporters?: SchemaReporter[];
     runner?: Runner;
+    runnerArgs?: string[];
     runnerConfig?: RunnerConfig;
     setupFiles?: string[];
     splitting?: boolean;

@@ -26,16 +26,20 @@ export interface VitestCliOptionsSource extends Pick<
  * @param options The normalized builder options to convert.
  * @param project The name of the Vitest project to execute.
  * @param configPath The path to an external Vitest configuration file, if any.
+ * @param runnerArgOptions The Vitest CLI options from the `runnerArgs` builder option, if any.
+ * The options created from the other builder options take precedence over these.
  * @returns The Vitest CLI options.
  */
 export function createVitestCliOptions(
   options: VitestCliOptionsSource,
   project: string,
   configPath: string | false | undefined,
+  runnerArgOptions?: CliOptions,
 ): CliOptions {
   const { workspaceRoot, watch, outputFile, cacheOptions, filter, ui, debug } = options;
 
   return {
+    ...runnerArgOptions,
     config: configPath,
     root: workspaceRoot,
     project,
