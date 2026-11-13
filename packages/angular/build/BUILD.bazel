@@ -155,6 +155,7 @@ ts_project(
         ":node_modules/@babel/core",
         ":node_modules/@parcel/watcher",
         ":node_modules/oxc-parser",
+        ":node_modules/vitest",
         "//:node_modules/@angular/compiler-cli",
         "//:node_modules/@angular/router",
         "//:node_modules/@types/jasmine",
