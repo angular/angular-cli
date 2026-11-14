@@ -9,7 +9,7 @@
 import { createHash } from 'node:crypto';
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { type Agent, get as httpsGet } from 'node:https';
-import { dirname, join } from 'node:path';
+import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
 import { htmlRewritingStream } from './html-rewriting-stream';
 
@@ -253,9 +253,9 @@ export class InlineFontsProcessor {
       );
     });
 
-    if (cacheFile) {
+    if (cacheFile && this.cachePath) {
       try {
-        await mkdir(dirname(cacheFile), { recursive: true });
+        await mkdir(this.cachePath, { recursive: true });
         const dataHash = createHash(CONTENT_HASH_ALGORITHM).update(data).digest('hex');
         await writeFile(cacheFile, dataHash + data);
       } catch {}
