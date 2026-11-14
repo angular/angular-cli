@@ -7,7 +7,7 @@
  */
 
 import { createHash } from 'node:crypto';
-import { readFile, rm, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { type Agent, get as httpsGet } from 'node:https';
 import { join } from 'node:path';
 import { NormalizedCachedOptions } from '../normalize-cache';
@@ -181,7 +181,7 @@ export class InlineFontsProcessor {
         if (data.length > CONTENT_HASH_LENGTH) {
           const storedHash = data.slice(0, CONTENT_HASH_LENGTH);
           const content = data.slice(CONTENT_HASH_LENGTH);
-          const contentHash = createHash(CONTENT_HASH_ALGORITHM).update(content).digest('base64');
+          const contentHash = createHash(CONTENT_HASH_ALGORITHM).update(content).digest('hex');
           if (storedHash === contentHash) {
             // Return valid content
             return content;
@@ -253,8 +253,9 @@ export class InlineFontsProcessor {
       );
     });
 
-    if (cacheFile) {
+    if (cacheFile && this.cachePath) {
       try {
+        await mkdir(this.cachePath, { recursive: true });
         const dataHash = createHash(CONTENT_HASH_ALGORITHM).update(data).digest('hex');
         await writeFile(cacheFile, dataHash + data);
       } catch {}
