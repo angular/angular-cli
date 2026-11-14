@@ -19,7 +19,7 @@ import { deserialize } from 'node:v8';
 import { parseSync } from 'oxc-parser';
 import { traversePostOrder } from '../oxc/traversal';
 import { createSharedTranslationProxy } from './i18n-translation-reader';
-import { loadLocaleData } from './locale-data';
+import { type LoadedLocaleData, loadLocaleData } from './locale-data';
 
 /**
  * The options passed to the inliner for each code request
@@ -51,6 +51,7 @@ export interface InlineCodeRequest {
    * How to handle missing translations.
    */
   missingTranslation?: 'error' | 'warning' | 'ignore';
+  workspaceRoot?: string;
 }
 
 /**
@@ -89,6 +90,7 @@ export interface InlineFileBatchRequest {
    * How to handle missing translations.
    */
   missingTranslation?: 'error' | 'warning' | 'ignore';
+  workspaceRoot?: string;
 
   /**
    * Whether the file data should be treated as ephemeral and not cached long-term in the Worker.
@@ -151,6 +153,8 @@ const fileDataCache = new Map<string, Promise<CachedFileData>>();
  * Cache of deserialized translation messages keyed by locale.
  */
 const deserializedTranslations = new Map<string, Promise<Record<string, ɵParsedTranslation>>>();
+
+const localeDataCache = new Map<string, Promise<LoadedLocaleData>>();
 
 /**
  * The current inlining generation for this worker.
@@ -286,6 +290,7 @@ export async function inlineFileBatch(
       locale,
       await loadTranslation(locale, translation),
       request.filename,
+      request.workspaceRoot,
       request.missingTranslation,
     );
 
@@ -319,6 +324,7 @@ export async function inlineCode(request: InlineCodeRequest): Promise<InlineCode
     request.locale,
     await loadTranslation(request.locale, request.translation),
     request.filename,
+    request.workspaceRoot,
     request.missingTranslation,
   );
 
@@ -480,6 +486,7 @@ function escapeTemplatePart(part: string): string {
  * @param locale The target locale identifier.
  * @param translation The translation messages dictionary, or undefined for untranslated locale.
  * @param filename The name of the file being transformed.
+ * @param workspaceRoot The workspace root used to resolve locale data.
  * @param missingTranslation How to handle missing translations.
  * @returns The transformed code, optional remapped source map, and diagnostics.
  */
@@ -490,6 +497,7 @@ async function inlineLocalize(
   locale: string,
   translation: Record<string, ɵParsedTranslation> | undefined,
   filename: string,
+  workspaceRoot = process.cwd(),
   missingTranslation: 'error' | 'warning' | 'ignore' = 'warning',
 ) {
   const magicString = new MagicString(code);
@@ -502,7 +510,13 @@ async function inlineLocalize(
   }
 
   if (metadata.localeInsertSites.length > 0) {
-    const localeData = await loadLocaleData(locale);
+    const cacheKey = JSON.stringify([workspaceRoot, locale]);
+    let pendingLocaleData = localeDataCache.get(cacheKey);
+    if (!pendingLocaleData) {
+      pendingLocaleData = loadLocaleData(locale, workspaceRoot);
+      localeDataCache.set(cacheKey, pendingLocaleData);
+    }
+    const localeData = await pendingLocaleData;
     if (localeData.error) {
       diagnostics.push({ type: 'error', message: localeData.error });
     } else if (localeData.warning) {

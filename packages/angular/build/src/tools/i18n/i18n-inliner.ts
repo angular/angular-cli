@@ -144,6 +144,7 @@ export interface I18nInlinerOptions {
   maxConcurrency?: number;
   persistentCachePath?: string;
   localizeVersion?: string;
+  workspaceRoot?: string;
 }
 
 /**
@@ -308,7 +309,7 @@ export class I18nInliner {
     await this.initCache();
 
     const generation = ++this.#generation;
-    const { missingTranslation, localizeVersion } = this.options;
+    const { missingTranslation, localizeVersion, workspaceRoot } = this.options;
     const localeList = Array.from(locales);
 
     if (localeList.length === 0) {
@@ -353,6 +354,7 @@ export class I18nInliner {
                   translation: translationIntegrity || translation,
                   missingTranslation,
                   localizeVersion,
+                  workspaceRoot,
                 }),
               ),
             );
@@ -572,6 +574,7 @@ export class I18nInliner {
             map: mapBlob,
             locales: new Map(batchEntries.map((e) => [e.locale, e.translation])),
             missingTranslation: this.options.missingTranslation,
+            workspaceRoot: this.options.workspaceRoot,
             ephemeral,
             activeLocales,
             generation,
@@ -675,6 +678,7 @@ export class I18nInliner {
       filename: templateId,
       locale,
       missingTranslation: this.options.missingTranslation,
+      workspaceRoot: this.options.workspaceRoot,
       translation: await serializeTranslation(
         translation,
         translationIntegrity,
