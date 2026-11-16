@@ -50,23 +50,30 @@ export function transformFocusedAndSkippedTests(
   return node;
 }
 
+/**
+ * Checks whether a call expression target is `it`, `it.only`, or `it.skip`.
+ * `fit`/`xit` have already become `it.only`/`it.skip` when `transformPending`
+ * and `transformDoneCallback` run, as `transformFocusedAndSkippedTests` is
+ * applied earlier in the pipeline.
+ */
+function isItCallExpression(expression: ts.Expression): boolean {
+  if (ts.isIdentifier(expression) && expression.text === 'it') {
+    return true;
+  }
+
+  return (
+    ts.isPropertyAccessExpression(expression) &&
+    ts.isIdentifier(expression.expression) &&
+    expression.expression.text === 'it' &&
+    (expression.name.text === 'only' || expression.name.text === 'skip')
+  );
+}
+
 export function transformPending(
   node: ts.Node,
   { sourceFile, reporter, tsContext }: RefactorContext,
 ): ts.Node {
-  if (!ts.isCallExpression(node)) {
-    return node;
-  }
-
-  // `fit`/`xit` have already become `it.only`/`it.skip` when this transformer runs,
-  // as `transformFocusedAndSkippedTests` is applied earlier in the pipeline.
-  const isBareIt = ts.isIdentifier(node.expression) && node.expression.text === 'it';
-  const isFocusedOrSkippedIt =
-    ts.isPropertyAccessExpression(node.expression) &&
-    ts.isIdentifier(node.expression.expression) &&
-    node.expression.expression.text === 'it' &&
-    (node.expression.name.text === 'only' || node.expression.name.text === 'skip');
-  if (!isBareIt && !isFocusedOrSkippedIt) {
+  if (!ts.isCallExpression(node) || !isItCallExpression(node.expression)) {
     return node;
   }
 
@@ -301,11 +308,14 @@ function countDoneUsages(node: ts.Node, doneIdentifier: ts.Identifier): number {
 
 export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContext): ts.Node {
   const { sourceFile, reporter, tsContext } = refactorCtx;
-  if (
-    !ts.isCallExpression(node) ||
-    !ts.isIdentifier(node.expression) ||
-    !['it', 'beforeEach', 'afterEach', 'beforeAll', 'afterAll'].includes(node.expression.text)
-  ) {
+  if (!ts.isCallExpression(node)) {
+    return node;
+  }
+
+  const isLifecycleHook =
+    ts.isIdentifier(node.expression) &&
+    ['beforeEach', 'afterEach', 'beforeAll', 'afterAll'].includes(node.expression.text);
+  if (!isItCallExpression(node.expression) && !isLifecycleHook) {
     return node;
   }
 
