@@ -314,7 +314,10 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
 
   const isLifecycleHook =
     ts.isIdentifier(node.expression) &&
-    ['beforeEach', 'afterEach', 'beforeAll', 'afterAll'].includes(node.expression.text);
+    (node.expression.text === 'beforeEach' ||
+      node.expression.text === 'afterEach' ||
+      node.expression.text === 'beforeAll' ||
+      node.expression.text === 'afterAll');
   if (!isItCallExpression(node.expression) && !isLifecycleHook) {
     return node;
   }
