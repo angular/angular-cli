@@ -473,6 +473,39 @@ describe('EntryPoint Schematic', () => {
       }
     });
 
+    it('should throw a descriptive error when the final name segment cannot name source files', async () => {
+      for (const invalidName of ['3d', 'feature/3d', 'svg~icons']) {
+        await expectAsync(
+          schematicRunner.runSchematic(
+            'entry-point',
+            {
+              name: invalidName,
+              project: 'foo',
+            },
+            workspaceTree,
+          ),
+        ).toBeRejectedWithError(
+          `Entry point name "${invalidName}" is invalid. The final path segment is used to name ` +
+            'the generated source files and must start with a letter and contain only ' +
+            'alphanumeric characters, dots, dashes, and underscores.',
+        );
+      }
+    });
+
+    it('should allow a final name segment containing dots', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'entry-point',
+        {
+          name: 'testing.v2',
+          project: 'foo',
+        },
+        workspaceTree,
+      );
+
+      const packageJson = getJsonFileContent(tree, '/projects/foo/package.json');
+      expect(packageJson.exports['./testing.v2']).toBeDefined();
+    });
+
     it('should throw if the entry point already exists in package.json exports', async () => {
       const tree = await schematicRunner.runSchematic('entry-point', defaultOptions, workspaceTree);
 

@@ -58,6 +58,20 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
     throw new SchematicsException('Entry point name "package.json" is reserved.');
   }
 
+  // The final segment names the generated class, selector, and files. Without this check,
+  // a name that is a valid export subpath but not usable as an identifier fails later with
+  // an error about a class or selector the user never provided.
+  if (
+    options.name !== '.' &&
+    !/^[a-zA-Z][a-zA-Z0-9_-]*(?:\.[a-zA-Z0-9_-]+)*$/.test(basename(options.name))
+  ) {
+    throw new SchematicsException(
+      `Entry point name "${options.name}" is invalid. The final path segment is used to name ` +
+        'the generated source files and must start with a letter and contain only ' +
+        'alphanumeric characters, dots, dashes, and underscores.',
+    );
+  }
+
   const libDir = project.root;
   const packageJsonPath = join(libDir, 'package.json');
   if (!tree.exists(packageJsonPath)) {
