@@ -60,6 +60,11 @@ export interface Option extends YargsOptions {
    * Allowed boolean values when `boolean` is one of the supported types.
    */
   booleanValues?: ReadonlySet<boolean>;
+
+  /**
+   * Whether arguments after `--` should be forwarded to this option.
+   */
+  passthrough?: boolean;
 }
 
 /**
@@ -530,6 +535,7 @@ export async function parseJsonSchemaToOptions(
       positional,
       types,
       booleanValues: types.includes('boolean') ? getAllowedBooleanValues(current) : undefined,
+      passthrough: current['x-passthrough'] === true || undefined,
       ...(type === 'object'
         ? {
             type: 'array',
