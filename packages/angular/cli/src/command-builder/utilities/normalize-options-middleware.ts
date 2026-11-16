@@ -26,7 +26,7 @@ export function createNormalizeOptionsMiddleware(localeYargs: Argv): (args: Argu
     const arrayOptions = new Set(array);
 
     for (const [key, value] of Object.entries(args)) {
-      if (key !== '_' && Array.isArray(value) && !arrayOptions.has(key)) {
+      if (key !== '_' && key !== '--' && Array.isArray(value) && !arrayOptions.has(key)) {
         const newValue = value.pop();
         // eslint-disable-next-line no-console
         console.warn(

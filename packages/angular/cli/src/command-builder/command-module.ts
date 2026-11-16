@@ -54,6 +54,8 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   readonly longDescription?: string;
   readonly longDescriptionRelativePath?: string;
   protected readonly shouldReportAnalytics: boolean = true;
+  protected readonly acceptsPassthroughArgs: boolean = false;
+  protected passthroughArgs: readonly string[] | undefined;
   readonly scope: CommandScope = CommandScope.Both;
 
   private readonly optionsWithAnalytics = new Map<
@@ -96,8 +98,20 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
   abstract run(options: Options<T> & OtherOptions): Promise<number | void> | number | void;
 
   async handler(args: ArgumentsCamelCase<T> & OtherOptions): Promise<void> {
-    const { _, $0, ...options } = args;
+    const { _, $0, '--': passthroughArgs, ...options } = args;
     const { logger } = this.context;
+
+    if (Array.isArray(passthroughArgs) && passthroughArgs.length > 0) {
+      if (!this.acceptsPassthroughArgs) {
+        throw new CommandModuleError(
+          `Arguments following "--" are not supported by the "${this.commandName}" command.`,
+        );
+      }
+
+      this.passthroughArgs = passthroughArgs.map(String);
+    } else {
+      this.passthroughArgs = undefined;
+    }
 
     // Camelize options as yargs will return the object in kebab-case when camel casing is disabled.
     const camelCasedOptions: Record<string, unknown> = {};
@@ -139,6 +153,7 @@ export abstract class CommandModule<T extends {} = {}> implements CommandModuleI
         throw e;
       }
     } finally {
+      this.passthroughArgs = undefined;
       await stopPeriodicFlushes?.();
 
       if (typeof exitCode === 'number' && exitCode > 0) {
