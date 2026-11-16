@@ -6,18 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { BaseException } from '../exception';
-
-export class DependencyNotFoundException extends BaseException {
-  constructor() {
-    super('One of the dependencies is not part of the set.');
-  }
-}
-export class CircularDependencyFoundException extends BaseException {
-  constructor() {
-    super('Circular dependencies found.');
-  }
-}
+import { CircularDependencyFoundException, DependencyNotFoundException } from '../exception';
 
 /**
  * @deprecated Use standard arrays and ensure correct insertion order instead.

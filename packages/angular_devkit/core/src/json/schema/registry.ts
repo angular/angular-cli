@@ -12,8 +12,11 @@ import * as http from 'node:http';
 import * as https from 'node:https';
 import * as Url from 'node:url';
 import { Observable, from, isObservable, lastValueFrom } from 'rxjs';
-import { BaseException } from '../../exception';
-import { PartiallyOrderedSet } from '../../utils';
+import {
+  BaseException,
+  CircularDependencyFoundException,
+  DependencyNotFoundException,
+} from '../../exception';
 import { JsonArray, JsonObject, JsonValue, isJsonObject } from '../utils';
 import {
   JsonPointer,
@@ -93,12 +96,46 @@ interface SchemaInfo {
   promptDefinitions: Array<PromptDefinition>;
 }
 
+/**
+ * Adds a transform to an ordered list of transforms.
+ *
+ * Transforms run in insertion order and each transform is only present once. Dependencies
+ * must already be in the list, which guarantees that they run before the added transform.
+ */
+function addTransform(
+  transforms: JsonVisitor[],
+  visitor: JsonVisitor,
+  deps: JsonVisitor[] = [],
+): void {
+  const existingIndex = transforms.indexOf(visitor);
+  const position = existingIndex === -1 ? transforms.length : existingIndex;
+
+  for (const dep of deps) {
+    const depIndex = transforms.indexOf(dep);
+    if (depIndex === -1) {
+      throw new DependencyNotFoundException();
+    }
+    if (depIndex === position) {
+      throw new CircularDependencyFoundException();
+    }
+    if (depIndex > position) {
+      throw new Error(
+        'The transform is already registered and runs before one of the provided dependencies.',
+      );
+    }
+  }
+
+  if (existingIndex === -1) {
+    transforms.push(visitor);
+  }
+}
+
 export class CoreSchemaRegistry implements SchemaRegistry {
   private _ajv: Ajv;
   private _uriCache = new Map<string, JsonObject>();
   private _uriHandlers = new Set<UriHandler>();
-  private _pre = new PartiallyOrderedSet<JsonVisitor>();
-  private _post = new PartiallyOrderedSet<JsonVisitor>();
+  private _pre: JsonVisitor[] = [];
+  private _post: JsonVisitor[] = [];
 
   private _currentCompilationSchemaInfo?: SchemaInfo;
 
@@ -181,7 +218,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * @param {JsonVisitor[]} deps [Deprecated] A list of other visitors to run before. Add transforms in the desired execution order instead.
    */
   addPreTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
-    this._pre.add(visitor, deps);
+    addTransform(this._pre, visitor, deps);
   }
 
   /**
@@ -192,7 +229,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
    * @param {JsonVisitor[]} deps [Deprecated] A list of other visitors to run before. Add transforms in the desired execution order instead.
    */
   addPostTransform(visitor: JsonVisitor, deps?: JsonVisitor[]): void {
-    this._post.add(visitor, deps);
+    addTransform(this._post, visitor, deps);
   }
 
   protected _resolver(
@@ -326,7 +363,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
       // Apply pre-validation transforms
       if (validationOptions.applyPreTransforms) {
-        for (const visitor of this._pre.values()) {
+        for (const visitor of this._pre) {
           data = await lastValueFrom(
             visitJson(data, visitor, schema, this._resolver.bind(this), validator),
           );
@@ -378,7 +415,7 @@ export class CoreSchemaRegistry implements SchemaRegistry {
 
       // Apply post-validation transforms
       if (validationOptions.applyPostTransforms) {
-        for (const visitor of this._post.values()) {
+        for (const visitor of this._post) {
           data = await lastValueFrom(
             visitJson(data, visitor, schema, this._resolver.bind(this), validator),
           );
