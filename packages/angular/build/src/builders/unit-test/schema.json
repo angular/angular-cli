@@ -29,7 +29,8 @@
       "description": "Additional command line arguments to provide to the test runner. Each argument must be a separate value, for example `--runner-args=--update --runner-args=--bail=1`. This option is only available for the Vitest runner and only a subset of the Vitest command line options is supported. Options that have an equivalent builder option, such as `--reporter` or `--coverage`, must be configured with the builder option.",
       "items": {
         "type": "string"
-      }
+      },
+      "x-passthrough": true
     },
     "browsers": {
       "description": "Specifies the browsers to use for test execution. When not specified, the Vitest runner runs tests in a Node.js environment using `happy-dom` if it is installed, otherwise `jsdom`, and the Karma runner uses the browsers of its configuration. Browser names ending with `Headless` enable headless mode (e.g., `ChromiumHeadless` for Vitest with the Playwright provider, or `ChromeHeadless` for Karma).",

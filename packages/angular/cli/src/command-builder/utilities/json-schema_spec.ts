@@ -580,4 +580,31 @@ describe('parseJsonSchemaToOptions', () => {
       ]);
     });
   });
+
+  describe('with x-passthrough', () => {
+    it('sets passthrough to true when x-passthrough is true and undefined otherwise', async () => {
+      const jsonSchema = {
+        '$id': 'FakeSchema',
+        'title': 'Fake Schema',
+        'type': 'object',
+        'properties': {
+          'runnerArgs': {
+            'type': 'array',
+            'items': { 'type': 'string' },
+            'x-passthrough': true,
+          },
+          'other': {
+            'type': 'string',
+          },
+        },
+      };
+      const registry = new schema.CoreSchemaRegistry();
+      const options = await parseJsonSchemaToOptions(registry, jsonSchema);
+
+      expect(options.find((opt) => opt.name === 'runnerArgs')).toEqual(
+        jasmine.objectContaining({ name: 'runnerArgs', passthrough: true }),
+      );
+      expect(options.find((opt) => opt.name === 'other')?.passthrough).toBeUndefined();
+    });
+  });
 });

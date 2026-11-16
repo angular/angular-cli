@@ -37,6 +37,7 @@ export abstract class ArchitectBaseCommandModule<T extends object>
   implements CommandModuleImplementation<T>
 {
   override scope = CommandScope.In;
+  protected override readonly acceptsPassthroughArgs = true;
   protected readonly missingTargetChoices: MissingTargetChoice[] | undefined;
 
   protected async runSingleTarget(target: Target, options: OtherOptions): Promise<number> {
@@ -51,12 +52,47 @@ export abstract class ArchitectBaseCommandModule<T extends object>
       return this.onMissingTarget(e.message);
     }
 
+    let targetOptions = options;
+    if (this.passthroughArgs?.length) {
+      const builderOptions = await this.getOptionsForBuilder(builderName);
+      const passthroughOptions = builderOptions.filter((option) => option.passthrough);
+      if (passthroughOptions.length > 1) {
+        throw new CommandModuleError(
+          `The '${builderName}' builder schema defines multiple options with 'x-passthrough'.`,
+        );
+      }
+
+      const [passthroughOption] = passthroughOptions;
+      if (!passthroughOption) {
+        throw new CommandModuleError(
+          `The '${builderName}' builder does not accept arguments after '--'.`,
+        );
+      }
+
+      if (passthroughOption.type !== 'array') {
+        throw new CommandModuleError(
+          `The '${builderName}' builder option '${passthroughOption.name}' has 'x-passthrough' enabled but is not an array.`,
+        );
+      }
+
+      const existing = options[passthroughOption.name];
+      const existingArgs = Array.isArray(existing)
+        ? existing
+        : existing !== undefined && existing !== null
+          ? [existing]
+          : [];
+      targetOptions = {
+        ...options,
+        [passthroughOption.name]: [...existingArgs, ...this.passthroughArgs],
+      };
+    }
+
     const isAngularBuild = builderName.startsWith('@angular/build:');
 
     const { logger } = this.context;
     const run = await this.getArchitect(isAngularBuild).scheduleTarget(
       target,
-      options as json.JsonObject,
+      targetOptions as json.JsonObject,
       {
         logger,
       },

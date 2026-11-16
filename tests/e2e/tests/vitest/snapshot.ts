@@ -124,4 +124,27 @@ describe('App', () => {
     /Snapshots\s+\d+ (written|updated|failed|obsolete)/,
     'Snapshots were unexpectedly modified after being updated.',
   );
+
+  // Sixth run: update snapshots via `-- --update` passthrough
+  await replaceInFile('src/app/app.ts', 'test-project (updated)', 'test-project (passthrough)');
+  const { stdout: passthroughUpdateStdout } = await ng('test', '--', '--update');
+  assert.match(
+    stripVTControlCharacters(passthroughUpdateStdout),
+    /Snapshots\s+2 updated/,
+    'Snapshots were not updated when `-- --update` was passed.',
+  );
+
+  const passthroughSpecContent = await readFile('src/app/app.spec.ts');
+  assert.match(
+    passthroughSpecContent,
+    /toMatchInlineSnapshot\(`"test-project \(passthrough\)"`\)/,
+    'Inline snapshot was not updated via `-- --update`.',
+  );
+
+  const passthroughSnapshotContent = await readFile('src/app/__snapshots__/app.spec.ts.snap');
+  assert.match(
+    passthroughSnapshotContent,
+    /exports\[`App > should match file snapshot 1`\] = `"test-project \(passthrough\)"`;/,
+    'File snapshot was not updated via `-- --update`.',
+  );
 }
