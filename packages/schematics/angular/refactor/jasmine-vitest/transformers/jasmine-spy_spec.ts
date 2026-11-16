@@ -71,9 +71,21 @@ getSpy().and.callThrough();`,
       expected: `const mySpy = vi.fn().mockName('mySpy');`,
     },
     {
-      description: 'should transform jasmine.createSpy("name", fn) to vi.fn(fn).mockName("name")',
+      description:
+        'should transform jasmine.createSpy("name", fn) to ' +
+        'vi.fn(fn).mockName("name").mockReturnValue(undefined)',
       input: `const mySpy = jasmine.createSpy('mySpy', () => 'foo');`,
+      expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy').mockReturnValue(undefined);`,
+    },
+    {
+      description: 'should not stub jasmine.createSpy("name", fn) chained with .and.callThrough()',
+      input: `const mySpy = jasmine.createSpy('mySpy', () => 'foo').and.callThrough();`,
       expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy');`,
+    },
+    {
+      description: 'should not stub jasmine.createSpy("name", fn) chained with another strategy',
+      input: `const mySpy = jasmine.createSpy('mySpy', () => 'foo').and.returnValue(true);`,
+      expected: `const mySpy = vi.fn(() => 'foo').mockName('mySpy').mockReturnValue(true);`,
     },
     {
       description:
