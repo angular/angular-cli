@@ -192,6 +192,32 @@ describe('generateAngularServerAppManifest', () => {
     );
   });
 
+  it('should generate a separate chunk for each asset', async () => {
+    const { manifestContent, serverAssetsChunks } = await generateManifest({
+      'blog/archive/index.html': '<main>Archive</main>',
+      'blog_archive/index.html': '<main>Landing</main>',
+      'blog.archive/index.html': '<main>Release</main>',
+    });
+
+    expect(serverAssetsChunks).toEqual([
+      jasmine.objectContaining({
+        path: 'assets-chunks/blog/archive/index.html.mjs',
+        text: 'export default `<main>Archive</main>`;',
+      }),
+      jasmine.objectContaining({
+        path: 'assets-chunks/blog_archive/index.html.mjs',
+        text: 'export default `<main>Landing</main>`;',
+      }),
+      jasmine.objectContaining({
+        path: 'assets-chunks/blog.archive/index.html.mjs',
+        text: 'export default `<main>Release</main>`;',
+      }),
+    ]);
+    expect(manifestContent).toContain('import("./assets-chunks/blog/archive/index.html.mjs")');
+    expect(manifestContent).toContain('import("./assets-chunks/blog_archive/index.html.mjs")');
+    expect(manifestContent).toContain('import("./assets-chunks/blog.archive/index.html.mjs")');
+  });
+
   it('should serialize a base href which contains JavaScript string delimiters', async () => {
     const { manifestContent } = await generateManifest(
       { 'index.html': '<main></main>' },

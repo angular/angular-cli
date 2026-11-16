@@ -170,7 +170,8 @@ export async function generateAngularServerAppManifest(
   for (const file of [...additionalHtmlOutputFiles.values(), ...outputFiles]) {
     const extension = extname(file.path);
     if (extension === '.html') {
-      const jsChunkFilePath = `assets-chunks/${file.path.replace(/[./]/g, '_')}.mjs`;
+      // Mirror the asset path, which is unique, so that two assets never share a chunk.
+      const jsChunkFilePath = `assets-chunks/${file.path}.mjs`;
       const escapedContent = escapeUnsafeChars(file.text);
 
       serverAssetsChunks.push(
