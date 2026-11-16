@@ -39,3 +39,13 @@ export class PathIsFileException extends BaseException {
     super(`Path "${path}" is a file.`);
   }
 }
+export class DependencyNotFoundException extends BaseException {
+  constructor() {
+    super('One of the dependencies is not part of the set.');
+  }
+}
+export class CircularDependencyFoundException extends BaseException {
+  constructor() {
+    super('Circular dependencies found.');
+  }
+}

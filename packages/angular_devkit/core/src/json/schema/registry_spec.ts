@@ -7,8 +7,9 @@
  */
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { CircularDependencyFoundException, DependencyNotFoundException } from '../../exception';
 import { JsonValue } from '../utils';
-import { SchemaFormat } from './interface';
+import { JsonVisitor, SchemaFormat } from './interface';
 import { CoreSchemaRegistry, SchemaValidationException } from './registry';
 import { JsonSchema } from './schema';
 import { addUndefinedDefaults } from './transforms';
@@ -452,6 +453,94 @@ describe('CoreSchemaRegistry', () => {
       );
 
       expect(messages).toEqual(['Data path "/outputPath" must be string.']);
+    });
+  });
+
+  describe('transform ordering', () => {
+    function createVisitor(name: string, calls: string[]): JsonVisitor {
+      return (value) => {
+        calls.push(name);
+
+        return value;
+      };
+    }
+
+    async function run(registry: CoreSchemaRegistry): Promise<void> {
+      const validator = await registry.compile({ type: 'string' });
+      const result = await validator('value');
+      expect(result.success).toBe(true);
+    }
+
+    it('runs transforms in the order they were added', async () => {
+      const calls: string[] = [];
+      const registry = new CoreSchemaRegistry();
+      registry.addPreTransform(createVisitor('pre1', calls));
+      registry.addPreTransform(createVisitor('pre2', calls));
+      registry.addPostTransform(createVisitor('post1', calls));
+      registry.addPostTransform(createVisitor('post2', calls));
+
+      await run(registry);
+
+      expect(calls).toEqual(['pre1', 'pre2', 'post1', 'post2']);
+    });
+
+    it('only runs a transform once when it is added multiple times', async () => {
+      const calls: string[] = [];
+      const registry = new CoreSchemaRegistry();
+      const first = createVisitor('first', calls);
+      registry.addPostTransform(first);
+      registry.addPostTransform(createVisitor('second', calls));
+      registry.addPostTransform(first);
+
+      await run(registry);
+
+      expect(calls).toEqual(['first', 'second']);
+    });
+
+    it('runs a transform after its dependencies', async () => {
+      const calls: string[] = [];
+      const registry = new CoreSchemaRegistry();
+      const first = createVisitor('first', calls);
+      const second = createVisitor('second', calls);
+      registry.addPostTransform(first);
+      registry.addPostTransform(second, [first]);
+      // Adding again with dependencies that already run earlier is a no-op.
+      registry.addPostTransform(second, [first]);
+
+      await run(registry);
+
+      expect(calls).toEqual(['first', 'second']);
+    });
+
+    it('throws when a dependency has not been added', () => {
+      const registry = new CoreSchemaRegistry();
+      const missing = createVisitor('missing', []);
+
+      expect(() => registry.addPreTransform(createVisitor('visitor', []), [missing])).toThrowError(
+        DependencyNotFoundException,
+      );
+    });
+
+    it('throws when a transform depends on itself', () => {
+      const registry = new CoreSchemaRegistry();
+      const visitor = createVisitor('visitor', []);
+      registry.addPreTransform(visitor);
+
+      expect(() => registry.addPreTransform(visitor, [visitor])).toThrowError(
+        CircularDependencyFoundException,
+      );
+    });
+
+    it('throws when an existing transform is given a dependency that runs after it', () => {
+      const registry = new CoreSchemaRegistry();
+      const first = createVisitor('first', []);
+      const second = createVisitor('second', []);
+      registry.addPreTransform(first);
+      registry.addPreTransform(second);
+
+      expect(() => registry.addPreTransform(first, [second])).toThrowError(
+        /already registered and runs before/,
+      );
     });
   });
 });
