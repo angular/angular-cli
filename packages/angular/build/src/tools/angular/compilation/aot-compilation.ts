@@ -8,7 +8,7 @@
 
 import type * as ng from '@angular/compiler-cli';
 import assert from 'node:assert';
-import { relative } from 'node:path';
+import { normalize, relative } from 'node:path';
 import ts from 'typescript';
 import { useTypeChecking } from '../../../utils/environment-options';
 import { profileAsync, profileSync } from '../../../utils/profiling';
@@ -331,7 +331,8 @@ export class AotCompilation extends TypeScriptCompilation {
       if (this.#state && hostOptions.modifiedFiles?.size) {
         for (const resourceDependency of resourceDependencies) {
           if (
-            !hostOptions.modifiedFiles.has(resourceDependency) ||
+            // modifiedFiles holds normalized paths, so the separators differ on Windows
+            !hostOptions.modifiedFiles.has(normalize(resourceDependency)) ||
             /\.(?:css|scss|sass|less)$/i.test(resourceDependency)
           ) {
             continue;
