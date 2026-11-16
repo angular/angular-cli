@@ -256,8 +256,8 @@ importers:
         specifier: 4.68.2
         version: 4.68.2
       '@stylistic/eslint-plugin':
-        specifier: ^5.0.0
-        version: 5.10.0(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))
+        specifier: ^6.0.0
+        version: 6.0.0(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))
       '@tony.ganchev/eslint-plugin-header':
         specifier: ~3.4.0
         version: 3.4.4(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))
@@ -3825,11 +3825,17 @@ packages:
   '@standard-schema/spec@1.1.0':
     resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
 
-  '@stylistic/eslint-plugin@5.10.0':
-    resolution: {integrity: sha512-nPK52ZHvot8Ju/0A4ucSX1dcPV2/1clx0kLcH5wDmrE4naKso7TUC/voUyU1O9OTKTrR6MYip6LP0ogEMQ9jPQ==}
-    engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+  '@stylistic/eslint-plugin@6.0.0':
+    resolution: {integrity: sha512-phICSey4OqR8nkSwmoeXsl9EBzv30Zqbge4jrK3CU02GhjTgZ+y5qhTTg92EDK5j7JhX2xzp4VvH+YYUknQ8/Q==}
+    engines: {node: ^20.19.0 || ^22.13.0 || >=24}
     peerDependencies:
       eslint: ^9.0.0 || ^10.0.0
+      oxlint: ^1.55.0
+    peerDependenciesMeta:
+      eslint:
+        optional: true
+      oxlint:
+        optional: true
 
   '@tony.ganchev/eslint-plugin-header@3.4.4':
     resolution: {integrity: sha512-O3PDvjikVWECu078bLdRb2HwjVgR+wa7D0GX8gN1A8axlgEc7tordHOoEYcKRVxGcAw7bxXjwiKGXaY17qXD+Q==}
@@ -11794,15 +11800,15 @@ snapshots:
 
   '@standard-schema/spec@1.1.0': {}
 
-  '@stylistic/eslint-plugin@5.10.0(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))':
+  '@stylistic/eslint-plugin@6.0.0(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))':
     dependencies:
       '@eslint-community/eslint-utils': 4.10.1(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))
       '@typescript-eslint/types': 8.72.2
-      eslint: 10.14.0(jiti@2.7.0)(supports-color@11.0.0)
-      eslint-visitor-keys: 4.2.1
-      espree: 10.4.0
-      estraverse: 5.3.0
+      '@typescript-eslint/visitor-keys': 8.72.2
+      espree: 11.2.0
       picomatch: 4.0.7
+    optionalDependencies:
+      eslint: 10.14.0(jiti@2.7.0)(supports-color@11.0.0)
 
   '@tony.ganchev/eslint-plugin-header@3.4.4(eslint@10.14.0(jiti@2.7.0)(supports-color@11.0.0))':
     dependencies:
