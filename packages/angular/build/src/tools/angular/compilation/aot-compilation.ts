@@ -331,8 +331,8 @@ export class AotCompilation extends TypeScriptCompilation {
       if (this.#state && hostOptions.modifiedFiles?.size) {
         for (const resourceDependency of resourceDependencies) {
           if (
-            // modifiedFiles holds normalized paths, so the separators differ on Windows
-            !hostOptions.modifiedFiles.has(normalize(resourceDependency)) ||
+            (!hostOptions.modifiedFiles.has(resourceDependency) &&
+              !hostOptions.modifiedFiles.has(normalize(resourceDependency))) ||
             /\.(?:css|scss|sass|less)$/i.test(resourceDependency)
           ) {
             continue;
