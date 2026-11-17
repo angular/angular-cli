@@ -171,6 +171,32 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
           });
         `,
     },
+    {
+      description: 'should transform a focused test (fit) with a done callback',
+      input: `
+          fit('should do something async', (done) => {
+            service.init().then(() => done());
+          });
+        `,
+      expected: `
+          it.only('should do something async', async () => {
+            await service.init().then(() => {});
+          });
+        `,
+    },
+    {
+      description: 'should transform a skipped test (xit) with a done callback',
+      input: `
+          xit('should do something async', (done) => {
+            done.fail('it failed');
+          });
+        `,
+      expected: `
+          it.skip('should do something async', async () => {
+            throw new Error('it failed');
+          });
+        `,
+    },
   ];
 
   testCases.forEach(({ description, input, expected }) => {
