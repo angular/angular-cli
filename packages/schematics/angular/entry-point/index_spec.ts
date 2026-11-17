@@ -473,23 +473,79 @@ describe('EntryPoint Schematic', () => {
       }
     });
 
-    it('should throw a descriptive error when the final name segment cannot name source files', async () => {
-      for (const invalidName of ['3d', 'feature/3d', 'svg~icons']) {
-        await expectAsync(
-          schematicRunner.runSchematic(
-            'entry-point',
-            {
-              name: invalidName,
-              project: 'foo',
-            },
-            workspaceTree,
-          ),
-        ).toBeRejectedWithError(
-          `Entry point name "${invalidName}" is invalid. The final path segment is used to name ` +
-            'the generated source files and must start with a letter and contain only ' +
-            'alphanumeric characters, dots, dashes, and underscores.',
-        );
-      }
+    it('should create a usable class and selector when the name starts with digits', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'entry-point',
+        {
+          name: '3d',
+          project: 'foo',
+        },
+        workspaceTree,
+      );
+
+      const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
+      expect(pkgJson.exports['./3d']).toBe('./3d/src/public-api.ts');
+
+      const componentContent = tree.readContent('/projects/foo/3d/src/lib3d.ts');
+      expect(componentContent).toContain('export class Lib3d');
+      expect(componentContent).toContain("selector: 'lib-lib3d'");
+      expect(tree.readContent('/projects/foo/3d/src/public-api.ts')).toContain(
+        "export * from './lib3d';",
+      );
+    });
+
+    it('should name artifacts from the parent segments when the final segment starts with digits', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'entry-point',
+        {
+          name: 'feature/3d',
+          project: 'foo',
+        },
+        workspaceTree,
+      );
+
+      const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
+      expect(pkgJson.exports['./feature/3d']).toBe('./feature/3d/src/public-api.ts');
+
+      const componentContent = tree.readContent('/projects/foo/feature/3d/src/feature3d.ts');
+      expect(componentContent).toContain('export class Feature3d');
+      expect(componentContent).toContain("selector: 'lib-feature3d'");
+    });
+
+    it('should merge a digit-led word into the preceding word', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'entry-point',
+        {
+          name: 'my-3d',
+          project: 'foo',
+        },
+        workspaceTree,
+      );
+
+      const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
+      expect(pkgJson.exports['./my-3d']).toBe('./my-3d/src/public-api.ts');
+
+      const componentContent = tree.readContent('/projects/foo/my-3d/src/my3d.ts');
+      expect(componentContent).toContain('export class My3d');
+      expect(componentContent).toContain("selector: 'lib-my3d'");
+    });
+
+    it('should replace characters that cannot appear in a class name or selector', async () => {
+      const tree = await schematicRunner.runSchematic(
+        'entry-point',
+        {
+          name: 'svg~icons',
+          project: 'foo',
+        },
+        workspaceTree,
+      );
+
+      const pkgJson = getJsonFileContent(tree, '/projects/foo/package.json');
+      expect(pkgJson.exports['./svg~icons']).toBe('./svg~icons/src/public-api.ts');
+
+      const componentContent = tree.readContent('/projects/foo/svg~icons/src/svg-icons.ts');
+      expect(componentContent).toContain('export class SvgIcons');
+      expect(componentContent).toContain("selector: 'lib-svg-icons'");
     });
 
     it('should allow a final name segment containing dots', async () => {
