@@ -122,6 +122,7 @@ export type DevServerBuilderOptions = {
     host?: string;
     inspect?: Inspect;
     liveReload?: boolean;
+    manualRebuild?: boolean;
     open?: boolean;
     poll?: number;
     port?: number;

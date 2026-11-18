@@ -19,6 +19,7 @@ import {
 } from '../../tools/esbuild/stylesheets/sass-language';
 import { logMessages, withNoProgress, withSpinner } from '../../tools/esbuild/utils';
 import { initializeHash } from '../../utils/hash';
+import type { ManualRebuildController, ManualRebuildResult } from '../../utils/manual-rebuild';
 import { NormalizedCachedOptions } from '../../utils/normalize-cache';
 import { ChangedFiles } from '../../utils/watcher';
 import { NormalizedApplicationBuildOptions, NormalizedOutputOptions } from './options';
@@ -50,6 +51,7 @@ export async function* runEsBuildBuildAction(
     colors?: boolean;
     jsonLogs?: boolean;
     incrementalResults?: boolean;
+    manualRebuild?: ManualRebuildController;
   },
 ): AsyncIterable<Result> {
   const {
@@ -67,6 +69,7 @@ export async function* runEsBuildBuildAction(
     colors,
     jsonLogs,
     incrementalResults,
+    manualRebuild,
   } = options;
 
   await initializeHash();
@@ -95,6 +98,11 @@ export async function* runEsBuildBuildAction(
     if (watch) {
       if (progress) {
         logger.info('Watch mode enabled. Watching for file changes...');
+        if (manualRebuild) {
+          logger.info(
+            'Manual rebuild mode enabled. File changes will be rebuilt only when a rebuild is requested.',
+          );
+        }
       }
 
       // Setup a watcher
@@ -140,8 +148,25 @@ export async function* runEsBuildBuildAction(
 
   // Wait for changes and rebuild as needed
   const currentWatchFiles = new Set(result.watchFiles);
+  let rebuilds: AsyncIterable<{
+    changes: ChangedFiles;
+    requests?: ((result: ManualRebuildResult) => void)[];
+  }>;
+  if (manualRebuild) {
+    const { waitForManualRebuilds } = await import('../../utils/manual-rebuild');
+    rebuilds = waitForManualRebuilds(watcher, manualRebuild, {
+      onChangesPending: () => {
+        if (progress) {
+          logger.info('File changes detected. Waiting for a rebuild request...');
+        }
+      },
+    });
+  } else {
+    rebuilds = mapChanges(watcher);
+  }
+
   try {
-    for await (const changes of watcher) {
+    for await (const { changes, requests } of rebuilds) {
       if (options.signal?.aborted) {
         break;
       }
@@ -202,12 +227,30 @@ export async function* runEsBuildBuildAction(
 
       // Clear initial build errors flag if no errors are now present
       hasInitialErrors &&= result.errors.length > 0;
+
+      // Notify any manual rebuild requesters now that all results have been emitted
+      if (requests?.length) {
+        const status = result.errors.length > 0 ? 'failure' : 'success';
+        for (const resolve of requests) {
+          resolve({ status });
+        }
+      }
     }
   } finally {
+    manualRebuild?.close();
+
     // Stop the watcher and cleanup incremental rebuild state
     await Promise.allSettled([watcher.close(), result.dispose()]);
 
     shutdownSassWorkerPool();
+  }
+}
+
+async function* mapChanges(
+  watcher: AsyncIterable<ChangedFiles>,
+): AsyncIterable<{ changes: ChangedFiles }> {
+  for await (const changes of watcher) {
+    yield { changes };
   }
 }
 

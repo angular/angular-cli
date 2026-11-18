@@ -13,11 +13,16 @@ import { join } from 'node:path';
 import type * as Vite from 'vite' with {
   'resolution-mode': 'import',
 };
-import type { ComponentStyleRecord } from '../../../tools/vite/middlewares';
+import {
+  type ComponentStyleRecord,
+  REBUILD_ROUTE,
+  createAngularRebuildMiddleware,
+} from '../../../tools/vite/middlewares';
 import { ServerSsrMode } from '../../../tools/vite/plugins';
 import { updateExternalMetadata } from '../../../tools/vite/utils';
 import { normalizeSourceMaps } from '../../../utils';
 import { useComponentStyleHmr, useComponentTemplateHmr } from '../../../utils/environment-options';
+import { ManualRebuildController } from '../../../utils/manual-rebuild';
 import { Result, ResultKind } from '../../application/results';
 import { OutputHashing } from '../../application/schema';
 import {
@@ -180,6 +185,18 @@ export async function* serveWithVite(
   // This will also replace file-based/inline styles as code if external runtime styles are not enabled.
   browserOptions.templateUpdates = componentsHmrCanBeUsed && useComponentTemplateHmr;
   browserOptions.incrementalResults = true;
+
+  // Setup manual rebuild support which requires watch mode to be enabled
+  let manualRebuild: ManualRebuildController | undefined;
+  if (serverOptions.manualRebuild) {
+    if (browserOptions.watch) {
+      manualRebuild = browserOptions.manualRebuild = new ManualRebuildController();
+    } else {
+      context.logger.warn(
+        `The 'manualRebuild' option has no effect because the 'watch' option is disabled.`,
+      );
+    }
+  }
 
   // Setup the prebundling transformer that will be shared across Vite prebundling requests
   const prebundleTransformer = new JavaScriptTransformer(
@@ -434,7 +451,9 @@ export async function* serveWithVite(
           'ngJitMode': browserOptions.aot ? 'false' : 'true',
           'ngHmrMode': browserOptions.templateUpdates ? 'true' : 'false',
         },
-        extensions?.middleware,
+        manualRebuild
+          ? [createAngularRebuildMiddleware(manualRebuild), ...(extensions?.middleware ?? [])]
+          : extensions?.middleware,
         transformers?.indexHtml,
         thirdPartySourcemaps,
       );
@@ -503,21 +522,45 @@ export async function* serveWithVite(
       // log connection information
       server.printUrls();
 
+      if (manualRebuild && serverUrl) {
+        context.logger.info(
+          `Manual rebuild mode enabled. Send a POST request to ${new URL(REBUILD_ROUTE, serverUrl)}` +
+            ` or press "b" to rebuild pending changes.`,
+        );
+      }
+
+      const customShortcuts: Vite.CLIShortcut<Vite.ViteDevServer>[] = [
+        {
+          key: 'r',
+          description: 'force reload browser',
+          action(server) {
+            componentStyles.forEach((record) => record.used?.clear());
+            server.ws.send({
+              type: 'full-reload',
+              path: '*',
+            });
+          },
+        },
+      ];
+
+      if (manualRebuild) {
+        const controller = manualRebuild;
+        customShortcuts.push({
+          key: 'b',
+          description: 'rebuild pending changes',
+          action() {
+            void controller.requestRebuild().then(({ status }) => {
+              if (status === 'no-changes') {
+                context.logger.info('No pending changes to rebuild.');
+              }
+            });
+          },
+        });
+      }
+
       server.bindCLIShortcuts({
         print: true,
-        customShortcuts: [
-          {
-            key: 'r',
-            description: 'force reload browser',
-            action(server) {
-              componentStyles.forEach((record) => record.used?.clear());
-              server.ws.send({
-                type: 'full-reload',
-                path: '*',
-              });
-            },
-          },
-        ],
+        customShortcuts,
       });
     }
 

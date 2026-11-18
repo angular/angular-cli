@@ -15,6 +15,7 @@ import { supportColor } from '../../utils/color';
 import { useJSONBuildLogs, usePartialSsrBuild } from '../../utils/environment-options';
 import { I18nOptions, createI18nOptions } from '../../utils/i18n-options';
 import { IndexHtmlTransform } from '../../utils/index-file/index-html-generator';
+import type { ManualRebuildController } from '../../utils/manual-rebuild';
 import { normalizeCacheOptions } from '../../utils/normalize-cache';
 import { canonicalizePath } from '../../utils/path';
 import {
@@ -113,6 +114,13 @@ interface InternalOptions {
    * for the initial build. This option also requires watch to be enabled to have an effect.
    */
   incrementalResults?: boolean;
+
+  /**
+   * When provided, file changes detected in watch mode do not automatically trigger a rebuild.
+   * Instead, accumulated changes are rebuilt incrementally only when a rebuild is requested
+   * via the controller. This option also requires watch to be enabled to have an effect.
+   */
+  manualRebuild?: ManualRebuildController;
 
   /**
    * Enables instrumentation to collect code coverage data for specific files.
@@ -560,6 +568,7 @@ export async function normalizeOptions(
     security,
     templateUpdates: !!options.templateUpdates,
     incrementalResults: !!options.incrementalResults,
+    manualRebuild: options.manualRebuild,
     customConditions: options.conditions,
     frameworkVersion: await findFrameworkVersion(projectRoot),
   };

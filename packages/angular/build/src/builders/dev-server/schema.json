@@ -102,6 +102,11 @@
       "type": "number",
       "description": "Enable and define the file watching poll time period in milliseconds."
     },
+    "manualRebuild": {
+      "type": "boolean",
+      "description": "Rebuild only when explicitly requested instead of on every file change. File changes are still tracked while in watch mode, and all pending changes are rebuilt incrementally when a `POST` request is sent to the `/__ng_rebuild` endpoint of the development server or the `b` key is pressed in the terminal. This option has no effect when 'watch' is disabled.",
+      "default": false
+    },
     "inspect": {
       "default": false,
       "description": "Activate debugging inspector. This option only has an effect when 'SSR' or 'SSG' are enabled.",

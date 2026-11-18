@@ -15,9 +15,10 @@ import { Schema as DevServerOptions } from './schema';
 
 export type NormalizedDevServerOptions = Omit<
   Awaited<ReturnType<typeof normalizeOptions>>,
-  'strictPort'
+  'strictPort' | 'manualRebuild'
 > & {
   strictPort?: boolean;
+  manualRebuild?: boolean;
 };
 
 /**
@@ -115,6 +116,7 @@ export async function normalizeOptions(
     verbose,
     define,
     watch,
+    manualRebuild,
     liveReload,
     hmr,
     headers,
@@ -138,6 +140,7 @@ export async function normalizeOptions(
     verbose,
     define,
     watch,
+    manualRebuild: !!manualRebuild,
     liveReload: !!liveReload,
     hmr: hmr ?? !!liveReload,
     headers,
