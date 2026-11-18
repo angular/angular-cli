@@ -192,7 +192,8 @@ export class LocalDevserver implements Devserver {
   }
 
   isBuilding() {
-    return this.buildInProgress;
+    // A stopped or crashed server is never building.
+    return !!this.devserverProcess && this.buildInProgress;
   }
 
   async requestRebuild(): Promise<RebuildStatus> {

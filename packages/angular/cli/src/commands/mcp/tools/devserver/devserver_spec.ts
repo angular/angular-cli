@@ -175,6 +175,16 @@ describe('Serve Tools', () => {
     expect(stopResult.structuredContent.logs).toEqual(['Fatal error.']);
   });
 
+  it('should not wait for a build if the server crashed while building', async () => {
+    await startDevserver({}, mockContext);
+
+    mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...\n');
+    mockProcess.emit('close', 1);
+
+    const waitResult = await waitForDevserverBuild({ timeout: 10 }, mockContext);
+    expect(waitResult.structuredContent.status).not.toBe('timeout');
+  });
+
   it('wait should timeout if build takes too long', async () => {
     addProjectToWorkspace(mockContext.workspace.projects, 'timeout-app');
     await startDevserver({ project: 'timeout-app' }, mockContext);
