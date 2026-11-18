@@ -1,3 +1,25 @@
+<a name="22.2.8"></a>
+
+# 22.2.8 (2026-11-18)
+
+### @schematics/angular
+
+| Commit                                                                                               | Type | Description                                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [e1e6066fb5](https://github.com/angular/angular-cli/commit/e1e6066fb5524caeb3923d8d828b17a39bc7793b) | fix  | add a TODO for negated arrayWithExactContents in refactor-jasmine-vitest   |
+| [7f5690fdcd](https://github.com/angular/angular-cli/commit/7f5690fdcd8bbf80406c5ea34c267b1b6e739eea) | fix  | handle done callbacks in focused and skipped tests                         |
+| [d363c42132](https://github.com/angular/angular-cli/commit/d363c42132169a16f30562a4a3e2d21c03b1ea77) | fix  | handle pending() in focused and skipped tests in refactor-jasmine-vitest   |
+| [c13afda017](https://github.com/angular/angular-cli/commit/c13afda017909d3714bd0df2535f59c579eca124) | fix  | preserve stub-by-default semantics for createSpy with an original function |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
+| [ae22d66f9a](https://github.com/angular/angular-cli/commit/ae22d66f9a0b00f01d0507e364ee52c77364a4ca) | fix  | generate a separate server chunk for each prerendered page |
+| [820ca173fe](https://github.com/angular/angular-cli/commit/820ca173fee1355c7dcc3b2547862d8dd0ab5639) | fix  | restore font stylesheet caching                            |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="21.2.30"></a>
 
 # 21.2.30 (2026-11-12)
