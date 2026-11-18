@@ -187,8 +187,8 @@ importers:
         specifier: 22.3.0-rc.0
         version: 22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))
       '@angular/cdk':
-        specifier: 22.3.0-rc.0
-        version: 22.3.0-rc.0(1814b6ae37d593a1cd260cecf0f13ccf)
+        specifier: 22.3.0
+        version: 22.3.0(1814b6ae37d593a1cd260cecf0f13ccf)
       '@angular/common':
         specifier: 22.3.0-rc.0
         version: 22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
@@ -205,8 +205,8 @@ importers:
         specifier: 22.3.0-rc.0
         version: 22.3.0-rc.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(@angular/compiler@22.3.0-rc.0)
       '@angular/material':
-        specifier: 22.3.0-rc.0
-        version: 22.3.0-rc.0(059018ab070e83b91db7f4917787481d)
+        specifier: 22.3.0
+        version: 22.3.0(f26eb45d9543a8168ebcee49eb082409)
       '@angular/ng-dev':
         specifier: https://github.com/angular/dev-infra-private-ng-dev-builds.git#4d3f549e803d585302ceb4d813c07ba4fe3adc1d
         version: https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4d3f549e803d585302ceb4d813c07ba4fe3adc1d(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/router@22.3.0-rc.0(@angular/common@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.3.0-rc.0(@angular/animations@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2))
@@ -463,8 +463,8 @@ importers:
         specifier: 31.0.0
         version: 31.0.0(@noble/hashes@1.8.0)
       ng-packagr:
-        specifier: 22.3.0-rc.0
-        version: 22.3.0-rc.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
+        specifier: 22.3.0
+        version: 22.3.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
       rxjs:
         specifier: 7.8.2
         version: 7.8.2
@@ -581,8 +581,8 @@ importers:
         specifier: 4.9.1
         version: 4.9.1(supports-color@11.0.0)
       ng-packagr:
-        specifier: 22.3.0-rc.0
-        version: 22.3.0-rc.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
+        specifier: 22.3.0
+        version: 22.3.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
       postcss:
         specifier: 8.5.32
         version: 8.5.32
@@ -851,8 +851,8 @@ importers:
         specifier: 3.0.4
         version: 3.0.4(bufferutil@4.2.0)(debug@4.4.3(supports-color@11.0.0))(supports-color@11.0.0)(utf-8-validate@6.0.6)
       ng-packagr:
-        specifier: 22.3.0-rc.0
-        version: 22.3.0-rc.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
+        specifier: 22.3.0
+        version: 22.3.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3)
       sass:
         specifier: 1.108.2
         version: 1.108.2
@@ -1002,13 +1002,13 @@ packages:
     peerDependencies:
       '@angular/core': 22.3.0-rc.0
 
-  '@angular/cdk@22.3.0-rc.0':
-    resolution: {integrity: sha512-PSV0lq8tRzyiziCI2jegzOnaRTe4WcQIu18CpZ9R23U8Rsw1q7/JXXd1rFHc9db8386fuZSC2hYA0v4Vv+2Trw==}
+  '@angular/cdk@22.3.0':
+    resolution: {integrity: sha512-5qLK4np1a26u/MgCgRzmP/E35DVK9lsMibT2yC22UiK5GCI7epT1bCy9PSmiTIMWNo4d7G2c6XxDWrwo0EmTCQ==}
     peerDependencies:
-      '@angular/common': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/core': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/forms': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
+      '@angular/common': ^22.0.0 || ^23.0.0
+      '@angular/core': ^22.0.0 || ^23.0.0
+      '@angular/forms': ^22.0.0 || ^23.0.0
+      '@angular/platform-browser': ^22.0.0 || ^23.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/common@22.3.0-rc.0':
@@ -1063,14 +1063,14 @@ packages:
       '@angular/compiler': 22.3.0-rc.0
       '@angular/compiler-cli': 22.3.0-rc.0
 
-  '@angular/material@22.3.0-rc.0':
-    resolution: {integrity: sha512-teApmkZfm/DMBeWniBa7PUV+9SeQKRqzCANaaXHzk8rKMTDUURfcUkOsej7DuipXLxjbqlD+EiuuWw5gh605oA==}
+  '@angular/material@22.3.0':
+    resolution: {integrity: sha512-ddyRNSJYhTCgCS8bpTGtIAC+mDMp+hTjhag3sZXDa+HdyQsasQ6yFaoYF6KXWwE9StEBxkuPavKok4vwweSNxQ==}
     peerDependencies:
-      '@angular/cdk': 22.3.0-rc.0
-      '@angular/common': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/core': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/forms': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
-      '@angular/platform-browser': ^22.0.0-0 || ^22.1.0-0 || ^22.2.0-0 || ^22.3.0-0 || ^23.0.0-0
+      '@angular/cdk': 22.3.0
+      '@angular/common': ^22.0.0 || ^23.0.0
+      '@angular/core': ^22.0.0 || ^23.0.0
+      '@angular/forms': ^22.0.0 || ^23.0.0
+      '@angular/platform-browser': ^22.0.0 || ^23.0.0
       rxjs: ^6.5.3 || ^7.4.0
 
   '@angular/ng-dev@https://codeload.github.com/angular/dev-infra-private-ng-dev-builds/tar.gz/4d3f549e803d585302ceb4d813c07ba4fe3adc1d':
@@ -4355,19 +4355,9 @@ packages:
   '@yarnpkg/lockfile@1.1.0':
     resolution: {integrity: sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==}
 
-  '@yuku-toolchain/darwin-arm64@0.25.0':
-    resolution: {integrity: sha512-21QMCgP74cgSrgxIgw/SS5uMnn7cFHwgjNEBZYgO1HxpdjG4ULenXyUY92xRReuAJZdbRyz6OGwtYi6lDKumSw==}
-    cpu: [arm64]
-    os: [darwin]
-
   '@yuku-toolchain/darwin-arm64@0.27.0':
     resolution: {integrity: sha512-A3v83rNyHWlnJeeMBsWggZ+RZDP2BEMHIiMk+j23LqtVch24MXwg8veflkQgZ2GtCtZOxcG+NkztnsSUS4rWEQ==}
     cpu: [arm64]
-    os: [darwin]
-
-  '@yuku-toolchain/darwin-x64@0.25.0':
-    resolution: {integrity: sha512-bsR90bUlDZpBdFyK5C+XFZ/Yuq4aPtK8BI15GZsT+dfdWabl8OGpTiJXcriSBu+4vrljw3pYKmn7WizWgjZ0fQ==}
-    cpu: [x64]
     os: [darwin]
 
   '@yuku-toolchain/darwin-x64@0.27.0':
@@ -4375,19 +4365,9 @@ packages:
     cpu: [x64]
     os: [darwin]
 
-  '@yuku-toolchain/linux-arm64@0.25.0':
-    resolution: {integrity: sha512-T0Y/gCqE4FKfchzRKpxXbQyWFpyaCcw6wdopu1ZKCLqZs48MfZShqihQjq1dck0JgJYwc+zxlfVvb693gFH4fg==}
-    cpu: [arm64]
-    os: [linux]
-
   '@yuku-toolchain/linux-arm64@0.27.0':
     resolution: {integrity: sha512-IPB+9LSC/sf8Sa8DtqapUgU4uTL/U94Vr5mgUsfRx59u8/4BT38cze+e5b96AlQynsdtuF4tgC0FW0TmJ2B75g==}
     cpu: [arm64]
-    os: [linux]
-
-  '@yuku-toolchain/linux-x64@0.25.0':
-    resolution: {integrity: sha512-uwroa8GsFLJLarEphscB0UCqrx3jdDNqhwVZC2Tv2QDN4i4Eo87NmJaTFpOlNF4+CNVsiN+P0BnriySTidc3xQ==}
-    cpu: [x64]
     os: [linux]
 
   '@yuku-toolchain/linux-x64@0.27.0':
@@ -4395,19 +4375,9 @@ packages:
     cpu: [x64]
     os: [linux]
 
-  '@yuku-toolchain/win32-arm64@0.25.0':
-    resolution: {integrity: sha512-VssXbUjyRj1egmSSNwo2NEayMTth0mHBPit9WiYGEnvQyTQSUM0TLix0sJn/mVjJBrwqEKyGYg7dkdWFafNYFw==}
-    cpu: [arm64]
-    os: [win32]
-
   '@yuku-toolchain/win32-arm64@0.27.0':
     resolution: {integrity: sha512-NZmiFTF7ee45Fhnsa0BGMCpElJGg8iGYt4N3UoKj/n1vNmACcgY6NI4najNr9Jc1ulIVVvtPbo934RMlZQakrA==}
     cpu: [arm64]
-    os: [win32]
-
-  '@yuku-toolchain/win32-x64@0.25.0':
-    resolution: {integrity: sha512-drLnLlLtqLni1UPZJ1pKl6PPsdGJoaFGaQsJa1khtjJT+OK5Z71rb+md9fO6KP9eJXjIOJKtW7OgnVlLf91WIw==}
-    cpu: [x64]
     os: [win32]
 
   '@yuku-toolchain/win32-x64@0.27.0':
@@ -7020,12 +6990,12 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  ng-packagr@22.3.0-rc.0:
-    resolution: {integrity: sha512-xh28JcrWXGiBlDROY2jXWAp9OhzKK7kpzssQ48quOF+C3nS1cmvtl5St2wCah6WlyRIY3FyMFiKIvbj2F48ffQ==}
+  ng-packagr@22.3.0:
+    resolution: {integrity: sha512-hua3iDuY2UCzwQBS7Hdrh7zGi0hS+eoMdnHLTyu6ad7lftZwvRGhJcYPMUJYVKPjppk4pih16AzhemcevQ+pdw==}
     engines: {node: ^22.22.3 || ^24.15.0 || >=26.0.0}
     hasBin: true
     peerDependencies:
-      '@angular/compiler-cli': ^22.0.0 || ^22.2.0-next || ^22.3.0-next
+      '@angular/compiler-cli': ^22.0.0 || ^22.3.0-next || ^22.4.0-next
       tailwindcss: ^2.0.0 || ^3.0.0 || ^4.0.0
       tslib: ^2.3.0
       typescript: '>=6.0 <6.1'
@@ -7672,28 +7642,6 @@ packages:
   rimraf@5.0.10:
     resolution: {integrity: sha512-l0OE8wL34P4nJH/H2ffoaniAokM2qSmrtXHmlpvYr5AVVX8msAyW0l8NVJFDxlSK4u3Uh/f41cQheDVdnYijwQ==}
     hasBin: true
-
-  rolldown-plugin-dts@0.29.0:
-    resolution: {integrity: sha512-PvsbRXQR5tHGnjLyxj2peRMwv3pfRfStiIqhbag3J/I2fFaYdfEQ1AaFwXfZlK8qKBkgQUNnCZdrUcaTPPq05Q==}
-    engines: {node: ^22.18.0 || ^24.11.0 || >=26.0.0}
-    peerDependencies:
-      '@volar/typescript': ~2.4.0
-      '@vue/language-core': ~3.2.0 || ~3.3.0
-      rolldown: ^1.2.0
-      tsrs: '*'
-      typescript: ^5.0.0 || ^6.0.0 || ~7.0.0 || ~7.1.0-0
-      vue-tsc: ~3.2.0 || ~3.3.0
-    peerDependenciesMeta:
-      '@volar/typescript':
-        optional: true
-      '@vue/language-core':
-        optional: true
-      tsrs:
-        optional: true
-      typescript:
-        optional: true
-      vue-tsc:
-        optional: true
 
   rolldown-plugin-dts@0.30.1:
     resolution: {integrity: sha512-tCDbuPygVmJMeq+Jk5BM3DUFx/6HO3HhJxI2yfc6ngtDGH71D5Qb7wv0V1sx4PPlqOErUrzAHXo8wQcLInreRQ==}
@@ -8941,15 +8889,6 @@ packages:
     resolution: {integrity: sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg==}
     engines: {node: '>=18'}
 
-  yuku@0.25.0:
-    resolution: {integrity: sha512-iAlHlpPmcjRqUauDkW9xF33b+jsUzTrrv49FfPLBNxEAUWuU7XN8tBUGjBHYPCEF/d3632MhG6GjCZutecA8Ng==}
-    engines: {node: '>=16.4.0'}
-    peerDependencies:
-      '@yuku-toolchain/wasm': 0.25.0
-    peerDependenciesMeta:
-      '@yuku-toolchain/wasm':
-        optional: true
-
   yuku@0.27.0:
     resolution: {integrity: sha512-YmSD4xYlESRi8egxzC4guegQdMhAcz1G9NUsMNrTABAIV9dQxoBzDC7ZyAG/dSG18o1Oxt4xDok2irvPy9FSJQ==}
     engines: {node: '>=16.4.0'}
@@ -8993,7 +8932,7 @@ snapshots:
       '@angular/core': 22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)
       tslib: 2.9.1
 
-  '@angular/cdk@22.3.0-rc.0(1814b6ae37d593a1cd260cecf0f13ccf)':
+  '@angular/cdk@22.3.0(1814b6ae37d593a1cd260cecf0f13ccf)':
     dependencies:
       '@angular/common': 22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
       '@angular/core': 22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)
@@ -9053,9 +8992,9 @@ snapshots:
       tinyglobby: 0.2.17
       yargs: 18.2.0
 
-  '@angular/material@22.3.0-rc.0(059018ab070e83b91db7f4917787481d)':
+  '@angular/material@22.3.0(f26eb45d9543a8168ebcee49eb082409)':
     dependencies:
-      '@angular/cdk': 22.3.0-rc.0(1814b6ae37d593a1cd260cecf0f13ccf)
+      '@angular/cdk': 22.3.0(1814b6ae37d593a1cd260cecf0f13ccf)
       '@angular/common': 22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2)
       '@angular/core': 22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)
       '@angular/forms': 22.3.0-rc.0(@angular/common@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(@angular/platform-browser@22.3.0-rc.0(@angular/animations@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)))(@angular/common@22.3.0-rc.0(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3))(rxjs@7.8.2))(@angular/core@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(rxjs@7.8.2)(zone.js@0.16.3)))(rxjs@7.8.2)
@@ -12595,37 +12534,19 @@ snapshots:
 
   '@yarnpkg/lockfile@1.1.0': {}
 
-  '@yuku-toolchain/darwin-arm64@0.25.0':
-    optional: true
-
   '@yuku-toolchain/darwin-arm64@0.27.0':
-    optional: true
-
-  '@yuku-toolchain/darwin-x64@0.25.0':
     optional: true
 
   '@yuku-toolchain/darwin-x64@0.27.0':
     optional: true
 
-  '@yuku-toolchain/linux-arm64@0.25.0':
-    optional: true
-
   '@yuku-toolchain/linux-arm64@0.27.0':
-    optional: true
-
-  '@yuku-toolchain/linux-x64@0.25.0':
     optional: true
 
   '@yuku-toolchain/linux-x64@0.27.0':
     optional: true
 
-  '@yuku-toolchain/win32-arm64@0.25.0':
-    optional: true
-
   '@yuku-toolchain/win32-arm64@0.27.0':
-    optional: true
-
-  '@yuku-toolchain/win32-x64@0.25.0':
     optional: true
 
   '@yuku-toolchain/win32-x64@0.27.0':
@@ -15551,7 +15472,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  ng-packagr@22.3.0-rc.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3):
+  ng-packagr@22.3.0(@angular/compiler-cli@22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3))(supports-color@11.0.0)(tslib@2.9.1)(typescript@6.0.3):
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@angular/compiler-cli': 22.3.0-rc.0(@angular/compiler@22.3.0-rc.0)(typescript@6.0.3)
@@ -15567,7 +15488,7 @@ snapshots:
       ora: 10.0.0
       postcss: 8.5.33
       rolldown: 1.3.2
-      rolldown-plugin-dts: 0.29.0(rolldown@1.3.2)(typescript@6.0.3)
+      rolldown-plugin-dts: 0.30.1(rolldown@1.3.2)(typescript@6.0.3)
       rxjs: 7.8.2
       sass: 1.108.2
       sass-embedded: 1.108.2
@@ -16312,25 +16233,25 @@ snapshots:
     dependencies:
       glob: 10.5.0
 
-  rolldown-plugin-dts@0.29.0(rolldown@1.3.2)(typescript@6.0.3):
-    dependencies:
-      dts-resolver: 3.0.0
-      get-tsconfig: 5.0.0-beta.6
-      obug: 3.0.0
-      rolldown: 1.3.2
-      yuku: 0.25.0
-    optionalDependencies:
-      typescript: 6.0.3
-    transitivePeerDependencies:
-      - '@yuku-toolchain/wasm'
-      - oxc-resolver
-
   rolldown-plugin-dts@0.30.1(rolldown@1.3.1)(typescript@6.0.3):
     dependencies:
       dts-resolver: 3.0.0
       get-tsconfig: 5.0.0-beta.6
       obug: 3.0.0
       rolldown: 1.3.1
+      yuku: 0.27.0
+    optionalDependencies:
+      typescript: 6.0.3
+    transitivePeerDependencies:
+      - '@yuku-toolchain/wasm'
+      - oxc-resolver
+
+  rolldown-plugin-dts@0.30.1(rolldown@1.3.2)(typescript@6.0.3):
+    dependencies:
+      dts-resolver: 3.0.0
+      get-tsconfig: 5.0.0-beta.6
+      obug: 3.0.0
+      rolldown: 1.3.2
       yuku: 0.27.0
     optionalDependencies:
       typescript: 6.0.3
@@ -17729,15 +17650,6 @@ snapshots:
   yocto-queue@0.1.0: {}
 
   yoctocolors@2.2.0: {}
-
-  yuku@0.25.0:
-    optionalDependencies:
-      '@yuku-toolchain/darwin-arm64': 0.25.0
-      '@yuku-toolchain/darwin-x64': 0.25.0
-      '@yuku-toolchain/linux-arm64': 0.25.0
-      '@yuku-toolchain/linux-x64': 0.25.0
-      '@yuku-toolchain/win32-arm64': 0.25.0
-      '@yuku-toolchain/win32-x64': 0.25.0
 
   yuku@0.27.0:
     optionalDependencies:
