@@ -1,3 +1,27 @@
+<a name="22.3.0-rc.1"></a>
+
+# 22.3.0-rc.1 (2026-11-18)
+
+### @schematics/angular
+
+| Commit                                                                                               | Type | Description                                                                |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------- |
+| [464987558f](https://github.com/angular/angular-cli/commit/464987558fd7c425e1b048f5f8582b761d199f46) | fix  | add a TODO for negated arrayWithExactContents in refactor-jasmine-vitest   |
+| [e50f182367](https://github.com/angular/angular-cli/commit/e50f182367413e5a6eaa846cce12c20911fa19df) | fix  | handle done callbacks in focused and skipped tests                         |
+| [3df747bbfb](https://github.com/angular/angular-cli/commit/3df747bbfb22b9cc6bf58e1c67edffe4064897e2) | fix  | handle pending() in focused and skipped tests in refactor-jasmine-vitest   |
+| [a2d8a25dea](https://github.com/angular/angular-cli/commit/a2d8a25dea58d2fb48ab1f5e1137b9f358349505) | fix  | preserve stub-by-default semantics for createSpy with an original function |
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description                                                    |
+| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
+| [0ee493e45e](https://github.com/angular/angular-cli/commit/0ee493e45e9d45d2ea3bf86eed236f40f53c7b8c) | fix  | generate a separate server chunk for each prerendered page     |
+| [f556fb41e3](https://github.com/angular/angular-cli/commit/f556fb41e3233659fb44ee378bc30745476c0fba) | fix  | rebase Vitest incremental paths when workspace root is aliased |
+| [4301fb4ebb](https://github.com/angular/angular-cli/commit/4301fb4ebb23ae0618355460cebeb7f63d2503f3) | fix  | resolve Vitest artifacts when workspace root is aliased        |
+| [67595ebff8](https://github.com/angular/angular-cli/commit/67595ebff8d14a34921e3a3eb73458ea0fe067d2) | fix  | restore font stylesheet caching                                |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.3.0-rc.0"></a>
 
 # 22.3.0-rc.0 (2026-11-12)
