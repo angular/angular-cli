@@ -14,6 +14,7 @@ import {
   addProjectToWorkspace,
   createMockContext,
 } from '../../testing/test-utils';
+import { rebuildDevserver } from './devserver-rebuild';
 import { startDevserver } from './devserver-start';
 import { stopDevserver } from './devserver-stop';
 import { WATCH_DELAY, waitForDevserverBuild } from './devserver-wait-for-build';
@@ -235,5 +236,62 @@ describe('Serve Tools', () => {
       expect((e as Error).message).toContain('Dev server not found. Currently running servers:');
       expect((e as Error).message).toContain("- Project 'app-one' in workspace path '/test'");
     }
+  });
+
+  describe('manual rebuild', () => {
+    let fetchSpy: jasmine.Spy<typeof fetch>;
+
+    beforeEach(() => {
+      fetchSpy = spyOn(globalThis, 'fetch');
+    });
+
+    it('should start the dev server in manual rebuild mode', async () => {
+      const startResult = await startDevserver({ manualRebuild: true }, mockContext);
+      expect(startResult.structuredContent.message).toContain('started in manual rebuild mode');
+      expect(mockHost.startNgProcess).toHaveBeenCalledWith(
+        ['serve', 'my-app', '--port=12345', '--manual-rebuild'],
+        { stdio: 'pipe', cwd: '/test' },
+      );
+    });
+
+    it('should request a rebuild and report the build logs', async () => {
+      await startDevserver({ manualRebuild: true }, mockContext);
+      fetchSpy.and.callFake(async () => {
+        mockProcess.stdout.emit('data', '❯ Changes detected. Rebuilding...\n');
+        mockProcess.stdout.emit('data', 'Application bundle generation complete.\n');
+
+        return Response.json({ status: 'success' });
+      });
+
+      const result = await rebuildDevserver({}, mockContext);
+
+      expect(fetchSpy).toHaveBeenCalledWith(new URL('http://localhost:12345/__ng_rebuild'), {
+        method: 'POST',
+      });
+      expect(result.structuredContent.status).toBe('success');
+      expect(result.structuredContent.logs).toEqual([
+        '❯ Changes detected. Rebuilding...',
+        'Application bundle generation complete.',
+      ]);
+    });
+
+    it('should report when there are no changes to rebuild', async () => {
+      await startDevserver({ manualRebuild: true }, mockContext);
+      fetchSpy.and.resolveTo(Response.json({ status: 'no-changes' }));
+
+      const result = await rebuildDevserver({}, mockContext);
+
+      expect(result.structuredContent.status).toBe('no-changes');
+      expect(result.structuredContent.logs).toBeUndefined();
+    });
+
+    it('should fail if the dev server is not in manual rebuild mode', async () => {
+      await startDevserver({}, mockContext);
+
+      await expectAsync(rebuildDevserver({}, mockContext)).toBeRejectedWithError(
+        /not started in manual rebuild mode/,
+      );
+      expect(fetchSpy).not.toHaveBeenCalled();
+    });
   });
 });

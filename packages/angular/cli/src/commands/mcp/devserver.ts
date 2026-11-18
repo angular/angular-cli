@@ -28,6 +28,16 @@ const BUILD_END_MESSAGES = [
 export type BuildStatus = 'success' | 'failure' | 'unknown';
 
 /**
+ * The outcome of a manually requested rebuild, as reported by the development server.
+ */
+export type RebuildStatus = 'success' | 'failure' | 'no-changes' | 'cancelled';
+
+/**
+ * The development server route used to request a rebuild when manual rebuild mode is enabled.
+ */
+export const REBUILD_ROUTE = '/__ng_rebuild';
+
+/**
  * An Angular development server managed by the MCP server.
  */
 export interface Devserver {
@@ -59,9 +69,22 @@ export interface Devserver {
   isBuilding(): boolean;
 
   /**
+   * Requests an incremental rebuild of all pending file changes. Only supported when the
+   * dev server was started in manual rebuild mode.
+   *
+   * Resolves once the rebuild has completed.
+   */
+  requestRebuild(): Promise<RebuildStatus>;
+
+  /**
    * `ng serve` port to use.
    */
   port: number;
+
+  /**
+   * Whether the dev server only rebuilds when explicitly requested.
+   */
+  manualRebuild: boolean;
 
   /**
    * The workspace path for this server.
@@ -82,6 +105,7 @@ export class LocalDevserver implements Devserver {
   readonly port: number;
   readonly workspacePath: string;
   readonly project: string;
+  readonly manualRebuild: boolean;
 
   private devserverProcess: ChildProcess | null = null;
   private serverLogs: string[] = [];
@@ -94,16 +118,19 @@ export class LocalDevserver implements Devserver {
     port,
     workspacePath,
     project,
+    manualRebuild = false,
   }: {
     host: Host;
     port: number;
     workspacePath: string;
     project: string;
+    manualRebuild?: boolean;
   }) {
     this.host = host;
     this.port = port;
     this.workspacePath = workspacePath;
     this.project = project;
+    this.manualRebuild = manualRebuild;
   }
 
   start() {
@@ -117,6 +144,10 @@ export class LocalDevserver implements Devserver {
     }
 
     args.push(`--port=${this.port}`);
+
+    if (this.manualRebuild) {
+      args.push('--manual-rebuild');
+    }
 
     this.devserverProcess = this.host.startNgProcess(args, {
       stdio: 'pipe',
@@ -162,6 +193,33 @@ export class LocalDevserver implements Devserver {
 
   isBuilding() {
     return this.buildInProgress;
+  }
+
+  async requestRebuild(): Promise<RebuildStatus> {
+    if (!this.manualRebuild) {
+      throw new Error(
+        `Development server for project '${this.project}' was not started in manual rebuild mode.`,
+      );
+    }
+    if (!this.devserverProcess) {
+      throw new Error(`Development server for project '${this.project}' is not running.`);
+    }
+
+    const response = await fetch(new URL(REBUILD_ROUTE, `http://localhost:${this.port}`), {
+      method: 'POST',
+    });
+    let body: { status?: RebuildStatus } | undefined;
+    try {
+      body = (await response.json()) as { status?: RebuildStatus };
+    } catch {}
+
+    if (!body?.status) {
+      throw new Error(
+        `Unexpected rebuild response from the development server (HTTP ${response.status}).`,
+      );
+    }
+
+    return body.status;
   }
 }
 

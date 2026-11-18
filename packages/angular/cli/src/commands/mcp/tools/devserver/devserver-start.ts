@@ -22,6 +22,13 @@ const devserverStartToolInputSchema = z.object({
       'The port number to run the server on. If not provided, a random available port will be chosen. ' +
         'It is recommended to reuse port numbers across calls within the same workspace to maintain consistency.',
     ),
+  manualRebuild: z
+    .boolean()
+    .optional()
+    .describe(
+      'When true, the server tracks file changes but only rebuilds when the "devserver_rebuild" tool is called. ' +
+        'Recommended when making many file edits in a batch, to avoid repeated rebuilds while files are still being edited.',
+    ),
 });
 
 export type DevserverStartToolInput = z.infer<typeof devserverStartToolInputSchema>;
@@ -78,13 +85,17 @@ export async function startDevserver(input: DevserverStartToolInput, context: Mc
     project: projectName,
     port,
     workspacePath,
+    manualRebuild: input.manualRebuild,
   });
   devserver.start();
 
   context.devservers.set(key, devserver);
 
   return createStructuredContentOutput({
-    message: `Development server for project '${projectName}' started and watching for workspace changes.`,
+    message: input.manualRebuild
+      ? `Development server for project '${projectName}' started in manual rebuild mode. ` +
+        `Call "devserver_rebuild" to rebuild after making changes.`
+      : `Development server for project '${projectName}' started and watching for workspace changes.`,
     address: localhostAddress(port),
   });
 }
@@ -117,6 +128,8 @@ the first build completes.
   changes or run more tests, as it saves time on restarts and maintains the file watcher state. You must still call
   'devserver_wait_for_build' after every change to see whether the change was successfully built and be sure that the app was updated.
 * **Consistent Ports**: If making multiple calls, it is recommended to reuse the port you got from the first call for subsequent ones.
+* **Manual Rebuilds**: Set "manualRebuild" to true to only rebuild when "devserver_rebuild" is called. This is useful when editing
+  many files in a batch. In this mode, call "devserver_rebuild" (instead of "devserver_wait_for_build") once all edits are done.
 </Operational Notes>
 `,
   isReadOnly: false,

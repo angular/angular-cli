@@ -16,6 +16,7 @@ import { LocalWorkspaceHost, createRootRestrictedHost } from './host';
 import { registerInstructionsResource } from './resources/instructions';
 import { AI_TUTOR_TOOL } from './tools/ai-tutor';
 import { BEST_PRACTICES_TOOL } from './tools/best-practices';
+import { DEVSERVER_REBUILD_TOOL } from './tools/devserver/devserver-rebuild';
 import { DEVSERVER_START_TOOL } from './tools/devserver/devserver-start';
 import { DEVSERVER_STOP_TOOL } from './tools/devserver/devserver-stop';
 import { DEVSERVER_WAIT_FOR_BUILD_TOOL } from './tools/devserver/devserver-wait-for-build';
@@ -28,7 +29,12 @@ import { type AnyMcpToolDeclaration, registerTools } from './tools/tool-registry
 /**
  * Tools to manage devservers. Should be bundled together, then added to experimental or stable as a group.
  */
-const DEVSERVER_TOOLS = [DEVSERVER_START_TOOL, DEVSERVER_STOP_TOOL, DEVSERVER_WAIT_FOR_BUILD_TOOL];
+const DEVSERVER_TOOLS = [
+  DEVSERVER_START_TOOL,
+  DEVSERVER_STOP_TOOL,
+  DEVSERVER_WAIT_FOR_BUILD_TOOL,
+  DEVSERVER_REBUILD_TOOL,
+];
 
 /**
  * The set of tools that are enabled by default for the MCP server.
