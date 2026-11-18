@@ -165,8 +165,12 @@ export async function* runEsBuildBuildAction(
     rebuilds = mapChanges(watcher);
   }
 
+  // Manual rebuild requests for the rebuild in progress. These are resolved as cancelled if the
+  // loop exits before the rebuild completes (e.g., abort signal, build error, or consumer exit).
+  let activeRequests: ((result: ManualRebuildResult) => void)[] | undefined;
   try {
     for await (const { changes, requests } of rebuilds) {
+      activeRequests = requests;
       if (options.signal?.aborted) {
         break;
       }
@@ -235,8 +239,14 @@ export async function* runEsBuildBuildAction(
           resolve({ status });
         }
       }
+      activeRequests = undefined;
     }
   } finally {
+    if (activeRequests) {
+      for (const resolve of activeRequests) {
+        resolve({ status: 'cancelled' });
+      }
+    }
     manualRebuild?.close();
 
     // Stop the watcher and cleanup incremental rebuild state

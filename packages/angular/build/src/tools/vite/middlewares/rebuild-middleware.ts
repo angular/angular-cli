@@ -45,7 +45,10 @@ export function createAngularRebuildMiddleware(
 
     // Reject cross-origin requests made by browsers to prevent arbitrary web pages from
     // triggering rebuilds. Non-browser clients (e.g., curl or tooling) do not send an origin.
-    if (!isSameOrigin(req.headers.origin, req.headers.host)) {
+    // HTTP/2 requests (used by the development server when SSL is enabled) provide the
+    // `:authority` pseudo-header instead of `host`.
+    const host = req.headers.host ?? (req.headers[':authority'] as string | undefined);
+    if (!isSameOrigin(req.headers.origin, host)) {
       res.statusCode = 403;
       res.end();
 
