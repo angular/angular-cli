@@ -55,6 +55,10 @@ describe('parseRunnerArgs', () => {
       expect(parse('--bail', '1').cli).toEqual({ bail: 1 });
     });
 
+    it('should support the bail option without a value', () => {
+      expect(parse('--bail').cli).toEqual({ bail: 1 });
+    });
+
     it('should support multiple options', () => {
       expect(parse('--retry=2', '--testTimeout=10000', '--allowOnly').cli).toEqual({
         retry: 2,
@@ -104,10 +108,16 @@ describe('parseRunnerArgs', () => {
 
     it('should reject an invalid value for a supported option', () => {
       expect(() => parse('--bail=abc')).toThrowError(
+        /Vitest was unable to parse the "runnerArgs" option:.*--bail=abc/,
+      );
+      expect(() => parse('--bail=-1')).toThrowError(
         /The Vitest "--bail" option requires a non-negative integer\./,
       );
-      expect(() => parse('--bail')).toThrowError(
-        /The Vitest "--bail" option requires a non-negative integer\./,
+      expect(() => parse('--retry=abc')).toThrowError(
+        /The Vitest "--retry" option requires a non-negative integer\./,
+      );
+      expect(() => parse('--retry')).toThrowError(
+        /The Vitest "--retry" option requires a non-negative integer\./,
       );
       expect(() => parse('--update=other')).toThrowError(
         /The Vitest "--update" option requires a boolean, "all", "new", or "none"\./,
