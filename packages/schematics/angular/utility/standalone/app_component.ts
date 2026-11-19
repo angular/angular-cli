@@ -89,7 +89,11 @@ function resolveNgModuleBasedData(
       );
     });
 
-    const componentIdentifier = (bootstrapProp?.initializer as ts.ArrayLiteralExpression)
+    if (!bootstrapProp) {
+      continue;
+    }
+
+    const componentIdentifier = (bootstrapProp.initializer as ts.ArrayLiteralExpression)
       .elements[0] as ts.Identifier | undefined;
     const componentResult = componentIdentifier ? resolveIdentifier(componentIdentifier) : null;
     const bootstrapCall = findBootstrapModuleCall(tree, mainFilePath);

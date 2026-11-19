@@ -109,6 +109,78 @@ describe('Server Schematic', () => {
       expect(contents).toContain(`bootstrap: [MyCustomApp],`);
     });
 
+    it('should skip an NgModule without bootstrap that is declared before the root module', async () => {
+      appTree.create(
+        '/projects/bar/src/app/my-custom-module.ts',
+        `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+          import { MyCustomApp } from './foo/bar/baz/app.foo';
+
+          @NgModule({
+            exports: [],
+          })
+          export class SharedModule {}
+
+          @NgModule({
+            declarations: [MyCustomApp],
+            imports: [BrowserModule, SharedModule],
+            bootstrap: [MyCustomApp]
+          })
+          export class MyCustomModule {}
+      `,
+      );
+
+      appTree.overwrite(
+        '/projects/bar/src/main.ts',
+        `
+        import { platformBrowser } from '@angular/platform-browser';
+        import { MyCustomModule } from './app/my-custom-module';
+
+        platformBrowser().bootstrapModule(MyCustomModule)
+          .catch(err => console.error(err));
+      `,
+      );
+
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      const contents = tree.readContent('/projects/bar/src/app/app.module.server.ts');
+
+      expect(contents).toContain(`import { MyCustomApp } from './foo/bar/baz/app.foo';`);
+      expect(contents).toContain(`imports: [MyCustomModule],`);
+      expect(contents).toContain(`bootstrap: [MyCustomApp],`);
+    });
+
+    it('should not fail when the root NgModule uses ngDoBootstrap', async () => {
+      appTree.create(
+        '/projects/bar/src/app/my-custom-module.ts',
+        `
+          import { NgModule } from '@angular/core';
+          import { BrowserModule } from '@angular/platform-browser';
+
+          @NgModule({
+            imports: [BrowserModule],
+          })
+          export class MyCustomModule {
+            ngDoBootstrap() {}
+          }
+      `,
+      );
+
+      appTree.overwrite(
+        '/projects/bar/src/main.ts',
+        `
+        import { platformBrowser } from '@angular/platform-browser';
+        import { MyCustomModule } from './app/my-custom-module';
+
+        platformBrowser().bootstrapModule(MyCustomModule)
+          .catch(err => console.error(err));
+      `,
+      );
+
+      const tree = await schematicRunner.runSchematic('server', defaultOptions, appTree);
+      expect(tree.exists('/projects/bar/src/app/app.module.server.ts')).toBeTrue();
+    });
+
     it('should account for renamed app component and module that have been aliased', async () => {
       appTree.create(
         '/projects/bar/src/app/my-custom-module.ts',
