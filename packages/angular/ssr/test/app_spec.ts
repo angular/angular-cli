@@ -15,11 +15,13 @@ import { APP_BASE_HREF } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  EnvironmentInjector,
   PendingTasks,
   PlatformRef,
   REQUEST,
   RESPONSE_INIT,
   inject,
+  provideAppInitializer,
 } from '@angular/core';
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { setTimeout } from 'node:timers/promises';
@@ -30,6 +32,7 @@ import { setAngularAppTestingManifest } from './testing-utils';
 describe('AngularServerApp', () => {
   let app: AngularServerApp;
   let slowRouteHook: (() => void) | undefined;
+  let appInitializerHook: (() => Promise<void>) | undefined;
 
   @Component({
     selector: 'app-home',
@@ -198,6 +201,7 @@ describe('AngularServerApp', () => {
           provide: APP_BASE_HREF,
           useFactory: () => inject(REQUEST)?.headers.get('X-Forwarded-Prefix'),
         },
+        provideAppInitializer(() => appInitializerHook?.()),
       ],
     );
 
@@ -340,6 +344,8 @@ describe('AngularServerApp', () => {
         });
         let appDestroyed = false;
         let destroySpy: jasmine.Spy | undefined;
+        const abortTimeout = new AbortController();
+        spyOn(AbortSignal, 'timeout').and.returnValue(abortTimeout.signal);
 
         slowRouteHook = () => {
           destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
@@ -369,6 +375,11 @@ describe('AngularServerApp', () => {
             DOMException,
             /Request for: http:\/\/localhost\/page-slow was aborted/,
           );
+          await setTimeout(0);
+          expect(destroySpy).not.toHaveBeenCalled();
+
+          // Simulate the abort timeout elapsing as the pending task never resolves
+          abortTimeout.abort();
 
           // Wait for the macrotask queue to clear since platform destruction is scheduled via setTimeout(0)
           await setTimeout(0);
@@ -376,6 +387,103 @@ describe('AngularServerApp', () => {
           expect(appDestroyed).toBeTrue();
         } finally {
           slowRouteHook = undefined;
+        }
+      });
+
+      it('should destroy the platform once pending work settles when an in-flight request is aborted', async () => {
+        const { promise: taskReady, resolve: resolveTaskReady } = Promise.withResolvers<void>();
+        const { promise: workDone, resolve: resolveWork } = Promise.withResolvers<void>();
+        const { promise: platformDestroyed, resolve: resolvePlatformDestroyed } =
+          Promise.withResolvers<void>();
+        let pendingWork: Promise<unknown> | undefined;
+        let destroySpy: jasmine.Spy | undefined;
+
+        slowRouteHook = () => {
+          const platformRef = inject(PlatformRef);
+          destroySpy = spyOn(platformRef, 'destroy').and.callThrough();
+          platformRef.onDestroy(resolvePlatformDestroyed);
+
+          // Like an `HttpClient` request, this work holds a pending task and uses the application once it settles
+          const injector = inject(EnvironmentInjector);
+          const removeTask = inject(PendingTasks).add();
+          pendingWork = workDone.then(() => injector.get(Router)).finally(removeTask);
+          resolveTaskReady();
+        };
+
+        try {
+          const controller = new AbortController();
+          const request = new Request('http://localhost/page-slow', { signal: controller.signal });
+
+          const handlePromise = app.handle(request);
+
+          // Abort the request while the work is still pending
+          await taskReady;
+          controller.abort();
+
+          await expectAsync(handlePromise).toBeRejectedWithError(
+            DOMException,
+            /Request for: http:\/\/localhost\/page-slow was aborted/,
+          );
+          await setTimeout(0);
+          expect(destroySpy).not.toHaveBeenCalled();
+
+          resolveWork();
+          await expectAsync(pendingWork).toBeResolved();
+
+          await platformDestroyed;
+          expect(destroySpy).toHaveBeenCalledTimes(1);
+        } finally {
+          slowRouteHook = undefined;
+        }
+      });
+
+      it('should wait for a pending app initializer before destroying the platform when the request is aborted', async () => {
+        // Warm up the router so route extraction does not run the app initializer during this test
+        const warmupResponse = await app.handle(new Request('http://localhost/home'));
+        await warmupResponse?.text();
+        await setTimeout(0);
+
+        const { promise: initializerStarted, resolve: resolveInitializerStarted } =
+          Promise.withResolvers<void>();
+        const { promise: initializerDone, resolve: resolveInitializer } =
+          Promise.withResolvers<void>();
+        const { promise: platformDestroyed, resolve: resolvePlatformDestroyed } =
+          Promise.withResolvers<void>();
+        let destroySpy: jasmine.Spy | undefined;
+
+        appInitializerHook = () => {
+          const platformRef = inject(PlatformRef);
+          destroySpy = spyOn(platformRef, 'destroy').and.callThrough();
+          platformRef.onDestroy(resolvePlatformDestroyed);
+          resolveInitializerStarted();
+
+          return initializerDone;
+        };
+
+        try {
+          const controller = new AbortController();
+          const request = new Request('http://localhost/home', { signal: controller.signal });
+
+          const handlePromise = app.handle(request);
+
+          // Abort the request while the app initializer is still pending
+          await initializerStarted;
+          controller.abort();
+
+          await expectAsync(handlePromise).toBeRejectedWithError(
+            DOMException,
+            /Request for: http:\/\/localhost\/home was aborted/,
+          );
+          await setTimeout(0);
+          expect(destroySpy).not.toHaveBeenCalled();
+
+          // Bootstrapping reads from the application injector once the initializer settles
+          resolveInitializer();
+
+          await platformDestroyed;
+          expect(destroySpy).toHaveBeenCalledTimes(1);
+        } finally {
+          appInitializerHook = undefined;
         }
       });
 

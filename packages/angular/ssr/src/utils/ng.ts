@@ -28,6 +28,12 @@ import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSla
 import { getFirstHeaderValue } from './validation';
 
 /**
+ * The maximum time, in milliseconds, that an aborted render can take to become stable before its platform is destroyed.
+ * This matches the time in which Angular expects an application to become stable (see NG0506).
+ */
+const ABORTED_RENDER_TIMEOUT = 10_000;
+
+/**
  * Represents the bootstrap mechanism for an Angular application.
  *
  * This type can either be:
@@ -104,6 +110,8 @@ export async function renderAngular(
   let renderTimeoutId: ReturnType<typeof setTimeout> | undefined;
   let destroyPromise: Promise<void> | undefined;
   let rejectContent: ((reason?: unknown) => void) | undefined;
+  let abortTimeoutSignal: AbortSignal | undefined;
+  let isStable = false;
 
   const destroy = (): Promise<void> => {
     rejectContent?.(
@@ -117,34 +125,56 @@ export async function renderAngular(
     if (!destroyPromise) {
       clearTimeout(renderTimeoutId);
       signal?.removeEventListener('abort', abortHandler);
+      abortTimeoutSignal?.removeEventListener('abort', abortTimeoutHandler);
       destroyPromise = asyncDestroyPlatform(platformRef);
     }
 
     return destroyPromise;
   };
 
-  const abortHandler = () => void destroy();
+  const abortTimeoutHandler = () => void destroy();
+
+  // Destroying the platform while the application has pending work, such as an app initializer or an
+  // `HttpClient` request, makes that work fail outside of the request where it cannot be caught.
+  // When the request is aborted before the application is stable, the platform is destroyed once it
+  // becomes stable, or when `ABORTED_RENDER_TIMEOUT` elapses if it never does.
+  const abortHandler = () => {
+    if (isStable) {
+      void destroy();
+
+      return;
+    }
+
+    abortTimeoutSignal = AbortSignal.timeout(ABORTED_RENDER_TIMEOUT);
+    abortTimeoutSignal.addEventListener('abort', abortTimeoutHandler, { once: true });
+  };
 
   try {
-    signal?.addEventListener('abort', abortHandler, { once: true });
-
     let applicationRef: ApplicationRef;
     if (isNgModule(bootstrap)) {
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
-      if (platformRef.destroyed || signal?.aborted) {
+      if (platformRef.destroyed) {
         return { hasNavigationError: true };
       }
 
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
       applicationRef = await bootstrap({ platformRef });
-      if (platformRef.destroyed || signal?.aborted) {
+      if (platformRef.destroyed) {
         return { hasNavigationError: true };
       }
     }
 
+    // Aborts are handled after bootstrapping, as app initializers cannot be stopped and use the platform once they settle.
+    if (signal?.aborted) {
+      abortHandler();
+    } else {
+      signal?.addEventListener('abort', abortHandler, { once: true });
+    }
+
     // Block until application is stable.
     await applicationRef.whenStable();
+    isStable = true;
 
     // This code protect against app destruction during bootstrapping which is a
     // valid case. We should not assume the `applicationRef` is not in destroyed state.
