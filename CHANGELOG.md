@@ -1,6 +1,6 @@
-<a name="22.3.0-rc.0"></a>
+<a name="22.3.0"></a>
 
-# 22.3.0-rc.0 (2026-11-12)
+# 22.3.0 (2026-11-18)
 
 ## Deprecations
 
@@ -14,42 +14,75 @@
 
 ### @schematics/angular
 
-| Commit                                                                                               | Type     | Description                                                                     |
-| ---------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------- |
-| [263130530c](https://github.com/angular/angular-cli/commit/263130530cd4af4b856ceb89ba60e475ccd40de1) | feat     | use library builder and add entry-point schematic                               |
-| [d088411806](https://github.com/angular/angular-cli/commit/d088411806eba09466bd0f443a1ff6f580891d86) | fix      | add the missing vi import for toHaveBeenCalledBefore in refactor-jasmine-vitest |
-| [c5d6f9f04d](https://github.com/angular/angular-cli/commit/c5d6f9f04d3a971b453b9189d8a344f8ca5e0fe2) | fix      | align sourceRoot and tsconfig includes in use-library-builder                   |
-| [c4028e8028](https://github.com/angular/angular-cli/commit/c4028e8028406a2b67ecebbf5979805a6082702e) | fix      | reject ng-packagr builders in entry-point schematic                             |
-| [5bfcd660a6](https://github.com/angular/angular-cli/commit/5bfcd660a66f9f8cb41523cc905e24f4ac5eec19) | refactor | deprecate testRunner option                                                     |
+| Commit                                                                                               | Type     | Description                                                        |
+| ---------------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------ |
+| [639d31f11b](https://github.com/angular/angular-cli/commit/639d31f11b102a12776ae8dce6369d6edd1b6ff3) | feat     | add use-library-builder migration to migrate from ng-packagr       |
+| [263130530c](https://github.com/angular/angular-cli/commit/263130530cd4af4b856ceb89ba60e475ccd40de1) | feat     | use library builder and add entry-point schematic                  |
+| [c5d6f9f04d](https://github.com/angular/angular-cli/commit/c5d6f9f04d3a971b453b9189d8a344f8ca5e0fe2) | fix      | align sourceRoot and tsconfig includes in use-library-builder      |
+| [512bb90615](https://github.com/angular/angular-cli/commit/512bb90615dd56c1f105d543eccd8c26f0bbdc5f) | fix      | keep the default ng-packagr output path in use-library-builder     |
+| [9732721b0e](https://github.com/angular/angular-cli/commit/9732721b0e35bd134240e1f5d316f813bd6ed9c3) | fix      | migrate ng-packagr glob string assets in use-library-builder       |
+| [c32a690f1e](https://github.com/angular/angular-cli/commit/c32a690f1e82230a695d6d349f5e7b68e6a07ffe) | fix      | migrate secondary entry point style options in use-library-builder |
+| [c4028e8028](https://github.com/angular/angular-cli/commit/c4028e8028406a2b67ecebbf5979805a6082702e) | fix      | reject ng-packagr builders in entry-point schematic                |
+| [5bfcd660a6](https://github.com/angular/angular-cli/commit/5bfcd660a66f9f8cb41523cc905e24f4ac5eec19) | refactor | deprecate testRunner option                                        |
 
 ### @angular/cli
 
-| Commit                                                                                               | Type | Description                                                    |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------- |
-| [892a044859](https://github.com/angular/angular-cli/commit/892a0448599639a32916b9e114c9a588ca8d82f3) | fix  | fix `pnpm-workspace.yaml` sanitization when using pnpm patches |
-| [acb3c8bbce](https://github.com/angular/angular-cli/commit/acb3c8bbce3d7149e7a338923b8215906b1c1b64) | fix  | report the worktree-local cache in `ng cache info`             |
-| [7ee5f905a8](https://github.com/angular/angular-cli/commit/7ee5f905a89bf93fc4857cd90f65b3dde7a2beeb) | fix  | support array options defined in oneOf schemas                 |
-
-### @angular-devkit/schematics
-
-| Commit                                                                                               | Type | Description                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [0d60ebd198](https://github.com/angular/angular-cli/commit/0d60ebd198b4c7be84c04f3e43a5c53a41bcb7bd) | fix  | do not ignore TypeErrors thrown by content templates            |
-| [207265a1a1](https://github.com/angular/angular-cli/commit/207265a1a1e7343e05ce1bb8aa7f9ed9ad7ec048) | fix  | include the template path in errors thrown by content templates |
+| Commit                                                                                               | Type | Description                                                 |
+| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
+| [7d6550ef25](https://github.com/angular/angular-cli/commit/7d6550ef2502d628cc65f1e4006065f40c242126) | feat | support Oxfmt for automatic file formatting                 |
+| [f52fb536a1](https://github.com/angular/angular-cli/commit/f52fb536a1fddabee42448a050961c7986314992) | fix  | decouple official Node.js support check from execution gate |
+| [5d50f59564](https://github.com/angular/angular-cli/commit/5d50f59564b2e7a5239cc1fd1162a5cd11a6ac51) | fix  | include builder options for build and test in json-help     |
+| [7ee5f905a8](https://github.com/angular/angular-cli/commit/7ee5f905a89bf93fc4857cd90f65b3dde7a2beeb) | fix  | support array options defined in oneOf schemas              |
 
 ### @angular/build
 
-| Commit                                                                                               | Type     | Description                                                    |
-| ---------------------------------------------------------------------------------------------------- | -------- | -------------------------------------------------------------- |
-| [0edb6c646f](https://github.com/angular/angular-cli/commit/0edb6c646fd405ff042a9dc6a00ef3fcd8c21767) | fix      | forward the poll and progress options to the karma build setup |
-| [3123cf2e99](https://github.com/angular/angular-cli/commit/3123cf2e99d914e2f9725ae6340af841245c050a) | fix      | pass an explicit port of 0 through to the dev server           |
-| [2170cffb65](https://github.com/angular/angular-cli/commit/2170cffb650f6d0c0f8a7c376a496071e2b36467) | refactor | deprecate ng-packagr builder and APIs                          |
-
-### @angular/pwa
-
-| Commit                                                                                               | Type | Description                                              |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
-| [0025bd98bf](https://github.com/angular/angular-cli/commit/0025bd98bfcedb24e88323ed03b1cc7a709a688c) | fix  | add the manifest link when the index option is an object |
+| Commit                                                                                               | Type     | Description                                                                       |
+| ---------------------------------------------------------------------------------------------------- | -------- | --------------------------------------------------------------------------------- |
+| [5f65028b19](https://github.com/angular/angular-cli/commit/5f65028b1928bcfc95b1581f754e93a5456bda63) | feat     | add `prerender.format` option to prerender routes as `&lt;route&gt;.html`         |
+| [c5b8bf0369](https://github.com/angular/angular-cli/commit/c5b8bf036965f31c283b1d14bd02b31bdfc02353) | feat     | add library builder                                                               |
+| [feb41cc934](https://github.com/angular/angular-cli/commit/feb41cc9341ff001a67ffc22ac9816aba8750e65) | feat     | add polyfills option to unit-test builder                                         |
+| [a38958c289](https://github.com/angular/angular-cli/commit/a38958c289663a90791e8d096963d2bd8dec802c) | fix      | align library watch asset matching with initial build and deduplicate outputs     |
+| [4244eb7ba1](https://github.com/angular/angular-cli/commit/4244eb7ba1be5371dc8eab0c8ee07a8269ce09aa) | fix      | allow library outputPath within project root                                      |
+| [65f302c5df](https://github.com/angular/angular-cli/commit/65f302c5dff0dea886c0544fdc9ba994d7d9d1c9) | fix      | avoid expanding directory patterns in asset globs                                 |
+| [d09f98ee70](https://github.com/angular/angular-cli/commit/d09f98ee701754bdb4eca7d56dcf506c8d8b6729) | fix      | avoid top-level await for Zone.js injection in Vitest runner                      |
+| [f61de66202](https://github.com/angular/angular-cli/commit/f61de6620271d71bb7fc051d0ea03426bfa2af5b) | fix      | capture and report Rolldown warnings and errors in library builder                |
+| [23d42fc806](https://github.com/angular/angular-cli/commit/23d42fc806f174c7da961c35e07a42aa1e00d1e7) | fix      | conditionally declare tslib in built library package                              |
+| [97efdcf913](https://github.com/angular/angular-cli/commit/97efdcf9136230baeb9ec757dcd24a17f12cd223) | fix      | consolidate initial shared chunks into main with Rolldown                         |
+| [566abde886](https://github.com/angular/angular-cli/commit/566abde8866d0512f89953dc5b6a0aae6ef63db8) | fix      | enforce library compilerOptions and skip unused .tsbuildinfo emit                 |
+| [2c518a6dbe](https://github.com/angular/angular-cli/commit/2c518a6dbe8734d247dfe4eb2c1c4af5e169fa94) | fix      | enhance build logs and output location for library builder                        |
+| [a0a6b422cd](https://github.com/angular/angular-cli/commit/a0a6b422cdc3ce4e79f5b8eaccf1e9ed82579afe) | fix      | ensure asset followSymlinks defaults to false                                     |
+| [432aea0161](https://github.com/angular/angular-cli/commit/432aea0161840bc135704c040108e46092e61c27) | fix      | filter Rolldown warnings and disable .d.ts annotation comments in library builder |
+| [d609a21333](https://github.com/angular/angular-cli/commit/d609a2133354c62a368f2dc4412bbb8eb18c5831) | fix      | improve library bundler resolution and watch shared chunk consistency             |
+| [be15160ff0](https://github.com/angular/angular-cli/commit/be15160ff0ecb7ea0c74acdead54644a2918a074) | fix      | improve library compilation diagnostics and stylesheet reference tracking         |
+| [f696eaaf8a](https://github.com/angular/angular-cli/commit/f696eaaf8a233c83981c5de01c8568074c575edd) | fix      | improve library watch mode state invalidation and lazy asset matchers             |
+| [69acf5b822](https://github.com/angular/angular-cli/commit/69acf5b822bebc0b4bebd30f1db6cc7b8d624531) | fix      | include dataurl option in global stylesheet config hash                           |
+| [70c2143c33](https://github.com/angular/angular-cli/commit/70c2143c33138476d0853370320621aff6c82f38) | fix      | key the Vitest fsModuleCache on the served build output                           |
+| [193abc0c15](https://github.com/angular/angular-cli/commit/193abc0c15621f28b8d12866e22711138c3339f6) | fix      | preserve asset precedence and expand glob-prefixed ignores in watch mode          |
+| [faca2b0f03](https://github.com/angular/angular-cli/commit/faca2b0f035e22fff421d353d6b51af1f6aec9d6) | fix      | preserve entry-point displayName casing and flatten bundle names                  |
+| [137351b7de](https://github.com/angular/angular-cli/commit/137351b7de55c899cea9108554777e020de52851) | fix      | preserve incremental .d.ts signatures and emit state in watch mode                |
+| [76dd17d522](https://github.com/angular/angular-cli/commit/76dd17d522751b91ff46d42c1eb11bb0f5cb1be9) | fix      | re-analyze exports on package.json change in library builder                      |
+| [f556fb41e3](https://github.com/angular/angular-cli/commit/f556fb41e3233659fb44ee378bc30745476c0fba) | fix      | rebase Vitest incremental paths when workspace root is aliased                    |
+| [93f238c978](https://github.com/angular/angular-cli/commit/93f238c9781897997b1c64d607f3bb3c91ba1fd1) | fix      | rebuild library when transitive stylesheet dependencies change in watch mode      |
+| [c3881e9eba](https://github.com/angular/angular-cli/commit/c3881e9eba39436faed4879342de9fd9541ea207) | fix      | report TypeScript declaration emit diagnostics                                    |
+| [3d00c76eb9](https://github.com/angular/angular-cli/commit/3d00c76eb9c5ea38d1ede08e65ed0ea22f6f0232) | fix      | resolve library bundle sourcemap sources relative to output directory             |
+| [7714a85375](https://github.com/angular/angular-cli/commit/7714a8537589afc6180443cc36acd5149a459c57) | fix      | resolve unimported NgModule scopes when filtering unit-test files                 |
+| [4301fb4ebb](https://github.com/angular/angular-cli/commit/4301fb4ebb23ae0618355460cebeb7f63d2503f3) | fix      | resolve Vitest artifacts when workspace root is aliased                           |
+| [ad4845583b](https://github.com/angular/angular-cli/commit/ad4845583b8d1b8de26ccc0e45b4e6e58d95b362) | fix      | respect tsconfig declarationMap and compilationMode in library builder            |
+| [9534f6287e](https://github.com/angular/angular-cli/commit/9534f6287edff39c25661e80408582a8659abf3b) | fix      | scope BundlerContext invalidation and cache one-shot bundle results               |
+| [5ffed3f3b6](https://github.com/angular/angular-cli/commit/5ffed3f3b6b39583cda1e35854cc001344ed6eba) | fix      | scope cache directory by project and builder name                                 |
+| [b8180a6530](https://github.com/angular/angular-cli/commit/b8180a6530cfb7a39515de016a5386ec48ef1fdb) | fix      | support incremental asset updates and output cleanup in library watch mode        |
+| [58c30c05f6](https://github.com/angular/angular-cli/commit/58c30c05f6f60d3a985921f411354705f12f611d) | fix      | use isSubDirectory in normalizeAssetPatterns and ignore nested .gitkeep           |
+| [9e998c1286](https://github.com/angular/angular-cli/commit/9e998c12862c2bd7a70a088ea6758aefb23a698e) | fix      | validate library outputPath and avoid duplicate secondary README assets           |
+| [6bae97bd49](https://github.com/angular/angular-cli/commit/6bae97bd498ac602e71e33daa8aa0f57a37f7347) | perf     | avoid TS AST eviction and d.ts re-emit on external resource edits                 |
+| [751adc3abc](https://github.com/angular/angular-cli/commit/751adc3abc664616dea333667e60910916c6334b) | perf     | cache pre-declaration transformed SourceFiles during AoT emit                     |
+| [2b5a9a6204](https://github.com/angular/angular-cli/commit/2b5a9a620495b4c85bf5cfa3db39b632d88e6ca5) | perf     | enable TypeScript incremental build cache in library builder                      |
+| [2ffbebf24c](https://github.com/angular/angular-cli/commit/2ffbebf24c0b12c14490f98a1df0448031bd105d) | perf     | immediately purge freed rolldown arena memory                                     |
+| [07845f019c](https://github.com/angular/angular-cli/commit/07845f019cf7d70c17f037d711b430a776f96031) | perf     | optimize incremental watch rebuilds in AOT compilation                            |
+| [5416c9fcd9](https://github.com/angular/angular-cli/commit/5416c9fcd9eb271c2a0e0cf9e3555aa04f36d67c) | perf     | optimize library dts bundling and enable dts tree-shaking                         |
+| [016a7f150d](https://github.com/angular/angular-cli/commit/016a7f150d58ef1e268846ae0ed1cc569c4894ae) | perf     | overlap library asset resolution with bundling and typechecking                   |
+| [dcf906a626](https://github.com/angular/angular-cli/commit/dcf906a6261a00f95cfbdb18cf9065e1c966e182) | perf     | reuse extendedConfigCache in TypeScript compilation                               |
+| [a84f9fa9d4](https://github.com/angular/angular-cli/commit/a84f9fa9d4945c404ddc59f3404168e9160e6b3f) | perf     | reuse precomputed hash for in-memory build asset ETags                            |
+| [2170cffb65](https://github.com/angular/angular-cli/commit/2170cffb650f6d0c0f8a7c376a496071e2b36467) | refactor | deprecate ng-packagr builder and APIs                                             |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -89,67 +122,6 @@
 | Commit                                                                                              | Type | Description                                              |
 | --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------- |
 | [4ed04b76c](https://github.com/angular/angular-cli/commit/4ed04b76cf294eca0cbc75e154f4427acc9953f0) | fix  | add the manifest link when the index option is an object |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.3.0-next.5"></a>
-
-# 22.3.0-next.5 (2026-11-04)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                                       |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [70afe1b222](https://github.com/angular/angular-cli/commit/70afe1b2222efdcfd7ac5595b6990624f9a1c2a9) | fix  | allow command arguments named `help`                              |
-| [c7706091a0](https://github.com/angular/angular-cli/commit/c7706091a083bc2439159c748b0860a253c37cfb) | fix  | also clean the worktree-local cache in a git worktree             |
-| [a69fe511c6](https://github.com/angular/angular-cli/commit/a69fe511c657d5c4ba5cac2ecc566f9de03c5239) | fix  | default ignoreScripts to true when install options are provided   |
-| [a9aaff5cae](https://github.com/angular/angular-cli/commit/a9aaff5cae9d8c3644a763b48f13669f72da05f9) | fix  | handle modern yarn registry error output and 404 detection        |
-| [81e9eae21d](https://github.com/angular/angular-cli/commit/81e9eae21d46be13163435d6da5c4c1b961f3ee7) | fix  | ignore registry manifests that do not match the requested version |
-| [5d50f59564](https://github.com/angular/angular-cli/commit/5d50f59564b2e7a5239cc1fd1162a5cd11a6ac51) | fix  | include builder options for build and test in json-help           |
-| [ed384643df](https://github.com/angular/angular-cli/commit/ed384643df5c9f1a9331b144ef4c616eead366cd) | fix  | strip terminal escape sequences in modern yarn error parser       |
-| [48cad3fed7](https://github.com/angular/angular-cli/commit/48cad3fed7a6e579819879e7170e33b716d13a36) | fix  | use unquoted specifier for registry manifest cache keys           |
-| [c063601c29](https://github.com/angular/angular-cli/commit/c063601c2904f0766fd80f757051a80e63081c56) | fix  | validate dist-tags and manifest caching under modern yarn         |
-
-### @schematics/angular
-
-| Commit                                                                                               | Type | Description                                                                       |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------- |
-| [0ae507d273](https://github.com/angular/angular-cli/commit/0ae507d27342603e198a603f1c2ff24a2258a5ed) | fix  | add a TODO for spy strategies configured with withArgs in refactor-jasmine-vitest |
-| [01abe08d86](https://github.com/angular/angular-cli/commit/01abe08d86e7a4b3db3f9ad37bfe7057a474ab1b) | fix  | do not drop callThrough() on existing spies in refactor-jasmine-vitest            |
-| [12a7d2a5f3](https://github.com/angular/angular-cli/commit/12a7d2a5f3d52f7e64d9b8f25deec1a3f73a40b8) | fix  | generate pnpm-workspace.yaml with allowBuilds for pnpm projects                   |
-| [af423fd3ad](https://github.com/angular/angular-cli/commit/af423fd3ad30b2f34b624b9c6868555c61b3c952) | fix  | keep existing worker tsconfig when generating another web worker                  |
-| [512bb90615](https://github.com/angular/angular-cli/commit/512bb90615dd56c1f105d543eccd8c26f0bbdc5f) | fix  | keep the default ng-packagr output path in use-library-builder                    |
-| [3436f92a26](https://github.com/angular/angular-cli/commit/3436f92a26955ecf4950d32bea8f93e73902817d) | fix  | keep the meaning of negated toHaveBeenCalledOnceWith in refactor-jasmine-vitest   |
-| [0da5863e52](https://github.com/angular/angular-cli/commit/0da5863e5213ac98ea1a0495e255b27d580de6f5) | fix  | migrate `serviceWorker: true` to a config path in use-application-builder         |
-| [ee847de523](https://github.com/angular/angular-cli/commit/ee847de523f97cf566ad7a67d928c183b0294939) | fix  | update the PostCSS configuration used by the build in tailwind                    |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                                                                              |
-| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------------------------------------------------ |
-| [254041d9d2](https://github.com/angular/angular-cli/commit/254041d9d248b1eea422c153ebc9be6570587d08) | fix  | copy assets replaced by a rename in watch mode                                                                           |
-| [174eb34540](https://github.com/angular/angular-cli/commit/174eb34540a2a3f916b7c86dacc9688ecb94568e) | fix  | elide non-value aliases and remaining type-only AST constructs                                                           |
-| [fd8e743fde](https://github.com/angular/angular-cli/commit/fd8e743fde2e76a8702f5a0b5d8161b3be078a12) | fix  | enable oxc WASI fallback in WebContainer environments                                                                    |
-| [88b43b929f](https://github.com/angular/angular-cli/commit/88b43b929f001375a0d89754f673d4dffb0ae103) | fix  | include source map hashes in optimized chunk hashes                                                                      |
-| [0e2799d3a2](https://github.com/angular/angular-cli/commit/0e2799d3a29f58d571e0500bcaca0efcd1ab051b) | fix  | quote weak ETags of assets served by the dev server                                                                      |
-| [ef4372583a](https://github.com/angular/angular-cli/commit/ef4372583a04d8e168910b92bd53e3d13fb4a325) | fix  | remove every output of a deleted asset in watch mode                                                                     |
-| [e6c29bde19](https://github.com/angular/angular-cli/commit/e6c29bde19079264dde1b4e08abafcfb0151f471) | fix  | require only the launchers the karma configuration loads                                                                 |
-| [8984b4a0ee](https://github.com/angular/angular-cli/commit/8984b4a0ee1ce1e265393233407a6409825bcdfa) | fix  | use oxc-parser fallback when stripping source-map comments ([#34632](https://github.com/angular/angular-cli/pull/34632)) |
-| [a84f9fa9d4](https://github.com/angular/angular-cli/commit/a84f9fa9d4945c404ddc59f3404168e9160e6b3f) | perf | reuse precomputed hash for in-memory build asset ETags                                                                   |
-
-### @angular/ssr
-
-| Commit                                                                                               | Type | Description                                               |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------- |
-| [47bc9c3969](https://github.com/angular/angular-cli/commit/47bc9c39698af966d90f478d39818dc41a7d86af) | fix  | destroy platform when request is aborted during rendering |
-| [bf1602a916](https://github.com/angular/angular-cli/commit/bf1602a9163cc5b14a87736d171eec71982334b6) | fix  | validate prerender parameter values                       |
-
-### @ngtools/webpack
-
-| Commit                                                                                               | Type | Description                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
-| [b6bfa2c747](https://github.com/angular/angular-cli/commit/b6bfa2c7476cf0fd939df2152491a5c694ff56bb) | fix  | elide imports used only in type re-exports or type declarations |
-| [9e6c1cefea](https://github.com/angular/angular-cli/commit/9e6c1cefea1ea6d27e8f8ac48f04703bc3bc311c) | fix  | elide non-value aliases and remaining type-only AST constructs  |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -208,82 +180,6 @@
 | ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------- |
 | [4b6caacbc7](https://github.com/angular/angular-cli/commit/4b6caacbc7028dfb70df64eb234f7909b6896079) | fix  | elide imports used only in type re-exports or type declarations |
 | [ea46fd855f](https://github.com/angular/angular-cli/commit/ea46fd855f03e4b65b69b0f03dee5adb344de24a) | fix  | elide non-value aliases and remaining type-only AST constructs  |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.3.0-next.4"></a>
-
-# 22.3.0-next.4 (2026-10-28)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                                         |
-| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------- |
-| [7d6550ef25](https://github.com/angular/angular-cli/commit/7d6550ef2502d628cc65f1e4006065f40c242126) | feat | support Oxfmt for automatic file formatting                         |
-| [540a1c495d](https://github.com/angular/angular-cli/commit/540a1c495de349b77ace17e0ad460991f6c680c2) | fix  | explain how to pick a project when a schematic cannot determine one |
-| [322777d80b](https://github.com/angular/angular-cli/commit/322777d80b7590059b6ba89d2abee8ab5381db3e) | fix  | handle bun registry error output and 404 detection                  |
-| [3adad37a90](https://github.com/angular/angular-cli/commit/3adad37a9083923ccf51c5ef70b3199c8248f47e) | fix  | support resolving subproject dependencies in bun workspaces         |
-
-### @schematics/angular
-
-| Commit                                                                                               | Type | Description                                                                     |
-| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------------- |
-| [6588204b8f](https://github.com/angular/angular-cli/commit/6588204b8f20839948e8d3a961f80488da8db7dc) | fix  | avoid adding web worker snippet to server configuration files                   |
-| [a68d0df2ca](https://github.com/angular/angular-cli/commit/a68d0df2ca5d33aa953324e3ea8d3680da8af567) | fix  | ignore non-workspace stylesheet entries when adding Tailwind                    |
-| [43c401c6b4](https://github.com/angular/angular-cli/commit/43c401c6b4b496a7a1ac88cae4460fb1d198429b) | fix  | include the SSR entry file in the trust-proxy-headers migration                 |
-| [4a59335cc5](https://github.com/angular/angular-cli/commit/4a59335cc55b3c6a9bd096d4ffabcd8b39a6281c) | fix  | include the type separator in the class spec import                             |
-| [4ea7c673e0](https://github.com/angular/angular-cli/commit/4ea7c673e06c712d96dd330f99dd291232f346f1) | fix  | keep the default getter access type of spyOnProperty in refactor-jasmine-vitest |
-| [54f261817c](https://github.com/angular/angular-cli/commit/54f261817c37b0c11cb8c7cde6d97c97e4c061b2) | fix  | migrate CallInfo returnValue and object in refactor-jasmine-vitest              |
-| [d3acc84bed](https://github.com/angular/angular-cli/commit/d3acc84bedef1dd89e532cb625c1e7ecceee822f) | fix  | migrate spy.calls.first().args in refactor-jasmine-vitest                       |
-| [02a067813b](https://github.com/angular/angular-cli/commit/02a067813bbaaf75c7a949d1da1b64a32ba101da) | fix  | set explicit type for the `module --route` component                            |
-| [0be52a8834](https://github.com/angular/angular-cli/commit/0be52a8834dedf0264f43e79e9a98d5e1dafe6dd) | fix  | set explicit type for the app-shell component                                   |
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                               | Type | Description                                                                                                                            |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [d2aafa2d25](https://github.com/angular/angular-cli/commit/d2aafa2d25a69b5e4d2e08414c296a2cd851caa8) | fix  | resolve dev-server `sslKey` and `sslCert` relative to the workspace root ([#34399](https://github.com/angular/angular-cli/pull/34399)) |
-
-### @angular-devkit/core
-
-| Commit                                                                                               | Type | Description                                                |
-| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------- |
-| [c44762fd44](https://github.com/angular/angular-cli/commit/c44762fd4434c63723aae0e46a023cd7b057ac4c) | fix  | only invoke smart default provider when value is undefined |
-
-### @angular-devkit/schematics
-
-| Commit                                                                                               | Type | Description                                                                                                 |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------------------------------------- |
-| [9d6baa30ae](https://github.com/angular/angular-cli/commit/9d6baa30ae80b267ec8e5361fdb6e433ceb7a8f2) | fix  | support delegating trees in `partition` ([#34539](https://github.com/angular/angular-cli/pull/34539))       |
-| [5094cd66c9](https://github.com/angular/angular-cli/commit/5094cd66c9cd563b6fc2119509eb64fb15892b5d) | fix  | support delegating trees in the `filter` rule ([#34539](https://github.com/angular/angular-cli/pull/34539)) |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                                                                                            |
-| ---------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [65f302c5df](https://github.com/angular/angular-cli/commit/65f302c5dff0dea886c0544fdc9ba994d7d9d1c9) | fix  | avoid expanding directory patterns in asset globs                                                                                      |
-| [537a47a482](https://github.com/angular/angular-cli/commit/537a47a48295a9973a90e59c22d7b5a8f5aae4e6) | fix  | escape prerender redirect URLs                                                                                                         |
-| [d609a21333](https://github.com/angular/angular-cli/commit/d609a2133354c62a368f2dc4412bbb8eb18c5831) | fix  | improve library bundler resolution and watch shared chunk consistency                                                                  |
-| [be15160ff0](https://github.com/angular/angular-cli/commit/be15160ff0ecb7ea0c74acdead54644a2918a074) | fix  | improve library compilation diagnostics and stylesheet reference tracking                                                              |
-| [f25cdbeadc](https://github.com/angular/angular-cli/commit/f25cdbeadc98f64fc153684a0ff8fe8c91cef04c) | fix  | include the oxc-parser WASI binding as an optional dependency                                                                          |
-| [70c2143c33](https://github.com/angular/angular-cli/commit/70c2143c33138476d0853370320621aff6c82f38) | fix  | key the Vitest fsModuleCache on the served build output                                                                                |
-| [77fb7fa0f2](https://github.com/angular/angular-cli/commit/77fb7fa0f2839cdd3ee4c685e542c237b1043648) | fix  | only require karma-coverage when coverage is enabled                                                                                   |
-| [fe60e27105](https://github.com/angular/angular-cli/commit/fe60e27105b1c52a9fab11ab4d2349c7b3c093d2) | fix  | resolve dev-server `sslKey` and `sslCert` relative to the workspace root ([#34399](https://github.com/angular/angular-cli/pull/34399)) |
-| [9534f6287e](https://github.com/angular/angular-cli/commit/9534f6287edff39c25661e80408582a8659abf3b) | fix  | scope BundlerContext invalidation and cache one-shot bundle results                                                                    |
-| [dd095343a5](https://github.com/angular/angular-cli/commit/dd095343a53759dc6daeabf54391ae03d000519d) | fix  | serialize server manifest asset paths                                                                                                  |
-| [eb38ef3904](https://github.com/angular/angular-cli/commit/eb38ef3904e08d226c7c9c273fb9ca463fa47aa4) | fix  | suggest the istanbul provider in the unit-test V8 browser coverage error                                                               |
-| [cd3d30c6b6](https://github.com/angular/angular-cli/commit/cd3d30c6b6f1f9503295c4f61ea590a3c85a7e0d) | fix  | warn about unsupported options in the unit-test karma runner                                                                           |
-| [b0c415aec0](https://github.com/angular/angular-cli/commit/b0c415aec068d2e41ec39df7674fdf61984f815f) | fix  | write the stats file in a stable, deterministic order                                                                                  |
-| [f15c8c6410](https://github.com/angular/angular-cli/commit/f15c8c6410d97b0b648ac6e8c9ef4c77e70209b6) | perf | avoid duplicate Domino bundling in server bundles                                                                                      |
-| [7f4de14688](https://github.com/angular/angular-cli/commit/7f4de14688f55ff718a999ca929dde0fc333d950) | perf | avoid web worker channel overhead in library parallel compilation                                                                      |
-| [5416c9fcd9](https://github.com/angular/angular-cli/commit/5416c9fcd9eb271c2a0e0cf9e3555aa04f36d67c) | perf | optimize library dts bundling and enable dts tree-shaking                                                                              |
-| [016a7f150d](https://github.com/angular/angular-cli/commit/016a7f150d58ef1e268846ae0ed1cc569c4894ae) | perf | overlap library asset resolution with bundling and typechecking                                                                        |
-
-### @angular/ssr
-
-| Commit                                                                                               | Type | Description                                                      |
-| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------- |
-| [194b64137e](https://github.com/angular/angular-cli/commit/194b64137e3830cd3ca0b2236c2a44b2873e2dec) | fix  | preserve trailing slashes in query and fragment of redirect URLs |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
@@ -394,71 +290,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="22.3.0-next.3"></a>
-
-# 22.3.0-next.3 (2026-10-22)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | -------------------------------------------------- |
-| [d69dcec31](https://github.com/angular/angular-cli/commit/d69dcec3137f0fd49e591d410c82569b3798f2ec) | fix  | keep schematic positional arguments in index order |
-| [21846daf3](https://github.com/angular/angular-cli/commit/21846daf3637496e5f4f86c95843300df871c4dd) | fix  | only load autocompletion in interactive shells     |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                        |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------ |
-| [1c1fe4e88](https://github.com/angular/angular-cli/commit/1c1fe4e88897f69116696a73c46f225b469aebab) | fix  | apply `viewEncapsulation` to generated application components      |
-| [32dd079da](https://github.com/angular/angular-cli/commit/32dd079da3fd6b53fe6d57eaba0ee2bcfb8f3b08) | fix  | correct error and warning messages in environments schematic       |
-| [9732721b0](https://github.com/angular/angular-cli/commit/9732721b0e35bd134240e1f5d316f813bd6ed9c3) | fix  | migrate ng-packagr glob string assets in use-library-builder       |
-| [c32a690f1](https://github.com/angular/angular-cli/commit/c32a690f1e82230a695d6d349f5e7b68e6a07ffe) | fix  | migrate secondary entry point style options in use-library-builder |
-| [490a6fe2f](https://github.com/angular/angular-cli/commit/490a6fe2f1938ea3da5299dabf3a41dec4ef8399) | fix  | show routing module suffixes in `findModule` error                 |
-| [41b54ecdd](https://github.com/angular/angular-cli/commit/41b54ecdda17b96924d82873042c04dc7d3a4e40) | fix  | skip `webWorkerTsConfig` for unit-test builder test targets        |
-| [b9163f3a5](https://github.com/angular/angular-cli/commit/b9163f3a559cf2c45c77dc2a50198b5cc6c3d66f) | fix  | use the generated class name when declaring in an NgModule         |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------------------- |
-| [5f65028b1](https://github.com/angular/angular-cli/commit/5f65028b1928bcfc95b1581f754e93a5456bda63) | feat | add `prerender.format` option to prerender routes as `&lt;route&gt;.html`     |
-| [089d39467](https://github.com/angular/angular-cli/commit/089d39467863643ecadf79cefc5c92a16b0a85d3) | fix  | add integrity metadata for all initial chunks beyond the module preload limit |
-| [1b893ed95](https://github.com/angular/angular-cli/commit/1b893ed95ba3bfe0690274682c6473489003dbe8) | fix  | align lazy route entry names with workspace root for SSR modulepreload        |
-| [a38958c28](https://github.com/angular/angular-cli/commit/a38958c289663a90791e8d096963d2bd8dec802c) | fix  | align library watch asset matching with initial build and deduplicate outputs |
-| [3fcf6c852](https://github.com/angular/angular-cli/commit/3fcf6c85237c13484d190455521e73569ebb4191) | fix  | attach location to Sass errors and guard stack parsing                        |
-| [97efdcf91](https://github.com/angular/angular-cli/commit/97efdcf9136230baeb9ec757dcd24a17f12cd223) | fix  | consolidate initial shared chunks into main with Rolldown                     |
-| [13a734649](https://github.com/angular/angular-cli/commit/13a73464935365ed48bf30ea520bcc4c84828b9e) | fix  | correct typos and spacing in error and warning messages                       |
-| [566abde88](https://github.com/angular/angular-cli/commit/566abde8866d0512f89953dc5b6a0aae6ef63db8) | fix  | enforce library compilerOptions and skip unused .tsbuildinfo emit             |
-| [f696eaaf8](https://github.com/angular/angular-cli/commit/f696eaaf8a233c83981c5de01c8568074c575edd) | fix  | improve library watch mode state invalidation and lazy asset matchers         |
-| [adcdcc668](https://github.com/angular/angular-cli/commit/adcdcc6688fd773491dcb9f5197eefffd4aeee45) | fix  | invalidate Vite module cache for removed dev server output files              |
-| [f9f386497](https://github.com/angular/angular-cli/commit/f9f3864974e90c6ea78c53cc4a0cab3f2e4477dc) | fix  | match proxy glob patterns against URL pathname only                           |
-| [f9325ab02](https://github.com/angular/angular-cli/commit/f9325ab02da065ea5b4cf81fb5f83ba56de5c50d) | fix  | name the provider packages in the unit-test `browsers` error                  |
-| [193abc0c1](https://github.com/angular/angular-cli/commit/193abc0c15621f28b8d12866e22711138c3339f6) | fix  | preserve asset precedence and expand glob-prefixed ignores in watch mode      |
-| [cd70beb20](https://github.com/angular/angular-cli/commit/cd70beb20db711cb178afccf6c688f9475f9e1f9) | fix  | preserve diagnostic locations at offset 0 and guard empty files               |
-| [faca2b0f0](https://github.com/angular/angular-cli/commit/faca2b0f035e22fff421d353d6b51af1f6aec9d6) | fix  | preserve entry-point displayName casing and flatten bundle names              |
-| [137351b7d](https://github.com/angular/angular-cli/commit/137351b7de55c899cea9108554777e020de52851) | fix  | preserve incremental .d.ts signatures and emit state in watch mode            |
-| [c3881e9eb](https://github.com/angular/angular-cli/commit/c3881e9eba39436faed4879342de9fd9541ea207) | fix  | report TypeScript declaration emit diagnostics                                |
-| [b8180a653](https://github.com/angular/angular-cli/commit/b8180a6530cfb7a39515de016a5386ec48ef1fdb) | fix  | support incremental asset updates and output cleanup in library watch mode    |
-| [e3787076e](https://github.com/angular/angular-cli/commit/e3787076ebca0af72079f669b5b047a065b16128) | fix  | support quotes in `styles` and `polyfills` paths                              |
-| [8c1498395](https://github.com/angular/angular-cli/commit/8c1498395a3576f397581a4629dfd15e83cae819) | fix  | use component file path in inline stylesheet diagnostic locations             |
-| [e93d9cb8b](https://github.com/angular/angular-cli/commit/e93d9cb8bb8d9902bbe437e9dece8f44cb859bfe) | fix  | use distinct chunk naming for web worker bundles                              |
-| [58c30c05f](https://github.com/angular/angular-cli/commit/58c30c05f6f60d3a985921f411354705f12f611d) | fix  | use isSubDirectory in normalizeAssetPatterns and ignore nested .gitkeep       |
-| [9e998c128](https://github.com/angular/angular-cli/commit/9e998c12862c2bd7a70a088ea6758aefb23a698e) | fix  | validate library outputPath and avoid duplicate secondary README assets       |
-| [972302ac3](https://github.com/angular/angular-cli/commit/972302ac3dc7b675e4b36dac465b876014a02b1e) | fix  | watch only explicitly added paths in chokidar watcher                         |
-| [5691298d0](https://github.com/angular/angular-cli/commit/5691298d035b8d965d73d3a2282436ada441ec90) | perf | avoid reading external component stylesheets twice                            |
-| [6bae97bd4](https://github.com/angular/angular-cli/commit/6bae97bd498ac602e71e33daa8aa0f57a37f7347) | perf | avoid TS AST eviction and d.ts re-emit on external resource edits             |
-| [751adc3ab](https://github.com/angular/angular-cli/commit/751adc3abc664616dea333667e60910916c6334b) | perf | cache pre-declaration transformed SourceFiles during AoT emit                 |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                                                                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------------------------------------------------------------------------- |
-| [8aa16b6f9](https://github.com/angular/angular-cli/commit/8aa16b6f9fe5bb1301438bfb4625a7b6c68a5392) | fix  | resolve query parameter placeholders in redirect targets ([#34321](https://github.com/angular/angular-cli/pull/34321)) |
-| [97ed36ec4](https://github.com/angular/angular-cli/commit/97ed36ec4f0423258cb949769c2fb6557054daa3) | fix  | resolve route parameters in redirect targets ([#34321](https://github.com/angular/angular-cli/pull/34321))             |
-| [b42cfeecf](https://github.com/angular/angular-cli/commit/b42cfeecfac376d1ed365ffbf9d247dbfc2bde59) | fix  | use only the first value of the `X-Forwarded-Prefix` header                                                            |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="21.2.28"></a>
 
 # 21.2.28 (2026-10-22)
@@ -556,65 +387,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="22.3.0-next.2"></a>
-
-# 22.3.0-next.2 (2026-10-15)
-
-### @angular/cli
-
-| Commit                                                                                              | Type | Description                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------------- |
-| [5c656152e](https://github.com/angular/angular-cli/commit/5c656152ef91e2731155f6027a845d8014b53e4f) | fix  | accept multi-digit array indices in ng config                     |
-| [2e0f48e3f](https://github.com/angular/angular-cli/commit/2e0f48e3ff40289725d3590fa8e1fc059fbaeb88) | fix  | keep ng version working when the package manager is not installed |
-| [a1cf33bc4](https://github.com/angular/angular-cli/commit/a1cf33bc45882fb74578cc7d1faeba8cecec7b73) | fix  | resolve package name in npm workspace members                     |
-
-### @schematics/angular
-
-| Commit                                                                                              | Type | Description                                                               |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------------------- |
-| [639d31f11](https://github.com/angular/angular-cli/commit/639d31f11b102a12776ae8dce6369d6edd1b6ff3) | feat | add use-library-builder migration to migrate from ng-packagr              |
-| [445cc767e](https://github.com/angular/angular-cli/commit/445cc767e62b72631dd53c0c5324b458fee76608) | fix  | keep the workspace build version in the use-application-builder migration |
-
-### @angular-devkit/schematics
-
-| Commit                                                                                              | Type | Description                                   |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------- |
-| [b39a5fcda](https://github.com/angular/angular-cli/commit/b39a5fcdac288e317f3b00468c09173a1d306f98) | fix  | avoid stack overflow when chaining many rules |
-
-### @angular/build
-
-| Commit                                                                                              | Type | Description                                                                       |
-| --------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------------------- |
-| [b975da4b0](https://github.com/angular/angular-cli/commit/b975da4b016eaa107acc259eb8205135d9396f95) | fix  | add CSP nonce to stylesheet and modulepreload link elements                       |
-| [13923047f](https://github.com/angular/angular-cli/commit/13923047f64b6e1063f7f07029c70295b5c99d69) | fix  | always use AOT when extracting i18n messages                                      |
-| [d2233e225](https://github.com/angular/angular-cli/commit/d2233e225aa5fd507e3ce7bfd35ae2268c036aa4) | fix  | coalesce external watcher directories to avoid macOS FSEvents limit               |
-| [23d42fc80](https://github.com/angular/angular-cli/commit/23d42fc806f174c7da961c35e07a42aa1e00d1e7) | fix  | conditionally declare tslib in built library package                              |
-| [f0a74e8f0](https://github.com/angular/angular-cli/commit/f0a74e8f0ea04fd3f839be0120346067440b1350) | fix  | disable Vitest fsModuleCache in unit-test builder                                 |
-| [2c518a6db](https://github.com/angular/angular-cli/commit/2c518a6dbe8734d247dfe4eb2c1c4af5e169fa94) | fix  | enhance build logs and output location for library builder                        |
-| [47c328d3e](https://github.com/angular/angular-cli/commit/47c328d3ef7b409af02f270a48f5e99a520fbe14) | fix  | ensure Sass importers return global Promise instances                             |
-| [432aea016](https://github.com/angular/angular-cli/commit/432aea0161840bc135704c040108e46092e61c27) | fix  | filter Rolldown warnings and disable .d.ts annotation comments in library builder |
-| [39d230e18](https://github.com/angular/angular-cli/commit/39d230e1862f2f626d3fba03bbf51873f3578153) | fix  | keep Vite server file watcher disabled in Vitest watch mode                       |
-| [93f238c97](https://github.com/angular/angular-cli/commit/93f238c9781897997b1c64d607f3bb3c91ba1fd1) | fix  | rebuild library when transitive stylesheet dependencies change in watch mode      |
-| [7714a8537](https://github.com/angular/angular-cli/commit/7714a8537589afc6180443cc36acd5149a459c57) | fix  | resolve unimported NgModule scopes when filtering unit-test files                 |
-| [ad4845583](https://github.com/angular/angular-cli/commit/ad4845583b8d1b8de26ccc0e45b4e6e58d95b362) | fix  | respect tsconfig declarationMap and compilationMode in library builder            |
-| [01afbf418](https://github.com/angular/angular-cli/commit/01afbf418cf6a7688f3f131988eeba3cdac2bde4) | fix  | sort discovered unit-test files for deterministic builds                          |
-| [b640b32e1](https://github.com/angular/angular-cli/commit/b640b32e148ab68f820b390b1d9f03ae9a809266) | fix  | use module.registerHooks() for in-memory ESM loader                               |
-| [0a077eeed](https://github.com/angular/angular-cli/commit/0a077eeed92b43fa195bf10f479d39a7aca2d3f7) | perf | avoid invalidating Angular diagnostic cache on stylesheet change                  |
-| [2b5a9a620](https://github.com/angular/angular-cli/commit/2b5a9a620495b4c85bf5cfa3db39b632d88e6ca5) | perf | enable TypeScript incremental build cache in library builder                      |
-| [07845f019](https://github.com/angular/angular-cli/commit/07845f019cf7d70c17f037d711b430a776f96031) | perf | optimize incremental watch rebuilds in AOT compilation                            |
-| [fb7efc862](https://github.com/angular/angular-cli/commit/fb7efc86228164330f68ed86801f9d5bbe9ad5b0) | perf | resolve asset patterns concurrently with bounded concurrency                      |
-| [dcf906a62](https://github.com/angular/angular-cli/commit/dcf906a6261a00f95cfbdb18cf9065e1c966e182) | perf | reuse extendedConfigCache in TypeScript compilation                               |
-
-### @angular/ssr
-
-| Commit                                                                                              | Type | Description                                            |
-| --------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------ |
-| [0b9a52cc9](https://github.com/angular/angular-cli/commit/0b9a52cc9516d28afa0d9ef0d07ec745967faf56) | fix  | preserve preload metadata for nested empty-path routes |
-| [f2cd8c8cf](https://github.com/angular/angular-cli/commit/f2cd8c8cf7c5aa7e7076c87e9c0c55b3bf880f4b) | fix  | preserve query parameters on relative route redirects  |
-| [b3bbada1e](https://github.com/angular/angular-cli/commit/b3bbada1efd0d3a414cce8843b7284e9560f66fc) | fix  | resolve relative redirects against the parent route    |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="22.2.3"></a>
 
 # 22.2.3 (2026-10-15)
@@ -688,30 +460,6 @@
 
 <!-- CHANGELOG SPLIT MARKER -->
 
-<a name="22.3.0-next.1"></a>
-
-# 22.3.0-next.1 (2026-10-07)
-
-### @angular-devkit/build-angular
-
-| Commit                                                                                               | Type | Description                                          |
-| ---------------------------------------------------------------------------------------------------- | ---- | ---------------------------------------------------- |
-| [3379a13314](https://github.com/angular/angular-cli/commit/3379a133148825a6ecb5eeacafdd6bcfd3c8e50b) | fix  | preserve Host header when proxying in ssr-dev-server |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                           |
-| ---------------------------------------------------------------------------------------------------- | ---- | --------------------------------------------------------------------- |
-| [4244eb7ba1](https://github.com/angular/angular-cli/commit/4244eb7ba1be5371dc8eab0c8ee07a8269ce09aa) | fix  | allow library outputPath within project root                          |
-| [f61de66202](https://github.com/angular/angular-cli/commit/f61de6620271d71bb7fc051d0ea03426bfa2af5b) | fix  | capture and report Rolldown warnings and errors in library builder    |
-| [3871a9da91](https://github.com/angular/angular-cli/commit/3871a9da9106aefc4b10095d4716e30db09fd864) | fix  | keep the order of glob entries in the proxy configuration             |
-| [3d00c76eb9](https://github.com/angular/angular-cli/commit/3d00c76eb9c5ea38d1ede08e65ed0ea22f6f0232) | fix  | resolve library bundle sourcemap sources relative to output directory |
-| [5ffed3f3b6](https://github.com/angular/angular-cli/commit/5ffed3f3b6b39583cda1e35854cc001344ed6eba) | fix  | scope cache directory by project and builder name                     |
-| [1e45d4d46a](https://github.com/angular/angular-cli/commit/1e45d4d46ad79ad890fe973b5fe697664826cc2d) | fix  | support a string `context` in array-form proxy configurations         |
-| [2ffbebf24c](https://github.com/angular/angular-cli/commit/2ffbebf24c0b12c14490f98a1df0448031bd105d) | perf | immediately purge freed rolldown arena memory                         |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
 <a name="22.2.2"></a>
 
 # 22.2.2 (2026-10-07)
@@ -776,29 +524,6 @@
 | Commit                                                                                               | Type | Description           |
 | ---------------------------------------------------------------------------------------------------- | ---- | --------------------- |
 | [3e39e33fb1](https://github.com/angular/angular-cli/commit/3e39e33fb1422af144ea795d871969640a27627b) | fix  | bump piscina to 5.3.2 |
-
-<!-- CHANGELOG SPLIT MARKER -->
-
-<a name="22.3.0-next.0"></a>
-
-# 22.3.0-next.0 (2026-10-01)
-
-### @angular/cli
-
-| Commit                                                                                               | Type | Description                                                 |
-| ---------------------------------------------------------------------------------------------------- | ---- | ----------------------------------------------------------- |
-| [f52fb536a1](https://github.com/angular/angular-cli/commit/f52fb536a1fddabee42448a050961c7986314992) | fix  | decouple official Node.js support check from execution gate |
-
-### @angular/build
-
-| Commit                                                                                               | Type | Description                                                  |
-| ---------------------------------------------------------------------------------------------------- | ---- | ------------------------------------------------------------ |
-| [c5b8bf0369](https://github.com/angular/angular-cli/commit/c5b8bf036965f31c283b1d14bd02b31bdfc02353) | feat | add library builder                                          |
-| [feb41cc934](https://github.com/angular/angular-cli/commit/feb41cc9341ff001a67ffc22ac9816aba8750e65) | feat | add polyfills option to unit-test builder                    |
-| [d09f98ee70](https://github.com/angular/angular-cli/commit/d09f98ee701754bdb4eca7d56dcf506c8d8b6729) | fix  | avoid top-level await for Zone.js injection in Vitest runner |
-| [a0a6b422cd](https://github.com/angular/angular-cli/commit/a0a6b422cdc3ce4e79f5b8eaccf1e9ed82579afe) | fix  | ensure asset followSymlinks defaults to false                |
-| [69acf5b822](https://github.com/angular/angular-cli/commit/69acf5b822bebc0b4bebd30f1db6cc7b8d624531) | fix  | include dataurl option in global stylesheet config hash      |
-| [76dd17d522](https://github.com/angular/angular-cli/commit/76dd17d522751b91ff46d42c1eb11bb0f5cb1be9) | fix  | re-analyze exports on package.json change in library builder |
 
 <!-- CHANGELOG SPLIT MARKER -->
 
