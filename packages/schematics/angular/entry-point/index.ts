@@ -40,6 +40,28 @@ function updateTsConfig(packageName: string, ...paths: string[]): Rule {
   };
 }
 
+/**
+ * Creates a name usable for the generated class, selector, and file names from an
+ * entry-point name. Entry-point names are npm export subpaths and may contain characters
+ * (such as `~`) or digit-led words (such as `3d`) that cannot appear in a class name or
+ * in a selector segment. Returns null when the result would not start with a letter.
+ */
+function toArtifactName(name: string): string | null {
+  const artifactName = name
+    // `~` and `/` cannot appear in a class name, selector, or file name.
+    .replace(/[~/]/g, '-')
+    // A word that starts with digits but contains more than digits cannot start a class
+    // name or a selector segment (`lib-foo-3d` is an invalid selector); merging it into
+    // the preceding word (`foo3d`) keeps both valid. All-digit words stay separate, as
+    // trailing digit segments are valid in a selector (`lib-foo-2`).
+    .replace(/[-_]+(?=\d+[a-zA-Z.])/g, '')
+    // Separator runs and leading or trailing separators produce empty selector segments.
+    .replace(/[-_]{2,}/g, '-')
+    .replace(/^[-_.]+|[-_.]+$/g, '');
+
+  return /^[a-zA-Z]/.test(artifactName) ? artifactName : null;
+}
+
 export default createProjectSchematic<EntryPointOptions>((options, { project, tree }) => {
   if (project.extensions['projectType'] !== ProjectType.Library) {
     throw new SchematicsException(`Project "${options.project}" is not a library project.`);
@@ -114,11 +136,16 @@ export default createProjectSchematic<EntryPointOptions>((options, { project, tr
 
   const prefix = (options.prefix ?? project.prefix) || 'lib';
   const sourceDir = isPrimary ? join(entryPointDir, 'lib') : entryPointDir;
-  const artifactName = isPrimary
+  const baseName = isPrimary
     ? /^@.*\/.*/.test(options.project)
       ? options.project.split('/')[1]
       : options.project
-    : basename(options.name);
+    : options.name;
+  const artifactName =
+    toArtifactName(basename(baseName)) ??
+    toArtifactName(baseName) ??
+    toArtifactName(`${prefix}-${baseName}`) ??
+    'entry';
 
   const buildOptions = project.targets.get('build')?.options;
   const distRoot =
