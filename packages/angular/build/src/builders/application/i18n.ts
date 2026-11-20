@@ -45,7 +45,7 @@ export async function inlineI18n(
   warnings: string[];
   prerenderedRoutes: PrerenderedRoutesRecord;
 }> {
-  const { i18nOptions, baseHref, cacheOptions } = options;
+  const { i18nOptions, baseHref, cacheOptions, workspaceRoot } = options;
 
   // Create the multi-threaded inliner with common options.
   const inliner = new I18nInliner(
@@ -56,6 +56,7 @@ export async function inlineI18n(
         : maxInlinerWorkers,
       persistentCachePath: cacheOptions.enabled ? cacheOptions.path : undefined,
       localizeVersion: i18nOptions.localizeVersion,
+      workspaceRoot,
     },
     workerPool,
   );

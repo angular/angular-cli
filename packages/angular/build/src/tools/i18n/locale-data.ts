@@ -37,8 +37,6 @@ export interface LoadedLocaleData {
   error?: string;
 }
 
-const localeDataCache = new Map<string, Promise<LoadedLocaleData>>();
-
 /**
  * Resolves the path to the Angular locale data file for a given locale tag.
  *
@@ -98,41 +96,28 @@ export function resolveLocaleDataPath(
  * @param projectRoot Optional project root for module resolution.
  * @returns A promise resolving to the loaded locale data script code and any diagnostic warnings.
  */
-export function loadLocaleData(
+export async function loadLocaleData(
   rawLocaleTag: string,
   projectRoot?: string,
 ): Promise<LoadedLocaleData> {
-  let cached = localeDataCache.get(rawLocaleTag);
-  if (!cached) {
-    cached = (async () => {
-      const projectResolve = createProjectResolver(projectRoot ?? process.cwd());
-      const resolution = resolveLocaleDataPath(rawLocaleTag, (potentialPath) => {
-        try {
-          return projectResolve(potentialPath);
-        } catch {
-          return undefined;
-        }
-      });
+  const projectResolve = createProjectResolver(projectRoot ?? process.cwd());
+  const resolution = resolveLocaleDataPath(rawLocaleTag, (potentialPath) =>
+    projectResolve(potentialPath),
+  );
 
-      if (resolution.error) {
-        return { error: resolution.error };
-      }
-
-      if (resolution.path) {
-        try {
-          const code = await readFile(resolution.path, 'utf8');
-
-          return { code, warning: resolution.warning };
-        } catch (e) {
-          return { error: `Failed to read locale data file: ${(e as Error).message}` };
-        }
-      }
-
-      return { warning: resolution.warning };
-    })();
-
-    localeDataCache.set(rawLocaleTag, cached);
+  if (resolution.error) {
+    return { error: resolution.error };
   }
 
-  return cached;
+  if (resolution.path) {
+    try {
+      const code = await readFile(resolution.path, 'utf8');
+
+      return { code, warning: resolution.warning };
+    } catch (e) {
+      return { error: `Failed to read locale data file: ${(e as Error).message}` };
+    }
+  }
+
+  return { warning: resolution.warning };
 }
