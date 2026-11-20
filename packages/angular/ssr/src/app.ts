@@ -261,6 +261,10 @@ export class AngularServerApp {
     matchedRoute: RouteTreeNodeMetadata,
     requestContext?: unknown,
   ): Promise<Response | null> {
+    if (request.signal.aborted) {
+      return null;
+    }
+
     const { renderMode, headers, status, preload } = matchedRoute;
 
     if (!this.allowStaticRouteRender && renderMode === RenderMode.Prerender) {
@@ -304,6 +308,10 @@ export class AngularServerApp {
     } else if (renderMode === RenderMode.Client) {
       // Serve the client-side rendered version if the route is configured for CSR.
       let html = await this.assets.getServerAsset('index.csr.html').text();
+      if (request.signal.aborted) {
+        return null;
+      }
+
       html = await this.runTransformsOnHtml(html, url, preload);
 
       return new Response(html, responseInit);
@@ -317,8 +325,19 @@ export class AngularServerApp {
     }
 
     this.boostrap ??= await bootstrap();
+    if (request.signal.aborted) {
+      return null;
+    }
+
     let html = await assets.getIndexServerHtml().text();
+    if (request.signal.aborted) {
+      return null;
+    }
+
     html = await this.runTransformsOnHtml(html, url, preload);
+    if (request.signal.aborted) {
+      return null;
+    }
 
     const result = await renderAngular(
       html,
@@ -329,7 +348,7 @@ export class AngularServerApp {
       request.signal,
     );
 
-    if (result.hasNavigationError) {
+    if (result.hasNavigationError || request.signal.aborted) {
       return null;
     }
 
@@ -339,6 +358,10 @@ export class AngularServerApp {
 
     if (renderMode === RenderMode.Prerender) {
       const renderedHtml = await result.content();
+      if (request.signal.aborted) {
+        return null;
+      }
+
       const finalHtml = this.inlineCriticalCss(renderedHtml);
 
       return new Response(finalHtml, responseInit);
@@ -349,6 +372,13 @@ export class AngularServerApp {
       start: async (controller) => {
         try {
           let renderedHtml = await result.content();
+          if (request.signal.aborted) {
+            throw new DOMException(
+              `Request for: ${request.url} was aborted.${request.signal.reason ? `\n${request.signal.reason}` : ''}`,
+              'AbortError',
+            );
+          }
+
           renderedHtml = this.inlineCriticalCss(renderedHtml);
           controller.enqueue(this.textEncoder.encode(renderedHtml));
           controller.close();
