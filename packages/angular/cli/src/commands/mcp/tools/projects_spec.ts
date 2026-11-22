@@ -83,7 +83,6 @@ describe('List Projects Tool', () => {
     expect(result.structuredContent).toBeDefined();
     const workspaces = result.structuredContent.workspaces;
     expect(workspaces.length).toBe(1);
-    expect(workspaces[0].frameworkVersion).toBe('18');
 
     const projects = workspaces[0].projects;
     expect(projects.length).toBe(1);
@@ -129,5 +128,81 @@ describe('List Projects Tool', () => {
     expect(result.structuredContent).toBeDefined();
     expect(result.structuredContent.workspaces.length).toBe(1);
     expect(result.structuredContent.workspaces[0].projects[0].name).toBe('my-app');
+  });
+
+  describe('frameworkVersion', () => {
+    function installAngularCore(dir: string, version: string): void {
+      const packageDir = join(dir, 'node_modules', '@angular', 'core');
+      mkdirSync(packageDir, { recursive: true });
+      writeFileSync(
+        join(packageDir, 'package.json'),
+        JSON.stringify({ name: '@angular/core', version }),
+      );
+    }
+
+    async function listProjects() {
+      const handler = await LIST_PROJECTS_TOOL.factory(mockContext);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return (handler as any)({});
+    }
+
+    it('should use the installed version when the dependency is declared with a catalog', async () => {
+      writeFileSync(
+        join(workspaceDir, 'package.json'),
+        JSON.stringify({ dependencies: { '@angular/core': 'catalog:' } }),
+      );
+      installAngularCore(workspaceDir, '22.3.0');
+
+      const result = await listProjects();
+
+      expect(result.structuredContent.workspaces.length).toBe(1);
+      expect(result.structuredContent.workspaces[0].frameworkVersion).toBe('22');
+      expect(result.structuredContent.versioningErrors).toEqual([]);
+      expect(result.content[0].text).not.toContain('could not be determined');
+    });
+
+    it('should not set a version or report an error when @angular/core is not installed', async () => {
+      writeFileSync(
+        join(workspaceDir, 'package.json'),
+        JSON.stringify({ dependencies: { '@angular/core': 'catalog:' } }),
+      );
+
+      const result = await listProjects();
+
+      expect(result.structuredContent.workspaces.length).toBe(1);
+      expect(result.structuredContent.workspaces[0].frameworkVersion).toBeUndefined();
+      expect(result.structuredContent.versioningErrors).toEqual([]);
+      expect(result.content[0].text).not.toContain('could not be determined');
+    });
+
+    it(`should resolve the version from a nested workspace's own node_modules`, async () => {
+      const appDir = join(allowedRoot, 'apps', 'web');
+      mkdirSync(appDir, { recursive: true });
+      writeFileSync(join(appDir, 'angular.json'), '{}');
+      writeFileSync(
+        join(appDir, 'package.json'),
+        JSON.stringify({ dependencies: { '@angular/core': 'catalog:angular' } }),
+      );
+      installAngularCore(appDir, '21.1.4');
+
+      const result = await listProjects();
+
+      const appWorkspace = result.structuredContent.workspaces.find(
+        (ws: { path: string }) => ws.path === join(appDir, 'angular.json'),
+      );
+      expect(appWorkspace).toBeDefined();
+      expect(appWorkspace.frameworkVersion).toBe('21');
+      expect(result.structuredContent.versioningErrors).toEqual([]);
+    });
+
+    it('should resolve the version from a node_modules directory in a parent directory', async () => {
+      installAngularCore(allowedRoot, '20.0.2');
+
+      const result = await listProjects();
+
+      expect(result.structuredContent.workspaces.length).toBe(1);
+      expect(result.structuredContent.workspaces[0].frameworkVersion).toBe('20');
+    });
   });
 });
