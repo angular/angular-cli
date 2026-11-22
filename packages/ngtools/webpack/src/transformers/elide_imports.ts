@@ -133,7 +133,10 @@ export function elideImports(
 
     // Note: with `verbatimModuleSyntax`, TypeScript reports an error for imports of non-value aliases
     // that do not use a `type` modifier (TS1484/TS1485), so no special handling is needed for it.
-    if ((symbol.flags & ts.SymbolFlags.Alias) !== 0 && !isValueAlias(symbol, typeChecker)) {
+    if (
+      (symbol.flags & ts.SymbolFlags.Alias) !== 0 &&
+      !isValueAlias(symbol, typeChecker, compilerOptions)
+    ) {
       return 'type';
     }
 
@@ -210,9 +213,14 @@ export function elideImports(
 /**
  * Determines whether an import alias resolves to a runtime value. Aliases that only resolve to
  * types, or that pass through a type-only import or export declaration anywhere along the alias
- * chain, are always elided by TypeScript.
+ * chain, are always elided by TypeScript. The same applies to const enums, whose references are
+ * inlined, unless `preserveConstEnums`, `isolatedModules` or `verbatimModuleSyntax` keeps them.
  */
-function isValueAlias(symbol: ts.Symbol, typeChecker: ts.TypeChecker): boolean {
+function isValueAlias(
+  symbol: ts.Symbol,
+  typeChecker: ts.TypeChecker,
+  compilerOptions: ts.CompilerOptions,
+): boolean {
   const seen = new Set<ts.Symbol>();
   let current = symbol;
 
@@ -236,6 +244,14 @@ function isValueAlias(symbol: ts.Symbol, typeChecker: ts.TypeChecker): boolean {
       return true;
     }
     current = next;
+  }
+
+  if ((current.flags & ts.SymbolFlags.ConstEnum) !== 0) {
+    return !!(
+      compilerOptions.preserveConstEnums ||
+      compilerOptions.isolatedModules ||
+      compilerOptions.verbatimModuleSyntax
+    );
   }
 
   return (current.flags & ts.SymbolFlags.Value) !== 0;

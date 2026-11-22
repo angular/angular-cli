@@ -545,6 +545,32 @@ describe('elide_imports', () => {
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('should not retain inlined const enum imports when a declaration is rewritten to remove an unused value import', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedService } from './mixed';
+
+          export const value = MixedEnum.A;
+          export let service: MixedService | undefined;
+
+          ${dummyNode}
+        `;
+
+      const output = tags.stripIndent`
+          export const value = 1 /* MixedEnum.A */;
+          export let service;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 
   it('keeps jsxFactory imports when configured', () => {
