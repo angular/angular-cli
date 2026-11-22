@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { CommandError } from '../../host';
 import { getCommandErrorLogs } from '../../utils';
 import type { McpToolContext } from '../tool-registry';
 import { serializeOptions } from './options-serializer';
@@ -66,6 +67,10 @@ export class GenericTargetStrategy implements TargetStrategy {
       const result = await context.host.executeNgCommand(args, { cwd: input.workspacePath });
       logs = result.logs;
     } catch (e) {
+      if (!(e instanceof CommandError)) {
+        throw e;
+      }
+
       status = 'failure';
       logs = getCommandErrorLogs(e);
     }

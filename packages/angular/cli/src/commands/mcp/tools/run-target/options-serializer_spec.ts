@@ -45,5 +45,27 @@ describe('run-target options-serializer', () => {
         /Invalid option key: 'fix --danger'/,
       );
     });
+
+    it('should throw an error if key starts with a hyphen or underscore', () => {
+      expect(() => serializeOptions({ '-output-path': 'dist' })).toThrowError(
+        /Invalid option key: '-output-path'/,
+      );
+      expect(() => serializeOptions({ '_output': 'dist' })).toThrowError(
+        /Invalid option key: '_output'/,
+      );
+    });
+
+    it('should ignore excluded keys case-insensitively', () => {
+      expect(serializeOptions({ WATCH: true, fix: true }, new Set(['watch']))).toEqual(['--fix']);
+    });
+
+    it('should throw an error if a string option value contains a null byte', () => {
+      expect(() => serializeOptions({ 'output-path': 'dist\0evil' })).toThrowError(
+        /Invalid option value for 'output-path': values must not contain null bytes/,
+      );
+      expect(() => serializeOptions({ include: ['src', 'evil\0path'] })).toThrowError(
+        /Invalid option value for 'include': values must not contain null bytes/,
+      );
+    });
   });
 });

@@ -14,11 +14,17 @@
  */
 
 import { ChildProcess, spawn } from 'node:child_process';
-import { Stats, existsSync as nodeExistsSync, realpathSync } from 'node:fs';
+import {
+  Stats,
+  lstatSync,
+  existsSync as nodeExistsSync,
+  readlinkSync,
+  realpathSync,
+} from 'node:fs';
 import { glob as nodeGlob, readFile as nodeReadFile, stat } from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { createServer } from 'node:net';
-import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, parse, relative, resolve, sep } from 'node:path';
 import { createInterface } from 'node:readline';
 import { stripVTControlCharacters } from 'node:util';
 
@@ -281,14 +287,555 @@ export const LocalWorkspaceHost: Host = {
   },
 };
 
+const MAX_SYMLINK_DEPTH = 40;
+const MAX_RUNNER_ARGS_DEPTH = 4;
+const PATH_SEPARATOR_PATTERN = sep === '\\' ? /[\\/]+/ : /\/+/;
+const DOT_DOT_SEGMENT_PATTERN =
+  sep === '\\' ? /(?:^|[\\/])\.\.(?:[\\/]|$)/ : /(?:^|\/)\.\.(?:\/|$)/;
+
+/**
+ * Normalized option names (lowercase, without hyphens/underscores) that represent non-filesystem
+ * values such as URL paths, booleans, enums, or Architect targets.
+ */
+const NON_PATH_OPTIONS = new Set([
+  'basehref',
+  'browsertarget',
+  'browserviewport',
+  'browsers',
+  'buildtarget',
+  'configuration',
+  'deleteoutputpath',
+  'deployurl',
+  'dumpvirtualfiles',
+  'filter',
+  'host',
+  'outputhashing',
+  'outputmode',
+  'publichost',
+  'route',
+  'routes',
+  'runner',
+  'servepath',
+  'servertarget',
+]);
+
+/**
+ * Normalized option names representing output directories that builders may clean recursively
+ * before writing output files.
+ */
+const OUTPUT_DIR_OPTIONS = new Set([
+  'dest',
+  'destination',
+  'outdir',
+  'outpath',
+  'outputdir',
+  'outputdirectory',
+  'outputpath',
+]);
+
+/**
+ * Normalized option names resolved relative to the effective output directory and workspace root.
+ */
+const OUTPUT_RELATIVE_OPTIONS = new Set(['outfile', 'resourcesoutputpath']);
+
+/**
+ * Normalized option names that accept filesystem paths.
+ */
+const EXACT_PATH_OPTIONS = new Set([
+  'appmodulebundle',
+  'assets',
+  'browser',
+  'cachelocation',
+  'config',
+  'configdir',
+  'configfile',
+  'coveragedir',
+  'coveragedirectory',
+  'eslintconfig',
+  'filereplacements',
+  'index',
+  'inputindexpath',
+  'karmaconfig',
+  'main',
+  'ngswconfigpath',
+  'out',
+  'outputfile',
+  'outputindexpath',
+  'polyfills',
+  'project',
+  'providersfile',
+  'proxyconfig',
+  'routesfile',
+  'runnerconfig',
+  'scripts',
+  'server',
+  'serviceworker',
+  'setupfiles',
+  'sslcert',
+  'sslkey',
+  'styles',
+  'tsconfig',
+  'webpackconfig',
+  'webworkertsconfig',
+]);
+
+/**
+ * Normalized option names that accept glob patterns.
+ */
+const GLOB_PATH_OPTIONS = new Set([
+  'codecoverageexclude',
+  'coverageexclude',
+  'coverageinclude',
+  'exclude',
+  'include',
+  'lintfilepatterns',
+]);
+
+/**
+ * Normalized option names whose schema allows both boolean literals (`true`/`false`) and file paths.
+ */
+const BOOLEAN_OR_PATH_OPTIONS = new Set(['index', 'runnerconfig', 'server', 'serviceworker']);
+
+/**
+ * Word-boundary suffix tokens used to identify custom/third-party builder path options
+ * (e.g., `--eslint-config`, `--output-dir`, `--report-file`, `--cache-location`).
+ */
+const PATH_OPTION_SUFFIX_TOKENS = new Set([
+  'config',
+  'dest',
+  'destination',
+  'dir',
+  'directory',
+  'dirs',
+  'file',
+  'files',
+  'location',
+  'path',
+  'paths',
+  'root',
+]);
+
+type OptionPathKind = 'none' | 'path' | 'output-dir' | 'output-relative' | 'glob' | 'runner-args';
+
+function normalizeOptionKey(key: string): string {
+  return key.toLowerCase().replace(/[-_]/g, '');
+}
+
+function getOptionKeyTokens(key: string): string[] {
+  return key
+    .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+    .replace(/([A-Z]+)([A-Z][a-z])/g, '$1-$2')
+    .toLowerCase()
+    .split(/[-_]+/)
+    .filter(Boolean);
+}
+
+function stripNegationPrefix(segment: string): string {
+  return segment.toLowerCase().startsWith('no-') ? segment.slice(3) : segment;
+}
+
+function classifySingleKey(rawSegment: string): OptionPathKind {
+  const segment = stripNegationPrefix(rawSegment);
+  const compact = normalizeOptionKey(segment);
+
+  if (!compact || NON_PATH_OPTIONS.has(compact)) {
+    return 'none';
+  }
+  if (compact === 'runnerargs') {
+    return 'runner-args';
+  }
+  if (OUTPUT_DIR_OPTIONS.has(compact)) {
+    return 'output-dir';
+  }
+  if (OUTPUT_RELATIVE_OPTIONS.has(compact)) {
+    return 'output-relative';
+  }
+  if (GLOB_PATH_OPTIONS.has(compact)) {
+    return 'glob';
+  }
+  if (EXACT_PATH_OPTIONS.has(compact) || compact === 'o') {
+    return 'path';
+  }
+
+  const lastToken = getOptionKeyTokens(segment).at(-1);
+  if (lastToken && PATH_OPTION_SUFFIX_TOKENS.has(lastToken)) {
+    return 'path';
+  }
+
+  return 'none';
+}
+
+function classifyOptionKey(rawKey: string): OptionPathKind {
+  const dotSegments = rawKey.split('.');
+  if (dotSegments.length === 1) {
+    return classifySingleKey(dotSegments[0]);
+  }
+
+  const rootKind = classifySingleKey(dotSegments[0]);
+  const leafSegment = dotSegments.at(-1) ?? '';
+  const leafCompact = normalizeOptionKey(leafSegment);
+
+  if (rootKind === 'output-dir') {
+    return leafCompact === 'base' ? 'output-dir' : 'output-relative';
+  }
+
+  const leafKind = classifySingleKey(leafSegment);
+  if (leafKind !== 'none') {
+    return leafKind;
+  }
+
+  if (
+    rootKind !== 'none' ||
+    leafCompact === 'entry' ||
+    leafCompact === 'input' ||
+    leafCompact === 'output'
+  ) {
+    return leafCompact === 'output' && normalizeOptionKey(dotSegments[0]) === 'index'
+      ? 'output-relative'
+      : 'path';
+  }
+
+  return 'none';
+}
+
+function isPathWithinRoot(root: string, targetPath: string): boolean {
+  const rel = relative(root, targetPath);
+
+  return rel !== '..' && !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+/**
+ * Resolves a path to its canonical real path, preserving trailing non-existent segments and
+ * following symlinks (including dangling symlinks) so targets outside allowed roots cannot bypass
+ * confinement.
+ */
+function resolveRealPath(targetPath: string, depth = 0): string {
+  if (targetPath.includes('\0')) {
+    throw new Error('Access denied: path contains a null byte.');
+  }
+  if (depth > MAX_SYMLINK_DEPTH) {
+    throw new Error(
+      `Access denied: too many symbolic links encountered resolving '${targetPath}'.`,
+    );
+  }
+
+  const resolvedPath = resolve(targetPath);
+  try {
+    return realpathSync(resolvedPath);
+  } catch (e) {
+    if ((e as Error & { code?: string }).code !== 'ENOENT') {
+      throw e;
+    }
+  }
+
+  const missingSegments: string[] = [];
+  let current = resolvedPath;
+
+  while (true) {
+    try {
+      const entryStats = lstatSync(current);
+      if (entryStats.isSymbolicLink()) {
+        const linkTarget = readlinkSync(current);
+        const parentDir = realpathSync(dirname(current));
+        const resolvedLink = resolveRealPath(resolve(parentDir, linkTarget), depth + 1);
+
+        return join(resolvedLink, ...missingSegments);
+      }
+
+      return join(realpathSync(current), ...missingSegments);
+    } catch (e) {
+      if ((e as Error & { code?: string }).code !== 'ENOENT') {
+        throw e;
+      }
+
+      const parent = dirname(current);
+      if (parent === current) {
+        return resolvedPath;
+      }
+
+      missingSegments.unshift(basename(current));
+      current = parent;
+    }
+  }
+}
+
+/**
+ * Walks an un-normalized path resolving intermediate symlinks BEFORE collapsing `..` segments,
+ * matching OS-level path resolution (e.g. catching `symlink/../secret` escaping via `symlink`).
+ */
+function resolvePathFollowingSymlinks(rawPath: string, realBaseDir: string): string {
+  let current: string;
+  let remainder: string;
+
+  if (isAbsolute(rawPath)) {
+    const parsedRoot = parse(rawPath).root;
+    current = parsedRoot;
+    remainder = rawPath.slice(parsedRoot.length);
+  } else {
+    current = realBaseDir;
+    remainder = rawPath;
+  }
+
+  const segments = remainder.split(PATH_SEPARATOR_PATTERN);
+  for (const segment of segments) {
+    if (!segment || segment === '.') {
+      continue;
+    }
+    if (segment === '..') {
+      current = dirname(current);
+      continue;
+    }
+
+    current = join(current, segment);
+    try {
+      if (lstatSync(current).isSymbolicLink()) {
+        current = resolveRealPath(current);
+      }
+    } catch (e) {
+      if ((e as Error & { code?: string }).code !== 'ENOENT') {
+        throw e;
+      }
+    }
+  }
+
+  return resolveRealPath(current);
+}
+
 function resolveRoots(roots: string[]): string[] {
   return roots.map((r) => {
     try {
-      return realpathSync(resolve(r));
+      return resolveRealPath(r);
     } catch {
       return resolve(r);
     }
   });
+}
+
+function isAllowedRealPath(roots: readonly string[], realPath: string): boolean {
+  return roots.some((root) => isPathWithinRoot(root, realPath));
+}
+
+function assertRealPathAllowed(
+  roots: readonly string[],
+  targetPath: string,
+  errorLabel?: string,
+): string {
+  const realPath = resolveRealPath(targetPath);
+
+  if (!isAllowedRealPath(roots, realPath)) {
+    if (errorLabel) {
+      throw new Error(`Access denied: ${errorLabel} is outside allowed roots.`);
+    }
+
+    throw new Error(`Access denied: path '${targetPath}' is outside allowed roots.`);
+  }
+
+  return realPath;
+}
+
+function validateOptionPathValue(
+  roots: readonly string[],
+  flag: string,
+  rawValue: string,
+  baseDir: string,
+  realBaseDir: string,
+): { realPath: string; walkedPath: string | undefined } {
+  if (rawValue.includes('\0')) {
+    throw new Error(`Access denied: option '${flag}' contains a null byte.`);
+  }
+
+  const label = `option '${flag}' path '${rawValue}'`;
+  const realPath = assertRealPathAllowed(roots, resolve(baseDir, rawValue), label);
+
+  let walkedPath: string | undefined;
+  if (DOT_DOT_SEGMENT_PATTERN.test(rawValue)) {
+    walkedPath = resolvePathFollowingSymlinks(rawValue, realBaseDir);
+    if (!isAllowedRealPath(roots, walkedPath)) {
+      throw new Error(`Access denied: ${label} is outside allowed roots.`);
+    }
+  }
+
+  return { realPath, walkedPath };
+}
+
+function assertNotWorkspaceOrRootAncestor(
+  roots: readonly string[],
+  flag: string,
+  rawValue: string,
+  candidatePath: string,
+  realCwd: string,
+): void {
+  if (isPathWithinRoot(candidatePath, realCwd)) {
+    throw new Error(
+      `Access denied: option '${flag}' path '${rawValue}' must not be the workspace directory ` +
+        'or a parent of it.',
+    );
+  }
+
+  if (roots.some((root) => isPathWithinRoot(candidatePath, root))) {
+    throw new Error(
+      `Access denied: option '${flag}' path '${rawValue}' must not be an allowed root directory ` +
+        'or a parent of it.',
+    );
+  }
+}
+
+function validateGlobOptionValue(
+  roots: readonly string[],
+  flag: string,
+  pattern: string,
+  cwd: string,
+  realCwd: string,
+): void {
+  if (pattern.includes('\0')) {
+    throw new Error(`Access denied: option '${flag}' contains a null byte.`);
+  }
+
+  const normalized = pattern.startsWith('!') ? pattern.slice(1) : pattern;
+  if (!normalized) {
+    return;
+  }
+
+  const label = `option '${flag}' pattern '${pattern}'`;
+  const firstWildcardIndex = normalized.search(/[*?[{]/);
+  const basePath = firstWildcardIndex >= 0 ? normalized.slice(0, firstWildcardIndex) : normalized;
+
+  if (firstWildcardIndex >= 0) {
+    const wildcardTail = normalized.slice(firstWildcardIndex);
+    if (/(?:^|[\\/{,])\.\.(?:[\\/},]|$)/.test(wildcardTail)) {
+      throw new Error(`Access denied: ${label} contains path traversal sequences.`);
+    }
+
+    if (normalized.startsWith('{')) {
+      let braceDepth = 0;
+      let braceCloseIndex = normalized.length;
+      for (let i = 0; i < normalized.length; i++) {
+        if (normalized[i] === '{') {
+          braceDepth++;
+        } else if (normalized[i] === '}') {
+          braceDepth--;
+          if (braceDepth === 0) {
+            braceCloseIndex = i;
+            break;
+          }
+        }
+      }
+
+      const braceContent = normalized.slice(1, braceCloseIndex);
+      for (const token of braceContent.split(/[{},]/)) {
+        if (!token) {
+          continue;
+        }
+        const tokenWildcard = token.search(/[*?[]/);
+        const tokenBase = tokenWildcard >= 0 ? token.slice(0, tokenWildcard) : token;
+        if (tokenBase) {
+          assertRealPathAllowed(roots, resolve(cwd, tokenBase), label);
+        }
+      }
+    }
+  }
+
+  assertRealPathAllowed(roots, resolve(cwd, basePath), label);
+  if (DOT_DOT_SEGMENT_PATTERN.test(basePath)) {
+    const walkedBase = resolvePathFollowingSymlinks(basePath, realCwd);
+    if (!isAllowedRealPath(roots, walkedBase)) {
+      throw new Error(`Access denied: ${label} is outside allowed roots.`);
+    }
+  }
+}
+
+function validateNgCommandArgs(
+  roots: readonly string[],
+  args: readonly string[],
+  cwd: string,
+  realCwd: string,
+  depth = 0,
+): void {
+  if (depth > MAX_RUNNER_ARGS_DEPTH) {
+    throw new Error('Access denied: nested runner argument depth exceeded.');
+  }
+
+  const outputDirs: Array<{ raw: string; real: string }> = [];
+  const outputRelativeChecks: Array<{ flag: string; value: string }> = [];
+  const nestedRunnerArgs: string[] = [];
+
+  for (let i = 0; i < args.length; i++) {
+    const arg = args[i];
+    if (!arg.startsWith('-') || arg === '-' || arg === '--') {
+      continue;
+    }
+
+    const withoutPrefix = arg.startsWith('--') ? arg.slice(2) : arg.slice(1);
+    const eqIndex = withoutPrefix.indexOf('=');
+    const hasEquals = eqIndex !== -1;
+    const rawKey = hasEquals ? withoutPrefix.slice(0, eqIndex) : withoutPrefix;
+    const kind = classifyOptionKey(rawKey);
+    if (kind === 'none') {
+      continue;
+    }
+
+    const flag = arg.startsWith('--') ? `--${rawKey}` : `-${rawKey}`;
+    const isNegated = rawKey.toLowerCase().startsWith('no-');
+
+    let value: string | undefined;
+    if (hasEquals) {
+      value = withoutPrefix.slice(eqIndex + 1);
+    } else if (!isNegated && i + 1 < args.length && !args[i + 1].startsWith('-')) {
+      value = args[++i];
+    }
+
+    if (kind === 'runner-args') {
+      if (value !== undefined) {
+        nestedRunnerArgs.push(value);
+      }
+      continue;
+    }
+
+    if (kind === 'output-dir') {
+      if (isNegated && !hasEquals) {
+        continue;
+      }
+      const rawDir = value ?? '';
+      const { realPath, walkedPath } = validateOptionPathValue(roots, flag, rawDir, cwd, realCwd);
+      assertNotWorkspaceOrRootAncestor(roots, flag, rawDir, realPath, realCwd);
+      if (walkedPath) {
+        assertNotWorkspaceOrRootAncestor(roots, flag, rawDir, walkedPath, realCwd);
+      }
+      outputDirs.push({ raw: resolve(cwd, rawDir), real: realPath });
+      continue;
+    }
+
+    if (value === undefined) {
+      continue;
+    }
+
+    const compactKey = normalizeOptionKey(stripNegationPrefix(rawKey));
+    if (
+      BOOLEAN_OR_PATH_OPTIONS.has(compactKey) &&
+      (value === 'true' || value === 'false' || value === '')
+    ) {
+      continue;
+    }
+
+    if (kind === 'glob') {
+      validateGlobOptionValue(roots, flag, value, cwd, realCwd);
+    } else if (kind === 'output-relative') {
+      validateOptionPathValue(roots, flag, value, cwd, realCwd);
+      outputRelativeChecks.push({ flag, value });
+    } else {
+      validateOptionPathValue(roots, flag, value, cwd, realCwd);
+    }
+  }
+
+  for (const { flag, value } of outputRelativeChecks) {
+    for (const outputDir of outputDirs) {
+      validateOptionPathValue(roots, flag, value, outputDir.raw, outputDir.real);
+    }
+  }
+
+  if (nestedRunnerArgs.length > 0) {
+    validateNgCommandArgs(roots, nestedRunnerArgs, cwd, realCwd, depth + 1);
+  }
 }
 
 export function createRootRestrictedHost(
@@ -298,45 +845,8 @@ export function createRootRestrictedHost(
   const defaultRoots = resolveRoots(initialRoots);
   let roots = defaultRoots;
 
-  function checkPath(path: string) {
-    const resolvedPath = resolve(path);
-    let realPath: string;
-    try {
-      realPath = realpathSync(resolvedPath);
-    } catch (e) {
-      if ((e as Error & { code?: string }).code === 'ENOENT') {
-        // Path does not exist. Find the first existing ancestor.
-        let current = resolvedPath;
-        while (current) {
-          try {
-            realPath = realpathSync(current);
-            break;
-          } catch (err) {
-            if ((err as Error & { code?: string }).code !== 'ENOENT') {
-              throw err;
-            }
-            const parent = dirname(current);
-            if (parent === current) {
-              // Reached filesystem root
-              throw err;
-            }
-            current = parent;
-          }
-        }
-      } else {
-        throw e;
-      }
-    }
-
-    const isAllowed = roots.some((root) => {
-      const rel = relative(root, realPath);
-
-      return !rel.startsWith('..') && !isAbsolute(rel);
-    });
-
-    if (!isAllowed) {
-      throw new Error(`Access denied: path '${path}' is outside allowed roots.`);
-    }
+  function checkPath(path: string): string {
+    return assertRealPathAllowed(roots, path);
   }
 
   return {
@@ -381,13 +891,15 @@ export function createRootRestrictedHost(
       options: Parameters<Host['executeNgCommand']>[1] = {},
     ) {
       const effectiveCwd = options?.cwd ?? process.cwd();
-      checkPath(effectiveCwd);
+      const realCwd = checkPath(effectiveCwd);
+      validateNgCommandArgs(roots, args, effectiveCwd, realCwd);
 
       return baseHost.executeNgCommand(args, options);
     },
     startNgProcess(args: readonly string[], options: Parameters<Host['startNgProcess']>[1] = {}) {
       const effectiveCwd = options?.cwd ?? process.cwd();
-      checkPath(effectiveCwd);
+      const realCwd = checkPath(effectiveCwd);
+      validateNgCommandArgs(roots, args, effectiveCwd, realCwd);
 
       return baseHost.startNgProcess(args, options);
     },
