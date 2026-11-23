@@ -11,7 +11,13 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, PlatformRef, inject, provideZonelessChangeDetection } from '@angular/core';
+import {
+  ApplicationRef,
+  Component,
+  PlatformRef,
+  inject,
+  provideZonelessChangeDetection,
+} from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { setTimeout } from 'node:timers/promises';
 import { renderAngular } from '../../src/utils/ng';
@@ -77,27 +83,25 @@ describe('renderAngular', () => {
       controller.signal,
     );
 
-    expect(result.hasNavigationError).toBeFalse();
+    expect(result).toEqual(
+      jasmine.objectContaining({
+        hasNavigationError: false,
+        content: jasmine.any(Function),
+      }),
+    );
     if (!('content' in result)) {
-      fail('Expected renderAngular result to expose content()');
-
       return;
     }
 
     controller.abort('client disconnected');
 
-    let caughtError: unknown;
-    try {
-      await result.content();
-      fail('Expected content() to reject with AbortError');
-    } catch (error) {
-      caughtError = error;
-    }
-
-    expect(caughtError).toBeInstanceOf(DOMException);
-    expect((caughtError as DOMException).name).toBe('AbortError');
-    expect((caughtError as DOMException).message).toContain(
+    const contentPromise = result.content();
+    await expectAsync(contentPromise).toBeRejectedWithError(
+      DOMException,
       'Request for: http://localhost/ was aborted.\nclient disconnected',
+    );
+    await expectAsync(contentPromise).toBeRejectedWith(
+      jasmine.objectContaining({ name: 'AbortError' }),
     );
 
     await setTimeout(0);
@@ -130,9 +134,13 @@ describe('renderAngular', () => {
       'ssr',
     );
 
+    expect(result).toEqual(
+      jasmine.objectContaining({
+        content: jasmine.any(Function),
+        destroy: jasmine.any(Function),
+      }),
+    );
     if (!('content' in result)) {
-      fail('Expected renderAngular result to expose content()');
-
       return;
     }
 
@@ -171,9 +179,8 @@ describe('renderAngular', () => {
       'ssr',
     );
 
+    expect(result).toEqual(jasmine.objectContaining({ destroy: jasmine.any(Function) }));
     if (!('destroy' in result)) {
-      fail('Expected renderAngular result to expose destroy()');
-
       return;
     }
 
@@ -183,6 +190,94 @@ describe('renderAngular', () => {
 
     await Promise.all([p1, p2, result.destroy()]);
     await result.destroy();
+    expect(destroySpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reuse the in-flight promise when content() is called concurrently', async () => {
+    let destroySpy: jasmine.Spy | undefined;
+
+    @Component({
+      selector: 'app-root',
+      template: 'Concurrent content works',
+    })
+    class AppComponent {
+      constructor() {
+        destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
+      }
+    }
+
+    const result = await renderAngular(
+      BASE_HTML,
+      (context) =>
+        bootstrapApplication(
+          AppComponent,
+          { providers: [provideZonelessChangeDetection()] },
+          context,
+        ),
+      new URL('http://localhost/'),
+      [],
+      'ssr',
+    );
+
+    expect(result).toEqual(jasmine.objectContaining({ content: jasmine.any(Function) }));
+    if (!('content' in result)) {
+      return;
+    }
+
+    const p1 = result.content();
+    const p2 = result.content();
+    expect(p1).toBe(p2);
+
+    const [html1, html2] = await Promise.all([p1, p2]);
+    expect(html1).toContain('Concurrent content works');
+    expect(html2).toBe(html1);
+
+    await setTimeout(0);
+    expect(destroySpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reject content() with AbortError if applicationRef is destroyed before rendering runs', async () => {
+    let appRef: ApplicationRef | undefined;
+    let destroySpy: jasmine.Spy | undefined;
+
+    @Component({
+      selector: 'app-root',
+      template: 'External app destroy works',
+    })
+    class AppComponent {
+      constructor() {
+        appRef = inject(ApplicationRef);
+        destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
+      }
+    }
+
+    const result = await renderAngular(
+      BASE_HTML,
+      (context) =>
+        bootstrapApplication(
+          AppComponent,
+          { providers: [provideZonelessChangeDetection()] },
+          context,
+        ),
+      new URL('http://localhost/'),
+      [],
+      'ssr',
+    );
+
+    expect(result).toEqual(jasmine.objectContaining({ content: jasmine.any(Function) }));
+    if (!('content' in result)) {
+      return;
+    }
+
+    const contentPromise = result.content();
+    appRef?.destroy();
+
+    await expectAsync(contentPromise).toBeRejectedWithError(
+      DOMException,
+      /Request for: http:\/\/localhost\/ was aborted/,
+    );
+
+    await setTimeout(0);
     expect(destroySpy).toHaveBeenCalledTimes(1);
   });
 });

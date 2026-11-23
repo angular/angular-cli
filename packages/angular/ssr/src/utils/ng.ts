@@ -103,19 +103,21 @@ export async function renderAngular(
   let hasNavigationError = true;
   let renderTimeoutId: ReturnType<typeof setTimeout> | undefined;
   let destroyPromise: Promise<void> | undefined;
+  let contentPromise: Promise<string> | undefined;
   let rejectContent: ((reason?: unknown) => void) | undefined;
 
-  const destroy = (): Promise<void> => {
-    clearTimeout(renderTimeoutId);
-    rejectContent?.(
-      new DOMException(
-        `Request for: ${url} was aborted.${signal?.reason ? `\n${signal.reason}` : ''}`,
-        'AbortError',
-      ),
+  const createAbortError = (): DOMException =>
+    new DOMException(
+      `Request for: ${url} was aborted.${signal?.reason ? `\n${signal.reason}` : ''}`,
+      'AbortError',
     );
-    rejectContent = undefined;
 
+  const destroy = (): Promise<void> => {
     if (!destroyPromise) {
+      clearTimeout(renderTimeoutId);
+      rejectContent?.(createAbortError());
+      rejectContent = undefined;
+      contentPromise = undefined;
       signal?.removeEventListener('abort', abortHandler);
       destroyPromise = asyncDestroyPlatform(platformRef);
     }
@@ -183,20 +185,20 @@ export async function renderAngular(
       destroy,
       hasNavigationError,
       redirectTo,
-      content: () =>
-        new Promise<string>((resolve, reject) => {
+      content: () => {
+        if (
+          destroyPromise ||
+          platformRef.destroyed ||
+          applicationRef.destroyed ||
+          signal?.aborted
+        ) {
+          void destroy();
+
+          return Promise.reject(createAbortError());
+        }
+
+        return (contentPromise ??= new Promise<string>((resolve, reject) => {
           rejectContent = reject;
-
-          if (
-            destroyPromise ||
-            platformRef.destroyed ||
-            applicationRef.destroyed ||
-            signal?.aborted
-          ) {
-            void destroy();
-
-            return;
-          }
 
           // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
           renderTimeoutId = setTimeout(() => {
@@ -206,7 +208,9 @@ export async function renderAngular(
               applicationRef.destroyed ||
               signal?.aborted
             ) {
+              rejectContent = undefined;
               void destroy();
+              reject(createAbortError());
 
               return;
             }
@@ -224,7 +228,8 @@ export async function renderAngular(
               },
             );
           }, 0);
-        }),
+        }));
+      },
     };
   } finally {
     if (hasNavigationError || redirectTo) {
