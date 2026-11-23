@@ -1,3 +1,15 @@
+<a name="21.2.31"></a>
+
+# 21.2.31 (2026-11-23)
+
+### @angular/build
+
+| Commit                                                                                               | Type | Description        |
+| ---------------------------------------------------------------------------------------------------- | ---- | ------------------ |
+| [f7b52ca517](https://github.com/angular/angular-cli/commit/f7b52ca517b9e92bc1b59c854c754b12eff2001c) | fix  | bump vite to 7.3.8 |
+
+<!-- CHANGELOG SPLIT MARKER -->
+
 <a name="22.3.0"></a>
 
 # 22.3.0 (2026-11-18)
