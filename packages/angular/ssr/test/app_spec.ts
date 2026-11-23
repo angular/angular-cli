@@ -24,6 +24,7 @@ import {
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { setTimeout } from 'node:timers/promises';
 import { AngularServerApp } from '../src/app';
+import { Hooks } from '../src/hooks';
 import { RenderMode } from '../src/routes/route-config';
 import { setAngularAppTestingManifest } from './testing-utils';
 
@@ -399,6 +400,7 @@ describe('AngularServerApp', () => {
       it('should clean up the abort event listener on request.signal after rendering completes', async () => {
         const controller = new AbortController();
         const request = new Request('http://localhost/home', { signal: controller.signal });
+        const addEventListenerSpy = spyOn(request.signal, 'addEventListener').and.callThrough();
         const removeEventListenerSpy = spyOn(
           request.signal,
           'removeEventListener',
@@ -408,7 +410,53 @@ describe('AngularServerApp', () => {
         expect(await response?.text()).toContain('Home works');
         await setTimeout(0);
 
-        expect(removeEventListenerSpy).toHaveBeenCalledWith('abort', jasmine.any(Function));
+        const addedAbortListeners = addEventListenerSpy.calls
+          .allArgs()
+          .filter(([event]) => event === 'abort')
+          .map(([, listener]) => listener);
+        const removedAbortListeners = removeEventListenerSpy.calls
+          .allArgs()
+          .filter(([event]) => event === 'abort')
+          .map(([, listener]) => listener);
+
+        expect(addedAbortListeners.length).toBeGreaterThan(0);
+        expect(removedAbortListeners).toEqual(jasmine.arrayWithExactContents(addedAbortListeners));
+      });
+
+      it('should skip html:transform:pre hooks when request signal is already aborted', async () => {
+        try {
+          setAngularAppTestingManifest(
+            [{ path: 'home', component: HomeComponent }],
+            [{ path: '**', renderMode: RenderMode.Server }],
+          );
+
+          const hooks = new Hooks();
+          const transformSpy = jasmine.createSpy('htmlTransform').and.callFake(({ html }) => html);
+          hooks.on('html:transform:pre', transformSpy);
+
+          const customApp = new AngularServerApp({ hooks });
+          // Warm up router.
+          const warmup = await customApp.handle(new Request('http://localhost/home'));
+          await warmup?.text();
+          await setTimeout(0);
+          expect(transformSpy).toHaveBeenCalledTimes(1);
+          transformSpy.calls.reset();
+
+          const controller = new AbortController();
+          controller.abort();
+
+          await expectAsync(
+            customApp.handle(new Request('http://localhost/home', { signal: controller.signal })),
+          ).toBeRejectedWithError(
+            DOMException,
+            /Request for: http:\/\/localhost\/home was aborted/,
+          );
+
+          await setTimeout(0);
+          expect(transformSpy).not.toHaveBeenCalled();
+        } finally {
+          setupManifest();
+        }
       });
 
       it('should reject reading response body if request is aborted after handle() resolves but before rendering completes', async () => {
