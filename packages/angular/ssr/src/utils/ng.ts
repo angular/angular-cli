@@ -103,19 +103,21 @@ export async function renderAngular(
   let hasNavigationError = true;
   let renderTimeoutId: ReturnType<typeof setTimeout> | undefined;
   let destroyPromise: Promise<void> | undefined;
+  let contentPromise: Promise<string> | undefined;
   let rejectContent: ((reason?: unknown) => void) | undefined;
 
-  const destroy = (): Promise<void> => {
-    rejectContent?.(
-      new DOMException(
-        `Request for: ${url} was aborted.${signal?.reason ? `\n${signal.reason}` : ''}`,
-        'AbortError',
-      ),
+  const createAbortError = (): DOMException =>
+    new DOMException(
+      `Request for: ${url} was aborted.${signal?.reason ? `\n${signal.reason}` : ''}`,
+      'AbortError',
     );
-    rejectContent = undefined;
 
+  const destroy = (): Promise<void> => {
     if (!destroyPromise) {
       clearTimeout(renderTimeoutId);
+      rejectContent?.(createAbortError());
+      rejectContent = undefined;
+      contentPromise = undefined;
       signal?.removeEventListener('abort', abortHandler);
       destroyPromise = asyncDestroyPlatform(platformRef);
     }
@@ -131,14 +133,14 @@ export async function renderAngular(
     let applicationRef: ApplicationRef;
     if (isNgModule(bootstrap)) {
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
-      if (platformRef.destroyed || signal?.aborted) {
+      if (platformRef.destroyed || moduleRef.injector.destroyed || signal?.aborted) {
         return { hasNavigationError: true };
       }
 
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
       applicationRef = await bootstrap({ platformRef });
-      if (platformRef.destroyed || signal?.aborted) {
+      if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
         return { hasNavigationError: true };
       }
     }
@@ -149,7 +151,7 @@ export async function renderAngular(
     // This code protect against app destruction during bootstrapping which is a
     // valid case. We should not assume the `applicationRef` is not in destroyed state.
     // Calling `envInjector.get` would throw `NG0205: Injector has already been destroyed`.
-    if (applicationRef.destroyed || signal?.aborted) {
+    if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
       return { hasNavigationError: true };
     }
 
@@ -183,27 +185,51 @@ export async function renderAngular(
       destroy,
       hasNavigationError,
       redirectTo,
-      content: () =>
-        new Promise<string>((resolve, reject) => {
+      content: () => {
+        if (
+          destroyPromise ||
+          platformRef.destroyed ||
+          applicationRef.destroyed ||
+          signal?.aborted
+        ) {
+          void destroy();
+
+          return Promise.reject(createAbortError());
+        }
+
+        return (contentPromise ??= new Promise<string>((resolve, reject) => {
           rejectContent = reject;
 
           // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
           renderTimeoutId = setTimeout(() => {
-            if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
+            if (
+              destroyPromise ||
+              platformRef.destroyed ||
+              applicationRef.destroyed ||
+              signal?.aborted
+            ) {
+              rejectContent = undefined;
               void destroy();
+              reject(createAbortError());
 
               return;
             }
 
-            renderInternal(platformRef, applicationRef)
-              .then(resolve)
-              .catch(reject)
-              .finally(() => {
+            renderInternal(platformRef, applicationRef).then(
+              (renderedHtml) => {
                 rejectContent = undefined;
                 void destroy();
-              });
+                resolve(renderedHtml);
+              },
+              (error) => {
+                rejectContent = undefined;
+                void destroy();
+                reject(error);
+              },
+            );
           }, 0);
-        }),
+        }));
+      },
     };
   } finally {
     if (hasNavigationError || redirectTo) {
@@ -237,11 +263,13 @@ function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
 
   return new Promise((resolve) => {
     setTimeout(() => {
-      if (!platformRef.destroyed) {
-        platformRef.destroy();
+      try {
+        if (!platformRef.destroyed) {
+          platformRef.destroy();
+        }
+      } finally {
+        resolve();
       }
-
-      resolve();
     }, 0);
   });
 }
