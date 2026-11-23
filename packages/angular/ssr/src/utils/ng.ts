@@ -267,6 +267,11 @@ function asyncDestroyPlatform(platformRef: PlatformRef): Promise<void> {
         if (!platformRef.destroyed) {
           platformRef.destroy();
         }
+      } catch (error) {
+        // An error thrown by a destroy hook must not escape this macrotask,
+        // otherwise it becomes an uncaught exception that can terminate the process.
+        // eslint-disable-next-line no-console
+        console.error('An error occurred while destroying the platform.', error);
       } finally {
         resolve();
       }

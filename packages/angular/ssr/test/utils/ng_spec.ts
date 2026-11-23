@@ -14,6 +14,7 @@ import '@angular/compiler';
 import {
   ApplicationRef,
   Component,
+  OnDestroy,
   PlatformRef,
   inject,
   provideZonelessChangeDetection,
@@ -279,5 +280,44 @@ describe('renderAngular', () => {
 
     await setTimeout(0);
     expect(destroySpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should log errors thrown by destroy hooks instead of leaving them uncaught', async () => {
+    const error = new Error('Destroy hook error');
+    const consoleErrorSpy = spyOn(console, 'error');
+
+    @Component({
+      selector: 'app-root',
+      template: 'Destroy hook error works',
+    })
+    class AppComponent implements OnDestroy {
+      ngOnDestroy(): void {
+        throw error;
+      }
+    }
+
+    const result = await renderAngular(
+      BASE_HTML,
+      (context) =>
+        bootstrapApplication(
+          AppComponent,
+          { providers: [provideZonelessChangeDetection()] },
+          context,
+        ),
+      new URL('http://localhost/'),
+      [],
+      'ssr',
+    );
+
+    expect(result).toEqual(jasmine.objectContaining({ destroy: jasmine.any(Function) }));
+    if (!('destroy' in result)) {
+      return;
+    }
+
+    await expectAsync(result.destroy()).toBeResolved();
+    expect(consoleErrorSpy).toHaveBeenCalledOnceWith(
+      'An error occurred while destroying the platform.',
+      error,
+    );
   });
 });
