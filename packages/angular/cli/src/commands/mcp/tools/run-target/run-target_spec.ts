@@ -149,6 +149,9 @@ describe('Run Target Tool', () => {
     await expectAsync(
       runTarget({ target: 'build', options: { watch: true } }, mockContext),
     ).toBeRejectedWithError(/Watch mode execution.*is not yet supported/);
+    await expectAsync(
+      runTarget({ target: 'build', options: { WATCH: true } }, mockContext),
+    ).toBeRejectedWithError(/Watch mode execution.*is not yet supported/);
   });
 
   describe('root-restricted host option validation', () => {
@@ -213,6 +216,16 @@ describe('Run Target Tool', () => {
           restrictedContext,
         ),
       ).toBeRejectedWithError(/Access denied: option '--runner-config'/);
+
+      await expectAsync(
+        runTarget(
+          {
+            target: 'test',
+            options: { reporters: [join(outsideDir, 'evil-reporter.mjs')] },
+          },
+          restrictedContext,
+        ),
+      ).toBeRejectedWithError(/Access denied: option '--reporters'/);
 
       expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
     });

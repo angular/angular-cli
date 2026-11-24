@@ -351,6 +351,7 @@ const EXACT_PATH_OPTIONS = new Set([
   'configfile',
   'coveragedir',
   'coveragedirectory',
+  'coveragereporters',
   'eslintconfig',
   'filereplacements',
   'index',
@@ -365,6 +366,7 @@ const EXACT_PATH_OPTIONS = new Set([
   'project',
   'providersfile',
   'proxyconfig',
+  'reporters',
   'routesfile',
   'runnerconfig',
   'scripts',
@@ -434,7 +436,7 @@ function stripNegationPrefix(segment: string): string {
   return segment.toLowerCase().startsWith('no-') ? segment.slice(3) : segment;
 }
 
-function classifySingleKey(rawSegment: string): OptionPathKind {
+function classifySingleKey(rawSegment: string, isRunnerContext = false): OptionPathKind {
   const segment = stripNegationPrefix(rawSegment);
   const compact = normalizeOptionKey(segment);
 
@@ -453,7 +455,11 @@ function classifySingleKey(rawSegment: string): OptionPathKind {
   if (GLOB_PATH_OPTIONS.has(compact)) {
     return 'glob';
   }
-  if (EXACT_PATH_OPTIONS.has(compact) || compact === 'o') {
+  if (
+    EXACT_PATH_OPTIONS.has(compact) ||
+    compact === 'o' ||
+    (isRunnerContext && (compact === 'c' || compact === 'r'))
+  ) {
     return 'path';
   }
 
@@ -465,13 +471,13 @@ function classifySingleKey(rawSegment: string): OptionPathKind {
   return 'none';
 }
 
-function classifyOptionKey(rawKey: string): OptionPathKind {
+function classifyOptionKey(rawKey: string, isRunnerContext = false): OptionPathKind {
   const dotSegments = rawKey.split('.');
   if (dotSegments.length === 1) {
-    return classifySingleKey(dotSegments[0]);
+    return classifySingleKey(dotSegments[0], isRunnerContext);
   }
 
-  const rootKind = classifySingleKey(dotSegments[0]);
+  const rootKind = classifySingleKey(dotSegments[0], isRunnerContext);
   const leafSegment = dotSegments.at(-1) ?? '';
   const leafCompact = normalizeOptionKey(leafSegment);
 
@@ -479,7 +485,7 @@ function classifyOptionKey(rawKey: string): OptionPathKind {
     return leafCompact === 'base' ? 'output-dir' : 'output-relative';
   }
 
-  const leafKind = classifySingleKey(leafSegment);
+  const leafKind = classifySingleKey(leafSegment, isRunnerContext);
   if (leafKind !== 'none') {
     return leafKind;
   }
@@ -680,36 +686,72 @@ function assertNotWorkspaceOrRootAncestor(
   }
 }
 
-function validateGlobOptionValue(
+function validateOutputRelativeOptionValue(
   roots: readonly string[],
   flag: string,
+  rawValue: string,
+  cwd: string,
+  realCwd: string,
+): void {
+  if (rawValue.includes('\0')) {
+    throw new Error(`Access denied: option '${flag}' contains a null byte.`);
+  }
+
+  if (isAbsolute(rawValue)) {
+    throw new Error(
+      `Access denied: option '${flag}' path '${rawValue}' must be relative to the output directory.`,
+    );
+  }
+
+  if (!isPathWithinRoot(cwd, resolve(cwd, rawValue))) {
+    throw new Error(
+      `Access denied: option '${flag}' path '${rawValue}' must not traverse outside the output directory.`,
+    );
+  }
+
+  validateOptionPathValue(roots, flag, rawValue, cwd, realCwd);
+}
+
+function validateGlobOptionValue(
+  roots: readonly string[],
+  flag: string | undefined,
   pattern: string,
   cwd: string,
   realCwd: string,
 ): void {
   if (pattern.includes('\0')) {
-    throw new Error(`Access denied: option '${flag}' contains a null byte.`);
+    throw new Error(
+      flag
+        ? `Access denied: option '${flag}' contains a null byte.`
+        : 'Access denied: glob pattern contains a null byte.',
+    );
   }
 
-  const normalized = pattern.startsWith('!') ? pattern.slice(1) : pattern;
+  const normalized = pattern.replace(/^!+/, '');
   if (!normalized) {
     return;
   }
 
-  const label = `option '${flag}' pattern '${pattern}'`;
+  const label = flag ? `option '${flag}' pattern '${pattern}'` : `glob pattern '${pattern}'`;
   const firstWildcardIndex = normalized.search(/[*?[{]/);
   const basePath = firstWildcardIndex >= 0 ? normalized.slice(0, firstWildcardIndex) : normalized;
 
   if (firstWildcardIndex >= 0) {
     const wildcardTail = normalized.slice(firstWildcardIndex);
-    if (/(?:^|[\\/{,])\.\.(?:[\\/},]|$)/.test(wildcardTail)) {
+    if (/(?:^|[\\/{,!])\.\.(?:[\\/},]|$)/.test(wildcardTail)) {
       throw new Error(`Access denied: ${label} contains path traversal sequences.`);
     }
 
-    if (normalized.startsWith('{')) {
+    let searchPos = 0;
+    while (searchPos < normalized.length) {
+      const braceOpenIndex = normalized.indexOf('{', searchPos);
+      if (braceOpenIndex === -1) {
+        break;
+      }
+
       let braceDepth = 0;
       let braceCloseIndex = normalized.length;
-      for (let i = 0; i < normalized.length; i++) {
+      for (let i = braceOpenIndex; i < normalized.length; i++) {
         if (normalized[i] === '{') {
           braceDepth++;
         } else if (normalized[i] === '}') {
@@ -721,17 +763,27 @@ function validateGlobOptionValue(
         }
       }
 
-      const braceContent = normalized.slice(1, braceCloseIndex);
-      for (const token of braceContent.split(/[{},]/)) {
+      const prefixBeforeBrace = normalized.slice(0, braceOpenIndex);
+      const hasWildcardInPrefix = /[*?[{]/.test(prefixBeforeBrace);
+      const braceBaseDir = hasWildcardInPrefix ? cwd : resolve(cwd, prefixBeforeBrace);
+      const braceContent = normalized.slice(braceOpenIndex + 1, braceCloseIndex);
+
+      for (const rawToken of braceContent.split(/[{},]/)) {
+        const token = rawToken.replace(/^!+/, '');
         if (!token) {
           continue;
         }
         const tokenWildcard = token.search(/[*?[]/);
         const tokenBase = tokenWildcard >= 0 ? token.slice(0, tokenWildcard) : token;
         if (tokenBase) {
-          assertRealPathAllowed(roots, resolve(cwd, tokenBase), label);
+          assertRealPathAllowed(roots, resolve(braceBaseDir, tokenBase), label);
+          if (braceBaseDir !== cwd) {
+            assertRealPathAllowed(roots, resolve(cwd, tokenBase), label);
+          }
         }
       }
+
+      searchPos = braceCloseIndex + 1;
     }
   }
 
@@ -758,35 +810,68 @@ function validateNgCommandArgs(
   const outputDirs: Array<{ raw: string; real: string }> = [];
   const outputRelativeChecks: Array<{ flag: string; value: string }> = [];
   const nestedRunnerArgs: string[] = [];
+  let inPassthrough = false;
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
-    if (!arg.startsWith('-') || arg === '-' || arg === '--') {
+    if (arg === '--') {
+      inPassthrough = true;
+      continue;
+    }
+    if (!arg.startsWith('-') || arg === '-') {
       continue;
     }
 
-    const withoutPrefix = arg.startsWith('--') ? arg.slice(2) : arg.slice(1);
+    const isRunnerContext = depth > 0 || inPassthrough;
+    const isLongFlag = arg.startsWith('--');
+    const withoutPrefix = isLongFlag ? arg.slice(2) : arg.slice(1);
     const eqIndex = withoutPrefix.indexOf('=');
     const hasEquals = eqIndex !== -1;
-    const rawKey = hasEquals ? withoutPrefix.slice(0, eqIndex) : withoutPrefix;
-    const kind = classifyOptionKey(rawKey);
+    let rawKey = hasEquals ? withoutPrefix.slice(0, eqIndex) : withoutPrefix;
+    let attachedShortValue: string | undefined;
+
+    if (!isLongFlag && !hasEquals && rawKey.length > 1) {
+      const shortChar = rawKey[0];
+      if (shortChar === 'o' || (isRunnerContext && (shortChar === 'c' || shortChar === 'r'))) {
+        attachedShortValue = rawKey.slice(1);
+        rawKey = shortChar;
+      }
+    }
+
+    const kind = classifyOptionKey(rawKey, isRunnerContext);
     if (kind === 'none') {
       continue;
     }
 
-    const flag = arg.startsWith('--') ? `--${rawKey}` : `-${rawKey}`;
+    const flag = isLongFlag ? `--${rawKey}` : `-${rawKey}`;
     const isNegated = rawKey.toLowerCase().startsWith('no-');
+    const compactKey = normalizeOptionKey(stripNegationPrefix(rawKey));
+    const canBeBareFlag = BOOLEAN_OR_PATH_OPTIONS.has(compactKey) || rawKey === 'o';
 
     let value: string | undefined;
     if (hasEquals) {
       value = withoutPrefix.slice(eqIndex + 1);
-    } else if (!isNegated && i + 1 < args.length && !args[i + 1].startsWith('-')) {
-      value = args[++i];
+    } else if (attachedShortValue !== undefined) {
+      value = attachedShortValue;
+    } else if (!isNegated && i + 1 < args.length) {
+      const nextArg = args[i + 1];
+      const isStandardFlag = /^--?[a-zA-Z0-9][a-zA-Z0-9-_.]*(?:=.*)?$/.test(nextArg);
+      if (
+        kind === 'runner-args' ||
+        !nextArg.startsWith('-') ||
+        !isStandardFlag ||
+        (!canBeBareFlag && !nextArg.startsWith('--'))
+      ) {
+        value = args[++i];
+      }
     }
 
     if (kind === 'runner-args') {
       if (value !== undefined) {
         nestedRunnerArgs.push(value);
+        if (/\s--?[a-zA-Z]/.test(value)) {
+          nestedRunnerArgs.push(...value.split(/\s+/).filter(Boolean));
+        }
       }
       continue;
     }
@@ -809,7 +894,6 @@ function validateNgCommandArgs(
       continue;
     }
 
-    const compactKey = normalizeOptionKey(stripNegationPrefix(rawKey));
     if (
       BOOLEAN_OR_PATH_OPTIONS.has(compactKey) &&
       (value === 'true' || value === 'false' || value === '')
@@ -820,7 +904,7 @@ function validateNgCommandArgs(
     if (kind === 'glob') {
       validateGlobOptionValue(roots, flag, value, cwd, realCwd);
     } else if (kind === 'output-relative') {
-      validateOptionPathValue(roots, flag, value, cwd, realCwd);
+      validateOutputRelativeOptionValue(roots, flag, value, cwd, realCwd);
       outputRelativeChecks.push({ flag, value });
     } else {
       validateOptionPathValue(roots, flag, value, cwd, realCwd);
@@ -829,7 +913,23 @@ function validateNgCommandArgs(
 
   for (const { flag, value } of outputRelativeChecks) {
     for (const outputDir of outputDirs) {
-      validateOptionPathValue(roots, flag, value, outputDir.raw, outputDir.real);
+      const { realPath, walkedPath } = validateOptionPathValue(
+        roots,
+        flag,
+        value,
+        outputDir.raw,
+        outputDir.real,
+      );
+      if (!isPathWithinRoot(outputDir.real, realPath)) {
+        throw new Error(
+          `Access denied: option '${flag}' path '${value}' must not traverse outside the output directory.`,
+        );
+      }
+      if (walkedPath && !isPathWithinRoot(outputDir.real, walkedPath)) {
+        throw new Error(
+          `Access denied: option '${flag}' path '${value}' must not traverse outside the output directory.`,
+        );
+      }
     }
   }
 
@@ -870,19 +970,8 @@ export function createRootRestrictedHost(
       return baseHost.readFile(path, encoding);
     },
     glob(pattern: string, options: { cwd: string }) {
-      if (pattern.includes('..')) {
-        throw new Error(
-          `Access denied: glob pattern '${pattern}' contains path traversal sequences.`,
-        );
-      }
-
-      checkPath(options.cwd);
-
-      const firstWildcardIndex = pattern.search(/[*?[{]/);
-      const basePath = firstWildcardIndex >= 0 ? pattern.substring(0, firstWildcardIndex) : pattern;
-
-      const targetDir = resolve(options.cwd, basePath);
-      checkPath(targetDir);
+      const realCwd = checkPath(options.cwd);
+      validateGlobOptionValue(roots, undefined, pattern, options.cwd, realCwd);
 
       return baseHost.glob(pattern, options);
     },

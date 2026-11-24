@@ -32,7 +32,12 @@ export class GenericTargetStrategy implements TargetStrategy {
     input: StrategyExecutionContext,
     context: McpToolContext,
   ): Promise<RunTargetOutput> {
-    if (input.targetName === 'serve' || input.options?.['watch'] === true) {
+    const hasWatchOption =
+      input.options !== undefined &&
+      Object.entries(input.options).some(
+        ([key, value]) => key.toLowerCase().replace(/[-_]/g, '') === 'watch' && value === true,
+      );
+    if (input.targetName === 'serve' || hasWatchOption) {
       throw new Error(
         `Watch mode execution (serve target or watch option) is not yet supported by 'run_target'. ` +
           `Please use the legacy 'devserver_start' / 'devserver_wait_for_build' tools instead.`,

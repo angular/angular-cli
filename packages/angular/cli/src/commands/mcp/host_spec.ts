@@ -48,6 +48,17 @@ describe('createRootRestrictedHost', () => {
     const host = createRootRestrictedHost(LocalWorkspaceHost, [root1]);
 
     expect(host.existsSync(dotDotFile)).toBeTrue();
+    expect(() => host.glob('..hidden.txt', { cwd: root1 })).not.toThrow();
+  });
+
+  it('should reject glob patterns escaping roots via braces or multiple negations', () => {
+    const linkOut = join(root1, 'link-out');
+    symlinkSync(outsideDir, linkOut, 'junction');
+    const host = createRootRestrictedHost(LocalWorkspaceHost, [root1]);
+
+    for (const pattern of [`{${outsideDir},src}/*`, './{link-out,src}/*', '!!../outside/*']) {
+      expect(() => host.glob(pattern, { cwd: root1 })).toThrowError(/Access denied/);
+    }
   });
 
   it('should reject file access outside of the configured roots', () => {
@@ -111,8 +122,13 @@ describe('createRootRestrictedHost', () => {
           '--output-hashing=all',
           '--output-mode=static',
           '--configuration=production',
+          '-c',
+          'production',
           '--define=API_BASE=/v1',
           '--filter=/AppComponent/',
+          '--reporters=default',
+          '--reporters=json',
+          '--coverage-reporters=lcov',
           '--route=/shell',
           '--routes=/home',
           '--profile',
@@ -273,7 +289,41 @@ describe('createRootRestrictedHost', () => {
         ),
       ).toThrowError(/Access denied: option '--out-file'/);
 
+      // Output-relative traversal must be rejected even without an explicit CLI --output-path
+      // (e.g., when outputPath is configured in angular.json).
+      expect(() =>
+        restrictedHost.executeNgCommand(['extract-i18n', 'web', '--out-file=../escape.xlf'], {
+          cwd: monoWorkspace,
+        }),
+      ).toThrowError(/Access denied: option '--out-file'/);
+
+      // Output-relative sub-options must not traverse up to the workspace root either.
+      expect(() =>
+        restrictedHost.executeNgCommand(
+          ['build', 'web', '--output-path=dist/app', '--output-path.browser=../..'],
+          { cwd: monoWorkspace },
+        ),
+      ).toThrowError(/Access denied: option '--output-path\.browser'/);
+
       expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
+    });
+
+    it('should allow valid relative output-relative options', async () => {
+      await restrictedHost.executeNgCommand(
+        [
+          'build',
+          'my-app',
+          '--output-path=dist/app',
+          '--output-path.browser=browser',
+          '--resources-output-path=media',
+        ],
+        { cwd: root1 },
+      );
+      await restrictedHost.executeNgCommand(['extract-i18n', 'my-app', '--out-file=messages.xlf'], {
+        cwd: root1,
+      });
+
+      expect(baseHost.executeNgCommand).toHaveBeenCalledTimes(2);
     });
 
     it('should reject other path-bearing builder and third-party options outside roots', () => {
@@ -305,7 +355,10 @@ describe('createRootRestrictedHost', () => {
         `--output-dir=${extPath}`,
         `--config-dir=${extPath}`,
         `--dest=${extPath}`,
+        `--reporters=${extPath}`,
+        `--coverage-reporters=${extPath}`,
         `-o=${extPath}`,
+        `-o${extPath}`,
       ]) {
         expect(() =>
           restrictedHost.executeNgCommand(['run', 'my-app:custom', flag], { cwd: root1 }),
@@ -314,6 +367,13 @@ describe('createRootRestrictedHost', () => {
 
       expect(() =>
         restrictedHost.executeNgCommand(['lint', 'my-app', '-o', extPath], { cwd: root1 }),
+      ).toThrowError(/Access denied/);
+
+      expect(() =>
+        restrictedHost.executeNgCommand(
+          ['build', 'my-app', '--ts-config', '-x/../../outside/tsconfig.json'],
+          { cwd: root1 },
+        ),
       ).toThrowError(/Access denied/);
 
       expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
@@ -342,7 +402,11 @@ describe('createRootRestrictedHost', () => {
         `{${outsideDir},src}/*.spec.ts`,
         `{a,{b,c},${outsideDir}}/*.spec.ts`,
         '{link-out,src}/*.spec.ts',
+        './{link-out,src}/*.spec.ts',
+        `src/{${outsideDir},a}/*.spec.ts`,
         '!../outside/*.spec.ts',
+        '!!../outside/*.spec.ts',
+        `!!${join(outsideDir, '*.spec.ts')}`,
       ]) {
         expect(() =>
           restrictedHost.executeNgCommand(['test', 'my-app', `--include=${badPattern}`], {
@@ -354,30 +418,36 @@ describe('createRootRestrictedHost', () => {
 
     it('should validate nested runner-args and passthrough args after --', async () => {
       await restrictedHost.executeNgCommand(
-        ['test', 'my-app', '--runner-args=--update', '--runner-args=--bail=1'],
+        [
+          'test',
+          'my-app',
+          '--runner-args=--update',
+          '--runner-args=--bail=1',
+          '--runner-args=--config=my folder/vitest.config.ts',
+        ],
         { cwd: root1 },
       );
       expect(baseHost.executeNgCommand).toHaveBeenCalledTimes(1);
 
       const extConfig = join(outsideDir, 'vitest.config.mjs');
-      expect(() =>
-        restrictedHost.executeNgCommand(['test', 'my-app', `--runner-args=--config=${extConfig}`], {
-          cwd: root1,
-        }),
-      ).toThrowError(/Access denied/);
-
-      expect(() =>
-        restrictedHost.executeNgCommand(
-          ['test', 'my-app', '--runner-args=--outputFile', `--runner-args=${extConfig}`],
-          { cwd: root1 },
-        ),
-      ).toThrowError(/Access denied/);
-
-      expect(() =>
-        restrictedHost.executeNgCommand(['test', 'my-app', '--', `--config=${extConfig}`], {
-          cwd: root1,
-        }),
-      ).toThrowError(/Access denied/);
+      for (const args of [
+        ['test', 'my-app', `--runner-args=--config=${extConfig}`],
+        ['test', 'my-app', '--runner-args', `--config=${extConfig}`],
+        ['test', 'my-app', '--runner-args=--outputFile', `--runner-args=${extConfig}`],
+        ['test', 'my-app', `--runner-args=-c=${extConfig}`],
+        ['test', 'my-app', `--runner-args=-c${extConfig}`],
+        ['test', 'my-app', '--runner-args=-c', `--runner-args=${extConfig}`],
+        ['test', 'my-app', `--runner-args=-r=${outsideDir}`],
+        ['test', 'my-app', `--runner-args=-r${outsideDir}`],
+        ['test', 'my-app', `--runner-args=--bail --config=${extConfig}`],
+        ['test', 'my-app', '--', `--config=${extConfig}`],
+        ['test', 'my-app', '--', '-c', extConfig],
+        ['test', 'my-app', '--', `-r${outsideDir}`],
+      ]) {
+        expect(() => restrictedHost.executeNgCommand(args, { cwd: root1 })).toThrowError(
+          /Access denied/,
+        );
+      }
     });
 
     it('should validate arguments in startNgProcess and allow valid devserver flags', () => {
