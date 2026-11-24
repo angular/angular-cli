@@ -45,7 +45,7 @@ export async function writeResponseToNodeResponse(
       await source.body.cancel().catch((err) => {
         // eslint-disable-next-line no-console
         console.error(
-          `An error occurred while cancelling the response body for: ${destination.req.url}.`,
+          `An error occurred while cancelling the response body for: ${destination.req?.url ?? 'unknown'}.`,
           err,
         );
       });
@@ -101,7 +101,7 @@ export async function writeResponseToNodeResponse(
     reader.cancel(error).catch((err) => {
       // eslint-disable-next-line no-console
       console.error(
-        `An error occurred while writing the response body for: ${destination.req.url}.`,
+        `An error occurred while writing the response body for: ${destination.req?.url ?? 'unknown'}.`,
         err,
       );
     });
