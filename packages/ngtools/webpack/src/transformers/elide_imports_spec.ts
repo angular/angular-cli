@@ -545,6 +545,76 @@ describe('elide_imports', () => {
 
       expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
     });
+
+    it('should not retain inlined const enum imports when a value specifier is removed from a declaration', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedService } from './mixed';
+
+          export const value = MixedEnum.A;
+
+          const remove = MixedService;
+        `;
+
+      const output = tags.stripIndent`
+          export const value = 1 /* MixedEnum.A */;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should retain const enum imports when a value specifier is removed and isolatedModules is enabled', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedService } from './mixed';
+
+          export const value = MixedEnum.A;
+
+          const remove = MixedService;
+        `;
+
+      const output = tags.stripIndent`
+          import { MixedEnum } from './mixed';
+          export const value = MixedEnum.A;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, {
+        ...extraCompilerOptions,
+        isolatedModules: true,
+      });
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should retain const enum imports when a value specifier is removed and preserveConstEnums is enabled', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedService } from './mixed';
+
+          export const value = MixedEnum.A;
+
+          const remove = MixedService;
+        `;
+
+      const output = tags.stripIndent`
+          import { MixedEnum } from './mixed';
+          export const value = 1 /* MixedEnum.A */;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(input, additionalFiles, true, {
+        ...extraCompilerOptions,
+        preserveConstEnums: true,
+      });
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
   });
 
   it('keeps jsxFactory imports when configured', () => {
@@ -1059,6 +1129,30 @@ describe('elide_imports', () => {
       const output = tags.stripIndent`
           export const value = 1 /* MixedEnum.A */;
           export let other;
+        `;
+
+      const { program, compilerHost } = createTypescriptContext(
+        input,
+        additionalFiles,
+        true,
+        extraCompilerOptions,
+      );
+      const result = transformTypescript(undefined, [transformer(program)], program, compilerHost);
+
+      expect(tags.oneLine`${result}`).toEqual(tags.oneLine`${output}`);
+    });
+
+    it('should not retain inlined const enum imports when a value specifier is removed from a declaration', () => {
+      const input = tags.stripIndent`
+          import { MixedEnum, MixedService } from './mixed';
+
+          export const value = MixedEnum.A;
+
+          const remove = MixedService;
+        `;
+
+      const output = tags.stripIndent`
+          export const value = 1 /* MixedEnum.A */;
         `;
 
       const { program, compilerHost } = createTypescriptContext(
