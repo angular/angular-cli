@@ -127,20 +127,29 @@ export async function renderAngular(
 
   const abortHandler = () => void destroy();
 
+  const isDestroyedOrAborted = (applicationRef?: ApplicationRef): boolean =>
+    !!(
+      destroyPromise ||
+      platformRef.destroyed ||
+      applicationRef?.destroyed ||
+      applicationRef?.injector.destroyed ||
+      signal?.aborted
+    );
+
   try {
     signal?.addEventListener('abort', abortHandler, { once: true });
 
     let applicationRef: ApplicationRef;
     if (isNgModule(bootstrap)) {
       const moduleRef = await platformRef.bootstrapModule(bootstrap);
-      if (platformRef.destroyed || moduleRef.injector.destroyed || signal?.aborted) {
+      if (isDestroyedOrAborted() || moduleRef.injector.destroyed) {
         return { hasNavigationError: true };
       }
 
       applicationRef = moduleRef.injector.get(ApplicationRef);
     } else {
       applicationRef = await bootstrap({ platformRef });
-      if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
+      if (isDestroyedOrAborted(applicationRef)) {
         return { hasNavigationError: true };
       }
     }
@@ -148,10 +157,10 @@ export async function renderAngular(
     // Block until application is stable.
     await applicationRef.whenStable();
 
-    // This code protect against app destruction during bootstrapping which is a
-    // valid case. We should not assume the `applicationRef` is not in destroyed state.
+    // This code protects against app destruction during bootstrapping which is a
+    // valid case. We should not assume the `applicationRef` or its injector is not in a destroyed state.
     // Calling `envInjector.get` would throw `NG0205: Injector has already been destroyed`.
-    if (platformRef.destroyed || applicationRef.destroyed || signal?.aborted) {
+    if (isDestroyedOrAborted(applicationRef)) {
       return { hasNavigationError: true };
     }
 
@@ -186,12 +195,7 @@ export async function renderAngular(
       hasNavigationError,
       redirectTo,
       content: () => {
-        if (
-          destroyPromise ||
-          platformRef.destroyed ||
-          applicationRef.destroyed ||
-          signal?.aborted
-        ) {
+        if (isDestroyedOrAborted(applicationRef)) {
           void destroy();
 
           return Promise.reject(createAbortError());
@@ -202,12 +206,7 @@ export async function renderAngular(
 
           // Defer rendering to the next event loop iteration to avoid blocking, as most operations in `renderInternal` are synchronous.
           renderTimeoutId = setTimeout(() => {
-            if (
-              destroyPromise ||
-              platformRef.destroyed ||
-              applicationRef.destroyed ||
-              signal?.aborted
-            ) {
+            if (isDestroyedOrAborted(applicationRef)) {
               rejectContent = undefined;
               void destroy();
               reject(createAbortError());

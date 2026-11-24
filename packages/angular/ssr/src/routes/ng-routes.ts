@@ -894,7 +894,14 @@ export async function getRoutesFromAngularRouterConfig(
       appShellRoute: serverRoutesConfig?.appShellRoute,
     };
   } finally {
-    platformRef.destroy();
+    try {
+      if (!platformRef.destroyed) {
+        platformRef.destroy();
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('An error occurred while destroying the platform.', error);
+    }
   }
 }
 

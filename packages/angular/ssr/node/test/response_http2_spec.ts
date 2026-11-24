@@ -160,4 +160,34 @@ describe('writeResponseToNodeResponse (HTTP/2)', () => {
     await writePromise;
     expect(readerCancelled).toBeTrue();
   });
+
+  it('should cancel response body when destination is already closed', async () => {
+    let writePromise!: Promise<void>;
+    let bodyCancelled = false;
+    const stream = new ReadableStream({
+      cancel() {
+        bodyCancelled = true;
+      },
+    });
+
+    server.once('request', (_, nodeResponse) => {
+      nodeResponse.end();
+      writePromise = writeResponseToNodeResponse(new Response(stream), nodeResponse);
+    });
+
+    const { port } = server.address() as AddressInfo;
+    const client = connect(`http://localhost:${port}`);
+    await new Promise<void>((resolve, reject) => {
+      const req = client.request({ ':path': '/' });
+      req.resume();
+      req.on('end', resolve);
+      req.on('error', reject);
+      req.end();
+    }).finally(() => {
+      client.close();
+    });
+
+    await writePromise;
+    expect(bodyCancelled).toBeTrue();
+  });
 });
