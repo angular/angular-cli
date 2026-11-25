@@ -62,6 +62,34 @@ describe('Jasmine to Vitest Schematic', () => {
     expect(newContent).toContain(`vi.spyOn(service, 'myMethod').mockReturnValue(undefined);`);
   });
 
+  it('should report a nested done callback for manual migration', async () => {
+    const specFilePath = 'projects/bar/src/app/app.spec.ts';
+    appTree.overwrite(
+      specFilePath,
+      `
+      it('waits for a value', (done) => {
+        values.subscribe({ error: (error) => { done.fail(error); } });
+        ready.then(done);
+      });
+    `,
+    );
+
+    const logs: string[] = [];
+    schematicRunner.logger.subscribe((entry) => logs.push(entry.message));
+    const tree = await schematicRunner.runSchematic(
+      'refactor-jasmine-vitest',
+      { project: 'bar', verbose: true },
+      appTree,
+    );
+
+    const content = tree.readContent(specFilePath);
+    expect(content).toContain('Please migrate manually.');
+    expect(content).toContain('done.fail(error)');
+    expect(content).toContain('ready.then(done)');
+    expect(logs).toContain('  - 1x unhandled-done-usage');
+    expect(logs.join('\n')).not.toContain('Transformed promise');
+  });
+
   it('should only transform files matching the fileSuffix option', async () => {
     const specFilePath = 'projects/bar/src/app/app.spec.ts';
     const specFileContent = `

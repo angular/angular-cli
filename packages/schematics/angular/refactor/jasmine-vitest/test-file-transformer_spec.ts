@@ -46,11 +46,13 @@ describe('Jasmine to Vitest Transformer - Nested Transformations', () => {
           });
         `,
       expected: `
-          it('should handle timers and async', async () => {
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('should handle timers and async', (done) => {
             vi.useFakeTimers();
             setTimeout(() => {
               expect(true).toBe(true);
               vi.useRealTimers();
+              done();
             }, 100);
             vi.advanceTimersByTime(100);
           });
@@ -175,10 +177,12 @@ describe('Comment Preservation', () => {
           });
         `,
       expected: `
-          it('should do something async', async () => {
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('should do something async', (done) => {
             // Start the async operation
             setTimeout(() => {
               // It's done now
+              done();
             }, 100);
           });
         `,
