@@ -12,6 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { APP_BASE_HREF } from '@angular/common';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
 import {
   Component,
   DestroyRef,
@@ -20,12 +21,14 @@ import {
   REQUEST,
   RESPONSE_INIT,
   inject,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { setTimeout } from 'node:timers/promises';
 import { AngularServerApp } from '../src/app';
 import { Hooks } from '../src/hooks';
 import { RenderMode } from '../src/routes/route-config';
+import { SSR_REQUEST_HEADER } from '../src/utils/ssr-request';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
@@ -816,6 +819,114 @@ describe('AngularServerApp', () => {
           expect(html).toContain('<style nonce="{% nonce %}">app-home{color:blue}</style>');
           expect(html).toContain('<script nonce="{% nonce %}">document.querySelectorAll');
         });
+      });
+    });
+
+    describe('requests sent while rendering on the server', () => {
+      @Component({
+        selector: 'app-request',
+        template: `{{ response() }}`,
+      })
+      class RequestComponent {
+        protected readonly response = signal('');
+
+        constructor() {
+          inject(HttpClient)
+            .get(inject(ActivatedRoute).snapshot.data['url'], { responseType: 'text' })
+            .subscribe({
+              next: (value) => this.response.set(value),
+              error: () => this.response.set('Request failed'),
+            });
+        }
+      }
+
+      /** Creates an application whose pages request the given URL while they are rendered. */
+      function createAppRequesting(url: string): AngularServerApp {
+        setAngularAppTestingManifest(
+          [{ path: '**', component: RequestComponent, data: { url } }],
+          [{ path: '**', renderMode: RenderMode.Server }],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          [provideHttpClient()],
+        );
+
+        return new AngularServerApp();
+      }
+
+      beforeEach(() => {
+        setupManifest();
+      });
+
+      it('should return a 400 response that is not stored for routes requested while rendering', async () => {
+        const response = await app.handle(
+          new Request('http://localhost/page-with-headers', {
+            headers: { [SSR_REQUEST_HEADER]: '' },
+          }),
+        );
+
+        expect(response?.status).toBe(400);
+        expect(Object.fromEntries(response?.headers.entries() ?? [])).toEqual({
+          'cache-control': 'no-store',
+          'content-type': 'text/plain',
+        });
+      });
+
+      it('should serve prerendered pages, redirects and client-side rendered routes requested while rendering', async () => {
+        const headers = { [SSR_REQUEST_HEADER]: '1' };
+
+        const redirect = await app.handle(new Request('http://localhost/redirect', { headers }));
+        expect(redirect?.headers.get('location')).toBe('/home');
+
+        const prerendered = await app.handle(new Request('http://localhost/home-ssg', { headers }));
+        expect(await prerendered?.text()).toContain('Home SSG works');
+
+        const clientSide = await app.handle(new Request('http://localhost/home-csr', { headers }));
+        expect(await clientSide?.text()).toContain('<title>CSR page</title>');
+      });
+
+      it('should not render the requests that a page sends to its own host', async () => {
+        const requestingApp = createAppRequesting('/api');
+        let requestCount = 0;
+        let requestStatus: number | undefined;
+        spyOn(globalThis, 'fetch').and.callFake(async (input, init) => {
+          // Stop the loop that renders the page again for each of its own requests.
+          if (++requestCount > 5) {
+            return new Response(null, { status: 508 });
+          }
+
+          const response =
+            (await requestingApp.handle(new Request(input, init))) ??
+            new Response(null, { status: 404 });
+          requestStatus = response.status;
+
+          return response;
+        });
+
+        const response = await requestingApp.handle(new Request('http://localhost/page'));
+        expect(await response?.text()).toContain('Request failed');
+        expect(requestCount).toBe(1);
+        expect(requestStatus).toBe(400);
+      });
+
+      it(`should add the '${SSR_REQUEST_HEADER}' header only to requests sent to the host of the page`, async () => {
+        const fetchSpy = spyOn(globalThis, 'fetch').and.callFake(
+          async () => new Response('Request works'),
+        );
+
+        for (const url of ['http://example.com/api', 'https://localhost:8443/api']) {
+          const response = await createAppRequesting(url).handle(
+            new Request('http://localhost/page'),
+          );
+          expect(await response?.text()).toContain('Request works');
+        }
+
+        const requests = fetchSpy.calls.allArgs().map(([input, init]) => new Request(input, init));
+        expect(requests.map(({ url, headers }) => [url, headers.has(SSR_REQUEST_HEADER)])).toEqual([
+          ['http://example.com/api', false],
+          ['https://localhost:8443/api', true],
+        ]);
       });
     });
   });

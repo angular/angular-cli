@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { ɵHTTP_ROOT_INTERCEPTOR_FNS as HTTP_ROOT_INTERCEPTOR_FNS } from '@angular/common/http';
 import {
   EnvironmentProviders,
   InjectionToken,
@@ -17,6 +18,7 @@ import {
 } from '@angular/core';
 import { provideServerRendering as provideServerRenderingPlatformServer } from '@angular/platform-server';
 import { type DefaultExport, ROUTES, type Route } from '@angular/router';
+import { ssrRequestInterceptorFn } from '../utils/ssr-request';
 
 /**
  * The internal path used for the app shell route.
@@ -448,6 +450,8 @@ export function provideServerRendering(
 
   const providers: (Provider | EnvironmentProviders)[] = [
     provideServerRenderingPlatformServer(options),
+    // Registered after the platform server providers, so that relative URLs are already resolved.
+    { provide: HTTP_ROOT_INTERCEPTOR_FNS, useValue: ssrRequestInterceptorFn, multi: true },
   ];
 
   let hasAppShell = false;

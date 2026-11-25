@@ -24,6 +24,7 @@ import { ServerRouter } from './routes/router';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
+import { SSR_REQUEST_HEADER, createSsrRequestResponse } from './utils/ssr-request';
 import { buildUrlWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 import { getFirstHeaderValue } from './utils/validation';
 
@@ -315,6 +316,12 @@ export class AngularServerApp {
       html = await this.runTransformsOnHtml(html, url, preload);
 
       return new Response(html, responseInit);
+    }
+
+    if (request.headers.has(SSR_REQUEST_HEADER)) {
+      // The application sent this request to its own host while it was rendered on the server.
+      // Rendering it could render a page that sends the same request again, without bound.
+      return createSsrRequestResponse();
     }
 
     if (locale !== undefined) {
