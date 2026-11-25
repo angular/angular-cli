@@ -21,24 +21,35 @@ export function serializeOptions(
     return args;
   }
 
+  const normalizedExcludeKeys = new Set(
+    [...excludeKeys].map((k) => k.toLowerCase().replace(/[-_]/g, '')),
+  );
+
   for (const [key, value] of Object.entries(options)) {
-    if (excludeKeys.has(key)) {
-      continue;
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9-_]*$/.test(key)) {
+      throw new Error(
+        `Invalid option key: '${key}'. Option keys must start with an alphanumeric character and ` +
+          'contain only alphanumeric characters, hyphens, or underscores.',
+      );
     }
 
-    if (!/^[a-zA-Z0-9-_]+$/.test(key)) {
-      throw new Error(
-        `Invalid option key: '${key}'. Option keys must be alphanumeric, hyphens, or underscores.`,
-      );
+    if (normalizedExcludeKeys.has(key.toLowerCase().replace(/[-_]/g, ''))) {
+      continue;
     }
 
     if (typeof value === 'boolean') {
       args.push(value ? `--${key}` : `--no-${key}`);
     } else if (Array.isArray(value)) {
       for (const item of value) {
+        if (typeof item === 'string' && item.includes('\0')) {
+          throw new Error(`Invalid option value for '${key}': values must not contain null bytes.`);
+        }
         args.push(`--${key}=${item}`);
       }
     } else if (value !== null && value !== undefined) {
+      if (typeof value === 'string' && value.includes('\0')) {
+        throw new Error(`Invalid option value for '${key}': values must not contain null bytes.`);
+      }
       args.push(`--${key}=${value}`);
     }
   }

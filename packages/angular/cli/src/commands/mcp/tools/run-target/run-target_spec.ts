@@ -6,12 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
-import { CommandError } from '../../host';
+import assert from 'node:assert';
+import { mkdtempSync, rmSync } from 'node:fs';
+import { join } from 'node:path';
+import { AngularWorkspace } from '../../../../utilities/config';
+import { CommandError, createRootRestrictedHost } from '../../host';
 import type { MockHost } from '../../testing/mock-host';
 import {
   type MockMcpToolContext,
   addProjectToWorkspace,
   createMockContext,
+  createMockHost,
 } from '../../testing/test-utils';
 import { runTarget } from './run-target';
 
@@ -144,5 +149,122 @@ describe('Run Target Tool', () => {
     await expectAsync(
       runTarget({ target: 'build', options: { watch: true } }, mockContext),
     ).toBeRejectedWithError(/Watch mode execution.*is not yet supported/);
+    await expectAsync(
+      runTarget({ target: 'build', options: { WATCH: true } }, mockContext),
+    ).toBeRejectedWithError(/Watch mode execution.*is not yet supported/);
+  });
+
+  describe('root-restricted host option validation', () => {
+    let tempRoot: string;
+    let outsideDir: string;
+    let baseHost: MockHost;
+    let restrictedContext: MockMcpToolContext;
+
+    beforeEach(() => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      tempRoot = mkdtempSync(join(baseTmpDir, 'angular-cli-run-target-root-'));
+      outsideDir = mkdtempSync(join(baseTmpDir, 'angular-cli-run-target-outside-'));
+
+      baseHost = createMockHost();
+      const restrictedHost = createRootRestrictedHost(baseHost, [tempRoot]);
+      const mock = createMockContext();
+      addProjectToWorkspace(mock.projects, 'my-app', {
+        build: { builder: '@angular/build:application' },
+        test: { builder: '@angular/build:unit-test' },
+        'extract-i18n': { builder: '@angular/build:extract-i18n' },
+      });
+
+      const workspace = new AngularWorkspace(
+        { projects: mock.projects, extensions: { defaultProject: 'my-app' } },
+        join(tempRoot, 'angular.json'),
+      );
+
+      restrictedContext = {
+        ...mock.context,
+        host: restrictedHost,
+        workspace,
+      };
+    });
+
+    afterEach(() => {
+      rmSync(tempRoot, { recursive: true, force: true });
+      rmSync(outsideDir, { recursive: true, force: true });
+    });
+
+    it('should reject and propagate out-of-root output-path in BuildTargetStrategy', async () => {
+      await expectAsync(
+        runTarget(
+          {
+            target: 'build',
+            options: { 'output-path': outsideDir },
+          },
+          restrictedContext,
+        ),
+      ).toBeRejectedWithError(/Access denied: option '--output-path'/);
+
+      expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
+    });
+
+    it('should reject and propagate out-of-root runner-config in UnitTestTargetStrategy', async () => {
+      await expectAsync(
+        runTarget(
+          {
+            target: 'test',
+            options: { 'runner-config': join(outsideDir, 'evil.mjs') },
+          },
+          restrictedContext,
+        ),
+      ).toBeRejectedWithError(/Access denied: option '--runner-config'/);
+
+      await expectAsync(
+        runTarget(
+          {
+            target: 'test',
+            options: { reporters: [join(outsideDir, 'evil-reporter.mjs')] },
+          },
+          restrictedContext,
+        ),
+      ).toBeRejectedWithError(/Access denied: option '--reporters'/);
+
+      expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
+    });
+
+    it('should reject and propagate out-of-root output-path in GenericTargetStrategy', async () => {
+      await expectAsync(
+        runTarget(
+          {
+            target: 'extract-i18n',
+            options: { 'output-path': '../escape' },
+          },
+          restrictedContext,
+        ),
+      ).toBeRejectedWithError(/Access denied: option '--output-path'/);
+
+      expect(baseHost.executeNgCommand).not.toHaveBeenCalled();
+    });
+
+    it('should allow valid in-root output-path and base-href options', async () => {
+      baseHost.executeNgCommand.and.resolveTo({
+        logs: ['Output location: dist/custom'],
+      });
+
+      const { structuredContent } = await runTarget(
+        {
+          target: 'build',
+          options: {
+            'output-path': 'dist/custom',
+            'base-href': '/my-app/',
+          },
+        },
+        restrictedContext,
+      );
+
+      expect(structuredContent.status).toBe('success');
+      expect(baseHost.executeNgCommand).toHaveBeenCalledWith(
+        ['build', 'my-app', '--output-path=dist/custom', '--base-href=/my-app/'],
+        { cwd: tempRoot },
+      );
+    });
   });
 });
