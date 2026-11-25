@@ -6,6 +6,7 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import { CommandError } from '../../host';
 import { getCommandErrorLogs } from '../../utils';
 import type { McpToolContext } from '../tool-registry';
 import { serializeOptions } from './options-serializer';
@@ -31,7 +32,12 @@ export class GenericTargetStrategy implements TargetStrategy {
     input: StrategyExecutionContext,
     context: McpToolContext,
   ): Promise<RunTargetOutput> {
-    if (input.targetName === 'serve' || input.options?.['watch'] === true) {
+    const hasWatchOption =
+      input.options !== undefined &&
+      Object.entries(input.options).some(
+        ([key, value]) => key.toLowerCase().replace(/[-_]/g, '') === 'watch' && value === true,
+      );
+    if (input.targetName === 'serve' || hasWatchOption) {
       throw new Error(
         `Watch mode execution (serve target or watch option) is not yet supported by 'run_target'. ` +
           `Please use the legacy 'devserver_start' / 'devserver_wait_for_build' tools instead.`,
@@ -66,6 +72,10 @@ export class GenericTargetStrategy implements TargetStrategy {
       const result = await context.host.executeNgCommand(args, { cwd: input.workspacePath });
       logs = result.logs;
     } catch (e) {
+      if (!(e instanceof CommandError)) {
+        throw e;
+      }
+
       status = 'failure';
       logs = getCommandErrorLogs(e);
     }
