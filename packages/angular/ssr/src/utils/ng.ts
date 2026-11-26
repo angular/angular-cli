@@ -24,8 +24,8 @@ import {
 } from '@angular/platform-server';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Console } from '../console';
+import { getFirstHeaderValue } from './headers';
 import { addTrailingSlash, joinUrlParts, stripIndexHtmlFromURL, stripTrailingSlash } from './url';
-import { getFirstHeaderValue } from './validation';
 
 /**
  * Represents the bootstrap mechanism for an Angular application.

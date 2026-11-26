@@ -10,14 +10,10 @@ import type { AngularServerApp, getOrCreateAngularServerApp } from './app';
 import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
+import { getFirstHeaderValue, normalizeTrustProxyHeaders } from './utils/headers';
 import { createRedirectResponse } from './utils/redirect';
 import { joinUrlParts } from './utils/url';
-import {
-  getFirstHeaderValue,
-  normalizeTrustProxyHeaders,
-  sanitizeRequestHeaders,
-  validateRequest,
-} from './utils/validation';
+import { sanitizeRequestHeaders, validateRequest } from './utils/validation';
 
 /**
  * Options for the Angular server application engine.
