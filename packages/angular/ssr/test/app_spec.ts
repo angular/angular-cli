@@ -12,6 +12,7 @@ import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
 import { APP_BASE_HREF } from '@angular/common';
+import { HttpClient, provideHttpClient } from '@angular/common/http';
 import {
   Component,
   DestroyRef,
@@ -20,12 +21,16 @@ import {
   REQUEST,
   RESPONSE_INIT,
   inject,
+  provideAppInitializer,
+  signal,
 } from '@angular/core';
 import { ActivatedRoute, CanActivateFn, Router } from '@angular/router';
 import { setTimeout } from 'node:timers/promises';
 import { AngularServerApp } from '../src/app';
 import { Hooks } from '../src/hooks';
 import { RenderMode } from '../src/routes/route-config';
+import { ServerRouter } from '../src/routes/router';
+import { SSR_REQUEST_HEADER } from '../src/utils/ssr-request';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 describe('AngularServerApp', () => {
@@ -816,6 +821,235 @@ describe('AngularServerApp', () => {
           expect(html).toContain('<style nonce="{% nonce %}">app-home{color:blue}</style>');
           expect(html).toContain('<script nonce="{% nonce %}">document.querySelectorAll');
         });
+      });
+    });
+
+    describe('requests sent while rendering on the server', () => {
+      @Component({
+        selector: 'app-request',
+        template: `{{ response() }}`,
+      })
+      class RequestComponent {
+        protected readonly response = signal('');
+
+        constructor() {
+          inject(HttpClient)
+            .get(inject(ActivatedRoute).snapshot.data['url'], { responseType: 'text' })
+            .subscribe({
+              next: (value) => this.response.set(value),
+              error: () => this.response.set('Request failed'),
+            });
+        }
+      }
+
+      /** Creates an application whose pages request the given URL while they are rendered. */
+      function createAppRequesting(url: string): AngularServerApp {
+        setAngularAppTestingManifest(
+          [{ path: '**', component: RequestComponent, data: { url } }],
+          [{ path: '**', renderMode: RenderMode.Server }],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          [provideHttpClient()],
+        );
+
+        return new AngularServerApp();
+      }
+
+      beforeEach(() => {
+        setupManifest();
+        spyOn(console, 'warn');
+      });
+
+      afterEach(() => {
+        setupManifest();
+      });
+
+      it('should reject recursive SSR requests before route extraction on cold start', async () => {
+        const fromSpy = spyOn(ServerRouter, 'from').and.callThrough();
+        const response = await app.handle(
+          new Request('http://localhost/home', {
+            headers: { [SSR_REQUEST_HEADER]: '1' },
+          }),
+        );
+
+        expect(fromSpy).not.toHaveBeenCalled();
+        expect(response?.status).toBe(404);
+        expect(Object.fromEntries(response?.headers.entries() ?? [])).toEqual({
+          'cache-control': 'no-store',
+          'content-type': 'text/plain',
+        });
+      });
+
+      it('should avoid deadlocking when route extraction triggers a self-request on cold start', async () => {
+        setAngularAppTestingManifest(
+          [
+            { path: 'home', component: HomeComponent },
+            { path: '**', component: HomeComponent },
+          ],
+          [{ path: '**', renderMode: RenderMode.Server }],
+          undefined,
+          undefined,
+          undefined,
+          undefined,
+          [
+            provideHttpClient(),
+            provideAppInitializer(() => {
+              const http = inject(HttpClient);
+
+              return new Promise<void>((resolve) => {
+                http.get('/api', { responseType: 'text' }).subscribe({
+                  next: () => resolve(),
+                  error: () => resolve(),
+                });
+              });
+            }),
+          ],
+        );
+
+        const coldApp = new AngularServerApp();
+        const handledResponses: Array<Response | null> = [];
+        spyOn(globalThis, 'fetch').and.callFake(async (input, init) => {
+          if (handledResponses.length >= 5) {
+            return new Response(null, { status: 508 });
+          }
+
+          const response = await coldApp.handle(new Request(input, init));
+          handledResponses.push(response);
+
+          return response ?? new Response(null, { status: 500 });
+        });
+
+        const response = await coldApp.handle(new Request('http://localhost/home'));
+        expect(await response?.text()).toContain('Home works');
+        expect(handledResponses.length).toBe(2);
+        for (const handled of handledResponses) {
+          expect(handled?.status).toBe(404);
+          expect(handled?.headers.get('cache-control')).toBe('no-store');
+        }
+      });
+
+      it('should return a non-cached 404 response for SSR routes requested while rendering', async () => {
+        // Warm the router so the request proceeds past cold-start extraction.
+        await app.handle(new Request('http://localhost/home'));
+
+        const response = await app.handle(
+          new Request('http://localhost/page-with-headers', {
+            headers: { [SSR_REQUEST_HEADER]: '' },
+          }),
+        );
+
+        expect(response?.status).toBe(404);
+        expect(response?.statusText).toBe('Not Found');
+        expect(Object.fromEntries(response?.headers.entries() ?? [])).toEqual({
+          'cache-control': 'no-store',
+          'content-type': 'text/plain',
+        });
+      });
+
+      it('should return a non-cached 404 response for static redirects requested while rendering', async () => {
+        await app.handle(new Request('http://localhost/home'));
+
+        const response = await app.handle(
+          new Request('http://localhost/redirect', {
+            headers: { [SSR_REQUEST_HEADER]: '1' },
+          }),
+        );
+
+        expect(response?.status).toBe(404);
+        expect(response?.headers.get('location')).toBeNull();
+        expect(Object.fromEntries(response?.headers.entries() ?? [])).toEqual({
+          'cache-control': 'no-store',
+          'content-type': 'text/plain',
+        });
+      });
+
+      it('should serve prerendered pages and client-side rendered routes requested while rendering', async () => {
+        await app.handle(new Request('http://localhost/home'));
+
+        const headers = { [SSR_REQUEST_HEADER]: '1' };
+
+        const prerendered = await app.handle(new Request('http://localhost/home-ssg', { headers }));
+        expect(prerendered?.status).toBe(200);
+        expect(await prerendered?.text()).toContain('Home SSG works');
+
+        const clientSide = await app.handle(new Request('http://localhost/home-csr', { headers }));
+        expect(clientSide?.status).toBe(200);
+        expect(await clientSide?.text()).toContain('<title>CSR page</title>');
+      });
+
+      it('should reject on-demand rendering of prerendered routes when allowStaticRouteRender is true', async () => {
+        setAngularAppTestingManifest(
+          [
+            { path: 'home', component: HomeComponent },
+            { path: 'ssg-missing', component: HomeComponent },
+          ],
+          [
+            { path: 'home', renderMode: RenderMode.Server },
+            { path: 'ssg-missing', renderMode: RenderMode.Prerender },
+          ],
+        );
+
+        const devApp = new AngularServerApp({ allowStaticRouteRender: true });
+        await devApp.handle(new Request('http://localhost/home'));
+
+        const devResponse = await devApp.handle(
+          new Request('http://localhost/ssg-missing', {
+            headers: { [SSR_REQUEST_HEADER]: '1' },
+          }),
+        );
+        expect(devResponse?.status).toBe(404);
+        expect(devResponse?.headers.get('cache-control')).toBe('no-store');
+
+        const prodApp = new AngularServerApp({ allowStaticRouteRender: false });
+        await prodApp.handle(new Request('http://localhost/home'));
+
+        const prodResponse = await prodApp.handle(
+          new Request('http://localhost/ssg-missing', {
+            headers: { [SSR_REQUEST_HEADER]: '1' },
+          }),
+        );
+        expect(prodResponse).toBeNull();
+      });
+
+      it('should return null for non-Angular routes when router is initialized', async () => {
+        setAngularAppTestingManifest(
+          [{ path: 'home', component: HomeComponent }],
+          [{ path: 'home', renderMode: RenderMode.Server }],
+        );
+
+        const limitedApp = new AngularServerApp();
+        await limitedApp.handle(new Request('http://localhost/home'));
+
+        const response = await limitedApp.handle(
+          new Request('http://localhost/api/users', {
+            headers: { [SSR_REQUEST_HEADER]: '1' },
+          }),
+        );
+        expect(response).toBeNull();
+      });
+
+      it('should not render the requests that a page sends to its own host', async () => {
+        const requestingApp = createAppRequesting('/api');
+        const handledResponses: Array<Response | null> = [];
+        spyOn(globalThis, 'fetch').and.callFake(async (input, init) => {
+          // Stop the loop that renders the page again for each of its own requests.
+          if (handledResponses.length >= 5) {
+            return new Response(null, { status: 508 });
+          }
+
+          const response = await requestingApp.handle(new Request(input, init));
+          handledResponses.push(response);
+
+          return response ?? new Response(null, { status: 500 });
+        });
+
+        const response = await requestingApp.handle(new Request('http://localhost/page'));
+        expect(await response?.text()).toContain('Request failed');
+        expect(handledResponses.length).toBe(1);
+        expect(handledResponses[0]?.status).toBe(404);
+        expect(handledResponses[0]?.headers.get('cache-control')).toBe('no-store');
       });
     });
   });

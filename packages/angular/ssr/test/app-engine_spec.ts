@@ -16,6 +16,7 @@ import { destroyAngularServerApp, getOrCreateAngularServerApp } from '../src/app
 import { AngularAppEngine } from '../src/app-engine';
 import { setAngularAppEngineManifest } from '../src/manifest';
 import { RenderMode } from '../src/routes/route-config';
+import { SSR_REQUEST_HEADER } from '../src/utils/ssr-request';
 import { setAngularAppTestingManifest } from './testing-utils';
 
 @Component({
@@ -232,6 +233,28 @@ describe('AngularAppEngine', () => {
 
       it('should return null for requests to file-like resources in a locale', async () => {
         const request = new Request('https://example.com/it/logo.png');
+        const response = await appEngine.handle(request);
+        expect(response).toBeNull();
+      });
+
+      it('should return a non-cached 404 instead of redirecting on "/" for recursive SSR requests', async () => {
+        spyOn(console, 'warn');
+        const request = new Request('https://example.com', {
+          headers: {
+            'Accept-Language': 'it',
+            [SSR_REQUEST_HEADER]: '1',
+          },
+        });
+        const response = await appEngine.handle(request);
+        expect(response?.status).toBe(404);
+        expect(response?.headers.get('Location')).toBeNull();
+        expect(response?.headers.get('Cache-Control')).toBe('no-store');
+      });
+
+      it('should still return null for unknown paths carrying the SSR request header', async () => {
+        const request = new Request('https://example.com/unknown/page', {
+          headers: { [SSR_REQUEST_HEADER]: '1' },
+        });
         const response = await appEngine.handle(request);
         expect(response).toBeNull();
       });

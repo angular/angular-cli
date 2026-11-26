@@ -11,6 +11,7 @@ import { Hooks } from './hooks';
 import { getPotentialLocaleIdFromUrl, getPreferredLocale } from './i18n';
 import { EntryPointExports, getAngularAppEngineManifest } from './manifest';
 import { createRedirectResponse } from './utils/redirect';
+import { createSsrRequestResponse, isSsrRequest } from './utils/ssr-request';
 import { joinUrlParts } from './utils/url';
 import {
   getFirstHeaderValue,
@@ -212,6 +213,10 @@ export class AngularAppEngine {
     if (preferredLocale) {
       const subPath = supportedLocales[preferredLocale];
       if (subPath !== undefined) {
+        if (isSsrRequest(request)) {
+          return createSsrRequestResponse(request);
+        }
+
         const prefix = getFirstHeaderValue(request.headers.get('X-Forwarded-Prefix')) ?? '';
 
         return createRedirectResponse(

@@ -24,6 +24,7 @@ import { ServerRouter } from './routes/router';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
+import { createSsrRequestResponse, isSsrRequest } from './utils/ssr-request';
 import { buildUrlWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
 import { getFirstHeaderValue } from './utils/validation';
 
@@ -159,6 +160,12 @@ export class AngularServerApp {
       return null;
     }
 
+    if (!this.router && !this.manifest.routes && isSsrRequest(request)) {
+      // Avoid triggering or awaiting route extraction (which bootstraps the app and may
+      // deadlock on the in-flight extraction promise) for requests sent during SSR.
+      return createSsrRequestResponse(request);
+    }
+
     this.router ??= await ServerRouter.from(this.manifest, url);
     const matchedRoute = this.router.match(url);
 
@@ -170,6 +177,10 @@ export class AngularServerApp {
     const { redirectTo, relativeRedirect, status, renderMode, headers } = matchedRoute;
 
     if (redirectTo !== undefined) {
+      if (isSsrRequest(request)) {
+        return createSsrRequestResponse(request);
+      }
+
       const location = joinUrlParts(
         getFirstHeaderValue(request.headers.get('X-Forwarded-Prefix')) ?? '',
         buildUrlWithParams(redirectTo, url.pathname, relativeRedirect ? undefined : url.search),
@@ -269,6 +280,12 @@ export class AngularServerApp {
 
     if (!this.allowStaticRouteRender && renderMode === RenderMode.Prerender) {
       return null;
+    }
+
+    if (renderMode !== RenderMode.Client && isSsrRequest(request)) {
+      // The application sent this request to its own host while it was rendered on the server.
+      // Rendering it could render a page that sends the same request again, without bound.
+      return createSsrRequestResponse(request);
     }
 
     const url = new URL(request.url);
