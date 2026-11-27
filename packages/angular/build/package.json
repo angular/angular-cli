@@ -33,7 +33,7 @@
     "listr2": "11.4.1",
     "magic-string": "1.4.5",
     "mrmime": "2.0.1",
-    "oxc-parser": "0.158.0",
+    "oxc-parser": "0.160.0",
     "parse5-html-rewriting-stream": "8.1.1",
     "picomatch": "4.0.7",
     "piscina": "5.3.2",
@@ -48,13 +48,13 @@
     "xxhash-wasm": "1.1.0"
   },
   "optionalDependencies": {
-    "@oxc-parser/binding-wasm32-wasi": "0.158.0",
+    "@oxc-parser/binding-wasm32-wasi": "0.160.0",
     "lmdb": "3.5.9"
   },
   "devDependencies": {
     "@angular-devkit/core": "workspace:*",
     "@angular/ssr": "workspace:*",
-    "@oxc-project/types": "0.158.0",
+    "@oxc-project/types": "0.160.0",
     "@vitest/coverage-v8": "5.1.0",
     "istanbul-lib-instrument": "6.0.3",
     "jsdom": "31.0.0",
