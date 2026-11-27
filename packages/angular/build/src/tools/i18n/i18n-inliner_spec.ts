@@ -8,6 +8,7 @@
 
 import type { ɵParsedTranslation } from '@angular/localize';
 import { transform } from 'esbuild';
+import assert from 'node:assert';
 import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
@@ -1117,6 +1118,37 @@ describe('I18nInliner', () => {
     afterEach(async () => {
       await externalPool?.destroy();
       externalPool = undefined;
+    });
+
+    it('resolves and caches locale data separately for each workspace', async () => {
+      const baseTmpDir = process.env['TEST_TMPDIR'];
+      assert(baseTmpDir, 'TEST_TMPDIR is not set');
+      const tempDir = await fs.mkdtemp(path.join(baseTmpDir, 'i18n-workspaces-'));
+      externalPool = new WorkerPool({ maxThreads: 1 });
+
+      try {
+        for (const name of ['first', 'second']) {
+          const workspaceRoot = path.join(tempDir, name);
+          const localeDir = path.join(workspaceRoot, 'node_modules/@angular/common/locales/global');
+          await fs.mkdir(localeDir, { recursive: true });
+          const localeData = `globalThis.localeData = "${name}";`;
+          await fs.writeFile(path.join(localeDir, 'fr.js'), localeData);
+
+          inliner = new I18nInliner({ missingTranslation: 'error', workspaceRoot }, externalPool);
+          const { outputFiles, errors, warnings } = await inliner.inlineForLocale(
+            [browserFile('polyfills.js', '$localize.locale = "___NG_LOCALE_INSERT___";')],
+            'fr',
+            undefined,
+          );
+
+          expect(errors).toEqual([]);
+          expect(warnings).toEqual([]);
+          expect(findFile(outputFiles, 'polyfills.js').text).toContain(localeData);
+          await inliner.close();
+        }
+      } finally {
+        await fs.rm(tempDir, { recursive: true, force: true });
+      }
     });
 
     it('uses the supplied workerPool to execute transformation tasks', async () => {

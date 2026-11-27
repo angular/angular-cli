@@ -19,6 +19,7 @@ import {
   SERVER_APP_MANIFEST_FILENAME,
   SERVER_GENERATED_EXTERNALS,
 } from '../../utils/server-rendering/manifest';
+import { loadLocaleData } from '../i18n/locale-data';
 import { AngularCompilationContext } from './angular/compilation-state';
 import { createCompilerPlugin } from './angular/compiler-plugin';
 import { ComponentStylesheetBundler } from './angular/component-stylesheets';
@@ -706,6 +707,22 @@ function getEsBuildCommonPolyfillsOptions(
   if (i18nOptions.shouldInline) {
     // Remove localize polyfill when i18n inline transformation have been applied to all the packages.
     polyfills = polyfills.filter((path) => !path.startsWith('@angular/localize'));
+
+    if (polyfills.length === 0 && !options.watch) {
+      buildOptions.plugins.push({
+        name: 'angular-locale-data-hash',
+        async setup({ initialOptions }) {
+          // The generated polyfills module only inlines the locale ID and locale data, not messages.
+          // Account for both in the shared output hash before esbuild assigns the filename.
+          const data = await Promise.all(
+            Array.from(i18nOptions.inlineLocales)
+              .sort()
+              .map(async (locale) => [locale, (await loadLocaleData(locale, workspaceRoot)).code]),
+          );
+          initialOptions.footer = { js: `/**i18n:${calculateHash(JSON.stringify(data))}*/` };
+        },
+      });
+    }
   } else if (i18nOptions.hasDefinedSourceLocale) {
     // When not inlining and a source locale is present, use the source locale data directly
     polyfills.unshift(`angular:locale/data:${i18nOptions.sourceLocale}`);
