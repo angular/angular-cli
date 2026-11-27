@@ -49,6 +49,12 @@ interface SupportedOption {
 
   /** Indicates the option only applies to the root Vitest configuration. */
   readonly rootOnly?: boolean;
+
+  /**
+   * Creates error messages specific to an invalid value. When absent, or when no
+   * messages are returned, a generic message based on `expects` is used.
+   */
+  readonly invalidMessages?: (value: unknown) => string[];
 }
 
 const isBoolean = (value: unknown): boolean => typeof value === 'boolean';
@@ -62,6 +68,10 @@ const SUPPORTED_SEQUENCE_OPTIONS: ReadonlyMap<string, SupportedOption> = new Map
   ['shuffle', BOOLEAN_OPTION],
   ['seed', COUNT_OPTION],
 ]);
+
+const SEQUENCE_OPTION_FLAGS = [...SUPPORTED_SEQUENCE_OPTIONS.keys()]
+  .map((name) => `"--sequence.${name}"`)
+  .join(', ');
 
 /**
  * The Vitest CLI options that can be provided via the `runnerArgs` option.
@@ -86,9 +96,7 @@ const SUPPORTED_OPTIONS: ReadonlyMap<string, SupportedOption> = new Map<string, 
   [
     'sequence',
     {
-      expects: `only the following options: ${[...SUPPORTED_SEQUENCE_OPTIONS.keys()]
-        .map((name) => `"--sequence.${name}"`)
-        .join(', ')}`,
+      expects: `only the following options: ${SEQUENCE_OPTION_FLAGS}`,
       isValid: (value) =>
         typeof value === 'object' &&
         value !== null &&
@@ -96,6 +104,28 @@ const SUPPORTED_OPTIONS: ReadonlyMap<string, SupportedOption> = new Map<string, 
           ([name, nestedValue]) =>
             SUPPORTED_SEQUENCE_OPTIONS.get(name)?.isValid(nestedValue) === true,
         ),
+      invalidMessages: (value) => {
+        if (typeof value !== 'object' || value === null) {
+          return [];
+        }
+
+        const messages: string[] = [];
+        for (const [name, nestedValue] of Object.entries(value)) {
+          const nestedOption = SUPPORTED_SEQUENCE_OPTIONS.get(name);
+          if (!nestedOption) {
+            messages.push(
+              `The Vitest "--sequence.${name}" option is not supported. ` +
+                `The "--sequence" option accepts only the following options: ${SEQUENCE_OPTION_FLAGS}.`,
+            );
+          } else if (!nestedOption.isValid(nestedValue)) {
+            messages.push(
+              `The Vitest "--sequence.${name}" option requires ${nestedOption.expects}.`,
+            );
+          }
+        }
+
+        return messages;
+      },
     },
   ],
   [
@@ -264,7 +294,12 @@ export function parseRunnerArgs(
           project[name] = value;
         }
       } else {
-        errors.push(`The Vitest "${toFlag(name)}" option requires ${supported.expects}.`);
+        const messages = supported.invalidMessages?.(value);
+        if (messages?.length) {
+          errors.push(...messages);
+        } else {
+          errors.push(`The Vitest "${toFlag(name)}" option requires ${supported.expects}.`);
+        }
       }
 
       continue;

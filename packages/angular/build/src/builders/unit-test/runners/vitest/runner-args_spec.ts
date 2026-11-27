@@ -132,7 +132,14 @@ describe('parseRunnerArgs', () => {
 
     it('should reject an unsupported nested sequence option', () => {
       expect(() => parse('--sequence.concurrent')).toThrowError(
-        /The Vitest "--sequence" option requires only the following options: "--sequence.shuffle", "--sequence.seed"\./,
+        // eslint-disable-next-line max-len
+        /The Vitest "--sequence.concurrent" option is not supported\. The "--sequence" option accepts only the following options: "--sequence.shuffle", "--sequence.seed"\./,
+      );
+    });
+
+    it('should reject an invalid value for a supported nested sequence option', () => {
+      expect(() => parse('--sequence.seed=-1')).toThrowError(
+        /The Vitest "--sequence.seed" option requires a non-negative integer\./,
       );
     });
 
