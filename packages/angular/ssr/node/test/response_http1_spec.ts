@@ -151,4 +151,66 @@ describe('writeResponseToNodeResponse (HTTP/1.1)', () => {
     await writePromise;
     expect(readerCancelled).toBeTrue();
   });
+
+  it('should cancel response body when destination is already closed', async () => {
+    let writePromise!: Promise<void>;
+    let bodyCancelled = false;
+    const stream = new ReadableStream({
+      cancel() {
+        bodyCancelled = true;
+      },
+    });
+
+    server.once('request', (_, nodeResponse) => {
+      nodeResponse.end();
+      writePromise = writeResponseToNodeResponse(new Response(stream), nodeResponse);
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      const { port } = server.address() as AddressInfo;
+      const clientRequest = requestCb({ host: 'localhost', port }, (response) => {
+        response.resume();
+        response.on('end', resolve);
+        response.on('error', reject);
+      });
+
+      clientRequest.end();
+    });
+
+    await writePromise;
+    expect(bodyCancelled).toBeTrue();
+  });
+
+  it('should log cancel errors and resolve when destination is already closed', async () => {
+    const cancelError = new Error('Cancel failed');
+    const consoleErrorSpy = spyOn(console, 'error');
+    let writePromise!: Promise<void>;
+    const stream = new ReadableStream({
+      cancel() {
+        return Promise.reject(cancelError);
+      },
+    });
+
+    server.once('request', (_, nodeResponse) => {
+      nodeResponse.end();
+      writePromise = writeResponseToNodeResponse(new Response(stream), nodeResponse);
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      const { port } = server.address() as AddressInfo;
+      const clientRequest = requestCb({ host: 'localhost', port }, (response) => {
+        response.resume();
+        response.on('end', resolve);
+        response.on('error', reject);
+      });
+
+      clientRequest.end();
+    });
+
+    await expectAsync(writePromise).toBeResolved();
+    expect(consoleErrorSpy).toHaveBeenCalledOnceWith(
+      'An error occurred while cancelling the response body for: /.',
+      cancelError,
+    );
+  });
 });

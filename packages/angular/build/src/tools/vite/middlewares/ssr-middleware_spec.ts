@@ -6,6 +6,8 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+import assert from 'node:assert';
+import { EventEmitter } from 'node:events';
 import type { IncomingMessage, ServerResponse } from 'node:http';
 import {
   createAngularSsrExternalMiddleware,
@@ -16,11 +18,12 @@ type ViteDevServer = Parameters<typeof createAngularSsrInternalMiddleware>[0];
 
 describe('SSR dev-server middleware', () => {
   function createMockReqRes(): { req: IncomingMessage; res: ServerResponse } {
-    const req = {
+    const req = Object.assign(new EventEmitter(), {
       url: '/',
       method: 'GET',
       headers: { host: 'localhost' },
-    } as unknown as IncomingMessage;
+      socket: {},
+    }) as unknown as IncomingMessage;
 
     const res = {
       statusCode: 200,
@@ -79,6 +82,120 @@ describe('SSR dev-server middleware', () => {
     });
     expect(resetComponentUpdates).toHaveBeenCalledTimes(1);
     expect(result).toBe('<div>test</div><!-- custom -->');
+  });
+
+  it('aborts SSR request on client disconnect while preserving the timeout signal in internal SSR middleware', async () => {
+    const timeoutController = new AbortController();
+    const timeoutSpy = spyOn(AbortSignal, 'timeout').and.returnValue(timeoutController.signal);
+    let capturedRequest: Request | undefined;
+    let resolveHandle!: (response: Response | null) => void;
+    let resolveHandleCalled!: () => void;
+    const handleCalled = new Promise<void>((resolve) => {
+      resolveHandleCalled = resolve;
+    });
+
+    const fakeAngularServerApp = {
+      hooks: {
+        on: () => {},
+      },
+      handle: jasmine.createSpy('handle').and.callFake((request: Request) => {
+        capturedRequest = request;
+        resolveHandleCalled();
+
+        return new Promise<Response | null>((resolve) => {
+          resolveHandle = resolve;
+        });
+      }),
+    };
+
+    const server = {
+      config: { server: { allowedHosts: true }, base: '/' },
+      ssrLoadModule: jasmine.createSpy('ssrLoadModule').and.resolveTo({
+        ɵgetOrCreateAngularServerApp: () => fakeAngularServerApp,
+      }),
+      transformIndexHtml: jasmine
+        .createSpy('transformIndexHtml')
+        .and.callFake(async (_path: string, html: string) => html),
+    } as unknown as ViteDevServer;
+
+    const middleware = createAngularSsrInternalMiddleware(server, () => {});
+    const { req, res } = createMockReqRes();
+    let resolveNext!: () => void;
+    const nextCalled = new Promise<void>((resolve) => {
+      resolveNext = resolve;
+    });
+    const next = jasmine.createSpy('next').and.callFake(() => resolveNext());
+
+    middleware(req, res, next);
+    await handleCalled;
+
+    assert(capturedRequest);
+    expect(timeoutSpy).toHaveBeenCalledOnceWith(30_000);
+    expect(capturedRequest.signal.aborted).toBeFalse();
+
+    req.emit('aborted');
+    expect(capturedRequest.signal.aborted).toBeTrue();
+
+    resolveHandle(null);
+    await nextCalled;
+    expect(next).toHaveBeenCalledOnceWith();
+  });
+
+  it('aborts SSR request when timeout signal fires in internal SSR middleware', async () => {
+    const timeoutController = new AbortController();
+    spyOn(AbortSignal, 'timeout').and.returnValue(timeoutController.signal);
+    let capturedRequest: Request | undefined;
+    let resolveHandle!: (response: Response | null) => void;
+    let resolveHandleCalled!: () => void;
+    const handleCalled = new Promise<void>((resolve) => {
+      resolveHandleCalled = resolve;
+    });
+
+    const fakeAngularServerApp = {
+      hooks: {
+        on: () => {},
+      },
+      handle: jasmine.createSpy('handle').and.callFake((request: Request) => {
+        capturedRequest = request;
+        resolveHandleCalled();
+
+        return new Promise<Response | null>((resolve) => {
+          resolveHandle = resolve;
+        });
+      }),
+    };
+
+    const server = {
+      config: { server: { allowedHosts: true }, base: '/' },
+      ssrLoadModule: jasmine.createSpy('ssrLoadModule').and.resolveTo({
+        ɵgetOrCreateAngularServerApp: () => fakeAngularServerApp,
+      }),
+      transformIndexHtml: jasmine
+        .createSpy('transformIndexHtml')
+        .and.callFake(async (_path: string, html: string) => html),
+    } as unknown as ViteDevServer;
+
+    const middleware = createAngularSsrInternalMiddleware(server, () => {});
+    const { req, res } = createMockReqRes();
+    let resolveNext!: () => void;
+    const nextCalled = new Promise<void>((resolve) => {
+      resolveNext = resolve;
+    });
+    const next = jasmine.createSpy('next').and.callFake(() => resolveNext());
+
+    middleware(req, res, next);
+    await handleCalled;
+
+    assert(capturedRequest);
+    expect(capturedRequest.signal.aborted).toBeFalse();
+
+    timeoutController.abort('timed out');
+    expect(capturedRequest.signal.aborted).toBeTrue();
+    expect(capturedRequest.signal.reason).toBe('timed out');
+
+    resolveHandle(null);
+    await nextCalled;
+    expect(next).toHaveBeenCalledOnceWith();
   });
 
   it('resets component updates when html:transform:pre executes in external SSR middleware', async () => {

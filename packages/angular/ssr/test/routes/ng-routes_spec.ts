@@ -11,7 +11,15 @@
 import '@angular/compiler';
 /* eslint-enable import/no-unassigned-import */
 
-import { Component, InjectionToken, Injector, inject } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  InjectionToken,
+  Injector,
+  PlatformRef,
+  inject,
+  provideAppInitializer,
+} from '@angular/core';
 import {
   Route,
   Routes,
@@ -1334,5 +1342,86 @@ describe('extractRoutesAndCreateRouteTree', () => {
         preload: ['chunk-home-routes.js', 'chunk-home-page.js'],
       },
     ]);
+  });
+
+  it('should log destroy errors without failing route extraction', async () => {
+    const destroyError = new Error('Destroy hook failed');
+    const consoleErrorSpy = spyOn(console, 'error');
+
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      [
+        provideAppInitializer(() => {
+          inject(DestroyRef).onDestroy(() => {
+            throw destroyError;
+          });
+        }),
+      ],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([{ route: '/home', renderMode: RenderMode.Server }]);
+    expect(consoleErrorSpy).toHaveBeenCalledOnceWith(
+      'An error occurred while destroying the platform.',
+      destroyError,
+    );
+  });
+
+  it('should not throw when the platform is already destroyed during route extraction', async () => {
+    const consoleErrorSpy = spyOn(console, 'error');
+
+    setAngularAppTestingManifest(
+      [
+        {
+          path: 'lazy',
+          loadChildren: () => {
+            inject(PlatformRef).destroy();
+
+            return [];
+          },
+        },
+      ],
+      [{ path: '**', renderMode: RenderMode.Server }],
+    );
+
+    const { routeTree, errors } = await extractRoutesAndCreateRouteTree({ url });
+    expect(errors).toHaveSize(0);
+    expect(routeTree.toObject()).toEqual([{ route: '/lazy', renderMode: RenderMode.Server }]);
+    expect(consoleErrorSpy).not.toHaveBeenCalled();
+  });
+
+  it('should not mask route extraction errors when platform destruction also throws', async () => {
+    const initError = new Error('Initializer failed');
+    const destroyError = new Error('Destroy hook failed');
+    const consoleErrorSpy = spyOn(console, 'error');
+
+    setAngularAppTestingManifest(
+      [{ path: 'home', component: DummyComponent }],
+      [{ path: '**', renderMode: RenderMode.Server }],
+      undefined,
+      undefined,
+      undefined,
+      undefined,
+      [
+        provideAppInitializer(() => {
+          inject(DestroyRef).onDestroy(() => {
+            throw destroyError;
+          });
+          throw initError;
+        }),
+      ],
+    );
+
+    await expectAsync(extractRoutesAndCreateRouteTree({ url })).toBeRejectedWith(initError);
+    expect(consoleErrorSpy).toHaveBeenCalledWith(
+      'An error occurred while destroying the platform.',
+      destroyError,
+    );
   });
 });

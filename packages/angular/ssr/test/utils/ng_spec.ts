@@ -14,12 +14,14 @@ import '@angular/compiler';
 import {
   ApplicationRef,
   Component,
-  OnDestroy,
+  type OnDestroy,
+  PendingTasks,
   PlatformRef,
   inject,
   provideZonelessChangeDetection,
 } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
+import assert from 'node:assert';
 import { setTimeout } from 'node:timers/promises';
 import { renderAngular } from '../../src/utils/ng';
 
@@ -90,9 +92,7 @@ describe('renderAngular', () => {
         content: jasmine.any(Function),
       }),
     );
-    if (!('content' in result)) {
-      return;
-    }
+    assert('content' in result);
 
     controller.abort('client disconnected');
 
@@ -141,9 +141,7 @@ describe('renderAngular', () => {
         destroy: jasmine.any(Function),
       }),
     );
-    if (!('content' in result)) {
-      return;
-    }
+    assert('content' in result);
 
     const destroyPromise = result.destroy();
     await expectAsync(result.content()).toBeRejectedWithError(
@@ -181,9 +179,7 @@ describe('renderAngular', () => {
     );
 
     expect(result).toEqual(jasmine.objectContaining({ destroy: jasmine.any(Function) }));
-    if (!('destroy' in result)) {
-      return;
-    }
+    assert('destroy' in result);
 
     const p1 = result.destroy();
     const p2 = result.destroy();
@@ -221,9 +217,7 @@ describe('renderAngular', () => {
     );
 
     expect(result).toEqual(jasmine.objectContaining({ content: jasmine.any(Function) }));
-    if (!('content' in result)) {
-      return;
-    }
+    assert('content' in result);
 
     const p1 = result.content();
     const p2 = result.content();
@@ -266,9 +260,7 @@ describe('renderAngular', () => {
     );
 
     expect(result).toEqual(jasmine.objectContaining({ content: jasmine.any(Function) }));
-    if (!('content' in result)) {
-      return;
-    }
+    assert('content' in result);
 
     const contentPromise = result.content();
     appRef?.destroy();
@@ -310,14 +302,95 @@ describe('renderAngular', () => {
     );
 
     expect(result).toEqual(jasmine.objectContaining({ destroy: jasmine.any(Function) }));
-    if (!('destroy' in result)) {
-      return;
-    }
+    assert('destroy' in result);
 
     await expectAsync(result.destroy()).toBeResolved();
     expect(consoleErrorSpy).toHaveBeenCalledOnceWith(
       'An error occurred while destroying the platform.',
       error,
     );
+  });
+
+  it('should return navigation error when applicationRef.injector is destroyed before applicationRef', async () => {
+    let destroySpy: jasmine.Spy | undefined;
+
+    @Component({
+      selector: 'app-root',
+      template: 'Partial injector destroy works',
+    })
+    class AppComponent {
+      constructor() {
+        const appRef = inject(ApplicationRef);
+        const pendingTasks = inject(PendingTasks);
+        destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
+        // Simulate a partial destroy where the EnvironmentInjector is marked destroyed
+        // before ApplicationRef.ngOnDestroy() runs.
+        spyOn(appRef as unknown as OnDestroy, 'ngOnDestroy');
+        pendingTasks.add();
+        globalThis.setTimeout(() => appRef.injector.destroy(), 0);
+      }
+    }
+
+    const result = await renderAngular(
+      BASE_HTML,
+      (context) =>
+        bootstrapApplication(
+          AppComponent,
+          { providers: [provideZonelessChangeDetection()] },
+          context,
+        ),
+      new URL('http://localhost/'),
+      [],
+      'ssr',
+    );
+
+    expect(result).toEqual({ hasNavigationError: true });
+    await setTimeout(0);
+    expect(destroySpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('should reject content() when applicationRef.injector is destroyed before applicationRef', async () => {
+    let appRef: ApplicationRef | undefined;
+    let destroySpy: jasmine.Spy | undefined;
+
+    @Component({
+      selector: 'app-root',
+      template: 'Partial injector destroy before content works',
+    })
+    class AppComponent {
+      constructor() {
+        appRef = inject(ApplicationRef);
+        destroySpy = spyOn(inject(PlatformRef), 'destroy').and.callThrough();
+      }
+    }
+
+    const result = await renderAngular(
+      BASE_HTML,
+      (context) =>
+        bootstrapApplication(
+          AppComponent,
+          { providers: [provideZonelessChangeDetection()] },
+          context,
+        ),
+      new URL('http://localhost/'),
+      [],
+      'ssr',
+    );
+
+    assert('content' in result);
+    assert(appRef);
+
+    spyOn(appRef as unknown as OnDestroy, 'ngOnDestroy');
+    appRef.injector.destroy();
+    expect(appRef.destroyed).toBeFalse();
+    expect(appRef.injector.destroyed).toBeTrue();
+
+    await expectAsync(result.content()).toBeRejectedWithError(
+      DOMException,
+      /Request for: http:\/\/localhost\/ was aborted/,
+    );
+
+    await setTimeout(0);
+    expect(destroySpy).toHaveBeenCalledTimes(1);
   });
 });
