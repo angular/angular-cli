@@ -13,6 +13,7 @@ import {
   apply,
   chain,
   externalSchematic,
+  filter,
   mergeWith,
   move,
   template,
@@ -151,15 +152,20 @@ export default function (options: PwaOptions): Rule {
     // Setup service worker schematic options
     const { title, ...swOptions } = options;
 
-    await writeWorkspace(host, workspace);
-    let assetsDir = posix.join(sourcePath, 'assets');
+    const assetsDir = posix.join(sourcePath, 'assets');
+    // `Tree.exists()` only matches files, so probe the directory for contained entries.
+    const assetsDirEntry = host.getDir(assetsDir);
+    const hasAssetsDir =
+      !host.exists(assetsDir) &&
+      (assetsDirEntry.subfiles.length > 0 || assetsDirEntry.subdirs.length > 0);
+
     let iconsPath: string;
-    if (host.exists(assetsDir)) {
-      // Add manifest to asset configuration
-      const assetEntry = posix.join(
-        project.sourceRoot ?? posix.join(project.root, 'src'),
-        'manifest.webmanifest',
-      );
+    let manifestDir: string;
+    let iconsDir: string;
+    if (hasAssetsDir) {
+      // Pre-v18 project layout: the manifest is served from the application root and the
+      // icons from the existing `assets` directory, which the build already copies.
+      const assetEntry = posix.join(sourcePath, 'manifest.webmanifest');
       for (const target of [...buildTargets, ...testTargets]) {
         if (target.options) {
           if (Array.isArray(target.options.assets)) {
@@ -171,16 +177,31 @@ export default function (options: PwaOptions): Rule {
           target.options = { assets: [assetEntry] };
         }
       }
-      iconsPath = 'assets';
+      iconsPath = 'assets/icons';
+      manifestDir = sourcePath;
+      iconsDir = assetsDir;
     } else {
-      assetsDir = posix.join(project.root, 'public');
       iconsPath = 'icons';
+      manifestDir = iconsDir = posix.join(project.root, 'public');
     }
+
+    // Written after the asset additions above so that they are persisted.
+    await writeWorkspace(host, workspace);
 
     return chain([
       externalSchematic('@schematics/angular', 'service-worker', swOptions),
       mergeWith(
-        apply(url('./files/assets'), [template({ ...options, iconsPath }), move(assetsDir)]),
+        apply(url('./files/assets'), [
+          filter((path) => !path.startsWith('/icons/')),
+          template({ ...options, iconsPath }),
+          move(manifestDir),
+        ]),
+      ),
+      mergeWith(
+        apply(url('./files/assets'), [
+          filter((path) => path.startsWith('/icons/')),
+          move(iconsDir),
+        ]),
       ),
       ...[...indexFiles].map((path) => updateIndexFile(path)),
     ]);

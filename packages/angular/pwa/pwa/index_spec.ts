@@ -222,4 +222,43 @@ describe('PWA Schematic', () => {
       expect(swFlag).toBe('projects/bar/ngsw-config.json');
     });
   });
+
+  describe('legacy src/assets project layout', () => {
+    beforeEach(() => {
+      appTree.create('/projects/bar/src/assets/.gitkeep', '');
+      appTree.delete('/projects/bar/public/favicon.ico');
+
+      const config = JSON.parse(appTree.readContent('/angular.json'));
+      const build = config.projects.bar.architect.build;
+      build.options.assets = ['projects/bar/src/favicon.ico', 'projects/bar/src/assets'];
+      appTree.overwrite('/angular.json', JSON.stringify(config, undefined, 2));
+    });
+
+    it('should place the manifest at the source root and the icons in the assets directory', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+
+      expect(tree.exists('/projects/bar/src/manifest.webmanifest')).toBeTrue();
+      expect(tree.exists('/projects/bar/src/assets/icons/icon-72x72.png')).toBeTrue();
+      expect(tree.exists('/projects/bar/public/manifest.webmanifest')).toBeFalse();
+      expect(tree.exists('/projects/bar/public/icons/icon-72x72.png')).toBeFalse();
+    });
+
+    it('should reference the icons relative to the application root in the manifest', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+
+      const manifest = JSON.parse(tree.readContent('/projects/bar/src/manifest.webmanifest'));
+      for (const icon of manifest.icons) {
+        expect(icon.src).toMatch(/^assets\/icons\/icon-\d+x\d+\.png/);
+      }
+    });
+
+    it('should add the manifest to the build assets in the workspace configuration', async () => {
+      const tree = await schematicRunner.runSchematic('ng-add', defaultOptions, appTree);
+
+      const config = JSON.parse(tree.readContent('/angular.json'));
+      expect(config.projects.bar.architect.build.options.assets).toContain(
+        'projects/bar/src/manifest.webmanifest',
+      );
+    });
+  });
 });
