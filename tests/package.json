@@ -1,6 +1,6 @@
 {
   "devDependencies": {
     "@types/tar-stream": "3.1.5",
-    "tar-stream": "3.2.2"
+    "tar-stream": "3.3.0"
   }
 }
