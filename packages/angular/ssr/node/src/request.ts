@@ -13,7 +13,7 @@ import {
   isProxyHeaderAllowed,
   normalizeTrustProxyHeaders,
   parseForwardedHeader,
-} from '../../src/utils/validation';
+} from '../../src/utils/headers';
 
 /**
  * A set containing all the pseudo-headers defined in the HTTP/2 specification.

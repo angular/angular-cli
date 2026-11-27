@@ -8,7 +8,7 @@
 
 import { IncomingMessage } from 'node:http';
 import { Socket } from 'node:net';
-import { normalizeTrustProxyHeaders } from '../../src/utils/validation';
+import { normalizeTrustProxyHeaders } from '../../src/utils/headers';
 import { createRequestUrl } from '../src/request';
 
 // Helper to create a mock request object for testing.

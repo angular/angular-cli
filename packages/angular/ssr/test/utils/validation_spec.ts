@@ -6,14 +6,17 @@
  * found in the LICENSE file at https://angular.dev/license
  */
 
+// The compiler is needed as tests are in JIT.
+/* eslint-disable import/no-unassigned-import */
+import '@angular/compiler';
+/* eslint-enable import/no-unassigned-import */
+
 import {
   getFirstHeaderValue,
   normalizeTrustProxyHeaders,
   parseForwardedHeader,
-  sanitizeRequestHeaders,
-  validateRequest,
-  validateUrl,
-} from '../../src/utils/validation';
+} from '../../src/utils/headers';
+import { sanitizeRequestHeaders, validateRequest, validateUrl } from '../../src/utils/validation';
 
 describe('Validation Utils', () => {
   describe('getFirstHeaderValue', () => {

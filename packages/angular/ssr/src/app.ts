@@ -21,11 +21,11 @@ import { getAngularAppManifest } from './manifest';
 import { RenderMode } from './routes/route-config';
 import { RouteTreeNodeMetadata } from './routes/route-tree';
 import { ServerRouter } from './routes/router';
+import { getFirstHeaderValue } from './utils/headers';
 import { AngularBootstrap, renderAngular } from './utils/ng';
 import { promiseWithAbort } from './utils/promise';
 import { createRedirectResponse } from './utils/redirect';
 import { buildUrlWithParams, joinUrlParts, stripLeadingSlash } from './utils/url';
-import { getFirstHeaderValue } from './utils/validation';
 
 /**
  * A set of well-known URLs that are not handled by Angular.
