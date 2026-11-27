@@ -8,6 +8,7 @@
 
 import { realpathSync } from 'node:fs';
 import { readFile, readdir, stat } from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { dirname, extname, isAbsolute, join, normalize, posix, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import semver from 'semver';
@@ -252,80 +253,34 @@ async function* findAngularJsonFiles(
 }
 
 /**
- * Searches upwards from a starting directory to find the version of '@angular/core'.
- * It caches results to avoid redundant lookups.
- * @param startDir The directory to start the search from.
- * @param cache A map to store cached results.
- * @param searchRoot The directory at which to stop the search.
- * @returns The major version of '@angular/core' as a string, otherwise undefined.
+ * Determines the major version of the `@angular/core` package installed for a workspace.
+ * The package is resolved with Node.js module resolution from the workspace's `angular.json`
+ * file, so the result is independent of how the dependency is declared in `package.json`
+ * (e.g., a semver range, a pnpm/yarn `catalog:` reference, a `workspace:` protocol, or an
+ * `npm:` alias).
+ * @param configFile The path to the workspace's `angular.json` file.
+ * @returns The major version of '@angular/core' as a string, or `undefined` if the package is
+ * not installed or its version cannot be read.
  */
-async function findAngularCoreVersion(
-  startDir: string,
-  cache: Map<string, string | undefined>,
-  searchRoot: string,
-): Promise<string | undefined> {
-  let currentDir = startDir;
-  const dirsToCache: string[] = [];
+async function findAngularCoreVersion(configFile: string): Promise<string | undefined> {
+  try {
+    // `createRequire` resolves from the parent directory of the given path. The path to the
+    // `angular.json` file is used (instead of the workspace directory) so that the workspace's
+    // own `node_modules` directory is included in the search.
+    const pkgJsonPath = createRequire(resolve(configFile)).resolve('@angular/core/package.json');
+    const { version } = JSON.parse(await readFile(pkgJsonPath, 'utf-8'));
+    const major = semver.parse(version)?.major;
 
-  while (currentDir) {
-    dirsToCache.push(currentDir);
-    if (cache.has(currentDir)) {
-      const cachedResult = cache.get(currentDir);
-      // Populate cache for all intermediate directories.
-      for (const dir of dirsToCache) {
-        cache.set(dir, cachedResult);
-      }
-
-      return cachedResult;
-    }
-
-    const pkgPath = join(currentDir, 'package.json');
-    try {
-      const pkgContent = await readFile(pkgPath, 'utf-8');
-      const pkg = JSON.parse(pkgContent);
-      const versionSpecifier =
-        pkg.dependencies?.['@angular/core'] ?? pkg.devDependencies?.['@angular/core'];
-
-      if (versionSpecifier) {
-        const minVersion = semver.minVersion(versionSpecifier);
-        const result = minVersion ? String(minVersion.major) : undefined;
-        for (const dir of dirsToCache) {
-          cache.set(dir, result);
-        }
-
-        return result;
-      }
-    } catch (error) {
-      assertIsError(error);
-      if (error.code !== 'ENOENT') {
-        // Ignore missing package.json files, but rethrow other errors.
-        throw error;
-      }
-    }
-
-    // Stop if we are at the search root or the filesystem root.
-    if (currentDir === searchRoot) {
-      break;
-    }
-    const parentDir = dirname(currentDir);
-    if (parentDir === currentDir) {
-      break; // Reached the filesystem root.
-    }
-    currentDir = parentDir;
+    return major === undefined ? undefined : String(major);
+  } catch {
+    // The package is not installed or its `package.json` could not be read.
+    return undefined;
   }
-
-  // Cache the failure for all traversed directories.
-  for (const dir of dirsToCache) {
-    cache.set(dir, undefined);
-  }
-
-  return undefined;
 }
 
 // Helper types inferred from the Zod schema for structured data processing.
 type WorkspaceData = z.infer<typeof listProjectsOutputSchema.workspaces>[number];
 type ParsingError = z.infer<typeof listProjectsOutputSchema.parsingErrors>[number];
-type VersioningError = z.infer<typeof listProjectsOutputSchema.versioningErrors>[number];
 
 /**
  * Determines the unit test framework for a project based on its 'test' target configuration.
@@ -495,20 +450,15 @@ async function loadAndParseWorkspace(
 /**
  * Processes a single `angular.json` file to extract workspace and framework version information.
  * @param configFile The path to the `angular.json` file.
- * @param searchRoot The directory at which to stop the upward search for `package.json`.
  * @param seenPaths A Set of absolute paths that have already been processed to avoid duplicates.
- * @param versionCache A Map to cache framework version lookups for performance.
- * @returns A promise resolving to an object containing the processed data and any errors.
+ * @returns A promise resolving to an object containing the processed data or a parsing error.
  */
 async function processConfigFile(
   configFile: string,
-  searchRoot: string,
   seenPaths: Set<string>,
-  versionCache: Map<string, string | undefined>,
 ): Promise<{
   workspace?: WorkspaceData;
   parsingError?: ParsingError;
-  versioningError?: VersioningError;
 }> {
   const { workspace, error } = await loadAndParseWorkspace(configFile, seenPaths);
   if (error) {
@@ -519,24 +469,9 @@ async function processConfigFile(
     return {}; // Skipped as it was already seen.
   }
 
-  try {
-    const workspaceDir = dirname(configFile);
-    workspace.frameworkVersion = await findAngularCoreVersion(
-      workspaceDir,
-      versionCache,
-      searchRoot,
-    );
+  workspace.frameworkVersion = await findAngularCoreVersion(configFile);
 
-    return { workspace };
-  } catch (e) {
-    return {
-      workspace,
-      versioningError: {
-        filePath: workspace.path,
-        message: e instanceof Error ? e.message : 'An unknown error occurred.',
-      },
-    };
-  }
+  return { workspace };
 }
 
 /**
@@ -568,9 +503,7 @@ async function createListProjectsHandler({ server, roots: configuredRoots }: Mcp
   return async () => {
     const workspaces: WorkspaceData[] = [];
     const parsingErrors: ParsingError[] = [];
-    const versioningErrors: z.infer<typeof listProjectsOutputSchema.versioningErrors> = [];
     const seenPaths = new Set<string>();
-    const versionCache = new Map<string, string | undefined>();
 
     let searchRoots: string[] | undefined;
     const clientCapabilities = server.server.getClientCapabilities();
@@ -600,21 +533,13 @@ async function createListProjectsHandler({ server, roots: configuredRoots }: Mcp
 
     for (const root of searchRoots) {
       for await (const configFile of findAngularJsonFiles(root, realAllowedRoots)) {
-        const { workspace, parsingError, versioningError } = await processConfigFile(
-          configFile,
-          root,
-          seenPaths,
-          versionCache,
-        );
+        const { workspace, parsingError } = await processConfigFile(configFile, seenPaths);
 
         if (workspace) {
           workspaces.push(workspace);
         }
         if (parsingError) {
           parsingErrors.push(parsingError);
-        }
-        if (versioningError) {
-          versioningErrors.push(versioningError);
         }
       }
     }
@@ -639,14 +564,12 @@ async function createListProjectsHandler({ server, roots: configuredRoots }: Mcp
       text += `\n\nWarning: The following ${parsingErrors.length} file(s) could not be parsed and were skipped:\n`;
       text += parsingErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
     }
-    if (versioningErrors.length > 0) {
-      text += `\n\nWarning: The framework version for the following ${versioningErrors.length} workspace(s) could not be determined:\n`;
-      text += versioningErrors.map((e) => `- ${e.filePath}: ${e.message}`).join('\n');
-    }
 
     return {
       content: [{ type: 'text' as const, text }],
-      structuredContent: { workspaces, parsingErrors, versioningErrors },
+      // `versioningErrors` is kept for output schema compatibility. A framework version that
+      // cannot be determined (e.g., `@angular/core` is not installed) is not reported as an error.
+      structuredContent: { workspaces, parsingErrors, versioningErrors: [] },
     };
   };
 }
