@@ -24,6 +24,11 @@ export interface TraversalContext {
   classDepth: number;
 
   /**
+   * The current class static block nesting depth. Code outside static blocks has depth 0.
+   */
+  staticBlockDepth: number;
+
+  /**
    * The immediate enclosing function AST node, if currently inside a function.
    */
   parentFunc?: Node;
@@ -312,6 +317,7 @@ export function traversePostOrder(
   const stack: (Node | null)[] = [root];
   let functionDepth = 0;
   let classDepth = 0;
+  let staticBlockDepth = 0;
   const functionStack: Node[] = [];
 
   while (stack.length > 0) {
@@ -330,10 +336,13 @@ export function traversePostOrder(
         functionStack.pop();
       } else if (isClass(type)) {
         classDepth--;
+      } else if (type === 'StaticBlock') {
+        staticBlockDepth--;
       }
       visit(node, {
         functionDepth,
         classDepth,
+        staticBlockDepth,
         parentFunc: functionStack[functionStack.length - 1],
       });
       continue;
@@ -347,6 +356,8 @@ export function traversePostOrder(
       functionStack.push(current);
     } else if (isClass(type)) {
       classDepth++;
+    } else if (type === 'StaticBlock') {
+      staticBlockDepth++;
     }
 
     pushChildNodes(current, stack);

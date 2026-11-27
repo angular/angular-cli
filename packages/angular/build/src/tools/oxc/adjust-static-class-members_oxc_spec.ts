@@ -1100,4 +1100,81 @@ describe('adjust-static-class-members oxc-transform implementation', () => {
       `,
     }),
   );
+
+  it(
+    'wraps class with Angular static fields and ngDevMode-guarded ɵsetClassMetadata static block',
+    testCase({
+      input: `
+        export class SomeComponent {
+          static ɵfac = function SomeComponent_Factory(t) { return new (t || SomeComponent)(); };
+          static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({
+            type: SomeComponent,
+            selectors: [['some-cmp']],
+            decls: 0,
+            vars: 0,
+            template: function(rf, ctx) {},
+          });
+          static {
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              i0.ɵsetClassMetadata(SomeComponent, [{ type: Component, args: [{ selector: 'some-cmp', template: '' }] }], null, null);
+          }
+        }
+      `,
+      expected: `
+        export let SomeComponent = /*#__PURE__*/ (() => {
+          class SomeComponent {
+            static ɵfac = function SomeComponent_Factory(t) { return new (t || SomeComponent)(); };
+            static ɵcmp = /*@__PURE__*/ i0.ɵɵdefineComponent({
+              type: SomeComponent,
+              selectors: [['some-cmp']],
+              decls: 0,
+              vars: 0,
+              template: function(rf, ctx) {},
+            });
+          }
+          return SomeComponent;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'wraps class with Angular static fields and internal setClassMetadata static block',
+    testCase({
+      input: `
+        class PlatformRef {
+          static ɵfac = function PlatformRef_Factory(t) { return new (t || PlatformRef)(); };
+          static ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: PlatformRef, factory: PlatformRef.ɵfac, providedIn: 'platform' });
+          static {
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              setClassMetadata(PlatformRef, [{ type: Injectable, args: [{ providedIn: 'platform' }] }], null, null);
+          }
+        }
+      `,
+      expected: `
+        let PlatformRef = /*#__PURE__*/ (() => {
+          class PlatformRef {
+            static ɵfac = function PlatformRef_Factory(t) { return new (t || PlatformRef)(); };
+            static ɵprov = /*@__PURE__*/ ɵɵdefineInjectable({ token: PlatformRef, factory: PlatformRef.ɵfac, providedIn: 'platform' });
+          }
+          return PlatformRef;
+        })();
+      `,
+    }),
+  );
+
+  it(
+    'does not wrap class with unguarded non-ɵ setClassMetadata call in static block',
+    testCase({
+      input: `
+        class CustomClass {
+          static ɵprov = 42;
+          static {
+            setClassMetadata(CustomClass);
+          }
+        }
+      `,
+      expected: NO_CHANGE,
+    }),
+  );
 });

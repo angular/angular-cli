@@ -111,6 +111,122 @@ const angularMetadataFunctions = new Set([
 ]);
 
 /**
+ * A set of internal `@angular/core` metadata helper names emitted without the `ɵ` prefix
+ * inside `@angular/core`'s own Rollup FESM bundles when guarded by `ngDevMode`/`ngJitMode`.
+ */
+const internalAngularMetadataFunctions = new Set([
+  'setClassMetadata',
+  'setClassMetadataAsync',
+  'setClassDebugInfo',
+]);
+
+/**
+ * Strips any numeric bundler rename suffix (e.g. `$1`) from an identifier name.
+ */
+function stripBundlerSuffix(name: string): string {
+  const dollarIndex = name.indexOf('$');
+  if (dollarIndex === -1) {
+    return name;
+  }
+  const suffix = name.slice(dollarIndex + 1);
+
+  return /^\d+$/.test(suffix) ? name.slice(0, dollarIndex) : name;
+}
+
+/**
+ * Determines whether an AST node is a call to an Angular class metadata helper.
+ */
+function isAngularMetadataCall(node: Node, allowInternalName = false): boolean {
+  const expr = unwrapParentheses(node);
+  if (expr.type !== 'CallExpression') {
+    return false;
+  }
+
+  const callee = unwrapParentheses(expr.callee);
+  let calleeName: string | undefined;
+  if (callee.type === 'Identifier') {
+    calleeName = callee.name;
+  } else if (
+    callee.type === 'MemberExpression' &&
+    !callee.computed &&
+    callee.property.type === 'Identifier'
+  ) {
+    calleeName = callee.property.name;
+  }
+
+  if (!calleeName) {
+    return false;
+  }
+
+  const baseName = stripBundlerSuffix(calleeName);
+
+  return (
+    angularMetadataFunctions.has(baseName) ||
+    (allowInternalName && internalAngularMetadataFunctions.has(baseName))
+  );
+}
+
+/**
+ * Determines whether an AST node is an `(typeof ngDevMode === "undefined" || ngDevMode)`
+ * or `(typeof ngJitMode === "undefined" || ngJitMode)` guard expression.
+ */
+function isAngularModeGuard(node: Node): boolean {
+  const expr = unwrapParentheses(node);
+  if (expr.type !== 'LogicalExpression' || expr.operator !== '||') {
+    return false;
+  }
+
+  const right = unwrapParentheses(expr.right);
+  if (right.type !== 'Identifier' || (right.name !== 'ngDevMode' && right.name !== 'ngJitMode')) {
+    return false;
+  }
+
+  const left = unwrapParentheses(expr.left);
+  if (left.type !== 'BinaryExpression' || (left.operator !== '===' && left.operator !== '==')) {
+    return false;
+  }
+
+  const binLeft = unwrapParentheses(left.left);
+  const binRight = unwrapParentheses(left.right);
+  const isTypeofGuard = (typeofSide: Node, literalSide: Node): boolean => {
+    if (typeofSide.type !== 'UnaryExpression' || typeofSide.operator !== 'typeof') {
+      return false;
+    }
+    const arg = unwrapParentheses(typeofSide.argument);
+
+    return (
+      arg.type === 'Identifier' &&
+      arg.name === right.name &&
+      literalSide.type === 'Literal' &&
+      literalSide.value === 'undefined'
+    );
+  };
+
+  return isTypeofGuard(binLeft, binRight) || isTypeofGuard(binRight, binLeft);
+}
+
+/**
+ * Determines whether a statement inside a `static {}` block is an elidable Angular metadata call.
+ */
+function isAngularMetadataStatement(node: Node): boolean {
+  if (node.type !== 'ExpressionStatement') {
+    return false;
+  }
+
+  const expr = unwrapParentheses(node.expression);
+  if (isAngularMetadataCall(expr)) {
+    return true;
+  }
+
+  return (
+    expr.type === 'LogicalExpression' &&
+    expr.operator === '&&' &&
+    isAngularModeGuard(expr.left) &&
+    isAngularMetadataCall(expr.right, true)
+  );
+}
+
+/**
  * A map of static properties and their matcher predicate functions to check if they
  * can be safely elided from class declarations.
  */
@@ -216,33 +332,33 @@ function analyzeClassStaticProperties(classNode: Node, code: string): boolean {
         break;
       }
     } else if (element.type === 'StaticBlock') {
-      const blockBody = element.body;
-      if (blockBody.length === 0) {
-        continue;
-      }
-      if (blockBody.length > 1) {
-        shouldWrap = false;
-        break;
-      }
-      const expressionStatement = blockBody[0];
-      if (expressionStatement && expressionStatement.type === 'ExpressionStatement') {
-        const assignment = expressionStatement.expression;
-        if (
-          assignment &&
-          assignment.type === 'AssignmentExpression' &&
-          assignment.left.type === 'MemberExpression'
-        ) {
-          const left = assignment.left;
-          if (left.object.type === 'ThisExpression' && left.property.type === 'Identifier') {
-            if (canWrapProperty(left.property.name, assignment.right, code)) {
-              shouldWrap = true;
-              continue;
+      let hasInvalidStatement = false;
+      for (const stmt of element.body) {
+        if (stmt.type === 'EmptyStatement' || isAngularMetadataStatement(stmt)) {
+          continue;
+        }
+        if (stmt.type === 'ExpressionStatement') {
+          const assignment = unwrapParentheses(stmt.expression);
+          if (
+            assignment.type === 'AssignmentExpression' &&
+            assignment.left.type === 'MemberExpression'
+          ) {
+            const left = assignment.left;
+            if (left.object.type === 'ThisExpression' && left.property.type === 'Identifier') {
+              if (canWrapProperty(left.property.name, assignment.right, code)) {
+                shouldWrap = true;
+                continue;
+              }
             }
           }
         }
+        hasInvalidStatement = true;
+        break;
       }
-      shouldWrap = false;
-      break;
+      if (hasInvalidStatement) {
+        shouldWrap = false;
+        break;
+      }
     }
   }
 
@@ -626,114 +742,142 @@ export function transform(filename: string, code: string, options: OxcTransformO
     }
   }
 
-  traversePostOrder(program, (node, { functionDepth, classDepth, parentFunc }) => {
-    switch (node.type) {
-      case 'Program':
-      case 'BlockStatement':
-        if (advancedOptimizations) {
-          adjustTypeScriptEnumsInStatements(node.body);
-          adjustStaticMembersInStatements(node.body);
-        }
-        break;
-
-      case 'CallExpression': {
-        if (isAlreadyEdited(node.start, node.end)) {
-          return;
-        }
-
-        if (linker) {
-          const linkedCode = linker.linkCallExpression(node);
-          if (linkedCode !== undefined) {
-            source.overwrite(node.start, node.end, linkedCode);
-            markEdited(node.start, node.end);
-
-            return;
+  traversePostOrder(
+    program,
+    (node, { functionDepth, classDepth, staticBlockDepth, parentFunc }) => {
+      switch (node.type) {
+        case 'Program':
+        case 'BlockStatement':
+          if (advancedOptimizations) {
+            adjustTypeScriptEnumsInStatements(node.body);
+            adjustStaticMembersInStatements(node.body);
           }
-        }
+          break;
 
-        if (!advancedOptimizations) {
-          return;
-        }
-
-        // 1. Elide Angular Metadata check
-        let calleeName: string | undefined;
-        if (node.callee.type === 'Identifier') {
-          calleeName = node.callee.name;
-        } else if (
-          node.callee.type === 'MemberExpression' &&
-          node.callee.property.type === 'Identifier'
-        ) {
-          calleeName = node.callee.property.name;
-        }
-
-        if (calleeName && angularMetadataFunctions.has(calleeName)) {
+        case 'StaticBlock': {
+          if (!advancedOptimizations || node.body.length === 0) {
+            break;
+          }
           if (
-            parentFunc &&
-            (parentFunc.type === 'FunctionExpression' ||
-              parentFunc.type === 'ArrowFunctionExpression')
+            node.body.every(
+              (stmt) => stmt.type === 'EmptyStatement' || isAngularMetadataStatement(stmt),
+            )
           ) {
-            source.overwrite(node.start, node.end, 'void 0');
-            markEdited(node.start, node.end);
+            if (node.body.some(isAngularMetadataStatement)) {
+              source.remove(node.start, node.end);
+              markEdited(node.start, node.end);
+            }
+          } else {
+            for (const stmt of node.body) {
+              if (isAngularMetadataStatement(stmt)) {
+                source.remove(stmt.start, stmt.end);
+                markEdited(stmt.start, stmt.end);
+              }
+            }
+          }
+          break;
+        }
+
+        case 'CallExpression': {
+          if (isAlreadyEdited(node.start, node.end)) {
+            return;
+          }
+
+          if (linker) {
+            const linkedCode = linker.linkCallExpression(node);
+            if (linkedCode !== undefined) {
+              source.overwrite(node.start, node.end, linkedCode);
+              markEdited(node.start, node.end);
+
+              return;
+            }
+          }
+
+          if (!advancedOptimizations) {
+            return;
+          }
+
+          // 1. Elide Angular Metadata check
+          let calleeName: string | undefined;
+          if (node.callee.type === 'Identifier') {
+            calleeName = node.callee.name;
+          } else if (
+            node.callee.type === 'MemberExpression' &&
+            node.callee.property.type === 'Identifier'
+          ) {
+            calleeName = node.callee.property.name;
+          }
+
+          if (calleeName && angularMetadataFunctions.has(stripBundlerSuffix(calleeName))) {
+            if (
+              staticBlockDepth > 0 ||
+              (parentFunc &&
+                (parentFunc.type === 'FunctionExpression' ||
+                  parentFunc.type === 'ArrowFunctionExpression'))
+            ) {
+              source.overwrite(node.start, node.end, 'void 0');
+              markEdited(node.start, node.end);
+
+              return;
+            }
+          }
+
+          // 2. Mark Top-Level Pure Functions check
+          if (!pureAnnotate || functionDepth > 0 || classDepth > 0 || topLevelSafeMode) {
+            return;
+          }
+
+          const callee = unwrapParentheses(node.callee);
+          if (
+            (callee.type === 'FunctionExpression' || callee.type === 'ArrowFunctionExpression') &&
+            node.arguments.length !== 0
+          ) {
+            return;
+          }
+
+          if (
+            callee.type === 'Identifier' &&
+            (isTslibHelperName(callee.name) || isBabelHelperName(callee.name))
+          ) {
+            return;
+          }
+
+          if (!hasPureComment(node.start)) {
+            source.appendLeft(node.start, '/*#__PURE__*/ ');
+          }
+          break;
+        }
+
+        case 'NewExpression': {
+          if (
+            !advancedOptimizations ||
+            !pureAnnotate ||
+            functionDepth > 0 ||
+            classDepth > 0 ||
+            isAlreadyEdited(node.start, node.end)
+          ) {
+            return;
+          }
+
+          if (!topLevelSafeMode) {
+            if (!hasPureComment(node.start)) {
+              source.appendLeft(node.start, '/*#__PURE__*/ ');
+            }
 
             return;
           }
-        }
 
-        // 2. Mark Top-Level Pure Functions check
-        if (!pureAnnotate || functionDepth > 0 || classDepth > 0 || topLevelSafeMode) {
-          return;
-        }
-
-        const callee = unwrapParentheses(node.callee);
-        if (
-          (callee.type === 'FunctionExpression' || callee.type === 'ArrowFunctionExpression') &&
-          node.arguments.length !== 0
-        ) {
-          return;
-        }
-
-        if (
-          callee.type === 'Identifier' &&
-          (isTslibHelperName(callee.name) || isBabelHelperName(callee.name))
-        ) {
-          return;
-        }
-
-        if (!hasPureComment(node.start)) {
-          source.appendLeft(node.start, '/*#__PURE__*/ ');
-        }
-        break;
-      }
-
-      case 'NewExpression': {
-        if (
-          !advancedOptimizations ||
-          !pureAnnotate ||
-          functionDepth > 0 ||
-          classDepth > 0 ||
-          isAlreadyEdited(node.start, node.end)
-        ) {
-          return;
-        }
-
-        if (!topLevelSafeMode) {
-          if (!hasPureComment(node.start)) {
-            source.appendLeft(node.start, '/*#__PURE__*/ ');
+          const newCallee = node.callee;
+          if (newCallee.type === 'Identifier' && sideEffectFreeConstructors.has(newCallee.name)) {
+            if (!hasPureComment(node.start)) {
+              source.appendLeft(node.start, '/*#__PURE__*/ ');
+            }
           }
-
-          return;
+          break;
         }
-
-        const newCallee = node.callee;
-        if (newCallee.type === 'Identifier' && sideEffectFreeConstructors.has(newCallee.name)) {
-          if (!hasPureComment(node.start)) {
-            source.appendLeft(node.start, '/*#__PURE__*/ ');
-          }
-        }
-        break;
       }
-    }
-  });
+    },
+  );
 
   let map: DecodedSourceMap | undefined;
   if (options.sourcemap) {

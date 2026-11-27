@@ -210,4 +210,111 @@ describe('elide-angular-metadata oxc-transform implementation', () => {
       `,
     }),
   );
+
+  it(
+    'elides ɵsetClassMetadata inside a class static block (ngtsc)',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {
+          static {
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              i0.ɵsetClassMetadata(SomeClass, [{ type: Component, args: [{ selector: 'app-lazy', template: '' }] }], null, null);
+          }
+        }
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+      `,
+    }),
+  );
+
+  it(
+    'elides parenthesized ɵsetClassMetadata inside a class static block (ngp)',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {
+          static {
+            (((typeof ngDevMode === "undefined") || ngDevMode) &&
+              i0.ɵsetClassMetadata(SomeClass, [{ type: Component, args: [{ selector: 'app-lazy', template: '' }] }], null, null));
+          }
+        }
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+      `,
+    }),
+  );
+
+  it(
+    'elides ɵsetClassMetadataAsync inside a class static block',
+    testCase({
+      input: `
+        import { Component } from '@angular/core';
+        export class SomeClass {
+          static {
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              i0.ɵsetClassMetadataAsync(
+                SomeClass,
+                () => [import("./cmp-a").then((m) => m.CmpA)],
+                (CmpA) => {
+                  i0.ɵsetClassMetadata(
+                    SomeClass,
+                    [{ type: Component, args: [{ selector: 'test-cmp', imports: [CmpA], template: '' }] }],
+                    null,
+                    null,
+                  );
+                },
+              );
+          }
+        }
+      `,
+      expected: `
+        import { Component } from '@angular/core';
+        export class SomeClass {}
+      `,
+    }),
+  );
+
+  it(
+    'elides ngDevMode-guarded internal setClassMetadata inside a class static block (@angular/core FESM)',
+    testCase({
+      input: `
+        export class PlatformRef {
+          static {
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              setClassMetadata(PlatformRef, [{ type: Injectable, args: [{ providedIn: 'platform' }] }], null, null);
+          }
+        }
+      `,
+      expected: `
+        export class PlatformRef {}
+      `,
+    }),
+  );
+
+  it(
+    'elides ɵsetClassMetadata statement inside a multi-statement static block while preserving side effects',
+    testCase({
+      input: `
+        export class SomeClass {
+          static {
+            console.log('keep');
+            (typeof ngDevMode === "undefined" || ngDevMode) &&
+              i0.ɵsetClassMetadata(SomeClass, [], null, null);
+          }
+        }
+      `,
+      expected: `
+        export class SomeClass {
+          static {
+            console.log('keep');
+          }
+        }
+      `,
+    }),
+  );
 });
