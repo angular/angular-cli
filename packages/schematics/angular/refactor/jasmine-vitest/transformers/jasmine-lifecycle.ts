@@ -223,6 +223,10 @@ function transformPromiseBasedDone(
   callExpr: ts.CallExpression,
   doneIdentifier: ts.Identifier,
 ): ts.Node | undefined {
+  if (callExpr.arguments.length !== 1) {
+    return undefined;
+  }
+
   if (
     ts.isPropertyAccessExpression(callExpr.expression) &&
     (callExpr.expression.name.text === 'then' || callExpr.expression.name.text === 'catch')

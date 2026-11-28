@@ -78,6 +78,24 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
       expected: `it('fails', async () => { throw new Error(); });`,
     },
     {
+      description: 'should preserve a rejection handler passed alongside done in then',
+      input: `
+          it('loads the data', (done) => {
+            loadData().then(done, (error) => {
+              expect(error).toBe(expectedError);
+            });
+          });
+        `,
+      expected: `
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('loads the data', (done) => {
+            loadData().then(done, (error) => {
+              expect(error).toBe(expectedError);
+            });
+          });
+        `,
+    },
+    {
       description: 'should handle promise rejections via catch',
       input: `
           it('should handle promise rejections via catch', (done) => {
