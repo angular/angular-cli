@@ -147,9 +147,7 @@ export function transformPending(
 function transformComplexDoneCallback(
   node: ts.Node,
   doneIdentifier: ts.Identifier,
-  refactorCtx: RefactorContext,
 ): ts.Node | ts.Node[] | undefined {
-  const { sourceFile, reporter } = refactorCtx;
   if (
     !ts.isExpressionStatement(node) ||
     !ts.isCallExpression(node.expression) ||
@@ -193,12 +191,6 @@ function transformComplexDoneCallback(
     return node;
   }
 
-  reporter.reportTransformation(
-    sourceFile,
-    node,
-    'Transformed promise `.then()` with `done()` to `await`.',
-  );
-
   const newThenCallback = ts.isArrowFunction(thenCallback)
     ? ts.factory.updateArrowFunction(
         thenCallback,
@@ -230,9 +222,11 @@ function transformComplexDoneCallback(
 function transformPromiseBasedDone(
   callExpr: ts.CallExpression,
   doneIdentifier: ts.Identifier,
-  refactorCtx: RefactorContext,
 ): ts.Node | undefined {
-  const { sourceFile, reporter } = refactorCtx;
+  if (callExpr.arguments.length !== 1) {
+    return undefined;
+  }
+
   if (
     ts.isPropertyAccessExpression(callExpr.expression) &&
     (callExpr.expression.name.text === 'then' || callExpr.expression.name.text === 'catch')
@@ -277,12 +271,6 @@ function transformPromiseBasedDone(
       }
 
       if (isDoneHandler) {
-        reporter.reportTransformation(
-          sourceFile,
-          callExpr,
-          'Transformed promise `.then(done)` to `await`.',
-        );
-
         return ts.factory.createExpressionStatement(
           ts.factory.createAwaitExpression(callExpr.expression.expression),
         );
@@ -342,14 +330,20 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
 
   // Count total usages of 'done' in the body
   const totalUsages = countDoneUsages(functionArg.body, doneIdentifier);
-  let handledUsages = 0;
-  let doneWasUsed = false;
+  const handledUsages: { node: ts.Node; message?: string }[] = [];
 
   const bodyVisitor = (bodyNode: ts.Node): ts.Node | ts.Node[] | undefined => {
-    const complexTransformed = transformComplexDoneCallback(bodyNode, doneIdentifier, refactorCtx);
+    // Leave nested callbacks for manual migration unless their enclosing promise is awaited.
+    if (ts.isFunctionLike(bodyNode)) {
+      return bodyNode;
+    }
+
+    const complexTransformed = transformComplexDoneCallback(bodyNode, doneIdentifier);
     if (complexTransformed !== bodyNode) {
-      doneWasUsed = true;
-      handledUsages++; // complex transform handles one usage
+      handledUsages.push({
+        node: bodyNode,
+        message: 'Transformed promise `.then()` with `done()` to `await`.',
+      });
 
       return complexTransformed;
     }
@@ -364,13 +358,10 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
         callExpr.expression.expression.text === doneIdentifier.text &&
         callExpr.expression.name.text === 'fail'
       ) {
-        doneWasUsed = true;
-        handledUsages++;
-        reporter.reportTransformation(
-          sourceFile,
-          bodyNode,
-          'Transformed `done.fail()` to `throw new Error()`.',
-        );
+        handledUsages.push({
+          node: bodyNode,
+          message: 'Transformed `done.fail()` to `throw new Error()`.',
+        });
         const errorArgs = callExpr.arguments.length > 0 ? [callExpr.arguments[0]] : [];
 
         return ts.factory.createThrowStatement(
@@ -383,10 +374,12 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
       }
 
       // Transform `promise.then(done)` or `promise.catch(done.fail)` to `await promise`
-      const promiseTransformed = transformPromiseBasedDone(callExpr, doneIdentifier, refactorCtx);
+      const promiseTransformed = transformPromiseBasedDone(callExpr, doneIdentifier);
       if (promiseTransformed) {
-        doneWasUsed = true;
-        handledUsages++;
+        handledUsages.push({
+          node: callExpr,
+          message: 'Transformed promise `.then(done)` to `await`.',
+        });
 
         return promiseTransformed;
       }
@@ -396,8 +389,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
         ts.isIdentifier(callExpr.expression) &&
         callExpr.expression.text === doneIdentifier.text
       ) {
-        doneWasUsed = true;
-        handledUsages++;
+        handledUsages.push({ node: callExpr });
 
         return ts.setTextRange(ts.factory.createEmptyStatement(), callExpr.expression);
       }
@@ -422,7 +414,7 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
   });
 
   // Safety check: if we found usages but didn't handle all of them, abort.
-  if (handledUsages < totalUsages) {
+  if (handledUsages.length < totalUsages) {
     reporter.reportTransformation(
       sourceFile,
       node,
@@ -435,8 +427,14 @@ export function transformDoneCallback(node: ts.Node, refactorCtx: RefactorContex
     return node;
   }
 
-  if (!doneWasUsed) {
+  if (!handledUsages.length) {
     return node;
+  }
+
+  for (const usage of handledUsages) {
+    if (usage.message) {
+      reporter.reportTransformation(sourceFile, usage.node, usage.message);
+    }
   }
 
   reporter.reportTransformation(

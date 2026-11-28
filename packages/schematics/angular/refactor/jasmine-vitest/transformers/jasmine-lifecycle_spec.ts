@@ -11,7 +11,7 @@ import { expectTransformation } from '../test-helpers';
 describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
   const testCases = [
     {
-      description: 'should transform an `it` block with a done callback to an async function',
+      description: 'should flag a done callback inside a timer for manual migration',
       input: `
           it('should do something async', (done) => {
             setTimeout(() => {
@@ -21,9 +21,11 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
           });
         `,
       expected: `
-          it('should do something async', async () => {
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('should do something async', (done) => {
             setTimeout(() => {
               expect(true).toBe(true);
+              done();
             }, 100);
           });
         `,
@@ -76,6 +78,24 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
       expected: `it('fails', async () => { throw new Error(); });`,
     },
     {
+      description: 'should preserve a rejection handler passed alongside done in then',
+      input: `
+          it('loads the data', (done) => {
+            loadData().then(done, (error) => {
+              expect(error).toBe(expectedError);
+            });
+          });
+        `,
+      expected: `
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('loads the data', (done) => {
+            loadData().then(done, (error) => {
+              expect(error).toBe(expectedError);
+            });
+          });
+        `,
+    },
+    {
       description: 'should handle promise rejections via catch',
       input: `
           it('should handle promise rejections via catch', (done) => {
@@ -89,7 +109,7 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
         `,
     },
     {
-      description: 'should work with a custom done name',
+      description: 'should flag a nested callback with a custom done name',
       input: `
           it('should work with a custom done name', (finish) => {
             setTimeout(() => {
@@ -98,9 +118,27 @@ describe('Jasmine to Vitest Transformer - transformDoneCallback', () => {
           });
         `,
       expected: `
-          it('should work with a custom done name', async () => {
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          it('should work with a custom done name', (finish) => {
             setTimeout(() => {
+              finish();
             }, 100);
+          });
+        `,
+    },
+    {
+      description: 'should keep the done parameter when a nested done.fail cannot be migrated',
+      input: `
+          beforeEach((done) => {
+            service.onError(function (error) { done.fail(error); });
+            service.init().then(done);
+          });
+        `,
+      expected: `
+          // TODO: vitest-migration: The 'done' callback was used in an unhandled way. Please migrate manually.
+          beforeEach((done) => {
+            service.onError(function (error) { done.fail(error); });
+            service.init().then(done);
           });
         `,
     },
